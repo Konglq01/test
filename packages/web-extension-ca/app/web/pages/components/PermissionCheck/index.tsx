@@ -50,8 +50,8 @@ export default function PermissionCheck({
 
   const getPassword = useCallback(async () => {
     try {
-      if (isRegisterPage) return InternalMessage.payload(PortkeyMessageTypes.REGISTER_WALLET, {}).send();
       if (noCheckPage) return;
+      if (isRegisterPage) return InternalMessage.payload(PortkeyMessageTypes.REGISTER_WALLET, {}).send();
       InternalMessage.payload(PortkeyMessageTypes.CHECK_WALLET_STATUS)
         .send()
         .then((res) => {
