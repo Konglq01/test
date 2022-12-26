@@ -1,0 +1,88 @@
+@import '../../../assets/theme/color.less';
+.create-wallet-form {
+  .@{app-prefix}-form-item-label {
+    &.@{app-prefix}-col {
+      padding-bottom: 4px;
+    }
+
+    & > label.@{app-prefix}-form-item-required {
+      color: @font-11;
+      line-height: 22px;
+      font-size: 16px;
+    }
+  }
+
+  .@{app-prefix}-form-item.checkbox {
+    margin-bottom: 40px;
+  }
+
+  .agree-box {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    .check-box {
+      display: flex;
+      align-items: center;
+      font-size: 18px;
+      color: @font-13;
+
+      .@{app-prefix}-checkbox {
+        top: 0;
+        margin-right: 8px;
+
+        .@{app-prefix}-checkbox-input,
+        .@{app-prefix}-checkbox-inner {
+          width: 32px;
+          height: 32px;
+        }
+
+        .@{app-prefix}-checkbox-inner {
+          background-color: @bg-11;
+          &::after {
+            left: 24.5%;
+            top: 44%;
+            width: 10px;
+            height: 18px;
+            border-color: @border-3;
+          }
+        }
+      }
+    }
+  }
+
+  .agree-link {
+    line-height: 22px;
+    color: @font-9;
+    font-size: 18px;
+    cursor: pointer;
+  }
+
+  .@{app-prefix}-form-item-control-input {
+    width: 350px;
+  }
+
+  .@{app-prefix}-form-item-control-input-content {
+    .@{app-prefix}-btn {
+      width: 168px;
+      height: 44px;
+      border-radius: 22px;
+      line-height: 22px;
+      font-size: 16px;
+    }
+  }
+}
+
+.terms-of-service-modal {
+  max-width: 100%;
+  overflow: scroll;
+  height: 100%;
+  pointer-events: auto;
+
+  .@{app-prefix}-modal-header {
+    display: none;
+  }
+  .@{app-prefix}-modal-body {
+    padding: 0;
+  }
+}

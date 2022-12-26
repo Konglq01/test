@@ -1,0 +1,40 @@
+@import '../../../assets/theme/color.less';
+
+.reset-modal {
+  .@{app-prefix}-modal-header {
+    padding: 24px;
+    padding-bottom: 0;
+
+    .@{app-prefix}-modal-title {
+      padding: 0;
+      font-weight: 500;
+      .@{app-prefix}-col {
+        word-break: keep-all;
+      }
+    }
+  }
+
+  .@{app-prefix}-modal-body {
+    padding: 0;
+
+    .reset-modal-footer {
+      border-top: 1px solid @border-2;
+      padding: 15px 16px 17px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  }
+
+  .reset-modal-content {
+    color: @font-13;
+    padding: 16px 24px 24px;
+  }
+
+  .@{app-prefix}-btn {
+    width: 136px;
+    height: 48px;
+    border-radius: 24px;
+    font-size: 16px;
+  }
+}

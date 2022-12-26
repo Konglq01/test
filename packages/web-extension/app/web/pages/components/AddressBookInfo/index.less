@@ -1,0 +1,168 @@
+@import '../../../assets/theme/color.less';
+
+.@{app-prefix}-form.address-book-info-form {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .form-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .@{app-prefix}-form-item {
+    margin-bottom: 24px;
+  }
+  .@{app-prefix}-form-item-label {
+    padding-bottom: 8px;
+    line-height: 0;
+
+    & > label {
+      line-height: 0;
+      height: 20px;
+      font-size: 14px;
+    }
+  }
+  .@{app-prefix}-form-item-control-input-content {
+    & > input {
+      font-size: 14px;
+      padding: 12px 16px;
+      color: @font-11;
+
+      &::placeholder {
+        font-size: 14px;
+        color: @font-12;
+      }
+    }
+  }
+  .@{app-prefix}-input-group-wrapper {
+    height: 48px;
+  }
+
+  .@{app-prefix}-input-affix-wrapper {
+    padding: 12px 15px;
+    line-height: 22px;
+    font-size: 16px;
+    color: @font-2;
+
+    & > input {
+      font-size: 14px;
+      color: @font-11;
+
+      &::placeholder {
+        font-size: 14px;
+        color: @font-12;
+      }
+    }
+  }
+
+  .@{app-prefix}-input-group-addon {
+    border-radius: 4px;
+    border-color: @border-1;
+    color: @font-13;
+    background-color: @bg-13;
+  }
+
+  .@{app-prefix}-input-group-addon:first-child {
+    border-radius: 4px 0 0 4px;
+    padding: 12px 17px 12px 15px;
+  }
+
+  .@{app-prefix}-input-group-addon:last-child {
+    padding: 12px;
+    padding-left: 11px;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .address-tips {
+    margin-top: 8px;
+    padding: 16px 9px;
+    font-size: 12px;
+    color: @font-10;
+    border-radius: 6px;
+    background-color: @bg-9;
+    line-height: 15px;
+    border: 1px solid @border-3;
+    display: flex;
+    align-items: flex-start;
+
+    .anticon-info-circle {
+      width: 18px;
+      height: 18px;
+      font-size: 18px;
+      margin-right: 12px;
+      color: @font-9;
+    }
+  }
+  .action-wrapper {
+    margin: 0 -24px;
+    border-top: 1px solid @border-2;
+    padding: 16px;
+
+    &.edit {
+      display: flex;
+
+      .@{app-prefix}-btn {
+        width: 156px;
+        border-radius: 24px;
+
+        &.@{app-prefix}-btn-dangerous {
+          margin-right: 16px;
+          border: 1px solid @border-7;
+        }
+      }
+    }
+  }
+
+  .@{app-prefix}-btn-primary {
+    border: none;
+    border-radius: 22px;
+    line-height: 47px;
+  }
+}
+
+.delete-modal {
+  .@{app-prefix}-modal-mask {
+    background-color: @bg-12;
+  }
+  .@{app-prefix}-modal-body {
+    padding: 0;
+  }
+  .@{app-prefix}-modal-confirm-body {
+    padding: 24px 24px 32px;
+  }
+  .@{app-prefix}-modal-content {
+    border-radius: 8px;
+  }
+  .@{app-prefix}-modal-confirm-content {
+    text-align: center;
+    height: 22px;
+    line-height: 22px;
+    margin-top: 0;
+    font-size: 18px;
+    color: @font-10;
+    font-weight: 700;
+  }
+
+  .@{app-prefix}-modal-confirm-btns {
+    display: flex;
+    align-items: center;
+    border-top: 1px solid @border-2;
+    padding: 15px 16px 16px;
+    justify-content: space-between;
+    margin-top: 0;
+
+    .@{app-prefix}-btn {
+      border-radius: 24px;
+      padding: 12px 0;
+      text-align: center;
+      width: 136px;
+
+      & > span {
+        font-size: 16px;
+        height: 22px;
+        line-height: 22px;
+      }
+    }
+  }
+}

@@ -1,0 +1,90 @@
+@import '../../../assets/theme/color.less';
+.prompt-networks {
+  padding-right: 16px;
+  .prompt-setting-column-content {
+    overflow: hidden;
+    height: auto;
+  }
+  .header {
+    display: flex;
+    align-items: center;
+    padding: 13px 0;
+    border-bottom: 1px solid @border-2;
+    .title {
+      flex: 1;
+      line-height: 22px;
+      font-size: 18px;
+      color: @font-11;
+    }
+    button {
+      border-radius: 100px;
+      width: 120px;
+      height: 44px;
+      padding: 0 20px;
+    }
+  }
+  .prompt-setting-column-box-left {
+    padding: 16px 0 0 16px;
+    overflow-y: auto;
+  }
+  .@{app-prefix}-tabs-top > .@{app-prefix}-tabs-nav::before {
+    border-bottom: 1px solid transparent;
+  }
+  .prompt-setting-column-box-right {
+    overflow-y: auto;
+  }
+  .dropdown-search-wrapper {
+    background-color: white;
+    padding: 0 0 4px;
+  }
+  .network-list {
+    overflow-y: scroll;
+    height: auto;
+    .@{app-prefix}-tabs {
+      .@{app-prefix}-tabs-nav {
+        .@{app-prefix}-tabs-nav-list {
+          justify-content: flex-start;
+          gap: 24px;
+          padding: 0;
+        }
+      }
+    }
+    .chain-list {
+      .@{app-prefix}-list-items {
+        .@{app-prefix}-list-item.network-unit {
+          padding: 12px 0 !important;
+        }
+      }
+    }
+  }
+  .empty-list {
+    padding-top: 94px !important;
+    padding-right: 18px;
+  }
+  .edit-network-wrapper {
+    .edit-content {
+      padding: 24px 16px;
+      .@{app-prefix}-row {
+        gap: 8px;
+      }
+    }
+  }
+  &.with-right {
+    .prompt-setting-column-box-left {
+      padding: 16px 16px 0;
+      .network-list {
+        overflow-y: scroll;
+        height: auto;
+        .@{app-prefix}-tabs {
+          .@{app-prefix}-tabs-nav {
+            .@{app-prefix}-tabs-nav-list {
+              justify-content: space-between;
+              gap: 24px;
+              padding: 0;
+            }
+          }
+        }
+      }
+    }
+  }
+}

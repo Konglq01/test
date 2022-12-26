@@ -1,0 +1,111 @@
+@import '../../assets/theme/constants.less';
+.register-start-content {
+  width: @page-width1;
+  margin: auto;
+  padding-top: 74px;
+  .text-content {
+    padding-top: 66px;
+    .portkey-icon {
+      width: 85.24px;
+      height: 88px;
+    }
+    h1 {
+      padding-top: 24px;
+      font-size: 32px;
+      line-height: 38px;
+      color: @font-13;
+      font-weight: 600;
+    }
+  }
+
+  .login-primary-btn {
+    border-radius: 28px;
+    line-height: 48px;
+    font-size: 18px;
+    margin-bottom: 24px;
+  }
+  .network-list-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 32px;
+    .portkey-select-item-option-disabled {
+      .label-item .title {
+        color: @font-12;
+      }
+    }
+    .network-list-select {
+      & > .portkey-select-selector {
+        border: none;
+        &::after {
+          visibility: hidden;
+        }
+        .portkey-select-selection-item {
+          justify-content: center;
+          .label-item {
+            .title {
+              display: flex;
+              align-items: center;
+              line-height: 20px;
+              font-size: 14px;
+              color: @primary-color;
+              &::after {
+                content: '';
+                margin-left: 6px;
+                display: block;
+                width: 16px;
+                height: 16px;
+                background: url('../../assets/svgIcon/Down-primary.svg') no-repeat center;
+                color: @primary-color;
+              }
+            }
+          }
+        }
+        .label-icon {
+          display: none;
+        }
+      }
+      &.portkey-select-focused .portkey-select-selector {
+        border: none !important;
+        box-shadow: none !important;
+      }
+    }
+  }
+}
+
+.login-card {
+  width: 406px;
+  padding: 0 20px 24px;
+  border-radius: 6px;
+  background-color: @bg-11;
+  box-shadow: @box-shadow5;
+  position: relative;
+  /* stylelint-disable-next-line no-descending-specificity */
+  .title {
+    text-align: center;
+    padding: 28px 0 32px;
+    line-height: 28px;
+    color: @font-11;
+    font-size: 24px;
+    font-weight: 500;
+  }
+  .qrcode-icon,
+  .pc-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    top: 4px;
+    right: 4px;
+    cursor: pointer;
+    position: absolute;
+  }
+
+  .sign-btn {
+    border-radius: 24px;
+    line-height: 48px;
+    font-size: 16px;
+    color: @font-9;
+    background-color: @bg-9;
+    border: none;
+  }
+}

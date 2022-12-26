@@ -1,0 +1,81 @@
+@import '../../../../assets/theme/color.less';
+
+.import-mnemonic-wrapper {
+  & > h1 {
+    padding: 16px 0 0;
+    color: @font-11;
+    font-size: 40px;
+  }
+  & > p {
+    line-height: 22px;
+    color: @font-11;
+    font-size: 16px;
+    padding: 24px 0;
+  }
+  .mnemonic-input-content {
+    position: relative;
+  }
+  .secret-wrapper {
+    position: relative;
+    display: block;
+    min-height: 160px;
+    border-radius: 6px;
+    padding: 35px 64px 43px;
+    border: 1px solid @border-2;
+  }
+  .show-icon {
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+  }
+  .@{app-prefix}-input,
+  textarea.@{app-prefix}-input {
+    height: 120px;
+    resize: none;
+    text-align: center;
+    line-height: 40px;
+    font-size: 24px;
+    color: @font-11;
+
+    &::placeholder {
+      color: @font-12;
+      text-align: center;
+      font-size: 16px;
+    }
+  }
+
+  .@{app-prefix}-btn {
+    margin-top: 32px;
+    width: 168px;
+    height: 44px;
+    line-height: 44px;
+    border-radius: 22px;
+    font-size: 16px;
+  }
+  .error-tip {
+    margin: 16px 0 0;
+    font-size: 12px;
+    color: @font-7;
+    border-radius: 6px;
+    background-color: @bg-6;
+    border: 1px solid @border-7;
+    padding: 15px 9px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    .anticon-info-circle {
+      font-size: 17px;
+    }
+
+    .msg {
+      flex: 1;
+      display: block;
+      margin-top: 2px;
+      margin-left: 9px;
+      color: @font-11;
+    }
+  }
+}

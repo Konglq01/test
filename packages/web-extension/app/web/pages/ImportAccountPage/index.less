@@ -1,0 +1,48 @@
+@import '../../assets/theme/color.less';
+.import-account-page {
+  padding: 24px 0 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .account-body-header {
+    padding-right: 24px;
+  }
+  .basic-import {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .account-body-content {
+    flex: 1;
+    .account-content-title,
+    .account-content-description {
+      padding-left: 24px;
+      padding-right: 24px;
+    }
+    .account-content-main {
+      margin: auto;
+      flex: 1;
+    }
+  }
+
+  .import-account-footer {
+    padding: 16px;
+    padding-top: 15px;
+    border-top: 1px solid @border-2;
+
+    & > button {
+      border-radius: 22px;
+      padding: 13px 16px 12px;
+      border: none;
+      display: block;
+
+      & > span {
+        font-size: 16px;
+        height: 22px;
+        line-height: 22px;
+      }
+    }
+  }
+}

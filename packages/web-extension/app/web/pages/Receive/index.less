@@ -1,0 +1,94 @@
+@import '../../assets/theme/color.less';
+
+.receive-wrapper {
+  background-color: #fff;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .@{app-prefix}-row {
+    padding: 24px;
+  }
+
+  .receive-content {
+    flex: 1;
+    width: 230px;
+    margin: 0 auto;
+    padding-top: 64px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .single-account {
+      padding: 9px 0;
+      text-align: center;
+      .name {
+        font-size: 18px;
+        height: 22px;
+        line-height: 22px;
+        color: @font-11;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 238px;
+      }
+    }
+    .more-account {
+      display: flex;
+      border: 1px solid @border-1;
+      align-items: center;
+      padding: 8px 16px;
+      border-radius: 4px;
+      max-width: 238px;
+      justify-content: flex-end;
+      gap: 11px;
+      overflow: hidden;
+      .name {
+        overflow: visible;
+        max-width: none;
+      }
+
+      .custom-svg {
+        margin-top: 3px;
+        min-width: 13px;
+      }
+    }
+
+    .receive-tip {
+      font-size: 14px;
+      color: @font-13;
+      height: 20px;
+      line-height: 20px;
+      text-align: center;
+      margin: 8px auto 40px;
+    }
+
+    .receive-address {
+      margin-top: 16px;
+      background-color: @bg-13;
+      border-radius: 6px;
+      padding: 10px;
+      position: relative;
+
+      .address {
+        font-size: 12px;
+        text-align: center;
+        word-break: break-all;
+        color: @font-11;
+        line-height: 16px;
+      }
+
+      .copy-icon {
+        position: absolute;
+        top: 50%;
+        right: -38px;
+        transform: translateY(-50%);
+
+        .custom-svg {
+          width: 14px;
+          height: 14px;
+        }
+      }
+    }
+  }
+}

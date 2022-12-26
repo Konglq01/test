@@ -1,0 +1,115 @@
+@import '../../../../assets/theme/color.less';
+
+.mnemonic-wrapper {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+
+  .backup-content-left {
+    width: 400px;
+    margin-right: 80px;
+
+    & > h1 {
+      font-size: 40px;
+      color: @font-11;
+      height: 94px;
+    }
+
+    .description {
+      font-size: 16px;
+      color: @font-11;
+      padding: 24px 0 32px;
+      line-height: 22px;
+    }
+
+    .mnemonic-container {
+      padding: 21px;
+      line-height: 22px;
+      font-size: 18px;
+      border-radius: 6px;
+      text-align: center;
+      color: @font-11;
+      background-color: @bg-11;
+      border: 1px solid @border-1;
+      margin-bottom: 12px;
+    }
+    .action-wrapper {
+      font-size: 14px;
+      .copy-wrapper {
+        padding-right: 16px;
+        border-right: 1px solid @border-2;
+      }
+      .download-wrapper {
+        padding-left: 17px;
+      }
+      .copy-wrapper,
+      .download-wrapper {
+        cursor: pointer;
+        line-height: 22px;
+        color: @font-9;
+        .icon {
+          width: 16px;
+          height: 16px;
+          margin-right: 8px;
+        }
+      }
+    }
+    .agree-check {
+      padding: 32px 0;
+      line-height: 22px;
+      font-size: 16px;
+      color: @font-2;
+      display: flex;
+      align-items: center;
+
+      .@{app-prefix}-checkbox + span {
+        padding-left: 8px;
+        color: @font-13;
+        font-size: 18px;
+      }
+
+      .@{app-prefix}-checkbox {
+        top: 0;
+        margin-right: 8px;
+
+        .@{app-prefix}-checkbox-input,
+        .@{app-prefix}-checkbox-inner {
+          width: 32px;
+          height: 32px;
+        }
+
+        .@{app-prefix}-checkbox-inner {
+          background-color: @bg-11;
+          &::after {
+            left: 24.5%;
+            top: 44%;
+            width: 10px;
+            height: 18px;
+            border-color: @border-3;
+          }
+        }
+      }
+    }
+    .submit-btn {
+      width: 168px;
+      height: 44px;
+      line-height: 44px;
+      border-radius: 22px;
+      font-size: 16px;
+    }
+  }
+
+  .backup-content-right {
+    font-size: 16px;
+
+    .tips-content {
+      width: 260px;
+      color: @font-11;
+
+      .tips-content-title {
+        margin-bottom: 8px;
+        line-height: 22px;
+      }
+    }
+  }
+}

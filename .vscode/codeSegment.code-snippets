@@ -1,0 +1,30 @@
+{
+  "rnfc gStyles": {
+    "prefix": "rnfc gStyles",
+    "body": [
+      "import React from 'react';",
+      "import { View } from 'react-native';",
+      "import { useGStyles } from 'assets/theme/useGStyles';",
+      "",
+      "export default function $1() {",
+      "  const gStyles = useGStyles();",
+      "  return <View style={gStyles.container}></View>;",
+      "}",
+      ""
+    ],
+    "description": "less prefix"
+  },
+  "rnfc PageContainer": {
+    "prefix": "rnfc PageContainer",
+    "body": [
+      "import React from 'react';",
+      "import PageContainer from 'components/PageContainer';",
+      "",
+      "export default function $1() {",
+      "  return <PageContainer></PageContainer>;",
+      "}",
+      ""
+    ],
+    "description": "less prefix"
+  }
+}

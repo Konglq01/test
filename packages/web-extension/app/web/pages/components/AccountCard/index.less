@@ -1,0 +1,190 @@
+@import '../../../assets/theme/color.less';
+
+.account-information {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 20px;
+
+  .account-name {
+    margin: 0 auto;
+    padding: 9px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .name {
+      font-size: 18px;
+      height: 22px;
+      line-height: 22px;
+      color: @font-11;
+      margin-right: 4px;
+      white-space: nowrap;
+      max-width: 238px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    &.edit {
+      padding: 0;
+      position: relative;
+
+      .custom-svg {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        right: -27px;
+      }
+    }
+
+    .edit-ipt {
+      width: 238px;
+      margin: 0 auto;
+      padding: 8px 0;
+      text-align: center;
+    }
+  }
+
+  .qrc {
+    margin: 16px auto;
+  }
+
+  .address-wrapper {
+    position: relative;
+    .address {
+      width: 230px;
+      border-radius: 6px;
+      background-color: @bg-13;
+      padding: 10px;
+      word-break: break-all;
+      font-size: 12px;
+      line-height: 16px;
+      text-align: center;
+      color: @font-11;
+    }
+
+    .copy {
+      width: 14px;
+      height: 14px;
+      position: absolute;
+      right: -39px;
+      top: 50%;
+      transform: translateY(-50%);
+
+      .custom-svg {
+        width: 14px;
+        height: 14px;
+      }
+    }
+  }
+}
+
+.account-actions-wrapper {
+  margin: 0 -24px;
+  border-top: 1px solid @border-2;
+
+  .account-actions {
+    padding: 24px 24px 0;
+
+    .btn-base {
+      display: block;
+      border-radius: 24px;
+      margin-bottom: 16px;
+      border: 1px solid @border-3;
+      padding: 13px 0 !important;
+      text-align: center;
+      font-size: 14px;
+      color: @font-9;
+      font-weight: 500;
+      line-height: unset;
+
+      &.remove {
+        border: none;
+        color: @font-14;
+        padding-top: 8px !important;
+      }
+    }
+  }
+}
+
+.edit-status {
+  .@{app-prefix}-modal-content {
+    display: flex;
+    flex-direction: column;
+
+    .@{app-prefix}-modal-close {
+      top: 27px;
+      right: 3px;
+    }
+
+    & > div.@{app-prefix}-modal-header {
+      padding: 42px 24px 26px;
+      margin-bottom: 0;
+      background-color: @bg-13;
+
+      .@{app-prefix}-modal-title {
+        padding: 0;
+
+        .account-edit-header {
+          display: flex;
+          justify-content: flex-start;
+          align-items: center;
+
+          .custom-svg {
+            margin-right: 12px;
+          }
+
+          .back {
+            font-size: 24px;
+            color: @font-11;
+            height: 28px;
+            line-height: 28px;
+          }
+        }
+      }
+    }
+
+    .@{app-prefix}-modal-body {
+      flex: 1;
+    }
+  }
+}
+
+.remove-account-modal {
+  font-size: inherit;
+  .@{app-prefix}-modal-content {
+    .@{app-prefix}-modal-header {
+      padding: 0;
+      .@{app-prefix}-modal-title {
+        padding: 0;
+        line-height: unset;
+        .remove-account-title {
+          padding: 11px 16px 10px;
+          padding-left: 0;
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+          border-bottom: 1px solid @border-2;
+
+          .txt {
+            height: 22px;
+            line-height: 22px;
+            font-size: 16px;
+            color: @font-11;
+            margin-right: 60px;
+          }
+
+          .custom-svg {
+            & > svg {
+              display: block;
+            }
+          }
+        }
+      }
+    }
+
+    .@{app-prefix}-modal-body {
+      padding: 0;
+    }
+  }
+}

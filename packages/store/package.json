@@ -1,0 +1,19 @@
+{
+  "name": "@portkey/store",
+  "publishConfig": {
+    "access": "public"
+  },
+  "version": "0.0.1",
+  "type": "commonjs",
+  "scripts": {
+    "prebuild": "rm -rf dist",
+    "build": "tsc",
+    "start": "tsc --watch"
+  },
+  "dependencies": {
+    "@portkey/types": "^0.0.1",
+    "@portkey/utils": "^0.0.1",
+    "@portkey/api": "^0.0.1",
+    "aelf-sdk": "^3.2.40"
+  }
+}

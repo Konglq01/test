@@ -1,0 +1,54 @@
+@import '../../assets/theme/color.less';
+
+.switch-chain-wrapper {
+  padding: 32px 0;
+  .tips-wrap {
+    margin: 0 auto 32px;
+  }
+  .switch-wrap {
+    width: 280px;
+    margin: 0 auto;
+    display: flex;
+
+    .chain {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      width: 80px;
+      .custom-svg,
+      svg {
+        width: 56px;
+        height: 56px;
+      }
+      p {
+        text-align: center;
+        line-height: 20px;
+      }
+    }
+    .link {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 56px;
+      position: relative;
+      .custom-svg,
+      svg {
+        width: 32px;
+        height: 32px;
+        z-index: 10;
+      }
+      .line {
+        position: absolute;
+        top: 50%;
+        width: 144px;
+        height: 0;
+        border-bottom: 1px dashed @border-2;
+      }
+    }
+  }
+  .btn-wrap {
+    margin: 32px auto;
+  }
+}

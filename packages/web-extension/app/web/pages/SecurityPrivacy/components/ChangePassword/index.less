@@ -1,0 +1,71 @@
+@import '../../../../assets/theme/color.less';
+
+.change-password {
+  width: 100%;
+  height: 100%;
+
+  .@{app-prefix}-form {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .@{app-prefix}-form-item-label
+      > label.@{app-prefix}-form-item-required:not(.@{app-prefix}-form-item-required-mark-optional)::before {
+      display: none;
+    }
+
+    .@{app-prefix}-form-item-label {
+      padding-bottom: 8px;
+      line-height: 20px;
+      flex: 0 0 100%;
+      max-width: 100%;
+      white-space: initial;
+      text-align: left;
+
+      label {
+        height: 20px;
+        line-height: 20px;
+        font-size: 14px;
+        color: @font-11;
+      }
+    }
+    .@{app-prefix}-form-item-control {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+
+    .form-content {
+      padding: 24px;
+
+      .confirm-password {
+        .@{app-prefix}-form-item-control :nth-child(2) :nth-child(2) {
+          height: 16px !important;
+        }
+      }
+    }
+
+    .next-btn {
+      border-top: 1px solid @border-2;
+      padding: 15px 16px 16px;
+
+      .@{app-prefix}-form-item {
+        margin-bottom: 0;
+      }
+
+      .@{app-prefix}-btn {
+        border: none;
+        border-radius: 22px;
+      }
+    }
+  }
+}
+
+.prompt-body {
+  .change-password {
+    .form-content {
+      padding: 24px 16px !important;
+    }
+  }
+}

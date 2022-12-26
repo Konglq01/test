@@ -1,0 +1,113 @@
+@import '../../assets/theme/color.less';
+
+.address-book-wrapper {
+  .setting-header-wrapper {
+    border: none;
+    height: unset;
+    padding-top: 24px;
+    background-color: @bg-13;
+
+    .title-center {
+      text-align: left;
+    }
+
+    .header-title {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+
+      .@{app-prefix}-btn {
+        width: 120px;
+        height: 44px;
+        border-radius: 24px;
+        margin-left: 16px;
+      }
+    }
+  }
+
+  .empty-list {
+    .setting-header-wrapper {
+      padding-top: 34px;
+    }
+  }
+
+  .address-booklists {
+    position: relative;
+    overflow: scroll;
+
+    .empty {
+      height: 100%;
+      padding-top: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .add-button {
+      margin-top: 24px;
+      width: fit-content;
+      background-color: transparent;
+      color: @font-9;
+      border: none;
+      box-shadow: none;
+      text-shadow: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      line-height: 20px;
+      .plus-icon {
+        margin-right: 8px;
+        & > svg {
+          display: block;
+        }
+      }
+    }
+
+    .address-booklists-content {
+      .contact-unit {
+        .contact-unit-letter {
+          font-size: 12px;
+          padding-left: 24px;
+          height: 32px;
+          line-height: 32px;
+          background-color: @bg-13;
+          border-bottom: 1px solid @border-2;
+          margin-bottom: 1px;
+        }
+
+        .contact-unit-item {
+          padding: 11px 24px;
+          border-bottom: 1px solid @border-2;
+          margin-bottom: 1px;
+          & > div {
+            &:nth-of-type(1) {
+              font-size: 14px;
+              color: @font-11;
+              margin-bottom: 2px;
+              line-height: 20px;
+            }
+
+            &:nth-of-type(2) {
+              font-size: 12px;
+              color: @font-12;
+              word-break: break-all;
+              line-height: 16px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.empty-dropdown {
+  .empty-tip {
+    background-color: @bg-11;
+    font-size: 14px;
+    color: @font-11;
+    padding: 17px 16px;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px 0 #eee;
+    margin-top: -3px;
+  }
+}

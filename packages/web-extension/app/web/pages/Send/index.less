@@ -1,0 +1,291 @@
+@import '../../assets/theme/color.less';
+.page-send {
+  padding-top: 16px;
+  background-color: @bg-13;
+  .page-title {
+    padding: 26px 24px;
+    align-items: center;
+    .title-left-col {
+      .custom-svg {
+        width: 24px;
+        height: 24px;
+        svg {
+          width: 24px;
+          height: 24px;
+        }
+      }
+    }
+    .title-center {
+      flex: 1;
+      padding: 0 12px;
+      color: @font-11;
+      line-height: 28px;
+      font-size: 24px;
+    }
+    .title-right-col {
+      .custom-svg {
+        width: 18px;
+        height: 18px;
+        svg {
+          width: 18px;
+          height: 18px;
+        }
+      }
+    }
+  }
+  .send-form {
+    .item {
+      display: flex;
+      padding: 0;
+      flex-flow: nowrap;
+      flex-direction: row;
+      align-items: center;
+      gap: 16px;
+      .label {
+        padding: 0;
+        width: 62px;
+        line-height: 22px;
+        max-height: 22px;
+        font-size: 16px;
+        color: @font-13;
+      }
+      .control {
+        width: 250px;
+        background-color: white;
+      }
+      .from-selector {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        line-height: 22px;
+        padding: 16px 15px;
+        border-radius: 6px;
+        border: 1px solid @border-1;
+        .name {
+          font-size: 16px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          color: @font-13;
+        }
+        .custom-svg {
+          display: flex;
+          margin-left: 16px;
+        }
+      }
+      .asset-selector {
+        display: flex;
+        align-items: center;
+        padding: 7px 15px;
+        border-radius: 6px;
+        border: 1px solid @border-1;
+        .icon {
+          margin-right: 8px;
+          .custom-svg,
+          .custom {
+            width: 36px;
+            height: 36px;
+            svg {
+              width: 36px;
+              height: 36px;
+            }
+          }
+          .custom {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid @border-1;
+            border-radius: 50%;
+          }
+        }
+        .center {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+          .symbol {
+            line-height: 22px;
+            font-size: 16px;
+            color: @font-13;
+          }
+          .amount {
+            line-height: 16px;
+            font-size: 12px;
+            color: @font-13;
+          }
+        }
+        .down-icon {
+          margin-right: 2px;
+        }
+      }
+      .@{app-prefix}-input-affix-wrapper {
+        height: 56px;
+        border-radius: 6px;
+        border: 1px solid @border-1;
+        padding: 16px 15px;
+        input {
+          color: @font-13;
+          &::placeholder {
+            color: @font-12;
+          }
+        }
+        .custom-svg {
+          width: 18px;
+          height: 18px;
+          svg {
+            width: 18px;
+          }
+        }
+      }
+      .to-account {
+        position: relative;
+        .@{app-prefix}-input-affix-wrapper {
+          input {
+            text-overflow: ellipsis;
+          }
+        }
+        .@{app-prefix}-input-affix-wrapper.with-name {
+          input {
+            transform: translateY(10px);
+            font-size: 12px;
+            line-height: 16px;
+            color: @font-13;
+          }
+        }
+        .@{app-prefix}-input-affix-wrapper-focused.with-name {
+          input {
+            transform: translateY(0);
+            line-height: 22px;
+            font-size: 16px;
+            color: @font-13;
+          }
+        }
+        .@{app-prefix}-input-affix-wrapper-focused + .account-name {
+          display: none;
+        }
+        .account-name {
+          white-space: nowrap;
+          max-width: calc(100% - 52px);
+          text-overflow: ellipsis;
+          overflow: hidden;
+          pointer-events: none;
+          position: absolute;
+          top: 5px;
+          left: 15px;
+          z-index: 10;
+          line-height: 22px;
+          font-size: 16px;
+        }
+      }
+    }
+    .address-wrap,
+    .amount-wrap,
+    .fee-wrap {
+      display: flex;
+      flex-direction: column;
+      border-bottom: 1px solid @border-2;
+      padding: 0 16px 15px;
+      gap: 8px;
+    }
+    .amount-wrap {
+      background-color: white;
+      padding-top: 16px;
+      .error-tip {
+        background-color: @bg-6;
+        width: 100%;
+        border: 1px solid @border-7;
+        padding: 15px;
+        line-height: 16px;
+        font-size: 12px;
+        color: @font-11;
+        border-radius: 6px;
+        margin-bottom: 16px;
+      }
+      .amount-input {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        border-radius: 6px;
+        padding: 15px;
+        height: 54px;
+        overflow: hidden;
+        border: 1px solid @border-1;
+        input,
+        .need-convert {
+          border: none;
+          padding: 0;
+          box-shadow: none;
+          line-height: 22px;
+          font-size: 16px;
+          color: @font-13;
+        }
+        &:focus-within,
+        &:focus {
+          input {
+            display: block;
+          }
+        }
+        .need-convert {
+          transform: translateY(-8px);
+          &:focus,
+          &.empty {
+            padding: 0 0 24px !important;
+            transform: translateY(0);
+          }
+        }
+        .convert {
+          color: @font-13;
+          transform: translateY(-8px);
+          line-height: 16px;
+          font-size: 12px;
+        }
+      }
+    }
+    .fee-wrap {
+      background-color: white;
+      padding-top: 24px;
+      padding-bottom: 47px;
+      gap: 20px;
+      height: 135px;
+      .fee,
+      .total {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        .label {
+          width: fit-content;
+          line-height: 22px;
+          font-size: 16px;
+          color: @font-13;
+        }
+        .value {
+          display: flex;
+          justify-content: flex-end;
+          flex-wrap: wrap;
+          align-items: flex-end;
+          .symbol {
+            line-height: 22px;
+            font-size: 16px;
+            color: @font-11;
+          }
+          .usd {
+            margin-left: 8px;
+            color: @font-13;
+            line-height: 16px;
+            font-size: 12px;
+          }
+        }
+      }
+    }
+
+    .btn-wrap {
+      background-color: white;
+      padding: 16px;
+      .send-btn {
+        height: 48px;
+        border-radius: 22px;
+        padding: 13px 16px;
+      }
+    }
+  }
+}

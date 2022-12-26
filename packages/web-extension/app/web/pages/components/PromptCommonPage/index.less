@@ -1,0 +1,33 @@
+@import '../../../assets/theme/color.less';
+
+.popup-body {
+  .popup-common-body {
+    width: 100%;
+    height: 100%;
+
+    .prompt-common-box {
+      width: 100%;
+      height: 100%;
+    }
+  }
+}
+
+.prompt-body {
+  .prompt-common-body {
+    min-height: 100%;
+    margin: 0 auto;
+    background: @bg-13;
+    padding-bottom: 50px;
+
+    .prompt-common-box {
+      margin: 0 auto;
+      width: 408px;
+      height: 600px;
+      border-radius: 8px;
+      overflow: hidden;
+      overflow-y: auto;
+      box-shadow: 0 2px 6px 0 @shadow-1;
+      background: @bg-11;
+    }
+  }
+}

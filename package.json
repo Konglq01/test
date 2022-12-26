@@ -1,0 +1,42 @@
+{
+  "name": "root",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ],
+    "nohoist": [
+      "**/react-native",
+      "**/react-native/**",
+      "**/react-native-**",
+      "**/@react-native-**",
+      "**/@react-native-**/**",
+      "**/expo-**"
+    ]
+  },
+  "scripts": {
+    "bootstrap": "lerna bootstrap",
+    "build": "lerna run build",
+    "clean": "lerna clean --yes",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "prepare": "husky install",
+    "reset-modules": "rm -rf node_modules/ yarn.lock packages/*/node_modules",
+    "common-package:extension": "npx lerna add @portkey/utils --scope=web-extension && npx lerna add @portkey/hooks --scope=web-extension  && npx lerna add @portkey/store --scope=web-extension && npx lerna add @portkey/constants --scope=web-extension",
+    "app": "yarn workspace walletappnew run",
+    "extension": "yarn workspace web-extension run",
+    "app:ca": "yarn workspace mobile-ca run",
+    "extension:ca": "yarn workspace web-extension-ca run",
+    "page": "yarn workspace web-page run"
+  },
+  "devDependencies": {
+    "eslint": "^8.23.1",
+    "eslint-plugin-react": "^7.31.8",
+    "husky": "^8.0.1",
+    "lerna": "^5.5.2",
+    "lint-staged": ">=13"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": "eslint --cache --fix"
+  },
+  "version": "1.22.19"
+}

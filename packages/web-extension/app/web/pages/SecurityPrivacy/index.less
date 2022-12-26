@@ -1,0 +1,118 @@
+@import '../../assets/theme/color.less';
+
+.security-privacy .setting-header-wrapper,
+.security-privacy-drawer .setting-header-wrapper {
+  padding-top: 16px;
+  height: 96px;
+  background: @bg-13;
+}
+
+.security-privacy .security-privacy-body .security-menu-list .menu-item-title {
+  font-size: 16px;
+}
+
+.security-privacy-prompt {
+  width: 100%;
+  height: 100%;
+
+  .security-privacy-body {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .reset-btn {
+      text-align: center;
+      font-size: 14px;
+      line-height: 20px;
+      color: @font-14;
+      cursor: pointer;
+      margin-bottom: 24px;
+    }
+
+    .security-menu-list {
+      &.security-menu-list-selected {
+        padding-left: 16px;
+      }
+
+      padding: 16px 16px 0 0;
+
+      .menu-item {
+        padding: 0;
+        border: none;
+        .menu-item-title {
+          font-size: 14px;
+          line-height: 20px;
+        }
+
+        &.menu-item-select {
+          .menu-item-title {
+            font-weight: 500;
+          }
+        }
+      }
+    }
+  }
+
+  .prompt-setting-column-box-right {
+    padding-right: 16px;
+  }
+}
+
+.security-privacy {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .security-privacy-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    // .security-menu-list {
+    //   .menu-item-title {
+    //     font-size: 16px;
+    //   }
+    // }
+
+    .reset-area {
+      padding: 16px;
+      padding-top: 15px;
+      border-top: 1px solid @border-2;
+
+      .reset-btn {
+        text-align: center;
+        font-size: 16px;
+        line-height: 22px;
+        padding: 12px;
+        border: 1px solid @border-7;
+        border-radius: 22px;
+        color: @font-14;
+      }
+    }
+  }
+}
+
+.security-privacy-drawer {
+  &.security-privacy-drawer-header-no-border {
+    .setting-header-wrapper {
+      border: none;
+    }
+  }
+
+  .@{app-prefix}-drawer-header {
+    padding: 0;
+    border: none;
+  }
+
+  .@{app-prefix}-drawer-title {
+    font-weight: 400;
+  }
+
+  .@{app-prefix}-drawer-body {
+    padding: 0;
+  }
+}

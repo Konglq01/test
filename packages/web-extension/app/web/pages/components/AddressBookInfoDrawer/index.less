@@ -1,0 +1,46 @@
+@import '../../../assets/theme/color.less';
+
+.add-new-contact-drawer {
+  .@{app-prefix}-drawer-header {
+    padding: 16px 0 0;
+    background-color: @bg-13;
+    border-bottom: 1px solid @border-2;
+
+    .setting-header-wrapper {
+      padding: 18px 24px 16px;
+      height: auto;
+      border: none;
+
+      .title-center {
+        font-weight: 300;
+      }
+    }
+
+    .@{app-prefix}-drawer-title {
+      line-height: 28px;
+    }
+  }
+
+  .@{app-prefix}-drawer-body {
+    .@{app-prefix}-tabs-nav {
+      margin-bottom: 0 !important;
+      &::before {
+        border-bottom: 1px solid @border-2;
+      }
+      .@{app-prefix}-tabs-nav-wrap {
+        justify-content: center;
+        .@{app-prefix}-tabs-nav-list {
+          width: 100%;
+          padding: 0 24px;
+          justify-content: space-between;
+        }
+      }
+      .@{app-prefix}-tabs-tab {
+        padding: 13px 0;
+      }
+      .@{app-prefix}-tabs-tab + .@{app-prefix}-tabs-tab {
+        margin-left: 30px;
+      }
+    }
+  }
+}

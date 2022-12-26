@@ -1,0 +1,123 @@
+@import '../../../../assets/theme/color.less';
+
+.confirm-mnemonic-content {
+  &.backup-content {
+    .title {
+      width: 588px;
+      text-align: left;
+      font-size: 40px;
+      color: @font-11;
+      height: 47px;
+      line-height: 47px;
+      margin: 16px 0 24px;
+    }
+  }
+
+  .description {
+    font-size: 16px;
+    color: @font-11;
+    margin-bottom: 24px;
+    line-height: 22px;
+  }
+  .confirm-mnemonic-container {
+    width: 568px;
+    min-height: 184px;
+    border-radius: 6px;
+    border: 1px solid @border-2;
+    padding: 16px 0 0 16px;
+
+    &::after {
+      display: block;
+      content: '';
+      height: 0;
+      clear: both;
+    }
+
+    &.error-confirm-mnemonic {
+      border-color: @border-5;
+    }
+    .@{app-prefix}-tag {
+      float: left;
+      background-color: transparent;
+      color: @font-9;
+      cursor: pointer;
+      border: 1px solid @border-6;
+      border-radius: 4px;
+      text-align: center;
+      font-size: 16px;
+      width: 128px;
+      height: 40px;
+      line-height: 40px;
+      margin: 0 8px 16px 0;
+    }
+  }
+
+  .tip-recover-container {
+    width: 568px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .error-tip {
+    margin-top: 4px;
+    height: 16px;
+    font-size: 12px;
+    color: @font-14;
+  }
+  .mnemonic-tag-wrapper {
+    width: 568px;
+
+    &::after {
+      display: block;
+      content: '';
+      height: 0;
+      clear: both;
+    }
+
+    .@{app-prefix}-tag {
+      float: left;
+      width: 128px;
+      height: 40px;
+      border-radius: 4px;
+      line-height: 40px;
+      text-align: center;
+      font-size: 16px;
+      color: @font-9;
+      border: 1px solid @border-6;
+      margin: 0 8px 16px 0;
+
+      &:focus-visible {
+        outline: none;
+      }
+      &.@{app-prefix}-tag-checkable-checked,
+      &.@{app-prefix}-tag-checkable:active {
+        background-color: @bg-7;
+        color: @font-5;
+        border-color: @bg-10;
+      }
+    }
+  }
+  .recover-wrapper {
+    margin-top: 4px;
+    line-height: 16px;
+    height: 16px;
+    font-size: 12px;
+    justify-content: flex-end;
+    color: @font-9;
+    cursor: pointer;
+
+    .recover-icon {
+      width: 14px;
+      height: 14px;
+      margin-right: 9px;
+    }
+  }
+
+  .submit-btn {
+    margin-top: 16px;
+    width: 168px;
+    height: 44px;
+    border-radius: 22px;
+    font-size: 16px;
+  }
+}

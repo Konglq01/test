@@ -1,0 +1,33 @@
+import { Col, Row } from 'antd';
+import clsx from 'clsx';
+import CustomSvg from 'components/CustomSvg';
+import { ReactNode } from 'react';
+
+export interface TitleWrapperProps {
+  title?: ReactNode;
+  className?: string;
+  leftElement?: ReactNode | boolean;
+  rightElement?: ReactNode;
+  leftCallBack?: (v?: any) => void;
+}
+
+export default function TitleWrapper({ title, className, leftElement, leftCallBack, rightElement }: TitleWrapperProps) {
+  return (
+    <Row justify="space-between" className={clsx(className)}>
+      <Col
+        className="title-left-col"
+        onClick={() => {
+          if (typeof leftElement === 'boolean') return;
+          leftCallBack?.();
+        }}>
+        {leftElement ? (
+          leftElement
+        ) : typeof leftElement === 'undefined' ? (
+          <CustomSvg style={{ cursor: 'pointer' }} type="LeftArrow" />
+        ) : null}
+      </Col>
+      <Col className="title-center">{title}</Col>
+      <Col className="title-right-col">{rightElement || ''}</Col>
+    </Row>
+  );
+}

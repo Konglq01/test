@@ -1,0 +1,89 @@
+@import '../../../assets/theme/color.less';
+
+.success-page-wrapper {
+  position: relative;
+
+  .success-page-content-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    .success-page-content {
+      padding-top: 23px;
+
+      .congratulations-icon {
+        width: 140px;
+        height: 140px;
+      }
+
+      & > h1 {
+        color: @font-11;
+        font-size: 40px;
+        padding-top: 24px;
+      }
+
+      & > p {
+        line-height: 22px;
+        color: @font-11;
+        font-size: 16px;
+        padding-top: 24px;
+      }
+      .tip-content {
+        color: @font-11;
+        font-size: 16px;
+        padding-top: 24px;
+      }
+      .confirm-btn {
+        margin-top: 40px;
+        height: 44px;
+        line-height: 44px;
+        width: auto;
+        min-width: 250px;
+        padding: 0 37px;
+        border-radius: 22px;
+        font-size: 16px;
+      }
+    }
+  }
+  .created-tip-wrapper {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 20px 21px;
+    width: 320px;
+    height: 130px;
+    border-radius: 8px;
+    background-color: @bg-11;
+    border: 1px solid @border-1;
+
+    .portkey-icon {
+      width: 31px;
+      height: 32px;
+    }
+    .created-tip-content {
+      flex: 1;
+      margin-left: 16px;
+
+      & > h3 {
+        line-height: 22px;
+        font-size: 18px;
+        margin-bottom: 8px;
+        color: @font-10;
+      }
+
+      & > div {
+        line-height: 20px;
+        font-size: 14px;
+        color: @font-11;
+        flex-wrap: wrap;
+      }
+      .extension-icon,
+      .fixed-icon {
+        line-height: 20px;
+        width: 16px;
+        display: inline-block;
+        vertical-align: text-top;
+      }
+    }
+  }
+}

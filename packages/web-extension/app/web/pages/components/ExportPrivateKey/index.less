@@ -1,0 +1,123 @@
+@import '../../../assets/theme/color.less';
+
+.edit-info {
+  height: 100%;
+  position: relative;
+
+  .account-name {
+    margin: 0 -24px;
+    padding: 20px 0;
+    text-align: center;
+    border-bottom: 1px solid @border-2;
+
+    & > span:nth-of-type(1) {
+      color: @font-11;
+      font-size: 20px;
+      height: 24px;
+      line-height: 24px;
+    }
+  }
+
+  .title {
+    text-align: center;
+    margin: 28px auto;
+    color: @font-11;
+    font-size: 20px;
+    height: 24px;
+    line-height: 24px;
+  }
+
+  .password-label {
+    font-size: 14px;
+    color: @font-11;
+    margin-bottom: 8px;
+  }
+
+  .private-key {
+    border: 1px solid @border-1;
+    padding: 14px 16px 0;
+    color: @font-14;
+    font-size: 14px;
+    min-height: 80px;
+    border-radius: 6px;
+    word-break: break-all;
+  }
+
+  .copy-content {
+    margin-top: 4px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    .copy-txt {
+      margin-left: 4px;
+      color: @font-9;
+      font-size: 12px;
+      height: 16px;
+      line-height: 16px;
+    }
+  }
+
+  .password-ipt {
+    font-size: 14px;
+    color: @font-11;
+
+    .@{app-prefix}-input {
+      font-size: 14px;
+
+      &::placeholder {
+        font-size: 14px;
+        color: @font-12;
+      }
+    }
+
+    .error-tip {
+      font-size: 12px;
+      color: @font-14;
+      height: 16px;
+      line-height: 16px;
+      margin-top: 4px;
+    }
+  }
+
+  .tip-info {
+    margin-top: 24px;
+    border-radius: 6px;
+    padding: 15px 8px;
+    color: @font-11;
+    border: 1px solid @border-7;
+    background-color: @bg-6;
+
+    & > div {
+      text-align: center;
+      &:nth-of-type(1) {
+        font-size: 14px;
+        height: 20px;
+        line-height: 20px;
+        margin-bottom: 6px;
+      }
+
+      &:nth-of-type(2) {
+        font-size: 12px;
+        height: 16px;
+        line-height: 16px;
+      }
+    }
+  }
+
+  .btn-wrapper {
+    position: absolute;
+    bottom: 0;
+    left: -24px;
+    width: 100vw;
+    border-top: 1px solid @border-2;
+    padding: 15px 16px 16px;
+
+    & > button {
+      border-radius: 22px;
+      padding: 13px 16px;
+      line-height: unset;
+      font-size: 16px;
+    }
+  }
+}

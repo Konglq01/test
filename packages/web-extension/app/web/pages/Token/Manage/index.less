@@ -1,0 +1,108 @@
+@import '../../../assets/theme/color.less';
+
+.add-token {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .add-token-top {
+    margin-bottom: 1px;
+    flex-shrink: 0;
+
+    .setting-header-wrapper {
+      border: none;
+      height: unset;
+      padding-top: 32px;
+      background-color: @bg-13;
+
+      .title-center {
+        text-align: left;
+      }
+
+      .header-title {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+
+        .@{app-prefix}-btn {
+          width: 120px;
+          height: 44px;
+          border-radius: 24px;
+          margin-left: 16px;
+        }
+      }
+    }
+  }
+
+  .add-token-content {
+    flex: 1;
+    background-color: #fff;
+    overflow: auto;
+
+    .token-item {
+      display: flex;
+      border-bottom: 1px solid @border-2;
+      padding: 18px 16px 17px;
+      justify-content: space-between;
+      align-items: center;
+
+      .token-item-content {
+        display: flex;
+        align-items: center;
+        margin-right: 8px;
+
+        .token-logo {
+          margin-right: 12px;
+        }
+        .custom-word-logo {
+          width: 28px;
+          height: 28px;
+          border-radius: 14px;
+          background-color: @bg-10;
+          border: 1px solid @border-1;
+          text-align: center;
+          line-height: 26px;
+          color: @font-11;
+        }
+
+        .token-item-symbol {
+          width: 232px;
+          font-size: 16px;
+          color: @font-11;
+          height: 22px;
+          line-height: 22px;
+        }
+      }
+    }
+  }
+
+  .add-token-btn {
+    min-width: 48px;
+    padding: 2px 8px;
+    font-size: 12px;
+    border-color: @border-3;
+    color: @font-9;
+    border-radius: 11px;
+
+    & > span {
+      display: block;
+      height: 16px;
+      line-height: 16px;
+    }
+  }
+
+  .add-token-btn-txt {
+    font-size: 12px;
+    color: @font-13;
+    display: block;
+    height: 16px;
+    line-height: 16px;
+  }
+}
+
+.left-icon {
+  display: inline-block;
+  font-size: 15px;
+  margin-right: 10px;
+}
