@@ -10,22 +10,51 @@ import useRouterParams from '@portkey/hooks/useRouterParams';
 import { VerifierItem } from '@portkey/types/verifier';
 import GuardianAccountItem from '../GuardianAccountItem';
 import { FontStyles } from 'assets/theme/styles';
-import CommonToast from 'components/CommonToast';
+import { WalletInfoType } from '@portkey/types/wallet';
+import { request } from 'api';
+import Loading from 'components/Loading';
 import navigationService from 'utils/navigationService';
 
 export default function VerifierDetails() {
-  const { email, item } = useRouterParams<{ email?: string; item?: VerifierItem }>();
+  const { email, item, walletInfo, verifierSessionId } = useRouterParams<{
+    email?: string;
+    item?: VerifierItem;
+    walletInfo?: WalletInfoType;
+    verifierSessionId?: string;
+  }>();
+  console.log(walletInfo, verifierSessionId, '====walletInfo');
+
   const countdown = useRef<VerifierCountdownInterface>();
   const digitInput = useRef<DigitInputInterface>();
-  const onFinish = useCallback((code: string) => {
-    // TODO: fetch
-    if (code !== '111111') {
-      CommonToast.fail('code invalid');
-      digitInput.current?.resetPin();
-    } else {
-      navigationService.navigate('SetPin');
-    }
-  }, []);
+  const onFinish = useCallback(
+    async (code: string) => {
+      try {
+        Loading.show();
+        const req = await request.verify.verifyCode({
+          baseURL: 'http://192.168.66.135:5588/',
+          data: {
+            type: 0,
+            code,
+            loginGuardianType: email,
+            verifierSessionId,
+          },
+        });
+        if (req.verifierSessionId) {
+          navigationService.navigate('SetPin', {
+            registerInfo: { walletInfo, loginGuardianType: email, type: 0 },
+          });
+        } else {
+          throw new Error('verify fail');
+        }
+        console.log(req, '=====req-verifyCode');
+      } catch (error) {
+        digitInput.current?.resetPin();
+        console.log(error, '====error');
+      }
+      Loading.hide();
+    },
+    [email, verifierSessionId, walletInfo],
+  );
   return (
     <PageContainer type="leftBack" titleDom containerStyles={styles.containerStyles}>
       <GuardianAccountItem

@@ -18,6 +18,11 @@ import fonts from 'assets/theme/fonts';
 import { isIos } from '@portkey/utils/mobile/device';
 import navigationService from 'utils/navigationService';
 import useRouterParams from '@portkey/hooks/useRouterParams';
+import { request } from 'api';
+import AElf from 'aelf-sdk';
+import { sleep } from 'utils';
+import CommonToast from 'components/CommonToast';
+import Loading from 'components/Loading';
 
 const verifierList = [{ name: 'Portkey' }, { name: 'Binance' }, { name: 'Huobi' }];
 
@@ -72,9 +77,37 @@ export default function SelectVerifier() {
               },
               {
                 title: t('Confirm'),
-                onPress: () => {
-                  // TODO:Confirm
-                  navigationService.navigate('VerifierDetails', { email });
+                onPress: async () => {
+                  try {
+                    Loading.show();
+                    await sleep(10);
+                    const walletInfo = AElf.wallet.createNewWallet();
+                    console.log(walletInfo, '=====walletInfo');
+
+                    // TODO:Confirm
+                    const req = await request.verify.sendCode({
+                      baseURL: 'http://192.168.66.135:5588/',
+                      data: {
+                        type: 0,
+                        loginGuardianType: email,
+                        managerUniqueId: walletInfo.address,
+                      },
+                    });
+                    if (req.verifierSessionId) {
+                      walletInfo.keyPair && delete walletInfo.keyPair;
+                      walletInfo.childWallet && delete walletInfo.childWallet;
+                      navigationService.navigate('VerifierDetails', {
+                        email,
+                        walletInfo,
+                        verifierSessionId: req.verifierSessionId,
+                      });
+                    } else {
+                      throw new Error('send fail');
+                    }
+                  } catch (error: any) {
+                    CommonToast.fail(typeof error.message === 'string' ? error.message : 'send fail');
+                  }
+                  Loading.hide();
                 },
                 // type: 'solid',
               },

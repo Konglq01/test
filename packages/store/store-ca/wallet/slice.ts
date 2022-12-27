@@ -12,14 +12,12 @@ import {
 } from './actions';
 import { WalletError, WalletState } from './type';
 import { changeEncryptStr } from '../../wallet/utils';
-import { NetworkList } from '@portkey/constants/constants-ca/network';
 
 const initialState: WalletState = {
   walletAvatar: `master${(Math.floor(Math.random() * 10000) % 6) + 1}`,
   walletType: 'aelf',
   walletName: 'Wallet 01',
   currentNetwork: 'TESTNET',
-  networkList: NetworkList,
   chainList: [],
 };
 export const walletSlice = createSlice({

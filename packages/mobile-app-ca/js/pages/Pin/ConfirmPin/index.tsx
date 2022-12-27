@@ -17,10 +17,19 @@ import { setCredentials } from 'store/user/actions';
 import { useUser } from 'hooks/store';
 import i18n from 'i18n';
 import { setSecureStoreItem } from '@portkey/utils/mobile/biometric';
+import { RegisterInfo } from '../types';
+import Loading from 'components/Loading';
+import { request } from 'api';
 
 export default function ConfirmPin() {
   const biometricsReady = useBiometricsReady();
-  const { pin, oldPin } = useRouterParams<{ oldPin?: string; pin?: string }>();
+  const { pin, oldPin, registerInfo } = useRouterParams<{
+    oldPin?: string;
+    pin?: string;
+    registerInfo?: RegisterInfo;
+  }>();
+  console.log(registerInfo, '=====registerInfo');
+
   const [errorMessage, setErrorMessage] = useState<string>();
   const pinRef = useRef<DigitInputInterface>();
   const dispatch = useAppDispatch();
@@ -47,11 +56,16 @@ export default function ConfirmPin() {
           CommonToast.fail(typeof error.message === 'string' ? error.message : i18n.t('Change Failed'));
         }
         navigationService.navigate('AccountSettings');
-      } else {
+      } else if (registerInfo) {
+        request.register.managerAddress({
+          baseURL: 'http://192.168.66.135:5577/',
+          data: {},
+        });
         // TODO:biometricsReady
         if (biometricsReady) {
           navigationService.navigate('SetBiometrics', { pin });
         } else {
+          Loading.show();
         }
       }
     },
