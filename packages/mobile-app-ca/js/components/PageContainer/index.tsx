@@ -3,8 +3,9 @@ import CustomHeader, { CustomHeaderProps } from 'components/CustomHeader';
 import SafeAreaBox, { SafeAreaBoxProps } from 'components/SafeAreaBox';
 import { useGStyles } from 'assets/theme/useGStyles';
 import { KeyboardAwareScrollView, KeyboardAwareScrollViewProps } from 'react-native-keyboard-aware-scroll-view';
-import { StyleProp, TouchableWithoutFeedback, View, ViewStyle, Keyboard } from 'react-native';
+import { TouchableWithoutFeedback, View, Keyboard } from 'react-native';
 import { defaultColors } from 'assets/theme';
+import { ViewStyleType } from 'types/styles';
 
 const safeAreaColorMap = {
   white: defaultColors.bg1,
@@ -31,7 +32,7 @@ export default function PageContainer({
   scrollViewProps?: KeyboardAwareScrollViewProps & {
     disabled?: boolean; // disabled scrollView
   };
-  containerStyles?: StyleProp<ViewStyle>;
+  containerStyles?: ViewStyleType;
   hideHeader?: boolean;
   hideTouchable?: boolean;
 }) {

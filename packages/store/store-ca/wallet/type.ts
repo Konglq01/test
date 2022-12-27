@@ -1,4 +1,3 @@
-import { NetworkItem } from '@portkey/constants/constants-ca/network';
 import { ChainType, NetworkType } from '@portkey/types';
 import { CAWalletInfoType } from '@portkey/types/types-ca/wallet';
 import { PinErrorMessage } from '@portkey/utils/wallet/types';
@@ -26,7 +25,6 @@ export interface WalletState {
   walletType: WalletType;
   walletName: string;
   currentNetwork: NetworkType;
-  networkList: NetworkItem[];
   walletInfo?: CAWalletInfoType;
   chainList: ChainItemType[];
 }

@@ -3,8 +3,7 @@ import { useMemo } from 'react';
 import { NetworkList } from '@portkey/constants/constants-ca/network';
 
 export function useNetworkList() {
-  const { networkList } = useCurrentWallet();
-  return useMemo(() => networkList || NetworkList, [networkList]);
+  return NetworkList;
 }
 
 export function useCurrentNetworkInfo() {
