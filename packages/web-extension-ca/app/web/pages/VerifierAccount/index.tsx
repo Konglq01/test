@@ -18,7 +18,6 @@ export default function VerifierAccount() {
   const dispatch = useAppDispatch();
   const { state } = useLocationState<'register' | 'login' | 'guardians'>();
   const { isPrompt } = useCommonState();
-  // const isPrompt = false;
   const verificationType = useMemo(() => {
     switch (state) {
       case 'register':
