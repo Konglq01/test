@@ -1,6 +1,7 @@
 import { ChainType } from '@portkey/types';
 import { isAddress as web3IsAddress } from 'web3-utils';
 import { isAelfAddress, isDIDAelfAddress } from './aelf';
+import * as uuid from 'uuid';
 
 export const addressFormat = (address: string, chainId: string | number, chainType: ChainType) => {
   if (chainType !== 'aelf') return address;
@@ -109,3 +110,5 @@ export function isPrivateKey(privateKey?: string) {
 }
 
 export const isExtension = () => process.env.DEVICE === 'extension';
+
+export const randomId = () => uuid.v4().replace(/-/g, '');
