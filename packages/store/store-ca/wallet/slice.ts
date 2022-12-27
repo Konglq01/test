@@ -7,6 +7,7 @@ import {
   getChainListAsync,
   resetWallet,
   setCAInfo,
+  setChainListAction,
   setSessionId,
   updateWalletNameAsync,
 } from './actions';
@@ -75,9 +76,10 @@ export const walletSlice = createSlice({
       .addCase(updateWalletNameAsync.rejected, (state, action) => {
         // TODO: add error tips
       })
-      .addCase(getChainListAsync.fulfilled, (state, action) => {
-        state.chainList = action.payload;
-      })
-      .addCase(getChainListAsync.rejected, (state, action) => {});
+      .addCase(setChainListAction, (state, action) => {
+        const { chainList, networkType } = action.payload;
+        if (!state.chainInfo) state.chainInfo = { [networkType]: chainList };
+        state.chainInfo[networkType] = chainList;
+      });
   },
 });

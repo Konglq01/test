@@ -18,6 +18,8 @@ export interface ChainItemType {
   chainId: string;
   name: string;
   endPoint: string;
+  exploreUrl: string;
+  caContractAddress: string;
 }
 
 export interface WalletState {
@@ -27,4 +29,5 @@ export interface WalletState {
   currentNetwork: NetworkType;
   walletInfo?: CAWalletInfoType;
   chainList: ChainItemType[];
+  chainInfo?: { [key in NetworkType]?: ChainItemType[] };
 }

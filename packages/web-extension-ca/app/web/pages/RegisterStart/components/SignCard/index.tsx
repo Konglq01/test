@@ -8,11 +8,13 @@ import { useAppDispatch } from 'store/Provider/hooks';
 import EmailTab from '../EmailTab';
 import './index.less';
 import { useTranslation } from 'react-i18next';
+import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 
 export default function SignCard() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
+  const currentNetwork = useCurrentNetworkInfo();
   const onEmailTabSuccess = useCallback(
     (email: string) => {
       console.log('onEmailTabSuccess');
@@ -35,7 +37,7 @@ export default function SignCard() {
         <span>{t('Sign Up')}</span>
       </h2>
       <div className="login-content sign-content">
-        <EmailTab onSuccess={onEmailTabSuccess} />
+        <EmailTab currentNetwork={currentNetwork} onSuccess={onEmailTabSuccess} />
       </div>
     </div>
   );
