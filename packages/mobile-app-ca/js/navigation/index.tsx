@@ -75,7 +75,7 @@ export default function NavigationRoot() {
         initialRouteName="Referral"
         screenOptions={{ cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS, headerShown: false }}>
         {stackNav.map((item, index) => (
-          <Stack.Screen options={item.name === 'SecurityLock' ? item.option : undefined} key={index} {...item} />
+          <Stack.Screen options={(item as any).option} key={index} {...item} />
         ))}
       </Stack.Navigator>
     </NavigationContainer>

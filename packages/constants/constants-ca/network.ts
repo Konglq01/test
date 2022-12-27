@@ -37,4 +37,4 @@ export const ChainList = [
   },
 ];
 
-export const DefaultChain = 'AELF';
+export const DefaultChainId = 'AELF';

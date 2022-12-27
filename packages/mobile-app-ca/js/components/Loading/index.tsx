@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: defaultColors.bg1,
+    backgroundColor: '#ffffff82',
   },
   textStyles: {
     color: defaultColors.font5,

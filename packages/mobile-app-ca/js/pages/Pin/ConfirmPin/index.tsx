@@ -4,14 +4,14 @@ import PageContainer from 'components/PageContainer';
 import DigitInput, { DigitInputInterface } from 'components/DigitInput';
 import useBiometricsReady from 'hooks/useBiometrics';
 import useRouterParams from '@portkey/hooks/useRouterParams';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import navigationService from 'utils/navigationService';
 import { DeviceEventEmitter, StyleSheet, View } from 'react-native';
 import { windowHeight } from '@portkey/utils/mobile/device';
 import { pTd } from 'utils/unit';
 import GStyles from 'assets/theme/GStyles';
 import { useAppDispatch } from 'store/hooks';
-import { changePin, createWallet, setCAInfo } from '@portkey/store/store-ca/wallet/actions';
+import { changePin, createWallet } from '@portkey/store/store-ca/wallet/actions';
 import CommonToast from 'components/CommonToast';
 import { setCredentials } from 'store/user/actions';
 import { useUser } from 'hooks/store';
@@ -22,8 +22,8 @@ import { request } from 'api';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import AElf from 'aelf-sdk';
 import { sleep } from '@portkey/utils';
-import { DefaultChain } from '@portkey/constants/constants-ca/network';
-
+import { DefaultChainId } from '@portkey/constants/constants-ca/network';
+import { intervalGetRegisterResult, TimerResult } from 'utils/wallet';
 export default function ConfirmPin() {
   const biometricsReady = useBiometricsReady();
   const { apiUrl } = useCurrentNetworkInfo();
@@ -32,13 +32,11 @@ export default function ConfirmPin() {
     pin?: string;
     registerInfo?: RegisterInfo;
   }>();
-  console.log(registerInfo, apiUrl, '=====registerInfo');
-
   const [errorMessage, setErrorMessage] = useState<string>();
   const pinRef = useRef<DigitInputInterface>();
   const dispatch = useAppDispatch();
   const { biometrics } = useUser();
-
+  const timer = useRef<TimerResult>();
   const onChangePin = useCallback(
     async (newPin: string) => {
       if (!oldPin) return;
@@ -65,7 +63,7 @@ export default function ConfirmPin() {
           baseURL: apiUrl,
           data: {
             ...registerInfo,
-            chainId: DefaultChain,
+            chainId: DefaultChainId,
             managerAddress: walletInfo.address,
             deviceString: JSON.stringify(new Date().getTime()),
           },
@@ -75,39 +73,12 @@ export default function ConfirmPin() {
           Loading.hide();
           navigationService.navigate('SetBiometrics', { pin: confirmPin });
         } else {
-          const timer = setInterval(async () => {
-            const req = await request.register.result({
-              baseURL: apiUrl,
-              data: registerInfo,
-            });
-            switch (req.register_status) {
-              case 'pass': {
-                dispatch(
-                  setCAInfo({
-                    caInfo: {
-                      caAddress: req.ca_address,
-                      caHash: req.ca_hash,
-                    },
-                    pin: confirmPin,
-                    chainId: DefaultChain,
-                  }),
-                );
-                navigationService.reset('Tab');
-                Loading.hide();
-                clearInterval(timer);
-                break;
-              }
-              case 'fail': {
-                clearInterval(timer);
-                CommonToast.fail(req.register_message);
-                Loading.hide();
-                clearInterval(timer);
-                break;
-              }
-              default:
-                break;
-            }
-          }, 1000);
+          timer.current = intervalGetRegisterResult({
+            dispatch,
+            apiUrl,
+            pin: confirmPin,
+            managerInfo: walletInfo.managerInfo,
+          });
         }
       } catch (error) {
         Loading.hide();
@@ -134,6 +105,11 @@ export default function ConfirmPin() {
     },
     [errorMessage, oldPin, onChangePin, onRegister, pin, registerInfo],
   );
+  useEffect(() => {
+    return () => {
+      timer.current?.remove();
+    };
+  }, []);
   return (
     <PageContainer
       titleDom
