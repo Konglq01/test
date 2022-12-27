@@ -9,10 +9,11 @@ import SafeAreaBox from 'components/SafeAreaBox';
 import ActionSheet from 'components/ActionSheet';
 import useLogOut from 'hooks/useLogOut';
 import { useTokenContract } from 'contexts/useInterface/hooks';
-import { createWallet, resetWallet, setCAInfo, setSessionId } from '@portkey/store/store-ca/wallet/actions';
-import AElf from 'aelf-sdk';
+import { resetWallet, setCAInfo } from '@portkey/store/store-ca/wallet/actions';
 import { useCurrentWallet, useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { useUser } from 'hooks/store';
+import Loading from 'components/Loading';
+
 export default function HomeScreen() {
   const navigation = useNavigation<RootNavigationProp>();
   const onLogOut = useLogOut();
@@ -51,15 +52,12 @@ export default function HomeScreen() {
           }}
         />
         <Button
-          title="Create Wallet"
-          onPress={async () => {
-            try {
-              const walletInfo = AElf.wallet.createNewWallet();
-              await dispatch(createWallet({ walletInfo, pin: '123456', sessionId: '123' }));
-              console.log('createWallet');
-            } catch (error) {
-              console.log(error, '====error');
-            }
+          title="loading show"
+          onPress={() => {
+            Loading.show();
+            setTimeout(() => {
+              Loading.hide();
+            }, 5000);
           }}
         />
         <Button
@@ -73,16 +71,6 @@ export default function HomeScreen() {
           }}
         />
         <Button title="Account Settings" onPress={() => navigationService.navigate('AccountSettings')} />
-        <Button
-          title="setSessionId"
-          onPress={async () => {
-            try {
-              await dispatch(setSessionId({ sessionId: '111', pin: '123456', networkType: 'MAIN' }));
-            } catch (error) {
-              console.log(error, '====error');
-            }
-          }}
-        />
         <Button
           title="setCAInfo"
           onPress={async () => {

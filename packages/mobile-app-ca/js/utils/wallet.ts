@@ -5,6 +5,13 @@ import AElf from 'aelf-sdk';
 import { isIOS } from '@rneui/base';
 import { rsaEncryptObj } from './rsaEncrypt';
 import { PUB_KEY } from 'constants/api';
+import { request } from 'api';
+import { ManagerInfo } from '@portkey/types/types-ca/wallet';
+import Loading from 'components/Loading';
+import navigationService from './navigationService';
+import CommonToast from 'components/CommonToast';
+import { setCAInfo } from '@portkey/store/store-ca/wallet/actions';
+import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 
 type SignType = { sign: string; sha256Sign: string };
 
@@ -68,3 +75,54 @@ export const getApiBaseData = ({
   }
   return ApiBaseObj[key];
 };
+
+export type TimerResult = {
+  remove: () => void;
+};
+export function intervalGetRegisterResult({
+  apiUrl,
+  managerInfo,
+  pin,
+  dispatch,
+}: {
+  apiUrl: string;
+  managerInfo: ManagerInfo;
+  pin: string;
+  dispatch: any;
+}) {
+  const timer = setInterval(async () => {
+    const req = await request.register.result({
+      baseURL: apiUrl,
+      data: managerInfo,
+    });
+    switch (req.register_status) {
+      case 'pass': {
+        dispatch(
+          setCAInfo({
+            caInfo: {
+              caAddress: req.ca_address,
+              caHash: req.ca_hash,
+            },
+            pin,
+            chainId: DefaultChainId,
+          }),
+        );
+        navigationService.reset('Tab');
+        Loading.hide();
+        clearInterval(timer);
+        break;
+      }
+      case 'fail': {
+        CommonToast.fail(req.register_message);
+        Loading.hide();
+        clearInterval(timer);
+        break;
+      }
+      default:
+        break;
+    }
+  }, 3000);
+  return {
+    remove: () => clearInterval(timer),
+  };
+}
