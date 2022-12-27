@@ -4,11 +4,10 @@ import { checkPassword } from './utils';
 import {
   changePin,
   createWalletAction,
-  getChainListAsync,
   resetWallet,
   setCAInfo,
   setChainListAction,
-  setSessionId,
+  setManagerInfo,
   updateWalletNameAsync,
 } from './actions';
 import { WalletError, WalletState } from './type';
@@ -38,7 +37,7 @@ export const walletSlice = createSlice({
 
         state.walletInfo = {
           ...action.payload.walletInfo,
-          caInfo: { [currentNetwork]: { sessionId: action.payload.sessionId } } as any,
+          caInfo: { [currentNetwork]: { managerInfo: action.payload.managerInfo } } as any,
         };
       })
       .addCase(setCAInfo, (state, action) => {
@@ -52,14 +51,14 @@ export const walletSlice = createSlice({
           [chainId]: caInfo,
         } as any;
       })
-      .addCase(setSessionId, (state, action) => {
-        const { pin, sessionId } = action.payload;
+      .addCase(setManagerInfo, (state, action) => {
+        const { pin, managerInfo } = action.payload;
         // check pin
         checkPassword(state.walletInfo?.AESEncryptMnemonic, pin);
         const currentNetwork = action.payload.networkType || state.currentNetwork || initialState.currentNetwork;
         if (!state.walletInfo?.AESEncryptMnemonic) throw new Error(WalletError.noCreateWallet);
         if (state.walletInfo.caInfo[currentNetwork]) throw new Error(WalletError.caAccountExists);
-        state.walletInfo.caInfo[currentNetwork] = { sessionId };
+        state.walletInfo.caInfo[currentNetwork] = { managerInfo };
       })
       .addCase(changePin, (state, action) => {
         const { pin, newPin } = action.payload;

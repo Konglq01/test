@@ -1,6 +1,6 @@
 import { NetworkList } from '@portkey/constants/constants-ca/network';
 import { ChainId, NetworkType } from '@portkey/types';
-import { CAInfo } from '@portkey/types/types-ca/wallet';
+import { CAInfo, ManagerInfo } from '@portkey/types/types-ca/wallet';
 import { WalletInfoType } from '@portkey/types/wallet';
 import { checkPinInput, formatWalletInfo } from '@portkey/utils/wallet';
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
@@ -12,12 +12,12 @@ export const createWallet =
   ({
     walletInfo,
     pin,
-    sessionId,
+    managerInfo,
     networkType,
   }: {
     walletInfo?: any;
     pin: string;
-    sessionId: string;
+    managerInfo: ManagerInfo;
     networkType?: NetworkType;
   }): any =>
   async (dispatch: any) => {
@@ -29,7 +29,7 @@ export const createWallet =
     const walletObj = formatWalletInfo(walletInfo, pin, 'walletName');
     if (walletObj) {
       const { walletInfo: newWalletInfo } = walletObj;
-      dispatch(createWalletAction({ walletInfo: newWalletInfo, networkType, sessionId }));
+      dispatch(createWalletAction({ walletInfo: newWalletInfo, networkType, managerInfo }));
       return true;
     }
     throw new Error('createWallet fail');
@@ -37,14 +37,14 @@ export const createWallet =
 export const createWalletAction = createAction<{
   walletInfo: WalletInfoType;
   networkType?: NetworkType;
-  sessionId: string;
+  managerInfo: ManagerInfo;
 }>('wallet/createWallet');
 
-export const setSessionId = createAction<{
+export const setManagerInfo = createAction<{
   networkType?: NetworkType;
   pin: string;
-  sessionId: string;
-}>('wallet/setSessionId');
+  managerInfo: ManagerInfo;
+}>('wallet/setManagerInfo');
 
 export const setCAInfo = createAction<{
   caInfo: CAInfo;

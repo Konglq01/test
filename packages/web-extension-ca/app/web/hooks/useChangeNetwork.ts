@@ -18,7 +18,7 @@ export function useChangeNetwork() {
       const { caInfo } = walletInfo || {};
       const tmpCaInfo = caInfo?.[network.networkType];
 
-      if (tmpCaInfo?.sessionId && tmpCaInfo.AELF?.caAddress) {
+      if (tmpCaInfo?.managerInfo && tmpCaInfo.AELF?.caAddress) {
         if (!isPrompt) {
           navigate('/');
         } else {

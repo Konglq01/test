@@ -36,3 +36,5 @@ export const ChainList = [
     caContractAddress: 'RXcxgSXuagn8RrvhQAV81Z652EEYSwR6JLnqHYJ5UVpEptW8Y',
   },
 ];
+
+export const DefaultChain = 'AELF';

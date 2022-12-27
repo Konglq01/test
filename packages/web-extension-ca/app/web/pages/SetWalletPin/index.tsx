@@ -8,7 +8,7 @@ import { useAppDispatch, useLoading, useLoginInfo } from 'store/Provider/hooks';
 import { setPinAction } from 'utils/lib/serviceWorkerAction';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { getLocalStorage, setLocalStorage } from 'utils/storage/chromeStorage';
-import { createWallet, setSessionId } from '@portkey/store/store-ca/wallet/actions';
+import { createWallet, setManagerInfo } from '@portkey/store/store-ca/wallet/actions';
 import { sleep } from '@portkey/utils';
 import useLocationState from 'hooks/useLocationState';
 import { useTranslation } from 'react-i18next';
@@ -75,6 +75,8 @@ export default function SetWalletPin() {
       try {
         const { pin } = values;
         console.log(pin, walletInfo, 'onCreate==');
+        if (!loginAccount?.loginGuardianType || (!loginAccount.accountLoginType && loginAccount.accountLoginType !== 0))
+          return message.error('Missing account!!! Please login/register again');
         setLoading(true);
         const _walletInfo = walletInfo.address ? walletInfo : AElf.wallet.createNewWallet();
         console.log(pin, walletInfo, _walletInfo, 'onCreate==');
@@ -85,10 +87,23 @@ export default function SetWalletPin() {
               createWallet({
                 walletInfo: _walletInfo,
                 pin,
-                sessionId,
+                managerInfo: {
+                  managerUniqueId: loginAccount?.managerUniqueId || sessionId,
+                  loginGuardianType: loginAccount?.loginGuardianType,
+                  type: loginAccount.accountLoginType,
+                },
               }),
             )
-          : dispatch(setSessionId({ pin, sessionId }));
+          : dispatch(
+              setManagerInfo({
+                pin,
+                managerInfo: {
+                  managerUniqueId: loginAccount?.managerUniqueId || sessionId,
+                  loginGuardianType: loginAccount?.loginGuardianType,
+                  type: loginAccount.accountLoginType,
+                },
+              }),
+            );
         await setPinAction(pin);
         await setLocalStorage({
           registerStatus: 'registeredNotGetCaAddress',

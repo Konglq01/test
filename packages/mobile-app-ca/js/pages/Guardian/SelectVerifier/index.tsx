@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import PageContainer from 'components/PageContainer';
 import { TextM, TextS, TextXXXL } from 'components/CommonText';
@@ -19,10 +19,9 @@ import { isIos } from '@portkey/utils/mobile/device';
 import navigationService from 'utils/navigationService';
 import useRouterParams from '@portkey/hooks/useRouterParams';
 import { request } from 'api';
-import AElf from 'aelf-sdk';
-import { sleep } from 'utils';
 import CommonToast from 'components/CommonToast';
 import Loading from 'components/Loading';
+import { randomId } from '@portkey/utils';
 
 const verifierList = [{ name: 'Portkey' }, { name: 'Binance' }, { name: 'Huobi' }];
 
@@ -31,6 +30,48 @@ export default function SelectVerifier() {
   const { t } = useLanguage();
   const [selectedVerifier, setSelectedVerifier] = useState(verifierList[0]);
   const { email } = useRouterParams<{ email?: string }>();
+  const onConfirm = useCallback(async () => {
+    ActionSheet.alert({
+      title2: `Portkey will send a verification code to ${email} to verify your email address.`,
+      buttons: [
+        {
+          title: t('Cancel'),
+          // type: 'solid',
+          type: 'outline',
+        },
+        {
+          title: t('Confirm'),
+          onPress: async () => {
+            try {
+              const managerUniqueId = randomId();
+              // TODO:Confirm
+              Loading.show();
+              const req = await request.verify.sendCode({
+                baseURL: 'http://192.168.66.135:5588/',
+                data: {
+                  type: 0,
+                  loginGuardianType: email,
+                  managerUniqueId,
+                },
+              });
+              if (req.verifierSessionId) {
+                navigationService.navigate('VerifierDetails', {
+                  email,
+                  verifierSessionId: req.verifierSessionId,
+                  managerUniqueId,
+                });
+              } else {
+                throw new Error('send fail');
+              }
+            } catch (error) {
+              CommonToast.failError(error);
+            }
+            Loading.hide();
+          },
+        },
+      ],
+    });
+  }, [email, t]);
   return (
     <PageContainer containerStyles={styles.containerStyles} scrollViewProps={ScrollViewProps} type="leftBack" titleDom>
       <View>
@@ -65,56 +106,7 @@ export default function SelectVerifier() {
           })}
         </View>
       </View>
-      <CommonButton
-        onPress={() => {
-          ActionSheet.alert({
-            title2: `Portkey will send a verification code to ${email} to verify your email address.`,
-            buttons: [
-              {
-                title: t('Cancel'),
-                // type: 'solid',
-                type: 'outline',
-              },
-              {
-                title: t('Confirm'),
-                onPress: async () => {
-                  try {
-                    Loading.show();
-                    await sleep(10);
-                    const walletInfo = AElf.wallet.createNewWallet();
-                    console.log(walletInfo, '=====walletInfo');
-
-                    // TODO:Confirm
-                    const req = await request.verify.sendCode({
-                      baseURL: 'http://192.168.66.135:5588/',
-                      data: {
-                        type: 0,
-                        loginGuardianType: email,
-                        managerUniqueId: walletInfo.address,
-                      },
-                    });
-                    if (req.verifierSessionId) {
-                      walletInfo.keyPair && delete walletInfo.keyPair;
-                      walletInfo.childWallet && delete walletInfo.childWallet;
-                      navigationService.navigate('VerifierDetails', {
-                        email,
-                        walletInfo,
-                        verifierSessionId: req.verifierSessionId,
-                      });
-                    } else {
-                      throw new Error('send fail');
-                    }
-                  } catch (error: any) {
-                    CommonToast.fail(typeof error.message === 'string' ? error.message : 'send fail');
-                  }
-                  Loading.hide();
-                },
-                // type: 'solid',
-              },
-            ],
-          });
-        }}
-        type="primary">
+      <CommonButton onPress={onConfirm} type="primary">
         {t('Confirm')}
       </CommonButton>
     </PageContainer>
