@@ -7,7 +7,6 @@ export interface VerifierItem {
   name: string;
   imageUrl: string;
   url: string;
-  id: string;
 }
 
 // 0: register, 1: community recovery, 2: Add Guardian 3: Set LoginAccount

@@ -7,6 +7,8 @@ import {
   resetVerifierState,
   setUserGuardianItemStatus,
   setCurrentGuardianAction,
+  setVerifierListAction,
+  setUserGuardianSessionIdAction,
 } from './actions';
 import { GuardiansState } from './type';
 
@@ -30,8 +32,20 @@ export const guardiansSlice = createSlice({
       .addCase(fetchVerifierListAsync.rejected, (state, action) => {
         throw Error(action.error.message);
       })
+      .addCase(setVerifierListAction, (state, action) => {
+        if (!action.payload) {
+          state.verifierMap = {};
+          return;
+        }
+        const map: GuardiansState['verifierMap'] = {};
+        action.payload.forEach((item: VerifierItem) => {
+          map[item.name] = item;
+        });
+        state.verifierMap = map;
+      })
       .addCase(fetchGuardianListAsync.fulfilled, (state, action) => {
         const { verifierMap } = state;
+        // if(!verifierMap) throw '';
         const { loginGuardianTypeIndexes, guardians } = action.payload;
         const _guardians: (typeof guardians[number] & { isLoginAccount?: boolean })[] = [...guardians];
         loginGuardianTypeIndexes.forEach((item, idx) => {
@@ -69,6 +83,11 @@ export const guardiansSlice = createSlice({
           // && status === VerifyStatus.Verifying
           state.guardianExpiredTime = moment().add(1, 'h').subtract(2, 'minute').valueOf();
         }
+      })
+      .addCase(setUserGuardianSessionIdAction, (state, action) => {
+        const { key, sessionId } = action.payload;
+        if (!state.userGuardianStatus?.[key]) throw Error("Can't find this item");
+        state.userGuardianStatus[key]['sessionId'] = sessionId;
       });
   },
 });

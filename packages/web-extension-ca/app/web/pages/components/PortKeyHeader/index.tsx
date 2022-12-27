@@ -11,7 +11,8 @@ interface PortKeyHeaderProps {
   customLogoShow?: boolean;
 }
 
-const PortKeyHeader = forwardRef(({ onUserClick, customLogoShow = true }: PortKeyHeaderProps) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const PortKeyHeader = forwardRef(({ onUserClick, customLogoShow = true }: PortKeyHeaderProps, ref) => {
   const dispatch = useAppDispatch();
   const { isPrompt } = useCommonState();
   const { walletAvatar } = useWalletInfo();
