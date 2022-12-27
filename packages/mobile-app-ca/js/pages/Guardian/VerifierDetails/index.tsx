@@ -10,19 +10,19 @@ import useRouterParams from '@portkey/hooks/useRouterParams';
 import { VerifierItem } from '@portkey/types/verifier';
 import GuardianAccountItem from '../GuardianAccountItem';
 import { FontStyles } from 'assets/theme/styles';
-import { WalletInfoType } from '@portkey/types/wallet';
 import { request } from 'api';
 import Loading from 'components/Loading';
 import navigationService from 'utils/navigationService';
+import CommonToast from 'components/CommonToast';
 
 export default function VerifierDetails() {
-  const { email, item, walletInfo, verifierSessionId } = useRouterParams<{
+  const { email, item, verifierSessionId, managerUniqueId } = useRouterParams<{
     email?: string;
     item?: VerifierItem;
-    walletInfo?: WalletInfoType;
     verifierSessionId?: string;
+    managerUniqueId?: string;
   }>();
-  console.log(walletInfo, verifierSessionId, '====walletInfo');
+  console.log(verifierSessionId, '====walletInfo');
 
   const countdown = useRef<VerifierCountdownInterface>();
   const digitInput = useRef<DigitInputInterface>();
@@ -41,19 +41,19 @@ export default function VerifierDetails() {
         });
         if (req.verifierSessionId) {
           navigationService.navigate('SetPin', {
-            registerInfo: { walletInfo, loginGuardianType: email, type: 0 },
+            registerInfo: { loginGuardianType: email, type: 0, managerUniqueId },
           });
         } else {
           throw new Error('verify fail');
         }
         console.log(req, '=====req-verifyCode');
       } catch (error) {
+        CommonToast.failError(error, 'Verify Fail');
         digitInput.current?.resetPin();
-        console.log(error, '====error');
       }
       Loading.hide();
     },
-    [email, verifierSessionId, walletInfo],
+    [email, managerUniqueId, verifierSessionId],
   );
   return (
     <PageContainer type="leftBack" titleDom containerStyles={styles.containerStyles}>
@@ -62,7 +62,6 @@ export default function VerifierDetails() {
           name: 'portkey',
           imageUrl: 'PortKey',
           url: 'string',
-          id: 'string',
         }}
         isButtonHide
       />

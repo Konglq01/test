@@ -16,7 +16,7 @@ export function useChangeNetwork(route: RouteProp<ParamListBase>) {
       const tmpCaInfo = caInfo?.[network.networkType];
       let routeName: keyof RootStackParamList = 'LoginPortkey';
 
-      if (tmpCaInfo?.sessionId && tmpCaInfo.AELF?.caAddress) routeName = 'Tab';
+      if (tmpCaInfo?.managerInfo && tmpCaInfo.AELF?.caAddress) routeName = 'Tab';
 
       if (routeName !== route.name) navigationService.reset(routeName);
       dispatch(changeNetworkType(network.networkType));

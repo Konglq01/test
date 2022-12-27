@@ -44,7 +44,7 @@ function LoadingBody({ text = 'Loading...' }: { text?: string }) {
 }
 
 export default class Loading extends React.Component {
-  static show(text?: string, overlayProps?: any, duration = 20000) {
+  static show(text?: string, overlayProps?: any, duration = 2000000) {
     Loading.hide();
     const overlayView = (
       <Overlay.PopView

@@ -31,7 +31,7 @@ export default function Biometric() {
           await setSecureStoreItem('Pin', pin);
           dispatch(setBiometrics(true));
         } catch (error: any) {
-          CommonToast.fail(typeof error.message === 'string' ? error.message : i18n.t('Failed to enable biometrics'));
+          CommonToast.failError(error, i18n.t('Failed to enable biometrics'));
           dispatch(setBiometrics(false));
         }
       }

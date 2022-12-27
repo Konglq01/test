@@ -99,6 +99,16 @@ export default {
     Overlay.hide(element);
     element = show(...args);
   },
+  failError(error: any, errorText?: string) {
+    Overlay.hide(element);
+    let text = '';
+    if (typeof error.message === 'string') {
+      text = error.message;
+    } else if (errorText) {
+      text = errorText;
+    }
+    if (text) element = show(text, undefined, 'top', 'fail');
+  },
   smile(...args: TostProps) {
     Toast.hide(element);
     element = Toast.smile(...args);
