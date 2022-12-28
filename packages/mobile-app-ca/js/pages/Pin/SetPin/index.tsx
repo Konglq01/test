@@ -11,9 +11,11 @@ import useRouterParams from '@portkey/hooks/useRouterParams';
 import ActionSheet from 'components/ActionSheet';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { RegisterInfo } from '../types';
+import { usePreventHardwareBack } from '@portkey/hooks/mobile';
 
 export default function SetPin() {
   const { oldPin, registerInfo } = useRouterParams<{ oldPin?: string; registerInfo?: RegisterInfo }>();
+  usePreventHardwareBack();
   const digitInput = useRef<DigitInputInterface>();
   useEffectOnce(() => {
     const listener = DeviceEventEmitter.addListener('clearSetPin', () => digitInput.current?.resetPin());

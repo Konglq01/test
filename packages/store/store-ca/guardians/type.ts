@@ -9,7 +9,7 @@ export interface UserGuardianItem {
   loginGuardianType: string;
   guardiansType: LoginType;
   key: string; // `${loginGuardianType}&${verifier?.name}`,
-  managerUniqueId?: string;
+  sessionId?: string;
 }
 
 export interface UserGuardianStatus extends UserGuardianItem {

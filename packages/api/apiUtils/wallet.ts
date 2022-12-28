@@ -1,21 +1,46 @@
 import { customFetch } from '@portkey/utils/fetch';
 import { baseUrl, walletApi } from '../index';
-import { LoginType } from '@portkey/types/verifier';
-interface registerWalletParams {
+import { LoginType, VerificationType } from '@portkey/types/verifier';
+
+interface CreateWalletInfoParams {
+  baseUrl: string;
   type: LoginType;
   loginGuardianType: string; //account
+  managerUniqueId: string;
   managerAddress: string;
   deviceString: string;
+  verificationType: VerificationType;
 }
-export const registerWalletByFetch = async (
-  params: registerWalletParams,
-): Promise<{
-  caAddress: string;
-  caHash: string;
-}> => {
-  return await customFetch(`${baseUrl}${walletApi.registerWallet}`, {
+
+export const createWalletInfo = async ({
+  baseUrl,
+  type,
+  loginGuardianType,
+  managerUniqueId,
+  managerAddress,
+  verificationType,
+  deviceString,
+}: CreateWalletInfoParams) => {
+  let api;
+  switch (verificationType) {
+    case VerificationType.register:
+      api = walletApi.registerWallet;
+      break;
+    case VerificationType.communityRecovery:
+      api = walletApi.recoveryWallet;
+      break;
+    default:
+      throw Error('Unable to find the corresponding api');
+  }
+  return customFetch(`${baseUrl}${api}`, {
     method: 'post',
-    params,
+    params: {
+      type,
+      loginGuardianType,
+      managerUniqueId,
+      managerAddress,
+      deviceString,
+    },
   });
 };
 
@@ -29,17 +54,40 @@ export const setWalletName = async ({ nickname }: { nickname: string }) => {
 };
 
 interface FetchCreateWalletParams {
-  loginType?: 'register' | 'login';
+  verificationType?: VerificationType;
   type: LoginType; //0: Email，1：Phone
   loginGuardianType: string;
   managerUniqueId: string;
+  baseUrl: string;
+  managerAddress: string;
 }
 
-export const fetchCreateWalletResult = async (params: FetchCreateWalletParams) => {
-  const api = params.loginType === 'register' ? walletApi.queryRegister : walletApi.queryRecovery;
-  delete params.loginType;
+export const fetchCreateWalletResult = async ({
+  baseUrl,
+  type,
+  managerUniqueId,
+  loginGuardianType,
+  verificationType,
+  managerAddress,
+}: FetchCreateWalletParams) => {
+  let api;
+  switch (verificationType) {
+    case VerificationType.register:
+      api = walletApi.queryRegister;
+      break;
+    case VerificationType.communityRecovery:
+      api = walletApi.queryRecovery;
+      break;
+    default:
+      throw Error('Unable to find the corresponding api');
+  }
   return await customFetch(`${baseUrl}${api}`, {
     method: 'post',
-    params,
+    params: {
+      type,
+      managerUniqueId,
+      loginGuardianType,
+      managerAddress,
+    },
   });
 };

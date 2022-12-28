@@ -77,12 +77,13 @@ export const customFetch: CustomFetchFun = (url, _config) => {
             if (control.abort) control.abort();
             reject(result);
           } else {
-            (result as Response)
+            const _result = result as Response;
+            _result
               .text()
               .then((text: string) => {
                 const res = formatResponse(text);
                 if (result.status !== 200 || !result.ok) {
-                  reject(res);
+                  reject(res ? res : _result.statusText);
                   return;
                 }
                 resolve(res);

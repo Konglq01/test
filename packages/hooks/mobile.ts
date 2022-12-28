@@ -5,6 +5,7 @@ export function usePreventHardwareBack() {
   useEffect(() => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => true);
     return () => {
+      console.log('remove-backHandler');
       backHandler.remove();
     };
   }, []);
