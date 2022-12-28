@@ -2,15 +2,15 @@ import { VerifierItem, VerifyStatus } from '@portkey/types/verifier';
 import { createSlice } from '@reduxjs/toolkit';
 import moment from 'moment';
 import {
-  fetchGuardianListAsync,
-  fetchVerifierListAsync,
   resetVerifierState,
   setUserGuardianItemStatus,
   setCurrentGuardianAction,
   setVerifierListAction,
   setUserGuardianSessionIdAction,
+  setGuardiansAction,
 } from './actions';
 import { GuardiansState } from './type';
+import { GUARDIAN_TYPE_TYPE } from './utils';
 
 const initialState: GuardiansState = {};
 export const guardiansSlice = createSlice({
@@ -21,16 +21,6 @@ export const guardiansSlice = createSlice({
     builder
       .addCase(resetVerifierState, state => {
         return { ...initialState, verifierMap: state.verifierMap };
-      })
-      .addCase(fetchVerifierListAsync.fulfilled, (state, action) => {
-        const map: GuardiansState['verifierMap'] = {};
-        action.payload.forEach((item: VerifierItem) => {
-          map[item.name] = item;
-        });
-        state.verifierMap = map;
-      })
-      .addCase(fetchVerifierListAsync.rejected, (state, action) => {
-        throw Error(action.error.message);
       })
       .addCase(setVerifierListAction, (state, action) => {
         if (!action.payload) {
@@ -43,9 +33,13 @@ export const guardiansSlice = createSlice({
         });
         state.verifierMap = map;
       })
-      .addCase(fetchGuardianListAsync.fulfilled, (state, action) => {
+      .addCase(setGuardiansAction, (state, action) => {
         const { verifierMap } = state;
-        // if(!verifierMap) throw '';
+        if (!action.payload) {
+          state.userGuardiansList = [];
+          state.userGuardianStatus = {};
+          return;
+        }
         const { loginGuardianTypeIndexes, guardians } = action.payload;
         const _guardians: (typeof guardians[number] & { isLoginAccount?: boolean })[] = [...guardians];
         loginGuardianTypeIndexes.forEach((item, idx) => {
@@ -55,25 +49,36 @@ export const guardiansSlice = createSlice({
         const userStatus = state.userGuardianStatus ?? {};
         const guardiansList = _guardians.map(guardian => {
           const loginGuardianType = guardian.guardianType.guardianType;
-          const verifier = verifierMap?.[guardian.verifier.name];
+          // TODO
+          const verifier = verifierMap?.[guardian.verifier.name || 'portkey'];
+          const guardiansType =
+            typeof guardian.guardianType.type === 'string'
+              ? GUARDIAN_TYPE_TYPE[guardian.guardianType.type]
+              : guardian.guardianType.type;
           const _guardian = {
             key: `${loginGuardianType}&${verifier?.name}`,
             isLoginAccount: guardian.isLoginAccount,
             verifier: verifier,
             loginGuardianType,
-            guardiansType: guardian.guardianType.type,
+            guardiansType,
           };
+
           userStatus[_guardian.key] = { ..._guardian, status: userStatus?.[_guardian.key]?.status };
           return _guardian;
         });
         state.userGuardiansList = guardiansList;
         state.userGuardianStatus = userStatus;
       })
-      .addCase(fetchGuardianListAsync.rejected, (state, action) => {
-        throw Error(action.error.message);
-      })
       .addCase(setCurrentGuardianAction, (state, action) => {
-        state.currentGuardian = action.payload;
+        state.currentGuardian = {
+          ...state.userGuardianStatus?.[action.payload.key],
+          ...action.payload,
+        };
+        state.userGuardianStatus = {
+          ...state.userGuardianStatus,
+          [action.payload.key]: state.currentGuardian,
+        };
+        console.log(JSON.parse(JSON.stringify(state.userGuardianStatus)), action.payload, 'setCurrentGuardianAction');
       })
       .addCase(setUserGuardianItemStatus, (state, action) => {
         const { key, status } = action.payload;
@@ -88,6 +93,7 @@ export const guardiansSlice = createSlice({
         const { key, sessionId } = action.payload;
         if (!state.userGuardianStatus?.[key]) throw Error("Can't find this item");
         state.userGuardianStatus[key]['sessionId'] = sessionId;
+        if (state.currentGuardian?.key === key) state.currentGuardian['sessionId'] = sessionId;
       });
   },
 });

@@ -54,18 +54,6 @@ export default function SetWalletPin() {
     [currentNetwork.apiUrl, loginAccount, state],
   );
 
-  const getCreateWalletResult = useCallback(async () => {
-    if (!loginAccount?.loginGuardianType || (!loginAccount.accountLoginType && loginAccount.accountLoginType !== 0))
-      throw 'Missing account!!! Please login/register again';
-    return await fetchWalletResult({
-      baseUrl: currentNetwork.apiUrl,
-      type: loginAccount?.accountLoginType,
-      verificationType: state === 'login' ? VerificationType.communityRecovery : VerificationType.register,
-      loginGuardianType: loginAccount.loginGuardianType,
-      managerUniqueId: loginAccount.managerUniqueId,
-    });
-  }, [currentNetwork.apiUrl, fetchWalletResult, loginAccount, state]);
-
   const onCreate = useCallback(
     async (values: any) => {
       try {
@@ -75,7 +63,7 @@ export default function SetWalletPin() {
           return message.error('Missing account!!! Please login/register again');
         setLoading(true);
         const _walletInfo = walletInfo.address ? walletInfo : AElf.wallet.createNewWallet();
-        console.log(pin, walletInfo, _walletInfo, 'onCreate==');
+        console.log(pin, walletInfo.address, 'onCreate==');
         // Step 9
         const sessionId = await createAndGetSessionId({ managerAddress: _walletInfo.address });
         !walletInfo.address
@@ -106,9 +94,14 @@ export default function SetWalletPin() {
         });
 
         // TODO Step 14 Only get Main Chain caAddress
-        const walletResult = await getCreateWalletResult();
-        if (walletResult.register_status !== 'pass')
-          throw walletResult?.register_message || walletResult.register_status;
+        const walletResult = await fetchWalletResult({
+          baseUrl: currentNetwork.apiUrl,
+          type: loginAccount?.accountLoginType,
+          verificationType: state === 'login' ? VerificationType.communityRecovery : VerificationType.register,
+          loginGuardianType: loginAccount.loginGuardianType,
+          managerUniqueId: loginAccount.managerUniqueId,
+        });
+        if (walletResult.status !== 'pass') throw walletResult?.message || walletResult.status;
         await setLocalStorage({
           registerStatus: 'Registered',
         });
@@ -122,7 +115,17 @@ export default function SetWalletPin() {
       }
       setLoading(false);
     },
-    [createAndGetSessionId, dispatch, getCreateWalletResult, loginAccount, navigate, setLoading, state, walletInfo],
+    [
+      createAndGetSessionId,
+      currentNetwork.apiUrl,
+      dispatch,
+      fetchWalletResult,
+      loginAccount,
+      navigate,
+      setLoading,
+      state,
+      walletInfo,
+    ],
   );
 
   const onFinishFailed = useCallback((errorInfo: any) => {

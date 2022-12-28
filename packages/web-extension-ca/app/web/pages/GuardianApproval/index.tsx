@@ -1,7 +1,6 @@
 import { Button, message } from 'antd';
-import useAccountVerifierList from 'hooks/useGuardianList';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useAppDispatch, useLoginInfo, useGuardiansInfo, useCommonState } from 'store/Provider/hooks';
+import { useAppDispatch, useLoginInfo, useGuardiansInfo, useCommonState, useLoading } from 'store/Provider/hooks';
 import { VerificationType, VerifyStatus } from '@portkey/types/verifier';
 import { useNavigate, useLocation } from 'react-router';
 import { setUserGuardianItemStatus, setCurrentGuardianAction } from '@portkey/store/store-ca/guardians/actions';
@@ -26,7 +25,7 @@ export default function GuardianApproval() {
   const { state } = useLocation();
   const dispatch = useAppDispatch();
   const { isPrompt } = useCommonState();
-  useAccountVerifierList();
+  const { setLoading } = useLoading();
 
   const userVerifiedList = useMemo(() => Object.values(userGuardianStatus ?? {}), [userGuardianStatus]);
   const approvalLength = useMemo(() => {
@@ -41,35 +40,43 @@ export default function GuardianApproval() {
 
   const SendCode = useCallback(
     async (item: UserGuardianItem) => {
-      if (
-        !loginAccount ||
-        (!loginAccount.accountLoginType && loginAccount.accountLoginType !== 0) ||
-        !loginAccount.loginGuardianType
-      )
-        return message.error('User registration information is invalid, please fill in the registration method again');
-
-      const result = await sendVerificationCode({
-        loginGuardianType: loginAccount?.loginGuardianType,
-        guardiansType: loginAccount?.accountLoginType,
-        verificationType: VerificationType.communityRecovery,
-        baseUrl: item?.verifier?.url || '',
-        // TODO
-        managerUniqueId: 'managerUniqueId',
-      });
-      if (result) {
-        dispatch(setCurrentGuardianAction(item));
-        dispatch(
-          setUserGuardianItemStatus({
-            key: item.key,
-            status: VerifyStatus.Verifying,
-          }),
-        );
-        state && state.indexOf('guardians') !== -1
-          ? navigate('/setting/guardians/verifier-account', { state: state })
-          : navigate('/login/verifier-account', { state: 'login' });
+      try {
+        if (
+          !loginAccount ||
+          (!loginAccount.accountLoginType && loginAccount.accountLoginType !== 0) ||
+          !loginAccount.loginGuardianType
+        )
+          return message.error(
+            'User registration information is invalid, please fill in the registration method again',
+          );
+        setLoading(true);
+        const result = await sendVerificationCode({
+          loginGuardianType: loginAccount?.loginGuardianType,
+          guardiansType: loginAccount?.accountLoginType,
+          verificationType: VerificationType.communityRecovery,
+          baseUrl: item?.verifier?.url || '',
+          managerUniqueId: loginAccount.managerUniqueId,
+        });
+        setLoading(false);
+        if (result.verifierSessionId) {
+          dispatch(setCurrentGuardianAction({ ...item, sessionId: result.verifierSessionId }));
+          dispatch(
+            setUserGuardianItemStatus({
+              key: item.key,
+              status: VerifyStatus.Verifying,
+            }),
+          );
+          state && state.indexOf('guardians') !== -1
+            ? navigate('/setting/guardians/verifier-account', { state: state })
+            : navigate('/login/verifier-account', { state: 'login' });
+        }
+      } catch (error: any) {
+        console.log(error, 'error===');
+        setLoading(false);
+        message.error(error?.error?.message ?? 'Something error');
       }
     },
-    [loginAccount, dispatch, navigate, state],
+    [loginAccount, setLoading, dispatch, state, navigate],
   );
 
   const recoveryWallet = useCallback(() => {

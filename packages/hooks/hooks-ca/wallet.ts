@@ -48,19 +48,32 @@ export const useFetchWalletCAAddress = () => {
     async (
       params: FetchCreateWalletParams,
     ): Promise<{
-      ca_address: string;
-      ca_hash: string;
-      register_message: null | string;
-      register_status: Omit<RegisterStatus, 'pending'>;
+      caAddress: string;
+      caHash: string;
+      message: null | string;
+      status: Omit<RegisterStatus, 'pending'>;
     }> => {
       // TODO
       const res = await fetchCreateWalletResult(params);
-
-      if (res.register_status === 'pending') {
+      let statusField;
+      switch (params.verificationType) {
+        case VerificationType.register:
+          statusField = 'register';
+          break;
+        case VerificationType.communityRecovery:
+          statusField = 'recovery';
+          break;
+      }
+      if (res[`${statusField}Status`] === 'pending') {
         await sleep(1000);
         return fetch(params);
+      } else {
+        return {
+          ...res,
+          status: res[`${statusField}Status`],
+          message: res[`${statusField}Message`],
+        };
       }
-      return res;
     },
     [],
   );

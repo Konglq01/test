@@ -65,7 +65,7 @@ export async function checkVerificationCode({
       api = verificationApi.checkRegisterVerificationCode;
       break;
     case VerificationType.communityRecovery:
-      api = verificationApi.sendRegisterVerificationCode;
+      api = verificationApi.checkRecoveryVerificationCode;
       break;
     default:
       throw Error('Unable to find the corresponding api');

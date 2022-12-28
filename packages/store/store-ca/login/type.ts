@@ -5,6 +5,7 @@ export interface loginInfo {
   accountLoginType: LoginType;
   createType?: 'register' | 'login';
   managerUniqueId: string;
+  caHash?: string;
 }
 
 export interface LoginState {
