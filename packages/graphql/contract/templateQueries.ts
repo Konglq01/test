@@ -59,7 +59,4 @@ const useFeeTierDistributionQuery = (
   );
 };
 
-export default {
-  useFeeTierDistributionQuery,
-  apolloClient
-};
+export { useFeeTierDistributionQuery };
