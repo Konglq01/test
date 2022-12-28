@@ -1,8 +1,11 @@
 import { useAppCASelector } from '.';
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import { WalletInfoType } from '@portkey/types/wallet';
-import { CAInfoType } from '@portkey/types/types-ca/wallet';
+import { CAInfoType, LoginType } from '@portkey/types/types-ca/wallet';
 import { WalletState } from '@portkey/store/store-ca/wallet/type';
+import { VerificationType } from '@portkey/types/verifier';
+import { fetchCreateWalletResult } from '@portkey/api/apiUtils/wallet';
+import { sleep } from '@portkey/utils';
 
 export interface CurrentWalletType extends WalletInfoType, CAInfoType {}
 
@@ -28,4 +31,39 @@ export const useCurrentWallet = () => {
     const { walletInfo, currentNetwork } = wallet;
     return { ...wallet, walletInfo: getCurrentWalletInfo(walletInfo, currentNetwork) };
   }, [wallet]);
+};
+
+interface FetchCreateWalletParams {
+  verificationType?: VerificationType;
+  type: LoginType; //0: Email，1：Phone
+  loginGuardianType: string;
+  managerUniqueId: string;
+  baseUrl: string;
+}
+
+type RegisterStatus = 'pass' | 'pending' | 'fail' | null;
+
+export const useFetchWalletCAAddress = () => {
+  const fetch = useCallback(
+    async (
+      params: FetchCreateWalletParams,
+    ): Promise<{
+      ca_address: string;
+      ca_hash: string;
+      register_message: null | string;
+      register_status: Omit<RegisterStatus, 'pending'>;
+    }> => {
+      // TODO
+      const res = await fetchCreateWalletResult(params);
+
+      if (res.register_status === 'pending') {
+        await sleep(1000);
+        return fetch(params);
+      }
+      return res;
+    },
+    [],
+  );
+
+  return fetch;
 };

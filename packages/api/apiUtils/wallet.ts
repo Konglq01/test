@@ -59,7 +59,6 @@ interface FetchCreateWalletParams {
   loginGuardianType: string;
   managerUniqueId: string;
   baseUrl: string;
-  managerAddress: string;
 }
 
 export const fetchCreateWalletResult = async ({
@@ -68,7 +67,6 @@ export const fetchCreateWalletResult = async ({
   managerUniqueId,
   loginGuardianType,
   verificationType,
-  managerAddress,
 }: FetchCreateWalletParams) => {
   let api;
   switch (verificationType) {
@@ -87,7 +85,6 @@ export const fetchCreateWalletResult = async ({
       type,
       managerUniqueId,
       loginGuardianType,
-      managerAddress,
     },
   });
 };
