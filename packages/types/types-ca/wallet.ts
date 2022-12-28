@@ -18,7 +18,7 @@ export interface CAInfo {
   // TODO: id
 }
 export type CAInfoType = {
-  managerInfo: ManagerInfo;
+  managerInfo?: ManagerInfo;
 } & { [key in ChainId]?: CAInfo };
 
 export interface CAWalletInfoType extends WalletInfoType {
