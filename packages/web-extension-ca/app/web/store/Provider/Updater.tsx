@@ -12,7 +12,7 @@ export default function Updater() {
     keepAliveOnPages();
   }, []);
 
-  // Query the caAddress of each chain
+  // TODO Query the caAddress of each chain by Contract
 
   return null;
 }

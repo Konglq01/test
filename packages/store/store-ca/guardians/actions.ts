@@ -12,12 +12,16 @@ export const fetchVerifierListAsync = createAsyncThunk('verifier/fetchVerifierLi
   return response;
 });
 
+// TODO Will delete
+/** @deprecated */
 export const fetchGuardianListAsync = createAsyncThunk('verifier/fetchGuardianListAsync', async () => {
   const response: GuardiansInfo = await fetchGuardiansList();
   return response;
 });
 
 export const setVerifierListAction = createAction<VerifierItem[] | null>('verifier/setVerifierList');
+
+export const setGuardiansAction = createAction<GuardiansInfo | null>('verifier/setGuardians');
 
 export const setCurrentGuardianAction = createAction<UserGuardianItem>('verifier/setCurrentGuardian');
 export const setUserGuardianItemStatus = createAction<{ key: string; status: VerifyStatus }>(
