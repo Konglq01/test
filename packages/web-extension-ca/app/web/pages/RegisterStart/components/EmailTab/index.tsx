@@ -1,15 +1,17 @@
 import { Button } from 'antd';
 import { useCallback, useRef, useState } from 'react';
-import EmailInput, { EmailInputInstance } from 'pages/components/EmailInput';
+import EmailInput, { EmailInputInstance } from 'pages/RegisterStart/components/EmailInput';
 import { useTranslation } from 'react-i18next';
 import './index.less';
+import { NetworkItem } from '@portkey/constants/constants-ca/network';
 
 interface EmailTabProps {
   onSuccess: (email: string) => void;
+  currentNetwork: NetworkItem;
   isTermsChecked?: boolean;
 }
 
-export default function EmailTab({ onSuccess }: EmailTabProps) {
+export default function EmailTab({ currentNetwork, onSuccess }: EmailTabProps) {
   const [error, setError] = useState<string>();
   const [val, setVal] = useState<string>();
   const emailInputInstance = useRef<EmailInputInstance>();
@@ -27,6 +29,7 @@ export default function EmailTab({ onSuccess }: EmailTabProps) {
   return (
     <div className="email-sign-wrapper">
       <EmailInput
+        currentNetwork={currentNetwork}
         val={val}
         ref={emailInputInstance}
         error={error}

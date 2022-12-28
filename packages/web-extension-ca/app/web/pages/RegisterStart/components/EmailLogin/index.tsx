@@ -2,11 +2,12 @@ import { setLoginAccountAction } from '@portkey/store/store-ca/login/actions';
 import { resetVerifierState } from '@portkey/store/store-ca/guardians/actions';
 import { LoginType } from '@portkey/types/verifier';
 import { Button, message } from 'antd';
-import EmailInput, { EmailInputInstance } from 'pages/components/EmailInput';
+import EmailInput, { EmailInputInstance } from 'pages/RegisterStart/components/EmailInput';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useAppDispatch, useLoginInfo } from 'store/Provider/hooks';
 import './index.less';
+import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 
 export default function EmailLogin() {
   const { loginAccount } = useLoginInfo();
@@ -19,6 +20,7 @@ export default function EmailLogin() {
   const emailInputInstance = useRef<EmailInputInstance>();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const currentNetwork = useCurrentNetworkInfo();
   const loginHandler = useCallback(() => {
     if (!val) return message.error('No Account');
     dispatch(
@@ -44,6 +46,7 @@ export default function EmailLogin() {
   return (
     <div className="email-login-wrapper">
       <EmailInput
+        currentNetwork={currentNetwork}
         val={val}
         ref={emailInputInstance}
         error={error}

@@ -57,6 +57,7 @@ export default function GuardiansView() {
         guardiansType: loginAccount.accountLoginType || 0,
         baseUrl: '', // TODO
         verificationType: VerificationType.register, // TODO
+        managerUniqueId: 'managerUniqueId',
       });
       if (result) {
         // TODO

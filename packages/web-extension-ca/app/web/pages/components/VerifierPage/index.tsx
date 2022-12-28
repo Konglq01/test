@@ -25,6 +25,7 @@ interface VerifierPageProps {
   currentGuardian?: UserGuardianItem;
   guardiansType?: LoginType;
   verificationType: VerificationType;
+
   onSuccess?: () => void;
 }
 
@@ -40,8 +41,6 @@ export default function VerifierPage({
   const { isPrompt } = useCommonState();
   const [pinVal, setPinVal] = useState<string>();
   const { t } = useTranslation();
-  // const isPrompt = false;
-  console.log(pinVal, 'loginAccount===');
 
   const onFinish = useCallback(
     async (code: string) => {
@@ -49,42 +48,47 @@ export default function VerifierPage({
       if (code && code.length === 6) {
         if (!loginAccount?.loginGuardianType || (!loginAccount.accountLoginType && loginAccount.accountLoginType !== 0))
           return message.error('Missing account!!!');
+        if (!currentGuardian?.sessionId) return message.error('Missing verifierSessionId!!!');
         setLoading(true);
-        // TODO
-        await sleep(1000);
+
         const res = await checkVerificationCode({
           code,
           baseUrl: currentGuardian?.verifier?.url || '',
           verificationType,
           type: loginAccount.accountLoginType,
           loginGuardianType: loginAccount?.loginGuardianType,
+          verifierSessionId: currentGuardian?.sessionId,
         });
         setLoading(false);
-        if (res.result === 0) return onSuccess?.();
-        if (res.result === 2) message.error(t(VerificationError.codeExpired));
-        if (!res?.result || res.result === 1) message.error(t(VerificationError.InvalidCode));
+        if (res?.verifierSessionId) return onSuccess?.();
+        if (res?.error?.message) {
+          message.error(t(res.error.message));
+        } else {
+          message.error(t(VerificationError.InvalidCode));
+        }
         setPinVal('');
       }
     },
-    [loginAccount, currentGuardian?.verifier?.url, verificationType, setLoading, onSuccess, t],
+    [loginAccount, currentGuardian, setLoading, verificationType, onSuccess, t],
   );
 
   const resendCode = useCallback(async () => {
     if (!loginAccount?.loginGuardianType) return message.error('Missing loginGuardianType');
     console.log(guardiansType, 'guardiansType===');
     if (!guardiansType && guardiansType !== 0) return message.error('Missing guardiansType');
+    setLoading(true);
     const res = await sendVerificationCode({
       loginGuardianType: loginAccount.loginGuardianType,
       guardiansType,
       verificationType,
       baseUrl: currentGuardian?.verifier?.url || '',
+      managerUniqueId: loginAccount.managerUniqueId,
     });
-    if (res) {
-      if (res.result === 0) {
-        setTimer(MAX_TIMER);
-      }
+    setLoading(false);
+    if (res.verifierSessionId) {
+      setTimer(MAX_TIMER);
     }
-  }, [currentGuardian, guardiansType, loginAccount, verificationType]);
+  }, [currentGuardian, guardiansType, loginAccount, setLoading, verificationType]);
 
   const timerUtil = useCallback(async () => {
     if (!timer) return setTimer(undefined);

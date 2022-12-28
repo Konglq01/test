@@ -3,7 +3,7 @@ import { Button, message } from 'antd';
 import CommonModal from 'components/CommonModal';
 import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { useAppDispatch, useLoginInfo, useGuardiansInfo } from 'store/Provider/hooks';
+import { useAppDispatch, useLoginInfo, useGuardiansInfo, useLoading } from 'store/Provider/hooks';
 import PortKeyTitle from 'pages/components/PortKeyTitle';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
 import './index.less';
@@ -15,11 +15,12 @@ import { useTranslation } from 'react-i18next';
 export default function SelectVerifier() {
   const { verifierMap } = useGuardiansInfo();
   const { loginAccount } = useLoginInfo();
-  const [selectVal, setSelectVal] = useState<string>('Portkey');
+  const [selectVal, setSelectVal] = useState<string>('portkey');
   const [open, setOpen] = useState<boolean>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
+  const { setLoading } = useLoading();
 
   const handleChange = useCallback((value: string) => {
     setSelectVal(value);
@@ -31,7 +32,7 @@ export default function SelectVerifier() {
     () =>
       Object.values(verifierMap ?? {})?.map((item) => ({
         value: item.name,
-        icon: item.imageUrl,
+        iconUrl: item.imageUrl ?? '',
         label: item.name,
       })),
     [verifierMap],
@@ -46,28 +47,34 @@ export default function SelectVerifier() {
       )
         return message.error('User registration information is invalid, please fill in the registration method again');
       if (!selectItem) return message.error('Can not get verification');
-      dispatch(
-        setCurrentGuardianAction({
-          isLoginAccount: true,
-          verifier: selectItem,
-          loginGuardianType: loginAccount.loginGuardianType,
-          guardiansType: loginAccount.accountLoginType,
-          key: `${loginAccount.loginGuardianType}&${selectItem.name}`,
-        }),
-      );
+
+      setLoading(true);
       const result = await sendVerificationCode({
         loginGuardianType: loginAccount.loginGuardianType,
         guardiansType: loginAccount?.accountLoginType,
         verificationType: VerificationType.register,
         baseUrl: selectItem?.url || '',
+        managerUniqueId: loginAccount.managerUniqueId,
       });
-      if (result) {
+      setLoading(false);
+      if (result.verifierSessionId) {
+        const _key = `${loginAccount.loginGuardianType}&${selectItem.name}`;
+        dispatch(
+          setCurrentGuardianAction({
+            isLoginAccount: true,
+            verifier: selectItem,
+            loginGuardianType: loginAccount.loginGuardianType,
+            guardiansType: loginAccount.accountLoginType,
+            sessionId: result.verifierSessionId,
+            key: _key,
+          }),
+        );
         navigate('/register/verifier-account', { state: 'register' });
       }
     } catch (error) {
       console.log(error, 'verifyHandler');
     }
-  }, [dispatch, loginAccount, navigate, selectItem]);
+  }, [dispatch, loginAccount, navigate, selectItem, setLoading]);
 
   return (
     <div className="common-page select-verifier-wrapper">

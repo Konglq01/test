@@ -53,6 +53,8 @@ export default function GuardianApproval() {
         guardiansType: loginAccount?.accountLoginType,
         verificationType: VerificationType.communityRecovery,
         baseUrl: item?.verifier?.url || '',
+        // TODO
+        managerUniqueId: 'managerUniqueId',
       });
       if (result) {
         dispatch(setCurrentGuardianAction(item));
