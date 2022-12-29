@@ -1,3 +1,3 @@
-import * as contractQueries from './contract/templateQueries';
+import * as contractQueries from './contract/queries';
 
 export { contractQueries };

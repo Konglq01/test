@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.7.3",
-    "graphql": "^16.6.0"
+    "graphql": "^16.6.0",
+    "subscriptions-transport-ws": "^0.11.0"
   }
 }

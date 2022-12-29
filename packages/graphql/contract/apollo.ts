@@ -1,40 +1,29 @@
-import { ApolloClient, ApolloLink, concat, HttpLink, InMemoryCache } from '@apollo/client';
+import { ApolloClient, HttpLink, InMemoryCache, NormalizedCacheObject } from '@apollo/client';
+import { NetworkType } from '@portkey/types';
 
-const httpLink = new HttpLink({ uri: '' });
-
-enum SupportedChainId {
-  MAINNET = 1,
-}
-
-const CHAIN_SUBGRAPH_URL: Record<string, string> = {
-  [SupportedChainId.MAINNET]: '',
+// TODO: hide url
+const CHAIN_SUBGRAPH_URL: Record<NetworkType, string> = {
+  ['MAIN']: '',
+  ['TESTNET']: 'http://192.168.66.255:8083/AElfIndexer_DApp/PortKeyIndexerCASchema/graphql',
 };
 
-// This middleware will allow us to dynamically update the uri for the requests based off chainId
-// For more information: https://www.apollographql.com/docs/react/networking/advanced-http-networking/
-const authMiddleware = new ApolloLink((operation, forward) => {
-  // add the authorization to the headers
-
-  // TODO: get curChainId
-  const chainId = '';
-
-  operation.setContext(() => ({
-    uri:
-      chainId && CHAIN_SUBGRAPH_URL[chainId]
-        ? CHAIN_SUBGRAPH_URL[chainId]
-        : CHAIN_SUBGRAPH_URL[SupportedChainId.MAINNET],
-  }));
-
-  return forward(operation);
-});
-
-export const apolloClient = new ApolloClient({
-  cache: new InMemoryCache(),
-  queryDeduplication: false,
-  defaultOptions: {
-    watchQuery: {
-      fetchPolicy: 'cache-and-network',
+const createApolloClient = (networkType: NetworkType) =>
+  new ApolloClient({
+    cache: new InMemoryCache(),
+    queryDeduplication: false,
+    defaultOptions: {
+      watchQuery: {
+        fetchPolicy: 'cache-and-network',
+      },
     },
-  },
-  link: concat(authMiddleware, httpLink),
-});
+    link: new HttpLink({ uri: CHAIN_SUBGRAPH_URL[networkType] }),
+  });
+
+export const networkClientMap: Record<NetworkType, ApolloClient<NormalizedCacheObject>> = {
+  ['MAIN']: createApolloClient('MAIN'),
+  ['TESTNET']: createApolloClient('TESTNET'),
+};
+
+export const getApolloClient = (networkType: NetworkType) => {
+  return networkClientMap[networkType];
+};
