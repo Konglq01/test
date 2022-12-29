@@ -1,13 +1,13 @@
 import { stringify } from 'query-string';
 
-type CustomConfig = RequestInit & {
+export interface CustomFetchConfig extends RequestInit {
   timeout?: number;
   params?: Record<string, any>;
-};
+}
 
-type CustomFetchFun = (
+export type CustomFetchFun = (
   url: string, // baseURL
-  _config?: CustomConfig,
+  _config?: CustomFetchConfig,
 ) => Promise<{ type: 'timeout' } | any>;
 
 const defaultHeaders = {

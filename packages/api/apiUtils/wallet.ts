@@ -1,6 +1,6 @@
 import { customFetch } from '@portkey/utils/fetch';
-import { baseUrl, walletApi } from '../index';
 import { LoginType, VerificationType } from '@portkey/types/verifier';
+import { request } from '..';
 
 interface CreateWalletInfoParams {
   baseUrl: string;
@@ -21,19 +21,19 @@ export const createWalletInfo = async ({
   verificationType,
   deviceString,
 }: CreateWalletInfoParams) => {
-  let api;
+  let tmpFetch;
   switch (verificationType) {
     case VerificationType.register:
-      api = walletApi.registerWallet;
+      tmpFetch = request.wallet.registerWallet;
       break;
     case VerificationType.communityRecovery:
-      api = walletApi.recoveryWallet;
+      tmpFetch = request.wallet.recoveryWallet;
       break;
     default:
       throw Error('Unable to find the corresponding api');
   }
-  return customFetch(`${baseUrl}${api}`, {
-    method: 'post',
+  return tmpFetch({
+    baseURL: baseUrl,
     params: {
       type,
       loginGuardianType,
@@ -43,10 +43,10 @@ export const createWalletInfo = async ({
     },
   });
 };
-
-export const setWalletName = async ({ nickname }: { nickname: string }) => {
-  return await customFetch(`${baseUrl}${walletApi.setWalletName}`, {
-    method: 'post',
+// TODO
+export const setWalletName = ({ nickname, baseURL = '' }: { baseURL?: string; nickname: string }) => {
+  return request.wallet.setWalletName({
+    baseURL,
     params: {
       nickname,
     },
@@ -68,19 +68,19 @@ export const fetchCreateWalletResult = async ({
   loginGuardianType,
   verificationType,
 }: FetchCreateWalletParams) => {
-  let api;
+  let tmpFetch;
   switch (verificationType) {
     case VerificationType.register:
-      api = walletApi.queryRegister;
+      tmpFetch = request.wallet.queryRegister;
       break;
     case VerificationType.communityRecovery:
-      api = walletApi.queryRecovery;
+      tmpFetch = request.wallet.queryRecovery;
       break;
     default:
       throw Error('Unable to find the corresponding api');
   }
-  return await customFetch(`${baseUrl}${api}`, {
-    method: 'post',
+  return await tmpFetch({
+    baseURL: baseUrl,
     params: {
       type,
       managerUniqueId,
