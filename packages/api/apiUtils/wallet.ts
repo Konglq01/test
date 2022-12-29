@@ -9,6 +9,7 @@ interface CreateWalletInfoParams {
   managerAddress: string;
   deviceString: string;
   verificationType: VerificationType;
+  chainId: string;
 }
 
 export const createWalletInfo = async ({
@@ -19,6 +20,7 @@ export const createWalletInfo = async ({
   managerAddress,
   verificationType,
   deviceString,
+  chainId,
 }: CreateWalletInfoParams) => {
   let tmpFetch;
   switch (verificationType) {
@@ -39,6 +41,7 @@ export const createWalletInfo = async ({
       managerUniqueId,
       managerAddress,
       deviceString,
+      chainId,
     },
   });
 };

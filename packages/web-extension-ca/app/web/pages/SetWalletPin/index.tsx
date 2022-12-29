@@ -45,9 +45,9 @@ export default function SetWalletPin() {
         loginGuardianType: loginAccount.loginGuardianType,
         managerUniqueId: loginAccount.managerUniqueId,
         managerAddress,
+        chainId: 'AELF',
         verificationType: state === 'login' ? VerificationType.communityRecovery : VerificationType.register,
-        // TODO
-        deviceString: '',
+        deviceString: navigator.userAgent,
       });
       return loginAccount.managerUniqueId;
     },
@@ -88,10 +88,10 @@ export default function SetWalletPin() {
                 },
               }),
             );
-        await setPinAction(pin);
         await setLocalStorage({
           registerStatus: 'registeredNotGetCaAddress',
         });
+        await setPinAction(pin);
 
         // TODO Step 14 Only get Main Chain caAddress
         const walletResult = await fetchWalletResult({
@@ -111,7 +111,7 @@ export default function SetWalletPin() {
         console.log(error, 'onCreate');
         const walletError = isWalletError(error);
         const errorString = typeof error === 'string' ? error : 'Something error';
-        message.error(walletError ?? errorString);
+        message.error(walletError || errorString);
       }
       setLoading(false);
     },

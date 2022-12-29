@@ -59,7 +59,8 @@ export default function EmailLogin() {
 
       navigate('/login/guardian-approval');
     } catch (error: any) {
-      setError(error);
+      setLoading(false);
+      typeof error === 'string' ? setError(error) : message.error(error);
     }
   }, [dispatch, fetchUserVerifier, loginHandler, navigate, setLoading, val]);
 

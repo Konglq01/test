@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { useAppDispatch, useLoginInfo } from 'store/Provider/hooks';
 import { setGuardiansAction } from '@portkey/store/store-ca/guardians/actions';
 import { getGuardianList } from 'utils/sandboxUtil/getGuardianList';
@@ -26,8 +26,10 @@ const useGuardiansList = () => {
         },
       });
       dispatch(setGuardiansAction(res.result.guardiansInfo));
-    } catch (error) {
+    } catch (error: any) {
       console.error(error, 'useGuardiansList===error');
+      const errorMessage = error.message;
+      throw errorMessage?.Error?.Message || errorMessage.message?.Message || errorMessage?.message;
     }
   }, [currentChain, currentNetwork, loginAccount, dispatch]);
 
