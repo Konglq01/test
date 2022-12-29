@@ -1,7 +1,5 @@
 import { LoginType, VerificationType } from '@portkey/types/verifier';
-import { randomId } from '@portkey/utils';
-import { customFetch } from '@portkey/utils/fetch';
-import { baseUrl, verificationApi } from '../index';
+import { request } from '..';
 
 interface SendVerificationCodeProps {
   verificationType: VerificationType;
@@ -10,22 +8,21 @@ interface SendVerificationCodeProps {
   baseUrl: string;
   managerUniqueId: string;
 }
-export async function sendVerificationCode(params: SendVerificationCodeProps): Promise<any> {
-  // sendRegisterVerificationCode
-  let api;
+export function sendVerificationCode(params: SendVerificationCodeProps): Promise<any> {
+  let tmpFetch;
   switch (params.verificationType) {
     case VerificationType.register:
-      api = verificationApi.sendRegisterVerificationCode;
+      tmpFetch = request.verify.sendRegisterVerificationCode;
       break;
     case VerificationType.communityRecovery:
-      api = verificationApi.sendRecoveryVerificationCode;
+      tmpFetch = request.verify.sendRecoveryVerificationCode;
       break;
     default:
       throw Error('Unable to find the corresponding api');
   }
 
-  return await customFetch(`${params.baseUrl}${api}`, {
-    method: 'post',
+  return tmpFetch({
+    baseURL: params.baseUrl,
     params: {
       type: params.guardiansType,
       loginGuardianType: params.loginGuardianType,
@@ -59,19 +56,19 @@ export async function checkVerificationCode({
   verifierSessionId?: string;
   error?: ErrorBack;
 }> {
-  let api;
+  let tmpFetch;
   switch (verificationType) {
     case VerificationType.register:
-      api = verificationApi.checkRegisterVerificationCode;
+      tmpFetch = request.verify.checkRegisterVerificationCode;
       break;
     case VerificationType.communityRecovery:
-      api = verificationApi.sendRegisterVerificationCode;
+      tmpFetch = request.verify.checkRecoveryVerificationCode;
       break;
     default:
       throw Error('Unable to find the corresponding api');
   }
-  return await customFetch(`${baseUrl}${api}`, {
-    method: 'post',
+  return await tmpFetch({
+    baseURL: baseUrl,
     params: {
       type,
       code,
@@ -81,16 +78,7 @@ export async function checkVerificationCode({
   });
 }
 
-export const getVerifierList = async () => {
-  return await customFetch(`${baseUrl}${verificationApi.getVerifierList}`);
-};
-
 export const getAccountVerifierList = async () => {
-  // return await customFetch(`${baseUrl}${walletApi.getAccountVerifierList}`, {
-  //   params: {
-  //     isPopular: false,
-  //   },
-  // });
   return;
 };
 
@@ -103,10 +91,7 @@ interface loginGuardianTypeCheckParams {
 export const loginGuardianTypeCheck = async (params: loginGuardianTypeCheckParams): Promise<{ result: boolean }> => {
   const apiUrl = params.apiUrl;
   delete params.apiUrl;
-  // return await customFetch(`${apiUrl}${verificationApi.loginGuardianTypeCheck}`, {
-  //   method: 'post',
-  //   params,
-  // });
+
   return {
     result: true,
   };

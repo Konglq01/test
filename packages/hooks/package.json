@@ -11,6 +11,7 @@
     "start": "tsc --watch"
   },
   "devDependencies": {
-    "@types/react-native": "^0.69.7"
+    "@types/react-native": "^0.69.7",
+    "@portkey/utils": "^0.0.1"
   }
 }
