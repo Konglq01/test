@@ -1,0 +1,19 @@
+{
+  "name": "@portkey/graphql",
+  "publishConfig": {
+    "access": "public"
+  },
+  "version": "0.0.1",
+  "type": "commonjs",
+  "scripts": {
+    "prebuild": "rm -rf dist",
+    "build": "tsc",
+    "start": "tsc --watch"
+  },
+  "dependencies": {
+    "@portkey/types": "^0.0.1",
+    "@apollo/client": "^3.7.3",
+    "graphql": "^16.6.0",
+    "subscriptions-transport-ws": "^0.11.0"
+  }
+}
