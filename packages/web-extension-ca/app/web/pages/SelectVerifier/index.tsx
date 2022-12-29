@@ -11,6 +11,8 @@ import { sendVerificationCode } from '@portkey/api/apiUtils/verification';
 import { VerificationType } from '@portkey/types/verifier';
 import CommonSelect from 'components/CommonSelect1';
 import { useTranslation } from 'react-i18next';
+import { isVerifyApiError } from '@portkey/constants/apiErrorMessage';
+import { verifyErrorHandler } from 'utils/tryErrorHandler';
 
 export default function SelectVerifier() {
   const { verifierMap } = useGuardiansInfo();
@@ -71,8 +73,11 @@ export default function SelectVerifier() {
         );
         navigate('/register/verifier-account', { state: 'register' });
       }
-    } catch (error) {
+    } catch (error: any) {
+      setLoading(false);
       console.log(error, 'verifyHandler');
+      const _error = verifyErrorHandler(error);
+      message.error(_error);
     }
   }, [dispatch, loginAccount, navigate, selectItem, setLoading]);
 

@@ -1,8 +1,11 @@
-import { customFetch } from '@portkey/utils/fetch';
+import { request } from '@portkey/api';
 
 export const getChainList = ({ baseUrl }: { baseUrl: string }) => {
   try {
-    return customFetch(`${baseUrl}/api/app/getChains`);
+    return request.chain.getChains({
+      baseURL: baseUrl,
+      method: 'get',
+    });
   } catch (error: any) {
     if (error?.type) throw Error(error.type);
     if (error?.error?.message) throw Error(error.error.message);

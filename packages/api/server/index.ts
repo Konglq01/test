@@ -14,7 +14,7 @@ class ServiceInit {
   parseRouter = (name: string, urlObj: UrlObj) => {
     const obj: any = (this[name] = {});
     Object.keys(urlObj).forEach(key => {
-      obj[key] = this.send.bind(this, urlObj[key]);
+      obj[key] = this.send.bind(this, urlObj[key] as any);
     });
   };
   /**
@@ -23,10 +23,10 @@ class ServiceInit {
    * @return {Promise<any>}
    */
 
-  send = (config: BaseConfig) => {
+  send = (url: string, config?: BaseConfig) => {
     //TODO networkType
-    const { method = DEFAULT_METHOD, url, baseURL, ...fetchConfig } = config || {};
-    const _baseURL = baseURL;
+    const { method = DEFAULT_METHOD, baseURL, ...fetchConfig } = config || {};
+    const _baseURL = baseURL ?? '';
     const _url = url;
     const URL = spliceUrl(_baseURL, _url);
     return customFetch(URL, {
@@ -35,5 +35,14 @@ class ServiceInit {
     });
   };
 }
+
 const myServer = new ServiceInit();
+
 export default myServer;
+
+const a = (a: string) => {
+  console.log(a);
+};
+const b = a.bind(this);
+
+b('2');

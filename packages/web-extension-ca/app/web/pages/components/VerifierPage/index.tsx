@@ -13,6 +13,7 @@ import './index.less';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import { useTranslation } from 'react-i18next';
 import { setUserGuardianSessionIdAction } from '@portkey/store/store-ca/guardians/actions';
+import { verifyErrorHandler } from 'utils/tryErrorHandler';
 
 const MAX_TIMER = 60;
 
@@ -66,7 +67,7 @@ export default function VerifierPage({
             verifierSessionId: currentGuardian?.sessionId,
           });
           setLoading(false);
-          if (res?.verifierSessionId) return onSuccess?.();
+          if (!Object.keys(res).length) return onSuccess?.();
           if (res?.error?.message) {
             message.error(t(res.error.message));
           } else {
@@ -78,8 +79,8 @@ export default function VerifierPage({
         console.log(error, 'error====');
         setLoading(false);
         setPinVal('');
-        const _error = typeof error === 'string' ? error : error?.error?.message;
-        message.error(_error ?? 'Something error');
+        const _error = verifyErrorHandler(error);
+        message.error(_error);
       }
     },
     [loginAccount, currentGuardian, setLoading, verificationType, onSuccess, t],

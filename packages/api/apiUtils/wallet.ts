@@ -1,4 +1,3 @@
-import { customFetch } from '@portkey/utils/fetch';
 import { LoginType, VerificationType } from '@portkey/types/verifier';
 import { request } from '..';
 

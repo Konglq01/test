@@ -1,5 +1,4 @@
 import { LoginType, VerificationType } from '@portkey/types/verifier';
-import { customFetch } from '@portkey/utils/fetch';
 import { request } from '..';
 
 interface SendVerificationCodeProps {
@@ -9,8 +8,7 @@ interface SendVerificationCodeProps {
   baseUrl: string;
   managerUniqueId: string;
 }
-export async function sendVerificationCode(params: SendVerificationCodeProps): Promise<any> {
-  // sendRegisterVerificationCode
+export function sendVerificationCode(params: SendVerificationCodeProps): Promise<any> {
   let tmpFetch;
   switch (params.verificationType) {
     case VerificationType.register:
@@ -23,7 +21,7 @@ export async function sendVerificationCode(params: SendVerificationCodeProps): P
       throw Error('Unable to find the corresponding api');
   }
 
-  return await tmpFetch({
+  return tmpFetch({
     baseURL: params.baseUrl,
     params: {
       type: params.guardiansType,
@@ -81,11 +79,6 @@ export async function checkVerificationCode({
 }
 
 export const getAccountVerifierList = async () => {
-  // return await customFetch(`${baseUrl}${walletApi.getAccountVerifierList}`, {
-  //   params: {
-  //     isPopular: false,
-  //   },
-  // });
   return;
 };
 
@@ -98,10 +91,7 @@ interface loginGuardianTypeCheckParams {
 export const loginGuardianTypeCheck = async (params: loginGuardianTypeCheckParams): Promise<{ result: boolean }> => {
   const apiUrl = params.apiUrl;
   delete params.apiUrl;
-  // return await customFetch(`${apiUrl}${verificationApi.loginGuardianTypeCheck}`, {
-  //   method: 'post',
-  //   params,
-  // });
+
   return {
     result: true,
   };
