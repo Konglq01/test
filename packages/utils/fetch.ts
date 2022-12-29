@@ -75,7 +75,7 @@ export const customFetch: CustomFetchFun = (url, _config) => {
           if (result.type === 'timeout') {
             // Cancel timeout request
             if (control.abort) control.abort();
-            reject(result);
+            reject('timeout');
           } else {
             const _result = result as Response;
             _result
