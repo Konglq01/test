@@ -144,7 +144,10 @@ export interface GetCAHolderManagerInfoDto {
   maxResultCount: Number;
 }
 
-export type SearchCAHolderManagerInfoParamsType = Omit<GetCAHolderManagerInfoDto, 'skipCount' | 'maxResultCount'>;
+export type SearchCAHolderManagerInfoParamsType = PartialOption<
+  GetCAHolderManagerInfoDto,
+  'skipCount' | 'maxResultCount'
+>;
 
 // LoginGuardianType
 export interface LoginGuardianTypeDto {
