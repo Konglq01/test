@@ -3,18 +3,27 @@ import GStyles from 'assets/theme/GStyles';
 import CommonButton from 'components/CommonButton';
 import { TextM } from 'components/CommonText';
 import Svg from 'components/Svg';
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { pTd } from 'utils/unit';
 import navigationService from 'utils/navigationService';
 import fonts from 'assets/theme/fonts';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
+import { useGuardiansInfo } from 'hooks/store';
+import Loading from 'components/Loading';
+import { request } from 'api';
+import CommonToast from 'components/CommonToast';
+import { sleep } from '@portkey/utils';
+import { useAppDispatch } from 'store/hooks';
+import { setUserGuardianItemStatus } from '@portkey/store/store-ca/guardians/actions';
+import { VerifyStatus } from '@portkey/types/verifier';
 
 interface GuardianAccountItemProps {
   item: UserGuardianItem;
   isButtonHide?: boolean;
   renderBtn?: (item: UserGuardianItem) => JSX.Element;
   isBorderHide?: boolean;
+  managerUniqueId: string;
 }
 
 export default function GuardianAccountItem({
@@ -22,7 +31,20 @@ export default function GuardianAccountItem({
   isButtonHide,
   renderBtn,
   isBorderHide = false,
+  managerUniqueId,
 }: GuardianAccountItemProps) {
+  const dispatch = useAppDispatch();
+  const { userGuardianStatus } = useGuardiansInfo();
+  const itemStatus = useMemo(() => userGuardianStatus?.[item.key], [item.key, userGuardianStatus]);
+  console.log(itemStatus, '====itemStatus');
+  const onVerifierSuccess = useCallback(() => {
+    dispatch(
+      setUserGuardianItemStatus({
+        key: item.key,
+        status: VerifyStatus.Verified,
+      }),
+    );
+  }, [dispatch, item.key]);
   return (
     <View style={[styles.itemRow, isBorderHide && styles.itemWithoutBorder]}>
       {item.isLoginAccount && (
@@ -37,16 +59,52 @@ export default function GuardianAccountItem({
           {item.loginGuardianType}
         </TextM>
       </View>
-      {!isButtonHide && !renderBtn && (
-        <CommonButton
-          onPress={() => navigationService.navigate('VerifierDetails', { item: item })}
-          titleStyle={[styles.titleStyle, fonts.mediumFont]}
-          buttonStyle={styles.buttonStyle}
-          type="primary"
-          title="Send"
-        />
-      )}
-      {!isButtonHide && renderBtn && renderBtn(item)}
+      {!isButtonHide &&
+        (!itemStatus ? (
+          <CommonButton
+            onPress={async () => {
+              Loading.show();
+              try {
+                const req = await request.recovery.sendCode({
+                  baseURL: item.verifier?.url,
+                  data: {
+                    type: 0,
+                    loginGuardianType: item.loginGuardianType,
+                    managerUniqueId,
+                  },
+                });
+                console.log(req, '=====req');
+
+                if (req.verifierSessionId) {
+                  Loading.hide();
+                  await sleep(200);
+                  dispatch(
+                    setUserGuardianItemStatus({
+                      key: item.key,
+                      status: VerifyStatus.Verifying,
+                    }),
+                  );
+                  navigationService.navigate('VerifierDetails', {
+                    loginGuardianType: item.loginGuardianType,
+                    verifierSessionId: req.verifierSessionId,
+                    managerUniqueId,
+                    onVerifierSuccess,
+                  });
+                } else {
+                  throw new Error('send fail');
+                }
+              } catch (error) {
+                CommonToast.failError(error);
+              }
+              Loading.hide();
+            }}
+            titleStyle={[styles.titleStyle, fonts.mediumFont]}
+            buttonStyle={styles.buttonStyle}
+            type="primary"
+            title="Send"
+          />
+        ) : null)}
+      {renderBtn && renderBtn(item)}
     </View>
   );
 }

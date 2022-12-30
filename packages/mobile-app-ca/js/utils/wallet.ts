@@ -91,35 +91,41 @@ export function intervalGetRegisterResult({
   dispatch: any;
 }) {
   const timer = setInterval(async () => {
-    const req = await request.register.result({
-      baseURL: apiUrl,
-      data: managerInfo,
-    });
-    switch (req.register_status) {
-      case 'pass': {
-        dispatch(
-          setCAInfo({
-            caInfo: {
-              caAddress: req.ca_address,
-              caHash: req.ca_hash,
-            },
-            pin,
-            chainId: DefaultChainId,
-          }),
-        );
-        navigationService.reset('Tab');
-        Loading.hide();
-        clearInterval(timer);
-        break;
+    try {
+      const req = await request.register.result({
+        baseURL: apiUrl,
+        data: managerInfo,
+      });
+      console.log(req, '=====req-register-result');
+
+      switch (req.register_status) {
+        case 'pass': {
+          dispatch(
+            setCAInfo({
+              caInfo: {
+                caAddress: req.ca_address,
+                caHash: req.ca_hash,
+              },
+              pin,
+              chainId: DefaultChainId,
+            }),
+          );
+          navigationService.reset('Tab');
+          Loading.hide();
+          clearInterval(timer);
+          break;
+        }
+        case 'fail': {
+          CommonToast.fail(req.register_message);
+          Loading.hide();
+          clearInterval(timer);
+          break;
+        }
+        default:
+          break;
       }
-      case 'fail': {
-        CommonToast.fail(req.register_message);
-        Loading.hide();
-        clearInterval(timer);
-        break;
-      }
-      default:
-        break;
+    } catch (error) {
+      console.log(error, '=====error');
     }
   }, 3000);
   return {

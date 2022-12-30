@@ -26,6 +26,10 @@ export const setCurrentGuardianAction = createAction<UserGuardianItem>('verifier
 export const setUserGuardianItemStatus = createAction<{ key: string; status: VerifyStatus }>(
   'verifier/setUserGuardianItemStatus',
 );
+export const setUserGuardianStatus = createAction<{ key: string; status: VerifyStatus }>(
+  'verifier/setUserGuardianStatus',
+);
+export const resetUserGuardianItemStatus = createAction('verifier/resetUserGuardianItemStatus');
 
 export const setUserGuardianSessionIdAction = createAction<{ key: string; sessionId: string }>(
   'verifier/setUserGuardianSessionId',

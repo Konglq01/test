@@ -1,7 +1,8 @@
 import { useEffect, useMemo } from 'react';
-import { useAppCommonDispatch } from '..';
+import { useAppCommonDispatch } from '../index';
 import { getChainListAsync } from '@portkey/store/store-ca/wallet/actions';
 import { useCurrentWallet } from './wallet';
+import { ChainId } from '@portkey/types';
 
 export function useChainListFetch() {
   const dispatch = useAppCommonDispatch();
@@ -15,7 +16,7 @@ export function useCurrentChainList() {
   return useMemo(() => chainInfo?.[currentNetwork], [chainInfo, currentNetwork]);
 }
 
-export function useCurrentChain(chainId: string = 'AELF') {
+export function useCurrentChain(chainId: ChainId = 'AELF') {
   const currentChainList = useCurrentChainList();
   return useMemo(() => currentChainList?.find(chain => chain.chainId === chainId), [currentChainList, chainId]);
 }
