@@ -26,6 +26,7 @@
     "extension": "yarn workspace web-extension run",
     "app:ca": "yarn workspace mobile-ca run",
     "extension:ca": "yarn workspace web-extension-ca run",
+    "graphql": "yarn workspace @portkey/graphql run",
     "page": "yarn workspace web-page run"
   },
   "devDependencies": {
