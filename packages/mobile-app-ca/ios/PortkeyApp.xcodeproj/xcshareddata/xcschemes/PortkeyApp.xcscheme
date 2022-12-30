@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "walletAppNew.app"
-               BlueprintName = "walletAppNew"
-               ReferencedContainer = "container:walletAppNew.xcodeproj">
+               BuildableName = "PortkeyApp.app"
+               BlueprintName = "PortkeyApp"
+               ReferencedContainer = "container:PortkeyApp.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "walletAppNewTests.xctest"
-               BlueprintName = "walletAppNewTests"
-               ReferencedContainer = "container:walletAppNew.xcodeproj">
+               BuildableName = "PortkeyAppTests.xctest"
+               BlueprintName = "PortkeyAppTests"
+               ReferencedContainer = "container:PortkeyApp.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "walletAppNew.app"
-            BlueprintName = "walletAppNew"
-            ReferencedContainer = "container:walletAppNew.xcodeproj">
+            BuildableName = "PortkeyApp.app"
+            BlueprintName = "PortkeyApp"
+            ReferencedContainer = "container:PortkeyApp.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <CommandLineArguments>
@@ -78,9 +78,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "walletAppNew.app"
-            BlueprintName = "walletAppNew"
-            ReferencedContainer = "container:walletAppNew.xcodeproj">
+            BuildableName = "PortkeyApp.app"
+            BlueprintName = "PortkeyApp"
+            ReferencedContainer = "container:PortkeyApp.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

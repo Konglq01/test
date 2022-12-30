@@ -7,7 +7,7 @@ install! 'cocoapods', :deterministic_uuids => false
 
 production = ENV["PRODUCTION"] == "1"
 
-target 'walletAppNew' do
+target 'PortkeyApp' do
 
   use_expo_modules!
   post_integrate do |installer|
@@ -52,7 +52,7 @@ target 'walletAppNew' do
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.." 
   )
-  target 'walletAppNewTests' do
+  target 'PortkeyAppTests' do
     inherit! :complete
     # Pods for testing
   end
