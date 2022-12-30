@@ -24,6 +24,11 @@ export const NetworkList: NetworkItem[] = [
   },
 ];
 
+export const CHAIN_GRAPHQL_URL: Record<NetworkType, string> = {
+  ['MAIN']: '',
+  ['TESTNET']: 'http://192.168.66.255:8083/AElfIndexer_DApp/PortKeyIndexerCASchema/graphql',
+};
+
 export const ChainList = [
   {
     rpcUrl: 'http://192.168.67.77:8000',

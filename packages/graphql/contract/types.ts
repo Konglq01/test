@@ -1,10 +1,12 @@
 import { PartialOption } from '@portkey/types/common';
 import {
+  CaHolderManagerDto,
   GetCaHolderManagerInfoDto,
   GetCaHolderTransactionDto,
   GetLoginGuardianTypeInfoDto,
   GetNftProtocolInfoDto,
   GetTokenInfoDto,
+  LoginGuardianTypeDto,
 } from './__generated__/resolversTypes';
 
 interface GraphqlRequestCommonType {
@@ -27,6 +29,11 @@ export type SearchCAHolderTransactionParamsType = GraphqlCommonOption<GetCaHolde
 // CAHolderManager
 export type SearchCAHolderManagerInfoParamsType = GraphqlCommonOption<GetCaHolderManagerInfoDto>;
 
-// LoginGuardianType
+export type getCAHolderByManagerParamsType = Required<Pick<GetCaHolderManagerInfoDto, 'manager' | 'chainId'>>;
 
+export type CaHolderWithGuardian = CaHolderManagerDto & {
+  loginGuardianTypeInfo: LoginGuardianTypeDto[];
+};
+
+// LoginGuardianType
 export type SearchLoginGuardianTypeParamsType = GraphqlCommonOption<GetLoginGuardianTypeInfoDto>;
