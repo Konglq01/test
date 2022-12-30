@@ -6,12 +6,9 @@ import { isIOS } from '@rneui/base';
 import { rsaEncryptObj } from './rsaEncrypt';
 import { PUB_KEY } from 'constants/api';
 import { request } from 'api';
-import { ManagerInfo } from '@portkey/types/types-ca/wallet';
-import Loading from 'components/Loading';
-import navigationService from './navigationService';
-import CommonToast from 'components/CommonToast';
-import { setCAInfo } from '@portkey/store/store-ca/wallet/actions';
-import { DefaultChainId } from '@portkey/constants/constants-ca/network';
+import { CAInfo, ManagerInfo } from '@portkey/types/types-ca/wallet';
+import { VerificationType } from '@portkey/types/verifier';
+import { clearTimeoutInterval, setTimeoutInterval } from './Interval';
 
 type SignType = { sign: string; sha256Sign: string };
 
@@ -82,43 +79,33 @@ export type TimerResult = {
 export function intervalGetRegisterResult({
   apiUrl,
   managerInfo,
-  pin,
-  dispatch,
+  onPass,
+  onFail,
 }: {
   apiUrl: string;
   managerInfo: ManagerInfo;
-  pin: string;
-  dispatch: any;
+  onPass?: (caInfo: CAInfo) => void;
+  onFail?: (message: string) => void;
 }) {
-  const timer = setInterval(async () => {
+  let fetch = request.register;
+  if (managerInfo.verificationType !== VerificationType.register) fetch = request.recovery;
+  const timer = setTimeoutInterval(async () => {
     try {
-      const req = await request.register.result({
+      const req = await fetch.result({
         baseURL: apiUrl,
         data: managerInfo,
       });
-      console.log(req, '=====req-register-result');
+      console.log(req, '====req-intervalGetRegisterResult');
 
-      switch (req.register_status) {
+      switch (req.recoveryStatus) {
         case 'pass': {
-          dispatch(
-            setCAInfo({
-              caInfo: {
-                caAddress: req.ca_address,
-                caHash: req.ca_hash,
-              },
-              pin,
-              chainId: DefaultChainId,
-            }),
-          );
-          navigationService.reset('Tab');
-          Loading.hide();
-          clearInterval(timer);
+          clearTimeoutInterval(timer);
+          onPass?.(req);
           break;
         }
         case 'fail': {
-          CommonToast.fail(req.register_message);
-          Loading.hide();
-          clearInterval(timer);
+          clearTimeoutInterval(timer);
+          onFail?.(req.recoveryMessage || req.registerMessage);
           break;
         }
         default:
@@ -128,7 +115,9 @@ export function intervalGetRegisterResult({
       console.log(error, '=====error');
     }
   }, 3000);
+  console.log(timer, '====timer');
+
   return {
-    remove: () => clearInterval(timer),
+    remove: () => clearTimeoutInterval(timer),
   };
 }

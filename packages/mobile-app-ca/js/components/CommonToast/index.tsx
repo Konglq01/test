@@ -7,6 +7,7 @@ import Svg from 'components/Svg';
 import { TextL } from 'components/CommonText';
 import { pTd } from 'utils/unit';
 import { statusBarHeight } from '@portkey/utils/mobile/device';
+import { handleError } from '@portkey/utils';
 
 type TostProps = [
   text: string,
@@ -101,12 +102,7 @@ export default {
   },
   failError(error: any, errorText?: string) {
     Overlay.hide(element);
-    let text = '';
-    if (typeof error.message === 'string') {
-      text = error.message;
-    } else if (errorText) {
-      text = errorText;
-    }
+    const text = handleError(error, errorText);
     if (text) element = show(text, undefined, 'top', 'fail');
   },
   smile(...args: TostProps) {

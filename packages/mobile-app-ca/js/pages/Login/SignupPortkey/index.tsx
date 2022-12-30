@@ -7,13 +7,19 @@ import { DeviceEventEmitter, ImageBackground, StyleSheet, View } from 'react-nat
 import CommonButton from 'components/CommonButton';
 import GStyles from 'assets/theme/GStyles';
 import { useLanguage } from 'i18n/hooks';
-import { checkEmail } from '@portkey/utils/check';
+import { checkEmail, EmailError } from '@portkey/utils/check';
 import CommonInput from 'components/CommonInput';
 import navigationService from 'utils/navigationService';
 import background from '../img/background.png';
 import Svg from 'components/Svg';
 import { BGStyles, FontStyles } from 'assets/theme/styles';
 import { screenHeight, screenWidth } from '@portkey/utils/mobile/device';
+import { useGetHolderInfo, useGetVerifierServers } from 'hooks/guardian';
+import { handleError } from '@portkey/utils';
+import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+import { useAppDispatch } from 'store/hooks';
+import { getChainListAsync } from '@portkey/store/store-ca/wallet/actions';
+import Loading from 'components/Loading';
 const safeAreaColor: SafeAreaColorMapKeyUnit[] = ['transparent', 'transparent'];
 
 const scrollViewProps = { extraHeight: 120 };
@@ -23,14 +29,30 @@ function SignupEmail() {
   const [loading] = useState<boolean>();
   const [email, setEmail] = useState<string>();
   const [errorMessage, setErrorMessage] = useState<string>();
-  const onSignup = useCallback(() => {
-    const message = checkEmail(email);
-    setErrorMessage(message);
-    if (message) return;
-    // setErrorMessage(EmailError.alreadyRegistered);
-    // TODO Signup
-    navigationService.navigate('SelectVerifier', { email });
-  }, [email]);
+  const getHolderInfo = useGetHolderInfo();
+  const getVerifierServers = useGetVerifierServers();
+  const chainInfo = useCurrentChain('AELF');
+  const dispatch = useAppDispatch();
+  const onSignup = useCallback(async () => {
+    try {
+      setErrorMessage(undefined);
+      const message = checkEmail(email);
+      if (message) return setErrorMessage(message);
+      Loading.show();
+      if (!chainInfo) await dispatch(getChainListAsync());
+      await getVerifierServers();
+      try {
+        const holderInfo = await getHolderInfo({ loginGuardianType: email });
+        if (holderInfo.guardians) return setErrorMessage(EmailError.alreadyRegistered);
+      } catch (error) {
+        console.debug(error, '====error');
+      }
+      navigationService.navigate('SelectVerifier', { loginGuardianType: email });
+    } catch (error) {
+      setErrorMessage(handleError(error));
+    }
+    Loading.hide();
+  }, [chainInfo, dispatch, email, getHolderInfo, getVerifierServers]);
   return (
     <View style={[BGStyles.bg1, styles.card]}>
       <CommonInput

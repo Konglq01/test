@@ -29,19 +29,12 @@ import { LoginQRData } from '@portkey/types/types-ca/qrcode';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { useAppDispatch } from 'store/hooks';
 import { getChainListAsync } from '@portkey/store/store-ca/wallet/actions';
-import CommonToast from 'components/CommonToast';
-import { useGetGuardiansList, useGetVerifierServers } from 'hooks/guardian';
+import { useGetHolderInfo, useGetVerifierServers } from 'hooks/guardian';
 import Loading from 'components/Loading';
-import { sleep } from '@portkey/utils';
+import { handleError, sleep } from '@portkey/utils';
 const scrollViewProps = { extraHeight: 120 };
 const safeAreaColor: SafeAreaColorMapKeyUnit[] = ['transparent', 'transparent'];
 type LoginType = 'email' | 'qr-code' | 'phone';
-
-const loginAccount = {
-  caHash: 'dd1ccc8e5864f54e8d06c175244c8bfd1a323a39ecaaf4fc339a68c563f5bf0f',
-  loginGuardianType: 'potter.sun@aelf.io',
-};
-
 function LoginEmail({ setLoginType }: { setLoginType: (type: LoginType) => void }) {
   const { t } = useLanguage();
   const dispatch = useAppDispatch();
@@ -50,37 +43,42 @@ function LoginEmail({ setLoginType }: { setLoginType: (type: LoginType) => void 
   const [errorMessage, setErrorMessage] = useState<string>();
   const chainInfo = useCurrentChain('AELF');
   const getVerifierServers = useGetVerifierServers();
-  const getGuardiansList = useGetGuardiansList();
+  const getHolderInfo = useGetHolderInfo();
   const onLogin = useCallback(async () => {
     const message = checkEmail(email);
     setErrorMessage(message);
     if (message) return;
-    // setErrorMessage(EmailError.alreadyRegistered);
+    setErrorMessage(undefined);
     // TODO Login
     Loading.show();
     await sleep(100);
     try {
       if (!chainInfo) await dispatch(getChainListAsync());
       const verifierServers = await getVerifierServers();
-      const guardiansList = await getGuardiansList({ loginGuardianType: email });
-      console.log(verifierServers, guardiansList, '====guardiansList');
-      const userGuardiansList = guardiansList.guardians.map((item: any) => {
+      console.log(verifierServers, '====verifierServers');
+
+      const holderInfo = await getHolderInfo({ loginGuardianType: email });
+      const userGuardiansList = holderInfo.guardians.map((item: any) => {
         return {
           ...item,
           loginGuardianType: email,
           guardiansType: 0,
           key: `${email}&${item.verifier.name}`,
-          verifier: verifierServers[0],
+          verifier: {
+            imageUrl: 'http://192.168.66.135:5588',
+            name: 'portkey',
+            url: 'http://192.168.66.135:5588',
+          },
         };
       });
       Loading.hide();
       await sleep(200);
       navigationService.navigate('GuardianApproval', { loginGuardianType: email, userGuardiansList });
-    } catch (error) {
+    } catch (error: any) {
+      setErrorMessage(handleError(error));
       Loading.hide();
-      CommonToast.failError(error);
     }
-  }, [chainInfo, dispatch, email, getGuardiansList, getVerifierServers]);
+  }, [chainInfo, dispatch, email, getHolderInfo, getVerifierServers]);
 
   useEffectOnce(() => {
     const listener = DeviceEventEmitter.addListener('clearLoginInput', () => setEmail(''));

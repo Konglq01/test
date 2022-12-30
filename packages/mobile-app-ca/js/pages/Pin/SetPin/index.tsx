@@ -10,11 +10,18 @@ import GStyles from 'assets/theme/GStyles';
 import useRouterParams from '@portkey/hooks/useRouterParams';
 import ActionSheet from 'components/ActionSheet';
 import useEffectOnce from 'hooks/useEffectOnce';
-import { RegisterInfo } from '../types';
 import { usePreventHardwareBack } from '@portkey/hooks/mobile';
+import { ManagerInfo } from '@portkey/types/types-ca/wallet';
+import { VerificationType } from '@portkey/types/verifier';
 
 export default function SetPin() {
-  const { oldPin, registerInfo } = useRouterParams<{ oldPin?: string; registerInfo?: RegisterInfo }>();
+  const { oldPin, managerInfo, guardianCount } = useRouterParams<{
+    oldPin?: string;
+    managerInfo?: ManagerInfo;
+    guardianCount?: number;
+  }>();
+  console.log(managerInfo, '====managerInfo');
+
   usePreventHardwareBack();
   const digitInput = useRef<DigitInputInterface>();
   useEffectOnce(() => {
@@ -26,7 +33,7 @@ export default function SetPin() {
       titleDom
       type="leftBack"
       leftCallback={() => {
-        if (!oldPin) {
+        if (!oldPin && managerInfo?.verificationType === VerificationType.register) {
           ActionSheet.alert({
             title: ' Confirm return?',
             message: 'After returning, you need to scan the code again to authorize login',
@@ -36,6 +43,8 @@ export default function SetPin() {
               { title: 'Yes', onPress: () => navigationService.navigate('SelectVerifier') },
             ],
           });
+        } else {
+          navigationService.goBack();
         }
       }}>
       <View style={styles.container}>
@@ -46,7 +55,7 @@ export default function SetPin() {
           secureTextEntry
           style={styles.pinStyle}
           onFinish={pin => {
-            navigationService.navigate('ConfirmPin', { oldPin, pin, registerInfo });
+            navigationService.navigate('ConfirmPin', { oldPin, pin, managerInfo, guardianCount });
           }}
         />
       </View>

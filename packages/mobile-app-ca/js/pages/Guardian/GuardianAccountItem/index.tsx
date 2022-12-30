@@ -1,6 +1,6 @@
 import { defaultColors } from 'assets/theme';
 import GStyles from 'assets/theme/GStyles';
-import CommonButton from 'components/CommonButton';
+import CommonButton, { CommonButtonProps } from 'components/CommonButton';
 import { TextM } from 'components/CommonText';
 import Svg from 'components/Svg';
 import React, { useCallback, useMemo } from 'react';
@@ -9,45 +9,135 @@ import { pTd } from 'utils/unit';
 import navigationService from 'utils/navigationService';
 import fonts from 'assets/theme/fonts';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
-import { useGuardiansInfo } from 'hooks/store';
 import Loading from 'components/Loading';
 import { request } from 'api';
 import CommonToast from 'components/CommonToast';
 import { sleep } from '@portkey/utils';
-import { useAppDispatch } from 'store/hooks';
-import { setUserGuardianItemStatus } from '@portkey/store/store-ca/guardians/actions';
-import { VerifyStatus } from '@portkey/types/verifier';
+import { VerificationType, VerifyStatus } from '@portkey/types/verifier';
+import { FontStyles } from 'assets/theme/styles';
+
+export type GuardiansStatusItem = {
+  status: VerifyStatus;
+  verifierSessionId: string;
+};
+
+export type GuardiansStatus = {
+  [key: string]: GuardiansStatusItem;
+};
 
 interface GuardianAccountItemProps {
-  item: UserGuardianItem;
+  guardianItem: UserGuardianItem;
   isButtonHide?: boolean;
   renderBtn?: (item: UserGuardianItem) => JSX.Element;
   isBorderHide?: boolean;
-  managerUniqueId: string;
+  managerUniqueId?: string;
+  guardiansStatus?: GuardiansStatus;
+  setGuardianStatus?: (key: string, status: GuardiansStatusItem) => void;
 }
 
 export default function GuardianAccountItem({
-  item,
+  guardianItem,
   isButtonHide,
   renderBtn,
   isBorderHide = false,
   managerUniqueId,
+  guardiansStatus,
+  setGuardianStatus,
 }: GuardianAccountItemProps) {
-  const dispatch = useAppDispatch();
-  const { userGuardianStatus } = useGuardiansInfo();
-  const itemStatus = useMemo(() => userGuardianStatus?.[item.key], [item.key, userGuardianStatus]);
-  console.log(itemStatus, '====itemStatus');
-  const onVerifierSuccess = useCallback(() => {
-    dispatch(
-      setUserGuardianItemStatus({
-        key: item.key,
-        status: VerifyStatus.Verified,
-      }),
-    );
-  }, [dispatch, item.key]);
+  const itemStatus = useMemo(() => guardiansStatus?.[guardianItem.key], [guardianItem.key, guardiansStatus]);
+
+  const { status, verifierSessionId } = itemStatus || {};
+  const onSetGuardianStatus = useCallback(
+    (guardianStatus: GuardiansStatusItem) => {
+      setGuardianStatus?.(guardianItem.key, guardianStatus);
+    },
+    [guardianItem.key, setGuardianStatus],
+  );
+  const onSendCode = useCallback(async () => {
+    Loading.show();
+    try {
+      console.log(
+        {
+          baseURL: guardianItem.verifier?.url,
+          data: {
+            type: 0,
+            loginGuardianType: guardianItem.loginGuardianType,
+            managerUniqueId,
+          },
+        },
+        '======',
+      );
+
+      const req = await request.recovery.sendCode({
+        baseURL: guardianItem.verifier?.url,
+        data: {
+          type: 0,
+          loginGuardianType: guardianItem.loginGuardianType,
+          managerUniqueId,
+        },
+      });
+      console.log(req, '=====req');
+
+      if (req.verifierSessionId) {
+        Loading.hide();
+        await sleep(200);
+        onSetGuardianStatus({
+          verifierSessionId: req.verifierSessionId,
+          status: VerifyStatus.Verifying,
+        });
+        navigationService.navigate('VerifierDetails', {
+          guardianItem,
+          verifierSessionId: req.verifierSessionId,
+          managerUniqueId,
+          loginGuardianType: guardianItem.loginGuardianType,
+          verificationType: VerificationType.communityRecovery,
+          guardianKey: guardianItem.key,
+        });
+      } else {
+        throw new Error('send fail');
+      }
+    } catch (error) {
+      console.log(error, '====error');
+
+      CommonToast.failError(error);
+    }
+    Loading.hide();
+  }, [guardianItem, managerUniqueId, onSetGuardianStatus]);
+  const onVerifier = useCallback(() => {
+    navigationService.navigate('VerifierDetails', {
+      guardianItem,
+      verifierSessionId,
+      loginGuardianType: guardianItem.loginGuardianType,
+      managerUniqueId,
+      startResend: true,
+      verificationType: VerificationType.communityRecovery,
+      guardianKey: guardianItem.key,
+    });
+  }, [guardianItem, managerUniqueId, verifierSessionId]);
+  const buttonProps: CommonButtonProps = useMemo(() => {
+    if (!status || status === VerifyStatus.NotVerified) {
+      return {
+        onPress: onSendCode,
+        title: 'Send',
+      };
+    } else if (status === VerifyStatus.Verifying) {
+      return {
+        onPress: onVerifier,
+        title: 'Verify',
+      };
+    } else {
+      return {
+        title: 'Confirmed',
+        type: 'clear',
+        disabledTitleStyle: FontStyles.font10,
+        disabledStyle: styles.confirmedButtonStyle,
+        disabled: true,
+      };
+    }
+  }, [onSendCode, onVerifier, status]);
   return (
     <View style={[styles.itemRow, isBorderHide && styles.itemWithoutBorder]}>
-      {item.isLoginAccount && (
+      {guardianItem.isLoginAccount && (
         <View style={styles.typeTextRow}>
           <Text style={styles.typeText}>Login Account</Text>
         </View>
@@ -56,55 +146,18 @@ export default function GuardianAccountItem({
         <Svg icon="logo-icon" color={defaultColors.primaryColor} size={pTd(32)} />
         <Svg iconStyle={styles.iconStyle} icon="logo-icon" color={defaultColors.primaryColor} size={pTd(32)} />
         <TextM numberOfLines={1} style={[styles.nameStyle, GStyles.flex1]}>
-          {item.loginGuardianType}
+          {guardianItem.loginGuardianType}
         </TextM>
       </View>
-      {!isButtonHide &&
-        (!itemStatus ? (
-          <CommonButton
-            onPress={async () => {
-              Loading.show();
-              try {
-                const req = await request.recovery.sendCode({
-                  baseURL: item.verifier?.url,
-                  data: {
-                    type: 0,
-                    loginGuardianType: item.loginGuardianType,
-                    managerUniqueId,
-                  },
-                });
-                console.log(req, '=====req');
-
-                if (req.verifierSessionId) {
-                  Loading.hide();
-                  await sleep(200);
-                  dispatch(
-                    setUserGuardianItemStatus({
-                      key: item.key,
-                      status: VerifyStatus.Verifying,
-                    }),
-                  );
-                  navigationService.navigate('VerifierDetails', {
-                    loginGuardianType: item.loginGuardianType,
-                    verifierSessionId: req.verifierSessionId,
-                    managerUniqueId,
-                    onVerifierSuccess,
-                  });
-                } else {
-                  throw new Error('send fail');
-                }
-              } catch (error) {
-                CommonToast.failError(error);
-              }
-              Loading.hide();
-            }}
-            titleStyle={[styles.titleStyle, fonts.mediumFont]}
-            buttonStyle={styles.buttonStyle}
-            type="primary"
-            title="Send"
-          />
-        ) : null)}
-      {renderBtn && renderBtn(item)}
+      {!isButtonHide && (
+        <CommonButton
+          type="primary"
+          {...buttonProps}
+          titleStyle={[styles.titleStyle, fonts.mediumFont, buttonProps.titleStyle]}
+          buttonStyle={[styles.buttonStyle, buttonProps.buttonStyle]}
+        />
+      )}
+      {renderBtn && renderBtn(guardianItem)}
     </View>
   );
 }
@@ -148,8 +201,12 @@ const styles = StyleSheet.create({
     height: 24,
   },
   titleStyle: {
-    height: 24,
+    height: 20,
     fontSize: pTd(12),
     marginTop: 4,
+  },
+  confirmedButtonStyle: {
+    opacity: 1,
+    backgroundColor: 'transparent',
   },
 });
