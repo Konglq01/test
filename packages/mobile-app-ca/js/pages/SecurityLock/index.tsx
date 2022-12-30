@@ -21,6 +21,8 @@ import useBiometricsReady from 'hooks/useBiometrics';
 import { usePreventHardwareBack } from '@portkey/hooks/mobile';
 import { intervalGetRegisterResult, TimerResult } from 'utils/wallet';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
+import CommonButton from 'components/CommonButton';
+import { resetWallet } from '@portkey/store/store-ca/wallet/actions';
 let appState: AppStateStatus;
 export default function SecurityLock() {
   const { pin } = useCredentials() || {};
@@ -70,6 +72,7 @@ export default function SecurityLock() {
   const handlePassword = useCallback(
     (pwd: string) => {
       dispatch(setCredentials({ pin: pwd }));
+      if (!walletInfo.managerInfo) return;
       if (isSyncCAInfo) {
         Loading.show('loading...');
         timer.current = intervalGetRegisterResult({
@@ -137,6 +140,14 @@ export default function SecurityLock() {
           style={styles.pinStyle}
           onChangeText={onChangeText}
           errorMessage={errorMessage}
+        />
+        <CommonButton
+          title="resetWallet"
+          type="primary"
+          onPress={() => {
+            dispatch(resetWallet());
+            navigationService.reset('Referral');
+          }}
         />
       </View>
     </PageContainer>
