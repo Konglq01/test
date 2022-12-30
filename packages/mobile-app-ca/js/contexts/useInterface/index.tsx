@@ -1,22 +1,28 @@
 import { useCurrentNetwork } from '@portkey/hooks/network';
 import { getAelfInstance } from '@portkey/utils/aelf';
-import { BasicActions, getELFContract } from 'contexts/utils';
 import usePrevious from 'hooks/usePrevious';
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useReducer } from 'react';
-import { getDefaultWallet } from 'utils/aelfUtils';
-import { setCurrentInterface, setViewContracts } from './actions';
+import React, { createContext, useContext, useEffect, useMemo, useReducer } from 'react';
+import { InterfaceActions, setCurrentInterface } from './actions';
 import { State } from './types';
 
 const INITIAL_STATE = {};
 const InterfaceContext = createContext<any>(INITIAL_STATE);
 
-export function useInterface(): [State, BasicActions] {
+export function useInterface(): [State, any] {
   return useContext(InterfaceContext);
 }
 
 //reducer
 function reducer(state: State, { type, payload }: any) {
+  console.log(payload, type, '=====payload');
+
   switch (type) {
+    case InterfaceActions.setViewContract: {
+      const { viewContract } = payload;
+      console.log(viewContract, '====viewContract');
+      const { viewContracts } = state;
+      return Object.assign({}, state, { viewContracts: Object.assign({}, viewContracts, viewContract) });
+    }
     default: {
       const { destroy } = payload;
       if (destroy) return Object.assign({}, payload);
@@ -36,26 +42,6 @@ export default function Provider({ children }: { children: React.ReactNode }) {
       // TODO:ethereum
     }
   }, [currentNetwork.chainType, currentNetwork.rpcUrl, prevRpcUrl]);
-  const initContract = useCallback(async () => {
-    if (currentNetwork.basicContracts && currentNetwork.rpcUrl) {
-      const viewContracts: any = {};
-      await Promise.all(
-        Object.entries(currentNetwork.basicContracts).map(async ([key, value]) => {
-          viewContracts[key] = await getELFContract({
-            contractAddress: value,
-            rpcUrl: currentNetwork.rpcUrl,
-            account: getDefaultWallet(),
-          });
-        }),
-      );
-      dispatch(setViewContracts(viewContracts));
-    } else {
-      dispatch(setViewContracts(undefined));
-    }
-  }, [currentNetwork.basicContracts, currentNetwork.rpcUrl]);
-  useEffect(() => {
-    initContract();
-  }, [initContract]);
   return (
     <InterfaceContext.Provider value={useMemo(() => [state, dispatch], [state, dispatch])}>
       {children}

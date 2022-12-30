@@ -28,8 +28,12 @@ export const useCurrentWalletInfo = () => {
 export const useCurrentWallet = () => {
   const wallet = useWallet();
   return useMemo(() => {
-    const { walletInfo, currentNetwork } = wallet;
-    return { ...wallet, walletInfo: getCurrentWalletInfo(walletInfo, currentNetwork) };
+    const { walletInfo, currentNetwork, chainInfo } = wallet;
+    return {
+      ...wallet,
+      walletInfo: getCurrentWalletInfo(walletInfo, currentNetwork),
+      chainList: chainInfo?.[currentNetwork],
+    };
   }, [wallet]);
 };
 

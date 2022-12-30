@@ -26,6 +26,7 @@ import Receive from 'pages/Receive';
 import NFTDetail from 'pages/NFT/NFTDetail';
 import { useLanguage } from 'i18n/hooks';
 import useEffectOnce from 'hooks/useEffectOnce';
+import { useChainListFetch } from '@portkey/hooks/hooks-ca/chainList';
 
 const Stack = createStackNavigator();
 export const stackNav = [
@@ -69,6 +70,7 @@ export default function NavigationRoot() {
   useEffectOnce(() => {
     changeLanguage('en');
   });
+  useChainListFetch();
   return (
     <NavigationContainer ref={navigationService.setTopLevelNavigator}>
       <Stack.Navigator

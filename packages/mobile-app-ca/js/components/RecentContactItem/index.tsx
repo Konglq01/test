@@ -1,7 +1,7 @@
 import { useWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { ContactItemType, RecentContactItemType } from '@portkey/types/types-ca/contact';
 import { defaultColors } from 'assets/theme';
-import { fontColorStyle } from 'assets/theme/color';
+import { FontStyles } from 'assets/theme/styles';
 import GStyles from 'assets/theme/GStyles';
 import Collapsible from 'components/Collapsible';
 import { TextM, TextS, TextXXXL } from 'components/CommonText';
@@ -43,11 +43,11 @@ const RecentContactItem: React.FC<ItemType> = props => {
               onPress={() => {
                 onPress?.({ address: contact.addresses?.[0].address, name: contact.name });
               }}>
-              <Text style={[styles.address, Math.random() > 0.5 && fontColorStyle.color7]}>
+              <Text style={[styles.address, Math.random() > 0.5 && FontStyles.font7]}>
                 {formatStr2EllipsisStr(ele?.address, 10)}
               </Text>
               {/* TODO */}
-              <Text style={[styles.address, Math.random() > 0.5 && fontColorStyle.color7]}>
+              <Text style={[styles.address, Math.random() > 0.5 && FontStyles.font7]}>
                 {`${ele?.chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${ele?.chainId} ${
                   currentNetwork === 'TESTNET' && 'Testnet'
                 }`}

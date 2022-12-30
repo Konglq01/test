@@ -77,7 +77,7 @@ export default function ConfirmPin() {
             dispatch,
             apiUrl,
             pin: confirmPin,
-            managerInfo: walletInfo.managerInfo,
+            managerInfo: registerInfo,
           });
         }
       } catch (error) {

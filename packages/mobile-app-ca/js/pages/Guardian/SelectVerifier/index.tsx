@@ -46,7 +46,7 @@ export default function SelectVerifier() {
               const managerUniqueId = randomId();
               // TODO:Confirm
               Loading.show();
-              const req = await request.verify.sendCode({
+              const req = await request.register.sendCode({
                 baseURL: 'http://192.168.66.135:5588/',
                 data: {
                   type: 0,
@@ -56,7 +56,7 @@ export default function SelectVerifier() {
               });
               if (req.verifierSessionId) {
                 navigationService.navigate('VerifierDetails', {
-                  email,
+                  loginGuardianType: email,
                   verifierSessionId: req.verifierSessionId,
                   managerUniqueId,
                 });
