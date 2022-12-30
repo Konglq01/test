@@ -19,17 +19,24 @@ export const DEFAULT_METHOD = 'POST';
 
 export const BASE_APIS = {};
 
-const WalletApiList = {
-  bind: 'app/elf/bind',
-  assets: 'app/elf/assets?lang=en',
-  activityList: 'app/elf/address?lang=en',
-  transactionNotice: 'app/user/transaction_notice?lang=en',
+const RecoveryApiList = {
+  managerAddress: '/api/app/account/recovery/managerAddress',
+  result: '/api/app/account/recovery/query',
+  sendCode: '/api/app/account/recovery/sendVerificationRequest',
+  verifyCode: '/api/app/account/recovery/verifyCode',
+};
+
+const RegisterApiList = {
+  managerAddress: '/api/app/account/register/managerAddress',
+  result: '/api/app/account/register/query',
+  sendCode: '/api/app/account/register/sendVerificationRequest',
+  verifyCode: '/api/app/account/register/verifyCode',
 };
 /**
  * api request extension configuration directory
  * @description object.key // The type of this object key comes from from @type {UrlObj}
  */
-export const EXPAND_APIS = { wallet: WalletApiList };
+export const EXPAND_APIS = { register: RegisterApiList, recovery: RecoveryApiList };
 
 export type BASE_REQ_TYPES = {
   [x in keyof typeof BASE_APIS]: API_REQ_FUNCTION;

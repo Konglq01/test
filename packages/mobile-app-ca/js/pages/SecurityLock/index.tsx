@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AppState, AppStateStatus, BackHandler, StyleSheet, View } from 'react-native';
+import { AppState, AppStateStatus, StyleSheet, View } from 'react-native';
 import { TextL } from 'components/CommonText';
 import { useAppDispatch } from 'store/hooks';
 import { setCredentials } from 'store/user/actions';
@@ -17,22 +17,28 @@ import navigationService from 'utils/navigationService';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import Loading from 'components/Loading';
 import usePrevious from 'hooks/usePrevious';
-import { setCAInfo } from '@portkey/store/store-ca/wallet/actions';
 import useBiometricsReady from 'hooks/useBiometrics';
 import { usePreventHardwareBack } from '@portkey/hooks/mobile';
+import { intervalGetRegisterResult, TimerResult } from 'utils/wallet';
+import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
+import CommonButton from 'components/CommonButton';
+import { resetWallet } from '@portkey/store/store-ca/wallet/actions';
 let appState: AppStateStatus;
 export default function SecurityLock() {
   const { pin } = useCredentials() || {};
   const { biometrics } = useUser();
+  const { apiUrl } = useCurrentNetworkInfo();
   const biometricsReady = useBiometricsReady();
   usePreventHardwareBack();
+  const timer = useRef<TimerResult>();
+
   const digitInput = useRef<DigitInputInterface>();
   const [errorMessage, setErrorMessage] = useState<string>();
   const { walletInfo } = useCurrentWallet();
   const dispatch = useAppDispatch();
   const isSyncCAInfo = useMemo(
-    () => walletInfo.address && !walletInfo.AELF?.caAddress,
-    [walletInfo.AELF?.caAddress, walletInfo.address],
+    () => walletInfo.address && walletInfo.managerInfo && !walletInfo.AELF?.caAddress,
+    [walletInfo.AELF?.caAddress, walletInfo.address, walletInfo.managerInfo],
   );
   const prevIsSyncCAInfo = usePrevious(isSyncCAInfo);
   const navigation = useNavigation();
@@ -66,16 +72,20 @@ export default function SecurityLock() {
   const handlePassword = useCallback(
     (pwd: string) => {
       dispatch(setCredentials({ pin: pwd }));
+      if (!walletInfo.managerInfo) return;
       if (isSyncCAInfo) {
         Loading.show('loading...');
-        setTimeout(() => {
-          dispatch(setCAInfo({ caInfo: { caAddress: 'aaaa', caHash: 'xxx' }, pin: '123456', chainId: 'AELF' }));
-        }, 5000);
+        timer.current = intervalGetRegisterResult({
+          dispatch,
+          apiUrl,
+          pin: pwd,
+          managerInfo: walletInfo.managerInfo,
+        });
         return;
       }
       handleRouter(pwd);
     },
-    [dispatch, handleRouter, isSyncCAInfo],
+    [apiUrl, dispatch, handleRouter, isSyncCAInfo, walletInfo.managerInfo],
   );
   const verifyBiometrics = useCallback(async () => {
     if (!biometrics) return;
@@ -99,6 +109,7 @@ export default function SecurityLock() {
   useEffect(() => {
     const listener = AppState.addEventListener('change', handleAppStateChange);
     return () => {
+      timer.current?.remove();
       listener.remove();
       appState = 'background';
     };
@@ -129,6 +140,14 @@ export default function SecurityLock() {
           style={styles.pinStyle}
           onChangeText={onChangeText}
           errorMessage={errorMessage}
+        />
+        <CommonButton
+          title="resetWallet"
+          type="primary"
+          onPress={() => {
+            dispatch(resetWallet());
+            navigationService.reset('Referral');
+          }}
         />
       </View>
     </PageContainer>

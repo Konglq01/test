@@ -2,18 +2,21 @@ import { AElfChainMethods } from '@portkey/types/aelf';
 import { basicActions } from 'contexts/utils';
 import { State } from './types';
 
-export enum interfaceActions {
+export enum InterfaceActions {
   setCurrentInterface = 'setCurrentInterface',
-  setViewContracts = 'viewContractInterface',
+  setViewContracts = 'setViewContracts',
+  setViewContract = 'setViewContract',
   destroy = 'DESTROY',
 }
 
 export const basicInterfaceActions = {
   setCurrentInterface: (currentInterface: AElfChainMethods) =>
-    basicActions(interfaceActions.setCurrentInterface, { currentInterface }),
+    basicActions(InterfaceActions.setCurrentInterface, { currentInterface }),
   setViewContracts: (viewContracts: State['viewContracts']) =>
-    basicActions(interfaceActions.setViewContracts, { viewContracts }),
-  interfaceDestroy: () => basicActions(interfaceActions.destroy),
+    basicActions(InterfaceActions.setViewContracts, { viewContracts }),
+  setViewContract: (viewContract: State['viewContracts']) =>
+    basicActions(InterfaceActions.setViewContract, { viewContract }),
+  interfaceDestroy: () => basicActions(InterfaceActions.destroy),
 };
 
-export const { interfaceDestroy, setCurrentInterface, setViewContracts } = basicInterfaceActions;
+export const { interfaceDestroy, setCurrentInterface, setViewContracts, setViewContract } = basicInterfaceActions;

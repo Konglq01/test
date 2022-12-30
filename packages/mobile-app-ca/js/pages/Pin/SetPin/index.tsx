@@ -3,7 +3,6 @@ import { TextL } from 'components/CommonText';
 import PageContainer from 'components/PageContainer';
 import DigitInput, { DigitInputInterface } from 'components/DigitInput';
 import navigationService from 'utils/navigationService';
-import { PIN_SIZE } from '@portkey/constants/misc';
 import { DeviceEventEmitter, StyleSheet, View } from 'react-native';
 import { windowHeight } from '@portkey/utils/mobile/device';
 import { pTd } from 'utils/unit';
@@ -11,9 +10,12 @@ import GStyles from 'assets/theme/GStyles';
 import useRouterParams from '@portkey/hooks/useRouterParams';
 import ActionSheet from 'components/ActionSheet';
 import useEffectOnce from 'hooks/useEffectOnce';
+import { RegisterInfo } from '../types';
+import { usePreventHardwareBack } from '@portkey/hooks/mobile';
 
 export default function SetPin() {
-  const { oldPin } = useRouterParams<{ oldPin?: string }>();
+  const { oldPin, registerInfo } = useRouterParams<{ oldPin?: string; registerInfo?: RegisterInfo }>();
+  usePreventHardwareBack();
   const digitInput = useRef<DigitInputInterface>();
   useEffectOnce(() => {
     const listener = DeviceEventEmitter.addListener('clearSetPin', () => digitInput.current?.resetPin());
@@ -43,8 +45,8 @@ export default function SetPin() {
           type="pin"
           secureTextEntry
           style={styles.pinStyle}
-          onChangeText={pin => {
-            if (pin.length === PIN_SIZE) navigationService.navigate('ConfirmPin', { oldPin, pin });
+          onFinish={pin => {
+            navigationService.navigate('ConfirmPin', { oldPin, pin, registerInfo });
           }}
         />
       </View>

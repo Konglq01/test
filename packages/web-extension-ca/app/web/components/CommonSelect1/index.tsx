@@ -16,11 +16,13 @@ export default function CommonSelect1({ items, className, ...props }: CommonSele
         disabled: item.disabled,
         label: (
           <div className="flex-row-center label-item">
-            {item?.iconUrl ? (
+            {/* {item?.iconUrl ? (
               <img src={item.iconUrl} className="label-icon" />
             ) : (
               <CustomSvg className="label-icon" type={item.icon as any} />
-            )}
+            )} */}
+            {typeof item.iconUrl !== 'undefined' && <img src={item.iconUrl} className="label-icon" />}
+            {typeof item.icon !== 'undefined' && <CustomSvg className="label-icon" type={item.icon as any} />}
             <span className="title">{item.label}</span>
           </div>
         ),

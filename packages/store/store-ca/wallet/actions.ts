@@ -1,21 +1,23 @@
+import { NetworkList } from '@portkey/constants/constants-ca/network';
 import { ChainId, NetworkType } from '@portkey/types';
-import { CAInfo } from '@portkey/types/types-ca/wallet';
+import { CAInfo, ManagerInfo } from '@portkey/types/types-ca/wallet';
 import { WalletInfoType } from '@portkey/types/wallet';
 import { checkPinInput, formatWalletInfo } from '@portkey/utils/wallet';
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 import AElf from 'aelf-sdk';
 import { getChainList } from './api';
+import { ChainItemType, WalletState } from './type';
 
 export const createWallet =
   ({
     walletInfo,
     pin,
-    sessionId,
+    managerInfo,
     networkType,
   }: {
     walletInfo?: any;
     pin: string;
-    sessionId: string;
+    managerInfo: ManagerInfo;
     networkType?: NetworkType;
   }): any =>
   async (dispatch: any) => {
@@ -27,7 +29,7 @@ export const createWallet =
     const walletObj = formatWalletInfo(walletInfo, pin, 'walletName');
     if (walletObj) {
       const { walletInfo: newWalletInfo } = walletObj;
-      dispatch(createWalletAction({ walletInfo: newWalletInfo, networkType, sessionId }));
+      dispatch(createWalletAction({ walletInfo: newWalletInfo, networkType, managerInfo }));
       return true;
     }
     throw new Error('createWallet fail');
@@ -35,14 +37,14 @@ export const createWallet =
 export const createWalletAction = createAction<{
   walletInfo: WalletInfoType;
   networkType?: NetworkType;
-  sessionId: string;
+  managerInfo: ManagerInfo;
 }>('wallet/createWallet');
 
-export const setSessionId = createAction<{
+export const setManagerInfo = createAction<{
   networkType?: NetworkType;
   pin: string;
-  sessionId: string;
-}>('wallet/setSessionId');
+  managerInfo: ManagerInfo;
+}>('wallet/setManagerInfo');
 
 export const setCAInfo = createAction<{
   caInfo: CAInfo;
@@ -65,8 +67,21 @@ export const updateWalletNameAsync = createAsyncThunk('wallet/updateWalletNameAs
 });
 
 export const changeNetworkType = createAction<NetworkType>('wallet/changeNetworkType');
+export const setChainListAction = createAction<{ chainList: ChainItemType[]; networkType: NetworkType }>(
+  'wallet/setChainListAction',
+);
 
-export const getChainListAsync = createAsyncThunk('wallet/getChainListAsync', async () => {
-  const response = await getChainList();
-  return response;
-});
+export const getChainListAsync = createAsyncThunk(
+  'wallet/getChainList',
+  async (type: NetworkType | undefined, { getState, dispatch }) => {
+    const {
+      wallet: { currentNetwork },
+    } = getState() as { wallet: WalletState };
+    const _networkType = type ? type : currentNetwork;
+    const baseUrl = NetworkList.find(item => item.networkType === _networkType)?.apiUrl;
+    if (!baseUrl) throw Error('Unable to obtain the corresponding network');
+    const response = await getChainList({ baseUrl });
+    if (!response) throw Error('No data');
+    dispatch(setChainListAction({ chainList: response, networkType: _networkType }));
+  },
+);

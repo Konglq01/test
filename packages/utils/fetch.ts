@@ -1,13 +1,13 @@
 import { stringify } from 'query-string';
 
-type CustomConfig = RequestInit & {
+export interface CustomFetchConfig extends RequestInit {
   timeout?: number;
   params?: Record<string, any>;
-};
+}
 
-type CustomFetchFun = (
+export type CustomFetchFun = (
   url: string, // baseURL
-  _config?: CustomConfig,
+  _config?: CustomFetchConfig,
 ) => Promise<{ type: 'timeout' } | any>;
 
 const defaultHeaders = {
@@ -75,14 +75,15 @@ export const customFetch: CustomFetchFun = (url, _config) => {
           if (result.type === 'timeout') {
             // Cancel timeout request
             if (control.abort) control.abort();
-            reject(result);
+            reject('timeout');
           } else {
-            (result as Response)
+            const _result = result as Response;
+            _result
               .text()
               .then((text: string) => {
                 const res = formatResponse(text);
                 if (result.status !== 200 || !result.ok) {
-                  reject(res);
+                  reject(res ? res : _result.statusText);
                   return;
                 }
                 resolve(res);

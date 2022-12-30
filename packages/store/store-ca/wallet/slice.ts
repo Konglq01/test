@@ -4,22 +4,20 @@ import { checkPassword } from './utils';
 import {
   changePin,
   createWalletAction,
-  getChainListAsync,
   resetWallet,
   setCAInfo,
-  setSessionId,
+  setChainListAction,
+  setManagerInfo,
   updateWalletNameAsync,
 } from './actions';
 import { WalletError, WalletState } from './type';
 import { changeEncryptStr } from '../../wallet/utils';
-import { NetworkList } from '@portkey/constants/constants-ca/network';
 
 const initialState: WalletState = {
   walletAvatar: `master${(Math.floor(Math.random() * 10000) % 6) + 1}`,
   walletType: 'aelf',
   walletName: 'Wallet 01',
   currentNetwork: 'TESTNET',
-  networkList: NetworkList,
   chainList: [],
 };
 export const walletSlice = createSlice({
@@ -39,7 +37,7 @@ export const walletSlice = createSlice({
 
         state.walletInfo = {
           ...action.payload.walletInfo,
-          caInfo: { [currentNetwork]: { sessionId: action.payload.sessionId } } as any,
+          caInfo: { [currentNetwork]: { managerInfo: action.payload.managerInfo } } as any,
         };
       })
       .addCase(setCAInfo, (state, action) => {
@@ -53,14 +51,14 @@ export const walletSlice = createSlice({
           [chainId]: caInfo,
         } as any;
       })
-      .addCase(setSessionId, (state, action) => {
-        const { pin, sessionId } = action.payload;
+      .addCase(setManagerInfo, (state, action) => {
+        const { pin, managerInfo } = action.payload;
         // check pin
         checkPassword(state.walletInfo?.AESEncryptMnemonic, pin);
         const currentNetwork = action.payload.networkType || state.currentNetwork || initialState.currentNetwork;
         if (!state.walletInfo?.AESEncryptMnemonic) throw new Error(WalletError.noCreateWallet);
-        if (state.walletInfo.caInfo[currentNetwork]) throw new Error(WalletError.caAccountExists);
-        state.walletInfo.caInfo[currentNetwork] = { sessionId };
+        // if (state.walletInfo.caInfo[currentNetwork]) throw new Error(WalletError.caAccountExists);
+        state.walletInfo.caInfo[currentNetwork] = { managerInfo };
       })
       .addCase(changePin, (state, action) => {
         const { pin, newPin } = action.payload;
@@ -77,9 +75,10 @@ export const walletSlice = createSlice({
       .addCase(updateWalletNameAsync.rejected, (state, action) => {
         // TODO: add error tips
       })
-      .addCase(getChainListAsync.fulfilled, (state, action) => {
-        state.chainList = action.payload;
-      })
-      .addCase(getChainListAsync.rejected, (state, action) => {});
+      .addCase(setChainListAction, (state, action) => {
+        const { chainList, networkType } = action.payload;
+        if (!state.chainInfo) state.chainInfo = { [networkType]: chainList };
+        state.chainInfo[networkType] = chainList;
+      });
   },
 });

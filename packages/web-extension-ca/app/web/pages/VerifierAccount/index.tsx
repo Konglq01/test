@@ -13,12 +13,12 @@ import useLocationState from 'hooks/useLocationState';
 
 export default function VerifierAccount() {
   const { loginAccount } = useLoginInfo();
-  const { currentGuardian } = useGuardiansInfo();
+  const { currentGuardian, userGuardianStatus } = useGuardiansInfo();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { state } = useLocationState<'register' | 'login' | 'guardians'>();
   const { isPrompt } = useCommonState();
-  // const isPrompt = false;
+  console.log(userGuardianStatus, 'userGuardianStatus===');
   const verificationType = useMemo(() => {
     switch (state) {
       case 'register':

@@ -194,7 +194,7 @@ class SandboxUtil {
   static async callViewMethod(event: MessageEvent<any>, callback: SendBack) {
     const data = event.data.data ?? {};
     try {
-      const { rpcUrl, address, methodName, paramsOption, chainType } = data;
+      const { rpcUrl, address, methodName, paramsOption = '', chainType } = data;
       if (!rpcUrl || !address || !methodName)
         return callback(event, {
           code: SandboxErrorCode.error,
@@ -210,6 +210,7 @@ class SandboxUtil {
         });
       }
       const contract = await SandboxUtil._getELFViewContract(rpcUrl, address);
+      console.log(contract, paramsOption, 'contract====callViewMethod');
       const result = await contract[methodName].call(paramsOption);
       console.log(result, 'callViewMethod');
       callback(event, {
@@ -218,6 +219,7 @@ class SandboxUtil {
         sid: data.sid,
       });
     } catch (error) {
+      console.log(error, 'error===callViewMethod');
       callback(event, {
         code: SandboxErrorCode.error,
         message: error,

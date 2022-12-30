@@ -20,5 +20,6 @@ export const useLockWallet = () => {
 };
 
 export const setPinAction = async (pin: string) => {
+  console.log('setPinAction===');
   await InternalMessage.payload(PortkeyMessageTypes.SET_SEED, pin).send();
 };

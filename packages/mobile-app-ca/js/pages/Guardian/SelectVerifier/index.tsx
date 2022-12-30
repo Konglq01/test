@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import PageContainer from 'components/PageContainer';
 import { TextM, TextS, TextXXXL } from 'components/CommonText';
@@ -18,6 +18,10 @@ import fonts from 'assets/theme/fonts';
 import { isIos } from '@portkey/utils/mobile/device';
 import navigationService from 'utils/navigationService';
 import useRouterParams from '@portkey/hooks/useRouterParams';
+import { request } from 'api';
+import CommonToast from 'components/CommonToast';
+import Loading from 'components/Loading';
+import { randomId } from '@portkey/utils';
 
 const verifierList = [{ name: 'Portkey' }, { name: 'Binance' }, { name: 'Huobi' }];
 
@@ -26,6 +30,48 @@ export default function SelectVerifier() {
   const { t } = useLanguage();
   const [selectedVerifier, setSelectedVerifier] = useState(verifierList[0]);
   const { email } = useRouterParams<{ email?: string }>();
+  const onConfirm = useCallback(async () => {
+    ActionSheet.alert({
+      title2: `Portkey will send a verification code to ${email} to verify your email address.`,
+      buttons: [
+        {
+          title: t('Cancel'),
+          // type: 'solid',
+          type: 'outline',
+        },
+        {
+          title: t('Confirm'),
+          onPress: async () => {
+            try {
+              const managerUniqueId = randomId();
+              // TODO:Confirm
+              Loading.show();
+              const req = await request.register.sendCode({
+                baseURL: 'http://192.168.66.135:5588/',
+                data: {
+                  type: 0,
+                  loginGuardianType: email,
+                  managerUniqueId,
+                },
+              });
+              if (req.verifierSessionId) {
+                navigationService.navigate('VerifierDetails', {
+                  loginGuardianType: email,
+                  verifierSessionId: req.verifierSessionId,
+                  managerUniqueId,
+                });
+              } else {
+                throw new Error('send fail');
+              }
+            } catch (error) {
+              CommonToast.failError(error);
+            }
+            Loading.hide();
+          },
+        },
+      ],
+    });
+  }, [email, t]);
   return (
     <PageContainer containerStyles={styles.containerStyles} scrollViewProps={ScrollViewProps} type="leftBack" titleDom>
       <View>
@@ -60,28 +106,7 @@ export default function SelectVerifier() {
           })}
         </View>
       </View>
-      <CommonButton
-        onPress={() => {
-          ActionSheet.alert({
-            title2: `Portkey will send a verification code to ${email} to verify your email address.`,
-            buttons: [
-              {
-                title: t('Cancel'),
-                // type: 'solid',
-                type: 'outline',
-              },
-              {
-                title: t('Confirm'),
-                onPress: () => {
-                  // TODO:Confirm
-                  navigationService.navigate('VerifierDetails', { email });
-                },
-                // type: 'solid',
-              },
-            ],
-          });
-        }}
-        type="primary">
+      <CommonButton onPress={onConfirm} type="primary">
         {t('Confirm')}
       </CommonButton>
     </PageContainer>

@@ -2,7 +2,7 @@ import { checkVerificationCode, sendVerificationCode } from '@portkey/api/apiUti
 import { sleep } from '@portkey/utils';
 import { Button, message } from 'antd';
 import { useCallback, useEffect, useState } from 'react';
-import { useCommonState, useLoading } from 'store/Provider/hooks';
+import { useAppDispatch, useCommonState, useLoading } from 'store/Provider/hooks';
 import { PasscodeInput } from 'antd-mobile';
 import { loginInfo } from '@portkey/store/store-ca/login/type';
 import { LoginType, VerificationType } from '@portkey/types/verifier';
@@ -12,6 +12,8 @@ import VerifierPair from 'components/VerifierPair';
 import './index.less';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import { useTranslation } from 'react-i18next';
+import { setUserGuardianSessionIdAction } from '@portkey/store/store-ca/guardians/actions';
+import { verifyErrorHandler } from 'utils/tryErrorHandler';
 
 const MAX_TIMER = 60;
 
@@ -25,6 +27,7 @@ interface VerifierPageProps {
   currentGuardian?: UserGuardianItem;
   guardiansType?: LoginType;
   verificationType: VerificationType;
+
   onSuccess?: () => void;
 }
 
@@ -40,51 +43,72 @@ export default function VerifierPage({
   const { isPrompt } = useCommonState();
   const [pinVal, setPinVal] = useState<string>();
   const { t } = useTranslation();
-  // const isPrompt = false;
-  console.log(pinVal, 'loginAccount===');
+  const dispatch = useAppDispatch();
 
   const onFinish = useCallback(
     async (code: string) => {
-      console.log(code);
-      if (code && code.length === 6) {
-        if (!loginAccount?.loginGuardianType || (!loginAccount.accountLoginType && loginAccount.accountLoginType !== 0))
-          return message.error('Missing account!!!');
-        setLoading(true);
-        // TODO
-        await sleep(1000);
-        const res = await checkVerificationCode({
-          code,
-          baseUrl: currentGuardian?.verifier?.url || '',
-          verificationType,
-          type: loginAccount.accountLoginType,
-          loginGuardianType: loginAccount?.loginGuardianType,
-        });
+      try {
+        console.log(code);
+        if (code && code.length === 6) {
+          if (
+            !loginAccount?.loginGuardianType ||
+            (!loginAccount.accountLoginType && loginAccount.accountLoginType !== 0)
+          )
+            throw 'Missing account!!!';
+          if (!currentGuardian?.sessionId) throw 'Missing verifierSessionId!!!';
+          setLoading(true);
+
+          const res = await checkVerificationCode({
+            code,
+            baseUrl: currentGuardian?.verifier?.url || '',
+            verificationType,
+            type: loginAccount.accountLoginType,
+            loginGuardianType: loginAccount?.loginGuardianType,
+            verifierSessionId: currentGuardian?.sessionId,
+          });
+          setLoading(false);
+          if (!Object.keys(res).length) return onSuccess?.();
+          if (res?.error?.message) {
+            message.error(t(res.error.message));
+          } else {
+            message.error(t(VerificationError.InvalidCode));
+          }
+          setPinVal('');
+        }
+      } catch (error: any) {
+        console.log(error, 'error====');
         setLoading(false);
-        if (res.result === 0) return onSuccess?.();
-        if (res.result === 2) message.error(t(VerificationError.codeExpired));
-        if (!res?.result || res.result === 1) message.error(t(VerificationError.InvalidCode));
         setPinVal('');
+        const _error = verifyErrorHandler(error);
+        message.error(_error);
       }
     },
-    [loginAccount, currentGuardian?.verifier?.url, verificationType, setLoading, onSuccess, t],
+    [loginAccount, currentGuardian, setLoading, verificationType, onSuccess, t],
   );
 
   const resendCode = useCallback(async () => {
     if (!loginAccount?.loginGuardianType) return message.error('Missing loginGuardianType');
     console.log(guardiansType, 'guardiansType===');
     if (!guardiansType && guardiansType !== 0) return message.error('Missing guardiansType');
+    setLoading(true);
     const res = await sendVerificationCode({
       loginGuardianType: loginAccount.loginGuardianType,
       guardiansType,
       verificationType,
       baseUrl: currentGuardian?.verifier?.url || '',
+      managerUniqueId: loginAccount.managerUniqueId,
     });
-    if (res) {
-      if (res.result === 0) {
-        setTimer(MAX_TIMER);
-      }
+    setLoading(false);
+    if (res.verifierSessionId) {
+      setTimer(MAX_TIMER);
+      dispatch(
+        setUserGuardianSessionIdAction({
+          key: currentGuardian?.key ?? `${currentGuardian?.loginGuardianType}&${currentGuardian?.verifier?.name}`,
+          sessionId: res.verifierSessionId,
+        }),
+      );
     }
-  }, [currentGuardian, guardiansType, loginAccount, verificationType]);
+  }, [currentGuardian, dispatch, guardiansType, loginAccount, setLoading, verificationType]);
 
   const timerUtil = useCallback(async () => {
     if (!timer) return setTimer(undefined);

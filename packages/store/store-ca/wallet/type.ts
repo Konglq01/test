@@ -1,4 +1,3 @@
-import { NetworkItem } from '@portkey/constants/constants-ca/network';
 import { ChainType, NetworkType } from '@portkey/types';
 import { CAWalletInfoType } from '@portkey/types/types-ca/wallet';
 import { PinErrorMessage } from '@portkey/utils/wallet/types';
@@ -19,6 +18,8 @@ export interface ChainItemType {
   chainId: string;
   name: string;
   endPoint: string;
+  exploreUrl: string;
+  caContractAddress: string;
 }
 
 export interface WalletState {
@@ -26,7 +27,7 @@ export interface WalletState {
   walletType: WalletType;
   walletName: string;
   currentNetwork: NetworkType;
-  networkList: NetworkItem[];
   walletInfo?: CAWalletInfoType;
   chainList: ChainItemType[];
+  chainInfo?: { [key in NetworkType]?: ChainItemType[] };
 }
