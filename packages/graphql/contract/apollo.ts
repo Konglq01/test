@@ -1,11 +1,6 @@
 import { ApolloClient, HttpLink, InMemoryCache, NormalizedCacheObject } from '@apollo/client';
 import { NetworkType } from '@portkey/types';
-
-// TODO: hide url
-const CHAIN_SUBGRAPH_URL: Record<NetworkType, string> = {
-  ['MAIN']: '',
-  ['TESTNET']: 'http://192.168.66.255:8083/AElfIndexer_DApp/PortKeyIndexerCASchema/graphql',
-};
+import { CHAIN_GRAPHQL_URL } from '@portkey/constants/constants-ca/network';
 
 const createApolloClient = (networkType: NetworkType) =>
   new ApolloClient({
@@ -16,7 +11,7 @@ const createApolloClient = (networkType: NetworkType) =>
         fetchPolicy: 'cache-and-network',
       },
     },
-    link: new HttpLink({ uri: CHAIN_SUBGRAPH_URL[networkType] }),
+    link: new HttpLink({ uri: CHAIN_GRAPHQL_URL[networkType] }),
   });
 
 export const networkClientMap: Record<NetworkType, ApolloClient<NormalizedCacheObject>> = {
