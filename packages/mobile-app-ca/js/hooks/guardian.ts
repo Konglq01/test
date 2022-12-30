@@ -3,7 +3,8 @@ import { useAppDispatch } from 'store/hooks';
 import { useCurrentCAContract } from './contract';
 import { setGuardiansAction, setVerifierListAction } from '@portkey/store/store-ca/guardians/actions';
 import { LoginInfo } from 'types/wallet';
-export const useGetGuardiansList = () => {
+import { EmailError } from '@portkey/utils/check';
+export const useGetHolderInfo = () => {
   const dispatch = useAppDispatch();
   const caContract = useCurrentCAContract();
   const getGuardiansList = useCallback(
@@ -20,6 +21,7 @@ export const useGetGuardiansList = () => {
         dispatch(setGuardiansAction(res.guardiansInfo));
         return res.guardiansInfo;
       } else {
+        if (res.error?.message && res.error.message.includes('Not found ca_hash')) throw new Error(EmailError.noEmail);
         throw res.error;
       }
     },

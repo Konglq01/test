@@ -11,12 +11,11 @@ import { windowHeight } from '@portkey/utils/mobile/device';
 import { pTd } from 'utils/unit';
 import GStyles from 'assets/theme/GStyles';
 import { useAppDispatch } from 'store/hooks';
-import { changePin, createWallet } from '@portkey/store/store-ca/wallet/actions';
+import { changePin, createWallet, setCAInfo } from '@portkey/store/store-ca/wallet/actions';
 import CommonToast from 'components/CommonToast';
 import { setCredentials } from 'store/user/actions';
 import { useUser } from 'hooks/store';
 import { setSecureStoreItem } from '@portkey/utils/mobile/biometric';
-import { RegisterInfo } from '../types';
 import Loading from 'components/Loading';
 import { request } from 'api';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
@@ -24,14 +23,19 @@ import AElf from 'aelf-sdk';
 import { sleep } from '@portkey/utils';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 import { intervalGetRegisterResult, TimerResult } from 'utils/wallet';
+import { CAInfo, ManagerInfo } from '@portkey/types/types-ca/wallet';
+import { VerificationType } from '@portkey/types/verifier';
 export default function ConfirmPin() {
   const biometricsReady = useBiometricsReady();
   const { apiUrl } = useCurrentNetworkInfo();
-  const { pin, oldPin, registerInfo } = useRouterParams<{
+  const { pin, oldPin, managerInfo, guardianCount } = useRouterParams<{
     oldPin?: string;
     pin?: string;
-    registerInfo?: RegisterInfo;
+    managerInfo?: ManagerInfo;
+    guardianCount?: number;
   }>();
+  console.log(guardianCount, '===guardianCount');
+
   const [errorMessage, setErrorMessage] = useState<string>();
   const pinRef = useRef<DigitInputInterface>();
   const dispatch = useAppDispatch();
@@ -52,32 +56,51 @@ export default function ConfirmPin() {
     },
     [biometrics, dispatch, oldPin],
   );
-  const onRegister = useCallback(
+  const onFinish = useCallback(
     async (confirmPin: string) => {
-      if (!registerInfo) return;
+      if (!managerInfo) return;
       Loading.show();
       await sleep(1000);
       try {
         const walletInfo = AElf.wallet.createNewWallet();
-        await request.register.managerAddress({
+        const data: any = {
+          ...managerInfo,
+          chainId: DefaultChainId,
+          managerAddress: walletInfo.address,
+          deviceString: JSON.stringify(new Date().getTime()),
+        };
+        let fetch = request.register;
+        if (managerInfo.verificationType === VerificationType.communityRecovery) {
+          fetch = request.recovery;
+          data.guardianCount = guardianCount;
+        }
+        await fetch.managerAddress({
           baseURL: apiUrl,
-          data: {
-            ...registerInfo,
-            chainId: DefaultChainId,
-            managerAddress: walletInfo.address,
-            deviceString: JSON.stringify(new Date().getTime()),
-          },
+          data,
         });
-        dispatch(createWallet({ walletInfo, managerInfo: registerInfo, pin: confirmPin }));
+        dispatch(createWallet({ walletInfo, managerInfo: managerInfo, pin: confirmPin }));
         if (biometricsReady) {
           Loading.hide();
           navigationService.navigate('SetBiometrics', { pin: confirmPin });
         } else {
           timer.current = intervalGetRegisterResult({
-            dispatch,
             apiUrl,
-            pin: confirmPin,
-            managerInfo: registerInfo,
+            managerInfo,
+            onPass: (caInfo: CAInfo) => {
+              Loading.hide();
+              dispatch(
+                setCAInfo({
+                  caInfo,
+                  pin: confirmPin,
+                  chainId: DefaultChainId,
+                }),
+              );
+              navigationService.reset('Tab');
+            },
+            onFail: (message: string) => {
+              Loading.hide();
+              CommonToast.fail(message);
+            },
           });
         }
       } catch (error) {
@@ -85,7 +108,7 @@ export default function ConfirmPin() {
         CommonToast.failError(error);
       }
     },
-    [apiUrl, biometricsReady, dispatch, registerInfo],
+    [apiUrl, biometricsReady, dispatch, guardianCount, managerInfo],
   );
 
   const onChangeText = useCallback(
@@ -101,9 +124,9 @@ export default function ConfirmPin() {
       }
 
       if (oldPin) return onChangePin(confirmPin);
-      if (registerInfo) return onRegister(confirmPin);
+      if (managerInfo) return onFinish(confirmPin);
     },
-    [errorMessage, oldPin, onChangePin, onRegister, pin, registerInfo],
+    [errorMessage, oldPin, onChangePin, onFinish, pin, managerInfo],
   );
   useEffect(() => {
     return () => {

@@ -9,10 +9,7 @@ import { defaultColors } from 'assets/theme';
 import { TextXL } from 'components/CommonText';
 import { pTd } from 'utils/unit';
 import OverlayBody from 'components/OverlayModal/OverlayBody';
-
-type VerifierItem = {
-  name: string;
-};
+import { VerifierItem } from '@portkey/types/verifier';
 
 type VerifierListProps = {
   selectedVerifier: VerifierItem;

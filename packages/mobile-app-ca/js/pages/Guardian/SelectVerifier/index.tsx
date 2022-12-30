@@ -22,12 +22,12 @@ import { request } from 'api';
 import CommonToast from 'components/CommonToast';
 import Loading from 'components/Loading';
 import { randomId } from '@portkey/utils';
-
-const verifierList = [{ name: 'Portkey' }, { name: 'Binance' }, { name: 'Huobi' }];
+import { useVerifierList } from '@portkey/hooks/hooks-ca/network';
 
 const ScrollViewProps = { disabled: true };
 export default function SelectVerifier() {
   const { t } = useLanguage();
+  const verifierList = useVerifierList();
   const [selectedVerifier, setSelectedVerifier] = useState(verifierList[0]);
   const { email } = useRouterParams<{ email?: string }>();
   const onConfirm = useCallback(async () => {
@@ -47,7 +47,7 @@ export default function SelectVerifier() {
               // TODO:Confirm
               Loading.show();
               const req = await request.register.sendCode({
-                baseURL: 'http://192.168.66.135:5588/',
+                baseURL: selectedVerifier.url,
                 data: {
                   type: 0,
                   loginGuardianType: email,
@@ -59,6 +59,11 @@ export default function SelectVerifier() {
                   loginGuardianType: email,
                   verifierSessionId: req.verifierSessionId,
                   managerUniqueId,
+                  guardianItem: {
+                    isLoginAccount: true,
+                    verifier: selectedVerifier,
+                    loginGuardianType: email,
+                  },
                 });
               } else {
                 throw new Error('send fail');
@@ -98,7 +103,7 @@ export default function SelectVerifier() {
         <View style={styles.verifierRow}>
           {verifierList.map(item => {
             return (
-              <Touchable key={item.name} onPress={() => setSelectedVerifier(item)}>
+              <Touchable style={GStyles.center} key={item.name} onPress={() => setSelectedVerifier(item)}>
                 <Svg icon="logo-icon" color={defaultColors.primaryColor} size={40} />
                 <TextS style={[FontStyles.font3, styles.verifierTitle]}>{item.name}</TextS>
               </Touchable>

@@ -2,9 +2,9 @@ import { TextM, TextXXXL } from 'components/CommonText';
 import PageContainer from 'components/PageContainer';
 import useRouterParams from '@portkey/hooks/useRouterParams';
 import { useLanguage } from 'i18n/hooks';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { VERIFIER_EXPIRATION } from '@portkey/constants/misc';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { DeviceEventEmitter, ScrollView, StyleSheet, View } from 'react-native';
 import GStyles from 'assets/theme/GStyles';
 import CommonButton from 'components/CommonButton';
 import { isIphoneX } from '@portkey/utils/mobile/device';
@@ -12,32 +12,54 @@ import { BorderStyles, FontStyles } from 'assets/theme/styles';
 import Svg from 'components/Svg';
 import { pTd } from 'utils/unit';
 import { getApprovalCount } from '@portkey/utils/guardian';
-import { VerifierItem } from '@portkey/types/verifier';
-import GuardianAccountItem from '../GuardianAccountItem';
-import { useCurrentCAContract } from 'hooks/contract';
+import { VerificationType, VerifyStatus } from '@portkey/types/verifier';
+import GuardianAccountItem, { GuardiansStatus, GuardiansStatusItem } from '../GuardianAccountItem';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { randomId } from '@portkey/utils';
-import { useAppDispatch } from 'store/hooks';
-import { resetUserGuardianItemStatus } from '@portkey/store/store-ca/guardians/actions';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
+import navigationService from 'utils/navigationService';
+import { LoginType, ManagerInfo } from '@portkey/types/types-ca/wallet';
 
 export default function GuardianApproval() {
-  const managerUniqueId = useRef<string>();
-  const dispatch = useAppDispatch();
+  const [managerUniqueId, setManagerUniqueId] = useState<string>();
+  console.log(managerUniqueId, '====managerUniqueId');
+
   const { loginGuardianType, userGuardiansList } = useRouterParams<{
     loginGuardianType?: string;
     userGuardiansList?: UserGuardianItem[];
   }>();
-  const [approved, setApproved] = useState<VerifierItem[]>([]);
-  const caContract = useCurrentCAContract();
-  console.log(loginGuardianType, '=====loginGuardianType');
+  const [guardiansStatus, setApproved] = useState<GuardiansStatus>();
+  console.log(guardiansStatus, '=====guardiansStatus');
 
-  console.log(userGuardiansList, '====userGuardianStatus');
+  const approvedList = useMemo(() => {
+    return Object.values(guardiansStatus || {}).filter(guardian => guardian.status === VerifyStatus.Verified);
+  }, [guardiansStatus]);
+
+  const setGuardianStatus = useCallback(
+    (key: string, status: GuardiansStatusItem) => {
+      setApproved({ ...guardiansStatus, [key]: status });
+    },
+    [guardiansStatus],
+  );
+
+  console.log(userGuardiansList, '====userGuardiansList');
   const { t } = useLanguage();
-  const approvalCount = useMemo(() => getApprovalCount(userGuardiansList?.length || 0), [userGuardiansList?.length]);
+  const guardianCount = useMemo(() => getApprovalCount(userGuardiansList?.length || 0), [userGuardiansList?.length]);
+  const isSuccess = useMemo(() => guardianCount <= approvedList.length, [guardianCount, approvedList.length]);
+  console.log(isSuccess, '====isSuccess');
+
   useEffectOnce(() => {
-    managerUniqueId.current = randomId();
-    dispatch(resetUserGuardianItemStatus());
+    setManagerUniqueId(randomId());
+    const listener = DeviceEventEmitter.addListener(
+      'setGuardianStatus',
+      (data: { key: string; status: GuardiansStatusItem }) => {
+        console.log(data, '=====data');
+        setGuardianStatus(data.key, data.status);
+      },
+    );
+    return () => {
+      listener.remove();
+    };
   });
   return (
     <PageContainer
@@ -60,21 +82,42 @@ export default function GuardianApproval() {
               <Svg color={FontStyles.font3.color} size={pTd(16)} icon="question-mark" />
             </View>
             <TextM>
-              <TextM style={FontStyles.font4}>{approved.length ?? 0}</TextM>/{approvalCount.toFixed(0)}
+              <TextM style={FontStyles.font4}>{approvedList.length ?? 0}</TextM>/{guardianCount.toFixed(0)}
             </TextM>
           </View>
           <View style={GStyles.flex1}>
             <ScrollView>
-              {userGuardiansList?.map((item, key) => {
+              {userGuardiansList?.map(item => {
                 return (
-                  <GuardianAccountItem managerUniqueId={managerUniqueId.current as string} key={key} item={item} />
+                  <GuardianAccountItem
+                    key={item.key}
+                    guardianItem={item}
+                    setGuardianStatus={setGuardianStatus}
+                    managerUniqueId={managerUniqueId as string}
+                    guardiansStatus={guardiansStatus}
+                  />
                 );
               })}
             </ScrollView>
           </View>
         </View>
       </View>
-      <CommonButton type="primary" title="Recover wallet" />
+      <CommonButton
+        onPress={() => {
+          navigationService.navigate('SetPin', {
+            managerInfo: {
+              verificationType: VerificationType.communityRecovery,
+              loginGuardianType,
+              type: LoginType.email,
+              managerUniqueId,
+            } as ManagerInfo,
+            guardianCount,
+          });
+        }}
+        disabled={!isSuccess}
+        type="primary"
+        title="Recover wallet"
+      />
     </PageContainer>
   );
 }
