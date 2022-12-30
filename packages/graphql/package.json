@@ -6,14 +6,18 @@
   "version": "0.0.1",
   "type": "commonjs",
   "scripts": {
-    "prebuild": "rm -rf dist",
-    "build": "tsc",
-    "start": "tsc --watch"
+    "generate": "graphql-codegen --config codegen.config.ts"
   },
   "dependencies": {
-    "@portkey/types": "^0.0.1",
     "@apollo/client": "^3.7.3",
+    "@portkey/types": "^0.0.1",
     "graphql": "^16.6.0",
     "subscriptions-transport-ws": "^0.11.0"
-  }
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "^2.16.2",
+    "@graphql-codegen/typescript": "^2.8.6"
+  },
+  "author": "thomas-portkey",
+  "license": "MIT"
 }
