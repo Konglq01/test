@@ -1,5 +1,5 @@
 import { defaultColors } from 'assets/theme';
-import { fontColorStyle } from 'assets/theme/color';
+import { FontStyles } from 'assets/theme/styles';
 import GStyles from 'assets/theme/GStyles';
 import CommonAvatar from 'components/CommonAvatar';
 import { IconName } from 'components/Svg';
@@ -66,12 +66,12 @@ const ActivityItem: React.FC<TokenListItemType> = props => {
         <View style={itemStyle.center}>
           {/* TODO:  sent and received not send */}
           <Text style={itemStyle.centerType}>{t('Transfer')}</Text>
-          <Text style={[itemStyle.centerStatus, fontColorStyle.color3]}>
+          <Text style={[itemStyle.centerStatus, FontStyles.font3]}>
             {t('From')}
             {':  '}
             {formatStr2EllipsisStr('0x46f4e431f49adsadasdas5b78d135a26', 12)}
           </Text>
-          <Text style={[itemStyle.centerStatus, fontColorStyle.color3]}>
+          <Text style={[itemStyle.centerStatus, FontStyles.font3]}>
             {'MainChain AELF'}
             {'-->'}
             {'MainChain tDVV'}

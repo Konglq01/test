@@ -28,6 +28,7 @@ const mockUrl =
   'https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/fotojet-5-1650369753.jpg?crop=0.498xw:0.997xh;0,0&resize=640:*';
 
 const ActivityDetail: React.FC<ActivityDetailProps> = ({ route, transfer }) => {
+  const { walletName } = useWallet();
   const { t } = useLanguage();
   const { params } = route;
   // const { transferInfo } = params;
@@ -73,7 +74,7 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ route, transfer }) => {
 
       <View style={[styles.flexSpaceBetween, styles.titles1]}>
         <TextM style={styles.lightGrayFontColor}>{t('Status')}</TextM>
-        <TextM style={styles.blackFontColor}>{t('Date')}</TextM>
+        <TextM style={styles.lightGrayFontColor}>{t('Date')}</TextM>
       </View>
 
       <View style={[styles.flexSpaceBetween, styles.values1]}>
@@ -86,7 +87,7 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ route, transfer }) => {
         <View style={styles.section}>
           <View style={[styles.flexSpaceBetween]}>
             <TextM style={styles.lightGrayFontColor}>{t('From')}</TextM>
-            <TextM style={styles.blackFontColor}>{'Wallet1'}</TextM>
+            <TextM style={styles.blackFontColor}>{walletName}</TextM>
           </View>
           <View style={[styles.flexSpaceBetween]}>
             <TextM style={styles.lightGrayFontColor} />

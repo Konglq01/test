@@ -1,7 +1,7 @@
 import { ZERO } from '@portkey/constants/misc';
 import { unitConverter } from '@portkey/utils/converter';
 import { defaultColors } from 'assets/theme';
-import { fontColorStyle } from 'assets/theme/color';
+import { FontStyles } from 'assets/theme/styles';
 import CommonAvatar from 'components/CommonAvatar';
 import { TextL, TextS } from 'components/CommonText';
 import { IconName } from 'components/Svg';
@@ -34,7 +34,7 @@ const TokenListItem: React.FC<TokenListItemType> = props => {
           <TextL numberOfLines={1} ellipsizeMode={'tail'} style={itemStyle.tokenName}>
             {item?.token?.symbol}
           </TextL>
-          <TextS numberOfLines={1} style={[fontColorStyle.color7, itemStyle.chainInfo]}>
+          <TextS numberOfLines={1} style={[FontStyles.font7, itemStyle.chainInfo]}>
             {item?.chainId === 'AELF' ? 'MainChain ' : 'SideChain '} {item?.chainId}{' '}
             {currentNetwork === 'MAIN' && 'Testnet'}
           </TextS>

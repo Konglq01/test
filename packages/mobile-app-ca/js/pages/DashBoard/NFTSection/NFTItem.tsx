@@ -10,7 +10,7 @@ import GStyles from 'assets/theme/GStyles';
 import CommonAvatar from 'components/CommonAvatar';
 import Svg from 'components/Svg';
 import { TextM, TextXL } from 'components/CommonText';
-import { fontColorStyle } from 'assets/theme/color';
+import { FontStyles } from 'assets/theme/styles';
 import { useWallet } from 'hooks/store';
 
 export enum NoDataMessage {
@@ -75,7 +75,7 @@ export default function NFTItem(props: NFTItemType) {
           ))}
         </View>
         <TouchableOpacity style={styles.loadMore} onPress={() => loadMoreItem?.(data.name)}>
-          <TextM style={fontColorStyle.color4}>More</TextM>
+          <TextM style={FontStyles.font4}>More</TextM>
           <Svg icon="down-arrow" size={pTd(16)} color={defaultColors.primaryColor} iconStyle={styles.downArrow} />
         </TouchableOpacity>
       </Collapsible>
