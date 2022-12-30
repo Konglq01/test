@@ -1,4 +1,5 @@
-import { LoginType, VerificationType } from '@portkey/types/verifier';
+import { LoginType } from '@portkey/types/types-ca/wallet';
+import { VerificationType } from '@portkey/types/verifier';
 import { request } from '..';
 
 interface SendVerificationCodeProps {

@@ -1,3 +1,5 @@
+import { LoginType } from './types-ca/wallet';
+
 export enum VerifyStatus {
   NotVerified = 'NotVerified',
   Verifying = 'Verifying',
@@ -15,11 +17,6 @@ export enum VerificationType {
   communityRecovery = 1,
   addGuardian = 2,
   setLoginAccount = 3,
-}
-
-export enum LoginType {
-  email = 0,
-  phone = 1,
 }
 
 export interface GuardiansInfo {

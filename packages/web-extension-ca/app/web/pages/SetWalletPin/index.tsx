@@ -48,6 +48,7 @@ export default function SetWalletPin() {
         chainId: 'AELF',
         verificationType: state === 'login' ? VerificationType.communityRecovery : VerificationType.register,
         deviceString: navigator.userAgent,
+        guardianCount: 1,
       });
       return loginAccount.managerUniqueId;
     },
@@ -66,26 +67,23 @@ export default function SetWalletPin() {
         console.log(pin, walletInfo.address, 'onCreate==');
         // Step 9
         const sessionId = await createAndGetSessionId({ managerAddress: _walletInfo.address });
+        const managerInfo = {
+          managerUniqueId: loginAccount?.managerUniqueId || sessionId,
+          loginGuardianType: loginAccount?.loginGuardianType,
+          type: loginAccount.accountLoginType,
+        };
         !walletInfo.address
           ? dispatch(
               createWallet({
                 walletInfo: _walletInfo,
                 pin,
-                managerInfo: {
-                  managerUniqueId: loginAccount?.managerUniqueId || sessionId,
-                  loginGuardianType: loginAccount?.loginGuardianType,
-                  type: loginAccount.accountLoginType,
-                },
+                managerInfo,
               }),
             )
           : dispatch(
               setManagerInfo({
                 pin,
-                managerInfo: {
-                  managerUniqueId: loginAccount?.managerUniqueId || sessionId,
-                  loginGuardianType: loginAccount?.loginGuardianType,
-                  type: loginAccount.accountLoginType,
-                },
+                managerInfo,
               }),
             );
         await setLocalStorage({

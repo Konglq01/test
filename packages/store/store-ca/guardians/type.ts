@@ -1,4 +1,5 @@
-import { LoginType, VerifierItem, VerifyStatus } from '@portkey/types/verifier';
+import { LoginType } from '@portkey/types/types-ca/wallet';
+import { VerifierItem, VerifyStatus } from '@portkey/types/verifier';
 
 type VerifyName = string;
 type UserGuardianItemKey = string;

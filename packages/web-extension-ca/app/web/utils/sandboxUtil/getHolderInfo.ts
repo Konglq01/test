@@ -23,7 +23,7 @@ export const getHolderInfo = async ({
     paramsOption,
   });
 
-  if (resMessage.code === SandboxErrorCode.error) throw resMessage;
+  if (resMessage.code === SandboxErrorCode.error) throw resMessage.message;
   const guardiansInfo = resMessage.message?.guardiansInfo;
   console.log(resMessage, 'getGuardianLis===');
   return {
