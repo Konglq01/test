@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.7.3",
+    "@portkey/constants": "^0.0.1",
     "@portkey/types": "^0.0.1",
     "graphql": "^16.6.0",
     "subscriptions-transport-ws": "^0.11.0"
