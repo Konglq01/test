@@ -1,4 +1,4 @@
-package com.walletappnew.newarchitecture;
+package com.PortkeyApp.newarchitecture;
 
 import android.app.Application;
 import androidx.annotation.NonNull;
@@ -19,9 +19,9 @@ import com.facebook.react.fabric.CoreComponentsRegistry;
 import com.facebook.react.fabric.ReactNativeConfig;
 import com.facebook.react.fabric.FabricJSIModuleProvider;
 import com.facebook.react.uimanager.ViewManagerRegistry;
-import com.walletappnew.BuildConfig;
-import com.walletappnew.newarchitecture.components.MainComponentsRegistry;
-import com.walletappnew.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
+import com.PortkeyApp.BuildConfig;
+import com.PortkeyApp.newarchitecture.components.MainComponentsRegistry;
+import com.PortkeyApp.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
 import java.util.ArrayList;
 import java.util.List;
 
