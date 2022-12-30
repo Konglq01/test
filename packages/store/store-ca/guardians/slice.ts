@@ -8,6 +8,8 @@ import {
   setVerifierListAction,
   setUserGuardianSessionIdAction,
   setGuardiansAction,
+  resetUserGuardianItemStatus,
+  setUserGuardianStatus,
 } from './actions';
 import { GuardiansState } from './type';
 import { GUARDIAN_TYPE_TYPE } from './utils';
@@ -88,6 +90,14 @@ export const guardiansSlice = createSlice({
           // && status === VerifyStatus.Verifying
           state.guardianExpiredTime = moment().add(1, 'h').subtract(2, 'minute').valueOf();
         }
+      })
+      .addCase(setUserGuardianStatus, (state, action) => {
+        const { key, status } = action.payload;
+        if (!state.userGuardianStatus) state.userGuardianStatus = {};
+        // if (!state.userGuardianStatus?.[key]) state.userGuardianStatus[key] = {};
+      })
+      .addCase(resetUserGuardianItemStatus, state => {
+        state.userGuardianStatus = {};
       })
       .addCase(setUserGuardianSessionIdAction, (state, action) => {
         const { key, sessionId } = action.payload;

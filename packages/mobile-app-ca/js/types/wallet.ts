@@ -14,3 +14,5 @@ export interface Wallet {
 export interface Credentials {
   password?: string;
 }
+
+export type LoginInfo = { loginGuardianType?: string; caHash?: string };
