@@ -17,7 +17,7 @@ import TransferItem from 'components/TransferList/components/TransferItem';
 
 import { FlashList } from '@shopify/flash-list';
 import GStyles from 'assets/theme/GStyles';
-import { fontColorStyle } from 'assets/theme/color';
+import { FontStyles } from 'assets/theme/styles';
 import { TextXL } from 'components/CommonText';
 import { fetchActivitiesAsync } from '@portkey/store/store-ca/activity/slice';
 import useEffectOnce from 'hooks/useEffectOnce';
@@ -79,8 +79,8 @@ const TokenDetail: React.FC<TokenDetailProps> = props => {
       backTitle={t('Back')}
       titleDom={
         <View>
-          <TextXL style={[GStyles.textAlignCenter, fontColorStyle.color2]}>ELF</TextXL>
-          <Text style={[GStyles.textAlignCenter, fontColorStyle.color2, styles.subTitle]}>MainChain AELF</Text>
+          <TextXL style={[GStyles.textAlignCenter, FontStyles.font2]}>ELF</TextXL>
+          <Text style={[GStyles.textAlignCenter, FontStyles.font2, styles.subTitle]}>MainChain AELF</Text>
         </View>
       }
       safeAreaColor={['blue', 'white']}

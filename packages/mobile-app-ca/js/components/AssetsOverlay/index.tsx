@@ -18,7 +18,7 @@ import { Image } from '@rneui/themed';
 import { defaultColors } from 'assets/theme';
 import { useWallet } from 'hooks/store';
 import TokenListItem from 'components/TokenListItem';
-import { fontColorStyle } from 'assets/theme/color';
+import { FontStyles } from 'assets/theme/styles';
 import { list } from 'pages/SettingsPage/HelpAndFeedBack/config';
 
 type onFinishSelectTokenType = (tokenItem: any) => void;
@@ -53,21 +53,21 @@ const AssetItem = (props: any) => {
       {/* <CommonAvatar style={itemStyle.left} title={symbol} svgName={undefined} avatarSize={pTd(48)} /> */}
       <View style={itemStyle.right}>
         <View>
-          <TextXL numberOfLines={1} ellipsizeMode={'tail'} style={[fontColorStyle.color5]}>
+          <TextXL numberOfLines={1} ellipsizeMode={'tail'} style={[FontStyles.font5]}>
             {symbol || 'Name'} {'#0271'}
           </TextXL>
 
           {currentNetwork === 'MAIN' ? (
-            <TextM numberOfLines={1} style={[fontColorStyle.color7]}>
+            <TextM numberOfLines={1} style={[FontStyles.font7]}>
               {item?.chainId === ' AELF' ? 'MainChain' : 'SideChain'} {item.chainId}
             </TextM>
           ) : (
-            <TextL style={[fontColorStyle.color7]}>$ 100 USD</TextL>
+            <TextL style={[FontStyles.font7]}>$ 100 USD</TextL>
           )}
         </View>
 
         <View style={itemStyle.balanceWrap}>
-          <TextXL style={[itemStyle.token, fontColorStyle.color5]}>{`2`}</TextXL>
+          <TextXL style={[itemStyle.token, FontStyles.font5]}>{`2`}</TextXL>
           <TextS style={itemStyle.dollar} />
         </View>
       </View>
@@ -128,7 +128,7 @@ const AssetList = ({ onFinishSelectToken, account }: TokenListProps) => {
 
   return (
     <ModalBody modalBodyType="bottom" style={styles.modalStyle}>
-      <TextXL style={[styles.title, fontColorStyle.color5]}>{t('Select Assets')}</TextXL>
+      <TextXL style={[styles.title, FontStyles.font5]}>{t('Select Assets')}</TextXL>
 
       {/* no assets in this accout  */}
       {!list.length ? (
