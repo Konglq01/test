@@ -13,6 +13,7 @@ import SafeAreaBox from 'components/SafeAreaBox';
 import { defaultColors } from 'assets/theme';
 
 import { useGetELFRateQuery } from '@portkey/store/rate/api';
+import PageContainer from 'components/PageContainer';
 
 interface DashBoardTypes {
   navigation: any;

@@ -9,7 +9,7 @@ import GStyles from 'assets/theme/GStyles';
 import { pTd } from 'utils/unit';
 import { defaultColors } from 'assets/theme';
 import { TextL, TextXL, TextXXXL } from 'components/CommonText';
-import { fontColorStyle } from 'assets/theme/color';
+import { FontStyles } from 'assets/theme/styles';
 import fonts from 'assets/theme/fonts';
 import navigationService from 'utils/navigationService';
 
@@ -35,7 +35,7 @@ const NFTDetail: React.FC<TokenDetailProps> = props => {
       <TextXXXL style={styles.title}>
         {'AoxcatPlanet'} {'#2271'}
       </TextXXXL>
-      <TextL style={[fontColorStyle.color3]}>{'Amount 3'}</TextL>
+      <TextL style={[FontStyles.font3]}>{'Amount 3'}</TextL>
 
       <Text style={styles.image}>A</Text>
       {/* <Image
@@ -48,7 +48,7 @@ const NFTDetail: React.FC<TokenDetailProps> = props => {
         Send
       </CommonButton>
       <TextXL style={styles.symbolDescribeTitle}>Symbol Content</TextXL>
-      <TextXL style={[styles.symbolContent, fontColorStyle.color3]}>
+      <TextXL style={[styles.symbolContent, FontStyles.font3]}>
         Symbol Symbol Content Symbol Content Symbol Content Symbol Content Symbol Content Symbol Content Symbol Content
         Symbol Content askdhaksfhahdalhdlah
       </TextXL>
