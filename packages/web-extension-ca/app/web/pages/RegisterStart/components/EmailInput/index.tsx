@@ -3,11 +3,11 @@ import { Input } from 'antd';
 import { forwardRef, useCallback, useImperativeHandle } from 'react';
 import clsx from 'clsx';
 import './index.less';
-import { loginGuardianTypeCheck } from '@portkey/api/apiUtils/verification';
-import { LoginType } from '@portkey/types/verifier';
 import { useTranslation } from 'react-i18next';
 import i18n from 'i18n';
 import { NetworkItem } from '@portkey/constants/constants-ca/network';
+import { searchLoginGuardianType } from '@portkey/graphql/contract/queries';
+import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
 
 enum EmailError {
   noEmail = 'Please enter Email address',
@@ -35,18 +35,27 @@ const EmailInput = forwardRef(({ error, val, wrapperClassName, currentNetwork, o
     async (email?: string, type?: 'login' | 'registered') => {
       if (!email) throw i18n.t(EmailError.noEmail);
       if (!EmailReg.test(email)) throw i18n.t(EmailError.invalidEmail);
-      const checkResult = await loginGuardianTypeCheck({
-        type: LoginType.email,
-        loginGuardianType: email,
-        apiUrl: currentNetwork.apiUrl,
-      });
-      if (type === 'registered') {
-        if (checkResult.result) throw i18n.t(EmailError.alreadyRegistered);
-      } else {
-        if (!checkResult.result) throw i18n.t(EmailError.noAccount);
-      }
+      // const checkResult = await searchLoginGuardianType(currentNetwork.networkType, {
+      //   chainId: 'AELF',
+      //   loginGuardianType: email,
+      // });
+      // const loginGuardianTypeInfo = checkResult.data.loginGuardianTypeInfo;
+      // console.log(loginGuardianTypeInfo, !loginGuardianTypeInfo.length, 'loginGuardianTypeInfo===');
+      // if (type === 'registered') {
+      //   if (loginGuardianTypeInfo.length) throw i18n.t(EmailError.alreadyRegistered);
+      // } else {
+      //   if (!loginGuardianTypeInfo.length) throw i18n.t(EmailError.noAccount);
+      // }
+      //     const checkResult = await getHolderInfo({
+      //       // rpcUrl: currentNetwork.
+      // address: currentNetwork.
+      // chainType: ChainType;
+      // paramsOption: {
+      //   loginGuardianType: string;
+      // };
+      //     });
     },
-    [currentNetwork.apiUrl],
+    [currentNetwork],
   );
 
   useImperativeHandle(ref, () => ({ validateEmail }));

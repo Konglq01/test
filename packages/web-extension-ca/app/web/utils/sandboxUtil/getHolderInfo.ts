@@ -2,7 +2,7 @@ import { ChainType } from '@portkey/types';
 import SandboxEventTypes from 'messages/SandboxEventTypes';
 import SandboxEventService, { SandboxErrorCode } from 'service/SandboxEventService';
 
-export const getGuardianList = async ({
+export const getHolderInfo = async ({
   rpcUrl,
   chainType,
   address, // contract address
@@ -12,7 +12,6 @@ export const getGuardianList = async ({
   address: string;
   chainType: ChainType;
   paramsOption: {
-    caHash: string;
     loginGuardianType: string;
   };
 }) => {

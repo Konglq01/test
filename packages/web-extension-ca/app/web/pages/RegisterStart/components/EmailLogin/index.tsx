@@ -8,7 +8,6 @@ import { useNavigate } from 'react-router';
 import { useAppDispatch, useLoading, useLoginInfo } from 'store/Provider/hooks';
 import './index.less';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { loginGuardianTypeCheck } from '@portkey/api/apiUtils/verification';
 import useAccountVerifierList from 'hooks/useGuardianList';
 
 export default function EmailLogin() {
@@ -26,13 +25,12 @@ export default function EmailLogin() {
   const currentNetwork = useCurrentNetworkInfo();
   const fetchUserVerifier = useAccountVerifierList();
   const loginHandler = useCallback(
-    (loginGuardianType: string, caHash: string) => {
+    (loginGuardianType: string) => {
       dispatch(
         setLoginAccountAction({
           loginGuardianType: loginGuardianType,
           accountLoginType: LoginType.email,
           createType: 'login',
-          caHash,
         }),
       );
     },
@@ -43,16 +41,10 @@ export default function EmailLogin() {
     try {
       if (!val) return message.error('No Account');
       setLoading(true);
-      await emailInputInstance?.current?.validateEmail(val);
-      // const result: any = await loginGuardianTypeCheck({
-      //   type: LoginType.email,
-      //   loginGuardianType: val,
-      //   apiUrl: currentNetwork.apiUrl,
-      // });
+      // await emailInputInstance?.current?.validateEmail(val, 'login');
       // TODO
-      const caHash = '652100680adc8283496d658834901e61c6a3ebeea8187c858b64dd16cc5e433c';
 
-      loginHandler(val, caHash);
+      loginHandler(val);
       dispatch(resetVerifierState());
       await fetchUserVerifier();
       setLoading(false);

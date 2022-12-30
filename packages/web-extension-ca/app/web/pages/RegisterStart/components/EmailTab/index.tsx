@@ -19,7 +19,7 @@ export default function EmailTab({ currentNetwork, onSuccess }: EmailTabProps) {
 
   const onSignUp = useCallback(async () => {
     try {
-      await emailInputInstance?.current?.validateEmail(val);
+      await emailInputInstance?.current?.validateEmail(val, 'registered');
       val && onSuccess(val);
     } catch (error: any) {
       setError(error);

@@ -1,10 +1,9 @@
 import { useCallback } from 'react';
 import { useAppDispatch, useLoginInfo } from 'store/Provider/hooks';
 import { setGuardiansAction } from '@portkey/store/store-ca/guardians/actions';
-import { getGuardianList } from 'utils/sandboxUtil/getGuardianList';
+import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
-import { message } from 'antd';
 
 const useGuardiansList = () => {
   const dispatch = useAppDispatch();
@@ -14,14 +13,13 @@ const useGuardiansList = () => {
 
   const fetch = useCallback(async () => {
     try {
-      if (!currentChain?.endPoint) return message.error('Could not find chain information');
-      if (!loginAccount?.caHash) return message.error('Unable to find user information');
-      const res = await getGuardianList({
+      if (!currentChain?.endPoint) throw 'Could not find chain information';
+      if (!loginAccount?.loginGuardianType) throw 'Unable to find user information';
+      const res = await getHolderInfo({
         rpcUrl: currentChain.endPoint,
         chainType: currentNetwork.walletType,
         address: currentChain.caContractAddress,
         paramsOption: {
-          caHash: loginAccount.caHash,
           loginGuardianType: loginAccount.loginGuardianType,
         },
       });
