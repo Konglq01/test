@@ -7,6 +7,8 @@ import {
   SearchNFTProtocolInfoParamsType,
   SearchCAHolderTransactionParamsType,
   SearchTokenInfoParamsType,
+  getCAHolderByManagerParamsType,
+  CaHolderWithGuardian,
 } from './types';
 import {
   CaHolderManagerDto,
@@ -192,15 +194,22 @@ const searchCAHolderTransaction = async (network: NetworkType, params: SearchCAH
 
 // CAHolderManager
 const SEARCH_CA_HOLDER_MANAGER_INFO_QUERY = gql`
-  query CaHolderManagerInfo($chainId: String, $caHash: String, $caAddress: String, $manager: String) {
+  query CaHolderManagerInfo(
+    $chainId: String
+    $caHash: String
+    $caAddress: String
+    $manager: String
+    $skipCount: Int!
+    $maxResultCount: Int!
+  ) {
     caHolderManagerInfo(
       dto: {
         chainId: $chainId
         caHash: $caHash
         caAddress: $caAddress
         manager: $manager
-        skipCount: 0
-        maxResultCount: 100
+        skipCount: $skipCount
+        maxResultCount: $maxResultCount
       }
     ) {
       id
@@ -308,10 +317,39 @@ const searchLoginGuardianType = async (network: NetworkType, params: SearchLogin
   return result;
 };
 
+const getCAHolderByManager = async (network: NetworkType, params: getCAHolderByManagerParamsType) => {
+  const caResult = await searchCAHolderManagerInfo(network, {
+    ...params,
+    skipCount: 0,
+    maxResultCount: 1,
+  });
+
+  if (caResult.error) throw caResult.error;
+  const result: {
+    caHolderManagerInfo: CaHolderWithGuardian[];
+  } = {
+    caHolderManagerInfo: caResult.data.caHolderManagerInfo.map(item => ({ ...item, loginGuardianTypeInfo: [] })),
+  };
+
+  if (caResult.data.caHolderManagerInfo.length > 0) {
+    const caHash = caResult.data.caHolderManagerInfo[0].caHash;
+    const guardianResult = await searchLoginGuardianType(network, {
+      chainId: params.chainId,
+      caHash,
+    });
+
+    if (guardianResult.error) throw guardianResult.error;
+    result.caHolderManagerInfo[0].loginGuardianTypeInfo = guardianResult.data.loginGuardianTypeInfo;
+  }
+
+  return result;
+};
+
 export {
   searchTokenInfo,
   searchNFTProtocolInfo,
   searchCAHolderTransaction,
   searchCAHolderManagerInfo,
   searchLoginGuardianType,
+  getCAHolderByManager,
 };
