@@ -8,7 +8,6 @@ import { TextM } from 'components/CommonText';
 import GStyles from 'assets/theme/GStyles';
 import { defaultColors } from 'assets/theme';
 import MenuItem from 'components/MenuItem';
-import { settingMenuList } from 'navigation/setting';
 import { RootStackName } from 'navigation';
 import { IconName } from 'components/Svg';
 
@@ -28,7 +27,7 @@ const MenuList: Array<{
     icon: 'contact2',
   },
   {
-    name: 'SetPin',
+    name: 'AccountSettings',
     label: 'Account Setting',
     icon: 'setting2',
   },
