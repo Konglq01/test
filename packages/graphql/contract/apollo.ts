@@ -10,6 +10,9 @@ const createApolloClient = (networkType: NetworkType) =>
       watchQuery: {
         fetchPolicy: 'cache-and-network',
       },
+      query: {
+        fetchPolicy: 'network-only',
+      },
     },
     link: new HttpLink({ uri: CHAIN_GRAPHQL_URL[networkType] }),
   });
