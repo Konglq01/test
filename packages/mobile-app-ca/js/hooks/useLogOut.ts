@@ -1,14 +1,14 @@
-import { resetWallet } from '@portkey/store/wallet/actions';
 import ActionSheet from 'components/ActionSheet';
 import { useCallback } from 'react';
 import { useAppDispatch } from 'store/hooks';
-import { resetUser } from 'store/user/actions';
-import { resetToken } from '@portkey/store/token/slice';
 import { resetSettings } from '@portkey/store/settings/slice';
 
 import navigationService from 'utils/navigationService';
 import { resetNetwork } from '@portkey/store/network/actions';
 import i18n from 'i18n';
+import { resetWallet } from '@portkey/store/store-ca/wallet/actions';
+import { resetUser } from 'store/user/actions';
+import { resetToken } from '@portkey/store/token/slice';
 
 export default function useLogOut() {
   const dispatch = useAppDispatch();
@@ -30,7 +30,7 @@ export default function useLogOut() {
               dispatch(resetToken());
               dispatch(resetSettings());
               dispatch(resetNetwork());
-              navigationService.reset('Entrance');
+              navigationService.reset('LoginPortkey');
             } catch (error) {
               console.log(error, '====error');
             }

@@ -7,7 +7,7 @@ import { useAppDispatch } from 'store/hooks';
 import { setBiometrics } from 'store/user/actions';
 import useBiometricsReady from 'hooks/useBiometrics';
 import navigationService from 'utils/navigationService';
-import { StyleSheet, DeviceEventEmitter } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { defaultColors } from 'assets/theme';
 import { checkPin } from 'utils/redux';
 import useEffectOnce from 'hooks/useEffectOnce';
@@ -17,6 +17,7 @@ import { useUser } from 'hooks/store';
 import { TextM } from 'components/CommonText';
 import ActionSheet from 'components/ActionSheet';
 import { setSecureStoreItem } from '@portkey/utils/mobile/biometric';
+import myEvents from 'utils/deviceEvent';
 
 export default function Biometric() {
   const dispatch = useAppDispatch();
@@ -39,7 +40,7 @@ export default function Biometric() {
     [dispatch],
   );
   useEffectOnce(() => {
-    const listener = DeviceEventEmitter.addListener('openBiometrics', openBiometrics);
+    const listener = myEvents.openBiometrics.addListener(openBiometrics);
     return () => listener.remove();
   });
   const onValueChange = useCallback(

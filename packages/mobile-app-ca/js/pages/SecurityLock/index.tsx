@@ -77,7 +77,7 @@ export default function SecurityLock() {
       if (!walletInfo.managerInfo) return;
       if (isSyncCAInfo && !caInfo) {
         timer.current?.remove();
-        Loading.show('loading...');
+        Loading.show();
         timer.current = intervalGetRegisterResult({
           apiUrl,
           managerInfo: walletInfo.managerInfo,

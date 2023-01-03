@@ -22,6 +22,7 @@ import { CAInfo } from '@portkey/types/types-ca/wallet';
 import Loading from 'components/Loading';
 import { setCAInfo } from '@portkey/store/store-ca/wallet/actions';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network';
+import { handleError } from '@portkey/utils';
 const ScrollViewProps = { disabled: true };
 export default function SetBiometrics() {
   usePreventHardwareBack();
@@ -56,7 +57,7 @@ export default function SetBiometrics() {
       dispatch(setBiometrics(true));
       if (isSyncCAInfo && !caInfo && walletInfo.managerInfo) {
         timer.current?.remove();
-        Loading.show('loading...');
+        Loading.show();
         timer.current = intervalGetRegisterResult({
           apiUrl,
           managerInfo: walletInfo.managerInfo,
@@ -83,15 +84,15 @@ export default function SetBiometrics() {
         );
         navigationService.reset('Tab');
       }
-    } catch (error: any) {
-      setErrorMessage(typeof error.message === 'string' ? error.message : 'Verification failed');
+    } catch (error) {
+      setErrorMessage(handleError(error, 'Failed To Verify'));
     }
   }, [apiUrl, caInfo, dispatch, isSyncCAInfo, pin, walletInfo.managerInfo]);
   return (
     <PageContainer scrollViewProps={ScrollViewProps} leftDom titleDom containerStyles={styles.containerStyles}>
       <Touchable style={GStyles.itemCenter} onPress={openBiometrics}>
         <Image resizeMode="contain" source={biometric} style={styles.biometricIcon} />
-        <TextL style={styles.tipText}>Biometric for quick access</TextL>
+        <TextL style={styles.tipText}>Enable biometric authentication</TextL>
         {errorMessage ? <TextS style={styles.errorText}>{errorMessage}</TextS> : null}
       </Touchable>
       <CommonButton
