@@ -36,11 +36,8 @@ interface GuardianAccountItemProps {
   isExpired?: boolean;
 }
 
-export default function GuardianAccountItem({
+function GuardianItemButton({
   guardianItem,
-  isButtonHide,
-  renderBtn,
-  isBorderHide = false,
   managerUniqueId,
   guardiansStatus,
   setGuardianStatus,
@@ -58,18 +55,6 @@ export default function GuardianAccountItem({
   const onSendCode = useCallback(async () => {
     Loading.show();
     try {
-      console.log(
-        {
-          baseURL: guardianItem.verifier?.url,
-          data: {
-            type: 0,
-            loginGuardianType: guardianItem.loginGuardianType,
-            managerUniqueId,
-          },
-        },
-        '======',
-      );
-
       const req = await request.recovery.sendCode({
         baseURL: guardianItem.verifier?.url,
         data: {
@@ -78,8 +63,6 @@ export default function GuardianAccountItem({
           managerUniqueId,
         },
       });
-      console.log(req, '=====req');
-
       if (req.verifierSessionId) {
         Loading.hide();
         await sleep(200);
@@ -147,6 +130,26 @@ export default function GuardianAccountItem({
     }
   }, [isExpired, onSendCode, onVerifier, status]);
   return (
+    <CommonButton
+      type="primary"
+      {...buttonProps}
+      titleStyle={[styles.titleStyle, fonts.mediumFont, buttonProps.titleStyle]}
+      buttonStyle={[styles.buttonStyle, buttonProps.buttonStyle]}
+    />
+  );
+}
+
+export default function GuardianAccountItem({
+  guardianItem,
+  isButtonHide,
+  renderBtn,
+  isBorderHide = false,
+  managerUniqueId,
+  guardiansStatus,
+  setGuardianStatus,
+  isExpired,
+}: GuardianAccountItemProps) {
+  return (
     <View style={[styles.itemRow, isBorderHide && styles.itemWithoutBorder]}>
       {guardianItem.isLoginAccount && (
         <View style={styles.typeTextRow}>
@@ -161,11 +164,12 @@ export default function GuardianAccountItem({
         </TextM>
       </View>
       {!isButtonHide && !renderBtn && (
-        <CommonButton
-          type="primary"
-          {...buttonProps}
-          titleStyle={[styles.titleStyle, fonts.mediumFont, buttonProps.titleStyle]}
-          buttonStyle={[styles.buttonStyle, buttonProps.buttonStyle]}
+        <GuardianItemButton
+          isExpired={isExpired}
+          guardianItem={guardianItem}
+          managerUniqueId={managerUniqueId}
+          guardiansStatus={guardiansStatus}
+          setGuardianStatus={setGuardianStatus}
         />
       )}
       {!isButtonHide && renderBtn && renderBtn(guardianItem)}
