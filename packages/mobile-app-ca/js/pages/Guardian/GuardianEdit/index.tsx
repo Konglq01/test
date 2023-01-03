@@ -123,7 +123,7 @@ const GuardianEdit: React.FC<GuardianEditProps> = ({ route }) => {
     setGuardianError(_guardianError);
     if (_guardianError.isError) return;
     // TODO: add callback or next step
-    navigationService.navigate('SelectVerifier', { email });
+    navigationService.navigate('SelectVerifier', { loginGuardianType: email });
   }, [checkCurGuardianRepeat, email]);
 
   const onRemove = useCallback(() => {
@@ -139,7 +139,7 @@ const GuardianEdit: React.FC<GuardianEditProps> = ({ route }) => {
           title: t('Yes'),
           onPress: () => {
             // TODO: add callback or next step
-            navigationService.navigate('SelectVerifier', { email });
+            navigationService.navigate('SelectVerifier', { loginGuardianType: email });
           },
         },
       ],

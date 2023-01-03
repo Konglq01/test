@@ -112,3 +112,9 @@ export function isPrivateKey(privateKey?: string) {
 export const isExtension = () => process.env.DEVICE === 'extension';
 
 export const randomId = () => uuid.v4().replace(/-/g, '');
+
+export const handleError = (error: any, errorText?: string) => {
+  let text = errorText;
+  if (typeof error.message === 'string') text = error.message;
+  return text;
+};

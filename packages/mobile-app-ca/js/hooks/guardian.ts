@@ -3,7 +3,9 @@ import { useAppDispatch } from 'store/hooks';
 import { useCurrentCAContract } from './contract';
 import { setGuardiansAction, setVerifierListAction } from '@portkey/store/store-ca/guardians/actions';
 import { LoginInfo } from 'types/wallet';
-export const useGetGuardiansList = () => {
+import { EmailError } from '@portkey/utils/check';
+import { VerifierItem } from '@portkey/types/verifier';
+export const useGetHolderInfo = () => {
   const dispatch = useAppDispatch();
   const caContract = useCurrentCAContract();
   const getGuardiansList = useCallback(
@@ -20,6 +22,8 @@ export const useGetGuardiansList = () => {
         dispatch(setGuardiansAction(res.guardiansInfo));
         return res.guardiansInfo;
       } else {
+        if (res.error?.message && res.error.message.includes('Not found ca_hash'))
+          throw new Error(EmailError.noAccount);
         throw res.error;
       }
     },
@@ -35,7 +39,7 @@ export const useGetVerifierServers = () => {
     if (!caContract) throw new Error('Could not find chain information');
     const res = await caContract?.callViewMethod('GetVerifierServers', '');
     if (!res?.error) {
-      const verifierList = res.verifierServers?.map((item: any) => ({
+      const verifierList: VerifierItem[] = res.verifierServers?.map((item: any) => ({
         name: item.name,
         url: item.endPoints[0],
         imageUrl: item.imageUrl,

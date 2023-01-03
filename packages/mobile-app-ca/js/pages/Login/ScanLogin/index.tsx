@@ -25,11 +25,11 @@ export default function ScanLogin() {
       }>
       <View style={GStyles.itemCenter}>
         <Svg size={pTd(100)} icon="logo-icon" color={defaultColors.primaryColor} />
-        <TextXXXL style={styles.title}>Login Portkey</TextXXXL>
+        <TextXXXL style={styles.title}>Confirm Your Log In To Portkey</TextXXXL>
       </View>
       <View style={styles.bottomBox}>
-        <CommonButton type="primary" title="Login" />
-        <CommonButton buttonStyle={styles.cancelButtonStyle} type="clear" title="Cancel Login" />
+        <CommonButton type="primary" title="Log In" />
+        <CommonButton buttonStyle={styles.cancelButtonStyle} type="clear" title="Cancel" />
       </View>
     </PageContainer>
   );

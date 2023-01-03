@@ -6,10 +6,15 @@ import { RootStackParamList } from 'navigation';
 import SafeAreaBox from 'components/SafeAreaBox';
 import { useCredentials } from 'hooks/store';
 import CommonButton from 'components/CommonButton';
-import Guide from './components/Guide';
 import GStyles from 'assets/theme/GStyles';
 import { useLanguage } from 'i18n/hooks';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import Welcome from './components/Welcome';
+import { ImageBackground, StyleSheet } from 'react-native';
+import { screenHeight } from '@portkey/utils/mobile/device';
+import background from '../Login/img/background.png';
+import { BGStyles, FontStyles } from 'assets/theme/styles';
+
 export default function Referral() {
   const credentials = useCredentials();
   const { walletInfo } = useCurrentWallet();
@@ -29,18 +34,27 @@ export default function Referral() {
     };
   }, [credentials, walletInfo]);
   return (
-    <SafeAreaBox style={gStyles.container}>
-      {!walletInfo?.address ? (
-        <>
-          <Guide />
-          <CommonButton
-            style={GStyles.marginBottom(20)}
-            type="primary"
-            title={t('Get Start')}
-            onPress={() => navigationService.reset('Entrance')}
-          />
-        </>
-      ) : null}
-    </SafeAreaBox>
+    <ImageBackground style={styles.backgroundContainer} resizeMode="cover" source={background}>
+      <SafeAreaBox style={[gStyles.container, BGStyles.transparent]}>
+        {!walletInfo?.address ? (
+          <>
+            <Welcome />
+            <CommonButton
+              buttonStyle={[GStyles.marginBottom(40), BGStyles.bg1]}
+              titleStyle={FontStyles.font4}
+              type="primary"
+              title={t('Get Start')}
+              onPress={() => navigationService.reset('LoginPortkey')}
+            />
+          </>
+        ) : null}
+      </SafeAreaBox>
+    </ImageBackground>
   );
 }
+
+const styles = StyleSheet.create({
+  backgroundContainer: {
+    height: screenHeight,
+  },
+});

@@ -3,7 +3,7 @@ import { AppState, AppStateStatus, StyleSheet, View } from 'react-native';
 import { TextL } from 'components/CommonText';
 import { useAppDispatch } from 'store/hooks';
 import { setCredentials } from 'store/user/actions';
-import { useCredentials, useUser } from 'hooks/store';
+import { useUser } from 'hooks/store';
 import secureStore from '@portkey/utils/mobile/secureStore';
 import GStyles from 'assets/theme/GStyles';
 import { windowHeight } from '@portkey/utils/mobile/device';
@@ -16,19 +16,20 @@ import { useNavigation } from '@react-navigation/native';
 import navigationService from 'utils/navigationService';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import Loading from 'components/Loading';
-import usePrevious from 'hooks/usePrevious';
 import useBiometricsReady from 'hooks/useBiometrics';
 import { usePreventHardwareBack } from '@portkey/hooks/mobile';
 import { intervalGetRegisterResult, TimerResult } from 'utils/wallet';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import CommonButton from 'components/CommonButton';
-import { resetWallet } from '@portkey/store/store-ca/wallet/actions';
+import { resetWallet, setCAInfo } from '@portkey/store/store-ca/wallet/actions';
+import { CAInfo } from '@portkey/types/types-ca/wallet';
+import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 let appState: AppStateStatus;
 export default function SecurityLock() {
-  const { pin } = useCredentials() || {};
   const { biometrics } = useUser();
   const { apiUrl } = useCurrentNetworkInfo();
   const biometricsReady = useBiometricsReady();
+  const [caInfo, setStateCAInfo] = useState<CAInfo>();
   usePreventHardwareBack();
   const timer = useRef<TimerResult>();
 
@@ -40,14 +41,20 @@ export default function SecurityLock() {
     () => walletInfo.address && walletInfo.managerInfo && !walletInfo.AELF?.caAddress,
     [walletInfo.AELF?.caAddress, walletInfo.address, walletInfo.managerInfo],
   );
-  const prevIsSyncCAInfo = usePrevious(isSyncCAInfo);
   const navigation = useNavigation();
   useEffect(() => {
     if (isSyncCAInfo) {
-      console.log('fetch step 14');
+      setTimeout(() => {
+        if (walletInfo.managerInfo && apiUrl)
+          timer.current = intervalGetRegisterResult({
+            apiUrl,
+            managerInfo: walletInfo.managerInfo,
+            onPass: setStateCAInfo,
+          });
+      }, 100);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSyncCAInfo]);
-
   const handleRouter = useCallback(
     (pinInput: string) => {
       Loading.hide();
@@ -64,28 +71,41 @@ export default function SecurityLock() {
     [biometrics, biometricsReady, navigation],
   );
 
-  useEffect(() => {
-    if (!isSyncCAInfo && isSyncCAInfo !== prevIsSyncCAInfo && pin && checkPin(pin)) {
-      handleRouter(pin);
-    }
-  }, [handleRouter, isSyncCAInfo, pin, prevIsSyncCAInfo]);
   const handlePassword = useCallback(
     (pwd: string) => {
       dispatch(setCredentials({ pin: pwd }));
       if (!walletInfo.managerInfo) return;
-      if (isSyncCAInfo) {
-        Loading.show('loading...');
+      if (isSyncCAInfo && !caInfo) {
+        timer.current?.remove();
+        Loading.show();
         timer.current = intervalGetRegisterResult({
-          dispatch,
           apiUrl,
-          pin: pwd,
           managerInfo: walletInfo.managerInfo,
+          onPass: (info: CAInfo) => {
+            dispatch(
+              setCAInfo({
+                caInfo: info,
+                pin: pwd,
+                chainId: DefaultChainId,
+              }),
+            );
+            Loading.hide();
+            handleRouter(pwd);
+          },
         });
         return;
+      } else if (caInfo) {
+        dispatch(
+          setCAInfo({
+            caInfo,
+            pin: pwd,
+            chainId: DefaultChainId,
+          }),
+        );
       }
       handleRouter(pwd);
     },
-    [apiUrl, dispatch, handleRouter, isSyncCAInfo, walletInfo.managerInfo],
+    [apiUrl, caInfo, dispatch, handleRouter, isSyncCAInfo, walletInfo.managerInfo],
   );
   const verifyBiometrics = useCallback(async () => {
     if (!biometrics) return;
