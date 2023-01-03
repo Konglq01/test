@@ -14,7 +14,7 @@ import { request } from 'api';
 import CommonToast from 'components/CommonToast';
 import { sleep } from '@portkey/utils';
 import { VerificationType, VerifyStatus } from '@portkey/types/verifier';
-import { FontStyles } from 'assets/theme/styles';
+import { BGStyles, FontStyles } from 'assets/theme/styles';
 
 export type GuardiansStatusItem = {
   status: VerifyStatus;
@@ -33,6 +33,7 @@ interface GuardianAccountItemProps {
   managerUniqueId?: string;
   guardiansStatus?: GuardiansStatus;
   setGuardianStatus?: (key: string, status: GuardiansStatusItem) => void;
+  isExpired?: boolean;
 }
 
 export default function GuardianAccountItem({
@@ -43,6 +44,7 @@ export default function GuardianAccountItem({
   managerUniqueId,
   guardiansStatus,
   setGuardianStatus,
+  isExpired,
 }: GuardianAccountItemProps) {
   const itemStatus = useMemo(() => guardiansStatus?.[guardianItem.key], [guardianItem.key, guardiansStatus]);
 
@@ -116,10 +118,19 @@ export default function GuardianAccountItem({
   }, [guardianItem, managerUniqueId, verifierSessionId]);
   const buttonProps: CommonButtonProps = useMemo(() => {
     if (!status || status === VerifyStatus.NotVerified) {
-      return {
-        onPress: onSendCode,
-        title: 'Send',
-      };
+      if (isExpired)
+        return {
+          disabled: true,
+          type: 'clear',
+          title: 'Expired',
+          disabledStyle: BGStyles.transparent,
+          disabledTitleStyle: FontStyles.font7,
+        };
+      else
+        return {
+          onPress: onSendCode,
+          title: 'Send',
+        };
     } else if (status === VerifyStatus.Verifying) {
       return {
         onPress: onVerifier,
@@ -134,7 +145,7 @@ export default function GuardianAccountItem({
         disabled: true,
       };
     }
-  }, [onSendCode, onVerifier, status]);
+  }, [isExpired, onSendCode, onVerifier, status]);
   return (
     <View style={[styles.itemRow, isBorderHide && styles.itemWithoutBorder]}>
       {guardianItem.isLoginAccount && (

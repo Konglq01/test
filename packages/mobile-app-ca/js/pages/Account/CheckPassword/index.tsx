@@ -4,13 +4,14 @@ import { sleep } from '@portkey/utils';
 import VerifyPasswordInput, { VerifyPasswordInputInterface } from 'components/VerifyPasswordInput';
 import navigationService from 'utils/navigationService';
 import CommonButton from 'components/CommonButton';
-import { DeviceEventEmitter, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import useKeyboardHeight from 'hooks/useKeyboardHeight';
 import GStyles from 'assets/theme/GStyles';
 import { defaultColors } from 'assets/theme';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { isIos } from '@portkey/utils/mobile/device';
 import { useLanguage } from 'i18n/hooks';
+import myEvents from 'utils/deviceEvent';
 type RouterParams = RouteProp<{ params: { openBiometrics?: boolean } }>;
 const bottomHeight = !isIos ? 30 : 20;
 const keyboardBottomHeight = !isIos ? bottomHeight : 0;
@@ -42,7 +43,7 @@ export default function CheckPassword() {
     setLoading(false);
     if (success) {
       if (openBiometrics) {
-        DeviceEventEmitter.emit('openBiometrics', password);
+        myEvents.openBiometrics.emit(password);
         navigationService.goBack();
       } else {
         navigationService.navigate('ChangePassword', { password });

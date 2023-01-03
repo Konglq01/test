@@ -5,7 +5,7 @@ import VerifierCountdown, { VerifierCountdownInterface } from 'components/Verifi
 import PageContainer from 'components/PageContainer';
 import DigitInput, { DigitInputInterface } from 'components/DigitInput';
 import React, { useCallback, useRef, useState } from 'react';
-import { DeviceEventEmitter, StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import useRouterParams from '@portkey/hooks/useRouterParams';
 import { VerificationType, VerifyStatus } from '@portkey/types/verifier';
 import GuardianAccountItem from '../GuardianAccountItem';
@@ -17,6 +17,7 @@ import CommonToast from 'components/CommonToast';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { LoginType } from '@portkey/types/types-ca/wallet';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
+import myEvents from 'utils/deviceEvent';
 type RouterParams = {
   loginGuardianType?: string;
   guardianItem?: UserGuardianItem;
@@ -63,8 +64,9 @@ export default function VerifierDetails() {
             verifierSessionId: stateSessionId,
           },
         });
+        CommonToast.success('Verified Successfully');
         if (verificationType === VerificationType.communityRecovery) {
-          DeviceEventEmitter.emit('setGuardianStatus', {
+          myEvents.setGuardianStatus.emit({
             key: guardianKey,
             status: {
               verifierSessionId,
@@ -126,7 +128,7 @@ export default function VerifierDetails() {
       {guardianItem ? <GuardianAccountItem guardianItem={guardianItem} isButtonHide /> : null}
       <TextM style={[FontStyles.font3, GStyles.marginTop(16), GStyles.marginBottom(50)]}>
         A {DIGIT_CODE.length}-digit code was sent to <Text style={FontStyles.font4}>{loginGuardianType}</Text>. Enter it
-        within {DIGIT_CODE.expiration} minutes.
+        within {DIGIT_CODE.expiration} minutes
       </TextM>
       <DigitInput ref={digitInput} onFinish={onFinish} maxLength={DIGIT_CODE.length} />
       <VerifierCountdown style={GStyles.marginTop(24)} onResend={resendCode} ref={countdown} />

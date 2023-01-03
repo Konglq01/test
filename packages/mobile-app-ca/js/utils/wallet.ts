@@ -95,9 +95,7 @@ export function intervalGetRegisterResult({
         baseURL: apiUrl,
         data: managerInfo,
       });
-      console.log(req, '====req-intervalGetRegisterResult');
-
-      switch (req.recoveryStatus) {
+      switch (req.recoveryStatus || req.registerStatus) {
         case 'pass': {
           clearTimeoutInterval(timer);
           onPass?.(req);
