@@ -149,7 +149,7 @@ export default function GuardianAccountItem({
           {guardianItem.loginGuardianType}
         </TextM>
       </View>
-      {!isButtonHide && !renderBtn && (
+      {!isButtonHide && (
         <CommonButton
           type="primary"
           {...buttonProps}
@@ -157,7 +157,7 @@ export default function GuardianAccountItem({
           buttonStyle={[styles.buttonStyle, buttonProps.buttonStyle]}
         />
       )}
-      {!isButtonHide && renderBtn && renderBtn(guardianItem)}
+      {renderBtn && renderBtn(guardianItem)}
     </View>
   );
 }
