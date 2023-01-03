@@ -1,5 +1,5 @@
 import { defaultColors } from 'assets/theme';
-import { TextL, TextM } from 'components/CommonText';
+import { TextM } from 'components/CommonText';
 import Svg, { IconName } from 'components/Svg';
 import React, { memo } from 'react';
 import { TouchableOpacity, StyleSheet } from 'react-native';
@@ -12,33 +12,33 @@ interface MenuItemProps {
   onPress?: () => void;
 }
 
-const MenuItem: React.FC<MenuItemProps> = ({ title, icon, onPress }) => {
+const WalletMenuItem: React.FC<MenuItemProps> = ({ title, icon, onPress }) => {
   return (
     <TouchableOpacity style={styles.itemWrap} onPress={() => onPress?.()}>
-      {icon && <Svg icon={icon} size={26} iconStyle={styles.menuIcon} />}
-      <TextL style={styles.title}>{title}</TextL>
+      {icon && <Svg icon={icon} size={24} iconStyle={styles.menuIcon} />}
+      <TextM style={styles.title}>{title}</TextM>
       <Svg icon="right-arrow" size={16} color={defaultColors.font7} />
     </TouchableOpacity>
   );
 };
 
-export default memo(MenuItem);
+export default memo(WalletMenuItem);
 
 const styles = StyleSheet.create({
   itemWrap: {
-    height: pTd(64),
+    marginBottom: pTd(12),
+    height: pTd(56),
     backgroundColor: defaultColors.bg1,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderBottomColor: defaultColors.border6,
-    borderBottomWidth: 1,
-    paddingHorizontal: pTd(16),
+    ...gStyles.paddingArg(0, 16),
+    borderRadius: pTd(6),
   },
   menuIcon: {
+    borderRadius: pTd(6),
     overflow: 'hidden',
     marginRight: pTd(16),
-    borderRadius: pTd(6),
   },
   title: {
     flex: 1,
