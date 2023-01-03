@@ -15,29 +15,13 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 ## iOS
 
-### ios build_ipa
+### ios beta
 
 ```sh
-[bundle exec] fastlane ios build_ipa
+[bundle exec] fastlane ios beta
 ```
 
-builds and packages iOS
-
-### ios distribute_firebase
-
-```sh
-[bundle exec] fastlane ios distribute_firebase
-```
-
-Distributes the staging app via Firebase App Distribution
-
-### ios push_telegram
-
-```sh
-[bundle exec] fastlane ios push_telegram
-```
-
-Automatically increment the build number
+Push a new beta build to TestFlight
 
 ----
 
