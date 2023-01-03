@@ -2,22 +2,17 @@ import { useQuery, gql } from '@apollo/client';
 import { NetworkType } from '@portkey/types';
 import { getApolloClient } from './apollo';
 import {
-  SearchCAHolderManagerInfoParamsType,
-  SearchLoginGuardianTypeParamsType,
-  SearchNFTProtocolInfoParamsType,
-  SearchCAHolderTransactionParamsType,
-  SearchTokenInfoParamsType,
-  getCAHolderByManagerParamsType,
+  GetCaHolderManagerInfoParamsType,
+  GetLoginGuardianTypeParamsType,
+  GetNftProtocolInfoParamsType,
+  GetCaHolderTransactionParamsType,
+  GetTokenInfoParamsType,
+  GetCAHolderByManagerParamsType,
   CaHolderWithGuardian,
 } from './types';
 import {
   CaHolderManagerDto,
   CaHolderTransactionDto,
-  GetCaHolderManagerInfoDto,
-  GetCaHolderTransactionDto,
-  GetLoginGuardianTypeInfoDto,
-  GetNftProtocolInfoDto,
-  GetTokenInfoDto,
   LoginGuardianTypeDto,
   NftProtocolInfoDto,
   TokenInfoDto,
@@ -25,7 +20,7 @@ import {
 
 // TokenInfo
 const TOKEN_INFO_LIST_QUERY = gql`
-  query TokenInfo($symbol: String, $chainId: String, $skipCount: Int!, $maxResultCount: Int!) {
+  query TokenInfo($symbol: String, $chainId: String, $skipCount: Int = 0, $maxResultCount: Int = 100) {
     tokenInfo(dto: { symbol: $symbol, chainId: $chainId, skipCount: $skipCount, maxResultCount: $maxResultCount }) {
       id
       chainId
@@ -44,7 +39,7 @@ const TOKEN_INFO_LIST_QUERY = gql`
   }
 `;
 
-const useTokenInfoList = (network: NetworkType, params: GetTokenInfoDto) => {
+const useTokenInfoList = (network: NetworkType, params: GetTokenInfoParamsType) => {
   const apolloClient = getApolloClient(network);
 
   const result = useQuery<TokenInfoDto>(TOKEN_INFO_LIST_QUERY, {
@@ -56,7 +51,7 @@ const useTokenInfoList = (network: NetworkType, params: GetTokenInfoDto) => {
 };
 
 const SEARCH_TOKEN_INFO_QUERY = gql`
-  query TokenInfo($chainId: String, $symbol: String, $skipCount: Int!, $maxResultCount: Int!) {
+  query TokenInfo($chainId: String, $symbol: String, $skipCount: Int = 0, $maxResultCount: Int = 100) {
     tokenInfo(dto: { chainId: $chainId, symbol: $symbol, skipCount: $skipCount, maxResultCount: $maxResultCount }) {
       id
       chainId
@@ -75,25 +70,19 @@ const SEARCH_TOKEN_INFO_QUERY = gql`
   }
 `;
 
-const searchTokenInfo = async (network: NetworkType, params: SearchTokenInfoParamsType) => {
+const searchTokenInfo = async (network: NetworkType, params: GetTokenInfoParamsType) => {
   const apolloClient = getApolloClient(network);
-
-  const queryParams: GetTokenInfoDto = {
-    ...params,
-    skipCount: params.skipCount === undefined ? 0 : params.skipCount,
-    maxResultCount: params.maxResultCount === undefined ? 100 : params.maxResultCount,
-  };
 
   const result = await apolloClient.query<{ tokenInfo: TokenInfoDto[] }>({
     query: SEARCH_TOKEN_INFO_QUERY,
-    variables: queryParams,
+    variables: params,
   });
   return result;
 };
 
 // NFTProtocolInfo
 const SEARCH_NFT_PROTOCOL_INFO_QUERY = gql`
-  query NftProtocolInfo($chainId: String, $symbol: String, $skipCount: Int!, $maxResultCount: Int!) {
+  query NftProtocolInfo($chainId: String, $symbol: String, $skipCount: Int = 0, $maxResultCount: Int = 100) {
     nftProtocolInfo(
       dto: { chainId: $chainId, symbol: $symbol, skipCount: $skipCount, maxResultCount: $maxResultCount }
     ) {
@@ -120,25 +109,19 @@ const SEARCH_NFT_PROTOCOL_INFO_QUERY = gql`
   }
 `;
 
-const searchNFTProtocolInfo = async (network: NetworkType, params: SearchNFTProtocolInfoParamsType) => {
+const searchNFTProtocolInfo = async (network: NetworkType, params: GetNftProtocolInfoParamsType) => {
   const apolloClient = getApolloClient(network);
-
-  const queryParams: GetNftProtocolInfoDto = {
-    ...params,
-    skipCount: params.skipCount === undefined ? 0 : params.skipCount,
-    maxResultCount: params.maxResultCount === undefined ? 100 : params.maxResultCount,
-  };
 
   const result = await apolloClient.query<{ nftProtocolInfo: NftProtocolInfoDto[] }>({
     query: SEARCH_NFT_PROTOCOL_INFO_QUERY,
-    variables: queryParams,
+    variables: params,
   });
   return result;
 };
 
 // CAHolderTransaction
 const SEARCH_CA_HOLDER_TRANSACTION_QUERY = gql`
-  query CaHolderTransaction($chainId: String, $address: String, $skipCount: Int!, $maxResultCount: Int!) {
+  query CaHolderTransaction($chainId: String, $address: String, $skipCount: Int = 0, $maxResultCount: Int = 100) {
     caHolderTransaction(
       dto: { chainId: $chainId, address: $address, skipCount: $skipCount, maxResultCount: $maxResultCount }
     ) {
@@ -176,18 +159,12 @@ const SEARCH_CA_HOLDER_TRANSACTION_QUERY = gql`
   }
 `;
 
-const searchCAHolderTransaction = async (network: NetworkType, params: SearchCAHolderTransactionParamsType) => {
+const searchCAHolderTransaction = async (network: NetworkType, params: GetCaHolderTransactionParamsType) => {
   const apolloClient = getApolloClient(network);
-
-  const queryParams: GetCaHolderTransactionDto = {
-    ...params,
-    skipCount: params.skipCount === undefined ? 0 : params.skipCount,
-    maxResultCount: params.maxResultCount === undefined ? 100 : params.maxResultCount,
-  };
 
   const result = await apolloClient.query<{ caHolderTransaction: CaHolderTransactionDto[] }>({
     query: SEARCH_CA_HOLDER_TRANSACTION_QUERY,
-    variables: queryParams,
+    variables: params,
   });
   return result;
 };
@@ -199,8 +176,8 @@ const SEARCH_CA_HOLDER_MANAGER_INFO_QUERY = gql`
     $caHash: String
     $caAddress: String
     $manager: String
-    $skipCount: Int!
-    $maxResultCount: Int!
+    $skipCount: Int = 0
+    $maxResultCount: Int = 100
   ) {
     caHolderManagerInfo(
       dto: {
@@ -224,18 +201,12 @@ const SEARCH_CA_HOLDER_MANAGER_INFO_QUERY = gql`
   }
 `;
 
-const searchCAHolderManagerInfo = async (network: NetworkType, params: SearchCAHolderManagerInfoParamsType) => {
+const searchCAHolderManagerInfo = async (network: NetworkType, params: GetCaHolderManagerInfoParamsType) => {
   const apolloClient = getApolloClient(network);
-
-  const queryParams: GetCaHolderManagerInfoDto = {
-    ...params,
-    skipCount: params.skipCount === undefined ? 0 : params.skipCount,
-    maxResultCount: params.maxResultCount === undefined ? 100 : params.maxResultCount,
-  };
 
   const result = await apolloClient.query<{ caHolderManagerInfo: CaHolderManagerDto[] }>({
     query: SEARCH_CA_HOLDER_MANAGER_INFO_QUERY,
-    variables: queryParams,
+    variables: params,
   });
   return result;
 };
@@ -247,8 +218,8 @@ const LOGIN_GUARDIAN_TYPE_LIST_QUERY = gql`
     $caHash: String
     $caAddress: String
     $loginGuardianType: String
-    $skipCount: Int!
-    $maxResultCount: Int!
+    $skipCount: Int = 0
+    $maxResultCount: Int = 100
   ) {
     loginGuardianTypeInfo(
       dto: {
@@ -269,7 +240,7 @@ const LOGIN_GUARDIAN_TYPE_LIST_QUERY = gql`
   }
 `;
 
-const useLoginGuardianTypeList = (network: NetworkType, params: GetLoginGuardianTypeInfoDto) => {
+const useLoginGuardianTypeList = (network: NetworkType, params: GetLoginGuardianTypeParamsType) => {
   const apolloClient = getApolloClient(network);
 
   const result = useQuery<TokenInfoDto>(LOGIN_GUARDIAN_TYPE_LIST_QUERY, {
@@ -281,15 +252,22 @@ const useLoginGuardianTypeList = (network: NetworkType, params: GetLoginGuardian
 };
 
 const SEARCH_LOGIN_GUARDIAN_TYPE_QUERY = gql`
-  query LoginGuardianTypeInfo($chainId: String, $caHash: String, $caAddress: String, $loginGuardianType: String) {
+  query LoginGuardianTypeInfo(
+    $chainId: String
+    $caHash: String
+    $caAddress: String
+    $loginGuardianType: String
+    $skipCount: Int = 0
+    $maxResultCount: Int = 100
+  ) {
     loginGuardianTypeInfo(
       dto: {
         chainId: $chainId
         caHash: $caHash
         caAddress: $caAddress
         loginGuardianType: $loginGuardianType
-        skipCount: 0
-        maxResultCount: 100
+        skipCount: $skipCount
+        maxResultCount: $maxResultCount
       }
     ) {
       id
@@ -301,23 +279,17 @@ const SEARCH_LOGIN_GUARDIAN_TYPE_QUERY = gql`
   }
 `;
 
-const searchLoginGuardianType = async (network: NetworkType, params: SearchLoginGuardianTypeParamsType) => {
+const searchLoginGuardianType = async (network: NetworkType, params: GetLoginGuardianTypeParamsType) => {
   const apolloClient = getApolloClient(network);
-
-  const queryParams: GetLoginGuardianTypeInfoDto = {
-    ...params,
-    skipCount: params.skipCount === undefined ? 0 : params.skipCount,
-    maxResultCount: params.maxResultCount === undefined ? 100 : params.maxResultCount,
-  };
 
   const result = await apolloClient.query<{ loginGuardianTypeInfo: LoginGuardianTypeDto[] }>({
     query: SEARCH_LOGIN_GUARDIAN_TYPE_QUERY,
-    variables: queryParams,
+    variables: params,
   });
   return result;
 };
 
-const getCAHolderByManager = async (network: NetworkType, params: getCAHolderByManagerParamsType) => {
+const getCAHolderByManager = async (network: NetworkType, params: GetCAHolderByManagerParamsType) => {
   const caResult = await searchCAHolderManagerInfo(network, {
     ...params,
     skipCount: 0,
