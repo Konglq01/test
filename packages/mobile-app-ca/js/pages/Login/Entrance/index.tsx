@@ -27,23 +27,8 @@ export default function Entrance() {
         </CommonButton>
         <CommonButton
           containerStyle={GStyles.paddingTop(pTd(16))}
-          onPress={() => navigationService.navigate('ContactsHome')}>
-          {t('ContactsHome')}
-        </CommonButton>
-        <CommonButton
-          containerStyle={GStyles.paddingTop(pTd(16))}
-          onPress={() => navigationService.navigate('WalletHome')}>
-          {t('WalletHome')}
-        </CommonButton>
-        <CommonButton
-          containerStyle={GStyles.paddingTop(pTd(16))}
           onPress={() => navigationService.navigate('InnerSettings')}>
           {t('InnerSettings')}
-        </CommonButton>
-        <CommonButton
-          containerStyle={GStyles.paddingTop(pTd(16))}
-          onPress={() => navigationService.navigate('GuardianHome')}>
-          {t('GuardianHome')}
         </CommonButton>
         <CommonButton containerStyle={GStyles.paddingTop(pTd(16))} onPress={() => navigationService.navigate('Tab')}>
           {t('Tab')}
