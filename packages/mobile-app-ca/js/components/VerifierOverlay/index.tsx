@@ -1,11 +1,10 @@
 import React from 'react';
 import OverlayModal from 'components/OverlayModal';
-import { Keyboard, ScrollView } from 'react-native';
+import { Image, Keyboard, ScrollView } from 'react-native';
 import Touchable from 'components/Touchable';
 import styles from './styles';
 import GStyles from 'assets/theme/GStyles';
 import Svg from 'components/Svg';
-import { defaultColors } from 'assets/theme';
 import { TextXL } from 'components/CommonText';
 import { pTd } from 'utils/unit';
 import OverlayBody from 'components/OverlayModal/OverlayBody';
@@ -18,8 +17,6 @@ type VerifierListProps = {
 };
 
 const VerifierList = ({ verifierList, callBack, selectedVerifier }: VerifierListProps) => {
-  console.log(selectedVerifier, '=====selectedVerifier');
-
   return (
     <OverlayBody>
       <ScrollView alwaysBounceVertical={false}>
@@ -32,7 +29,7 @@ const VerifierList = ({ verifierList, callBack, selectedVerifier }: VerifierList
                 OverlayModal.hide();
                 callBack(item);
               }}>
-              <Svg icon="logo-icon" color={defaultColors.primaryColor} size={pTd(36)} />
+              <Image source={{ uri: item.imageUrl }} style={styles.iconStyle} />
               <TextXL style={styles.itemName}>{item.name}</TextXL>
               {selectedVerifier.name === item.name && (
                 <Svg iconStyle={styles.itemIcon} icon="selected" size={pTd(24)} />

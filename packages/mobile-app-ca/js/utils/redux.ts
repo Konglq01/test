@@ -2,31 +2,40 @@ import { store } from 'store';
 import aes from '@portkey/utils/aes';
 import AElf from 'aelf-sdk';
 import { AElfWallet } from '@portkey/types/aelf';
-export const getState = () => {
-  return store.getState();
-};
+const walletMap: { [address: string]: AElfWallet } = {};
+export const getState = () => store.getState();
 
-export const getWalletInfo = () => {
-  return getState().wallet.walletInfo?.address;
+export const getWalletInfo = () => getState().wallet?.walletInfo;
+
+export const getWalletAddress = () => {
+  return getWalletInfo()?.address;
 };
 export const getWallet = (password: string): AElfWallet | undefined => {
-  const currentAccount = getState().wallet.walletInfo;
-  if (!currentAccount) return;
-  return AElf.wallet.getWalletByPrivateKey(aes.decrypt(currentAccount.AESEncryptPrivateKey, password));
+  const walletInfo = getWalletInfo();
+  if (!walletInfo) return;
+
+  // get privateKey
+  const privateKey = aes.decrypt(walletInfo.AESEncryptPrivateKey, password);
+  if (!privateKey) return;
+
+  if (!walletMap[walletInfo.address]) walletMap[walletInfo.address] = AElf.wallet.getWalletByPrivateKey(privateKey);
+  return walletMap[walletInfo.address];
 };
+
 export const getWalletPrivateKey = (password: string) => {
-  const { AESEncryptPrivateKey } = getState().wallet.walletInfo || {};
+  const { AESEncryptPrivateKey } = getWalletInfo() || {};
   if (!AESEncryptPrivateKey) return;
   return aes.decrypt(AESEncryptPrivateKey, password) || '';
 };
+
 export const getWalletMnemonic = (password: string) => {
-  const { AESEncryptMnemonic } = getState().wallet.walletInfo || {};
+  const { AESEncryptMnemonic } = getWalletInfo() || {};
   if (!AESEncryptMnemonic) return;
   return aes.decrypt(AESEncryptMnemonic, password) || '';
 };
 
 export const checkPin = (pin: string) => {
-  const { AESEncryptPrivateKey } = getState().wallet.walletInfo || {};
+  const { AESEncryptPrivateKey } = getWalletInfo() || {};
   if (!AESEncryptPrivateKey) return false;
   return !!aes.decrypt(AESEncryptPrivateKey, pin);
 };
