@@ -1,21 +1,42 @@
 import crashlytics from '@react-native-firebase/crashlytics';
-import { View, Button, Text } from 'react-native';
-import React from 'react';
-import { styles } from './Test.style';
+import React, { useEffect } from 'react';
+import CommonButton from 'components/CommonButton';
+import { Text } from 'react-native';
 
-export const PerfTest = () => {
-  const crash = async () => {
-    crashlytics().crash();
-  };
+async function onSignIn(user: any) {
+  crashlytics().log('User signed in.');
+
+  await Promise.all([
+    crashlytics().setUserId(user.uid),
+    crashlytics().setAttribute('credits', String(user.credits)),
+    crashlytics().setAttributes({
+      role: 'admin',
+      followers: '13',
+      email: user.email,
+      username: user.username,
+    }),
+  ]);
+}
+
+export const CrashTest = () => {
+  useEffect(() => {
+    crashlytics().log('App mounted.');
+  }, []);
 
   return (
-    <View style={styles.sectionContainer}>
-      <View>
-        <Text>perf</Text>
-        <View>
-          <Button title="crash" onPress={() => crash()} />
-        </View>
-      </View>
-    </View>
+    <Text>
+      <CommonButton
+        title="Sign In"
+        onPress={() =>
+          onSignIn({
+            uid: 'Aa0Bb1Cc2Dd3Ee4Ff5Gg6Hh7Ii8Jj9',
+            username: 'Joaquin Phoenix',
+            email: 'phoenix@example.com',
+            credits: 42,
+          })
+        }
+      />
+      <CommonButton title="crash!" onPress={() => crashlytics().crash()} />
+    </Text>
   );
 };

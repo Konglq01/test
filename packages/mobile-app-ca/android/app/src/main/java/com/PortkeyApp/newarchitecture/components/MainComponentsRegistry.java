@@ -1,4 +1,4 @@
-package com.walletappnew.newarchitecture.components;
+package com.PortkeyApp.newarchitecture.components;
 
 import com.facebook.jni.HybridData;
 import com.facebook.proguard.annotations.DoNotStrip;

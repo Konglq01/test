@@ -11,6 +11,7 @@ import useLogOut from 'hooks/useLogOut';
 import { useTokenContract } from 'contexts/useInterface/hooks';
 import { setCAInfo } from '@portkey/store/store-ca/wallet/actions';
 import { useCurrentWallet, useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import { CrashTest } from 'Test/CrashTest';
 import { useUser } from 'hooks/store';
 import Loading from 'components/Loading';
 import { queryFailAlert } from 'utils/login';
@@ -64,6 +65,7 @@ export default function HomeScreen() {
           title="reset"
           onPress={() => navigationService.reset([{ name: 'LoginPortkey' }, { name: 'SignupPortkey' }])}
         />
+        <CrashTest />
       </ScrollView>
     </SafeAreaBox>
   );

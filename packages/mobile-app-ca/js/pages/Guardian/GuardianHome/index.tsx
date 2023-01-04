@@ -48,6 +48,7 @@ export default function GuardianHome() {
             }}>
             <GuardianAccountItem
               guardianItem={guardian}
+              isButtonHide
               renderBtn={renderGuardianBtn}
               isBorderHide={idx === userGuardiansList.length - 1}
             />

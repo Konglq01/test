@@ -1,4 +1,4 @@
-package com.walletappnew;
+package com.PortkeyApp;
 import expo.modules.ReactActivityDelegateWrapper;
 
 import com.facebook.react.ReactActivity;
@@ -25,7 +25,7 @@ public class MainActivity extends ReactActivity {
    */
   @Override
   protected String getMainComponentName() {
-    return "walletAppNew";
+    return "PortkeyApp";
   }
 
 /**
