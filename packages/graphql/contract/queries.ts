@@ -9,6 +9,8 @@ import {
   GetTokenInfoParamsType,
   GetCAHolderByManagerParamsType,
   CaHolderWithGuardian,
+  GetCaHolderTokenBalanceParamsType,
+  GetCaHolderTransactionAddressParamsType,
 } from './types';
 import {
   CaHolderManagerDto,
@@ -317,6 +319,72 @@ const getCAHolderByManager = async (network: NetworkType, params: GetCAHolderByM
   return result;
 };
 
+// CAHolderTokenBalanceInfo
+const CA_HOLDER_TOKEN_BALANCE_INFO_QUERY = gql`
+  query CaHolderTokenBalanceInfo(
+    $caAddress: String
+    $chainId: String
+    $symbol: String
+    $skipCount: Int = 0
+    $maxResultCount: Int = 100
+  ) {
+    caHolderTokenBalanceInfo(
+      dto: {
+        caAddress: $caAddress
+        chainId: $chainId
+        symbol: $symbol
+        skipCount: $skipCount
+        maxResultCount: $maxResultCount
+      }
+    ) {
+      balance
+      caAddress
+      chainId
+      symbol
+    }
+  }
+`;
+
+const getCaHolderTokenBalance = async (network: NetworkType, params: GetCaHolderTokenBalanceParamsType) => {
+  const apolloClient = getApolloClient(network);
+
+  const result = await apolloClient.query<{ caHolderManagerInfo: CaHolderManagerDto[] }>({
+    query: CA_HOLDER_TOKEN_BALANCE_INFO_QUERY,
+    variables: params,
+  });
+  return result;
+};
+
+// CAHolderTransactionAddressInfo
+const CA_HOLDER_TRANSACTION_ADDRESS_QUERY = gql`
+  query CaHolderTransactionAddressInfo(
+    $caAddress: String
+    $chainId: String
+    $skipCount: Int = 0
+    $maxResultCount: Int = 100
+  ) {
+    caHolderTransactionAddressInfo(
+      dto: { caAddress: $caAddress, chainId: $chainId, skipCount: $skipCount, maxResultCount: $maxResultCount }
+    ) {
+      address
+      addressChainId
+      caAddress
+      chainId
+      transactionTime
+    }
+  }
+`;
+
+const getCaHolderTransactionAddress = async (network: NetworkType, params: GetCaHolderTransactionAddressParamsType) => {
+  const apolloClient = getApolloClient(network);
+
+  const result = await apolloClient.query<{ caHolderManagerInfo: CaHolderManagerDto[] }>({
+    query: CA_HOLDER_TRANSACTION_ADDRESS_QUERY,
+    variables: params,
+  });
+  return result;
+};
+
 export {
   searchTokenInfo,
   searchNFTProtocolInfo,
@@ -324,4 +392,6 @@ export {
   searchCAHolderManagerInfo,
   searchLoginGuardianType,
   getCAHolderByManager,
+  getCaHolderTokenBalance,
+  getCaHolderTransactionAddress,
 };

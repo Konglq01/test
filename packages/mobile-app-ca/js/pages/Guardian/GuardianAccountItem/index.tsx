@@ -14,7 +14,7 @@ import { request } from 'api';
 import CommonToast from 'components/CommonToast';
 import { sleep } from '@portkey/utils';
 import { VerificationType, VerifyStatus } from '@portkey/types/verifier';
-import { FontStyles } from 'assets/theme/styles';
+import { BGStyles, FontStyles } from 'assets/theme/styles';
 
 export type GuardiansStatusItem = {
   status: VerifyStatus;
@@ -33,16 +33,15 @@ interface GuardianAccountItemProps {
   managerUniqueId?: string;
   guardiansStatus?: GuardiansStatus;
   setGuardianStatus?: (key: string, status: GuardiansStatusItem) => void;
+  isExpired?: boolean;
 }
 
-export default function GuardianAccountItem({
+function GuardianItemButton({
   guardianItem,
-  isButtonHide,
-  renderBtn,
-  isBorderHide = false,
   managerUniqueId,
   guardiansStatus,
   setGuardianStatus,
+  isExpired,
 }: GuardianAccountItemProps) {
   const itemStatus = useMemo(() => guardiansStatus?.[guardianItem.key], [guardianItem.key, guardiansStatus]);
 
@@ -56,18 +55,6 @@ export default function GuardianAccountItem({
   const onSendCode = useCallback(async () => {
     Loading.show();
     try {
-      console.log(
-        {
-          baseURL: guardianItem.verifier?.url,
-          data: {
-            type: 0,
-            loginGuardianType: guardianItem.loginGuardianType,
-            managerUniqueId,
-          },
-        },
-        '======',
-      );
-
       const req = await request.recovery.sendCode({
         baseURL: guardianItem.verifier?.url,
         data: {
@@ -76,8 +63,6 @@ export default function GuardianAccountItem({
           managerUniqueId,
         },
       });
-      console.log(req, '=====req');
-
       if (req.verifierSessionId) {
         Loading.hide();
         await sleep(200);
@@ -116,10 +101,19 @@ export default function GuardianAccountItem({
   }, [guardianItem, managerUniqueId, verifierSessionId]);
   const buttonProps: CommonButtonProps = useMemo(() => {
     if (!status || status === VerifyStatus.NotVerified) {
-      return {
-        onPress: onSendCode,
-        title: 'Send',
-      };
+      if (isExpired)
+        return {
+          disabled: true,
+          type: 'clear',
+          title: 'Expired',
+          disabledStyle: BGStyles.transparent,
+          disabledTitleStyle: FontStyles.font7,
+        };
+      else
+        return {
+          onPress: onSendCode,
+          title: 'Send',
+        };
     } else if (status === VerifyStatus.Verifying) {
       return {
         onPress: onVerifier,
@@ -134,7 +128,27 @@ export default function GuardianAccountItem({
         disabled: true,
       };
     }
-  }, [onSendCode, onVerifier, status]);
+  }, [isExpired, onSendCode, onVerifier, status]);
+  return (
+    <CommonButton
+      type="primary"
+      {...buttonProps}
+      titleStyle={[styles.titleStyle, fonts.mediumFont, buttonProps.titleStyle]}
+      buttonStyle={[styles.buttonStyle, buttonProps.buttonStyle]}
+    />
+  );
+}
+
+export default function GuardianAccountItem({
+  guardianItem,
+  isButtonHide,
+  renderBtn,
+  isBorderHide = false,
+  managerUniqueId,
+  guardiansStatus,
+  setGuardianStatus,
+  isExpired,
+}: GuardianAccountItemProps) {
   return (
     <View style={[styles.itemRow, isBorderHide && styles.itemWithoutBorder]}>
       {guardianItem.isLoginAccount && (
@@ -149,12 +163,13 @@ export default function GuardianAccountItem({
           {guardianItem.loginGuardianType}
         </TextM>
       </View>
-      {!isButtonHide && (
-        <CommonButton
-          type="primary"
-          {...buttonProps}
-          titleStyle={[styles.titleStyle, fonts.mediumFont, buttonProps.titleStyle]}
-          buttonStyle={[styles.buttonStyle, buttonProps.buttonStyle]}
+      {!isButtonHide && !renderBtn && (
+        <GuardianItemButton
+          isExpired={isExpired}
+          guardianItem={guardianItem}
+          managerUniqueId={managerUniqueId}
+          guardiansStatus={guardiansStatus}
+          setGuardianStatus={setGuardianStatus}
         />
       )}
       {renderBtn && renderBtn(guardianItem)}

@@ -29,10 +29,12 @@ export default function SelectVerifier() {
   const { t } = useLanguage();
   const verifierList = useVerifierList();
   const [selectedVerifier, setSelectedVerifier] = useState(verifierList[0]);
-  const { email } = useRouterParams<{ email?: string }>();
+  console.log(selectedVerifier, '====selectedVerifier');
+
+  const { loginGuardianType } = useRouterParams<{ loginGuardianType?: string }>();
   const onConfirm = useCallback(async () => {
     ActionSheet.alert({
-      title2: `Portkey will send a verification code to ${email} to verify your email address.`,
+      title2: `Portkey will send a verification code to ${loginGuardianType} to verify your email address.`,
       buttons: [
         {
           title: t('Cancel'),
@@ -50,19 +52,19 @@ export default function SelectVerifier() {
                 baseURL: selectedVerifier.url,
                 data: {
                   type: 0,
-                  loginGuardianType: email,
+                  loginGuardianType,
                   managerUniqueId,
                 },
               });
               if (req.verifierSessionId) {
                 navigationService.navigate('VerifierDetails', {
-                  loginGuardianType: email,
+                  loginGuardianType,
                   verifierSessionId: req.verifierSessionId,
                   managerUniqueId,
                   guardianItem: {
                     isLoginAccount: true,
                     verifier: selectedVerifier,
-                    loginGuardianType: email,
+                    loginGuardianType,
                   },
                 });
               } else {
@@ -76,13 +78,13 @@ export default function SelectVerifier() {
         },
       ],
     });
-  }, [email, t]);
+  }, [loginGuardianType, selectedVerifier, t]);
   return (
     <PageContainer containerStyles={styles.containerStyles} scrollViewProps={ScrollViewProps} type="leftBack" titleDom>
       <View>
         <TextXXXL style={GStyles.textAlignCenter}>Select verifier</TextXXXL>
         <TextM style={[GStyles.textAlignCenter, FontStyles.font3, GStyles.marginTop(8)]}>
-          The recovery of decentralized accounts requires the protection of verifiers
+          The recovery of decentralized accounts requires approval from your verifiers
         </TextM>
         <ListItem
           onPress={() =>

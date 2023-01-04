@@ -3,7 +3,7 @@ import PageContainer, { SafeAreaColorMapKeyUnit } from 'components/PageContainer
 import { TextL, TextM, TextXXXL } from 'components/CommonText';
 import { pTd } from 'utils/unit';
 import { defaultColors } from 'assets/theme';
-import { DeviceEventEmitter, Image, ImageBackground, StyleSheet, Text, View } from 'react-native';
+import { Image, ImageBackground, StyleSheet, Text, View } from 'react-native';
 import CommonButton from 'components/CommonButton';
 import { screenHeight, screenWidth, windowHeight } from '@portkey/utils/mobile/device';
 import GStyles from 'assets/theme/GStyles';
@@ -32,6 +32,8 @@ import { getChainListAsync } from '@portkey/store/store-ca/wallet/actions';
 import { useGetHolderInfo, useGetVerifierServers } from 'hooks/guardian';
 import Loading from 'components/Loading';
 import { handleError, sleep } from '@portkey/utils';
+import myEvents from 'utils/deviceEvent';
+import { handleUserGuardiansList } from 'utils/login';
 const scrollViewProps = { extraHeight: 120 };
 const safeAreaColor: SafeAreaColorMapKeyUnit[] = ['transparent', 'transparent'];
 type LoginType = 'email' | 'qr-code' | 'phone';
@@ -55,33 +57,23 @@ function LoginEmail({ setLoginType }: { setLoginType: (type: LoginType) => void 
     try {
       if (!chainInfo) await dispatch(getChainListAsync());
       const verifierServers = await getVerifierServers();
-      console.log(verifierServers, '====verifierServers');
-
       const holderInfo = await getHolderInfo({ loginGuardianType: email });
-      const userGuardiansList = holderInfo.guardians.map((item: any) => {
-        return {
-          ...item,
-          loginGuardianType: email,
-          guardiansType: 0,
-          key: `${email}&${item.verifier.name}`,
-          verifier: {
-            imageUrl: 'http://192.168.66.135:5588',
-            name: 'portkey',
-            url: 'http://192.168.66.135:5588',
-          },
-        };
-      });
       Loading.hide();
       await sleep(200);
-      navigationService.navigate('GuardianApproval', { loginGuardianType: email, userGuardiansList });
+      navigationService.navigate('GuardianApproval', {
+        loginGuardianType: email,
+        userGuardiansList: handleUserGuardiansList(holderInfo, verifierServers),
+      });
     } catch (error: any) {
+      console.log(error, '=====error');
+
       setErrorMessage(handleError(error));
       Loading.hide();
     }
   }, [chainInfo, dispatch, email, getHolderInfo, getVerifierServers]);
 
   useEffectOnce(() => {
-    const listener = DeviceEventEmitter.addListener('clearLoginInput', () => setEmail(''));
+    const listener = myEvents.clearLoginInput.addListener(() => setEmail(''));
     return () => listener.remove();
   });
   return (
@@ -101,7 +93,7 @@ function LoginEmail({ setLoginType }: { setLoginType: (type: LoginType) => void 
         keyboardType="email-address"
       />
       <CommonButton style={GStyles.marginTop(15)} disabled={!email} type="primary" loading={loading} onPress={onLogin}>
-        {t('Login')}
+        {t('Log In')}
       </CommonButton>
       <Touchable
         style={[GStyles.flexRow, GStyles.itemCenter, styles.signUpTip]}
@@ -150,7 +142,7 @@ function LoginQRCode({ setLoginType }: { setLoginType: (type: LoginType) => void
         <Image source={phone} style={styles.iconStyle} />
       </Touchable>
       <TextXXXL style={[styles.qrCodeTitle, GStyles.textAlignCenter]}>Scan code to log in</TextXXXL>
-      <TextM style={[GStyles.textAlignCenter, FontStyles.font3]}>Please use the portkey Dapp to scan the QR code</TextM>
+      <TextM style={[GStyles.textAlignCenter, FontStyles.font3]}>Please use the Portkey DApp to scan the QR code</TextM>
       <View style={[GStyles.alignCenter, styles.qrCodeBox]}>
         {!newWallet && (
           <View style={styles.loading}>
@@ -175,7 +167,7 @@ export default function LoginPortkey() {
         scrollViewProps={scrollViewProps}
         hideHeader>
         <Svg icon="logo-icon" size={pTd(60)} iconStyle={styles.logoIconStyle} />
-        <TextXXXL style={[styles.titleStyle, FontStyles.font11]}>{t('Login Portkey')}</TextXXXL>
+        <TextXXXL style={[styles.titleStyle, FontStyles.font11]}>{t('Log In To Portkey')}</TextXXXL>
         {loginType === 'email' ? (
           <LoginEmail setLoginType={setLoginType} />
         ) : (
