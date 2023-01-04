@@ -1,6 +1,6 @@
 {
-  "name": "walletAppNew",
-  "displayName": "walletAppNew",
+  "name": "PortkeyApp",
+  "displayName": "PortkeyApp",
   "expo": {
     "android": {
       "googleServicesFile": "./google-services.json"

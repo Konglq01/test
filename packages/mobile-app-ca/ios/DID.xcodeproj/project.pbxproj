@@ -7,16 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		00E356F31AD99517003FC87E /* walletAppNewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* walletAppNewTests.m */; };
+		00E356F31AD99517003FC87E /* DIDTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* DIDTests.m */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		2B96396928ACEFE3003CD665 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2B96396828ACEFE3003CD665 /* GoogleService-Info.plist */; };
 		6067DF7E96A3512FE02CDF4C /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EB8AAA944A581AA64A54B32 /* ExpoModulesProvider.swift */; };
 		6F181D1660AB87A542DF1190 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E2290B46C5ACD8AF2D1AC3 /* ExpoModulesProvider.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		857607C86A3D76329C1C7C53 /* libPods-walletAppNew-walletAppNewTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F4ED9A1505108E4F925209B /* libPods-walletAppNew-walletAppNewTests.a */; };
-		C080F5E0D94878C8BC74BEDE /* libPods-walletAppNew.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9760C1D5E86A9D34982348E9 /* libPods-walletAppNew.a */; };
+		857607C86A3D76329C1C7C53 /* libPods-DID-DIDTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F4ED9A1505108E4F925209B /* libPods-DID-DIDTests.a */; };
+		9C3C24932956CF790000204B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9C3C24922956CF780000204B /* GoogleService-Info.plist */; };
+		C080F5E0D94878C8BC74BEDE /* libPods-DID.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9760C1D5E86A9D34982348E9 /* libPods-DID.a */; };
 		E5A1B79EA5754765B45B0F05 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CB9009F46A7D48EB9656781B /* SplashScreen.storyboard */; };
 /* End PBXBuildFile section */
 
@@ -26,33 +26,33 @@
 			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
-			remoteInfo = walletAppNew;
+			remoteInfo = DID;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		00E356EE1AD99517003FC87E /* walletAppNewTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = walletAppNewTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		00E356EE1AD99517003FC87E /* DIDTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DIDTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		00E356F21AD99517003FC87E /* walletAppNewTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = walletAppNewTests.m; sourceTree = "<group>"; };
-		13B07F961A680F5B00A75B9A /* walletAppNew.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = walletAppNew.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = walletAppNew/AppDelegate.h; sourceTree = "<group>"; };
-		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = walletAppNew/AppDelegate.mm; sourceTree = "<group>"; };
-		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = walletAppNew/Images.xcassets; sourceTree = "<group>"; };
-		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = walletAppNew/Info.plist; sourceTree = "<group>"; };
-		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = walletAppNew/main.m; sourceTree = "<group>"; };
+		00E356F21AD99517003FC87E /* DIDTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DIDTests.m; sourceTree = "<group>"; };
+		13B07F961A680F5B00A75B9A /* DID.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DID.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = DID/AppDelegate.h; sourceTree = "<group>"; };
+		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = DID/AppDelegate.mm; sourceTree = "<group>"; };
+		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = DID/Images.xcassets; sourceTree = "<group>"; };
+		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = DID/Info.plist; sourceTree = "<group>"; };
+		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = DID/main.m; sourceTree = "<group>"; };
 		2B4CF73429344C200071ED92 /* hermes.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = hermes.xcframework; path = "Pods/hermes-engine/destroot/Library/Frameworks/universal/hermes.xcframework"; sourceTree = "<group>"; };
-		2B96396828ACEFE3003CD665 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		2B96396A28ACF299003CD665 /* walletAppNew.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = walletAppNew.entitlements; path = walletAppNew/walletAppNew.entitlements; sourceTree = "<group>"; };
-		2F4ED9A1505108E4F925209B /* libPods-walletAppNew-walletAppNewTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-walletAppNew-walletAppNewTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		3B4392A12AC88292D35C810B /* Pods-walletAppNew.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-walletAppNew.debug.xcconfig"; path = "Target Support Files/Pods-walletAppNew/Pods-walletAppNew.debug.xcconfig"; sourceTree = "<group>"; };
-		5709B34CF0A7D63546082F79 /* Pods-walletAppNew.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-walletAppNew.release.xcconfig"; path = "Target Support Files/Pods-walletAppNew/Pods-walletAppNew.release.xcconfig"; sourceTree = "<group>"; };
-		5B7EB9410499542E8C5724F5 /* Pods-walletAppNew-walletAppNewTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-walletAppNew-walletAppNewTests.debug.xcconfig"; path = "Target Support Files/Pods-walletAppNew-walletAppNewTests/Pods-walletAppNew-walletAppNewTests.debug.xcconfig"; sourceTree = "<group>"; };
-		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = walletAppNew/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		87E2290B46C5ACD8AF2D1AC3 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-walletAppNew-walletAppNewTests/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
-		89C6BE57DB24E9ADA2F236DE /* Pods-walletAppNew-walletAppNewTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-walletAppNew-walletAppNewTests.release.xcconfig"; path = "Target Support Files/Pods-walletAppNew-walletAppNewTests/Pods-walletAppNew-walletAppNewTests.release.xcconfig"; sourceTree = "<group>"; };
-		9760C1D5E86A9D34982348E9 /* libPods-walletAppNew.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-walletAppNew.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		9EB8AAA944A581AA64A54B32 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-walletAppNew/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
-		CB9009F46A7D48EB9656781B /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = walletAppNew/SplashScreen.storyboard; sourceTree = "<group>"; };
+		2B96396A28ACF299003CD665 /* DID.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = DID.entitlements; path = DID/DID.entitlements; sourceTree = "<group>"; };
+		2F4ED9A1505108E4F925209B /* libPods-DID-DIDTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-DID-DIDTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3B4392A12AC88292D35C810B /* Pods-DID.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DID.debug.xcconfig"; path = "Target Support Files/Pods-DID/Pods-DID.debug.xcconfig"; sourceTree = "<group>"; };
+		5709B34CF0A7D63546082F79 /* Pods-DID.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DID.release.xcconfig"; path = "Target Support Files/Pods-DID/Pods-DID.release.xcconfig"; sourceTree = "<group>"; };
+		5B7EB9410499542E8C5724F5 /* Pods-DID-DIDTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DID-DIDTests.debug.xcconfig"; path = "Target Support Files/Pods-DID-DIDTests/Pods-DID-DIDTests.debug.xcconfig"; sourceTree = "<group>"; };
+		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = DID/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		87E2290B46C5ACD8AF2D1AC3 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-DID-DIDTests/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		89C6BE57DB24E9ADA2F236DE /* Pods-DID-DIDTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DID-DIDTests.release.xcconfig"; path = "Target Support Files/Pods-DID-DIDTests/Pods-DID-DIDTests.release.xcconfig"; sourceTree = "<group>"; };
+		9760C1D5E86A9D34982348E9 /* libPods-DID.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-DID.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9C3C24922956CF780000204B /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		9EB8AAA944A581AA64A54B32 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-DID/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		CB9009F46A7D48EB9656781B /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = DID/SplashScreen.storyboard; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -61,7 +61,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				857607C86A3D76329C1C7C53 /* libPods-walletAppNew-walletAppNewTests.a in Frameworks */,
+				857607C86A3D76329C1C7C53 /* libPods-DID-DIDTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -69,20 +69,20 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C080F5E0D94878C8BC74BEDE /* libPods-walletAppNew.a in Frameworks */,
+				C080F5E0D94878C8BC74BEDE /* libPods-DID.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		00E356EF1AD99517003FC87E /* walletAppNewTests */ = {
+		00E356EF1AD99517003FC87E /* DIDTests */ = {
 			isa = PBXGroup;
 			children = (
-				00E356F21AD99517003FC87E /* walletAppNewTests.m */,
+				00E356F21AD99517003FC87E /* DIDTests.m */,
 				00E356F01AD99517003FC87E /* Supporting Files */,
 			);
-			path = walletAppNewTests;
+			path = DIDTests;
 			sourceTree = "<group>";
 		};
 		00E356F01AD99517003FC87E /* Supporting Files */ = {
@@ -93,10 +93,10 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		13B07FAE1A68108700A75B9A /* walletAppNew */ = {
+		13B07FAE1A68108700A75B9A /* DID */ = {
 			isa = PBXGroup;
 			children = (
-				2B96396A28ACF299003CD665 /* walletAppNew.entitlements */,
+				2B96396A28ACF299003CD665 /* DID.entitlements */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -105,15 +105,15 @@
 				13B07FB71A68108700A75B9A /* main.m */,
 				CB9009F46A7D48EB9656781B /* SplashScreen.storyboard */,
 			);
-			name = walletAppNew;
+			name = DID;
 			sourceTree = "<group>";
 		};
-		2A7E36AF752B7C3FCC04FE75 /* walletAppNew */ = {
+		2A7E36AF752B7C3FCC04FE75 /* DID */ = {
 			isa = PBXGroup;
 			children = (
 				9EB8AAA944A581AA64A54B32 /* ExpoModulesProvider.swift */,
 			);
-			name = walletAppNew;
+			name = DID;
 			sourceTree = "<group>";
 		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
@@ -121,8 +121,8 @@
 			children = (
 				2B4CF73429344C200071ED92 /* hermes.xcframework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				9760C1D5E86A9D34982348E9 /* libPods-walletAppNew.a */,
-				2F4ED9A1505108E4F925209B /* libPods-walletAppNew-walletAppNewTests.a */,
+				9760C1D5E86A9D34982348E9 /* libPods-DID.a */,
+				2F4ED9A1505108E4F925209B /* libPods-DID-DIDTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -130,8 +130,8 @@
 		40692C6E0EFA19D39BA420B4 /* ExpoModulesProviders */ = {
 			isa = PBXGroup;
 			children = (
-				2A7E36AF752B7C3FCC04FE75 /* walletAppNew */,
-				E006A5B3F6586B6A992063A9 /* walletAppNewTests */,
+				2A7E36AF752B7C3FCC04FE75 /* DID */,
+				E006A5B3F6586B6A992063A9 /* DIDTests */,
 			);
 			name = ExpoModulesProviders;
 			sourceTree = "<group>";
@@ -146,10 +146,10 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				2B96396828ACEFE3003CD665 /* GoogleService-Info.plist */,
-				13B07FAE1A68108700A75B9A /* walletAppNew */,
+				9C3C24922956CF780000204B /* GoogleService-Info.plist */,
+				13B07FAE1A68108700A75B9A /* DID */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
-				00E356EF1AD99517003FC87E /* walletAppNewTests */,
+				00E356EF1AD99517003FC87E /* DIDTests */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
@@ -163,8 +163,8 @@
 		83CBBA001A601CBA00E9B192 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				13B07F961A680F5B00A75B9A /* walletAppNew.app */,
-				00E356EE1AD99517003FC87E /* walletAppNewTests.xctest */,
+				13B07F961A680F5B00A75B9A /* DID.app */,
+				00E356EE1AD99517003FC87E /* DIDTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -172,28 +172,28 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				3B4392A12AC88292D35C810B /* Pods-walletAppNew.debug.xcconfig */,
-				5709B34CF0A7D63546082F79 /* Pods-walletAppNew.release.xcconfig */,
-				5B7EB9410499542E8C5724F5 /* Pods-walletAppNew-walletAppNewTests.debug.xcconfig */,
-				89C6BE57DB24E9ADA2F236DE /* Pods-walletAppNew-walletAppNewTests.release.xcconfig */,
+				3B4392A12AC88292D35C810B /* Pods-DID.debug.xcconfig */,
+				5709B34CF0A7D63546082F79 /* Pods-DID.release.xcconfig */,
+				5B7EB9410499542E8C5724F5 /* Pods-DID-DIDTests.debug.xcconfig */,
+				89C6BE57DB24E9ADA2F236DE /* Pods-DID-DIDTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
 		};
-		E006A5B3F6586B6A992063A9 /* walletAppNewTests */ = {
+		E006A5B3F6586B6A992063A9 /* DIDTests */ = {
 			isa = PBXGroup;
 			children = (
 				87E2290B46C5ACD8AF2D1AC3 /* ExpoModulesProvider.swift */,
 			);
-			name = walletAppNewTests;
+			name = DIDTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		00E356ED1AD99517003FC87E /* walletAppNewTests */ = {
+		00E356ED1AD99517003FC87E /* DIDTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "walletAppNewTests" */;
+			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "DIDTests" */;
 			buildPhases = (
 				A55EABD7B0C7F3A422A6CC61 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
@@ -207,14 +207,14 @@
 			dependencies = (
 				00E356F51AD99517003FC87E /* PBXTargetDependency */,
 			);
-			name = walletAppNewTests;
-			productName = walletAppNewTests;
-			productReference = 00E356EE1AD99517003FC87E /* walletAppNewTests.xctest */;
+			name = DIDTests;
+			productName = DIDTests;
+			productReference = 00E356EE1AD99517003FC87E /* DIDTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		13B07F861A680F5B00A75B9A /* walletAppNew */ = {
+		13B07F861A680F5B00A75B9A /* DID */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "walletAppNew" */;
+			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "DID" */;
 			buildPhases = (
 				C38B50BA6285516D6DCD4F65 /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
@@ -231,9 +231,9 @@
 			);
 			dependencies = (
 			);
-			name = walletAppNew;
-			productName = walletAppNew;
-			productReference = 13B07F961A680F5B00A75B9A /* walletAppNew.app */;
+			name = DID;
+			productName = DID;
+			productReference = 13B07F961A680F5B00A75B9A /* DID.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -253,7 +253,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "walletAppNew" */;
+			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "DID" */;
 			compatibilityVersion = "Xcode 12.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -266,8 +266,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				13B07F861A680F5B00A75B9A /* walletAppNew */,
-				00E356ED1AD99517003FC87E /* walletAppNewTests */,
+				13B07F861A680F5B00A75B9A /* DID */,
+				00E356ED1AD99517003FC87E /* DIDTests */,
 			);
 		};
 /* End PBXProject section */
@@ -285,8 +285,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
+				9C3C24932956CF790000204B /* GoogleService-Info.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				2B96396928ACEFE3003CD665 /* GoogleService-Info.plist in Resources */,
 				E5A1B79EA5754765B45B0F05 /* SplashScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -314,15 +314,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-walletAppNew/Pods-walletAppNew-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-DID/Pods-DID-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-walletAppNew/Pods-walletAppNew-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-DID/Pods-DID-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-walletAppNew/Pods-walletAppNew-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-DID/Pods-DID-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		8365FD4267607D634034D505 /* [CP-User] [RNFB] Crashlytics Configuration */ = {
@@ -367,7 +367,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-walletAppNew-walletAppNewTests-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-DID-DIDTests-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -389,7 +389,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-walletAppNew-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-DID-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -402,15 +402,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-walletAppNew-walletAppNewTests/Pods-walletAppNew-walletAppNewTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-DID-DIDTests/Pods-DID-DIDTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-walletAppNew-walletAppNewTests/Pods-walletAppNew-walletAppNewTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-DID-DIDTests/Pods-DID-DIDTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-walletAppNew-walletAppNewTests/Pods-walletAppNew-walletAppNewTests-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-DID-DIDTests/Pods-DID-DIDTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		E235C05ADACE081382539298 /* [CP] Copy Pods Resources */ = {
@@ -419,15 +419,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-walletAppNew/Pods-walletAppNew-resources-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-DID/Pods-DID-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-walletAppNew/Pods-walletAppNew-resources-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-DID/Pods-DID-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-walletAppNew/Pods-walletAppNew-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-DID/Pods-DID-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		F6A41C54EA430FDDC6A6ED99 /* [CP] Copy Pods Resources */ = {
@@ -436,15 +436,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-walletAppNew-walletAppNewTests/Pods-walletAppNew-walletAppNewTests-resources-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-DID-DIDTests/Pods-DID-DIDTests-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-walletAppNew-walletAppNewTests/Pods-walletAppNew-walletAppNewTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-DID-DIDTests/Pods-DID-DIDTests-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-walletAppNew-walletAppNewTests/Pods-walletAppNew-walletAppNewTests-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-DID-DIDTests/Pods-DID-DIDTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
@@ -473,7 +473,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				00E356F31AD99517003FC87E /* walletAppNewTests.m in Sources */,
+				00E356F31AD99517003FC87E /* DIDTests.m in Sources */,
 				6F181D1660AB87A542DF1190 /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -493,7 +493,7 @@
 /* Begin PBXTargetDependency section */
 		00E356F51AD99517003FC87E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 13B07F861A680F5B00A75B9A /* walletAppNew */;
+			target = 13B07F861A680F5B00A75B9A /* DID */;
 			targetProxy = 00E356F41AD99517003FC87E /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -501,7 +501,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5B7EB9410499542E8C5724F5 /* Pods-walletAppNew-walletAppNewTests.debug.xcconfig */;
+			baseConfigurationReference = 5B7EB9410499542E8C5724F5 /* Pods-DID-DIDTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				DEVELOPMENT_TEAM = LR77E76VJ6;
@@ -509,7 +509,7 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				INFOPLIST_FILE = walletAppNewTests/Info.plist;
+				INFOPLIST_FILE = DIDTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -524,18 +524,18 @@
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/walletAppNew.app/walletAppNew";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DID.app/DID";
 			};
 			name = Debug;
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 89C6BE57DB24E9ADA2F236DE /* Pods-walletAppNew-walletAppNewTests.release.xcconfig */;
+			baseConfigurationReference = 89C6BE57DB24E9ADA2F236DE /* Pods-DID-DIDTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = LR77E76VJ6;
-				INFOPLIST_FILE = walletAppNewTests/Info.plist;
+				INFOPLIST_FILE = DIDTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -550,23 +550,25 @@
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE -D EXPO_CONFIGURATION_DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/walletAppNew.app/walletAppNew";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DID.app/DID";
 			};
 			name = Release;
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3B4392A12AC88292D35C810B /* Pods-walletAppNew.debug.xcconfig */;
+			baseConfigurationReference = 3B4392A12AC88292D35C810B /* Pods-DID.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = walletAppNew/walletAppNew.entitlements;
+				CODE_SIGN_ENTITLEMENTS = DID/DID.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = LR77E76VJ6;
 				ENABLE_BITCODE = NO;
-				INFOPLIST_FILE = walletAppNew/Info.plist;
+				INFOPLIST_FILE = DID/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = DID;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -577,8 +579,8 @@
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
-				PRODUCT_BUNDLE_IDENTIFIER = com.aelfWalletNew;
-				PRODUCT_NAME = walletAppNew;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aelf.portkeyapp;
+				PRODUCT_NAME = DID;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -588,16 +590,18 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5709B34CF0A7D63546082F79 /* Pods-walletAppNew.release.xcconfig */;
+			baseConfigurationReference = 5709B34CF0A7D63546082F79 /* Pods-DID.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = walletAppNew/walletAppNew.entitlements;
+				CODE_SIGN_ENTITLEMENTS = DID/DID.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = LR77E76VJ6;
-				INFOPLIST_FILE = walletAppNew/Info.plist;
+				INFOPLIST_FILE = DID/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = DID;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -608,8 +612,8 @@
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE -D EXPO_CONFIGURATION_DEBUG";
-				PRODUCT_BUNDLE_IDENTIFIER = com.aelfWalletNew;
-				PRODUCT_NAME = walletAppNew;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aelf.portkeyapp;
+				PRODUCT_NAME = DID;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -756,7 +760,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "walletAppNewTests" */ = {
+		00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "DIDTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				00E356F61AD99517003FC87E /* Debug */,
@@ -765,7 +769,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "walletAppNew" */ = {
+		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "DID" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				13B07F941A680F5B00A75B9A /* Debug */,
@@ -774,7 +778,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "walletAppNew" */ = {
+		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "DID" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				83CBBA201A601CBA00E9B192 /* Debug */,
