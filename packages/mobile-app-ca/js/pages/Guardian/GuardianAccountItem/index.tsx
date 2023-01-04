@@ -15,6 +15,7 @@ import CommonToast from 'components/CommonToast';
 import { sleep } from '@portkey/utils';
 import { VerificationType, VerifyStatus } from '@portkey/types/verifier';
 import { BGStyles, FontStyles } from 'assets/theme/styles';
+import { isIOS } from '@rneui/base';
 
 export type GuardiansStatusItem = {
   status: VerifyStatus;
@@ -216,7 +217,7 @@ const styles = StyleSheet.create({
     height: 24,
   },
   titleStyle: {
-    height: 20,
+    height: isIOS ? 20 : 24,
     fontSize: pTd(12),
     marginTop: 4,
   },

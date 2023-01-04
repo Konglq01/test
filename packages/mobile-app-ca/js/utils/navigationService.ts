@@ -20,12 +20,12 @@ function goBack() {
   _navigator?.dispatch(CommonActions.goBack());
 }
 
-function reset(name: keyof RootStackParamList, params?: object) {
+function reset(name: keyof RootStackParamList | { name: keyof RootStackParamList; params?: any }[], params?: object) {
   let resetAction;
   if (Array.isArray(name)) {
     resetAction = CommonActions.reset({
       index: name.length - 1,
-      routes: name,
+      routes: name as any,
     });
   } else {
     resetAction = CommonActions.reset({

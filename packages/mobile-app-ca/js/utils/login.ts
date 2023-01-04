@@ -4,7 +4,7 @@ import ActionSheet from 'components/ActionSheet';
 import { AppDispatch } from 'store';
 import navigationService from './navigationService';
 
-export function queryFailAlert(dispatch: AppDispatch, isRecovery?: boolean) {
+export function queryFailAlert(dispatch: AppDispatch, isRecovery?: boolean, isReset?: boolean) {
   ActionSheet.alert({
     message: isRecovery ? 'Wallet Recovery Failed!' : 'Wallet Register Failed!',
     buttons: [
@@ -13,9 +13,11 @@ export function queryFailAlert(dispatch: AppDispatch, isRecovery?: boolean) {
         onPress: () => {
           dispatch(resetWallet());
           if (isRecovery) {
-            navigationService.navigate('LoginPortkey');
+            if (isReset) navigationService.reset('LoginPortkey');
+            else navigationService.navigate('LoginPortkey');
           } else {
-            navigationService.navigate('SignupPortkey');
+            if (isReset) navigationService.reset([{ name: 'LoginPortkey' }, { name: 'SignupPortkey' }]);
+            else navigationService.navigate('SignupPortkey');
           }
         },
       },

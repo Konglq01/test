@@ -1,4 +1,4 @@
-import { screenHeight } from '@portkey/utils/mobile/device';
+import { screenHeight, windowHeight } from '@portkey/utils/mobile/device';
 import { defaultColors } from 'assets/theme';
 import { TextL, TextXXXL } from 'components/CommonText';
 import Svg from 'components/Svg';
@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   iconStyle: {
-    marginTop: screenHeight * 0.25,
+    marginTop: windowHeight * 0.29,
   },
   title: {
     marginTop: screenHeight * 0.04,

@@ -13,6 +13,7 @@ import { setCAInfo } from '@portkey/store/store-ca/wallet/actions';
 import { useCurrentWallet, useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { useUser } from 'hooks/store';
 import Loading from 'components/Loading';
+import { queryFailAlert } from 'utils/login';
 
 export default function HomeScreen() {
   const navigation = useNavigation<RootNavigationProp>();
@@ -58,18 +59,10 @@ export default function HomeScreen() {
           }}
         />
         <Button title="Account Settings" onPress={() => navigationService.navigate('AccountSettings')} />
+        <Button title="queryFailAlert" onPress={() => queryFailAlert(dispatch, true)} />
         <Button
-          title="setCAInfo"
-          onPress={async () => {
-            try {
-              await dispatch(
-                setCAInfo({ caInfo: { caAddress: 'aaaa', caHash: 'xxx' }, pin: '123456', chainId: 'tDVV' }),
-              );
-              console.log('setCAInfo');
-            } catch (error) {
-              console.log(error, '====error');
-            }
-          }}
+          title="reset"
+          onPress={() => navigationService.reset([{ name: 'LoginPortkey' }, { name: 'SignupPortkey' }])}
         />
       </ScrollView>
     </SafeAreaBox>
