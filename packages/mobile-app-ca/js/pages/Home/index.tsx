@@ -9,7 +9,7 @@ import SafeAreaBox from 'components/SafeAreaBox';
 import ActionSheet from 'components/ActionSheet';
 import useLogOut from 'hooks/useLogOut';
 import { useTokenContract } from 'contexts/useInterface/hooks';
-import { resetWallet, setCAInfo } from '@portkey/store/store-ca/wallet/actions';
+import { setCAInfo } from '@portkey/store/store-ca/wallet/actions';
 import { useCurrentWallet, useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { CrashTest } from 'Test/CrashTest';
 import { useUser } from 'hooks/store';
@@ -30,10 +30,7 @@ export default function HomeScreen() {
     <SafeAreaBox>
       <ScrollView>
         <Text>Home Screen</Text>
-        <Button title="Go to DashBoard" onPress={() => navigation.navigate('DashBoard')} />
-
         <Button onPress={onLogOut}>reSetWallet</Button>
-        <Button title="sider" onPress={() => navigationService.navigate('DashBoard')} />
         {/* <Button title="Go to Element" onPress={() => navigation.navigate('Element')} /> */}
         {/* <Button title="Go to I18n" onPress={() => navigation.navigate('I18n')} /> */}
         {/* <Button title="Go to Webview" onPress={() => navigation.navigate('WebView')} /> */}
@@ -59,16 +56,6 @@ export default function HomeScreen() {
             setTimeout(() => {
               Loading.hide();
             }, 5000);
-          }}
-        />
-        <Button
-          title="Reset Wallet"
-          onPress={async () => {
-            try {
-              await dispatch(resetWallet());
-            } catch (error) {
-              console.log(error, '====error');
-            }
           }}
         />
         <Button title="Account Settings" onPress={() => navigationService.navigate('AccountSettings')} />

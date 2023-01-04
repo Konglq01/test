@@ -11,7 +11,7 @@ import { BorderStyles, FontStyles } from 'assets/theme/styles';
 import { useWallet } from 'hooks/store';
 import Svg, { IconName } from 'components/Svg';
 
-import MenuItem from 'components/MenuItem';
+import WalletMenuItem from './components/WalletMenuItem';
 import ExistOverlay from './components/ExistOverlay';
 
 interface WalletHomeProps {
@@ -34,10 +34,10 @@ const WalletHome: React.FC<WalletHomeProps> = () => {
       <ScrollView alwaysBounceVertical={false}>
         <TouchableWithoutFeedback>
           <View>
-            <MenuItem onPress={() => navigationService.navigate('WalletName')} title={walletName} />
-            <MenuItem onPress={() => navigationService.navigate('AutoLock')} title={t('Auto-Lock')} />
-            <MenuItem onPress={() => navigationService.navigate('SwitchNetworks')} title={t('Switch Networks')} />
-            <MenuItem onPress={() => navigationService.navigate('AboutUs')} title={t('About Us')} />
+            <WalletMenuItem onPress={() => navigationService.navigate('WalletName')} title={walletName} />
+            <WalletMenuItem onPress={() => navigationService.navigate('AutoLock')} title={t('Auto-Lock')} />
+            <WalletMenuItem onPress={() => navigationService.navigate('SwitchNetworks')} title={t('Switch Networks')} />
+            <WalletMenuItem onPress={() => navigationService.navigate('AboutUs')} title={t('About Us')} />
           </View>
         </TouchableWithoutFeedback>
       </ScrollView>
