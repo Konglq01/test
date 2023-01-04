@@ -38,6 +38,8 @@ export const useGetVerifierServers = () => {
   const getGuardiansList = useCallback(async () => {
     if (!caContract) throw new Error('Could not find chain information');
     const res = await caContract?.callViewMethod('GetVerifierServers', '');
+    console.log(res, caContract, '=====res');
+
     if (!res?.error) {
       const verifierList: VerifierItem[] = res.verifierServers?.map((item: any) => ({
         name: item.name,

@@ -9,6 +9,10 @@ import { request } from 'api';
 import { CAInfo, ManagerInfo } from '@portkey/types/types-ca/wallet';
 import { VerificationType } from '@portkey/types/verifier';
 import { clearTimeoutInterval, setTimeoutInterval } from './Interval';
+import Loading from 'components/Loading';
+import CommonToast from 'components/CommonToast';
+import { queryFailAlert } from './login';
+import { AppDispatch } from 'store';
 
 type SignType = { sign: string; sha256Sign: string };
 
@@ -76,7 +80,7 @@ export const getApiBaseData = ({
 export type TimerResult = {
   remove: () => void;
 };
-export function intervalGetRegisterResult({
+export function intervalGetResult({
   apiUrl,
   managerInfo,
   onPass,
@@ -118,4 +122,10 @@ export function intervalGetRegisterResult({
   return {
     remove: () => clearTimeoutInterval(timer),
   };
+}
+
+export function onResultFail(dispatch: AppDispatch, message: string, isRecovery?: boolean, isReset?: boolean) {
+  Loading.hide();
+  CommonToast.fail(message);
+  queryFailAlert(dispatch, isRecovery, isReset);
 }

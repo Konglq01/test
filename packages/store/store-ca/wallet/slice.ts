@@ -30,7 +30,8 @@ export const walletSlice = createSlice({
   },
   extraReducers: builder => {
     builder
-      .addCase(resetWallet, () => initialState)
+      // do not reset chain information
+      .addCase(resetWallet, state => ({ ...initialState, chainList: state.chainList }))
       .addCase(createWalletAction, (state, action) => {
         if (state.walletInfo?.AESEncryptMnemonic) throw new Error(WalletError.walletExists);
         const currentNetwork = action.payload.networkType || state.currentNetwork || initialState.currentNetwork;

@@ -14,7 +14,7 @@ export const NetworkList: NetworkItem[] = [
     walletType: 'aelf',
     networkType: 'TESTNET',
     isActive: true,
-    apiUrl: 'http://192.168.66.135:5577',
+    apiUrl: 'http://192.168.67.35:5577',
   },
   {
     name: 'aelf Mainnet',

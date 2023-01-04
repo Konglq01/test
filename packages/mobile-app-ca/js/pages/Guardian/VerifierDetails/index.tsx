@@ -103,7 +103,9 @@ export default function VerifierDetails() {
   const resendCode = useCallback(async () => {
     Loading.show();
     try {
-      const req = await request.register.sendCode({
+      let fetch = request.register;
+      if (verificationType === VerificationType.communityRecovery) fetch = request.recovery;
+      const req = await fetch.sendCode({
         baseURL: guardianItem?.verifier?.url,
         data: {
           type: 0,
@@ -120,7 +122,7 @@ export default function VerifierDetails() {
       CommonToast.failError(error, 'Verify Fail');
     }
     Loading.hide();
-  }, [guardianItem?.verifier?.url, loginGuardianType, managerUniqueId]);
+  }, [guardianItem?.verifier?.url, loginGuardianType, managerUniqueId, verificationType]);
   console.log(guardianItem, '====verifierItem');
 
   return (
