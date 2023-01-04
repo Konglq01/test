@@ -163,7 +163,7 @@ export default function GuardianAccountItem({
           {guardianItem.loginGuardianType}
         </TextM>
       </View>
-      {!isButtonHide && !renderBtn && (
+      {!isButtonHide && (
         <GuardianItemButton
           isExpired={isExpired}
           guardianItem={guardianItem}
@@ -172,7 +172,7 @@ export default function GuardianAccountItem({
           setGuardianStatus={setGuardianStatus}
         />
       )}
-      {!isButtonHide && renderBtn && renderBtn(guardianItem)}
+      {renderBtn && renderBtn(guardianItem)}
     </View>
   );
 }
