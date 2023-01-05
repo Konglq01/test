@@ -47,7 +47,7 @@ export const walletPersistConfig = {
 export const loginPersistConfig = {
   key: loginSlice.name,
   storage: localStorage,
-  blacklist: [''],
+  blacklist: ['walletInfo'],
 };
 
 export const contactPersistConfig = {

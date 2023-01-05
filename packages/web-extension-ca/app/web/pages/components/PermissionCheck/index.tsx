@@ -8,6 +8,8 @@ import { useAppDispatch } from 'store/Provider/hooks';
 import { setIsPrompt } from 'store/reducers/common/slice';
 import { useStorage } from 'hooks/useStorage';
 import { fetchContractListAsync } from '@portkey/store/store-ca/contact/actions';
+import { getLocalStorage } from 'utils/storage/chromeStorage';
+import { useEffectOnce } from 'react-use';
 
 export default function PermissionCheck({
   children,
@@ -31,7 +33,7 @@ export default function PermissionCheck({
     appDispatch(fetchContractListAsync());
   }, [appDispatch]);
 
-  const noCheckPage = useMemo(
+  const noCheckRegister = useMemo(
     () =>
       location.pathname.includes('/login') ||
       location.pathname.includes('/register') ||
@@ -42,7 +44,7 @@ export default function PermissionCheck({
   const isRegisterPage = useMemo(
     () =>
       location.pathname.includes('/register') ||
-      ((location.pathname.includes('/blank-page') || location.pathname.includes('/login')) && pageType === 'Popup'),
+      ((location.pathname.includes('/query-page') || location.pathname.includes('/login')) && pageType === 'Popup'),
     [location.pathname, pageType],
   );
 
@@ -50,8 +52,6 @@ export default function PermissionCheck({
 
   const getPassword = useCallback(async () => {
     try {
-      if (noCheckPage) return;
-      if (isRegisterPage) return InternalMessage.payload(PortkeyMessageTypes.REGISTER_WALLET, {}).send();
       InternalMessage.payload(PortkeyMessageTypes.CHECK_WALLET_STATUS)
         .send()
         .then((res) => {
@@ -61,7 +61,7 @@ export default function PermissionCheck({
             detail?.privateKey && dispatch(setPasswordSeed(detail.privateKey));
             !detail?.privateKey && navigate('/unlock');
           } else if (detail?.registerStatus === 'registeredNotGetCaAddress') {
-            navigate('/blank-page');
+            navigate('/query-page');
           } else {
             navigate('/register/start');
           }
@@ -69,12 +69,32 @@ export default function PermissionCheck({
     } catch (error) {
       console.error(error, 'CHECK_WALLET_STATUS==error');
     }
-  }, [dispatch, isRegisterPage, navigate, noCheckPage]);
+  }, [navigate, dispatch]);
+
+  const goQueryPage = useCallback(async () => {
+    const registerStatus = await getLocalStorage('registerStatus');
+    if (!location.pathname.includes('/query-page') && registerStatus === 'registeredNotGetCaAddress')
+      return navigate('/query-page');
+  }, [location.pathname, navigate]);
+
+  useEffectOnce(() => {
+    goQueryPage();
+  });
+
+  const checkRegisterHandler = useCallback(async () => {
+    const registerStatus = await getLocalStorage('registerStatus');
+    if (registerStatus !== 'Registered' && pageType === 'Popup') {
+      return InternalMessage.payload(PortkeyMessageTypes.REGISTER_WALLET, {}).send();
+    }
+    if (noCheckRegister) return;
+    if (isRegisterPage) return InternalMessage.payload(PortkeyMessageTypes.REGISTER_WALLET, {}).send();
+    getPassword();
+  }, [pageType, noCheckRegister, isRegisterPage, getPassword]);
 
   useEffect(() => {
-    if (locked && !noCheckPage && !isRegisterPage) return navigate('/unlock');
-    getPassword();
-  }, [getPassword, isRegisterPage, locked, navigate, noCheckPage]);
+    if (locked && !noCheckRegister && !isRegisterPage) return navigate('/unlock');
+    checkRegisterHandler();
+  }, [isRegisterPage, locked, noCheckRegister, navigate, getPassword, checkRegisterHandler]);
 
   return <>{children}</>;
 }

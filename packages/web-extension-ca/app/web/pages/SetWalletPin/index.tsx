@@ -21,7 +21,7 @@ import { isWalletError } from '@portkey/store/wallet/utils';
 export default function SetWalletPin() {
   const [form] = Form.useForm();
   const { t } = useTranslation();
-  const { state } = useLocationState<'login' | 'register'>();
+  const { state } = useLocationState<'login' | 'register' | 'scan'>();
   // const { state } = useLocation();
   const currentNetwork = useCurrentNetworkInfo();
 
@@ -45,19 +45,48 @@ export default function SetWalletPin() {
         loginGuardianType: loginAccount.loginGuardianType,
         managerUniqueId: loginAccount.managerUniqueId,
         managerAddress,
+        chainId: 'AELF',
         verificationType: state === 'login' ? VerificationType.communityRecovery : VerificationType.register,
-        // TODO
-        deviceString: '',
+        deviceString: navigator.userAgent,
+        guardianCount: 1,
       });
       return loginAccount.managerUniqueId;
     },
     [currentNetwork.apiUrl, loginAccount, state],
   );
 
+  const createByScan = useCallback(
+    (pin: string) => {
+      const scanWallet = loginAccount?.walletInfo;
+      if (!scanWallet?.address) throw 'Wallet information is wrong, please go back to scan the code and try again';
+      // const managerInfo = {
+      //   managerUniqueId: loginAccount?.managerUniqueId || sessionId,
+      //   loginGuardianType: loginAccount?.loginGuardianType,
+      //   type: loginAccount.accountLoginType,
+      // };
+      // !walletInfo.address
+      //   ? dispatch(
+      //       createWallet({
+      //         walletInfo: scanWallet,
+      //         pin,
+      //         managerInfo,
+      //       }),
+      //     )
+      //   : dispatch(
+      //       setManagerInfo({
+      //         pin,
+      //         managerInfo,
+      //       }),
+      //     );
+    },
+    [dispatch, loginAccount, walletInfo.address],
+  );
+
   const onCreate = useCallback(
     async (values: any) => {
       try {
         const { pin } = values;
+        if (state === 'scan') return createByScan(pin);
         console.log(pin, walletInfo, 'onCreate==');
         if (!loginAccount?.loginGuardianType || (!loginAccount.accountLoginType && loginAccount.accountLoginType !== 0))
           return message.error('Missing account!!! Please login/register again');
@@ -66,32 +95,29 @@ export default function SetWalletPin() {
         console.log(pin, walletInfo.address, 'onCreate==');
         // Step 9
         const sessionId = await createAndGetSessionId({ managerAddress: _walletInfo.address });
+        const managerInfo = {
+          managerUniqueId: loginAccount?.managerUniqueId || sessionId,
+          loginGuardianType: loginAccount?.loginGuardianType,
+          type: loginAccount.accountLoginType,
+        };
         !walletInfo.address
           ? dispatch(
               createWallet({
                 walletInfo: _walletInfo,
                 pin,
-                managerInfo: {
-                  managerUniqueId: loginAccount?.managerUniqueId || sessionId,
-                  loginGuardianType: loginAccount?.loginGuardianType,
-                  type: loginAccount.accountLoginType,
-                },
+                managerInfo,
               }),
             )
           : dispatch(
               setManagerInfo({
                 pin,
-                managerInfo: {
-                  managerUniqueId: loginAccount?.managerUniqueId || sessionId,
-                  loginGuardianType: loginAccount?.loginGuardianType,
-                  type: loginAccount.accountLoginType,
-                },
+                managerInfo,
               }),
             );
-        await setPinAction(pin);
         await setLocalStorage({
           registerStatus: 'registeredNotGetCaAddress',
         });
+        await setPinAction(pin);
 
         // TODO Step 14 Only get Main Chain caAddress
         const walletResult = await fetchWalletResult({
@@ -111,20 +137,21 @@ export default function SetWalletPin() {
         console.log(error, 'onCreate');
         const walletError = isWalletError(error);
         const errorString = typeof error === 'string' ? error : 'Something error';
-        message.error(walletError ?? errorString);
+        message.error(walletError || errorString);
       }
       setLoading(false);
     },
     [
-      createAndGetSessionId,
-      currentNetwork.apiUrl,
-      dispatch,
-      fetchWalletResult,
-      loginAccount,
-      navigate,
-      setLoading,
       state,
       walletInfo,
+      loginAccount,
+      currentNetwork.apiUrl,
+      navigate,
+      dispatch,
+      setLoading,
+      createByScan,
+      fetchWalletResult,
+      createAndGetSessionId,
     ],
   );
 
