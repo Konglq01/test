@@ -15,7 +15,7 @@ import CommonInput from 'components/CommonInput';
 import { checkEmail } from '@portkey/utils/check';
 import { useGuardiansInfo } from 'hooks/store';
 import { LOGIN_TYPE_LIST } from '@portkey/constants/verifier';
-import { LoginType, VerificationType, VerifierItem } from '@portkey/types/verifier';
+import { VerificationType, VerifierItem } from '@portkey/types/verifier';
 import { INIT_HAS_ERROR, INIT_NONE_ERROR } from 'constants/common';
 import GuardianTypeSelectOverlay from '../components/GuardianTypeSelectOverlay';
 import VerifierSelectOverlay from '../components/VerifierSelectOverlay';
@@ -28,6 +28,7 @@ import { randomId } from '@portkey/utils';
 import Loading from 'components/Loading';
 import CommonToast from 'components/CommonToast';
 import useRouterParams from '@portkey/hooks/useRouterParams';
+import { LoginType } from '@portkey/types/types-ca/wallet';
 
 type RouterParams = {
   guardian?: UserGuardianItem;
