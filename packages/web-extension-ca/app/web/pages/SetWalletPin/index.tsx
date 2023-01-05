@@ -99,6 +99,7 @@ export default function SetWalletPin() {
           managerUniqueId: loginAccount?.managerUniqueId || sessionId,
           loginGuardianType: loginAccount?.loginGuardianType,
           type: loginAccount.accountLoginType,
+          verificationType: state === 'login' ? VerificationType.communityRecovery : VerificationType.register,
         };
         !walletInfo.address
           ? dispatch(
@@ -127,7 +128,12 @@ export default function SetWalletPin() {
           loginGuardianType: loginAccount.loginGuardianType,
           managerUniqueId: loginAccount.managerUniqueId,
         });
-        if (walletResult.status !== 'pass') throw walletResult?.message || walletResult.status;
+        if (walletResult.status !== 'pass') {
+          await setLocalStorage({
+            registerStatus: null,
+          });
+          throw walletResult?.message || walletResult.status;
+        }
         await setLocalStorage({
           registerStatus: 'Registered',
         });
