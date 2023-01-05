@@ -25,6 +25,7 @@ export default function HomeScreen() {
   const { currentNetwork } = useCurrentWallet();
   const caInfo = useIntervalQueryCAInfoByAddress(currentNetwork, wallet.address);
   console.log(caInfo, '======caInfo');
+  console.log(wallet, '======wallet');
 
   return (
     <SafeAreaBox>
@@ -44,7 +45,7 @@ export default function HomeScreen() {
           onPress={async () => {
             const balance = await tokenContract?.callViewMethod('GetBalance', {
               symbol: 'ELF',
-              owner: '2BC7WWMNBp4LjmJ48VAfDocEU2Rjg5yhELxT2HewfYxPPrdxA9',
+              owner: '5xC4AXHmVqaRNhN5LPMe9hU8t51QeHyVaUDJ6Ph6gs5mEuBNF',
             });
             console.log(balance, '=====balance');
           }}
