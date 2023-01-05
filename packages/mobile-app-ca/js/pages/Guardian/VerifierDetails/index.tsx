@@ -8,7 +8,7 @@ import React, { useCallback, useRef, useState } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import useRouterParams from '@portkey/hooks/useRouterParams';
 import { VerificationType, VerifyStatus } from '@portkey/types/verifier';
-import GuardianAccountItem from '../GuardianAccountItem';
+import GuardianAccountItem, { GuardiansStatusItem } from '../components/GuardianAccountItem';
 import { FontStyles } from 'assets/theme/styles';
 import { request } from 'api';
 import Loading from 'components/Loading';
@@ -43,18 +43,22 @@ export default function VerifierDetails() {
   });
   const [stateSessionId, setStateSessionId] = useState<string>(verifierSessionId || '');
   const digitInput = useRef<DigitInputInterface>();
+  const setGuardianStatus = useCallback(
+    (status: GuardiansStatusItem) => {
+      myEvents.setGuardianStatus.emit({
+        key: guardianKey,
+        status,
+      });
+    },
+    [guardianKey],
+  );
   const onFinish = useCallback(
     async (code: string) => {
-      console.log(stateSessionId, loginGuardianType, code, '====stateSessionId');
-
       if (!stateSessionId || !loginGuardianType || !code) return;
-      console.log(stateSessionId, '=====stateSessionId');
-
       try {
         Loading.show();
         let fetch = request.register;
         if (verificationType === VerificationType.communityRecovery) fetch = request.recovery;
-
         await fetch.verifyCode({
           baseURL: guardianItem?.verifier?.url,
           data: {
@@ -66,12 +70,9 @@ export default function VerifierDetails() {
         });
         CommonToast.success('Verified Successfully');
         if (verificationType === VerificationType.communityRecovery) {
-          myEvents.setGuardianStatus.emit({
-            key: guardianKey,
-            status: {
-              verifierSessionId,
-              status: VerifyStatus.Verified,
-            },
+          setGuardianStatus({
+            verifierSessionId: stateSessionId,
+            status: VerifyStatus.Verified,
           });
           navigationService.goBack();
         } else {
@@ -92,12 +93,11 @@ export default function VerifierDetails() {
     },
     [
       guardianItem?.verifier?.url,
-      guardianKey,
       loginGuardianType,
       managerUniqueId,
+      setGuardianStatus,
       stateSessionId,
       verificationType,
-      verifierSessionId,
     ],
   );
   const resendCode = useCallback(async () => {
@@ -115,16 +115,19 @@ export default function VerifierDetails() {
       });
       if (req.verifierSessionId) {
         setStateSessionId(req.verifierSessionId);
+        setGuardianStatus({
+          verifierSessionId: req.verifierSessionId,
+          status: VerifyStatus.Verifying,
+        });
         countdown.current?.resetTime(60);
         digitInput.current?.resetPin();
       }
     } catch (error) {
+      digitInput.current?.resetPin();
       CommonToast.failError(error, 'Verify Fail');
     }
     Loading.hide();
-  }, [guardianItem?.verifier?.url, loginGuardianType, managerUniqueId, verificationType]);
-  console.log(guardianItem, '====verifierItem');
-
+  }, [guardianItem?.verifier?.url, loginGuardianType, managerUniqueId, setGuardianStatus, verificationType]);
   return (
     <PageContainer type="leftBack" titleDom containerStyles={styles.containerStyles}>
       {guardianItem ? <GuardianAccountItem guardianItem={guardianItem} isButtonHide /> : null}

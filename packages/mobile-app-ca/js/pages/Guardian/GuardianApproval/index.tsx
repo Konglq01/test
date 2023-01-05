@@ -13,7 +13,7 @@ import Svg from 'components/Svg';
 import { pTd } from 'utils/unit';
 import { getApprovalCount } from '@portkey/utils/guardian';
 import { VerificationType, VerifyStatus } from '@portkey/types/verifier';
-import GuardianAccountItem, { GuardiansStatus, GuardiansStatusItem } from '../GuardianAccountItem';
+import GuardianAccountItem, { GuardiansStatus, GuardiansStatusItem } from '../components/GuardianAccountItem';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { randomId } from '@portkey/utils';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
@@ -30,14 +30,10 @@ export default function GuardianApproval() {
   const [isExpired, setIsExpired] = useState<boolean>();
 
   const guardianExpiredTime = useRef<number>();
-  console.log(managerUniqueId, guardianExpiredTime, '====managerUniqueId');
-
   const { loginGuardianType, userGuardiansList } = useRouterParams<{
     loginGuardianType?: string;
     userGuardiansList?: UserGuardianItem[];
   }>();
-  console.log(userGuardiansList, '====userGuardiansList');
-
   const approvedList = useMemo(() => {
     return Object.values(guardiansStatus || {}).filter(guardian => guardian.status === VerifyStatus.Verified);
   }, [guardiansStatus]);
@@ -117,6 +113,7 @@ export default function GuardianApproval() {
                     managerUniqueId={managerUniqueId as string}
                     guardiansStatus={guardiansStatus}
                     isExpired={isExpired}
+                    isSuccess={isSuccess}
                   />
                 );
               })}
