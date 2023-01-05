@@ -24,7 +24,7 @@ const Svg: React.FC<SvgProps> = (props: SvgProps) => {
 
   if (!svgXmlData) {
     const err_msg = `There is no "${icon}" icon, please download the latest svg and run yarn generate-svg`;
-    throw new Error(err_msg);
+    if (__DEV__) throw new Error(err_msg);
   }
 
   return (

@@ -15,7 +15,7 @@ import Loading from 'components/Loading';
 import { queryFailAlert } from 'utils/login';
 import { contractQueries } from '@portkey/graphql/index';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network';
-import { useIntervalQueryManagerInfo } from '@portkey/hooks/hooks-ca/graphql';
+import { useIntervalQueryCAInfoByAddress } from '@portkey/hooks/hooks-ca/graphql';
 export default function HomeScreen() {
   const navigation = useNavigation<RootNavigationProp>();
   const onLogOut = useLogOut();
@@ -23,7 +23,7 @@ export default function HomeScreen() {
   const dispatch = useAppDispatch();
   const wallet = useCurrentWalletInfo();
   const { currentNetwork } = useCurrentWallet();
-  const caInfo = useIntervalQueryManagerInfo(currentNetwork, wallet.address);
+  const caInfo = useIntervalQueryCAInfoByAddress(currentNetwork, wallet.address);
   console.log(caInfo, '======caInfo');
 
   return (
