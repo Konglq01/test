@@ -12,7 +12,7 @@ import { BorderStyles, FontStyles } from 'assets/theme/styles';
 import Svg from 'components/Svg';
 import { pTd } from 'utils/unit';
 import { getApprovalCount } from '@portkey/utils/guardian';
-import { VerificationType, VerifyStatus } from '@portkey/types/verifier';
+import { ApprovalType, VerificationType, VerifyStatus } from '@portkey/types/verifier';
 import GuardianAccountItem, { GuardiansStatus, GuardiansStatusItem } from '../components/GuardianAccountItem';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { randomId } from '@portkey/utils';
@@ -22,18 +22,57 @@ import { LoginType, ManagerInfo } from '@portkey/types/types-ca/wallet';
 import Touchable from 'components/Touchable';
 import ActionSheet from 'components/ActionSheet';
 import myEvents from 'utils/deviceEvent';
+import Loading from 'components/Loading';
+import { getELFContract } from 'contexts/utils';
+import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+import { useCredentials, useGuardiansInfo } from 'hooks/store';
+import { getWallet } from 'utils/redux';
+import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import CommonToast from 'components/CommonToast';
+
+export interface EditGuardianParamsType {
+  signature: string;
+  verifierDoc: string;
+}
+
+type RouterParams = {
+  loginGuardianType?: string;
+  userGuardiansList?: UserGuardianItem[];
+  approvalType?: ApprovalType;
+  guardianItem?: UserGuardianItem;
+  editGuardianParams?: EditGuardianParamsType;
+  managerUniqueId?: string;
+};
+
 export default function GuardianApproval() {
+  const {
+    loginGuardianType,
+    userGuardiansList: paramUserGuardiansList,
+    approvalType = ApprovalType.register,
+    guardianItem,
+    editGuardianParams,
+    managerUniqueId: paramManagerUniqueId,
+  } = useRouterParams<RouterParams>();
+
+  const { userGuardiansList: storeUserGuardiansList } = useGuardiansInfo();
+
+  const userGuardiansList = useMemo(() => {
+    if (paramUserGuardiansList) return paramUserGuardiansList;
+    if (approvalType !== ApprovalType.register) {
+      return storeUserGuardiansList;
+    }
+  }, [approvalType, paramUserGuardiansList, storeUserGuardiansList]);
+
   const { t } = useLanguage();
+  const chainInfo = useCurrentChain('AELF');
+  const { pin } = useCredentials() || {};
+  const { AELF } = useCurrentWalletInfo();
 
   const [managerUniqueId, setManagerUniqueId] = useState<string>();
   const [guardiansStatus, setApproved] = useState<GuardiansStatus>();
   const [isExpired, setIsExpired] = useState<boolean>();
 
   const guardianExpiredTime = useRef<number>();
-  const { loginGuardianType, userGuardiansList } = useRouterParams<{
-    loginGuardianType?: string;
-    userGuardiansList?: UserGuardianItem[];
-  }>();
   const approvedList = useMemo(() => {
     return Object.values(guardiansStatus || {}).filter(guardian => guardian.status === VerifyStatus.Verified);
   }, [guardiansStatus]);
@@ -60,7 +99,7 @@ export default function GuardianApproval() {
     [setGuardianStatus],
   );
   useEffectOnce(() => {
-    setManagerUniqueId(randomId());
+    setManagerUniqueId(paramManagerUniqueId || randomId());
     const listener = myEvents.setGuardianStatus.addListener(onSetGuardianStatus);
     const expiredTimer = setInterval(() => {
       if (guardianExpiredTime.current && new Date().getTime() > guardianExpiredTime.current) setIsExpired(true);
@@ -70,12 +109,116 @@ export default function GuardianApproval() {
       expiredTimer && clearInterval(expiredTimer);
     };
   });
+
+  const onFinish = useCallback(async () => {
+    if (approvalType === ApprovalType.register) {
+      navigationService.navigate('SetPin', {
+        managerInfo: {
+          verificationType: VerificationType.communityRecovery,
+          loginGuardianType,
+          type: LoginType.email,
+          managerUniqueId,
+        } as ManagerInfo,
+        guardianCount,
+      });
+      return;
+    }
+
+    if (approvalType === ApprovalType.addGuardian) {
+      if (!chainInfo || !pin || !AELF || !guardianItem || !editGuardianParams || !guardiansStatus || !userGuardiansList)
+        return;
+      const wallet = getWallet(pin);
+      if (!wallet) return;
+
+      Loading.show();
+      const contract = await getELFContract({
+        contractAddress: chainInfo.caContractAddress,
+        rpcUrl: chainInfo.endPoint,
+        account: wallet,
+      });
+
+      const guardianToAdd = {
+        guardian_type: {
+          type: LoginType.email,
+          guardian_type: guardianItem.loginGuardianType,
+        },
+        verifier: {
+          name: guardianItem.verifier?.name,
+          signature: editGuardianParams.signature,
+          verificationDoc: editGuardianParams.verifierDoc,
+        },
+      };
+
+      const guardiansApproved = userGuardiansList
+        .map(guardian => {
+          if (!guardiansStatus[guardian.key] || !guardiansStatus[guardian.key].editGuardianParams) return null;
+          return {
+            guardian_type: {
+              type: guardian.guardiansType,
+              guardian_type: guardian.loginGuardianType,
+            },
+            verifier: {
+              name: guardian.verifier?.name,
+              signature: guardiansStatus[guardian.key].editGuardianParams?.signature,
+              verificationDoc: guardiansStatus[guardian.key].editGuardianParams?.verifierDoc,
+            },
+          };
+        })
+        .filter(item => item !== null);
+
+      console.log({
+        ca_hash: AELF?.caHash,
+        guardian_to_add: guardianToAdd,
+        guardians_approved: guardiansApproved,
+      });
+
+      const req = await contract?.callSendMethod('AddGuardian', wallet.address, {
+        ca_hash: AELF?.caHash,
+        // guardianToAdd,
+        // guardiansApproved,
+        guardian_to_add: guardianToAdd,
+        guardians_approved: guardiansApproved,
+      });
+      Loading.hide();
+      console.log(req);
+      if (req && !req.error) {
+        console.log(req);
+      } else {
+        CommonToast.failError(req?.error?.message?.Message);
+      }
+    }
+  }, [
+    AELF,
+    approvalType,
+    chainInfo,
+    editGuardianParams,
+    guardianCount,
+    guardianItem,
+    guardiansStatus,
+    loginGuardianType,
+    managerUniqueId,
+    pin,
+    userGuardiansList,
+  ]);
+
+  const onBack = useCallback(() => {
+    switch (approvalType) {
+      case ApprovalType.addGuardian:
+        navigationService.navigate('GuardianEdit');
+        break;
+      default:
+        navigationService.goBack();
+        break;
+    }
+  }, [approvalType]);
+
   return (
     <PageContainer
       scrollViewProps={{ disabled: true }}
       containerStyles={styles.containerStyle}
       leftIconType="close"
-      backTitle="Wallet Login"
+      leftCallback={onBack}
+      backTitle={approvalType === ApprovalType.register ? 'Wallet Login' : undefined}
       type="leftBack"
       titleDom
       hideTouchable>
@@ -114,6 +257,7 @@ export default function GuardianApproval() {
                     guardiansStatus={guardiansStatus}
                     isExpired={isExpired}
                     isSuccess={isSuccess}
+                    approvalType={approvalType}
                   />
                 );
               })}
@@ -121,24 +265,7 @@ export default function GuardianApproval() {
           </View>
         </View>
       </View>
-      {!isExpired && (
-        <CommonButton
-          onPress={() => {
-            navigationService.navigate('SetPin', {
-              managerInfo: {
-                verificationType: VerificationType.communityRecovery,
-                loginGuardianType,
-                type: LoginType.email,
-                managerUniqueId,
-              } as ManagerInfo,
-              guardianCount,
-            });
-          }}
-          disabled={!isSuccess}
-          type="primary"
-          title="Recover wallet"
-        />
-      )}
+      {!isExpired && <CommonButton onPress={onFinish} disabled={!isSuccess} type="primary" title="Recover wallet" />}
     </PageContainer>
   );
 }

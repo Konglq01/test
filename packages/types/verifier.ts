@@ -18,6 +18,12 @@ export enum VerificationType {
   addGuardian,
   setLoginAccount,
   addManager,
+  editGuardianApproval,
+}
+
+export enum ApprovalType {
+  register = 0,
+  addGuardian = 2,
 }
 
 export interface GuardiansInfo {

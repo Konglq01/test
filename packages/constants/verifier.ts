@@ -1,4 +1,5 @@
-import { LoginType } from '@portkey/types/verifier';
+import { LoginType } from "@portkey/types/types-ca/wallet";
+
 
 export const LOGIN_TYPE_LABEL_MAP: { [key in LoginType]: string } = {
   [LoginType.email]: 'Email',
