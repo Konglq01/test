@@ -5,6 +5,7 @@ const EventMap = {
   openBiometrics: 'openBiometrics',
   clearLoginInput: 'clearLoginInput',
   clearSetPin: 'clearSetPin',
+  clearQRWallet: 'clearQRWallet',
 };
 
 // eslint-disable-next-line no-new-func
