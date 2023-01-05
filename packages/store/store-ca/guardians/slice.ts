@@ -47,6 +47,7 @@ export const guardiansSlice = createSlice({
         loginGuardianTypeIndexes.forEach(item => {
           _guardians[item].isLoginAccount = true;
         });
+
         const userStatus = state.userGuardianStatus ?? {};
         const guardiansList = _guardians.map(guardian => {
           const loginGuardianType = guardian.guardianType.guardianType;

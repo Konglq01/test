@@ -41,7 +41,7 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
             !(
               item.guardiansType === guardian.guardiansType &&
               item.loginGuardianType === guardian.loginGuardianType &&
-              item.verifier?.id === guardian.verifier?.id
+              item.verifier?.url === guardian.verifier?.url
             ),
         );
         if (loginIndex === -1) {
@@ -118,7 +118,7 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
       <CommonButton
         type="primary"
         onPress={() => {
-          navigationService.navigate('GuardianEdit', { guardian: JSON.stringify(guardian) });
+          navigationService.navigate('GuardianEdit', { guardian: JSON.parse(JSON.stringify(guardian)), isEdit: true });
         }}>
         {t('Edit')}
       </CommonButton>
