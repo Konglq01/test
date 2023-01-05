@@ -35,6 +35,7 @@ interface GuardianAccountItemProps {
   guardiansStatus?: GuardiansStatus;
   setGuardianStatus?: (key: string, status: GuardiansStatusItem) => void;
   isExpired?: boolean;
+  isSuccess?: boolean;
 }
 
 function GuardianItemButton({
@@ -149,7 +150,9 @@ export default function GuardianAccountItem({
   guardiansStatus,
   setGuardianStatus,
   isExpired,
+  isSuccess,
 }: GuardianAccountItemProps) {
+  const itemStatus = useMemo(() => guardiansStatus?.[guardianItem.key], [guardianItem.key, guardiansStatus]);
   return (
     <View style={[styles.itemRow, isBorderHide && styles.itemWithoutBorder]}>
       {guardianItem.isLoginAccount && (

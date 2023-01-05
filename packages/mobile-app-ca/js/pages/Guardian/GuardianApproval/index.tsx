@@ -30,14 +30,10 @@ export default function GuardianApproval() {
   const [isExpired, setIsExpired] = useState<boolean>();
 
   const guardianExpiredTime = useRef<number>();
-  console.log(managerUniqueId, guardianExpiredTime, '====managerUniqueId');
-
   const { loginGuardianType, userGuardiansList } = useRouterParams<{
     loginGuardianType?: string;
     userGuardiansList?: UserGuardianItem[];
   }>();
-  console.log(userGuardiansList, '====userGuardiansList');
-
   const approvedList = useMemo(() => {
     return Object.values(guardiansStatus || {}).filter(guardian => guardian.status === VerifyStatus.Verified);
   }, [guardiansStatus]);
@@ -117,6 +113,7 @@ export default function GuardianApproval() {
                     managerUniqueId={managerUniqueId as string}
                     guardiansStatus={guardiansStatus}
                     isExpired={isExpired}
+                    isSuccess={isSuccess}
                   />
                 );
               })}
