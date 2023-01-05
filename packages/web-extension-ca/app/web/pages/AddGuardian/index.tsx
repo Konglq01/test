@@ -6,13 +6,10 @@ import SettingHeader from 'pages/components/SettingHeader';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import CommonModal from 'components/CommonModal';
 import { useAppDispatch, useGuardiansInfo, useLoginInfo } from 'store/Provider/hooks';
-// import { useAppDispatch, useGuardiansInfo, useLoginInfo, useWalletInfo } from 'store/Provider/hooks';
 import { EmailReg } from '@portkey/utils/reg';
-import './index.less';
-// import { sendVerificationCode } from '@portkey/api/apiUtils/verification';
-import { LoginType } from '@portkey/types/verifier';
-// import { LoginType, VerificationType } from '@portkey/types/verifier';
 import CustomSelect from 'pages/components/CustomSelect';
+import { LoginType } from '@portkey/types/types-ca/wallet';
+import './index.less';
 
 const guardianList = [{ label: 'email', value: LoginType.email }];
 

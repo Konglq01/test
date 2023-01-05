@@ -1,15 +1,15 @@
 import { setLoginAccountAction } from '@portkey/store/store-ca/login/actions';
 import { resetVerifierState } from '@portkey/store/store-ca/guardians/actions';
-import { LoginType } from '@portkey/types/verifier';
 import { Button, message } from 'antd';
 import EmailInput, { EmailInputInstance } from 'pages/RegisterStart/components/EmailInput';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useAppDispatch, useLoading, useLoginInfo } from 'store/Provider/hooks';
-import './index.less';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { loginGuardianTypeCheck } from '@portkey/api/apiUtils/verification';
 import useAccountVerifierList from 'hooks/useGuardianList';
+import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+import { LoginType } from '@portkey/types/types-ca/wallet';
+import './index.less';
 
 export default function EmailLogin() {
   const { loginAccount } = useLoginInfo();
@@ -24,15 +24,15 @@ export default function EmailLogin() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const currentNetwork = useCurrentNetworkInfo();
+  const currentChain = useCurrentChain();
   const fetchUserVerifier = useAccountVerifierList();
   const loginHandler = useCallback(
-    (loginGuardianType: string, caHash: string) => {
+    (loginGuardianType: string) => {
       dispatch(
         setLoginAccountAction({
           loginGuardianType: loginGuardianType,
           accountLoginType: LoginType.email,
           createType: 'login',
-          caHash,
         }),
       );
     },
@@ -43,23 +43,17 @@ export default function EmailLogin() {
     try {
       if (!val) return message.error('No Account');
       setLoading(true);
-      await emailInputInstance?.current?.validateEmail(val);
-      // const result: any = await loginGuardianTypeCheck({
-      //   type: LoginType.email,
-      //   loginGuardianType: val,
-      //   apiUrl: currentNetwork.apiUrl,
-      // });
-      // TODO
-      const caHash = '652100680adc8283496d658834901e61c6a3ebeea8187c858b64dd16cc5e433c';
-
-      loginHandler(val, caHash);
+      await emailInputInstance?.current?.validateEmail(val, 'login');
+      loginHandler(val);
       dispatch(resetVerifierState());
-      await fetchUserVerifier();
+      await fetchUserVerifier(val);
       setLoading(false);
 
       navigate('/login/guardian-approval');
     } catch (error: any) {
-      setError(error);
+      setLoading(false);
+      console.error(error, 'error====onLogin');
+      typeof error === 'string' ? setError(error) : message.error(error);
     }
   }, [dispatch, fetchUserVerifier, loginHandler, navigate, setLoading, val]);
 
@@ -70,6 +64,7 @@ export default function EmailLogin() {
         val={val}
         ref={emailInputInstance}
         error={error}
+        currentChain={currentChain}
         onChange={(v) => {
           setError(undefined);
           setVal(v);

@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useAppDispatch, useCommonState, useLoading } from 'store/Provider/hooks';
 import { PasscodeInput } from 'antd-mobile';
 import { loginInfo } from '@portkey/store/store-ca/login/type';
-import { LoginType, VerificationType } from '@portkey/types/verifier';
+import { VerificationType } from '@portkey/types/verifier';
 import { DIGIT_CODE } from '@portkey/constants/misc';
 import clsx from 'clsx';
 import VerifierPair from 'components/VerifierPair';
@@ -14,6 +14,7 @@ import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import { useTranslation } from 'react-i18next';
 import { setUserGuardianSessionIdAction } from '@portkey/store/store-ca/guardians/actions';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
+import { LoginType } from '@portkey/types/types-ca/wallet';
 
 const MAX_TIMER = 60;
 

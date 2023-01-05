@@ -18,7 +18,7 @@ const routMap: { [x in keyof typeof PromptRouteTypes]?: string } = {
   [PromptRouteTypes.REGISTER_WALLET]: '#/register',
   [PromptRouteTypes.PERMISSION_CONTROLLER]: '#/permission',
   [PromptRouteTypes.SWITCH_CHAIN]: '#/switch-chain',
-  [PromptRouteTypes.BLANK_PAGE]: '#/blank-page',
+  [PromptRouteTypes.BLANK_PAGE]: '#/query-page',
   [PromptRouteTypes.CONNECT_WALLET]: '#/connect-wallet',
   [PromptRouteTypes.SIGN_MESSAGE]: '#/sign-message',
   [PromptRouteTypes.GET_SIGNATURE]: '#/get-signature',
