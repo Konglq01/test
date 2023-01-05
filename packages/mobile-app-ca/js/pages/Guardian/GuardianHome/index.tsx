@@ -1,6 +1,6 @@
 import { defaultColors } from 'assets/theme';
 import Svg from 'components/Svg';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import { pTd } from 'utils/unit';
 import navigationService from 'utils/navigationService';
@@ -9,14 +9,24 @@ import { pageStyles } from './style';
 import { useLanguage } from 'i18n/hooks';
 import { useGuardianList } from 'hooks/useGuardianList';
 import { useGuardiansInfo } from 'hooks/store';
-import GuardianAccountItem from '../GuardianAccountItem';
+import GuardianAccountItem from '../components/GuardianAccountItem';
 import useVerifierList from 'hooks/useVerifierList';
 import Touchable from 'components/Touchable';
+import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import { useGetHolderInfo } from 'hooks/guardian';
 
 export default function GuardianHome() {
   const { t } = useLanguage();
   useVerifierList();
   useGuardianList();
+
+  const { AELF } = useCurrentWalletInfo();
+  const getGuardiansList = useGetHolderInfo();
+  useEffect(() => {
+    getGuardiansList({
+      caHash: AELF?.caHash,
+    });
+  }, [AELF?.caHash, getGuardiansList]);
 
   const { userGuardiansList } = useGuardiansInfo();
 
@@ -47,7 +57,8 @@ export default function GuardianHome() {
               navigationService.navigate('GuardianDetail', { guardian: JSON.stringify(guardian) });
             }}>
             <GuardianAccountItem
-              item={guardian}
+              guardianItem={guardian}
+              isButtonHide
               renderBtn={renderGuardianBtn}
               isBorderHide={idx === userGuardiansList.length - 1}
             />

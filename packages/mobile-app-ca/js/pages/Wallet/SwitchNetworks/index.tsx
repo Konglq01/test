@@ -12,10 +12,12 @@ import { FontStyles } from 'assets/theme/styles';
 import Svg from 'components/Svg';
 import { changeNetworkType } from '@portkey/store/store-ca/wallet/actions';
 import { NetworkItem } from '@portkey/constants/constants-ca/network';
+import { useNetworkList } from '@portkey/hooks/hooks-ca/network';
 
 const SwitchNetworks: React.FC = () => {
   const { t } = useLanguage();
-  const { networkList, currentNetwork } = useAppSelector(state => state.wallet);
+  const { currentNetwork } = useAppSelector(state => state.wallet);
+  const NetworkList = useNetworkList();
   const appDispatch = useAppDispatch();
 
   const onNetworkChange = useCallback(
@@ -31,7 +33,7 @@ const SwitchNetworks: React.FC = () => {
       safeAreaColor={['blue', 'gray']}
       containerStyles={styles.pageWrap}
       scrollViewProps={{ disabled: false }}>
-      {networkList.map(item => (
+      {NetworkList.map(item => (
         <Touchable
           key={item.networkType}
           disabled={item.networkType === currentNetwork || !item.isActive}

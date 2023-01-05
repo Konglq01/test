@@ -9,6 +9,8 @@ import { assetsSlice, AssetsStateType } from '@portkey/store/store-ca/assets/sli
 import { activitySlice, ActivityStateType } from '@portkey/store/store-ca/activity/slice';
 import { walletSlice } from '@portkey/store/store-ca/wallet/slice';
 import { WalletState } from '@portkey/store/store-ca/wallet/type';
+import { GuardiansState } from '@portkey/store/store-ca/guardians/type';
+import { guardiansSlice } from '@portkey/store/store-ca/guardians/slice';
 import { contactSlice, ContactState } from '@portkey/store/store-ca/contact/slice';
 
 export type CACommonState = RootCommonState & {
@@ -19,4 +21,5 @@ export type CACommonState = RootCommonState & {
   [activitySlice.name]: ActivityStateType;
   [walletSlice.name]: WalletState;
   [contactSlice.name]: ContactState;
+  [guardiansSlice.name]: GuardiansState;
 };

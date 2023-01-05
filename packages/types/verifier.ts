@@ -1,3 +1,5 @@
+import { LoginType } from './types-ca/wallet';
+
 export enum VerifyStatus {
   NotVerified = 'NotVerified',
   Verifying = 'Verifying',
@@ -9,17 +11,19 @@ export interface VerifierItem {
   url: string;
 }
 
-// 0: register, 1: community recovery, 2: Add Guardian 3: Set LoginAccount
+// 0: register, 1: community recovery, 2: Add Guardian 3: Set LoginAccount 4: addManager
 export enum VerificationType {
-  register = 0,
-  communityRecovery = 1,
-  addGuardian = 2,
-  setLoginAccount = 3,
+  register,
+  communityRecovery,
+  addGuardian,
+  setLoginAccount,
+  addManager,
+  editGuardianApproval,
 }
 
-export enum LoginType {
-  email = 0,
-  phone = 1,
+export enum ApprovalType {
+  register = 0,
+  addGuardian = 2,
 }
 
 export interface GuardiansInfo {

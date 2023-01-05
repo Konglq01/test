@@ -4,13 +4,14 @@ import PageContainer from 'components/PageContainer';
 import DigitInput, { DigitInputInterface } from 'components/DigitInput';
 import navigationService from 'utils/navigationService';
 import { PIN_SIZE } from '@portkey/constants/misc';
-import { DeviceEventEmitter, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { windowHeight } from '@portkey/utils/mobile/device';
 import { pTd } from 'utils/unit';
 import GStyles from 'assets/theme/GStyles';
 import useRouterParams from '@portkey/hooks/useRouterParams';
 import { checkPin } from 'utils/redux';
 import { PinErrorMessage } from '@portkey/utils/wallet/types';
+import myEvents from 'utils/deviceEvent';
 
 export default function CheckPin() {
   const { openBiometrics } = useRouterParams<{ openBiometrics?: boolean }>();
@@ -33,7 +34,7 @@ export default function CheckPin() {
                 return setErrorMessage(PinErrorMessage.invalidPin);
               }
               if (openBiometrics) {
-                DeviceEventEmitter.emit('openBiometrics', pin);
+                myEvents.openBiometrics.emit(pin);
                 navigationService.goBack();
               } else {
                 navigationService.navigate('SetPin', { oldPin: pin });

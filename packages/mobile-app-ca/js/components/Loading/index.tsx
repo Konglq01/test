@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import Overlay from 'teaset/components/Overlay/Overlay';
-import { View, StyleSheet, Animated } from 'react-native';
+import { View, StyleSheet, Animated, Keyboard } from 'react-native';
 import { TextL } from '../CommonText';
 import { defaultColors } from 'assets/theme';
 import Svg from 'components/Svg';
@@ -45,6 +45,7 @@ function LoadingBody({ text = 'Loading...' }: { text?: string }) {
 
 export default class Loading extends React.Component {
   static show(text?: string, overlayProps?: any, duration = 2000000) {
+    Keyboard.dismiss();
     Loading.hide();
     const overlayView = (
       <Overlay.PopView

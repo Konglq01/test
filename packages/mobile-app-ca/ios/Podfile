@@ -7,7 +7,7 @@ install! 'cocoapods', :deterministic_uuids => false
 
 production = ENV["PRODUCTION"] == "1"
 
-target 'walletAppNew' do
+target 'DID' do
 
   use_expo_modules!
   post_integrate do |installer|
@@ -52,7 +52,7 @@ target 'walletAppNew' do
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.." 
   )
-  target 'walletAppNewTests' do
+  target 'DIDTests' do
     inherit! :complete
     # Pods for testing
   end
@@ -60,5 +60,11 @@ target 'walletAppNew' do
   post_install do |installer|
     react_native_post_install(installer)
     __apply_Xcode_12_5_M1_post_install_workaround(installer)
+    # to deal with xcode14 sign bug 
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+          config.build_settings['CODE_SIGN_IDENTITY'] = ''
+      end
+    end
   end
 end

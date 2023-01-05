@@ -4,14 +4,16 @@ import EmailInput, { EmailInputInstance } from 'pages/RegisterStart/components/E
 import { useTranslation } from 'react-i18next';
 import './index.less';
 import { NetworkItem } from '@portkey/constants/constants-ca/network';
+import { ChainItemType } from '@portkey/store/store-ca/wallet/type';
 
 interface EmailTabProps {
   onSuccess: (email: string) => void;
   currentNetwork: NetworkItem;
   isTermsChecked?: boolean;
+  currentChain?: ChainItemType;
 }
 
-export default function EmailTab({ currentNetwork, onSuccess }: EmailTabProps) {
+export default function EmailTab({ currentNetwork, currentChain, onSuccess }: EmailTabProps) {
   const [error, setError] = useState<string>();
   const [val, setVal] = useState<string>();
   const emailInputInstance = useRef<EmailInputInstance>();
@@ -19,7 +21,7 @@ export default function EmailTab({ currentNetwork, onSuccess }: EmailTabProps) {
 
   const onSignUp = useCallback(async () => {
     try {
-      await emailInputInstance?.current?.validateEmail(val);
+      await emailInputInstance?.current?.validateEmail(val, 'registered');
       val && onSuccess(val);
     } catch (error: any) {
       setError(error);
@@ -30,6 +32,7 @@ export default function EmailTab({ currentNetwork, onSuccess }: EmailTabProps) {
     <div className="email-sign-wrapper">
       <EmailInput
         currentNetwork={currentNetwork}
+        currentChain={currentChain}
         val={val}
         ref={emailInputInstance}
         error={error}
