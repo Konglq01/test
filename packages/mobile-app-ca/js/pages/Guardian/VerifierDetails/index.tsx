@@ -8,7 +8,7 @@ import React, { useCallback, useRef, useState } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import useRouterParams from '@portkey/hooks/useRouterParams';
 import { ApprovalType, VerificationType, VerifyStatus } from '@portkey/types/verifier';
-import GuardianAccountItem, { GuardiansStatusItem } from '../GuardianAccountItem';
+import GuardianAccountItem, { GuardiansStatusItem } from '../components/GuardianAccountItem';
 import { FontStyles } from 'assets/theme/styles';
 import { request } from 'api';
 import Loading from 'components/Loading';
@@ -156,12 +156,11 @@ export default function VerifierDetails() {
         digitInput.current?.resetPin();
       }
     } catch (error) {
+      digitInput.current?.resetPin();
       CommonToast.failError(error, 'Verify Fail');
     }
     Loading.hide();
   }, [guardianItem?.verifier?.url, loginGuardianType, managerUniqueId, setGuardianStatus, verificationType]);
-  console.log(guardianItem, '====verifierItem');
-
   return (
     <PageContainer type="leftBack" titleDom containerStyles={styles.containerStyles}>
       {guardianItem ? <GuardianAccountItem guardianItem={guardianItem} isButtonHide /> : null}

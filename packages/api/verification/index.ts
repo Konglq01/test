@@ -4,6 +4,5 @@ export default {
   checkRegisterVerificationCode: '/api/app/account/register/verifyCode',
   checkRecoveryVerificationCode: '/api/app/account/recovery/verifyCode',
   loginGuardianTypeCheck: '/api/app/account/loginGuardianTypeCheck',
-  getVerifierList: '/api/app/getVerifiers',
   getAccountVerifierList: '',
 } as const;

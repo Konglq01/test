@@ -11,8 +11,9 @@ export const VerifyErrorMessage = {
 };
 
 export const isVerifyApiError = (err: any) => {
-  if (!err?.code) return false;
-  const isError = VerifyErrorMessage[err as keyof typeof VerifyErrorMessage];
+  const code = err?.error?.code || err?.code;
+  if (!code) return false;
+  const isError = VerifyErrorMessage[code as keyof typeof VerifyErrorMessage];
   if (isError) return isError;
   return false;
 };

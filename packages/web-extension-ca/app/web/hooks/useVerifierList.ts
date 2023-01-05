@@ -2,14 +2,22 @@ import { useEffect } from 'react';
 import { useAppDispatch } from 'store/Provider/hooks';
 import { setVerifierListAction } from '@portkey/store/store-ca/guardians/actions';
 import { getVerifierList } from 'utils/sandboxUtil/getVerifierList';
+import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+import { message } from 'antd';
+import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 
 const useVerifierList = () => {
   const dispatch = useAppDispatch();
+  const currentChain = useCurrentChain('AELF');
+  const currentNetwork = useCurrentNetworkInfo();
   useEffect(() => {
+    console.log(currentChain, 'currentChain===');
+    // message.error('Could not find chain information')
+    if (!currentChain) return;
     getVerifierList({
-      rpcUrl: 'http://192.168.67.77:8000',
-      address: '2LUmicHyH4RXrMjG4beDwuDsiWJESyLkgkwPdGTR8kahRzq5XS',
-      chainType: 'aelf',
+      rpcUrl: currentChain.endPoint,
+      address: currentChain.caContractAddress,
+      chainType: currentNetwork.walletType,
     })
       .then((res) => {
         console.log(res, 'getVerifierList===');
@@ -23,7 +31,7 @@ const useVerifierList = () => {
       .catch((err) => {
         console.error(err, 'useVerifierList===error');
       });
-  }, [dispatch]);
+  }, [currentChain, currentNetwork, dispatch]);
 };
 
 export default useVerifierList;

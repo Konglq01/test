@@ -1,11 +1,11 @@
-import { LoginType } from '@portkey/types/verifier';
+import { LoginType } from '@portkey/types/types-ca/wallet';
 
 export interface loginInfo {
   loginGuardianType: string; // account
   accountLoginType: LoginType;
-  createType?: 'register' | 'login';
+  createType?: 'register' | 'login' | 'scan';
   managerUniqueId: string;
-  caHash?: string;
+  walletInfo?: any;
 }
 
 export interface LoginState {

@@ -23,7 +23,7 @@ import Send from 'pages/Send';
 import Transaction from 'pages/Transaction';
 import NFT from 'pages/NFT';
 import Unlock from 'pages/Unlock';
-import BlankPage from 'pages/BlankPage';
+import QueryPage from 'pages/QueryPage';
 
 // TODO delete unnecessary pages
 export const PageRouter = () =>
@@ -145,8 +145,8 @@ export const PageRouter = () =>
       element: <Unlock />,
     },
     {
-      path: 'blank-page',
-      element: <BlankPage />,
+      path: 'query-page',
+      element: <QueryPage />,
     },
     {
       path: '*',

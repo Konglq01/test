@@ -568,7 +568,7 @@
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = DID/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = DID;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -601,7 +601,7 @@
 				DEVELOPMENT_TEAM = LR77E76VJ6;
 				INFOPLIST_FILE = DID/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = DID;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

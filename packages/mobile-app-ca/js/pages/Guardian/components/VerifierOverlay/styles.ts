@@ -25,11 +25,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 26,
   },
-  iconStyle: {
-    height: 36,
-    width: 36,
-    borderRadius: 18,
-  },
 });
 
 export default styles;

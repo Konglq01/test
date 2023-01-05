@@ -11,7 +11,6 @@ import { sendVerificationCode } from '@portkey/api/apiUtils/verification';
 import { VerificationType } from '@portkey/types/verifier';
 import CommonSelect from 'components/CommonSelect1';
 import { useTranslation } from 'react-i18next';
-import { isVerifyApiError } from '@portkey/constants/apiErrorMessage';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
 
 export default function SelectVerifier() {
