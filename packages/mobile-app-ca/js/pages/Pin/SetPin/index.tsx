@@ -11,25 +11,29 @@ import useRouterParams from '@portkey/hooks/useRouterParams';
 import ActionSheet from 'components/ActionSheet';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { usePreventHardwareBack } from '@portkey/hooks/mobile';
-import { ManagerInfo } from '@portkey/types/types-ca/wallet';
+import { CAInfoType, ManagerInfo } from '@portkey/types/types-ca/wallet';
 import { VerificationType } from '@portkey/types/verifier';
 import myEvents from 'utils/deviceEvent';
+import { AElfWallet } from '@portkey/types/aelf';
 
 const MessageMap: any = {
-  0: 'Are you sure you want to leave this page? All changes will not be saved.',
-  1: 'Are you sure you want to leave this page? You will need approval from guardians again',
-  2: 'After returning, you need to scan the code again to authorize login',
+  [VerificationType.register]: 'Are you sure you want to leave this page? All changes will not be saved.',
+  [VerificationType.communityRecovery]:
+    'Are you sure you want to leave this page? You will need approval from guardians again',
+  [VerificationType.addManager]: 'After returning, you need to scan the code again to authorize login',
 };
 const RouterMap: any = {
-  0: 'SelectVerifier',
-  1: 'GuardianApproval',
-  2: 'LoginPortkey',
+  [VerificationType.register]: 'SelectVerifier',
+  [VerificationType.communityRecovery]: 'GuardianApproval',
+  [VerificationType.addManager]: 'LoginPortkey',
 };
 export default function SetPin() {
-  const { oldPin, managerInfo, guardianCount } = useRouterParams<{
+  const { oldPin, managerInfo, guardianCount, caInfo, walletInfo } = useRouterParams<{
     oldPin?: string;
     managerInfo?: ManagerInfo;
     guardianCount?: number;
+    caInfo?: CAInfoType;
+    walletInfo?: AElfWallet;
   }>();
   usePreventHardwareBack();
   const digitInput = useRef<DigitInputInterface>();
@@ -54,6 +58,7 @@ export default function SetPin() {
                 onPress: () => {
                   if (managerInfo.verificationType === VerificationType.communityRecovery)
                     myEvents.setGuardianStatus.emit({ key: 'resetGuardianApproval' });
+                  if (managerInfo.verificationType === VerificationType.addManager) myEvents.clearQRWallet.emit();
                   navigationService.navigate(RouterMap[managerInfo.verificationType]);
                 },
               },
@@ -71,7 +76,7 @@ export default function SetPin() {
           secureTextEntry
           style={styles.pinStyle}
           onFinish={pin => {
-            navigationService.navigate('ConfirmPin', { oldPin, pin, managerInfo, guardianCount });
+            navigationService.navigate('ConfirmPin', { oldPin, pin, managerInfo, guardianCount, walletInfo, caInfo });
           }}
         />
       </View>
