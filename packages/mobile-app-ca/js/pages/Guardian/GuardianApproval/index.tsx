@@ -28,6 +28,7 @@ import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { useCredentials, useGuardiansInfo } from 'hooks/store';
 import { getWallet } from 'utils/redux';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import CommonToast from 'components/CommonToast';
 
 export interface EditGuardianParamsType {
   signature: string;
@@ -183,7 +184,7 @@ export default function GuardianApproval() {
       if (req && !req.error) {
         console.log(req);
       } else {
-        // CommonToast.fail(req?.error.message);
+        CommonToast.failError(req?.error?.message?.Message);
       }
     }
   }, [

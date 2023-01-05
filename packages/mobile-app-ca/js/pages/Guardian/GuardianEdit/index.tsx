@@ -135,6 +135,7 @@ const GuardianEdit: React.FC = () => {
                     isLoginAccount: false,
                     verifier: selectedVerifier,
                     loginGuardianType: email,
+                    guardiansType: LoginType.email,
                   },
                 });
               } else {
