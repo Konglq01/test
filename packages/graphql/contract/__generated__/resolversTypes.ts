@@ -22,6 +22,23 @@ export type CaHolderManagerDto = {
   managers?: Maybe<Array<Maybe<ManagerInfo>>>;
 };
 
+export type CaHolderTokenBalanceDto = {
+  __typename?: 'CAHolderTokenBalanceDto';
+  balance: Scalars['Long'];
+  caAddress?: Maybe<Scalars['String']>;
+  chainId?: Maybe<Scalars['String']>;
+  symbol?: Maybe<Scalars['String']>;
+};
+
+export type CaHolderTransactionAddressDto = {
+  __typename?: 'CAHolderTransactionAddressDto';
+  address?: Maybe<Scalars['String']>;
+  addressChainId?: Maybe<Scalars['String']>;
+  caAddress?: Maybe<Scalars['String']>;
+  chainId?: Maybe<Scalars['String']>;
+  transactionTime: Scalars['Long'];
+};
+
 export type CaHolderTransactionDto = {
   __typename?: 'CAHolderTransactionDto';
   blockHash?: Maybe<Scalars['String']>;
@@ -45,6 +62,21 @@ export type GetCaHolderManagerInfoDto = {
   caHash?: InputMaybe<Scalars['String']>;
   chainId?: InputMaybe<Scalars['String']>;
   manager?: InputMaybe<Scalars['String']>;
+  maxResultCount: Scalars['Int'];
+  skipCount: Scalars['Int'];
+};
+
+export type GetCaHolderTokenBalanceDto = {
+  caAddress?: InputMaybe<Scalars['String']>;
+  chainId?: InputMaybe<Scalars['String']>;
+  maxResultCount: Scalars['Int'];
+  skipCount: Scalars['Int'];
+  symbol?: InputMaybe<Scalars['String']>;
+};
+
+export type GetCaHolderTransactionAddressDto = {
+  caAddress?: InputMaybe<Scalars['String']>;
+  chainId?: InputMaybe<Scalars['String']>;
   maxResultCount: Scalars['Int'];
   skipCount: Scalars['Int'];
 };
@@ -131,7 +163,9 @@ export type NftProtocolInfoDto = {
 export type Query = {
   __typename?: 'Query';
   caHolderManagerInfo?: Maybe<Array<Maybe<CaHolderManagerDto>>>;
+  caHolderTokenBalanceInfo?: Maybe<Array<Maybe<CaHolderTokenBalanceDto>>>;
   caHolderTransaction?: Maybe<Array<Maybe<CaHolderTransactionDto>>>;
+  caHolderTransactionAddressInfo?: Maybe<Array<Maybe<CaHolderTransactionAddressDto>>>;
   loginGuardianTypeInfo?: Maybe<Array<Maybe<LoginGuardianTypeDto>>>;
   nftProtocolInfo?: Maybe<Array<Maybe<NftProtocolInfoDto>>>;
   tokenInfo?: Maybe<Array<Maybe<TokenInfoDto>>>;
@@ -143,8 +177,18 @@ export type QueryCaHolderManagerInfoArgs = {
 };
 
 
+export type QueryCaHolderTokenBalanceInfoArgs = {
+  dto?: InputMaybe<GetCaHolderTokenBalanceDto>;
+};
+
+
 export type QueryCaHolderTransactionArgs = {
   dto?: InputMaybe<GetCaHolderTransactionDto>;
+};
+
+
+export type QueryCaHolderTransactionAddressInfoArgs = {
+  dto?: InputMaybe<GetCaHolderTransactionAddressDto>;
 };
 
 

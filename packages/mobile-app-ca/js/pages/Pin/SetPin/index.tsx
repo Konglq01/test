@@ -3,22 +3,38 @@ import { TextL } from 'components/CommonText';
 import PageContainer from 'components/PageContainer';
 import DigitInput, { DigitInputInterface } from 'components/DigitInput';
 import navigationService from 'utils/navigationService';
-import { DeviceEventEmitter, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { windowHeight } from '@portkey/utils/mobile/device';
 import { pTd } from 'utils/unit';
 import GStyles from 'assets/theme/GStyles';
 import useRouterParams from '@portkey/hooks/useRouterParams';
 import ActionSheet from 'components/ActionSheet';
 import useEffectOnce from 'hooks/useEffectOnce';
-import { RegisterInfo } from '../types';
 import { usePreventHardwareBack } from '@portkey/hooks/mobile';
+import { ManagerInfo } from '@portkey/types/types-ca/wallet';
+import { VerificationType } from '@portkey/types/verifier';
+import myEvents from 'utils/deviceEvent';
 
+const MessageMap: any = {
+  0: 'Are you sure you want to leave this page? All changes will not be saved.',
+  1: 'Are you sure you want to leave this page? You will need approval from guardians again',
+  2: 'After returning, you need to scan the code again to authorize login',
+};
+const RouterMap: any = {
+  0: 'SelectVerifier',
+  1: 'GuardianApproval',
+  2: 'LoginPortkey',
+};
 export default function SetPin() {
-  const { oldPin, registerInfo } = useRouterParams<{ oldPin?: string; registerInfo?: RegisterInfo }>();
+  const { oldPin, managerInfo, guardianCount } = useRouterParams<{
+    oldPin?: string;
+    managerInfo?: ManagerInfo;
+    guardianCount?: number;
+  }>();
   usePreventHardwareBack();
   const digitInput = useRef<DigitInputInterface>();
   useEffectOnce(() => {
-    const listener = DeviceEventEmitter.addListener('clearSetPin', () => digitInput.current?.resetPin());
+    const listener = myEvents.clearSetPin.addListener(() => digitInput.current?.resetPin());
     return () => listener.remove();
   });
   return (
@@ -26,16 +42,25 @@ export default function SetPin() {
       titleDom
       type="leftBack"
       leftCallback={() => {
-        if (!oldPin) {
+        if (!oldPin && managerInfo) {
           ActionSheet.alert({
-            title: ' Confirm return?',
-            message: 'After returning, you need to scan the code again to authorize login',
+            title: 'Leave this page?',
+            message: MessageMap[managerInfo.verificationType],
             buttons: [
               { title: 'No', type: 'outline' },
               // TODO: navigate
-              { title: 'Yes', onPress: () => navigationService.navigate('SelectVerifier') },
+              {
+                title: 'Yes',
+                onPress: () => {
+                  if (managerInfo.verificationType === VerificationType.communityRecovery)
+                    myEvents.setGuardianStatus.emit({ key: 'resetGuardianApproval' });
+                  navigationService.navigate(RouterMap[managerInfo.verificationType]);
+                },
+              },
             ],
           });
+        } else {
+          navigationService.goBack();
         }
       }}>
       <View style={styles.container}>
@@ -46,7 +71,7 @@ export default function SetPin() {
           secureTextEntry
           style={styles.pinStyle}
           onFinish={pin => {
-            navigationService.navigate('ConfirmPin', { oldPin, pin, registerInfo });
+            navigationService.navigate('ConfirmPin', { oldPin, pin, managerInfo, guardianCount });
           }}
         />
       </View>

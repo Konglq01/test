@@ -8,13 +8,14 @@ import { defaultColors } from 'assets/theme';
 import { useNetworkInitialization } from '@portkey/hooks/network';
 import { useAccountListBalanceTimer } from 'contexts/useInterface/hooks';
 import { useLanguage } from 'i18n/hooks';
+import MyMenu from 'components/MyMenu';
 
 const Tab = createBottomTabNavigator();
 
 export const tabMenuList = [
   { name: 'Wallet', label: 'Wallet', index: 0, icon: 'logo-icon', component: DashBoard },
   { name: 'Discover', label: 'Discover', index: 1, icon: 'discover', component: HomeScreen },
-  { name: 'Settings', label: 'Settings', index: 2, icon: 'setting', component: SettingsPage },
+  { name: 'Settings', label: 'My', index: 2, icon: 'my', component: MyMenu },
 ] as const;
 
 type tabMenuIcon = typeof tabMenuList[number]['icon'];

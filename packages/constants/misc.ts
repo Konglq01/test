@@ -26,3 +26,6 @@ export const DIGIT_CODE = {
 };
 // verifier info expiration time (hour)
 export const VERIFIER_EXPIRATION = 1;
+
+// guardian expired time (millisecond)
+export const GUARDIAN_EXPIRED_TIME = 58 * 60 * 1000;
