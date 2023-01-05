@@ -249,12 +249,10 @@ android {
             keyPassword 'android'
         }
         release{
-            if (project.hasProperty('RELEASE_STORE_FILE')) {
-                storeFile file(RELEASE_STORE_FILE)
-                storePassword RELEASE_STORE_PASSWORD
-                keyAlias RELEASE_KEY_ALIAS
-                keyPassword RELEASE_KEY_PASSWORD
-            }
+            storeFile file(project.env.get("RELEASE_STORE_FILE"))
+            storePassword project.env.get("RELEASE_STORE_PASSWORD")
+            keyAlias project.env.get("RELEASE_KEY_ALIAS")
+            keyPassword project.env.get("RELEASE_KEY_PASSWORD")
         }
     }
     buildTypes {
@@ -274,7 +272,6 @@ android {
                 nativeSymbolUploadEnabled true
                 unstrippedNativeLibsDir 'build/intermediates/merged_native_libs/release/out/lib'
             }
-
         }
     }
 
