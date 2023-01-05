@@ -1,10 +1,9 @@
 import React, { useCallback, useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { Image, StyleSheet } from 'react-native';
 import PageContainer from 'components/PageContainer';
 import { TextM, TextS, TextXXXL } from 'components/CommonText';
 import GStyles from 'assets/theme/GStyles';
 import Svg from 'components/Svg';
-import { defaultColors } from 'assets/theme';
 import Touchable from 'components/Touchable';
 import { View } from 'react-native';
 import CommonButton from 'components/CommonButton';
@@ -22,17 +21,19 @@ import { request } from 'api';
 import CommonToast from 'components/CommonToast';
 import Loading from 'components/Loading';
 import { randomId } from '@portkey/utils';
-
-const verifierList = [{ name: 'Portkey' }, { name: 'Binance' }, { name: 'Huobi' }];
+import { useVerifierList } from '@portkey/hooks/hooks-ca/network';
 
 const ScrollViewProps = { disabled: true };
 export default function SelectVerifier() {
   const { t } = useLanguage();
+  const verifierList = useVerifierList();
   const [selectedVerifier, setSelectedVerifier] = useState(verifierList[0]);
-  const { email } = useRouterParams<{ email?: string }>();
+  console.log(selectedVerifier, '====selectedVerifier');
+
+  const { loginGuardianType } = useRouterParams<{ loginGuardianType?: string }>();
   const onConfirm = useCallback(async () => {
     ActionSheet.alert({
-      title2: `Portkey will send a verification code to ${email} to verify your email address.`,
+      title2: `Portkey will send a verification code to ${loginGuardianType} to verify your email address.`,
       buttons: [
         {
           title: t('Cancel'),
@@ -47,18 +48,24 @@ export default function SelectVerifier() {
               // TODO:Confirm
               Loading.show();
               const req = await request.register.sendCode({
-                baseURL: 'http://192.168.66.135:5588/',
+                baseURL: selectedVerifier.url,
                 data: {
                   type: 0,
-                  loginGuardianType: email,
+                  loginGuardianType,
                   managerUniqueId,
                 },
               });
+
               if (req.verifierSessionId) {
                 navigationService.navigate('VerifierDetails', {
-                  loginGuardianType: email,
+                  loginGuardianType,
                   verifierSessionId: req.verifierSessionId,
                   managerUniqueId,
+                  guardianItem: {
+                    isLoginAccount: true,
+                    verifier: selectedVerifier,
+                    loginGuardianType,
+                  },
                 });
               } else {
                 throw new Error('send fail');
@@ -71,13 +78,13 @@ export default function SelectVerifier() {
         },
       ],
     });
-  }, [email, t]);
+  }, [loginGuardianType, selectedVerifier, t]);
   return (
     <PageContainer containerStyles={styles.containerStyles} scrollViewProps={ScrollViewProps} type="leftBack" titleDom>
       <View>
         <TextXXXL style={GStyles.textAlignCenter}>Select verifier</TextXXXL>
         <TextM style={[GStyles.textAlignCenter, FontStyles.font3, GStyles.marginTop(8)]}>
-          The recovery of decentralized accounts requires the protection of verifiers
+          The recovery of decentralized accounts requires approval from your verifiers
         </TextM>
         <ListItem
           onPress={() =>
@@ -87,7 +94,14 @@ export default function SelectVerifier() {
               callBack: setSelectedVerifier,
             })
           }
-          titleLeftElement={<Svg icon="logo-icon" color={defaultColors.primaryColor} size={30} />}
+          titleLeftElement={
+            <Image
+              source={{
+                uri: selectedVerifier.imageUrl,
+              }}
+              style={styles.itemIconStyle}
+            />
+          }
           titleStyle={[GStyles.flexRow, GStyles.itemCenter]}
           titleTextStyle={styles.titleTextStyle}
           style={[styles.selectedItem, BorderStyles.border1]}
@@ -98,8 +112,13 @@ export default function SelectVerifier() {
         <View style={styles.verifierRow}>
           {verifierList.map(item => {
             return (
-              <Touchable key={item.name} onPress={() => setSelectedVerifier(item)}>
-                <Svg icon="logo-icon" color={defaultColors.primaryColor} size={40} />
+              <Touchable style={GStyles.center} key={item.name} onPress={() => setSelectedVerifier(item)}>
+                <Image
+                  source={{
+                    uri: item.imageUrl,
+                  }}
+                  style={styles.iconStyle}
+                />
                 <TextS style={[FontStyles.font3, styles.verifierTitle]}>{item.name}</TextS>
               </Touchable>
             );
@@ -137,5 +156,15 @@ const styles = StyleSheet.create({
   verifierTitle: {
     marginTop: 8,
     textAlign: 'center',
+  },
+  iconStyle: {
+    height: 42,
+    width: 42,
+    borderRadius: 21,
+  },
+  itemIconStyle: {
+    height: 30,
+    width: 30,
+    borderRadius: 15,
   },
 });

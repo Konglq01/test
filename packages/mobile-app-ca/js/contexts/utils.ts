@@ -1,4 +1,4 @@
-import { AElfInterface } from '@portkey/types/aelf';
+import { AElfInterface, AElfWallet } from '@portkey/types/aelf';
 import { getAelfInstance } from '@portkey/utils/aelf';
 import { ContractBasic } from 'utils/contract';
 
@@ -21,7 +21,7 @@ export async function getELFContract({
   rpcUrl?: string;
   contractAddress: string;
   aelfInstance?: AElfInterface;
-  account: { address: string };
+  account: { address: string } | AElfWallet;
 }) {
   let instance = aelfInstance;
   if (rpcUrl) instance = getAelfInstance(rpcUrl);

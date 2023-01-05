@@ -14,7 +14,7 @@ export const NetworkList: NetworkItem[] = [
     walletType: 'aelf',
     networkType: 'TESTNET',
     isActive: true,
-    apiUrl: 'http://192.168.66.135:5577',
+    apiUrl: 'http://192.168.67.35:5577',
   },
   {
     name: 'aelf Mainnet',
@@ -23,6 +23,11 @@ export const NetworkList: NetworkItem[] = [
     apiUrl: '',
   },
 ];
+
+export const CHAIN_GRAPHQL_URL: Record<NetworkType, string> = {
+  ['MAIN']: '',
+  ['TESTNET']: 'http://192.168.66.255:8083/AElfIndexer_DApp/PortKeyIndexerCASchema/graphql',
+};
 
 export const ChainList = [
   {

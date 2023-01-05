@@ -15,7 +15,7 @@ export type VerifierCountdownProps = {
 };
 
 const VerifierCountdown = forwardRef(({ style, onResend }: VerifierCountdownProps, ref) => {
-  const [time, setTime] = useState<number>(60);
+  const [time, setTime] = useState<number>(0);
   const timer = useRef<NodeJS.Timer>();
   const startTimer = useCallback(() => {
     timer.current && clearInterval(timer.current);
@@ -49,7 +49,7 @@ const VerifierCountdown = forwardRef(({ style, onResend }: VerifierCountdownProp
   return (
     <View style={[GStyles.center, style]}>
       {time > 0 ? (
-        <TextM style={styles.resendTip}>Resend in {time}s</TextM>
+        <TextM style={styles.resendTip}>Resend after {time}s</TextM>
       ) : (
         <Touchable onPress={onResend}>
           <TextM style={styles.resendText}>Resend</TextM>

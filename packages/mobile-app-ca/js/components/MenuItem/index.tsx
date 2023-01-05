@@ -1,5 +1,5 @@
 import { defaultColors } from 'assets/theme';
-import { TextM } from 'components/CommonText';
+import { TextL, TextM } from 'components/CommonText';
 import Svg, { IconName } from 'components/Svg';
 import React, { memo } from 'react';
 import { TouchableOpacity, StyleSheet } from 'react-native';
@@ -15,8 +15,8 @@ interface MenuItemProps {
 const MenuItem: React.FC<MenuItemProps> = ({ title, icon, onPress }) => {
   return (
     <TouchableOpacity style={styles.itemWrap} onPress={() => onPress?.()}>
-      {icon && <Svg icon={icon} size={24} iconStyle={styles.menuIcon} />}
-      <TextM style={styles.title}>{title}</TextM>
+      {icon && <Svg icon={icon} size={26} iconStyle={styles.menuIcon} />}
+      <TextL style={styles.title}>{title}</TextL>
       <Svg icon="right-arrow" size={16} color={defaultColors.font7} />
     </TouchableOpacity>
   );
@@ -26,19 +26,19 @@ export default memo(MenuItem);
 
 const styles = StyleSheet.create({
   itemWrap: {
-    marginBottom: pTd(12),
-    height: pTd(56),
+    height: pTd(64),
     backgroundColor: defaultColors.bg1,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    ...gStyles.paddingArg(0, 16),
-    borderRadius: pTd(6),
+    borderBottomColor: defaultColors.border6,
+    borderBottomWidth: 1,
+    paddingHorizontal: pTd(16),
   },
   menuIcon: {
-    borderRadius: pTd(6),
     overflow: 'hidden',
     marginRight: pTd(16),
+    borderRadius: pTd(6),
   },
   title: {
     flex: 1,

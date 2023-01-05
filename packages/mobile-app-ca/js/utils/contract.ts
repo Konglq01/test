@@ -105,7 +105,15 @@ export class AElfContractBasic {
       const req = await contract[functionNameUpper].call(paramsOption);
       if (!req?.error && (req?.result || req?.result === null)) return req.result;
       return req;
-    } catch (e) {
+    } catch (e: any) {
+      if (e?.Error) {
+        return {
+          error: {
+            message: e.Error.Details || e.Error.Message,
+            code: e.Error.Code,
+          },
+        };
+      }
       return { error: e };
     }
   };

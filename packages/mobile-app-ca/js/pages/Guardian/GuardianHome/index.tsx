@@ -47,7 +47,8 @@ export default function GuardianHome() {
               navigationService.navigate('GuardianDetail', { guardian: JSON.stringify(guardian) });
             }}>
             <GuardianAccountItem
-              item={guardian}
+              guardianItem={guardian}
+              isButtonHide
               renderBtn={renderGuardianBtn}
               isBorderHide={idx === userGuardiansList.length - 1}
             />
