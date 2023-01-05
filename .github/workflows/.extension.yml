@@ -15,4 +15,4 @@ jobs:
         run: |
           yarn
           yarn extension:ca pro
-          zip -r public.zip app/public
+          zip -r public.zip ./packages/web-extension-ca/app/public
