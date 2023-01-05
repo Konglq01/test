@@ -46,7 +46,7 @@ export default function ScanLogin() {
       },
     });
     setLoading(false);
-    if (!req?.error) {
+    if (req && !req.error) {
       navigationService.navigate('Tab');
     } else {
       CommonToast.fail(req?.error.message);
