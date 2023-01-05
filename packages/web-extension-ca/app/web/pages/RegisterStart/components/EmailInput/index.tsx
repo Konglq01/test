@@ -8,14 +8,7 @@ import i18n from 'i18n';
 import { NetworkItem } from '@portkey/constants/constants-ca/network';
 import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
 import { ChainItemType } from '@portkey/store/store-ca/wallet/type';
-
-enum EmailError {
-  noEmail = 'Please enter Email address',
-  invalidEmail = 'Invalid email address',
-  alreadyRegistered = 'This address is already registered',
-  noAccount = 'Failed to log in with this email. Please use your login account.',
-}
-
+import { checkEmail, EmailError } from '@portkey/utils/check';
 interface EmailInputProps {
   currentNetwork: NetworkItem;
   currentChain?: ChainItemType;
@@ -35,8 +28,8 @@ const EmailInput = forwardRef(
 
     const validateEmail = useCallback(
       async (email?: string, type?: 'login' | 'registered') => {
-        if (!email) throw i18n.t(EmailError.noEmail);
-        if (!EmailReg.test(email)) throw i18n.t(EmailError.invalidEmail);
+        const checkError = checkEmail(email);
+        if (checkError) throw i18n.t(checkError);
         if (!currentChain) throw 'Could not find chain information';
         let isHasAccount = false;
         try {
@@ -45,7 +38,7 @@ const EmailInput = forwardRef(
             address: currentChain.caContractAddress,
             chainType: currentNetwork.walletType,
             paramsOption: {
-              loginGuardianType: email,
+              loginGuardianType: email as string,
             },
           });
           if (checkResult.result.guardiansInfo?.guardians?.length > 0) {

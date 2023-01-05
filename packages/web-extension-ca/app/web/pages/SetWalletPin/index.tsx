@@ -21,7 +21,7 @@ import { isWalletError } from '@portkey/store/wallet/utils';
 export default function SetWalletPin() {
   const [form] = Form.useForm();
   const { t } = useTranslation();
-  const { state } = useLocationState<'login' | 'register'>();
+  const { state } = useLocationState<'login' | 'register' | 'scan'>();
   // const { state } = useLocation();
   const currentNetwork = useCurrentNetworkInfo();
 
@@ -55,10 +55,38 @@ export default function SetWalletPin() {
     [currentNetwork.apiUrl, loginAccount, state],
   );
 
+  const createByScan = useCallback(
+    (pin: string) => {
+      const scanWallet = loginAccount?.walletInfo;
+      if (!scanWallet?.address) throw 'Wallet information is wrong, please go back to scan the code and try again';
+      // const managerInfo = {
+      //   managerUniqueId: loginAccount?.managerUniqueId || sessionId,
+      //   loginGuardianType: loginAccount?.loginGuardianType,
+      //   type: loginAccount.accountLoginType,
+      // };
+      // !walletInfo.address
+      //   ? dispatch(
+      //       createWallet({
+      //         walletInfo: scanWallet,
+      //         pin,
+      //         managerInfo,
+      //       }),
+      //     )
+      //   : dispatch(
+      //       setManagerInfo({
+      //         pin,
+      //         managerInfo,
+      //       }),
+      //     );
+    },
+    [dispatch, loginAccount, walletInfo.address],
+  );
+
   const onCreate = useCallback(
     async (values: any) => {
       try {
         const { pin } = values;
+        if (state === 'scan') return createByScan(pin);
         console.log(pin, walletInfo, 'onCreate==');
         if (!loginAccount?.loginGuardianType || (!loginAccount.accountLoginType && loginAccount.accountLoginType !== 0))
           return message.error('Missing account!!! Please login/register again');
@@ -114,15 +142,16 @@ export default function SetWalletPin() {
       setLoading(false);
     },
     [
-      createAndGetSessionId,
-      currentNetwork.apiUrl,
-      dispatch,
-      fetchWalletResult,
-      loginAccount,
-      navigate,
-      setLoading,
       state,
       walletInfo,
+      loginAccount,
+      currentNetwork.apiUrl,
+      navigate,
+      dispatch,
+      setLoading,
+      createByScan,
+      fetchWalletResult,
+      createAndGetSessionId,
     ],
   );
 

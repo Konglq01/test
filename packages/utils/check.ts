@@ -3,6 +3,7 @@ export enum EmailError {
   noEmail = 'Please enter Email address',
   invalidEmail = 'Invalid email address',
   alreadyRegistered = 'This address is already registered',
+  noAccount = 'Failed to log in with this email. Please use your login account.',
 }
 
 export function checkEmail(email?: string) {
