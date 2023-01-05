@@ -10,7 +10,7 @@ import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { useCurrentWalletInfoByScan } from '@portkey/hooks/hooks-ca/useCurrentWalletInfoByScan';
 import './index.less';
 import { useAppDispatch, useLoading } from 'store/Provider/hooks';
-import { setLoginAccountAction } from '@portkey/store/store-ca/login/actions';
+import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
 
 export default function ScanCard() {
   const navigate = useNavigate();

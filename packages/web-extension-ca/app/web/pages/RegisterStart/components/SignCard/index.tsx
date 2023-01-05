@@ -1,4 +1,4 @@
-import { setLoginAccountAction } from '@portkey/store/store-ca/login/actions';
+import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
 import { resetVerifierState } from '@portkey/store/store-ca/guardians/actions';
 import CustomSvg from 'components/CustomSvg';
 import { useCallback } from 'react';

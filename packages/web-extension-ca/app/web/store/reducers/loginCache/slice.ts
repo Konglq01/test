@@ -5,10 +5,10 @@ import { LoginState } from './type';
 
 const initialState: LoginState = {};
 export const loginSlice = createSlice({
-  name: 'login',
+  name: 'loginCache',
   initialState,
   reducers: {},
-  extraReducers: builder => {
+  extraReducers: (builder) => {
     builder
       .addCase(setLoginAccountAction, (state, action) => {
         state.loginAccount = { ...action.payload, managerUniqueId: randomId() };
