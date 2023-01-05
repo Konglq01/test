@@ -4,18 +4,18 @@ import * as React from 'react';
 import { Button, Text } from '@rneui/base';
 import { ScrollView } from 'react-native-gesture-handler';
 import navigationService from '../../utils/navigationService';
-import { useAppDispatch, useAppSelector } from 'store/hooks';
+import { useAppDispatch } from 'store/hooks';
 import SafeAreaBox from 'components/SafeAreaBox';
 import ActionSheet from 'components/ActionSheet';
 import useLogOut from 'hooks/useLogOut';
 import { useTokenContract } from 'contexts/useInterface/hooks';
-import { setCAInfo } from '@portkey/store/store-ca/wallet/actions';
 import { useCurrentWallet, useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { CrashTest } from 'Test/CrashTest';
-import { useUser } from 'hooks/store';
 import Loading from 'components/Loading';
 import { queryFailAlert } from 'utils/login';
-
+import { contractQueries } from '@portkey/graphql/index';
+import { DefaultChainId } from '@portkey/constants/constants-ca/network';
+import { useIntervalQueryManagerInfo } from '@portkey/hooks/hooks-ca/graphql';
 export default function HomeScreen() {
   const navigation = useNavigation<RootNavigationProp>();
   const onLogOut = useLogOut();
@@ -23,9 +23,8 @@ export default function HomeScreen() {
   const dispatch = useAppDispatch();
   const wallet = useCurrentWalletInfo();
   const { currentNetwork } = useCurrentWallet();
-  const stateWallet = useAppSelector(state => state.wallet);
-  const user = useUser();
-  console.log(user, currentNetwork, wallet, stateWallet, '====wallet-HomeScreen');
+  const caInfo = useIntervalQueryManagerInfo(currentNetwork, wallet.address);
+  console.log(caInfo, '======caInfo');
 
   return (
     <SafeAreaBox>
@@ -64,6 +63,20 @@ export default function HomeScreen() {
         <Button
           title="reset"
           onPress={() => navigationService.reset([{ name: 'LoginPortkey' }, { name: 'SignupPortkey' }])}
+        />
+        <Button
+          title="getCAHolderByManager"
+          onPress={async () => {
+            try {
+              const { caHolderManagerInfo } = await contractQueries.getCAHolderByManager('TESTNET', {
+                chainId: DefaultChainId,
+                manager: wallet.address,
+              });
+              console.log(caHolderManagerInfo, '=====caHolderManagerInfo');
+            } catch (error) {
+              console.log(error, '=====error');
+            }
+          }}
         />
         <CrashTest />
       </ScrollView>

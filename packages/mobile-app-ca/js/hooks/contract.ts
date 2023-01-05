@@ -8,8 +8,6 @@ import { getDefaultWallet } from 'utils/aelfUtils';
 
 export function useCurrentCAContract(chainId: ChainId = 'AELF') {
   const chainInfo = useCurrentChain(chainId);
-  console.log(chainInfo, '====chainInfo');
-
   const [{ viewContracts }, dispatch] = useInterface();
   const getCAContract = useCallback(async () => {
     if (!chainInfo) return;
