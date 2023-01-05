@@ -62,7 +62,7 @@ export function useOnManagerAddressAndQueryResult() {
         if (walletInfo?.address) {
           dispatch(setManagerInfo({ managerInfo, pin: confirmPin }));
         } else {
-          dispatch(createWallet({ walletInfo: tmpWalletInfo, managerInfo: managerInfo, pin: confirmPin }));
+          dispatch(createWallet({ walletInfo: tmpWalletInfo, caInfo: { managerInfo }, pin: confirmPin }));
         }
         if (biometricsReady) {
           Loading.hide();

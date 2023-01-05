@@ -9,7 +9,7 @@ import { pageStyles } from './style';
 import { useLanguage } from 'i18n/hooks';
 import { useGuardianList } from 'hooks/useGuardianList';
 import { useGuardiansInfo } from 'hooks/store';
-import GuardianAccountItem from '../GuardianAccountItem';
+import GuardianAccountItem from '../components/GuardianAccountItem';
 import useVerifierList from 'hooks/useVerifierList';
 import Touchable from 'components/Touchable';
 

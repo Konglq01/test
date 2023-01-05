@@ -9,17 +9,18 @@ export interface VerifierItem {
   url: string;
 }
 
-// 0: register, 1: community recovery, 2: Add Guardian 3: Set LoginAccount
+// 0: register, 1: community recovery, 2: Add Guardian 3: Set LoginAccount 4: addManager
 export enum VerificationType {
-  register = 0,
-  communityRecovery = 1,
-  addGuardian = 2,
-  setLoginAccount = 3,
+  register,
+  communityRecovery,
+  addGuardian,
+  setLoginAccount,
+  addManager,
 }
 
 export enum LoginType {
-  email = 0,
-  phone = 1,
+  email,
+  phone,
 }
 
 export interface GuardiansInfo {

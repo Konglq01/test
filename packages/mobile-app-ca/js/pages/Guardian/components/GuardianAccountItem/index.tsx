@@ -16,6 +16,9 @@ import { sleep } from '@portkey/utils';
 import { VerificationType, VerifyStatus } from '@portkey/types/verifier';
 import { BGStyles, FontStyles } from 'assets/theme/styles';
 import { isIOS } from '@rneui/base';
+import { LoginGuardianTypeIcon } from 'constants/misc';
+import { LoginType } from '@portkey/types/types-ca/wallet';
+import { VerifierImage } from '../VerifierImage';
 
 export type GuardiansStatusItem = {
   status: VerifyStatus;
@@ -44,7 +47,10 @@ function GuardianItemButton({
   guardiansStatus,
   setGuardianStatus,
   isExpired,
-}: GuardianAccountItemProps) {
+  disabled,
+}: GuardianAccountItemProps & {
+  disabled?: boolean;
+}) {
   const itemStatus = useMemo(() => guardiansStatus?.[guardianItem.key], [guardianItem.key, guardiansStatus]);
 
   const { status, verifierSessionId } = itemStatus || {};
@@ -134,6 +140,7 @@ function GuardianItemButton({
   return (
     <CommonButton
       type="primary"
+      disabled={disabled}
       {...buttonProps}
       titleStyle={[styles.titleStyle, fonts.mediumFont, buttonProps.titleStyle]}
       buttonStyle={[styles.buttonStyle, buttonProps.buttonStyle]}
@@ -152,27 +159,30 @@ export default function GuardianAccountItem({
   isExpired,
   isSuccess,
 }: GuardianAccountItemProps) {
+  console.log(guardianItem, '=====guardianItem');
   const itemStatus = useMemo(() => guardiansStatus?.[guardianItem.key], [guardianItem.key, guardiansStatus]);
+  const disabled = isSuccess && !itemStatus;
   return (
-    <View style={[styles.itemRow, isBorderHide && styles.itemWithoutBorder]}>
+    <View style={[styles.itemRow, isBorderHide && styles.itemWithoutBorder, disabled && styles.disabledStyle]}>
       {guardianItem.isLoginAccount && (
         <View style={styles.typeTextRow}>
           <Text style={styles.typeText}>Login Account</Text>
         </View>
       )}
       <View style={[GStyles.flexRow, GStyles.itemCenter, GStyles.flex1]}>
-        <Svg icon="logo-icon" color={defaultColors.primaryColor} size={pTd(32)} />
-        <Svg iconStyle={styles.iconStyle} icon="logo-icon" color={defaultColors.primaryColor} size={pTd(32)} />
+        <Svg icon={LoginGuardianTypeIcon[guardianItem.guardiansType as LoginType] as any} size={pTd(32)} />
+        <VerifierImage size={pTd(32)} uri={guardianItem.verifier?.imageUrl} style={styles.iconStyle} />
         <TextM numberOfLines={1} style={[styles.nameStyle, GStyles.flex1]}>
           {guardianItem.loginGuardianType}
         </TextM>
       </View>
       {!isButtonHide && (
         <GuardianItemButton
+          disabled={disabled}
           isExpired={isExpired}
           guardianItem={guardianItem}
-          managerUniqueId={managerUniqueId}
           guardiansStatus={guardiansStatus}
+          managerUniqueId={managerUniqueId}
           setGuardianStatus={setGuardianStatus}
         />
       )}
@@ -227,5 +237,11 @@ const styles = StyleSheet.create({
   confirmedButtonStyle: {
     opacity: 1,
     backgroundColor: 'transparent',
+  },
+  verifierStyle: {
+    marginLeft: pTd(-6),
+  },
+  disabledStyle: {
+    opacity: 0.4,
   },
 });

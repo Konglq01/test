@@ -29,6 +29,7 @@ export function handleUserGuardiansList(holderInfo: any, verifierServers: Verifi
     return {
       ...item,
       loginGuardianType: item.guardianType.guardianType,
+      // TODO: guardiansType
       guardiansType: 0,
       key: `${item.guardianType.guardianType}&${item.verifier.name}`,
       verifier: verifierServers.find(verifier => verifier.name === item.verifier.name),
