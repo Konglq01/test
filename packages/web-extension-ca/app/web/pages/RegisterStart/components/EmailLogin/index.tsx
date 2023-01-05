@@ -1,4 +1,4 @@
-import { setLoginAccountAction } from '@portkey/store/store-ca/login/actions';
+import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
 import { resetVerifierState } from '@portkey/store/store-ca/guardians/actions';
 import { Button, message } from 'antd';
 import EmailInput, { EmailInputInstance } from 'pages/RegisterStart/components/EmailInput';

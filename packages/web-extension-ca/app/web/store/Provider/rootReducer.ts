@@ -1,5 +1,5 @@
 import { walletSlice } from '@portkey/store/store-ca/wallet/slice';
-import { loginSlice } from '@portkey/store/store-ca/login/slice';
+import { loginSlice } from 'store/reducers/loginCache/slice';
 import { contactSlice } from '@portkey/store/store-ca/contact/slice';
 import userReducer, { userSlice } from 'store/reducers/user/slice';
 import tokenBalanceSlice from '@portkey/store/tokenBalance/slice';
