@@ -15,6 +15,12 @@ export enum VerificationType {
   communityRecovery = 1,
   addGuardian = 2,
   setLoginAccount = 3,
+  editGuardianApproval = 4,
+}
+
+export enum ApprovalType {
+  register = 0,
+  addGuardian = 2,
 }
 
 export enum LoginType {

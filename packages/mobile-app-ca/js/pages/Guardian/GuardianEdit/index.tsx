@@ -15,7 +15,7 @@ import CommonInput from 'components/CommonInput';
 import { checkEmail } from '@portkey/utils/check';
 import { useGuardiansInfo } from 'hooks/store';
 import { LOGIN_TYPE_LIST } from '@portkey/constants/verifier';
-import { LoginType, VerifierItem } from '@portkey/types/verifier';
+import { LoginType, VerificationType, VerifierItem } from '@portkey/types/verifier';
 import { INIT_HAS_ERROR, INIT_NONE_ERROR } from 'constants/common';
 import GuardianTypeSelectOverlay from '../components/GuardianTypeSelectOverlay';
 import VerifierSelectOverlay from '../components/VerifierSelectOverlay';
@@ -23,19 +23,21 @@ import ActionSheet from 'components/ActionSheet';
 import { ErrorType } from 'types/common';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import { FontStyles } from 'assets/theme/styles';
+import { request } from 'api';
+import { randomId } from '@portkey/utils';
+import Loading from 'components/Loading';
+import CommonToast from 'components/CommonToast';
+import useRouterParams from '@portkey/hooks/useRouterParams';
 
-interface GuardianEditProps {
-  route?: any;
-}
+type RouterParams = {
+  guardian?: UserGuardianItem;
+  isEdit?: boolean;
+};
 
-const GuardianEdit: React.FC<GuardianEditProps> = ({ route }) => {
+const GuardianEdit: React.FC = () => {
   const { t } = useLanguage();
-  const { params } = route;
-  const editGuardian = useMemo<UserGuardianItem | undefined>(
-    () => (params?.guardian ? JSON.parse(params.guardian) : undefined),
-    [params],
-  );
-  const isEdit = useMemo(() => editGuardian !== undefined, [editGuardian]);
+
+  const { guardian: editGuardian, isEdit = false } = useRouterParams<RouterParams>();
 
   const { verifierMap, userGuardiansList } = useGuardiansInfo();
   const verifierList = useMemo(() => (verifierMap ? Object.values(verifierMap) : []), [verifierMap]);
@@ -47,12 +49,12 @@ const GuardianEdit: React.FC<GuardianEditProps> = ({ route }) => {
   const [guardianError, setGuardianError] = useState<ErrorType>({ ...INIT_NONE_ERROR });
 
   useEffect(() => {
-    if (isEdit) {
+    if (editGuardian) {
       setSelectedType(LOGIN_TYPE_LIST.find(item => item.value === editGuardian?.guardiansType));
       setEmail(editGuardian?.loginGuardianType);
       setSelectedVerifier(verifierList.find(item => item.name === editGuardian?.verifier?.name));
     }
-  }, [editGuardian, isEdit, verifierList]);
+  }, [editGuardian, verifierList]);
 
   const onEmailTextChange = useCallback(
     (value: string) => {
@@ -77,7 +79,7 @@ const GuardianEdit: React.FC<GuardianEditProps> = ({ route }) => {
         guardian =>
           guardian.guardiansType === selectedType?.value &&
           guardian.loginGuardianType === email &&
-          guardian.verifier?.id === selectedVerifier?.id,
+          guardian.verifier?.url === selectedVerifier?.url,
       ) !== -1
     ) {
       return { ...INIT_HAS_ERROR, errorMsg: t('This guardians is already exists') };
@@ -99,6 +101,7 @@ const GuardianEdit: React.FC<GuardianEditProps> = ({ route }) => {
     const _guardianError = checkCurGuardianRepeat();
     setGuardianError(_guardianError);
     if (_guardianError.isError) return;
+    if (selectedVerifier === undefined || selectedType === undefined) return;
 
     ActionSheet.alert({
       title2: `Portkey will send a verification code to ${email} to verify your email address.`,
@@ -109,14 +112,42 @@ const GuardianEdit: React.FC<GuardianEditProps> = ({ route }) => {
         },
         {
           title: t('Confirm'),
-          onPress: () => {
-            // TODO:Confirm
-            navigationService.navigate('VerifierDetails', { email });
+          onPress: async () => {
+            try {
+              const managerUniqueId = randomId();
+              Loading.show();
+              const req = await request.verification.sendCode({
+                baseURL: selectedVerifier.url,
+                data: {
+                  type: selectedType.value,
+                  loginGuardianType: email,
+                  managerUniqueId,
+                },
+              });
+              if (req.verifierSessionId) {
+                navigationService.navigate('VerifierDetails', {
+                  loginGuardianType: email,
+                  verifierSessionId: req.verifierSessionId,
+                  managerUniqueId,
+                  verificationType: VerificationType.addGuardian,
+                  guardianItem: {
+                    isLoginAccount: false,
+                    verifier: selectedVerifier,
+                    loginGuardianType: email,
+                  },
+                });
+              } else {
+                throw new Error('send fail');
+              }
+            } catch (error) {
+              CommonToast.failError(error);
+            }
+            Loading.hide();
           },
         },
       ],
     });
-  }, [checkCurGuardianRepeat, email, t]);
+  }, [checkCurGuardianRepeat, email, selectedType, selectedVerifier, t]);
 
   const onApproval = useCallback(() => {
     const _guardianError = checkCurGuardianRepeat();
@@ -152,7 +183,7 @@ const GuardianEdit: React.FC<GuardianEditProps> = ({ route }) => {
   );
 
   const isApprovalDisable = useMemo(
-    () => selectedVerifier?.id === editGuardian?.verifier?.id,
+    () => selectedVerifier?.url === editGuardian?.verifier?.url,
     [editGuardian, selectedVerifier],
   );
 
@@ -160,6 +191,7 @@ const GuardianEdit: React.FC<GuardianEditProps> = ({ route }) => {
     <PageContainer
       safeAreaColor={['blue', 'gray']}
       titleDom={isEdit ? t('guardians') : t('Add Guardians')}
+      leftCallback={() => navigationService.navigate('GuardianHome')}
       containerStyles={pageStyles.pageWrap}
       scrollViewProps={{ disabled: true }}>
       <View style={pageStyles.contentWrap}>
@@ -203,7 +235,7 @@ const GuardianEdit: React.FC<GuardianEditProps> = ({ route }) => {
         <ListItem
           onPress={() => {
             VerifierSelectOverlay.showList({
-              id: selectedVerifier?.id,
+              url: selectedVerifier?.url,
               labelAttrName: 'name',
               list: verifierList,
               callBack: onSelectedVerifier,

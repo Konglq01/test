@@ -13,13 +13,16 @@ import Loading from 'components/Loading';
 import { request } from 'api';
 import CommonToast from 'components/CommonToast';
 import { sleep } from '@portkey/utils';
-import { VerificationType, VerifyStatus } from '@portkey/types/verifier';
+import { ApprovalType, VerificationType, VerifyStatus } from '@portkey/types/verifier';
 import { BGStyles, FontStyles } from 'assets/theme/styles';
 import { isIOS } from '@rneui/base';
+import { API_REQ_FUNCTION } from 'api/types';
+import { EditGuardianParamsType } from '../GuardianApproval';
 
 export type GuardiansStatusItem = {
   status: VerifyStatus;
   verifierSessionId: string;
+  editGuardianParams?: EditGuardianParamsType;
 };
 
 export type GuardiansStatus = {
@@ -36,6 +39,7 @@ interface GuardianAccountItemProps {
   setGuardianStatus?: (key: string, status: GuardiansStatusItem) => void;
   isExpired?: boolean;
   isSuccess?: boolean;
+  approvalType?: ApprovalType;
 }
 
 function GuardianItemButton({
@@ -44,6 +48,7 @@ function GuardianItemButton({
   guardiansStatus,
   setGuardianStatus,
   isExpired,
+  approvalType,
 }: GuardianAccountItemProps) {
   const itemStatus = useMemo(() => guardiansStatus?.[guardianItem.key], [guardianItem.key, guardiansStatus]);
 
@@ -57,7 +62,14 @@ function GuardianItemButton({
   const onSendCode = useCallback(async () => {
     Loading.show();
     try {
-      const req = await request.recovery.sendCode({
+      let fetch: Record<string, API_REQ_FUNCTION> = request.recovery;
+      let _verificationType = VerificationType.communityRecovery;
+      if (approvalType === ApprovalType.addGuardian) {
+        _verificationType = VerificationType.editGuardianApproval;
+        fetch = request.verification;
+      }
+
+      const req = await fetch.sendCode({
         baseURL: guardianItem.verifier?.url,
         data: {
           type: 0,
@@ -72,12 +84,13 @@ function GuardianItemButton({
           verifierSessionId: req.verifierSessionId,
           status: VerifyStatus.Verifying,
         });
-        navigationService.navigate('VerifierDetails', {
+
+        navigationService.push('VerifierDetails', {
           guardianItem,
           verifierSessionId: req.verifierSessionId,
           managerUniqueId,
           loginGuardianType: guardianItem.loginGuardianType,
-          verificationType: VerificationType.communityRecovery,
+          verificationType: _verificationType,
           guardianKey: guardianItem.key,
         });
       } else {
@@ -89,18 +102,23 @@ function GuardianItemButton({
       CommonToast.failError(error);
     }
     Loading.hide();
-  }, [guardianItem, managerUniqueId, onSetGuardianStatus]);
+  }, [approvalType, guardianItem, managerUniqueId, onSetGuardianStatus]);
   const onVerifier = useCallback(() => {
+    let _verificationType = VerificationType.communityRecovery;
+    if (approvalType === ApprovalType.addGuardian) {
+      _verificationType = VerificationType.editGuardianApproval;
+    }
+
     navigationService.navigate('VerifierDetails', {
       guardianItem,
       verifierSessionId,
       loginGuardianType: guardianItem.loginGuardianType,
       managerUniqueId,
       startResend: true,
-      verificationType: VerificationType.communityRecovery,
+      verificationType: _verificationType,
       guardianKey: guardianItem.key,
     });
-  }, [guardianItem, managerUniqueId, verifierSessionId]);
+  }, [approvalType, guardianItem, managerUniqueId, verifierSessionId]);
   const buttonProps: CommonButtonProps = useMemo(() => {
     if (!status || status === VerifyStatus.NotVerified) {
       if (isExpired)
@@ -151,6 +169,7 @@ export default function GuardianAccountItem({
   setGuardianStatus,
   isExpired,
   isSuccess,
+  approvalType = ApprovalType.register,
 }: GuardianAccountItemProps) {
   const itemStatus = useMemo(() => guardiansStatus?.[guardianItem.key], [guardianItem.key, guardiansStatus]);
   return (
@@ -174,6 +193,7 @@ export default function GuardianAccountItem({
           managerUniqueId={managerUniqueId}
           guardiansStatus={guardiansStatus}
           setGuardianStatus={setGuardianStatus}
+          approvalType={approvalType}
         />
       )}
       {renderBtn && renderBtn(guardianItem)}
