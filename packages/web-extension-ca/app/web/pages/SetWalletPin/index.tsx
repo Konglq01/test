@@ -13,10 +13,10 @@ import useLocationState from 'hooks/useLocationState';
 import { useTranslation } from 'react-i18next';
 import { createWalletInfo } from '@portkey/api/apiUtils/wallet';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import AElf from 'aelf-sdk';
 import { VerificationType } from '@portkey/types/verifier';
-import './index.less';
 import { isWalletError } from '@portkey/store/wallet/utils';
+import AElf from 'aelf-sdk';
+import './index.less';
 
 export default function SetWalletPin() {
   const [form] = Form.useForm();
@@ -87,7 +87,7 @@ export default function SetWalletPin() {
       try {
         const { pin } = values;
         if (state === 'scan') return createByScan(pin);
-        console.log(pin, walletInfo, 'onCreate==');
+        console.log(pin, walletInfo, loginAccount, 'onCreate==');
         if (!loginAccount?.loginGuardianType || (!loginAccount.accountLoginType && loginAccount.accountLoginType !== 0))
           return message.error('Missing account!!! Please login/register again');
         setLoading(true);
@@ -106,7 +106,7 @@ export default function SetWalletPin() {
               createWallet({
                 walletInfo: _walletInfo,
                 pin,
-                managerInfo,
+                caInfo: { managerInfo },
               }),
             )
           : dispatch(

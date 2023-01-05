@@ -4,7 +4,7 @@ import { Button, message } from 'antd';
 import { useCallback, useEffect, useState } from 'react';
 import { useAppDispatch, useCommonState, useLoading } from 'store/Provider/hooks';
 import { PasscodeInput } from 'antd-mobile';
-import { loginInfo } from '@portkey/store/store-ca/login/type';
+import { loginInfo } from 'store/reducers/loginCache/type';
 import { VerificationType } from '@portkey/types/verifier';
 import { DIGIT_CODE } from '@portkey/constants/misc';
 import clsx from 'clsx';
