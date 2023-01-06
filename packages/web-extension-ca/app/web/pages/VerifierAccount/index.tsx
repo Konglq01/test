@@ -10,15 +10,26 @@ import PortKeyTitle from 'pages/components/PortKeyTitle';
 import clsx from 'clsx';
 import SettingHeader from 'pages/components/SettingHeader';
 import useLocationState from 'hooks/useLocationState';
+import getPrivateKeyAndMnemonic from 'utils/Wallet/getPrivateKeyAndMnemonic';
+import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { setGuardianTypeForLogin } from 'utils/sandboxUtil/setLoginAccount';
+import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
+import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+import { resetLoginInfoAction } from 'store/reducers/loginCache/actions';
 
 export default function VerifierAccount() {
   const { loginAccount } = useLoginInfo();
   const { currentGuardian, userGuardianStatus } = useGuardiansInfo();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { state } = useLocationState<'register' | 'login' | 'guardians/add' | 'guardians/edit'>();
+  const { state } = useLocationState<
+    'register' | 'login' | 'guardians/add' | 'guardians/edit' | 'guardians/setLoginAccount'
+  >();
   const { isPrompt } = useCommonState();
+  const { walletInfo } = useCurrentWallet();
   console.log(userGuardianStatus, 'userGuardianStatus===');
+  const currentNetwork = useCurrentNetworkInfo();
+  const currentChain = useCurrentChain();
   const verificationType = useMemo(() => {
     switch (state) {
       case 'register':
@@ -37,7 +48,7 @@ export default function VerifierAccount() {
   console.log(state, 'location==');
 
   const onSuccess = useCallback(
-    (res: Record<string, string>) => {
+    async (res: Record<string, string>) => {
       if (state === 'register') {
         navigate('/register/set-pin', { state: 'register' });
       } else if (state == 'login') {
@@ -49,6 +60,32 @@ export default function VerifierAccount() {
           }),
         );
         navigate('/login/guardian-approval');
+      } else if (state === 'guardians/setLoginAccount') {
+        const res = await getPrivateKeyAndMnemonic(
+          {
+            AESEncryptPrivateKey: walletInfo.AESEncryptPrivateKey,
+          },
+          '11111111',
+        );
+        if (!currentChain?.endPoint || !res?.privateKey) return message.error('error');
+        const seed = await setGuardianTypeForLogin({
+          rpcUrl: currentChain.endPoint,
+          chainType: currentNetwork.walletType,
+          address: currentChain.caContractAddress,
+          privateKey: res.privateKey,
+          paramsOption: [
+            {
+              caHash: walletInfo?.AELF?.caHash,
+              guardianType: {
+                type: currentGuardian?.guardiansType,
+                guardianType: currentGuardian?.loginGuardianType,
+              },
+            },
+          ],
+        });
+        console.log('------------setGuardianTypeForLogin------------', seed);
+        dispatch(resetLoginInfoAction());
+        navigate('/setting/guardians');
       } else if (state?.indexOf('guardians') !== -1) {
         if (!currentGuardian) return;
         dispatch(
@@ -64,7 +101,17 @@ export default function VerifierAccount() {
         message.error('Router state error');
       }
     },
-    [dispatch, navigate, state, currentGuardian],
+    [
+      state,
+      navigate,
+      currentGuardian,
+      dispatch,
+      walletInfo.AESEncryptPrivateKey,
+      walletInfo?.AELF?.caHash,
+      currentChain?.endPoint,
+      currentChain?.caContractAddress,
+      currentNetwork.walletType,
+    ],
   );
 
   return (

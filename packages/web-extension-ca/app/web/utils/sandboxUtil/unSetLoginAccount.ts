@@ -2,7 +2,7 @@ import { ChainType } from '@portkey/types';
 import SandboxEventTypes from 'messages/SandboxEventTypes';
 import SandboxEventService, { SandboxErrorCode } from 'service/SandboxEventService';
 
-export const setGuardianTypeForLogin = async ({
+export const unsetGuardianTypeForLogin = async ({
   rpcUrl,
   chainType,
   address, // contract address
@@ -20,13 +20,13 @@ export const setGuardianTypeForLogin = async ({
     address,
     privateKey,
     chainType,
-    methodName: 'SetGuardianTypeForLogin',
+    methodName: 'UnsetGuardianTypeForLogin',
     paramsOption,
   });
 
   if (resMessage.code === SandboxErrorCode.error) throw resMessage.message;
   const info = resMessage.message;
-  console.log(resMessage, 'setGuardianTypeForLogin===');
+  console.log(resMessage, 'unsetGuardianTypeForLogin===');
   return {
     code: resMessage.code,
     result: {

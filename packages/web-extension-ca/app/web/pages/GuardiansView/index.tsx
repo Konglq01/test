@@ -3,16 +3,23 @@ import CommonModal from 'components/CommonModal';
 import { useNavigate } from 'react-router';
 import CustomSvg from 'components/CustomSvg';
 import SettingHeader from 'pages/components/SettingHeader';
-import { useGuardiansInfo, useLoginInfo } from 'store/Provider/hooks';
-import { useCallback, useState } from 'react';
+import { useAppDispatch, useGuardiansInfo, useLoading, useLoginInfo } from 'store/Provider/hooks';
+import { useState } from 'react';
 import { sendVerificationCode } from '@portkey/api/apiUtils/verification';
 import { VerificationType } from '@portkey/types/verifier';
 import { useTranslation } from 'react-i18next';
-
+import { unsetGuardianTypeForLogin } from 'utils/sandboxUtil/unSetLoginAccount';
 import './index.less';
 import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+import { resetLoginInfoAction, setLoginAccountAction } from 'store/reducers/loginCache/actions';
+import { LoginType } from '@portkey/types/types-ca/wallet';
+import { resetUserGuardianStatus, setCurrentGuardianAction } from '@portkey/store/store-ca/guardians/actions';
+import useGuardianList from 'hooks/useGuardianList';
+import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { verifyErrorHandler } from 'utils/tryErrorHandler';
+import getPrivateKeyAndMnemonic from 'utils/Wallet/getPrivateKeyAndMnemonic';
 
 enum SwitchFail {
   default = 0,
@@ -29,6 +36,10 @@ export default function GuardiansView() {
   const [switchFail, setSwitchFail] = useState<SwitchFail>(SwitchFail.default);
   const currentNetwork = useCurrentNetworkInfo();
   const currentChain = useCurrentChain();
+  const dispatch = useAppDispatch();
+  const { setLoading } = useLoading();
+  const userGuardianList = useGuardianList();
+  const { walletInfo } = useCurrentWallet();
 
   const handleSwitch = async () => {
     if (currentGuardian?.isLoginAccount) {
@@ -58,26 +69,78 @@ export default function GuardiansView() {
     }
   };
 
-  const verifyHandler = useCallback(async () => {
+  const verifyHandler = async () => {
     try {
       if (!loginAccount)
         return message.error('User registration information is invalid, please fill in the registration method again');
-
-      const result = await sendVerificationCode({
-        loginGuardianType: loginAccount.loginGuardianType,
-        guardiansType: loginAccount.accountLoginType || 0,
-        baseUrl: '', // TODO
-        verificationType: VerificationType.register, // TODO
-        managerUniqueId: 'managerUniqueId',
-      });
-      if (result) {
-        // TODO
-        navigate('/setting/guardians/verifier-account', { state: 'guardians' });
+      if (currentGuardian?.isLoginAccount) {
+        const res = await getPrivateKeyAndMnemonic(
+          {
+            AESEncryptPrivateKey: walletInfo.AESEncryptPrivateKey,
+          },
+          '11111111',
+        );
+        if (!currentChain?.endPoint || !res?.privateKey) return message.error('error');
+        const seed = await unsetGuardianTypeForLogin({
+          rpcUrl: currentChain.endPoint,
+          chainType: currentNetwork.walletType,
+          address: currentChain.caContractAddress,
+          privateKey: res.privateKey,
+          paramsOption: [
+            {
+              caHash: walletInfo?.AELF?.caHash,
+              guardianType: {
+                type: currentGuardian.guardiansType,
+                guardianType: currentGuardian.loginGuardianType,
+              },
+            },
+          ],
+        });
+        console.log('------------unsetGuardianTypeForLogin------------', seed);
+        dispatch(resetLoginInfoAction());
+        navigate('/setting/guardians');
+      } else {
+        try {
+          dispatch(
+            setLoginAccountAction({
+              loginGuardianType: currentGuardian?.loginGuardianType as string,
+              accountLoginType: LoginType.email,
+            }),
+          );
+          setLoading(true);
+          dispatch(resetUserGuardianStatus());
+          await userGuardianList(walletInfo.managerInfo?.loginGuardianType as string);
+          const result = await sendVerificationCode({
+            loginGuardianType: currentGuardian?.loginGuardianType as string,
+            guardiansType: currentGuardian?.guardiansType as LoginType,
+            verificationType: VerificationType.addGuardian,
+            baseUrl: currentGuardian?.verifier?.url || '',
+            managerUniqueId: loginAccount?.managerUniqueId as string,
+          });
+          setLoading(false);
+          if (result.verifierSessionId) {
+            dispatch(
+              setCurrentGuardianAction({
+                isLoginAccount: true,
+                verifier: currentGuardian?.verifier,
+                loginGuardianType: currentGuardian?.loginGuardianType as string,
+                guardiansType: currentGuardian?.guardiansType as LoginType,
+                sessionId: result.verifierSessionId,
+                key: currentGuardian?.key as string,
+              }),
+            );
+            navigate('/setting/guardians/verifier-account', { state: 'guardians/setLoginAccount' });
+          }
+        } catch (error) {
+          console.log(error, 'verifyHandler');
+          const _error = verifyErrorHandler(error);
+          message.error(_error);
+        }
       }
     } catch (error) {
       console.log(error, 'verifyHandler');
     }
-  }, [loginAccount, navigate]);
+  };
 
   return (
     <div className="guardian-view-frame">

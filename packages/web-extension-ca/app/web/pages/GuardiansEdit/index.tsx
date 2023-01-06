@@ -40,7 +40,6 @@ export default function GuardiansEdit() {
       })),
     [verifierMap],
   );
-  console.log('--------verifierMap----------', verifierMap);
   const disabled = useMemo(
     () => exist || selectVal === currentGuardian?.verifier?.name,
     [exist, selectVal, currentGuardian],
