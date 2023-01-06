@@ -205,7 +205,6 @@ const SEARCH_CA_HOLDER_MANAGER_INFO_QUERY = gql`
 
 const searchCAHolderManagerInfo = async (network: NetworkType, params: GetCaHolderManagerInfoParamsType) => {
   const apolloClient = getApolloClient(network);
-
   const result = await apolloClient.query<{ caHolderManagerInfo: CaHolderManagerDto[] }>({
     query: SEARCH_CA_HOLDER_MANAGER_INFO_QUERY,
     variables: params,
@@ -297,6 +296,7 @@ const getCAHolderByManager = async (network: NetworkType, params: GetCAHolderByM
     skipCount: 0,
     maxResultCount: 1,
   });
+  console.log(caResult, '====caResult');
 
   if (caResult.error) throw caResult.error;
   const result: {
