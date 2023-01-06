@@ -14,7 +14,7 @@ import './index.less';
 import { useTranslation } from 'react-i18next';
 
 interface LockPageProps extends FormProps {
-  onUnLockHandler?: () => void;
+  onUnLockHandler?: (pwd: string) => void;
   header?: ReactNode;
 }
 
@@ -50,7 +50,7 @@ export default function LockPage({ header, onUnLockHandler, ...props }: LockPage
           setIsPassword(1);
           dispatch(setPasswordSeed(password));
           await InternalMessage.payload(InternalMessageTypes.SET_SEED, password).send();
-          onUnLockHandler?.();
+          onUnLockHandler?.(password);
         }
       } catch (error: any) {
         setIsPassword(0);

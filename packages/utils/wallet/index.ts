@@ -16,6 +16,20 @@ import { AccountType, Password, WalletInfoType } from '@portkey/types/wallet';
 import { PIN_SIZE, ZERO } from '@portkey/constants/misc';
 import { isExtension } from '@portkey/utils';
 
+export const handleWalletInfo = (walletInfo: any) => {
+  const tmpWallet = { ...walletInfo };
+  if (!tmpWallet.publicKey) {
+    const publicKey = tmpWallet.keyPair.getPublic();
+    tmpWallet.publicKey = {
+      x: publicKey.x.toString('hex'),
+      y: publicKey.y.toString('hex'),
+    };
+  }
+  tmpWallet.keyPair && delete tmpWallet.keyPair;
+  tmpWallet.childWallet && delete tmpWallet.childWallet;
+  return tmpWallet;
+};
+
 export const formatWalletInfo = (
   walletInfoInput: any,
   password: Password,

@@ -10,24 +10,38 @@ import { windowHeight } from '@portkey/utils/mobile/device';
 import { pTd } from 'utils/unit';
 import GStyles from 'assets/theme/GStyles';
 import { useAppDispatch } from 'store/hooks';
-import { changePin } from '@portkey/store/store-ca/wallet/actions';
+import { changePin, createWallet } from '@portkey/store/store-ca/wallet/actions';
 import CommonToast from 'components/CommonToast';
 import { setCredentials } from 'store/user/actions';
 import { useUser } from 'hooks/store';
 import { setSecureStoreItem } from '@portkey/utils/mobile/biometric';
-import { ManagerInfo } from '@portkey/types/types-ca/wallet';
+import { CAInfoType, ManagerInfo } from '@portkey/types/types-ca/wallet';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { useOnManagerAddressAndQueryResult } from 'hooks/login';
 import myEvents from 'utils/deviceEvent';
+import { AElfWallet } from '@portkey/types/aelf';
+import { VerificationType } from '@portkey/types/verifier';
+import useBiometricsReady from 'hooks/useBiometrics';
 
 export default function ConfirmPin() {
   const { walletInfo } = useCurrentWallet();
-  const { pin, oldPin, managerInfo, guardianCount } = useRouterParams<{
+  const {
+    pin,
+    oldPin,
+    managerInfo,
+    guardianCount,
+    caInfo,
+    walletInfo: paramsWalletInfo,
+  } = useRouterParams<{
     oldPin?: string;
     pin?: string;
     managerInfo?: ManagerInfo;
     guardianCount?: number;
+    caInfo?: CAInfoType;
+    walletInfo?: AElfWallet;
   }>();
+  const biometricsReady = useBiometricsReady();
+
   const [errorMessage, setErrorMessage] = useState<string>();
   const pinRef = useRef<DigitInputInterface>();
   const dispatch = useAppDispatch();
@@ -50,14 +64,33 @@ export default function ConfirmPin() {
   );
   const onFinish = useCallback(
     async (confirmPin: string) => {
-      onManagerAddressAndQueryResult({
-        managerInfo: managerInfo as ManagerInfo,
-        confirmPin,
-        walletInfo,
-        guardianCount,
-      });
+      if (managerInfo?.verificationType === VerificationType.addManager) {
+        dispatch(setCredentials({ pin: confirmPin }));
+        dispatch(createWallet({ walletInfo: paramsWalletInfo, caInfo, pin: confirmPin }));
+        if (biometricsReady) {
+          navigationService.navigate('SetBiometrics', { pin: confirmPin });
+        } else {
+          navigationService.reset('Tab');
+        }
+      } else {
+        onManagerAddressAndQueryResult({
+          managerInfo: managerInfo as ManagerInfo,
+          confirmPin,
+          walletInfo,
+          guardianCount,
+        });
+      }
     },
-    [guardianCount, managerInfo, onManagerAddressAndQueryResult, walletInfo],
+    [
+      biometricsReady,
+      caInfo,
+      dispatch,
+      guardianCount,
+      managerInfo,
+      onManagerAddressAndQueryResult,
+      paramsWalletInfo,
+      walletInfo,
+    ],
   );
 
   const onChangeText = useCallback(

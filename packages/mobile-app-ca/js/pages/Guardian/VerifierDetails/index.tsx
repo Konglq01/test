@@ -65,7 +65,8 @@ export default function VerifierDetails() {
         if (verificationType === VerificationType.communityRecovery) fetch = request.recovery;
         if (
           verificationType === VerificationType.addGuardian ||
-          verificationType === VerificationType.editGuardianApproval
+          verificationType === VerificationType.editGuardianApproval ||
+          verificationType === VerificationType.setLoginAccount
         ) {
           fetch = request.verification;
         }
@@ -110,6 +111,8 @@ export default function VerifierDetails() {
               managerUniqueId,
             });
           }
+        } else if (verificationType === VerificationType.setLoginAccount) {
+          // TODO: add set login account
         } else {
           navigationService.navigate('SetPin', {
             managerInfo: {
@@ -135,7 +138,8 @@ export default function VerifierDetails() {
       if (verificationType === VerificationType.communityRecovery) fetch = request.recovery;
       if (
         verificationType === VerificationType.addGuardian ||
-        verificationType === VerificationType.editGuardianApproval
+        verificationType === VerificationType.editGuardianApproval ||
+        verificationType === VerificationType.setLoginAccount
       )
         fetch = request.verification;
       const req = await fetch.sendCode({
