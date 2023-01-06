@@ -56,33 +56,26 @@ export default function SetWalletPin() {
   );
 
   const createByScan = useCallback(
-    (pin: string) => {
+    async (pin: string) => {
       const scanWallet = scanWalletInfo;
       if (!scanWallet?.address || !scanCaWalletInfo) {
         navigate(-1);
         throw 'Wallet information is wrong, please go back to scan the code and try again';
       }
-      // const managerInfo = {
-      //   managerUniqueId: loginAccount?.managerUniqueId || sessionId,
-      //   loginGuardianType: loginAccount?.loginGuardianType,
-      //   type: loginAccount.accountLoginType,
-      // };
-      // !walletInfo.address
-      //   ? dispatch(
-      //       createWallet({
-      //         walletInfo: scanWallet,
-      //         pin,
-      //         managerInfo,
-      //       }),
-      //     )
-      //   : dispatch(
-      //       setManagerInfo({
-      //         pin,
-      //         managerInfo,
-      //       }),
-      //     );
+      dispatch(
+        createWallet({
+          walletInfo: scanWallet,
+          pin,
+          caInfo: scanCaWalletInfo,
+        }),
+      );
+      await setLocalStorage({
+        registerStatus: 'Registered',
+      });
+      await setPinAction(pin);
+      navigate('/register/success', { state });
     },
-    [navigate, scanCaWalletInfo, scanWalletInfo],
+    [dispatch, navigate, scanCaWalletInfo, scanWalletInfo, state],
   );
 
   const onCreate = useCallback(
