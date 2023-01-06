@@ -66,7 +66,7 @@ export default function GuardianApproval() {
   const { t } = useLanguage();
   const chainInfo = useCurrentChain('AELF');
   const { pin } = useCredentials() || {};
-  const { AELF } = useCurrentWalletInfo();
+  const { caHash } = useCurrentWalletInfo();
 
   const [managerUniqueId, setManagerUniqueId] = useState<string>();
   const [guardiansStatus, setApproved] = useState<GuardiansStatus>();
@@ -125,7 +125,15 @@ export default function GuardianApproval() {
     }
 
     if (approvalType === ApprovalType.addGuardian) {
-      if (!chainInfo || !pin || !AELF || !guardianItem || !editGuardianParams || !guardiansStatus || !userGuardiansList)
+      if (
+        !chainInfo ||
+        !pin ||
+        !caHash ||
+        !guardianItem ||
+        !editGuardianParams ||
+        !guardiansStatus ||
+        !userGuardiansList
+      )
         return;
       const wallet = getWallet(pin);
       if (!wallet) return;
@@ -167,13 +175,13 @@ export default function GuardianApproval() {
         .filter(item => item !== null);
 
       console.log({
-        ca_hash: AELF?.caHash,
+        ca_hash: caHash,
         guardian_to_add: guardianToAdd,
         guardians_approved: guardiansApproved,
       });
 
       const req = await contract?.callSendMethod('AddGuardian', wallet.address, {
-        ca_hash: AELF?.caHash,
+        ca_hash: caHash,
         // guardianToAdd,
         // guardiansApproved,
         guardian_to_add: guardianToAdd,
@@ -188,7 +196,7 @@ export default function GuardianApproval() {
       }
     }
   }, [
-    AELF,
+    caHash,
     approvalType,
     chainInfo,
     editGuardianParams,
@@ -225,7 +233,7 @@ export default function GuardianApproval() {
       <View style={GStyles.flex1}>
         <TextXXXL style={GStyles.alignCenter}>{t(`Guardians' approval`)}</TextXXXL>
         <TextM style={[styles.expireText, GStyles.alignCenter, FontStyles.font3]}>
-          Expire after {VERIFIER_EXPIRATION} hour
+          {isExpired ? 'Expired' : `Expire after ${VERIFIER_EXPIRATION} hour`}
         </TextM>
         <View style={[styles.verifierBody, GStyles.flex1]}>
           <View style={[GStyles.itemCenter, GStyles.flexRow, BorderStyles.border6, styles.approvalTitleRow]}>
