@@ -15,7 +15,7 @@ import CommonInput from 'components/CommonInput';
 import { checkEmail } from '@portkey/utils/check';
 import { useGuardiansInfo } from 'hooks/store';
 import { LOGIN_TYPE_LIST } from '@portkey/constants/verifier';
-import { VerificationType, VerifierItem } from '@portkey/types/verifier';
+import { ApprovalType, VerificationType, VerifierItem } from '@portkey/types/verifier';
 import { INIT_HAS_ERROR, INIT_NONE_ERROR } from 'constants/common';
 import GuardianTypeSelectOverlay from '../components/GuardianTypeSelectOverlay';
 import VerifierSelectOverlay from '../components/VerifierSelectOverlay';
@@ -61,7 +61,7 @@ const GuardianEdit: React.FC = () => {
     (value: string) => {
       const _value = value.trim();
       if (_value === '') {
-        setGuardianTypeError({ ...INIT_HAS_ERROR, errorMsg: t('Please enter Email address') });
+        setGuardianTypeError({ ...INIT_HAS_ERROR, errorMsg: t(' Please enter email address') });
       }
       setEmail(value);
       setGuardianTypeError({ ...INIT_NONE_ERROR });
@@ -83,7 +83,7 @@ const GuardianEdit: React.FC = () => {
           guardian.verifier?.url === selectedVerifier?.url,
       ) !== -1
     ) {
-      return { ...INIT_HAS_ERROR, errorMsg: t('This guardians is already exists') };
+      return { ...INIT_HAS_ERROR, errorMsg: t('This guardian already exists') };
     } else {
       return { ...INIT_NONE_ERROR };
     }
@@ -96,6 +96,7 @@ const GuardianEdit: React.FC = () => {
         isError: true,
         errorMsg: guardianErrorMsg,
       });
+      setGuardianError({ ...INIT_NONE_ERROR });
       return;
     }
 
@@ -155,29 +156,46 @@ const GuardianEdit: React.FC = () => {
     const _guardianError = checkCurGuardianRepeat();
     setGuardianError(_guardianError);
     if (_guardianError.isError) return;
-    // TODO: add callback or next step
-    navigationService.navigate('SelectVerifier', { loginGuardianType: email });
-  }, [checkCurGuardianRepeat, email]);
+    navigationService.navigate('GuardianApproval', {
+      approvalType: ApprovalType.editGuardian,
+      guardianItem: editGuardian,
+    });
+  }, [checkCurGuardianRepeat, editGuardian]);
 
   const onRemove = useCallback(() => {
+    if (!editGuardian) return;
+    if (editGuardian.isLoginAccount) {
+      ActionSheet.alert({
+        title2: t(`This guardian is login account and cannot be remove`),
+        buttons: [
+          {
+            title: t('OK'),
+          },
+        ],
+      });
+      return;
+    }
+
     ActionSheet.alert({
       title: t('Are you sure you want to remove this guardian?'),
-      message: t('Removing a guardian requires guardian approval'),
+      message: t(`Removing a guardian requires guardians' approval`),
       buttons: [
         {
-          title: t('No'),
+          title: t('Close'),
           type: 'outline',
         },
         {
-          title: t('Yes'),
+          title: t('Send Request'),
           onPress: () => {
-            // TODO: add callback or next step
-            navigationService.navigate('SelectVerifier', { loginGuardianType: email });
+            navigationService.navigate('GuardianApproval', {
+              approvalType: ApprovalType.deleteGuardian,
+              guardianItem: editGuardian,
+            });
           },
         },
       ],
     });
-  }, [email, t]);
+  }, [editGuardian, t]);
 
   const isConfirmDisable = useMemo(
     () => !selectedVerifier || !selectedType || !email,
@@ -192,7 +210,7 @@ const GuardianEdit: React.FC = () => {
   return (
     <PageContainer
       safeAreaColor={['blue', 'gray']}
-      titleDom={isEdit ? t('guardians') : t('Add Guardians')}
+      titleDom={isEdit ? t('Edit Guardians') : t('Add Guardians')}
       leftCallback={() => navigationService.navigate('GuardianHome')}
       containerStyles={pageStyles.pageWrap}
       scrollViewProps={{ disabled: true }}>
@@ -212,7 +230,7 @@ const GuardianEdit: React.FC = () => {
               titleStyle={[GStyles.flexRow, GStyles.itemCenter]}
               titleTextStyle={pageStyles.titleTextStyle}
               style={GStyles.marginBottom(24)}
-              title={selectedType?.name || 'Select Guardians Type'}
+              title={selectedType?.name || t('Select guardian types')}
               rightElement={<Svg size={pTd(16)} icon="down-arrow" />}
             />
           </>
@@ -223,9 +241,9 @@ const GuardianEdit: React.FC = () => {
             disabled={isEdit}
             type="general"
             theme="white-bg"
-            label="Guardian Email"
+            label={t("Guardian's email")}
             value={email}
-            placeholder={t('Enter Email')}
+            placeholder={t('Enter email')}
             maxLength={30}
             onChangeText={onEmailTextChange}
             errorMessage={guardianTypeError.isError ? guardianTypeError.errorMsg : ''}
@@ -251,7 +269,7 @@ const GuardianEdit: React.FC = () => {
           titleStyle={[GStyles.flexRow, GStyles.itemCenter]}
           titleTextStyle={pageStyles.titleTextStyle}
           style={GStyles.marginBottom(4)}
-          title={selectedVerifier?.name || 'Select Guardians Verifier'}
+          title={selectedVerifier?.name || t('Select guardian verifiers')}
           rightElement={<Svg size={pTd(16)} icon="down-arrow" />}
         />
         {guardianError.isError && <TextS style={pageStyles.errorTips}>{guardianError.errorMsg || ''}</TextS>}
@@ -261,7 +279,7 @@ const GuardianEdit: React.FC = () => {
         {isEdit ? (
           <>
             <CommonButton disabled={isApprovalDisable} type="primary" onPress={onApproval}>
-              {t('Guardians Approval')}
+              {t('Send Request')}
             </CommonButton>
             <CommonButton style={GStyles.marginTop(8)} type="clear" onPress={onRemove} titleStyle={FontStyles.font12}>
               {t('Remove')}

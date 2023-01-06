@@ -77,6 +77,11 @@ export default function GuardianApproval() {
     return Object.values(guardiansStatus || {}).filter(guardian => guardian.status === VerifyStatus.Verified);
   }, [guardiansStatus]);
 
+  const isExcludeCurrent = useMemo(
+    () => approvalType === ApprovalType.deleteGuardian || approvalType === ApprovalType.editGuardian,
+    [approvalType],
+  );
+
   const setGuardianStatus = useCallback(
     (key: string, status: GuardiansStatusItem) => {
       if (key === 'resetGuardianApproval') {
@@ -89,7 +94,10 @@ export default function GuardianApproval() {
     [guardiansStatus],
   );
 
-  const guardianCount = useMemo(() => getApprovalCount(userGuardiansList?.length || 0), [userGuardiansList?.length]);
+  const guardianCount = useMemo(
+    () => getApprovalCount((isExcludeCurrent ? (userGuardiansList?.length || 1) - 1 : userGuardiansList?.length) || 0),
+    [isExcludeCurrent, userGuardiansList?.length],
+  );
   const isSuccess = useMemo(() => guardianCount <= approvedList.length, [guardianCount, approvedList.length]);
   const onSetGuardianStatus = useCallback(
     (data: { key: string; status: GuardiansStatusItem }) => {
@@ -110,105 +118,6 @@ export default function GuardianApproval() {
     };
   });
 
-  const onFinish = useCallback(async () => {
-    if (approvalType === ApprovalType.register) {
-      navigationService.navigate('SetPin', {
-        managerInfo: {
-          verificationType: VerificationType.communityRecovery,
-          loginGuardianType,
-          type: LoginType.email,
-          managerUniqueId,
-        } as ManagerInfo,
-        guardianCount,
-      });
-      return;
-    }
-
-    if (approvalType === ApprovalType.addGuardian) {
-      if (
-        !chainInfo ||
-        !pin ||
-        !caHash ||
-        !guardianItem ||
-        !editGuardianParams ||
-        !guardiansStatus ||
-        !userGuardiansList
-      )
-        return;
-      const wallet = getWallet(pin);
-      if (!wallet) return;
-
-      Loading.show();
-      const contract = await getELFContract({
-        contractAddress: chainInfo.caContractAddress,
-        rpcUrl: chainInfo.endPoint,
-        account: wallet,
-      });
-
-      const guardianToAdd = {
-        guardian_type: {
-          type: LoginType.email,
-          guardian_type: guardianItem.loginGuardianType,
-        },
-        verifier: {
-          name: guardianItem.verifier?.name,
-          signature: editGuardianParams.signature,
-          verificationDoc: editGuardianParams.verifierDoc,
-        },
-      };
-
-      const guardiansApproved = userGuardiansList
-        .map(guardian => {
-          if (!guardiansStatus[guardian.key] || !guardiansStatus[guardian.key].editGuardianParams) return null;
-          return {
-            guardian_type: {
-              type: guardian.guardiansType,
-              guardian_type: guardian.loginGuardianType,
-            },
-            verifier: {
-              name: guardian.verifier?.name,
-              signature: guardiansStatus[guardian.key].editGuardianParams?.signature,
-              verificationDoc: guardiansStatus[guardian.key].editGuardianParams?.verifierDoc,
-            },
-          };
-        })
-        .filter(item => item !== null);
-
-      console.log({
-        ca_hash: caHash,
-        guardian_to_add: guardianToAdd,
-        guardians_approved: guardiansApproved,
-      });
-
-      const req = await contract?.callSendMethod('AddGuardian', wallet.address, {
-        ca_hash: caHash,
-        // guardianToAdd,
-        // guardiansApproved,
-        guardian_to_add: guardianToAdd,
-        guardians_approved: guardiansApproved,
-      });
-      Loading.hide();
-      console.log(req);
-      if (req && !req.error) {
-        console.log(req);
-      } else {
-        CommonToast.failError(req?.error?.message?.Message);
-      }
-    }
-  }, [
-    caHash,
-    approvalType,
-    chainInfo,
-    editGuardianParams,
-    guardianCount,
-    guardianItem,
-    guardiansStatus,
-    loginGuardianType,
-    managerUniqueId,
-    pin,
-    userGuardiansList,
-  ]);
-
   const onBack = useCallback(() => {
     switch (approvalType) {
       case ApprovalType.addGuardian:
@@ -219,6 +128,115 @@ export default function GuardianApproval() {
         break;
     }
   }, [approvalType]);
+
+  const registerAccount = useCallback(() => {
+    navigationService.navigate('SetPin', {
+      managerInfo: {
+        verificationType: VerificationType.communityRecovery,
+        loginGuardianType,
+        type: LoginType.email,
+        managerUniqueId,
+      } as ManagerInfo,
+      guardianCount,
+    });
+  }, [guardianCount, loginGuardianType, managerUniqueId]);
+
+  const addGuardian = useCallback(async () => {
+    if (!chainInfo || !pin || !caHash || !guardianItem || !editGuardianParams || !guardiansStatus || !userGuardiansList)
+      return;
+    const wallet = getWallet(pin);
+    if (!wallet) return;
+
+    Loading.show();
+    const contract = await getELFContract({
+      contractAddress: chainInfo.caContractAddress,
+      rpcUrl: chainInfo.endPoint,
+      account: wallet,
+    });
+
+    const guardianToAdd = {
+      guardianType: {
+        type: LoginType.email,
+        guardianType: guardianItem.loginGuardianType,
+      },
+      verifier: {
+        name: guardianItem.verifier?.name,
+        signature: Buffer.from(editGuardianParams.signature as any, 'base64').toString('hex'),
+        verificationDoc: editGuardianParams.verifierDoc,
+      },
+    };
+
+    const guardiansApproved = userGuardiansList
+      .map(guardian => {
+        if (!guardiansStatus[guardian.key] || !guardiansStatus[guardian.key].editGuardianParams) return null;
+        return {
+          guardianType: {
+            type: guardian.guardiansType,
+            guardianType: guardian.loginGuardianType,
+          },
+          verifier: {
+            name: guardian.verifier?.name,
+            signature: Buffer.from(
+              guardiansStatus[guardian.key].editGuardianParams?.signature as any,
+              'base64',
+            ).toString('hex'),
+            verificationDoc: guardiansStatus[guardian.key].editGuardianParams?.verifierDoc,
+          },
+        };
+      })
+      .filter(item => item !== null);
+
+    console.log({
+      caHash,
+      guardianToAdd: guardianToAdd,
+      guardiansApproved: guardiansApproved,
+    });
+    console.log(wallet.privateKey);
+    console.log(chainInfo.caContractAddress);
+
+    const req = await contract?.callSendMethod('AddGuardian', wallet.address, {
+      caHash,
+      guardianToAdd: guardianToAdd,
+      guardiansApproved: guardiansApproved,
+    });
+    Loading.hide();
+    console.log(req);
+    if (req && !req.error) {
+      console.log(req);
+    } else {
+      CommonToast.failError(req?.error?.message?.Message);
+    }
+  }, [caHash, chainInfo, editGuardianParams, guardianItem, guardiansStatus, pin, userGuardiansList]);
+
+  const deleteGuardian = useCallback(() => {
+    //
+  }, []);
+
+  const editGuardian = useCallback(() => {
+    //
+  }, []);
+
+  const onFinish = useCallback(async () => {
+    if (approvalType === ApprovalType.register) {
+      registerAccount();
+      return;
+    }
+
+    if (approvalType === ApprovalType.addGuardian) {
+      addGuardian();
+      return;
+    }
+
+    if (approvalType === ApprovalType.deleteGuardian) {
+      deleteGuardian();
+      return;
+    }
+
+    if (approvalType === ApprovalType.editGuardian) {
+      editGuardian();
+      return;
+    }
+  }, [addGuardian, approvalType, deleteGuardian, editGuardian, registerAccount]);
 
   return (
     <PageContainer
@@ -255,20 +273,37 @@ export default function GuardianApproval() {
           </View>
           <View style={GStyles.flex1}>
             <ScrollView>
-              {userGuardiansList?.map(item => {
-                return (
-                  <GuardianAccountItem
-                    key={item.key}
-                    guardianItem={item}
-                    setGuardianStatus={setGuardianStatus}
-                    managerUniqueId={managerUniqueId as string}
-                    guardiansStatus={guardiansStatus}
-                    isExpired={isExpired}
-                    isSuccess={isSuccess}
-                    approvalType={approvalType}
-                  />
-                );
-              })}
+              {isExcludeCurrent
+                ? userGuardiansList
+                    ?.filter(item => item.key !== guardianItem?.key)
+                    .map(item => {
+                      return (
+                        <GuardianAccountItem
+                          key={item.key}
+                          guardianItem={item}
+                          setGuardianStatus={setGuardianStatus}
+                          managerUniqueId={managerUniqueId as string}
+                          guardiansStatus={guardiansStatus}
+                          isExpired={isExpired}
+                          isSuccess={isSuccess}
+                          approvalType={approvalType}
+                        />
+                      );
+                    })
+                : userGuardiansList?.map(item => {
+                    return (
+                      <GuardianAccountItem
+                        key={item.key}
+                        guardianItem={item}
+                        setGuardianStatus={setGuardianStatus}
+                        managerUniqueId={managerUniqueId as string}
+                        guardiansStatus={guardiansStatus}
+                        isExpired={isExpired}
+                        isSuccess={isSuccess}
+                        approvalType={approvalType}
+                      />
+                    );
+                  })}
             </ScrollView>
           </View>
         </View>

@@ -129,7 +129,7 @@ const ContactsList: React.FC<ContactsListProps> = ({
         <View style={[BGStyles.bg5, GStyles.paddingArg(0, 20, 16)]}>
           <CommonInput
             value={keyWord}
-            placeholder={t('Name or Address')}
+            placeholder={t('Name or address')}
             onChangeText={value => {
               onChangeKeywords(value);
             }}
@@ -151,7 +151,7 @@ const ContactsList: React.FC<ContactsListProps> = ({
       )}
 
       {!isExistContact && !!keyWord && (
-        <TextL style={[contactListStyles.noResult, FontStyles.font7]}>{t('There is no search result.')}</TextL>
+        <TextL style={[contactListStyles.noResult, FontStyles.font7]}>{t('No results found')}</TextL>
       )}
 
       {!isExistContact && !keyWord && !isReadOnly && (
@@ -161,7 +161,7 @@ const ContactsList: React.FC<ContactsListProps> = ({
           buttonStyle={[contactListStyles.addButton]}
           onPress={() => navigationService.navigate('ContactEdit')}>
           <Svg icon="add1" size={pTd(16)} color={defaultColors.icon2} />
-          <Text style={contactListStyles.addText}>{t('Add New Contact')}</Text>
+          <Text style={contactListStyles.addText}>{t('Add New Contacts')}</Text>
         </CommonButton>
       )}
     </View>

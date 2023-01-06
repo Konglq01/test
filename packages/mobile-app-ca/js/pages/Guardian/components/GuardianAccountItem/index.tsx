@@ -70,7 +70,11 @@ function GuardianItemButton({
     try {
       let fetch: Record<string, API_REQ_FUNCTION> = request.recovery;
       let _verificationType = VerificationType.communityRecovery;
-      if (approvalType === ApprovalType.addGuardian) {
+      if (
+        approvalType === ApprovalType.addGuardian ||
+        approvalType === ApprovalType.deleteGuardian ||
+        approvalType === ApprovalType.editGuardian
+      ) {
         _verificationType = VerificationType.editGuardianApproval;
         fetch = request.verification;
       }
@@ -111,7 +115,11 @@ function GuardianItemButton({
   }, [approvalType, guardianItem, managerUniqueId, onSetGuardianStatus]);
   const onVerifier = useCallback(() => {
     let _verificationType = VerificationType.communityRecovery;
-    if (approvalType === ApprovalType.addGuardian) {
+    if (
+      approvalType === ApprovalType.addGuardian ||
+      approvalType === ApprovalType.deleteGuardian ||
+      approvalType === ApprovalType.editGuardian
+    ) {
       _verificationType = VerificationType.editGuardianApproval;
     }
 

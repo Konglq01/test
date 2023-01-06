@@ -8,7 +8,7 @@ import { useAppDispatch, useLoading, useLoginInfo } from 'store/Provider/hooks';
 import { setPinAction } from 'utils/lib/serviceWorkerAction';
 import { useCurrentWallet, useFetchWalletCAAddress } from '@portkey/hooks/hooks-ca/wallet';
 import { setLocalStorage } from 'utils/storage/chromeStorage';
-import { createWallet, setManagerInfo } from '@portkey/store/store-ca/wallet/actions';
+import { createWallet, setCAInfo, setManagerInfo } from '@portkey/store/store-ca/wallet/actions';
 import useLocationState from 'hooks/useLocationState';
 import { useTranslation } from 'react-i18next';
 import { createWalletInfo } from '@portkey/api/apiUtils/wallet';
@@ -30,7 +30,7 @@ export default function SetWalletPin() {
   const dispatch = useAppDispatch();
   const { setLoading } = useLoading();
   const { walletInfo } = useCurrentWallet();
-  const { loginAccount } = useLoginInfo();
+  const { scanWalletInfo, scanCaWalletInfo, loginAccount } = useLoginInfo();
   const fetchWalletResult = useFetchWalletCAAddress();
 
   console.log(walletInfo, 'walletInfo===');
@@ -56,30 +56,26 @@ export default function SetWalletPin() {
   );
 
   const createByScan = useCallback(
-    (pin: string) => {
-      const scanWallet = loginAccount?.walletInfo;
-      if (!scanWallet?.address) throw 'Wallet information is wrong, please go back to scan the code and try again';
-      // const managerInfo = {
-      //   managerUniqueId: loginAccount?.managerUniqueId || sessionId,
-      //   loginGuardianType: loginAccount?.loginGuardianType,
-      //   type: loginAccount.accountLoginType,
-      // };
-      // !walletInfo.address
-      //   ? dispatch(
-      //       createWallet({
-      //         walletInfo: scanWallet,
-      //         pin,
-      //         managerInfo,
-      //       }),
-      //     )
-      //   : dispatch(
-      //       setManagerInfo({
-      //         pin,
-      //         managerInfo,
-      //       }),
-      //     );
+    async (pin: string) => {
+      const scanWallet = scanWalletInfo;
+      if (!scanWallet?.address || !scanCaWalletInfo) {
+        navigate(-1);
+        throw 'Wallet information is wrong, please go back to scan the code and try again';
+      }
+      dispatch(
+        createWallet({
+          walletInfo: scanWallet,
+          pin,
+          caInfo: scanCaWalletInfo,
+        }),
+      );
+      await setLocalStorage({
+        registerStatus: 'Registered',
+      });
+      await setPinAction(pin);
+      navigate('/register/success', { state });
     },
-    [dispatch, loginAccount, walletInfo.address],
+    [dispatch, navigate, scanCaWalletInfo, scanWalletInfo, state],
   );
 
   const onCreate = useCallback(
@@ -134,6 +130,17 @@ export default function SetWalletPin() {
           });
           throw walletResult?.message || walletResult.status;
         }
+
+        dispatch(
+          setCAInfo({
+            caInfo: {
+              caAddress: walletResult.caAddress,
+              caHash: walletResult.caHash,
+            },
+            pin,
+            chainId: 'AELF',
+          }),
+        );
         await setLocalStorage({
           registerStatus: 'Registered',
         });
