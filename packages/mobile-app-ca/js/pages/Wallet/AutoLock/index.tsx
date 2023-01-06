@@ -16,19 +16,19 @@ const AutoLockList: { value: number; label: string }[] = [
   },
   {
     value: 15,
-    label: 'After 15 Seconds',
+    label: 'After 15 seconds',
   },
   {
     value: 60,
-    label: 'After 60 Seconds',
+    label: 'After 60 seconds',
   },
   {
     value: 300,
-    label: 'After 5 Minutes',
+    label: 'After 5 minutes',
   },
   {
     value: 600,
-    label: 'After 10 Minutes',
+    label: 'After 10 minutes',
   },
   {
     value: Infinity,

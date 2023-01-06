@@ -23,7 +23,7 @@ const ExistOverlay = ({ callBack }: ExistOverlayProps) => {
         {t('Your current wallet and assets will be removed from this app permanently. This action cannot be undone.')}
       </TextM>
       <TextM style={[FontStyles.font3, styles.label]}>
-        {t('You can ONLY recover this wallet with your guardians.')}
+        {t('You can ONLY recover this wallet with the help of your guardians.')}
       </TextM>
 
       <CommonButton
@@ -35,7 +35,7 @@ const ExistOverlay = ({ callBack }: ExistOverlayProps) => {
           OverlayModal.hide();
           callBack(true);
         }}>
-        {t('I Understand，Confirm Exit')}
+        {t('I Understand, Confirm Exit')}
       </CommonButton>
       <CommonButton
         type="outline"
