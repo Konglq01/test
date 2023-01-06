@@ -25,7 +25,7 @@ export function queryFailAlert(dispatch: AppDispatch, isRecovery?: boolean, isRe
   });
 }
 export function handleUserGuardiansList(holderInfo: any, verifierServers: VerifierItem[]) {
-  return holderInfo.guardians.map((item: any) => {
+  return holderInfo.guardians.map((item: any, index: number) => {
     return {
       ...item,
       loginGuardianType: item.guardianType.guardianType,
@@ -33,6 +33,7 @@ export function handleUserGuardiansList(holderInfo: any, verifierServers: Verifi
       guardiansType: 0,
       key: `${item.guardianType.guardianType}&${item.verifier.name}`,
       verifier: verifierServers.find(verifier => verifier.name === item.verifier.name),
+      isLoginAccount: index === holderInfo.loginGuardianTypeIndexes[0],
     };
   });
 }

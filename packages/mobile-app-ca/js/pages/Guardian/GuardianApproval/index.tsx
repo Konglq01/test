@@ -66,7 +66,7 @@ export default function GuardianApproval() {
   const { t } = useLanguage();
   const chainInfo = useCurrentChain('AELF');
   const { pin } = useCredentials() || {};
-  const { AELF } = useCurrentWalletInfo();
+  const { caHash } = useCurrentWalletInfo();
 
   const [managerUniqueId, setManagerUniqueId] = useState<string>();
   const [guardiansStatus, setApproved] = useState<GuardiansStatus>();
@@ -142,7 +142,7 @@ export default function GuardianApproval() {
   }, [guardianCount, loginGuardianType, managerUniqueId]);
 
   const addGuardian = useCallback(async () => {
-    if (!chainInfo || !pin || !AELF || !guardianItem || !editGuardianParams || !guardiansStatus || !userGuardiansList)
+    if (!chainInfo || !pin || !caHash || !guardianItem || !editGuardianParams || !guardiansStatus || !userGuardiansList)
       return;
     const wallet = getWallet(pin);
     if (!wallet) return;
@@ -187,7 +187,7 @@ export default function GuardianApproval() {
       .filter(item => item !== null);
 
     console.log({
-      caHash: AELF?.caHash,
+      caHash,
       guardianToAdd: guardianToAdd,
       guardiansApproved: guardiansApproved,
     });
@@ -195,7 +195,7 @@ export default function GuardianApproval() {
     console.log(chainInfo.caContractAddress);
 
     const req = await contract?.callSendMethod('AddGuardian', wallet.address, {
-      caHash: AELF?.caHash,
+      caHash,
       guardianToAdd: guardianToAdd,
       guardiansApproved: guardiansApproved,
     });
@@ -206,7 +206,7 @@ export default function GuardianApproval() {
     } else {
       CommonToast.failError(req?.error?.message?.Message);
     }
-  }, [AELF, chainInfo, editGuardianParams, guardianItem, guardiansStatus, pin, userGuardiansList]);
+  }, [caHash, chainInfo, editGuardianParams, guardianItem, guardiansStatus, pin, userGuardiansList]);
 
   const deleteGuardian = useCallback(() => {
     //
@@ -251,7 +251,7 @@ export default function GuardianApproval() {
       <View style={GStyles.flex1}>
         <TextXXXL style={GStyles.alignCenter}>{t(`Guardians' approval`)}</TextXXXL>
         <TextM style={[styles.expireText, GStyles.alignCenter, FontStyles.font3]}>
-          Expire after {VERIFIER_EXPIRATION} hour
+          {isExpired ? 'Expired' : `Expire after ${VERIFIER_EXPIRATION} hour`}
         </TextM>
         <View style={[styles.verifierBody, GStyles.flex1]}>
           <View style={[GStyles.itemCenter, GStyles.flexRow, BorderStyles.border6, styles.approvalTitleRow]}>

@@ -1,19 +1,24 @@
 import { useAppCASelector } from '.';
 import { useMemo, useCallback } from 'react';
 import { WalletInfoType } from '@portkey/types/wallet';
-import { CAInfoType, LoginType } from '@portkey/types/types-ca/wallet';
+import { CAInfo, CAInfoType, LoginType } from '@portkey/types/types-ca/wallet';
 import { WalletState } from '@portkey/store/store-ca/wallet/type';
 import { VerificationType } from '@portkey/types/verifier';
 import { fetchCreateWalletResult } from '@portkey/api/apiUtils/wallet';
 import { sleep } from '@portkey/utils';
 
-export interface CurrentWalletType extends WalletInfoType, CAInfoType {}
+export interface CurrentWalletType extends WalletInfoType, CAInfoType {
+  caHash?: string;
+}
 
 function getCurrentWalletInfo(
   walletInfo: WalletState['walletInfo'],
   currentNetwork: WalletState['currentNetwork'],
 ): CurrentWalletType {
-  const tmpWalletInfo: any = Object.assign({}, walletInfo, walletInfo?.caInfo?.[currentNetwork]);
+  const currentCAInfo = walletInfo?.caInfo?.[currentNetwork];
+  const tmpWalletInfo: any = Object.assign({}, walletInfo, currentCAInfo, {
+    caHash: currentCAInfo?.AELF?.caHash,
+  });
   if (tmpWalletInfo.caInfo) delete tmpWalletInfo.caInfo;
   return tmpWalletInfo;
 }
