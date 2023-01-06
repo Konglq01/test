@@ -87,7 +87,7 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
         );
         if (loginIndex === -1) {
           ActionSheet.alert({
-            title2: t('This guardian is the only Login account and cannot be turn off'),
+            title2: t('This guardian is the only login account and cannot be turned off'),
             buttons: [
               {
                 title: t('Close'),
@@ -171,7 +171,7 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
         </View>
 
         <TextM style={pageStyles.tips}>
-          {t('The login account will be able to log in and control all your assets')}
+          {t('The master account will be able to log in and control all your assets')}
         </TextM>
       </View>
       <CommonButton
