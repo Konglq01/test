@@ -1,7 +1,7 @@
 import { AppState, AppStateStatus, NativeEventSubscription } from 'react-native';
 import BackgroundTimer from 'react-native-background-timer';
 import navigationService from './navigationService';
-import { getWalletInfo } from './redux';
+import { getWalletAddress } from './redux';
 
 export default class LockManager {
   lockTime: number;
@@ -51,7 +51,7 @@ export default class LockManager {
   };
 
   gotoLockScreen = () => {
-    if (!getWalletInfo()) navigationService.reset('Referral');
+    if (!getWalletAddress()) navigationService.reset('Referral');
     else navigationService.navigate('SecurityLock');
     this.locked = true;
   };

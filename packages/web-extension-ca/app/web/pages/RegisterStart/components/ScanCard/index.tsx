@@ -1,18 +1,25 @@
 import { WalletInfoType } from '@portkey/types/wallet';
 import CustomSvg from 'components/CustomSvg';
 import QRCode from 'qrcode.react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import AElf from 'aelf-sdk';
 import { useEffectOnce } from 'react-use';
 import { LoginQRData } from '@portkey/types/types-ca/qrcode';
-import './index.less';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import './index.less';
+import { useAppDispatch, useLoading } from 'store/Provider/hooks';
+import { useIntervalQueryCAInfoByAddress } from '@portkey/hooks/hooks-ca/graphql';
+import { setWalletInfoAction } from 'store/reducers/loginCache/actions';
 
 export default function ScanCard() {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const { setLoading } = useLoading();
   const [newWallet, setNewWallet] = useState<WalletInfoType>();
   const { walletInfo, currentNetwork } = useCurrentWallet();
+  const caWallet = useIntervalQueryCAInfoByAddress(currentNetwork, newWallet?.address);
+  console.log(caWallet, newWallet?.address, 'caWallet====');
   const generateKeystore = useCallback(() => {
     try {
       const wallet = walletInfo?.address ? walletInfo : AElf.wallet.createNewWallet();
@@ -41,6 +48,19 @@ export default function ScanCard() {
     };
     return JSON.stringify(data);
   }, [currentNetwork, newWallet]);
+
+  useEffect(() => {
+    if (caWallet) {
+      // caWallet
+      dispatch(
+        setWalletInfoAction({
+          walletInfo: newWallet,
+          caWalletInfo: caWallet,
+        }),
+      );
+      navigate('/register/set-pin', { state: 'scan' });
+    }
+  }, [caWallet, dispatch, navigate, newWallet]);
 
   return (
     <div className="login-card scan-card-wrapper">

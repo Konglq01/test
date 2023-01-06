@@ -4,13 +4,11 @@ import PageContainer from 'components/PageContainer';
 import { TextM, TextS, TextXXXL } from 'components/CommonText';
 import GStyles from 'assets/theme/GStyles';
 import Svg from 'components/Svg';
-import { defaultColors } from 'assets/theme';
 import Touchable from 'components/Touchable';
 import { View } from 'react-native';
 import CommonButton from 'components/CommonButton';
 import { useLanguage } from 'i18n/hooks';
 import ActionSheet from 'components/ActionSheet';
-import VerifierOverlay from 'components/VerifierOverlay';
 import { BorderStyles, FontStyles } from 'assets/theme/styles';
 import ListItem from 'components/ListItem';
 import { pTd } from 'utils/unit';
@@ -23,13 +21,15 @@ import CommonToast from 'components/CommonToast';
 import Loading from 'components/Loading';
 import { randomId } from '@portkey/utils';
 import { useVerifierList } from '@portkey/hooks/hooks-ca/network';
+import VerifierOverlay from '../components/VerifierOverlay';
+import { VerifierImage } from '../components/VerifierImage';
+import { LoginType } from '@portkey/types/types-ca/wallet';
 
 const ScrollViewProps = { disabled: true };
 export default function SelectVerifier() {
   const { t } = useLanguage();
   const verifierList = useVerifierList();
   const [selectedVerifier, setSelectedVerifier] = useState(verifierList[0]);
-  console.log(selectedVerifier, '====selectedVerifier');
 
   const { loginGuardianType } = useRouterParams<{ loginGuardianType?: string }>();
   const onConfirm = useCallback(async () => {
@@ -56,6 +56,7 @@ export default function SelectVerifier() {
                   managerUniqueId,
                 },
               });
+
               if (req.verifierSessionId) {
                 navigationService.navigate('VerifierDetails', {
                   loginGuardianType,
@@ -65,6 +66,7 @@ export default function SelectVerifier() {
                     isLoginAccount: true,
                     verifier: selectedVerifier,
                     loginGuardianType,
+                    guardiansType: LoginType.email,
                   },
                 });
               } else {
@@ -94,7 +96,7 @@ export default function SelectVerifier() {
               callBack: setSelectedVerifier,
             })
           }
-          titleLeftElement={<Svg icon="logo-icon" color={defaultColors.primaryColor} size={30} />}
+          titleLeftElement={<VerifierImage uri={selectedVerifier.imageUrl} size={30} />}
           titleStyle={[GStyles.flexRow, GStyles.itemCenter]}
           titleTextStyle={styles.titleTextStyle}
           style={[styles.selectedItem, BorderStyles.border1]}
@@ -106,7 +108,7 @@ export default function SelectVerifier() {
           {verifierList.map(item => {
             return (
               <Touchable style={GStyles.center} key={item.name} onPress={() => setSelectedVerifier(item)}>
-                <Svg icon="logo-icon" color={defaultColors.primaryColor} size={40} />
+                <VerifierImage uri={item.imageUrl} size={42} />
                 <TextS style={[FontStyles.font3, styles.verifierTitle]}>{item.name}</TextS>
               </Touchable>
             );

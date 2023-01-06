@@ -20,7 +20,7 @@ const AppListener: React.FC<AppListenerProps> = props => {
     return autoLockingTime;
   }, [autoLockingTime, walletInfo.AELF, walletInfo.address]);
   const prevLockingTime = usePrevious(lockingTime);
-  console.log(lockingTime, '====lockingTime');
+  console.log(lockingTime, '=====lockingTime');
 
   useEffect(() => {
     if (prevLockingTime !== lockingTime) lockManager.current?.updateLockTime(lockingTime * 1000);

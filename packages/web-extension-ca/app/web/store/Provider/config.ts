@@ -11,7 +11,7 @@ import addressBook from '@portkey/store/addressBook/slice';
 import tokenBalanceSlice from '@portkey/store/tokenBalance/slice';
 import tradeSlice from '@portkey/store/trade/slice';
 import tokenSlice from '@portkey/store/token/slice';
-import { loginSlice } from '@portkey/store/store-ca/login/slice';
+import { loginSlice } from 'store/reducers/loginCache/slice';
 import { contactSlice } from '@portkey/store/store-ca/contact/slice';
 import { guardiansSlice } from '@portkey/store/store-ca/guardians/slice';
 import activitySlice from '@portkey/store/store-ca/activity/slice';
@@ -47,7 +47,7 @@ export const walletPersistConfig = {
 export const loginPersistConfig = {
   key: loginSlice.name,
   storage: localStorage,
-  blacklist: [''],
+  blacklist: ['scanWalletInfo', 'scanCaWalletInfo'],
 };
 
 export const contactPersistConfig = {

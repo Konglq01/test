@@ -7,8 +7,8 @@ import DigitInput, { DigitInputInterface } from 'components/DigitInput';
 import React, { useCallback, useRef, useState } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import useRouterParams from '@portkey/hooks/useRouterParams';
-import { VerificationType, VerifyStatus } from '@portkey/types/verifier';
-import GuardianAccountItem from '../GuardianAccountItem';
+import { ApprovalType, VerificationType, VerifyStatus } from '@portkey/types/verifier';
+import GuardianAccountItem, { GuardiansStatusItem } from '../components/GuardianAccountItem';
 import { FontStyles } from 'assets/theme/styles';
 import { request } from 'api';
 import Loading from 'components/Loading';
@@ -18,6 +18,10 @@ import useEffectOnce from 'hooks/useEffectOnce';
 import { LoginType } from '@portkey/types/types-ca/wallet';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import myEvents from 'utils/deviceEvent';
+import { API_REQ_FUNCTION } from 'api/types';
+
+type FetchType = Record<string, API_REQ_FUNCTION>;
+
 type RouterParams = {
   loginGuardianType?: string;
   guardianItem?: UserGuardianItem;
@@ -43,19 +47,31 @@ export default function VerifierDetails() {
   });
   const [stateSessionId, setStateSessionId] = useState<string>(verifierSessionId || '');
   const digitInput = useRef<DigitInputInterface>();
+  const setGuardianStatus = useCallback(
+    (status: GuardiansStatusItem) => {
+      myEvents.setGuardianStatus.emit({
+        key: guardianKey,
+        status,
+      });
+    },
+    [guardianKey],
+  );
   const onFinish = useCallback(
     async (code: string) => {
-      console.log(stateSessionId, loginGuardianType, code, '====stateSessionId');
-
       if (!stateSessionId || !loginGuardianType || !code) return;
-      console.log(stateSessionId, '=====stateSessionId');
-
       try {
         Loading.show();
-        let fetch = request.register;
+        let fetch: FetchType = request.register;
         if (verificationType === VerificationType.communityRecovery) fetch = request.recovery;
+        if (
+          verificationType === VerificationType.addGuardian ||
+          verificationType === VerificationType.editGuardianApproval ||
+          verificationType === VerificationType.setLoginAccount
+        ) {
+          fetch = request.verification;
+        }
 
-        await fetch.verifyCode({
+        const rst = await fetch.verifyCode({
           baseURL: guardianItem?.verifier?.url,
           data: {
             type: 0,
@@ -66,14 +82,37 @@ export default function VerifierDetails() {
         });
         CommonToast.success('Verified Successfully');
         if (verificationType === VerificationType.communityRecovery) {
-          myEvents.setGuardianStatus.emit({
-            key: guardianKey,
-            status: {
-              verifierSessionId,
-              status: VerifyStatus.Verified,
-            },
+          setGuardianStatus({
+            verifierSessionId: stateSessionId,
+            status: VerifyStatus.Verified,
           });
           navigationService.goBack();
+        } else if (verificationType === VerificationType.editGuardianApproval) {
+          if (rst.signature && rst.verifierDoc) {
+            setGuardianStatus({
+              verifierSessionId: stateSessionId,
+              status: VerifyStatus.Verified,
+              editGuardianParams: {
+                signature: rst.signature,
+                verifierDoc: rst.verifierDoc,
+              },
+            });
+            navigationService.goBack();
+          }
+        } else if (verificationType === VerificationType.addGuardian) {
+          if (rst.signature && rst.verifierDoc) {
+            navigationService.navigate('GuardianApproval', {
+              approvalType: ApprovalType.addGuardian,
+              guardianItem,
+              editGuardianParams: {
+                signature: rst.signature,
+                verifierDoc: rst.verifierDoc,
+              },
+              managerUniqueId,
+            });
+          }
+        } else if (verificationType === VerificationType.setLoginAccount) {
+          // TODO: add set login account
         } else {
           navigationService.navigate('SetPin', {
             managerInfo: {
@@ -90,20 +129,20 @@ export default function VerifierDetails() {
       }
       Loading.hide();
     },
-    [
-      guardianItem?.verifier?.url,
-      guardianKey,
-      loginGuardianType,
-      managerUniqueId,
-      stateSessionId,
-      verificationType,
-      verifierSessionId,
-    ],
+    [guardianItem, loginGuardianType, managerUniqueId, setGuardianStatus, stateSessionId, verificationType],
   );
   const resendCode = useCallback(async () => {
     Loading.show();
     try {
-      const req = await request.register.sendCode({
+      let fetch: FetchType = request.register;
+      if (verificationType === VerificationType.communityRecovery) fetch = request.recovery;
+      if (
+        verificationType === VerificationType.addGuardian ||
+        verificationType === VerificationType.editGuardianApproval ||
+        verificationType === VerificationType.setLoginAccount
+      )
+        fetch = request.verification;
+      const req = await fetch.sendCode({
         baseURL: guardianItem?.verifier?.url,
         data: {
           type: 0,
@@ -113,16 +152,19 @@ export default function VerifierDetails() {
       });
       if (req.verifierSessionId) {
         setStateSessionId(req.verifierSessionId);
+        setGuardianStatus({
+          verifierSessionId: req.verifierSessionId,
+          status: VerifyStatus.Verifying,
+        });
         countdown.current?.resetTime(60);
         digitInput.current?.resetPin();
       }
     } catch (error) {
+      digitInput.current?.resetPin();
       CommonToast.failError(error, 'Verify Fail');
     }
     Loading.hide();
-  }, [guardianItem?.verifier?.url, loginGuardianType, managerUniqueId]);
-  console.log(guardianItem, '====verifierItem');
-
+  }, [guardianItem?.verifier?.url, loginGuardianType, managerUniqueId, setGuardianStatus, verificationType]);
   return (
     <PageContainer type="leftBack" titleDom containerStyles={styles.containerStyles}>
       {guardianItem ? <GuardianAccountItem guardianItem={guardianItem} isButtonHide /> : null}

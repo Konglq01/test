@@ -5,7 +5,6 @@ import { TextS } from 'components/CommonText';
 import React, { useRef, useState, useCallback, memo, useMemo, forwardRef, useImperativeHandle } from 'react';
 import { StyleSheet, View, TextInput, TouchableHighlight, StyleProp, ViewStyle } from 'react-native';
 import { screenWidth } from '@portkey/utils/mobile/device';
-import { isValidPositiveInteger } from '@portkey/utils/reg';
 
 type DigitInputProps = {
   maxLength?: number;
@@ -92,7 +91,7 @@ const DigitInput = forwardRef(
               ref={input}
               value={text}
               maxLength={maxLength}
-              autoFocus={true}
+              // autoFocus={true}
               keyboardType={keyboardType}
               onChangeText={value => {
                 // if (value && !isValidPositiveInteger(value)) return;

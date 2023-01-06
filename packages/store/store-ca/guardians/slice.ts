@@ -8,7 +8,7 @@ import {
   setVerifierListAction,
   setUserGuardianSessionIdAction,
   setGuardiansAction,
-  resetUserGuardianItemStatus,
+  resetUserGuardianStatus,
   setUserGuardianStatus,
 } from './actions';
 import { GuardiansState } from './type';
@@ -44,15 +44,14 @@ export const guardiansSlice = createSlice({
         }
         const { loginGuardianTypeIndexes, guardians } = action.payload;
         const _guardians: (typeof guardians[number] & { isLoginAccount?: boolean })[] = [...guardians];
-        loginGuardianTypeIndexes.forEach((item, idx) => {
-          // TODO: delete test code
-          if (idx === 0) _guardians[item].isLoginAccount = true;
+        loginGuardianTypeIndexes.forEach(item => {
+          _guardians[item].isLoginAccount = true;
         });
+
         const userStatus = state.userGuardianStatus ?? {};
         const guardiansList = _guardians.map(guardian => {
           const loginGuardianType = guardian.guardianType.guardianType;
-          // TODO
-          const verifier = verifierMap?.[guardian.verifier.name || 'portkey'];
+          const verifier = verifierMap?.[guardian.verifier.name];
           const guardiansType =
             typeof guardian.guardianType.type === 'string'
               ? GUARDIAN_TYPE_TYPE[guardian.guardianType.type]
@@ -80,7 +79,10 @@ export const guardiansSlice = createSlice({
           ...state.userGuardianStatus,
           [action.payload.key]: state.currentGuardian,
         };
-        console.log(JSON.parse(JSON.stringify(state.userGuardianStatus)), action.payload, 'setCurrentGuardianAction');
+      })
+      .addCase(setUserGuardianStatus, (state, action) => {
+        const userStatus = action.payload;
+        state.userGuardianStatus = userStatus;
       })
       .addCase(setUserGuardianItemStatus, (state, action) => {
         const { key, status } = action.payload;
@@ -91,12 +93,7 @@ export const guardiansSlice = createSlice({
           state.guardianExpiredTime = moment().add(1, 'h').subtract(2, 'minute').valueOf();
         }
       })
-      .addCase(setUserGuardianStatus, (state, action) => {
-        const { key, status } = action.payload;
-        if (!state.userGuardianStatus) state.userGuardianStatus = {};
-        // if (!state.userGuardianStatus?.[key]) state.userGuardianStatus[key] = {};
-      })
-      .addCase(resetUserGuardianItemStatus, state => {
+      .addCase(resetUserGuardianStatus, state => {
         state.userGuardianStatus = {};
       })
       .addCase(setUserGuardianSessionIdAction, (state, action) => {

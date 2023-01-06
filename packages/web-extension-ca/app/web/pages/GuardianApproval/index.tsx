@@ -97,7 +97,7 @@ export default function GuardianApproval() {
   );
 
   useEffect(() => {
-    const timeGap = guardianExpiredTime ?? 0 - Date.now();
+    const timeGap = (guardianExpiredTime ?? 0) - Date.now();
     if (timeGap <= 0) return setIsExpired(false);
 
     const timeout = setTimeout(() => {

@@ -18,12 +18,14 @@ import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import Loading from 'components/Loading';
 import useBiometricsReady from 'hooks/useBiometrics';
 import { usePreventHardwareBack } from '@portkey/hooks/mobile';
-import { intervalGetRegisterResult, TimerResult } from 'utils/wallet';
+import { intervalGetResult, onResultFail, TimerResult } from 'utils/wallet';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import CommonButton from 'components/CommonButton';
 import { resetWallet, setCAInfo } from '@portkey/store/store-ca/wallet/actions';
 import { CAInfo } from '@portkey/types/types-ca/wallet';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network';
+import { VerificationType } from '@portkey/types/verifier';
+import useEffectOnce from 'hooks/useEffectOnce';
 let appState: AppStateStatus;
 export default function SecurityLock() {
   const { biometrics } = useUser();
@@ -46,10 +48,17 @@ export default function SecurityLock() {
     if (isSyncCAInfo) {
       setTimeout(() => {
         if (walletInfo.managerInfo && apiUrl)
-          timer.current = intervalGetRegisterResult({
+          timer.current = intervalGetResult({
             apiUrl,
             managerInfo: walletInfo.managerInfo,
             onPass: setStateCAInfo,
+            onFail: message =>
+              onResultFail(
+                dispatch,
+                message,
+                walletInfo.managerInfo?.verificationType === VerificationType.communityRecovery,
+                true,
+              ),
           });
       }, 100);
     }
@@ -78,7 +87,7 @@ export default function SecurityLock() {
       if (isSyncCAInfo && !caInfo) {
         timer.current?.remove();
         Loading.show();
-        timer.current = intervalGetRegisterResult({
+        timer.current = intervalGetResult({
           apiUrl,
           managerInfo: walletInfo.managerInfo,
           onPass: (info: CAInfo) => {
@@ -92,6 +101,13 @@ export default function SecurityLock() {
             Loading.hide();
             handleRouter(pwd);
           },
+          onFail: message =>
+            onResultFail(
+              dispatch,
+              message,
+              walletInfo.managerInfo?.verificationType === VerificationType.communityRecovery,
+              true,
+            ),
         });
         return;
       } else if (caInfo) {
@@ -126,6 +142,9 @@ export default function SecurityLock() {
     },
     [verifyBiometrics],
   );
+  useEffectOnce(() => {
+    if (!navigation.canGoBack()) verifyBiometrics();
+  });
   useEffect(() => {
     const listener = AppState.addEventListener('change', handleAppStateChange);
     return () => {
