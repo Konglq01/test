@@ -22,8 +22,10 @@ export enum VerificationType {
 }
 
 export enum ApprovalType {
-  register = 0,
-  addGuardian = 2,
+  register,
+  addGuardian,
+  deleteGuardian,
+  editGuardian,
 }
 
 export interface GuardiansInfo {
