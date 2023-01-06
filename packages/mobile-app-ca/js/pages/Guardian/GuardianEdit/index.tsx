@@ -15,7 +15,7 @@ import CommonInput from 'components/CommonInput';
 import { checkEmail } from '@portkey/utils/check';
 import { useGuardiansInfo } from 'hooks/store';
 import { LOGIN_TYPE_LIST } from '@portkey/constants/verifier';
-import { VerificationType, VerifierItem } from '@portkey/types/verifier';
+import { ApprovalType, VerificationType, VerifierItem } from '@portkey/types/verifier';
 import { INIT_HAS_ERROR, INIT_NONE_ERROR } from 'constants/common';
 import GuardianTypeSelectOverlay from '../components/GuardianTypeSelectOverlay';
 import VerifierSelectOverlay from '../components/VerifierSelectOverlay';
@@ -96,6 +96,7 @@ const GuardianEdit: React.FC = () => {
         isError: true,
         errorMsg: guardianErrorMsg,
       });
+      setGuardianError({ ...INIT_NONE_ERROR });
       return;
     }
 
@@ -155,11 +156,26 @@ const GuardianEdit: React.FC = () => {
     const _guardianError = checkCurGuardianRepeat();
     setGuardianError(_guardianError);
     if (_guardianError.isError) return;
-    // TODO: add callback or next step
-    navigationService.navigate('SelectVerifier', { loginGuardianType: email });
-  }, [checkCurGuardianRepeat, email]);
+    navigationService.navigate('GuardianApproval', {
+      approvalType: ApprovalType.editGuardian,
+      guardianItem: editGuardian,
+    });
+  }, [checkCurGuardianRepeat, editGuardian]);
 
   const onRemove = useCallback(() => {
+    if (!editGuardian) return;
+    if (editGuardian.isLoginAccount) {
+      ActionSheet.alert({
+        title2: t(`This guardian is login account and cannot be remove`),
+        buttons: [
+          {
+            title: t('OK'),
+          },
+        ],
+      });
+      return;
+    }
+
     ActionSheet.alert({
       title: t('Are you sure you want to remove this guardian?'),
       message: t('Removing a guardian requires guardian approval'),
@@ -171,13 +187,15 @@ const GuardianEdit: React.FC = () => {
         {
           title: t('Yes'),
           onPress: () => {
-            // TODO: add callback or next step
-            navigationService.navigate('SelectVerifier', { loginGuardianType: email });
+            navigationService.navigate('GuardianApproval', {
+              approvalType: ApprovalType.deleteGuardian,
+              guardianItem: editGuardian,
+            });
           },
         },
       ],
     });
-  }, [email, t]);
+  }, [editGuardian, t]);
 
   const isConfirmDisable = useMemo(
     () => !selectedVerifier || !selectedType || !email,
