@@ -21,6 +21,7 @@ import { useAppDispatch } from 'store/hooks';
 import { getChainListAsync } from '@portkey/store/store-ca/wallet/actions';
 import Loading from 'components/Loading';
 import myEvents from 'utils/deviceEvent';
+import useEffectOnce from 'hooks/useEffectOnce';
 const safeAreaColor: SafeAreaColorMapKeyUnit[] = ['transparent', 'transparent'];
 
 const scrollViewProps = { extraHeight: 120 };
@@ -57,6 +58,15 @@ function SignupEmail() {
     }
     Loading.hide();
   }, [chainInfo, dispatch, email, getHolderInfo, getVerifierServers]);
+  useEffectOnce(() => {
+    const listener = myEvents.clearSignupInput.addListener(() => {
+      setEmail('');
+      setErrorMessage(undefined);
+    });
+    return () => {
+      listener.remove();
+    };
+  });
   return (
     <View style={[BGStyles.bg1, styles.card]}>
       <CommonInput
@@ -91,7 +101,7 @@ export default function SignupPortkey() {
         safeAreaColor={safeAreaColor}
         scrollViewProps={scrollViewProps}
         leftCallback={() => {
-          myEvents.clearLoginInput.emit('clearLoginInput');
+          myEvents.clearLoginInput.emit();
           navigationService.goBack();
         }}>
         <Svg icon="logo-icon" size={pTd(60)} iconStyle={styles.iconStyle} />

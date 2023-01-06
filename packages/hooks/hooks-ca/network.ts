@@ -1,7 +1,7 @@
 import { useCurrentWallet } from './wallet';
 import { useMemo } from 'react';
 import { NetworkList } from '@portkey/constants/constants-ca/network';
-import { useAppCASelector } from '..';
+import { useAppCASelector } from '.';
 
 export function useNetworkList() {
   return NetworkList;

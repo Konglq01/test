@@ -20,8 +20,7 @@ import useBiometricsReady from 'hooks/useBiometrics';
 import { usePreventHardwareBack } from '@portkey/hooks/mobile';
 import { intervalGetResult, onResultFail, TimerResult } from 'utils/wallet';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import CommonButton from 'components/CommonButton';
-import { resetWallet, setCAInfo } from '@portkey/store/store-ca/wallet/actions';
+import { setCAInfo } from '@portkey/store/store-ca/wallet/actions';
 import { CAInfo } from '@portkey/types/types-ca/wallet';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 import { VerificationType } from '@portkey/types/verifier';
@@ -179,14 +178,6 @@ export default function SecurityLock() {
           style={styles.pinStyle}
           onChangeText={onChangeText}
           errorMessage={errorMessage}
-        />
-        <CommonButton
-          title="resetWallet"
-          type="primary"
-          onPress={() => {
-            dispatch(resetWallet());
-            navigationService.reset('Referral');
-          }}
         />
       </View>
     </PageContainer>

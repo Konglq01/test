@@ -73,7 +73,10 @@ function LoginEmail({ setLoginType }: { setLoginType: (type: LoginType) => void 
   }, [chainInfo, dispatch, email, getHolderInfo, getVerifierServers]);
 
   useEffectOnce(() => {
-    const listener = myEvents.clearLoginInput.addListener(() => setEmail(''));
+    const listener = myEvents.clearLoginInput.addListener(() => {
+      setEmail('');
+      setErrorMessage(undefined);
+    });
     return () => listener.remove();
   });
   return (
