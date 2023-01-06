@@ -1,4 +1,3 @@
-import { EmailReg } from '@portkey/utils/reg';
 import { Input } from 'antd';
 import { forwardRef, useCallback, useImperativeHandle } from 'react';
 import clsx from 'clsx';

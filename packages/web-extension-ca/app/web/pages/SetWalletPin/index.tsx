@@ -47,7 +47,7 @@ export default function SetWalletPin() {
         managerAddress,
         chainId: 'AELF',
         verificationType: state === 'login' ? VerificationType.communityRecovery : VerificationType.register,
-        deviceString: navigator.userAgent,
+        deviceString: Date.now().toString(), //navigator.userAgent,
         guardianCount: 1,
       });
       return loginAccount.managerUniqueId;
