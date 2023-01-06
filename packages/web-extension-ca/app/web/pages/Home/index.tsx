@@ -1,22 +1,29 @@
-import { Button } from 'antd';
+import { Button, message } from 'antd';
 import PortKeyHeader from 'pages/components/PortKeyHeader';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import MyBalance from './components/MyBalance';
 import './index.less';
-import { useCommonState } from 'store/Provider/hooks';
-import InternalMessage from 'messages/InternalMessage';
-import InternalMessageTypes from 'messages/InternalMessageTypes';
-import './index.less';
+import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 
 export default function Home() {
   const navigate = useNavigate();
+  const currentChain = useCurrentChain();
+  const wallet = useCurrentWallet();
+  // 2A7tQJt8LgTPDvExTRSKdXQxgKWBcudSaUgBSkh7BPwxbHHMNw
+  console.log(wallet, 'walletInfo==');
   const TestCode = (
     <Button
       onClick={async () => {
         // await InternalMessage.payload(InternalMessageTypes.SET_SEED, '11111111').send();
-        const seed = await InternalMessage.payload(InternalMessageTypes.GET_SEED).send();
-        console.log(seed, 'Check==');
+
+        if (!currentChain?.endPoint) return message.error('error');
+        try {
+          //
+        } catch (error) {
+          console.log(error, 'error====addGuardian');
+        }
       }}>
       Check
     </Button>
@@ -31,7 +38,7 @@ export default function Home() {
       <PortKeyHeader onUserClick={onUserClick} />
       <div className="portkey-home-body">
         <MyBalance />
-        {/* {TestCode} */}
+        {TestCode}
         {/* <SettingDrawer
           open={visible}
           onClose={() => setVisible(false)}
