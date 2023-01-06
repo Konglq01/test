@@ -18,7 +18,7 @@ export default function useLogOut() {
       dispatch(resetToken());
       dispatch(resetSettings());
       dispatch(resetNetwork());
-      navigationService.reset('LoginPortkey');
+      navigationService.reset('Referral');
     } catch (error) {
       console.log(error, '====error');
     }
