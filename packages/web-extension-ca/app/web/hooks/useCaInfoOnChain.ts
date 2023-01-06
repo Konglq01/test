@@ -9,6 +9,7 @@ import InternalMessageTypes from 'messages/InternalMessageTypes';
 import { useCallback } from 'react';
 import { useAppDispatch } from 'store/Provider/hooks';
 import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
+// TODO get
 
 export const useCaInfoOnChain = () => {
   const { walletInfo, chainList } = useCurrentWallet();
