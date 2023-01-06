@@ -1,6 +1,7 @@
 import { PartialOption } from '@portkey/types/common';
 import {
   CaHolderManagerDto,
+  GetCaHolderManagerChangeRecordDto,
   GetCaHolderManagerInfoDto,
   GetCaHolderTokenBalanceDto,
   GetCaHolderTransactionAddressDto,
