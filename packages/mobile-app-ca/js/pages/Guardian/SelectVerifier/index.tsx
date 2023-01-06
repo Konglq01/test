@@ -24,11 +24,13 @@ import { useVerifierList } from '@portkey/hooks/hooks-ca/network';
 import VerifierOverlay from '../components/VerifierOverlay';
 import { VerifierImage } from '../components/VerifierImage';
 import { LoginType } from '@portkey/types/types-ca/wallet';
+import myEvents from 'utils/deviceEvent';
 
 const ScrollViewProps = { disabled: true };
 export default function SelectVerifier() {
   const { t } = useLanguage();
   const verifierList = useVerifierList();
+
   const [selectedVerifier, setSelectedVerifier] = useState(verifierList[0]);
 
   const { loginGuardianType } = useRouterParams<{ loginGuardianType?: string }>();
@@ -82,7 +84,15 @@ export default function SelectVerifier() {
     });
   }, [loginGuardianType, selectedVerifier, t]);
   return (
-    <PageContainer containerStyles={styles.containerStyles} scrollViewProps={ScrollViewProps} type="leftBack" titleDom>
+    <PageContainer
+      containerStyles={styles.containerStyles}
+      scrollViewProps={ScrollViewProps}
+      type="leftBack"
+      titleDom
+      leftCallback={() => {
+        myEvents.clearSignupInput.emit();
+        navigationService.goBack();
+      }}>
       <View>
         <TextXXXL style={GStyles.textAlignCenter}>Select verifier</TextXXXL>
         <TextM style={[GStyles.textAlignCenter, FontStyles.font3, GStyles.marginTop(8)]}>
@@ -96,11 +106,11 @@ export default function SelectVerifier() {
               callBack: setSelectedVerifier,
             })
           }
-          titleLeftElement={<VerifierImage uri={selectedVerifier.imageUrl} size={30} />}
+          titleLeftElement={<VerifierImage uri={selectedVerifier?.imageUrl} size={30} />}
           titleStyle={[GStyles.flexRow, GStyles.itemCenter]}
           titleTextStyle={styles.titleTextStyle}
           style={[styles.selectedItem, BorderStyles.border1]}
-          title={selectedVerifier.name}
+          title={selectedVerifier?.name}
           rightElement={<Svg size={pTd(16)} icon="down-arrow" />}
         />
         <TextM style={fonts.mediumFont}>Popular</TextM>

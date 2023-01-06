@@ -39,14 +39,14 @@ const WalletName: React.FC = () => {
       return;
     }
     if (!isValidCAWalletName(_nameValue)) {
-      setNameError({ ...INIT_HAS_ERROR, errorMsg: t('only a-z, A-Z,0-9 and "_"allowed') });
+      setNameError({ ...INIT_HAS_ERROR, errorMsg: t('3-16 characters, only a-z, A-Z, 0-9 and "_" allowed') });
       return;
     }
 
     const response = await appDispatch(updateWalletNameAsync(_nameValue));
     if (response.meta.requestStatus === 'fulfilled') {
       navigationService.goBack();
-      CommonToast.success(t('Saved successful'), undefined, 'bottom');
+      CommonToast.success(t('Saved Successful'), undefined, 'bottom');
     }
   }, [appDispatch, nameValue, t]);
 

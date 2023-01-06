@@ -26,7 +26,11 @@ export default function AccountSettings() {
         <ListItem style={styles.listStyle} key={item.title} {...item} title={t(item.title)} />
       ))}
       {biometricsReady && (
-        <ListItem style={styles.listStyle} title="Biometric" onPress={() => navigationService.navigate('Biometric')} />
+        <ListItem
+          style={styles.listStyle}
+          title={t('Biometric Authentication')}
+          onPress={() => navigationService.navigate('Biometric')}
+        />
       )}
     </PageContainer>
   );

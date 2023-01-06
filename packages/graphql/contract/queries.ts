@@ -13,12 +13,91 @@ import {
   GetCaHolderTransactionAddressParamsType,
 } from './types';
 import {
+  CaHolderManagerChangeRecordDto,
   CaHolderManagerDto,
+  CaHolderTokenBalanceDto,
+  CaHolderTransactionAddressDto,
   CaHolderTransactionDto,
+  GetCaHolderManagerChangeRecordDto,
+  GetLoginGuardianTypeChangeRecordDto,
+  LoginGuardianTypeChangeRecordDto,
   LoginGuardianTypeDto,
   NftProtocolInfoDto,
   TokenInfoDto,
 } from './__generated__/resolversTypes';
+
+// CaHolderManagerChangeRecord
+const CA_HOLDER_MANAGER_CHANGE_RECORD_QUERY = gql`
+  query CaHolderManagerChangeRecordInfo(
+    $caHash: String
+    $chainId: String
+    $endBlockHeight: Int!
+    $startBlockHeight: Int!
+  ) {
+    caHolderManagerChangeRecordInfo(
+      dto: { caHash: $caHash, chainId: $chainId, endBlockHeight: $endBlockHeight, startBlockHeight: $startBlockHeight }
+    ) {
+      blockHeight
+      caAddress
+      caHash
+      changeType
+      manager
+    }
+  }
+`;
+
+const getCaHolderManagerChangeRecord = async (network: NetworkType, params: GetCaHolderManagerChangeRecordDto) => {
+  const apolloClient = getApolloClient(network);
+
+  const result = await apolloClient.query<{ caHolderManagerChangeRecordInfo: CaHolderManagerChangeRecordDto[] }>({
+    query: CA_HOLDER_MANAGER_CHANGE_RECORD_QUERY,
+    variables: params,
+  });
+  return result;
+};
+
+// CAHolderManager
+const SEARCH_CA_HOLDER_MANAGER_INFO_QUERY = gql`
+  query CaHolderManagerInfo(
+    $caAddress: String
+    $caHash: String
+    $chainId: String
+    $manager: String
+    $maxResultCount: Int = 100
+    $skipCount: Int = 0
+  ) {
+    caHolderManagerInfo(
+      dto: {
+        caAddress: $caAddress
+        caHash: $caHash
+        chainId: $chainId
+        manager: $manager
+        maxResultCount: $maxResultCount
+        skipCount: $skipCount
+      }
+    ) {
+      caAddress
+      caHash
+      chainId
+      id
+      managers {
+        deviceString
+        manager
+      }
+    }
+  }
+`;
+
+const searchCAHolderManagerInfo = async (network: NetworkType, params: GetCaHolderManagerInfoParamsType) => {
+  const apolloClient = getApolloClient(network);
+  const result = await apolloClient.query<{ caHolderManagerInfo: CaHolderManagerDto[] }>({
+    query: SEARCH_CA_HOLDER_MANAGER_INFO_QUERY,
+    variables: params,
+  });
+  return result;
+};
+
+// TODO: It's not verified down here
 
 // TokenInfo
 const TOKEN_INFO_LIST_QUERY = gql`
@@ -123,39 +202,57 @@ const searchNFTProtocolInfo = async (network: NetworkType, params: GetNftProtoco
 
 // CAHolderTransaction
 const SEARCH_CA_HOLDER_TRANSACTION_QUERY = gql`
-  query CaHolderTransaction($chainId: String, $address: String, $skipCount: Int = 0, $maxResultCount: Int = 100) {
+  query CaHolderTransaction(
+    $address: String
+    $blockHash: String
+    $chainId: String
+    $maxResultCount: Int = 100
+    $methodNames: [String]
+    $skipCount: Int = 0
+    $symbol: String
+    $transactionId: String
+  ) {
     caHolderTransaction(
-      dto: { chainId: $chainId, address: $address, skipCount: $skipCount, maxResultCount: $maxResultCount }
+      dto: {
+        address: $address
+        blockHash: $blockHash
+        chainId: $chainId
+        maxResultCount: $maxResultCount
+        methodNames: $methodNames
+        skipCount: $skipCount
+        symbol: $symbol
+        transactionId: $transactionId
+      }
     ) {
-      id
-      chainId
       blockHash
       blockHeight
-      previousBlockHash
-      transactionId
-      transactionType
-      tokenInfo {
-        symbol
-        decimals
-      }
+      chainId
+      fromAddress
+      id
+      methodName
       nftInfo {
         url
         alias
         nftId
       }
+      previousBlockHash
       status
       timestamp
-      transferInfo {
-        fromAddress
-        toAddress
-        amount
-        fromChainId
-        toChainId
-      }
-      fromAddress
-      transactionFees {
+      tokenInfo {
         symbol
+        decimals
+      }
+      transactionFees {
         amount
+        symbol
+      }
+      transactionId
+      transferInfo {
+        amount
+        fromAddress
+        fromChainId
+        toAddress
+        toChainId
       }
     }
   }
@@ -166,47 +263,6 @@ const searchCAHolderTransaction = async (network: NetworkType, params: GetCaHold
 
   const result = await apolloClient.query<{ caHolderTransaction: CaHolderTransactionDto[] }>({
     query: SEARCH_CA_HOLDER_TRANSACTION_QUERY,
-    variables: params,
-  });
-  return result;
-};
-
-// CAHolderManager
-const SEARCH_CA_HOLDER_MANAGER_INFO_QUERY = gql`
-  query CaHolderManagerInfo(
-    $chainId: String
-    $caHash: String
-    $caAddress: String
-    $manager: String
-    $skipCount: Int = 0
-    $maxResultCount: Int = 100
-  ) {
-    caHolderManagerInfo(
-      dto: {
-        chainId: $chainId
-        caHash: $caHash
-        caAddress: $caAddress
-        manager: $manager
-        skipCount: $skipCount
-        maxResultCount: $maxResultCount
-      }
-    ) {
-      id
-      chainId
-      caHash
-      caAddress
-      managers {
-        manager
-        deviceString
-      }
-    }
-  }
-`;
-
-const searchCAHolderManagerInfo = async (network: NetworkType, params: GetCaHolderManagerInfoParamsType) => {
-  const apolloClient = getApolloClient(network);
-  const result = await apolloClient.query<{ caHolderManagerInfo: CaHolderManagerDto[] }>({
-    query: SEARCH_CA_HOLDER_MANAGER_INFO_QUERY,
     variables: params,
   });
   return result;
@@ -276,6 +332,7 @@ const SEARCH_LOGIN_GUARDIAN_TYPE_QUERY = gql`
       caHash
       caAddress
       loginGuardianType
+      type
     }
   }
 `;
@@ -340,7 +397,10 @@ const CA_HOLDER_TOKEN_BALANCE_INFO_QUERY = gql`
       balance
       caAddress
       chainId
-      symbol
+      tokenInfo {
+        decimals
+        symbol
+      }
     }
   }
 `;
@@ -348,7 +408,7 @@ const CA_HOLDER_TOKEN_BALANCE_INFO_QUERY = gql`
 const getCaHolderTokenBalance = async (network: NetworkType, params: GetCaHolderTokenBalanceParamsType) => {
   const apolloClient = getApolloClient(network);
 
-  const result = await apolloClient.query<{ caHolderManagerInfo: CaHolderManagerDto[] }>({
+  const result = await apolloClient.query<{ caHolderTokenBalanceInfo: CaHolderTokenBalanceDto[] }>({
     query: CA_HOLDER_TOKEN_BALANCE_INFO_QUERY,
     variables: params,
   });
@@ -378,8 +438,39 @@ const CA_HOLDER_TRANSACTION_ADDRESS_QUERY = gql`
 const getCaHolderTransactionAddress = async (network: NetworkType, params: GetCaHolderTransactionAddressParamsType) => {
   const apolloClient = getApolloClient(network);
 
-  const result = await apolloClient.query<{ caHolderManagerInfo: CaHolderManagerDto[] }>({
+  const result = await apolloClient.query<{ caHolderTransactionAddressInfo: CaHolderTransactionAddressDto[] }>({
     query: CA_HOLDER_TRANSACTION_ADDRESS_QUERY,
+    variables: params,
+  });
+  return result;
+};
+
+// LoginGuardianTypeChangeRecord
+const LOGIN_GUARDIAN_TYPE_CHANGE_RECORD_QUERY = gql`
+  query LoginGuardianTypeChangeRecordInfo(
+    $caHash: String
+    $chainId: String
+    $endBlockHeight: Int!
+    $startBlockHeight: Int!
+  ) {
+    loginGuardianTypeChangeRecordInfo(
+      dto: { caHash: $caHash, chainId: $chainId, endBlockHeight: $endBlockHeight, startBlockHeight: $startBlockHeight }
+    ) {
+      blockHeight
+      caAddress
+      caHash
+      changeType
+      id
+      loginGuardianType
+    }
+  }
+`;
+
+const getLoginGuardianTypeChangeRecord = async (network: NetworkType, params: GetLoginGuardianTypeChangeRecordDto) => {
+  const apolloClient = getApolloClient(network);
+
+  const result = await apolloClient.query<{ loginGuardianTypeChangeRecordInfo: LoginGuardianTypeChangeRecordDto[] }>({
+    query: LOGIN_GUARDIAN_TYPE_CHANGE_RECORD_QUERY,
     variables: params,
   });
   return result;
@@ -394,4 +485,6 @@ export {
   getCAHolderByManager,
   getCaHolderTokenBalance,
   getCaHolderTransactionAddress,
+  getCaHolderManagerChangeRecord,
+  getLoginGuardianTypeChangeRecord,
 };
