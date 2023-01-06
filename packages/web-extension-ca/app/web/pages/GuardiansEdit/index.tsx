@@ -5,9 +5,14 @@ import CommonModal from 'components/CommonModal';
 import CustomSvg from 'components/CustomSvg';
 import SettingHeader from 'pages/components/SettingHeader';
 import { useCallback, useMemo, useState } from 'react';
-import { useGuardiansInfo } from 'store/Provider/hooks';
+import { useAppDispatch, useGuardiansInfo } from 'store/Provider/hooks';
 import './index.less';
 import CustomSelect from 'pages/components/CustomSelect';
+import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { resetUserGuardianStatus } from '@portkey/store/store-ca/guardians/actions';
+import useGuardianList from 'hooks/useGuardianList';
+import { LoginType } from '@portkey/types/types-ca/wallet';
+import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
 
 export default function GuardiansEdit() {
   const { t } = useTranslation();
@@ -15,8 +20,12 @@ export default function GuardiansEdit() {
   const { currentGuardian, userGuardiansList } = useGuardiansInfo();
   const { verifierMap } = useGuardiansInfo();
   const [removeOpen, setRemoveOpen] = useState<boolean>();
-  const [selectVal, setSelectVal] = useState<string>(currentGuardian?.verifier?.name || 'Portkey');
+  const [removeClose, setRemoveClose] = useState<boolean>(false);
+  const [selectVal, setSelectVal] = useState<string>(currentGuardian?.verifier?.name as string);
   const [exist, setExist] = useState<boolean>(false);
+  const { walletInfo } = useCurrentWallet();
+  const userGuardianList = useGuardianList();
+  const dispatch = useAppDispatch();
 
   const selectOptions = useMemo(
     () =>
@@ -24,14 +33,14 @@ export default function GuardiansEdit() {
         value: item.name,
         children: (
           <div className="flex verifier-option">
-            <CustomSvg type={item.imageUrl as any} />
+            <img src={item.imageUrl} alt="icon" />
             <span className="title">{item.name}</span>
           </div>
         ),
       })),
     [verifierMap],
   );
-
+  console.log('--------verifierMap----------', verifierMap);
   const disabled = useMemo(
     () => exist || selectVal === currentGuardian?.verifier?.name,
     [exist, selectVal, currentGuardian],
@@ -54,10 +63,25 @@ export default function GuardiansEdit() {
     }
   };
 
-  const removeHandler = useCallback(() => {
-    // TODO
+  const checkRemove = () => {
+    if (currentGuardian?.isLoginAccount) {
+      setRemoveClose(true);
+    } else {
+      setRemoveOpen(true);
+    }
+  };
+
+  const removeHandler = async () => {
+    dispatch(
+      setLoginAccountAction({
+        loginGuardianType: currentGuardian?.loginGuardianType as string,
+        accountLoginType: LoginType.email,
+      }),
+    );
+    dispatch(resetUserGuardianStatus());
+    await userGuardianList(walletInfo.managerInfo?.loginGuardianType as string);
     navigate('/setting/guardians/guardian-approval', { state: 'guardians/edit' }); // status
-  }, [navigate]);
+  };
 
   return (
     <div className="edit-guardians-page">
@@ -86,13 +110,26 @@ export default function GuardiansEdit() {
         {exist && <div className="error">{t('This guardians is already exists')}</div>}
       </div>
       <div className="btn-wrap">
-        <Button className="warning" onClick={() => setRemoveOpen(true)}>
+        <Button className="warning" onClick={checkRemove}>
           {t('Remove')}
         </Button>
         <Button onClick={guardiansChangeHandler} disabled={disabled} type="primary">
           {t('Guardians Approval')}
         </Button>
       </div>
+      <CommonModal
+        open={removeClose}
+        closable={false}
+        width={320}
+        className={'remove-modal'}
+        onCancel={() => setRemoveOpen(false)}
+        title={t('The guardian is login account and cannot be remove')}
+        footer={
+          <Button type="primary" onClick={() => setRemoveClose(false)}>
+            {t('OK')}
+          </Button>
+        }
+      />
       <CommonModal
         open={removeOpen}
         closable={false}

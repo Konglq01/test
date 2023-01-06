@@ -16,6 +16,8 @@ export interface UserGuardianItem {
 export interface UserGuardianStatus extends UserGuardianItem {
   status?: VerifyStatus;
   sessionId?: string;
+  signature?: string;
+  verificationDoc?: string;
 }
 
 export interface GuardiansState {

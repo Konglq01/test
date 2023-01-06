@@ -23,7 +23,7 @@ export const setVerifierListAction = createAction<VerifierItem[] | null>('verifi
 export const setGuardiansAction = createAction<GuardiansInfo | null>('verifier/setGuardians');
 
 export const setCurrentGuardianAction = createAction<UserGuardianItem>('verifier/setCurrentGuardian');
-export const setUserGuardianItemStatus = createAction<{ key: string; status: VerifyStatus }>(
+export const setUserGuardianItemStatus = createAction<{ key: string; status: VerifyStatus, signature?: string, verificationDoc?: string }>(
   'verifier/setUserGuardianItemStatus',
 );
 export const setUserGuardianStatus = createAction<{ [x: string]: UserGuardianStatus }>(

@@ -10,6 +10,9 @@ import { VerificationType } from '@portkey/types/verifier';
 import { useTranslation } from 'react-i18next';
 
 import './index.less';
+import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
+import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
+import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 
 enum SwitchFail {
   default = 0,
@@ -24,6 +27,8 @@ export default function GuardiansView() {
   const { currentGuardian, userGuardiansList } = useGuardiansInfo();
   const [tipOpen, setTipOpen] = useState<boolean>(false);
   const [switchFail, setSwitchFail] = useState<SwitchFail>(SwitchFail.default);
+  const currentNetwork = useCurrentNetworkInfo();
+  const currentChain = useCurrentChain();
 
   const handleSwitch = async () => {
     if (currentGuardian?.isLoginAccount) {
@@ -37,13 +42,19 @@ export default function GuardiansView() {
         setTipOpen(true);
       }
     } else {
-      //TODO: is other login account ?
-      setSwitchFail(SwitchFail.openFail);
-      // if(true) {
-      //   setSwitchFail(SwitchFail.openFail)
-      // } else {
-      //   setTipOpen(true);
-      // }
+      const checkResult = await getHolderInfo({
+        rpcUrl: currentChain?.endPoint as string,
+        address: currentChain?.caContractAddress as string,
+        chainType: currentNetwork.walletType,
+        paramsOption: {
+          loginGuardianType: currentGuardian?.loginGuardianType as string,
+        },
+      });
+      if (checkResult.result.guardiansInfo?.guardians?.length > 0) {
+        setSwitchFail(SwitchFail.openFail);
+      } else {
+        setTipOpen(true);
+      }
     }
   };
 
@@ -96,7 +107,7 @@ export default function GuardiansView() {
           <div className="input-item">
             <div className="label">{t('Verifier')}</div>
             <div className="control">
-              <CustomSvg type="PortKey" />
+              <img src={currentGuardian?.verifier?.imageUrl} alt="icon" />
               <span>{currentGuardian?.verifier?.name ?? ''}</span>
             </div>
           </div>

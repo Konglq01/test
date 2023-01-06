@@ -16,7 +16,7 @@ export default function VerifierAccount() {
   const { currentGuardian, userGuardianStatus } = useGuardiansInfo();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { state } = useLocationState<'register' | 'login' | 'guardians'>();
+  const { state } = useLocationState<'register' | 'login' | 'guardians/add' | 'guardians/edit'>();
   const { isPrompt } = useCommonState();
   console.log(userGuardianStatus, 'userGuardianStatus===');
   const verificationType = useMemo(() => {
@@ -25,7 +25,8 @@ export default function VerifierAccount() {
         return VerificationType.register;
       case 'login':
         return VerificationType.communityRecovery;
-      case 'guardians':
+      case 'guardians/add':
+      case 'guardians/edit':
         return VerificationType.addGuardian;
       default:
         message.error('Router state error', 2000, () => navigate(-1));
@@ -35,24 +36,36 @@ export default function VerifierAccount() {
 
   console.log(state, 'location==');
 
-  const onSuccess = useCallback(() => {
-    if (state === 'register') {
-      navigate('/register/set-pin', { state: 'register' });
-    } else if (state == 'login') {
-      if (!currentGuardian) return;
-      dispatch(
-        setUserGuardianItemStatus({
-          key: currentGuardian.key,
-          status: VerifyStatus.Verified,
-        }),
-      );
-      navigate('/login/guardian-approval');
-    } else if (state?.indexOf('guardians') !== -1) {
-      navigate('/setting/guardians/guardian-approval', { state: state });
-    } else {
-      message.error('Router state error');
-    }
-  }, [dispatch, navigate, state, currentGuardian]);
+  const onSuccess = useCallback(
+    (res: Record<string, string>) => {
+      if (state === 'register') {
+        navigate('/register/set-pin', { state: 'register' });
+      } else if (state == 'login') {
+        if (!currentGuardian) return;
+        dispatch(
+          setUserGuardianItemStatus({
+            key: currentGuardian.key,
+            status: VerifyStatus.Verified,
+          }),
+        );
+        navigate('/login/guardian-approval');
+      } else if (state?.indexOf('guardians') !== -1) {
+        if (!currentGuardian) return;
+        dispatch(
+          setUserGuardianItemStatus({
+            key: currentGuardian.key,
+            status: VerifyStatus.Verified,
+            signature: res.signature,
+            verificationDoc: res.verifierDoc,
+          }),
+        );
+        navigate('/setting/guardians/guardian-approval', { state: state });
+      } else {
+        message.error('Router state error');
+      }
+    },
+    [dispatch, navigate, state, currentGuardian],
+  );
 
   return (
     <div className={clsx('verifier-account-wrapper', isPrompt ? 'common-page' : 'popup-page')}>
@@ -62,7 +75,7 @@ export default function VerifierAccount() {
           leftCallBack={() => {
             state === 'register' && navigate('/register/select-verifier');
             state === 'login' && navigate('/login/guardian-approval');
-            state?.indexOf('guardians') !== -1 && navigate(`/setting/${state}`, { state: { back: 'back' } });
+            state?.indexOf('guardians') !== -1 && navigate(`/setting/${state}`, { state: 'back' });
           }}
         />
       ) : (
@@ -70,7 +83,7 @@ export default function VerifierAccount() {
           leftCallBack={() => {
             state === 'register' && navigate('/register/select-verifier');
             state === 'login' && navigate('/login/guardian-approval');
-            state?.indexOf('guardians') !== -1 && navigate(`/setting/${state}`, { state: { back: 'back' } });
+            state?.indexOf('guardians') !== -1 && navigate(`/setting/${state}`, { state: 'back' });
           }}
         />
       )}

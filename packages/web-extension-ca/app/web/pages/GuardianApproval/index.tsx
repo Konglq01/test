@@ -4,7 +4,7 @@ import { useAppDispatch, useLoginInfo, useGuardiansInfo, useCommonState, useLoad
 import { VerificationType, VerifyStatus } from '@portkey/types/verifier';
 import { useNavigate, useLocation } from 'react-router';
 import { setUserGuardianItemStatus, setCurrentGuardianAction } from '@portkey/store/store-ca/guardians/actions';
-import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
+import { UserGuardianItem, UserGuardianStatus } from '@portkey/store/store-ca/guardians/type';
 import { ZERO } from '@portkey/constants/misc';
 import BigNumber from 'bignumber.js';
 import './index.less';
@@ -14,8 +14,32 @@ import clsx from 'clsx';
 import CommonTooltip from 'components/CommonTooltip';
 import { sendVerificationCode } from '@portkey/api/apiUtils/verification';
 import SettingHeader from 'pages/components/SettingHeader';
+import getPrivateKeyAndMnemonic from 'utils/Wallet/getPrivateKeyAndMnemonic';
+import { addGuardian } from 'utils/sandboxUtil/addGuardian';
+import { useCurrentWallet, useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
+import { LoginType } from '@portkey/types/types-ca/wallet';
+import { resetLoginInfoAction } from 'store/reducers/loginCache/actions';
 
 const APPROVAL_COUNT = ZERO.plus(3).div(5);
+
+interface IGuardianItem {
+  guardianType: {
+    type: LoginType;
+    guardianType: string;
+  };
+  verifier: {
+    name: string;
+    signature: string;
+    verificationDoc: string;
+  };
+}
+interface IAddGuardian {
+  caHash: string;
+  guardianToAdd: IGuardianItem;
+  guardiansApproved: IGuardianItem[];
+}
 
 export default function GuardianApproval() {
   const { userGuardianStatus, guardianExpiredTime } = useGuardiansInfo();
@@ -26,8 +50,18 @@ export default function GuardianApproval() {
   const dispatch = useAppDispatch();
   const { isPrompt } = useCommonState();
   const { setLoading } = useLoading();
+  const { walletInfo } = useCurrentWallet();
+  const currentNetwork = useCurrentNetworkInfo();
+  const currentChain = useCurrentChain();
+  console.log('-----------curWalletInfo--------------', walletInfo);
 
-  const userVerifiedList = useMemo(() => Object.values(userGuardianStatus ?? {}), [userGuardianStatus]);
+  const userVerifiedList = useMemo(() => {
+    let tempVerifiedList = Object.values(userGuardianStatus ?? {});
+    if (state && state.indexOf('guardians') !== -1) {
+      tempVerifiedList = tempVerifiedList.filter((item) => item.loginGuardianType !== loginAccount?.loginGuardianType);
+    }
+    return tempVerifiedList;
+  }, [loginAccount?.loginGuardianType, state, userGuardianStatus]);
   const approvalLength = useMemo(() => {
     if (userVerifiedList.length <= 3) return userVerifiedList.length;
     return APPROVAL_COUNT.times(userVerifiedList.length).dp(0, BigNumber.ROUND_DOWN).toNumber();
@@ -79,12 +113,78 @@ export default function GuardianApproval() {
     [loginAccount, setLoading, dispatch, state, navigate],
   );
 
+  const formatGuardiansValue = () => {
+    // let guardianToAdd: IGuardianItem = {} as IGuardianItem;
+    let guardianToAdd;
+    const guardiansApproved: any[] = [];
+    // const guardiansApproved: IGuardianItem[] = [];
+    Object.values(userGuardianStatus ?? {})?.forEach((item: UserGuardianStatus) => {
+      if (item.loginGuardianType === loginAccount?.loginGuardianType) {
+        guardianToAdd = {
+          guardianType: {
+            // type: item.guardiansType,
+            guardianType: item.loginGuardianType,
+          },
+          verifier: {
+            name: item.verifier?.name as string,
+            signature: item.signature as string,
+            verificationDoc: item.verificationDoc as string,
+          },
+        };
+      } else {
+        guardiansApproved.push({
+          guardianType: {
+            // type: item.guardiansType,
+            guardianType: item.loginGuardianType,
+          },
+          verifier: {
+            name: item.verifier?.name as string,
+            signature: item.signature as string,
+            verificationDoc: item.verificationDoc as string,
+          },
+        });
+      }
+    });
+    return { guardianToAdd, guardiansApproved };
+  };
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleGuardianRecovery = async () => {
+    if (state && state.indexOf('guardians') !== -1) {
+      const res = await getPrivateKeyAndMnemonic(
+        {
+          AESEncryptPrivateKey: walletInfo.AESEncryptPrivateKey,
+        },
+        '11111111',
+      );
+      if (!currentChain?.endPoint || !res?.privateKey) return message.error('error');
+      const { guardianToAdd, guardiansApproved } = formatGuardiansValue();
+      const seed = await addGuardian({
+        rpcUrl: currentChain.endPoint,
+        chainType: currentNetwork.walletType,
+        address: currentChain.caContractAddress,
+        privateKey: res.privateKey,
+        paramsOption: [
+          {
+            caHash: walletInfo?.AELF?.caHash,
+            guardianToAdd,
+            guardiansApproved,
+          },
+        ],
+      });
+      console.log('------------seed------------', seed);
+      dispatch(resetLoginInfoAction());
+      navigate('/setting/guardians');
+    }
+  };
+
   const recoveryWallet = useCallback(() => {
-    // TODO
-    state && state.indexOf('guardians') !== -1
-      ? navigate('/setting/guardians')
-      : navigate('/register/set-pin', { state: 'login' });
-  }, [navigate, state]);
+    if (state && state.indexOf('guardians') !== -1) {
+      handleGuardianRecovery();
+    } else {
+      navigate('/register/set-pin', { state: 'login' });
+    }
+  }, [handleGuardianRecovery, navigate, state]);
 
   const verifyingHandler = useCallback(
     async (item: UserGuardianItem) => {
@@ -115,7 +215,7 @@ export default function GuardianApproval() {
           leftElement
           leftCallBack={() =>
             state && state.indexOf('guardians') !== -1
-              ? navigate(`/setting/${state}`, { state: { back: 'back' } })
+              ? navigate(`/setting/${state}`, { state: 'back' })
               : navigate('/register/start')
           }
         />
@@ -123,7 +223,7 @@ export default function GuardianApproval() {
         <SettingHeader
           leftCallBack={() =>
             state && state.indexOf('guardians') !== -1
-              ? navigate(`/setting/${state}`, { state: { back: 'back' } })
+              ? navigate(`/setting/${state}`, { state: 'back' })
               : navigate('/register/start')
           }
         />
@@ -194,7 +294,7 @@ export default function GuardianApproval() {
               className="recovery-wallet-btn"
               disabled={alreadyApprovalLength <= 0 || alreadyApprovalLength !== approvalLength}
               onClick={recoveryWallet}>
-              {state === 'guardians' ? 'Request to Pass' : 'Recovery Wallet'}
+              {state && state.indexOf('guardians') !== -1 ? 'Request to Pass' : 'Recovery Wallet'}
             </Button>
           </div>
         )}
