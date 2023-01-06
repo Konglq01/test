@@ -36,7 +36,7 @@ const SelectList = <ItemType extends ItemTypeBase<ItemValueType>, ItemValueType 
 
   return (
     <OverlayBody>
-      <TextXL style={styles.typeOverlayTitleLabel}>{t('Select Verifier')}</TextXL>
+      <TextXL style={styles.typeOverlayTitleLabel}>{t('Select verifiers')}</TextXL>
       <ScrollView alwaysBounceVertical={false}>
         {list.map(item => {
           return (

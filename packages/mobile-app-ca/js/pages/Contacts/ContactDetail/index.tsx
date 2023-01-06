@@ -57,7 +57,7 @@ const ContactDetail: React.FC<ContactDetailProps> = ({ route }) => {
           onPress={async () => {
             if (!addressItem.address) return;
             const isCopy = await setStringAsync(`ELF_${addressItem.address}_${addressItem.chainId}`);
-            isCopy && CommonToast.success(t('Copy Success'));
+            isCopy && CommonToast.success(t('Copied'));
           }}>
           <Svg icon="copy" size={pTd(16)} />
         </Touchable>
