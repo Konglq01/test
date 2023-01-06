@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { sendVerificationCode } from '@portkey/api/apiUtils/verification';
 import { VerificationType } from '@portkey/types/verifier';
 import { useTranslation } from 'react-i18next';
-import { unsetGuardianTypeForLogin } from 'utils/sandboxUtil/unSetLoginAccount';
+import { handleGuardian } from 'utils/sandboxUtil/handleGuardian';
 import './index.less';
 import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
@@ -18,8 +18,8 @@ import { LoginType } from '@portkey/types/types-ca/wallet';
 import { resetUserGuardianStatus, setCurrentGuardianAction } from '@portkey/store/store-ca/guardians/actions';
 import useGuardianList from 'hooks/useGuardianList';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
-import { verifyErrorHandler } from 'utils/tryErrorHandler';
 import getPrivateKeyAndMnemonic from 'utils/Wallet/getPrivateKeyAndMnemonic';
+import { GuardianMth } from 'types/guardians';
 
 enum SwitchFail {
   default = 0,
@@ -81,60 +81,57 @@ export default function GuardiansView() {
           '11111111',
         );
         if (!currentChain?.endPoint || !res?.privateKey) return message.error('error');
-        const seed = await unsetGuardianTypeForLogin({
+        const seed = await handleGuardian({
           rpcUrl: currentChain.endPoint,
           chainType: currentNetwork.walletType,
           address: currentChain.caContractAddress,
           privateKey: res.privateKey,
-          paramsOption: [
-            {
-              caHash: walletInfo?.AELF?.caHash,
-              guardianType: {
-                type: currentGuardian.guardiansType,
-                guardianType: currentGuardian.loginGuardianType,
+          paramsOption: {
+            method: GuardianMth.UnsetGuardianTypeForLogin,
+            params: [
+              {
+                caHash: walletInfo?.AELF?.caHash,
+                guardianType: {
+                  type: currentGuardian.guardiansType,
+                  guardianType: currentGuardian.loginGuardianType,
+                },
               },
-            },
-          ],
+            ],
+          },
         });
         console.log('------------unsetGuardianTypeForLogin------------', seed);
         dispatch(resetLoginInfoAction());
         navigate('/setting/guardians');
       } else {
-        try {
+        dispatch(
+          setLoginAccountAction({
+            loginGuardianType: currentGuardian?.loginGuardianType as string,
+            accountLoginType: LoginType.email,
+          }),
+        );
+        setLoading(true);
+        dispatch(resetUserGuardianStatus());
+        await userGuardianList(walletInfo.managerInfo?.loginGuardianType as string);
+        const result = await sendVerificationCode({
+          loginGuardianType: currentGuardian?.loginGuardianType as string,
+          guardiansType: currentGuardian?.guardiansType as LoginType,
+          verificationType: VerificationType.addGuardian,
+          baseUrl: currentGuardian?.verifier?.url || '',
+          managerUniqueId: loginAccount?.managerUniqueId as string,
+        });
+        setLoading(false);
+        if (result.verifierSessionId) {
           dispatch(
-            setLoginAccountAction({
+            setCurrentGuardianAction({
+              isLoginAccount: true,
+              verifier: currentGuardian?.verifier,
               loginGuardianType: currentGuardian?.loginGuardianType as string,
-              accountLoginType: LoginType.email,
+              guardiansType: currentGuardian?.guardiansType as LoginType,
+              sessionId: result.verifierSessionId,
+              key: currentGuardian?.key as string,
             }),
           );
-          setLoading(true);
-          dispatch(resetUserGuardianStatus());
-          await userGuardianList(walletInfo.managerInfo?.loginGuardianType as string);
-          const result = await sendVerificationCode({
-            loginGuardianType: currentGuardian?.loginGuardianType as string,
-            guardiansType: currentGuardian?.guardiansType as LoginType,
-            verificationType: VerificationType.addGuardian,
-            baseUrl: currentGuardian?.verifier?.url || '',
-            managerUniqueId: loginAccount?.managerUniqueId as string,
-          });
-          setLoading(false);
-          if (result.verifierSessionId) {
-            dispatch(
-              setCurrentGuardianAction({
-                isLoginAccount: true,
-                verifier: currentGuardian?.verifier,
-                loginGuardianType: currentGuardian?.loginGuardianType as string,
-                guardiansType: currentGuardian?.guardiansType as LoginType,
-                sessionId: result.verifierSessionId,
-                key: currentGuardian?.key as string,
-              }),
-            );
-            navigate('/setting/guardians/verifier-account', { state: 'guardians/setLoginAccount' });
-          }
-        } catch (error) {
-          console.log(error, 'verifyHandler');
-          const _error = verifyErrorHandler(error);
-          message.error(_error);
+          navigate('/setting/guardians/verifier-account', { state: 'guardians/setLoginAccount' });
         }
       }
     } catch (error) {
@@ -207,7 +204,7 @@ export default function GuardiansView() {
       <CommonModal
         open={!!switchFail}
         closable={false}
-        footer={<Button onClick={() => setSwitchFail(SwitchFail.default)}>{t('Cancel')}</Button>}
+        footer={<Button onClick={() => setSwitchFail(SwitchFail.default)}>{t('Close')}</Button>}
         title={
           switchFail === SwitchFail.closeFail
             ? t('This guardian is the only Login account and cannot be turn off')

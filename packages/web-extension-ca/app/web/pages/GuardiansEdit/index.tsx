@@ -136,11 +136,9 @@ export default function GuardiansEdit() {
         className={'remove-modal'}
         onCancel={() => setRemoveOpen(false)}
         title={t('Are you sure you want to remove this guardian?')}>
-        <div className="description">
-          {t('After returning, you will need to re-select the operator and re-do the code verification.')}
-        </div>
+        <div className="description">{t("Removing a guardian requires guardians' approval")}</div>
         <div className="btn-wrap">
-          <Button onClick={() => setRemoveOpen(false)}>{t('Cancel')}</Button>
+          <Button onClick={() => setRemoveOpen(false)}>{t('Close')}</Button>
           <Button type="primary" onClick={removeHandler}>
             {t('Guardians Approval')}
           </Button>

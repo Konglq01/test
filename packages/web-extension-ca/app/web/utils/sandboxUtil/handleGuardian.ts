@@ -2,7 +2,7 @@ import { ChainType } from '@portkey/types';
 import SandboxEventTypes from 'messages/SandboxEventTypes';
 import SandboxEventService, { SandboxErrorCode } from 'service/SandboxEventService';
 
-export const addGuardian = async ({
+export const handleGuardian = async ({
   rpcUrl,
   chainType,
   address, // contract address
@@ -13,25 +13,25 @@ export const addGuardian = async ({
   address: string;
   chainType: ChainType;
   privateKey: string;
-  paramsOption: any[];
+  paramsOption: { method: string; params: any[] };
 }) => {
   const resMessage = await SandboxEventService.dispatchAndReceive(SandboxEventTypes.callSendMethod, {
     rpcUrl: rpcUrl,
     address,
     privateKey,
     chainType,
-    methodName: 'AddGuardian',
-    paramsOption,
+    methodName: paramsOption.method,
+    paramsOption: paramsOption.params,
   });
 
   if (resMessage.code === SandboxErrorCode.error) throw resMessage.message;
-  const guardiansInfo = resMessage.message?.guardiansInfo;
-  console.log(resMessage, 'AddGuardian===');
+  const msg = resMessage.message;
+  console.log(resMessage, 'paramsOption.method===');
   return {
     code: resMessage.code,
     result: {
       rpcUrl,
-      guardiansInfo: guardiansInfo,
+      msg,
     },
   };
 };

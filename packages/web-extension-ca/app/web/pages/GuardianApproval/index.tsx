@@ -15,8 +15,9 @@ import CommonTooltip from 'components/CommonTooltip';
 import { sendVerificationCode } from '@portkey/api/apiUtils/verification';
 import SettingHeader from 'pages/components/SettingHeader';
 import getPrivateKeyAndMnemonic from 'utils/Wallet/getPrivateKeyAndMnemonic';
-import { addGuardian } from 'utils/sandboxUtil/addGuardian';
-import { useCurrentWallet, useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import { handleGuardian } from 'utils/sandboxUtil/handleGuardian';
+import { GuardianMth } from 'types/guardians';
+import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { LoginType } from '@portkey/types/types-ca/wallet';
@@ -114,15 +115,13 @@ export default function GuardianApproval() {
   );
 
   const formatGuardiansValue = () => {
-    // let guardianToAdd: IGuardianItem = {} as IGuardianItem;
-    let guardianToAdd;
-    const guardiansApproved: any[] = [];
-    // const guardiansApproved: IGuardianItem[] = [];
+    let guardianToAdd: IGuardianItem = {} as IGuardianItem;
+    const guardiansApproved: IGuardianItem[] = [];
     Object.values(userGuardianStatus ?? {})?.forEach((item: UserGuardianStatus) => {
       if (item.loginGuardianType === loginAccount?.loginGuardianType) {
         guardianToAdd = {
           guardianType: {
-            // type: item.guardiansType,
+            type: item.guardiansType,
             guardianType: item.loginGuardianType,
           },
           verifier: {
@@ -134,7 +133,7 @@ export default function GuardianApproval() {
       } else {
         guardiansApproved.push({
           guardianType: {
-            // type: item.guardiansType,
+            type: item.guardiansType,
             guardianType: item.loginGuardianType,
           },
           verifier: {
@@ -159,18 +158,21 @@ export default function GuardianApproval() {
       );
       if (!currentChain?.endPoint || !res?.privateKey) return message.error('error');
       const { guardianToAdd, guardiansApproved } = formatGuardiansValue();
-      const seed = await addGuardian({
+      const seed = await handleGuardian({
         rpcUrl: currentChain.endPoint,
         chainType: currentNetwork.walletType,
         address: currentChain.caContractAddress,
         privateKey: res.privateKey,
-        paramsOption: [
-          {
-            caHash: walletInfo?.AELF?.caHash,
-            guardianToAdd,
-            guardiansApproved,
-          },
-        ],
+        paramsOption: {
+          method: GuardianMth.addGuardian,
+          params: [
+            {
+              caHash: walletInfo?.AELF?.caHash,
+              guardianToAdd,
+              guardiansApproved,
+            },
+          ],
+        },
       });
       console.log('------------seed------------', seed);
       dispatch(resetLoginInfoAction());

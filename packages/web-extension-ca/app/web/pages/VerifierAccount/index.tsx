@@ -12,7 +12,8 @@ import SettingHeader from 'pages/components/SettingHeader';
 import useLocationState from 'hooks/useLocationState';
 import getPrivateKeyAndMnemonic from 'utils/Wallet/getPrivateKeyAndMnemonic';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
-import { setGuardianTypeForLogin } from 'utils/sandboxUtil/setLoginAccount';
+import { handleGuardian } from 'utils/sandboxUtil/handleGuardian';
+import { GuardianMth } from 'types/guardians';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { resetLoginInfoAction } from 'store/reducers/loginCache/actions';
@@ -68,20 +69,23 @@ export default function VerifierAccount() {
           '11111111',
         );
         if (!currentChain?.endPoint || !res?.privateKey) return message.error('error');
-        const seed = await setGuardianTypeForLogin({
+        const seed = await handleGuardian({
           rpcUrl: currentChain.endPoint,
           chainType: currentNetwork.walletType,
           address: currentChain.caContractAddress,
           privateKey: res.privateKey,
-          paramsOption: [
-            {
-              caHash: walletInfo?.AELF?.caHash,
-              guardianType: {
-                type: currentGuardian?.guardiansType,
-                guardianType: currentGuardian?.loginGuardianType,
+          paramsOption: {
+            method: GuardianMth.SetGuardianTypeForLogin,
+            params: [
+              {
+                caHash: walletInfo?.AELF?.caHash,
+                guardianType: {
+                  type: currentGuardian?.guardiansType,
+                  guardianType: currentGuardian?.loginGuardianType,
+                },
               },
-            },
-          ],
+            ],
+          },
         });
         console.log('------------setGuardianTypeForLogin------------', seed);
         dispatch(resetLoginInfoAction());
