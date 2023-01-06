@@ -10,7 +10,6 @@ import GStyles from 'assets/theme/GStyles';
 import useRouterParams from '@portkey/hooks/useRouterParams';
 import ActionSheet from 'components/ActionSheet';
 import useEffectOnce from 'hooks/useEffectOnce';
-import { usePreventHardwareBack } from '@portkey/hooks/mobile';
 import { CAInfoType, ManagerInfo } from '@portkey/types/types-ca/wallet';
 import { VerificationType } from '@portkey/types/verifier';
 import myEvents from 'utils/deviceEvent';
@@ -35,7 +34,6 @@ export default function SetPin() {
     caInfo?: CAInfoType;
     walletInfo?: AElfWallet;
   }>();
-  usePreventHardwareBack();
   const digitInput = useRef<DigitInputInterface>();
   useEffectOnce(() => {
     const listener = myEvents.clearSetPin.addListener(() => digitInput.current?.resetPin());

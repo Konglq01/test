@@ -12,7 +12,8 @@ export const getHolderInfo = async ({
   address: string;
   chainType: ChainType;
   paramsOption: {
-    loginGuardianType: string;
+    loginGuardianType?: string;
+    caHash?: string;
   };
 }) => {
   const resMessage = await SandboxEventService.dispatchAndReceive(SandboxEventTypes.callViewMethod, {
@@ -24,13 +25,11 @@ export const getHolderInfo = async ({
   });
 
   if (resMessage.code === SandboxErrorCode.error) throw resMessage.message;
-  const guardiansInfo = resMessage.message?.guardiansInfo;
-  console.log(resMessage, 'getGuardianLis===');
   return {
     code: resMessage.code,
     result: {
       rpcUrl,
-      guardiansInfo: guardiansInfo,
+      ...resMessage.message,
     },
   };
 };
