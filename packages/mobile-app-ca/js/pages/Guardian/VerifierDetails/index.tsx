@@ -56,6 +56,11 @@ export default function VerifierDetails() {
     },
     [guardianKey],
   );
+
+  const setLoginAccount = useCallback(async () => {
+    //
+  }, []);
+
   const onFinish = useCallback(
     async (code: string) => {
       if (!stateSessionId || !loginGuardianType || !code) return;
@@ -113,6 +118,11 @@ export default function VerifierDetails() {
           }
         } else if (verificationType === VerificationType.setLoginAccount) {
           // TODO: add set login account
+          try {
+            await setLoginAccount();
+          } catch (error) {
+            //
+          }
         } else {
           navigationService.navigate('SetPin', {
             managerInfo: {
