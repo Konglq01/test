@@ -7,7 +7,6 @@ import navigationService from '../../utils/navigationService';
 import { useAppDispatch } from 'store/hooks';
 import SafeAreaBox from 'components/SafeAreaBox';
 import ActionSheet from 'components/ActionSheet';
-import useLogOut from 'hooks/useLogOut';
 import { useTokenContract } from 'contexts/useInterface/hooks';
 import { useCurrentWallet, useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { CrashTest } from 'Test/CrashTest';
@@ -16,7 +15,6 @@ import { queryFailAlert } from 'utils/login';
 import { contractQueries } from '@portkey/graphql/index';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 import { useIntervalQueryCAInfoByAddress } from '@portkey/hooks/hooks-ca/graphql';
-import { getELFContract } from 'contexts/utils';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { getWallet } from 'utils/redux';
 import { useCredentials } from 'hooks/store';
@@ -42,7 +40,6 @@ export const getServicesFromFileDescriptors = (descriptors: any) => {
 };
 export default function HomeScreen() {
   const navigation = useNavigation<RootNavigationProp>();
-  const onLogOut = useLogOut();
   const tokenContract = useTokenContract();
   const dispatch = useAppDispatch();
   const wallet = useCurrentWalletInfo();
@@ -57,7 +54,6 @@ export default function HomeScreen() {
     <SafeAreaBox>
       <ScrollView>
         <Text>Home Screen</Text>
-        <Button onPress={onLogOut}>reSetWallet</Button>
         {/* <Button title="Go to Element" onPress={() => navigation.navigate('Element')} /> */}
         {/* <Button title="Go to I18n" onPress={() => navigation.navigate('I18n')} /> */}
         {/* <Button title="Go to Webview" onPress={() => navigation.navigate('WebView')} /> */}
