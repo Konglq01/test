@@ -12,6 +12,7 @@ import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import {
   resetUserGuardianStatus,
   setCurrentGuardianAction,
+  setOpGuardianAction,
   setPreGuardianAction,
 } from '@portkey/store/store-ca/guardians/actions';
 import useGuardianList from 'hooks/useGuardianList';
@@ -86,15 +87,24 @@ export default function GuardiansEdit() {
           }),
         );
         dispatch(
+          setOpGuardianAction({
+            isLoginAccount: currentGuardian?.isLoginAccount,
+            verifier: targetVerifier()?.[0],
+            loginGuardianType: currentGuardian?.loginGuardianType as string,
+            guardiansType: currentGuardian?.guardiansType as LoginType,
+            key: `${currentGuardian?.loginGuardianType}&${selectVal}`,
+          }),
+        );
+        dispatch(
           setCurrentGuardianAction({
             isLoginAccount: currentGuardian?.isLoginAccount,
             verifier: targetVerifier()?.[0],
             loginGuardianType: currentGuardian?.loginGuardianType as string,
             guardiansType: currentGuardian?.guardiansType as LoginType,
-            // sessionId: result.verifierSessionId,
             key: `${currentGuardian?.loginGuardianType}&${selectVal}`,
           }),
         );
+        setLoading(false);
         navigate('/setting/guardians/guardian-approval', { state: 'guardians/edit' }); // status
       } catch (error) {
         setLoading(false);
@@ -120,7 +130,16 @@ export default function GuardiansEdit() {
     );
     dispatch(resetUserGuardianStatus());
     await userGuardianList(walletInfo.managerInfo?.loginGuardianType as string);
-    navigate('/setting/guardians/guardian-approval', { state: 'guardians/edit' }); // status
+    dispatch(
+      setOpGuardianAction({
+        isLoginAccount: currentGuardian?.isLoginAccount,
+        verifier: currentGuardian?.verifier,
+        loginGuardianType: currentGuardian?.loginGuardianType as string,
+        guardiansType: currentGuardian?.guardiansType as LoginType,
+        key: currentGuardian?.key as string,
+      }),
+    );
+    navigate('/setting/guardians/guardian-approval', { state: 'guardians/del' }); // status
   };
 
   return (
@@ -162,14 +181,14 @@ export default function GuardiansEdit() {
         closable={false}
         width={320}
         className={'remove-modal'}
-        onCancel={() => setRemoveOpen(false)}
-        title={t('The guardian is login account and cannot be remove')}
-        footer={
-          <Button type="primary" onClick={() => setRemoveClose(false)}>
+        onCancel={() => setRemoveOpen(false)}>
+        <p className="modal-content">{t('The guardian is login account and cannot be remove')}</p>
+        <div style={{ padding: '15px 16px 17px 16px' }}>
+          <Button type="primary" style={{ borderRadius: 24 }} onClick={() => setRemoveClose(false)}>
             {t('OK')}
           </Button>
-        }
-      />
+        </div>
+      </CommonModal>
       <CommonModal
         open={removeOpen}
         closable={false}

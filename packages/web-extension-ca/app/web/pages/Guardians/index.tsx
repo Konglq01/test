@@ -23,7 +23,7 @@ export default function Guardians() {
   useVerifierList();
   useEffect(() => {
     getGuardianList(walletInfo.managerInfo?.loginGuardianType as string);
-  }, [getGuardianList, walletInfo.managerInfo?.loginGuardianType]);
+  }, [getGuardianList, walletInfo]);
 
   return (
     <div className="my-guardians-frame">
@@ -47,7 +47,7 @@ export default function Guardians() {
             <li
               key={key}
               onClick={() => {
-                dispatch(setCurrentGuardianAction(item));
+                dispatch(setCurrentGuardianAction({ ...item, isLoginAccount: !!item.isLoginAccount }));
                 navigate('/setting/guardians/view');
               }}>
               <div className="flex-between-center guardian">

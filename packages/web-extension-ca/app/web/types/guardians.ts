@@ -15,8 +15,8 @@ export interface GuardianType {
 
 export interface VerifierType {
   name: string;
-  signature: string;
-  verificationDoc: string;
+  signature?: number[];
+  verificationDoc?: string;
 }
 
 export interface GuardianItem {

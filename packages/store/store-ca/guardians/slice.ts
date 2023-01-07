@@ -11,6 +11,9 @@ import {
   resetUserGuardianStatus,
   setUserGuardianStatus,
   setPreGuardianAction,
+  setOpGuardianAction,
+  resetPreGuardianAction,
+  resetOpGuardianAction,
 } from './actions';
 import { GuardiansState } from './type';
 import { GUARDIAN_TYPE_TYPE } from './utils';
@@ -71,13 +74,25 @@ export const guardiansSlice = createSlice({
         state.userGuardiansList = guardiansList;
         state.userGuardianStatus = userStatus;
       })
-      .addCase(setCurrentGuardianAction, (state, action) => {
+      .addCase(setPreGuardianAction, (state, action) => {
         state.preGuardian = {
           ...state.userGuardianStatus?.[action.payload.key],
           ...action.payload,
         };
       })
-      .addCase(setPreGuardianAction, (state, action) => {
+      .addCase(setOpGuardianAction, (state, action) => {
+        state.opGuardian = {
+          ...state.userGuardianStatus?.[action.payload.key],
+          ...action.payload,
+        };
+      })
+      .addCase(resetPreGuardianAction, state => {
+        state.preGuardian && delete state.preGuardian;
+      })
+      .addCase(resetOpGuardianAction, state => {
+        state.opGuardian && delete state.opGuardian;
+      })
+      .addCase(setCurrentGuardianAction, (state, action) => {
         state.currentGuardian = {
           ...state.userGuardianStatus?.[action.payload.key],
           ...action.payload,

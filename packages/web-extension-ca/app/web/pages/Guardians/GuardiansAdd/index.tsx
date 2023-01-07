@@ -1,4 +1,10 @@
-import { resetUserGuardianStatus, setCurrentGuardianAction } from '@portkey/store/store-ca/guardians/actions';
+import {
+  resetUserGuardianStatus,
+  setCurrentGuardianAction,
+  setOpGuardianAction,
+  resetOpGuardianAction,
+  resetPreGuardianAction,
+} from '@portkey/store/store-ca/guardians/actions';
 import { Input, Button, message } from 'antd';
 import { useNavigate, useLocation } from 'react-router';
 import CustomSvg from 'components/CustomSvg';
@@ -114,6 +120,7 @@ export default function AddGuardian() {
       );
       setLoading(true);
       dispatch(resetUserGuardianStatus());
+      dispatch(resetPreGuardianAction());
       await userGuardianList(walletInfo.managerInfo?.loginGuardianType as string);
       const result = await sendVerificationCode({
         loginGuardianType: emailVal as string,
@@ -127,7 +134,17 @@ export default function AddGuardian() {
         const _key = `${emailVal}&${selectVerifierItem?.name}`;
         dispatch(
           setCurrentGuardianAction({
-            isLoginAccount: true,
+            isLoginAccount: false,
+            verifier: selectVerifierItem,
+            loginGuardianType: emailVal as string,
+            guardiansType: guardianType as LoginType,
+            sessionId: result.verifierSessionId,
+            key: _key,
+          }),
+        );
+        dispatch(
+          setOpGuardianAction({
+            isLoginAccount: false,
             verifier: selectVerifierItem,
             loginGuardianType: emailVal as string,
             guardiansType: guardianType as LoginType,

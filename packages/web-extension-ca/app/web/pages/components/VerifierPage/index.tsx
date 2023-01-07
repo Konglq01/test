@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { setUserGuardianSessionIdAction } from '@portkey/store/store-ca/guardians/actions';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
 import { LoginType } from '@portkey/types/types-ca/wallet';
-import useLocationState from 'hooks/useLocationState';
+import { useLocation } from 'react-router';
 
 const MAX_TIMER = 60;
 
@@ -46,7 +46,7 @@ export default function VerifierPage({
   const [pinVal, setPinVal] = useState<string>();
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const { state } = useLocationState<'guardians/add' | 'guardians/edit'>();
+  const { state } = useLocation();
 
   const onFinish = useCallback(
     async (code: string) => {
@@ -90,17 +90,7 @@ export default function VerifierPage({
         message.error(_error);
       }
     },
-    [
-      loginAccount?.loginGuardianType,
-      loginAccount?.accountLoginType,
-      currentGuardian?.sessionId,
-      currentGuardian?.verifier?.url,
-      setLoading,
-      verificationType,
-      state,
-      onSuccess,
-      t,
-    ],
+    [loginAccount, currentGuardian, setLoading, verificationType, state, onSuccess, t],
   );
 
   const resendCode = useCallback(async () => {
