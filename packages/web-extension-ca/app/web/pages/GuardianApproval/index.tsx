@@ -1,6 +1,13 @@
 import { Button, message } from 'antd';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useAppDispatch, useLoginInfo, useGuardiansInfo, useCommonState, useLoading } from 'store/Provider/hooks';
+import {
+  useAppDispatch,
+  useLoginInfo,
+  useGuardiansInfo,
+  useCommonState,
+  useLoading,
+  useUserInfo,
+} from 'store/Provider/hooks';
 import { VerificationType, VerifyStatus } from '@portkey/types/verifier';
 import { useNavigate, useLocation } from 'react-router';
 import { setUserGuardianItemStatus, setCurrentGuardianAction } from '@portkey/store/store-ca/guardians/actions';
@@ -22,28 +29,12 @@ import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { LoginType } from '@portkey/types/types-ca/wallet';
 import { resetLoginInfoAction } from 'store/reducers/loginCache/actions';
+import { GuardianItem } from 'types/guardians';
 
 const APPROVAL_COUNT = ZERO.plus(3).div(5);
 
-interface IGuardianItem {
-  guardianType: {
-    type: LoginType;
-    guardianType: string;
-  };
-  verifier: {
-    name: string;
-    signature: string;
-    verificationDoc: string;
-  };
-}
-interface IAddGuardian {
-  caHash: string;
-  guardianToAdd: IGuardianItem;
-  guardiansApproved: IGuardianItem[];
-}
-
 export default function GuardianApproval() {
-  const { userGuardianStatus, guardianExpiredTime } = useGuardiansInfo();
+  const { userGuardianStatus, guardianExpiredTime, currentGuardian, preGuardian } = useGuardiansInfo();
   const { loginAccount } = useLoginInfo();
   const [isExpired, setIsExpired] = useState<boolean>(false);
   const navigate = useNavigate();
@@ -54,15 +45,17 @@ export default function GuardianApproval() {
   const { walletInfo } = useCurrentWallet();
   const currentNetwork = useCurrentNetworkInfo();
   const currentChain = useCurrentChain();
-  console.log('-----------curWalletInfo--------------', walletInfo);
+  const { passwordSeed } = useUserInfo();
 
   const userVerifiedList = useMemo(() => {
     let tempVerifiedList = Object.values(userGuardianStatus ?? {});
     if (state && state.indexOf('guardians') !== -1) {
-      tempVerifiedList = tempVerifiedList.filter((item) => item.loginGuardianType !== loginAccount?.loginGuardianType);
+      tempVerifiedList = tempVerifiedList.filter(
+        (item) => item.key !== currentGuardian?.key || item.key !== preGuardian?.key,
+      );
     }
     return tempVerifiedList;
-  }, [loginAccount?.loginGuardianType, state, userGuardianStatus]);
+  }, [currentGuardian?.key, preGuardian?.key, state, userGuardianStatus]);
   const approvalLength = useMemo(() => {
     if (userVerifiedList.length <= 3) return userVerifiedList.length;
     return APPROVAL_COUNT.times(userVerifiedList.length).dp(0, BigNumber.ROUND_DOWN).toNumber();
@@ -114,11 +107,11 @@ export default function GuardianApproval() {
     [loginAccount, setLoading, dispatch, state, navigate],
   );
 
-  const formatGuardiansValue = () => {
-    let guardianToAdd: IGuardianItem = {} as IGuardianItem;
-    const guardiansApproved: IGuardianItem[] = [];
+  const formatAddGuardianValue = () => {
+    let guardianToAdd: GuardianItem = {} as GuardianItem;
+    const guardiansApproved: GuardianItem[] = [];
     Object.values(userGuardianStatus ?? {})?.forEach((item: UserGuardianStatus) => {
-      if (item.loginGuardianType === loginAccount?.loginGuardianType) {
+      if (item.key === currentGuardian?.key) {
         guardianToAdd = {
           guardianType: {
             type: item.guardiansType,
@@ -149,35 +142,33 @@ export default function GuardianApproval() {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleGuardianRecovery = async () => {
-    if (state && state.indexOf('guardians') !== -1) {
-      const res = await getPrivateKeyAndMnemonic(
-        {
-          AESEncryptPrivateKey: walletInfo.AESEncryptPrivateKey,
-        },
-        '11111111',
-      );
-      if (!currentChain?.endPoint || !res?.privateKey) return message.error('error');
-      const { guardianToAdd, guardiansApproved } = formatGuardiansValue();
-      const seed = await handleGuardian({
-        rpcUrl: currentChain.endPoint,
-        chainType: currentNetwork.walletType,
-        address: currentChain.caContractAddress,
-        privateKey: res.privateKey,
-        paramsOption: {
-          method: GuardianMth.addGuardian,
-          params: [
-            {
-              caHash: walletInfo?.AELF?.caHash,
-              guardianToAdd,
-              guardiansApproved,
-            },
-          ],
-        },
-      });
-      console.log('------------seed------------', seed);
-      dispatch(resetLoginInfoAction());
-      navigate('/setting/guardians');
-    }
+    const res = await getPrivateKeyAndMnemonic(
+      {
+        AESEncryptPrivateKey: walletInfo.AESEncryptPrivateKey,
+      },
+      passwordSeed,
+    );
+    if (!currentChain?.endPoint || !res?.privateKey) return message.error('error');
+    const { guardianToAdd, guardiansApproved } = formatAddGuardianValue();
+    const seed = await handleGuardian({
+      rpcUrl: currentChain.endPoint,
+      chainType: currentNetwork.walletType,
+      address: currentChain.caContractAddress,
+      privateKey: res.privateKey,
+      paramsOption: {
+        method: GuardianMth.addGuardian,
+        params: [
+          {
+            caHash: walletInfo?.AELF?.caHash,
+            guardianToAdd,
+            guardiansApproved,
+          },
+        ],
+      },
+    });
+    console.log('------------seed------------', seed);
+    dispatch(resetLoginInfoAction());
+    // navigate('/setting/guardians');
   };
 
   const recoveryWallet = useCallback(() => {

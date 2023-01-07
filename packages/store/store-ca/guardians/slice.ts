@@ -10,6 +10,7 @@ import {
   setGuardiansAction,
   resetUserGuardianStatus,
   setUserGuardianStatus,
+  setPreGuardianAction,
 } from './actions';
 import { GuardiansState } from './type';
 import { GUARDIAN_TYPE_TYPE } from './utils';
@@ -71,6 +72,12 @@ export const guardiansSlice = createSlice({
         state.userGuardianStatus = userStatus;
       })
       .addCase(setCurrentGuardianAction, (state, action) => {
+        state.preGuardian = {
+          ...state.userGuardianStatus?.[action.payload.key],
+          ...action.payload,
+        };
+      })
+      .addCase(setPreGuardianAction, (state, action) => {
         state.currentGuardian = {
           ...state.userGuardianStatus?.[action.payload.key],
           ...action.payload,

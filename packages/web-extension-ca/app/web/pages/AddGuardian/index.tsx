@@ -5,7 +5,7 @@ import CustomSvg from 'components/CustomSvg';
 import SettingHeader from 'pages/components/SettingHeader';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import CommonModal from 'components/CommonModal';
-import { useAppDispatch, useGuardiansInfo, useLoginInfo, useLoading } from 'store/Provider/hooks';
+import { useAppDispatch, useGuardiansInfo, useLoading } from 'store/Provider/hooks';
 import { EmailReg } from '@portkey/utils/reg';
 import { sendVerificationCode } from '@portkey/api/apiUtils/verification';
 import { VerificationType } from '@portkey/types/verifier';
@@ -34,7 +34,6 @@ export default function AddGuardian() {
   const [inputErr, setInputErr] = useState<string>();
   const [visible, setVisible] = useState<boolean>(false);
   const [exist, setExist] = useState<boolean>(false);
-  const { loginAccount } = useLoginInfo();
   const dispatch = useAppDispatch();
   const { setLoading } = useLoading();
   const { walletInfo } = useCurrentWallet();
@@ -121,7 +120,7 @@ export default function AddGuardian() {
         guardiansType: guardianType as LoginType,
         verificationType: VerificationType.addGuardian,
         baseUrl: selectVerifierItem?.url || '',
-        managerUniqueId: loginAccount?.managerUniqueId as string,
+        managerUniqueId: walletInfo.managerInfo?.managerUniqueId as string,
       });
       setLoading(false);
       if (result.verifierSessionId) {
@@ -139,6 +138,7 @@ export default function AddGuardian() {
         navigate('/setting/guardians/verifier-account', { state: 'guardians/add' });
       }
     } catch (error) {
+      setLoading(false);
       console.log(error, 'verifyHandler');
       const _error = verifyErrorHandler(error);
       message.error(_error);

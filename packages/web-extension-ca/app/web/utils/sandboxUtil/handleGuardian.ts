@@ -23,10 +23,11 @@ export const handleGuardian = async ({
     methodName: paramsOption.method,
     paramsOption: paramsOption.params,
   });
+  console.log('--------contact params------------', paramsOption);
+  console.log('--------contact res----------- ', resMessage);
 
   if (resMessage.code === SandboxErrorCode.error) throw resMessage.message;
   const msg = resMessage.message;
-  console.log(resMessage, 'paramsOption.method===');
   return {
     code: resMessage.code,
     result: {

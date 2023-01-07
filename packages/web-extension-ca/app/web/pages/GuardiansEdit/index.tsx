@@ -5,14 +5,19 @@ import CommonModal from 'components/CommonModal';
 import CustomSvg from 'components/CustomSvg';
 import SettingHeader from 'pages/components/SettingHeader';
 import { useCallback, useMemo, useState } from 'react';
-import { useAppDispatch, useGuardiansInfo } from 'store/Provider/hooks';
+import { useAppDispatch, useGuardiansInfo, useLoading } from 'store/Provider/hooks';
 import './index.less';
 import CustomSelect from 'pages/components/CustomSelect';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
-import { resetUserGuardianStatus } from '@portkey/store/store-ca/guardians/actions';
+import {
+  resetUserGuardianStatus,
+  setCurrentGuardianAction,
+  setPreGuardianAction,
+} from '@portkey/store/store-ca/guardians/actions';
 import useGuardianList from 'hooks/useGuardianList';
 import { LoginType } from '@portkey/types/types-ca/wallet';
 import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
+import { VerifierItem } from '@portkey/types/verifier';
 
 export default function GuardiansEdit() {
   const { t } = useTranslation();
@@ -26,10 +31,11 @@ export default function GuardiansEdit() {
   const { walletInfo } = useCurrentWallet();
   const userGuardianList = useGuardianList();
   const dispatch = useAppDispatch();
+  const { setLoading } = useLoading();
 
   const selectOptions = useMemo(
     () =>
-      Object.values(verifierMap ?? {})?.map((item: any) => ({
+      Object.values(verifierMap ?? {})?.map((item: VerifierItem) => ({
         value: item.name,
         children: (
           <div className="flex verifier-option">
@@ -45,20 +51,55 @@ export default function GuardiansEdit() {
     [exist, selectVal, currentGuardian],
   );
 
+  const targetVerifier = () =>
+    Object.values(verifierMap ?? {})?.filter((item: VerifierItem) => item.name === selectVal);
+
   const handleChange = useCallback((value: string) => {
     setExist(false);
     setSelectVal(value);
   }, []);
-  console.log(currentGuardian, 'currentGuardian===');
 
-  const guardiansChangeHandler = () => {
+  const guardiansChangeHandler = async () => {
     const flag: boolean =
       Object.values(userGuardiansList ?? {})?.some((item) => {
         return item.loginGuardianType === currentGuardian?.loginGuardianType && item.verifier?.name === selectVal;
       }) ?? false;
     setExist(flag);
     if (!flag) {
-      navigate('/setting/guardians/guardian-approval', { state: 'guardians/edit' }); // status
+      try {
+        dispatch(
+          setLoginAccountAction({
+            loginGuardianType: currentGuardian?.loginGuardianType as string,
+            accountLoginType: LoginType.email,
+          }),
+        );
+        setLoading(true);
+        dispatch(resetUserGuardianStatus());
+        await userGuardianList(walletInfo.managerInfo?.loginGuardianType as string);
+        dispatch(
+          setPreGuardianAction({
+            isLoginAccount: currentGuardian?.isLoginAccount,
+            verifier: currentGuardian?.verifier,
+            loginGuardianType: currentGuardian?.loginGuardianType as string,
+            guardiansType: currentGuardian?.guardiansType as LoginType,
+            key: currentGuardian?.key as string,
+          }),
+        );
+        dispatch(
+          setCurrentGuardianAction({
+            isLoginAccount: currentGuardian?.isLoginAccount,
+            verifier: targetVerifier()?.[0],
+            loginGuardianType: currentGuardian?.loginGuardianType as string,
+            guardiansType: currentGuardian?.guardiansType as LoginType,
+            // sessionId: result.verifierSessionId,
+            key: `${currentGuardian?.loginGuardianType}&${selectVal}`,
+          }),
+        );
+        navigate('/setting/guardians/guardian-approval', { state: 'guardians/edit' }); // status
+      } catch (error) {
+        setLoading(false);
+        console.log(error, 'verifyHandler');
+      }
     }
   };
 

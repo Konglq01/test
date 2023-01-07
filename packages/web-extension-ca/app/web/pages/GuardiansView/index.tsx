@@ -3,7 +3,7 @@ import CommonModal from 'components/CommonModal';
 import { useNavigate } from 'react-router';
 import CustomSvg from 'components/CustomSvg';
 import SettingHeader from 'pages/components/SettingHeader';
-import { useAppDispatch, useGuardiansInfo, useLoading, useLoginInfo } from 'store/Provider/hooks';
+import { useAppDispatch, useGuardiansInfo, useLoading, useLoginInfo, useUserInfo } from 'store/Provider/hooks';
 import { useState } from 'react';
 import { sendVerificationCode } from '@portkey/api/apiUtils/verification';
 import { VerificationType } from '@portkey/types/verifier';
@@ -40,6 +40,7 @@ export default function GuardiansView() {
   const { setLoading } = useLoading();
   const userGuardianList = useGuardianList();
   const { walletInfo } = useCurrentWallet();
+  const { passwordSeed } = useUserInfo();
 
   const handleSwitch = async () => {
     if (currentGuardian?.isLoginAccount) {
@@ -78,7 +79,7 @@ export default function GuardiansView() {
           {
             AESEncryptPrivateKey: walletInfo.AESEncryptPrivateKey,
           },
-          '11111111',
+          passwordSeed,
         );
         if (!currentChain?.endPoint || !res?.privateKey) return message.error('error');
         const seed = await handleGuardian({
@@ -99,7 +100,7 @@ export default function GuardiansView() {
             ],
           },
         });
-        console.log('------------unsetGuardianTypeForLogin------------', seed);
+        console.log('------------setGuardianTypeForLogin------------', seed);
         dispatch(resetLoginInfoAction());
         navigate('/setting/guardians');
       } else {

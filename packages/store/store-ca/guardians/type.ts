@@ -25,5 +25,6 @@ export interface GuardiansState {
   userGuardiansList?: UserGuardianItem[];
   userGuardianStatus?: { [x: string]: UserGuardianStatus };
   currentGuardian?: UserGuardianItem;
+  preGuardian?: UserGuardianItem;
   guardianExpiredTime?: number; // timestamp
 }
