@@ -72,7 +72,12 @@ export default function ScanLogin() {
       </View>
       <View style={styles.bottomBox}>
         <CommonButton type="primary" title="Log In" onPress={onLogin} loading={loading} />
-        <CommonButton buttonStyle={styles.cancelButtonStyle} type="clear" title="Cancel" />
+        <CommonButton
+          buttonStyle={styles.cancelButtonStyle}
+          type="clear"
+          title="Cancel"
+          onPress={() => navigationService.navigate('Tab')}
+        />
       </View>
     </PageContainer>
   );
