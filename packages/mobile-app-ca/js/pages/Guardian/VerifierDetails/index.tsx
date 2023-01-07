@@ -19,6 +19,12 @@ import { LoginType } from '@portkey/types/types-ca/wallet';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import myEvents from 'utils/deviceEvent';
 import { API_REQ_FUNCTION } from 'api/types';
+import { getELFContract } from 'contexts/utils';
+import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+import { useCredentials } from 'hooks/store';
+import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import { getWallet } from 'utils/redux';
+import { sleep } from '@portkey/utils';
 
 type FetchType = Record<string, API_REQ_FUNCTION>;
 
@@ -57,9 +63,42 @@ export default function VerifierDetails() {
     [guardianKey],
   );
 
+  const chainInfo = useCurrentChain('AELF');
+  const { pin } = useCredentials() || {};
+  const { caHash } = useCurrentWalletInfo();
+
   const setLoginAccount = useCallback(async () => {
-    //
-  }, []);
+    if (!chainInfo || !pin || !caHash || !guardianItem) return;
+    const wallet = getWallet(pin);
+    if (!wallet) return;
+    const contract = await getELFContract({
+      contractAddress: chainInfo.caContractAddress,
+      rpcUrl: chainInfo.endPoint,
+      account: wallet,
+    });
+
+    try {
+      const req = await contract?.callSendMethod('SetGuardianTypeForLogin', wallet.address, {
+        caHash,
+        guardianType: {
+          type: guardianItem.guardiansType,
+          guardianType: guardianItem.loginGuardianType,
+        },
+      });
+
+      if (req && !req.error) {
+        await sleep(1000);
+        myEvents.refreshGuardiansList.emit();
+        navigationService.navigate('GuardianDetail', {
+          guardian: JSON.stringify({ ...guardianItem, isLoginAccount: true }),
+        });
+      } else {
+        CommonToast.failError(req?.error?.message?.Message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }, [caHash, chainInfo, guardianItem, pin]);
 
   const onFinish = useCallback(
     async (code: string) => {
@@ -117,12 +156,7 @@ export default function VerifierDetails() {
             });
           }
         } else if (verificationType === VerificationType.setLoginAccount) {
-          // TODO: add set login account
-          try {
-            await setLoginAccount();
-          } catch (error) {
-            //
-          }
+          await setLoginAccount();
         } else {
           navigationService.navigate('SetPin', {
             managerInfo: {
@@ -135,11 +169,27 @@ export default function VerifierDetails() {
         }
       } catch (error) {
         CommonToast.failError(error, 'Verify Fail');
-        digitInput.current?.resetPin();
+        // TODO: check: which verificationType will execute
+        if (
+          verificationType === undefined ||
+          verificationType === VerificationType.register ||
+          verificationType === VerificationType.communityRecovery
+        ) {
+          console.log('---------resetPin-------');
+          digitInput.current?.resetPin();
+        }
       }
       Loading.hide();
     },
-    [guardianItem, loginGuardianType, managerUniqueId, setGuardianStatus, stateSessionId, verificationType],
+    [
+      guardianItem,
+      loginGuardianType,
+      managerUniqueId,
+      setGuardianStatus,
+      setLoginAccount,
+      stateSessionId,
+      verificationType,
+    ],
   );
   const resendCode = useCallback(async () => {
     Loading.show();

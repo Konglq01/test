@@ -123,7 +123,7 @@ function GuardianItemButton({
       _verificationType = VerificationType.editGuardianApproval;
     }
 
-    navigationService.navigate('VerifierDetails', {
+    navigationService.push('VerifierDetails', {
       guardianItem,
       verifierSessionId,
       loginGuardianType: guardianItem.loginGuardianType,
