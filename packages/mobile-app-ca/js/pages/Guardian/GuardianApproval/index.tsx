@@ -15,7 +15,7 @@ import { getApprovalCount } from '@portkey/utils/guardian';
 import { ApprovalType, VerificationType, VerifyStatus } from '@portkey/types/verifier';
 import GuardianAccountItem, { GuardiansStatus, GuardiansStatusItem } from '../components/GuardianAccountItem';
 import useEffectOnce from 'hooks/useEffectOnce';
-import { randomId } from '@portkey/utils';
+import { randomId, sleep } from '@portkey/utils';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import navigationService from 'utils/navigationService';
 import { LoginType, ManagerInfo } from '@portkey/types/types-ca/wallet';
@@ -29,6 +29,8 @@ import { useCredentials, useGuardiansInfo } from 'hooks/store';
 import { getWallet } from 'utils/redux';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import CommonToast from 'components/CommonToast';
+import { useAppDispatch } from 'store/hooks';
+import { setPreGuardianAction } from '@portkey/store/store-ca/guardians/actions';
 
 export interface EditGuardianParamsType {
   signature: string;
@@ -53,8 +55,9 @@ export default function GuardianApproval() {
     editGuardianParams,
     managerUniqueId: paramManagerUniqueId,
   } = useRouterParams<RouterParams>();
+  const dispatch = useAppDispatch();
 
-  const { userGuardiansList: storeUserGuardiansList } = useGuardiansInfo();
+  const { userGuardiansList: storeUserGuardiansList, preGuardian } = useGuardiansInfo();
 
   const userGuardiansList = useMemo(() => {
     if (paramUserGuardiansList) return paramUserGuardiansList;
@@ -81,18 +84,22 @@ export default function GuardianApproval() {
     () => approvalType === ApprovalType.deleteGuardian || approvalType === ApprovalType.editGuardian,
     [approvalType],
   );
-
-  const setGuardianStatus = useCallback(
-    (key: string, status: GuardiansStatusItem) => {
-      if (key === 'resetGuardianApproval') {
-        setApproved(undefined);
-        guardianExpiredTime.current = undefined;
-      } else {
-        setApproved({ ...guardiansStatus, [key]: status });
-      }
-    },
-    [guardiansStatus],
+  const isGuardianOpt = useMemo(
+    () =>
+      approvalType === ApprovalType.addGuardian ||
+      approvalType === ApprovalType.deleteGuardian ||
+      approvalType === ApprovalType.editGuardian,
+    [approvalType],
   );
+
+  const setGuardianStatus = useCallback((key: string, status: GuardiansStatusItem) => {
+    if (key === 'resetGuardianApproval') {
+      setApproved(undefined);
+      guardianExpiredTime.current = undefined;
+    } else {
+      setApproved(preGuardiansStatus => ({ ...preGuardiansStatus, [key]: status }));
+    }
+  }, []);
 
   const guardianCount = useMemo(
     () => getApprovalCount((isExcludeCurrent ? (userGuardiansList?.length || 1) - 1 : userGuardiansList?.length) || 0),
@@ -156,12 +163,12 @@ export default function GuardianApproval() {
 
     const guardianToAdd = {
       guardianType: {
-        type: LoginType.email,
+        type: guardianItem.guardiansType,
         guardianType: guardianItem.loginGuardianType,
       },
       verifier: {
         name: guardianItem.verifier?.name,
-        signature: Buffer.from(editGuardianParams.signature as any, 'base64').toString('hex'),
+        signature: Object.values(Buffer.from(editGuardianParams.signature as any, 'hex')),
         verificationDoc: editGuardianParams.verifierDoc,
       },
     };
@@ -176,45 +183,176 @@ export default function GuardianApproval() {
           },
           verifier: {
             name: guardian.verifier?.name,
-            signature: Buffer.from(
-              guardiansStatus[guardian.key].editGuardianParams?.signature as any,
-              'base64',
-            ).toString('hex'),
+            signature: Object.values(
+              Buffer.from(guardiansStatus[guardian.key].editGuardianParams?.signature as any, 'hex'),
+            ),
             verificationDoc: guardiansStatus[guardian.key].editGuardianParams?.verifierDoc,
           },
         };
       })
       .filter(item => item !== null);
 
-    console.log({
-      caHash,
-      guardianToAdd: guardianToAdd,
-      guardiansApproved: guardiansApproved,
-    });
-    console.log(wallet.privateKey);
-    console.log(chainInfo.caContractAddress);
-
-    const req = await contract?.callSendMethod('AddGuardian', wallet.address, {
-      caHash,
-      guardianToAdd: guardianToAdd,
-      guardiansApproved: guardiansApproved,
-    });
-    Loading.hide();
-    console.log(req);
-    if (req && !req.error) {
-      console.log(req);
-    } else {
-      CommonToast.failError(req?.error?.message?.Message);
+    try {
+      const req = await contract?.callSendMethod('AddGuardian', wallet.address, {
+        caHash,
+        guardianToAdd: guardianToAdd,
+        guardiansApproved: guardiansApproved,
+      });
+      if (req && !req.error) {
+        await sleep(1000);
+        CommonToast.success('Guardians Added');
+        myEvents.refreshGuardiansList.emit();
+        navigationService.navigate('GuardianHome');
+      } else {
+        CommonToast.failError(req?.error?.message?.Message);
+      }
+    } catch (error) {
+      console.log(error);
     }
+
+    Loading.hide();
   }, [caHash, chainInfo, editGuardianParams, guardianItem, guardiansStatus, pin, userGuardiansList]);
 
-  const deleteGuardian = useCallback(() => {
-    //
-  }, []);
+  const deleteGuardian = useCallback(async () => {
+    if (!chainInfo || !pin || !caHash || !guardianItem || !guardiansStatus || !userGuardiansList) return;
+    const wallet = getWallet(pin);
+    if (!wallet) return;
 
-  const editGuardian = useCallback(() => {
-    //
-  }, []);
+    Loading.show();
+    const contract = await getELFContract({
+      contractAddress: chainInfo.caContractAddress,
+      rpcUrl: chainInfo.endPoint,
+      account: wallet,
+    });
+
+    const guardianToRemove = {
+      guardianType: {
+        type: guardianItem.guardiansType,
+        guardianType: guardianItem.loginGuardianType,
+      },
+      verifier: {
+        name: guardianItem.verifier?.name,
+      },
+    };
+
+    const guardiansApproved = userGuardiansList
+      .map(guardian => {
+        if (!guardiansStatus[guardian.key] || !guardiansStatus[guardian.key].editGuardianParams) return null;
+        return {
+          guardianType: {
+            type: guardian.guardiansType,
+            guardianType: guardian.loginGuardianType,
+          },
+          verifier: {
+            name: guardian.verifier?.name,
+            signature: Object.values(
+              Buffer.from(guardiansStatus[guardian.key].editGuardianParams?.signature as any, 'hex'),
+            ),
+            verificationDoc: guardiansStatus[guardian.key].editGuardianParams?.verifierDoc,
+          },
+        };
+      })
+      .filter(item => item !== null);
+
+    try {
+      const req = await contract?.callSendMethod('RemoveGuardian', wallet.address, {
+        caHash,
+        guardianToRemove,
+        guardiansApproved: guardiansApproved,
+      });
+      console.log({
+        caHash,
+        guardianToRemove,
+        guardiansApproved: guardiansApproved,
+      });
+
+      if (req && !req.error) {
+        await sleep(1000);
+        myEvents.refreshGuardiansList.emit();
+        navigationService.navigate('GuardianHome');
+      } else {
+        CommonToast.failError(req?.error?.message?.Message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
+    Loading.hide();
+  }, [caHash, chainInfo, guardianItem, guardiansStatus, pin, userGuardiansList]);
+
+  const editGuardian = useCallback(async () => {
+    if (!chainInfo || !pin || !caHash || !guardianItem || !guardiansStatus || !userGuardiansList || !preGuardian)
+      return;
+    const wallet = getWallet(pin);
+    if (!wallet) return;
+
+    Loading.show();
+    const contract = await getELFContract({
+      contractAddress: chainInfo.caContractAddress,
+      rpcUrl: chainInfo.endPoint,
+      account: wallet,
+    });
+
+    const guardianToUpdatePre = {
+      guardianType: {
+        type: preGuardian.guardiansType,
+        guardianType: preGuardian.loginGuardianType,
+      },
+      verifier: {
+        name: preGuardian.verifier?.name,
+      },
+    };
+
+    const guardianToUpdateNew = {
+      guardianType: {
+        type: guardianItem.guardiansType,
+        guardianType: guardianItem.loginGuardianType,
+      },
+      verifier: {
+        name: guardianItem.verifier?.name,
+      },
+    };
+
+    const guardiansApproved = userGuardiansList
+      .map(guardian => {
+        if (!guardiansStatus[guardian.key] || !guardiansStatus[guardian.key].editGuardianParams) return null;
+        return {
+          guardianType: {
+            type: guardian.guardiansType,
+            guardianType: guardian.loginGuardianType,
+          },
+          verifier: {
+            name: guardian.verifier?.name,
+            signature: Object.values(
+              Buffer.from(guardiansStatus[guardian.key].editGuardianParams?.signature as any, 'hex'),
+            ),
+            verificationDoc: guardiansStatus[guardian.key].editGuardianParams?.verifierDoc,
+          },
+        };
+      })
+      .filter(item => item !== null);
+
+    try {
+      const req = await contract?.callSendMethod('UpdateGuardian', wallet.address, {
+        caHash,
+        guardianToUpdatePre,
+        guardianToUpdateNew,
+        guardiansApproved: guardiansApproved,
+      });
+      if (req && !req.error) {
+        dispatch(setPreGuardianAction(undefined));
+        await sleep(1000);
+        myEvents.refreshGuardiansList.emit();
+        navigationService.navigate('GuardianHome');
+      } else {
+        CommonToast.failError(req?.error?.message?.Message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
+    Loading.hide();
+  }, [caHash, chainInfo, dispatch, guardianItem, guardiansStatus, pin, preGuardian, userGuardiansList]);
 
   const onFinish = useCallback(async () => {
     if (approvalType === ApprovalType.register) {
@@ -308,7 +446,14 @@ export default function GuardianApproval() {
           </View>
         </View>
       </View>
-      {!isExpired && <CommonButton onPress={onFinish} disabled={!isSuccess} type="primary" title="Recover wallet" />}
+      {!isExpired && (
+        <CommonButton
+          onPress={onFinish}
+          disabled={!isSuccess}
+          type="primary"
+          title={isGuardianOpt ? 'Confirm' : 'Recover wallet'}
+        />
+      )}
     </PageContainer>
   );
 }

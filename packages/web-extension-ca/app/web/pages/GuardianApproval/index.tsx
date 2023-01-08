@@ -387,7 +387,7 @@ export default function GuardianApproval() {
                   item.status !== VerifyStatus.Verified &&
                   'verifier-item-disabled',
               )}
-              key={item.verifier?.name}>
+              key={`${item.key}`}>
               {item.isLoginAccount && <div className="login-icon">Login Account</div>}
               <div className="flex-between-center">
                 <VerifierPair guardiansType={item.guardiansType} verifierSrc={item.verifier?.imageUrl} />

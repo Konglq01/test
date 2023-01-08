@@ -2,8 +2,7 @@ import {
   resetUserGuardianStatus,
   setCurrentGuardianAction,
   setOpGuardianAction,
-  resetOpGuardianAction,
-  resetPreGuardianAction,
+  setPreGuardianAction,
 } from '@portkey/store/store-ca/guardians/actions';
 import { Input, Button, message } from 'antd';
 import { useNavigate, useLocation } from 'react-router';
@@ -120,7 +119,7 @@ export default function AddGuardian() {
       );
       setLoading(true);
       dispatch(resetUserGuardianStatus());
-      dispatch(resetPreGuardianAction());
+      dispatch(setPreGuardianAction());
       await userGuardianList(walletInfo.managerInfo?.loginGuardianType as string);
       const result = await sendVerificationCode({
         loginGuardianType: emailVal as string,

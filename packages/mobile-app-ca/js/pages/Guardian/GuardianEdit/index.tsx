@@ -29,6 +29,8 @@ import Loading from 'components/Loading';
 import CommonToast from 'components/CommonToast';
 import useRouterParams from '@portkey/hooks/useRouterParams';
 import { LoginType } from '@portkey/types/types-ca/wallet';
+import { useAppDispatch } from 'store/hooks';
+import { setPreGuardianAction } from '@portkey/store/store-ca/guardians/actions';
 
 type RouterParams = {
   guardian?: UserGuardianItem;
@@ -37,6 +39,7 @@ type RouterParams = {
 
 const GuardianEdit: React.FC = () => {
   const { t } = useLanguage();
+  const dispatch = useAppDispatch();
 
   const { guardian: editGuardian, isEdit = false } = useRouterParams<RouterParams>();
 
@@ -155,12 +158,17 @@ const GuardianEdit: React.FC = () => {
   const onApproval = useCallback(() => {
     const _guardianError = checkCurGuardianRepeat();
     setGuardianError(_guardianError);
-    if (_guardianError.isError) return;
+    if (_guardianError.isError || !editGuardian || !selectedVerifier) return;
+    dispatch(setPreGuardianAction(editGuardian));
+
     navigationService.navigate('GuardianApproval', {
       approvalType: ApprovalType.editGuardian,
-      guardianItem: editGuardian,
+      guardianItem: {
+        ...editGuardian,
+        verifier: selectedVerifier,
+      },
     });
-  }, [checkCurGuardianRepeat, editGuardian]);
+  }, [checkCurGuardianRepeat, dispatch, editGuardian, selectedVerifier]);
 
   const onRemove = useCallback(() => {
     if (!editGuardian) return;

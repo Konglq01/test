@@ -7,6 +7,7 @@ const EventMap = {
   clearSetPin: 'clearSetPin',
   clearQRWallet: 'clearQRWallet',
   clearSignupInput: 'clearSignupInput',
+  refreshGuardiansList: 'refreshGuardiansList',
 };
 
 // eslint-disable-next-line no-new-func
