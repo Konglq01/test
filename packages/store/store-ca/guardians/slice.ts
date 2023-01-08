@@ -10,6 +10,7 @@ import {
   setGuardiansAction,
   resetUserGuardianStatus,
   setUserGuardianStatus,
+  setPreGuardianAction,
 } from './actions';
 import { GuardiansState } from './type';
 import { GUARDIAN_TYPE_TYPE } from './utils';
@@ -44,10 +45,10 @@ export const guardiansSlice = createSlice({
         }
         const { loginGuardianTypeIndexes, guardians } = action.payload;
         const _guardians: (typeof guardians[number] & { isLoginAccount?: boolean })[] = [...guardians];
-        loginGuardianTypeIndexes.forEach((item, idx) => {
-          // TODO: delete test code
-          if (idx === 0) _guardians[item].isLoginAccount = true;
+        loginGuardianTypeIndexes.forEach(item => {
+          _guardians[item].isLoginAccount = true;
         });
+
         const userStatus = state.userGuardianStatus ?? {};
         const guardiansList = _guardians.map(guardian => {
           const loginGuardianType = guardian.guardianType.guardianType;
@@ -69,6 +70,16 @@ export const guardiansSlice = createSlice({
         });
         state.userGuardiansList = guardiansList;
         state.userGuardianStatus = userStatus;
+      })
+      .addCase(setPreGuardianAction, (state, action) => {
+        if (!action.payload) {
+          state.preGuardian = undefined;
+        } else {
+          state.preGuardian = {
+            ...state.userGuardianStatus?.[action.payload.key],
+            ...action.payload,
+          };
+        }
       })
       .addCase(setCurrentGuardianAction, (state, action) => {
         state.currentGuardian = {

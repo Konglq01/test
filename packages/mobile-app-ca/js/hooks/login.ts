@@ -15,6 +15,7 @@ import { intervalGetResult, onResultFail, TimerResult } from 'utils/wallet';
 import CommonToast from 'components/CommonToast';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import useEffectOnce from './useEffectOnce';
+import { setCredentials } from 'store/user/actions';
 
 export function useOnManagerAddressAndQueryResult() {
   const dispatch = useAppDispatch();
@@ -64,6 +65,7 @@ export function useOnManagerAddressAndQueryResult() {
         } else {
           dispatch(createWallet({ walletInfo: tmpWalletInfo, caInfo: { managerInfo }, pin: confirmPin }));
         }
+        dispatch(setCredentials({ pin: confirmPin }));
         if (biometricsReady) {
           Loading.hide();
           navigationService.navigate('SetBiometrics', { pin: confirmPin });

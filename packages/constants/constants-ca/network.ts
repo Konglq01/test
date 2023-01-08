@@ -6,6 +6,7 @@ export type NetworkItem = {
   networkType: NetworkType;
   isActive?: boolean;
   apiUrl: string;
+  graphqlUrl: string;
 };
 
 export const NetworkList: NetworkItem[] = [
@@ -15,19 +16,16 @@ export const NetworkList: NetworkItem[] = [
     networkType: 'TESTNET',
     isActive: true,
     apiUrl: 'http://192.168.67.35:5577',
+    graphqlUrl: 'http://192.168.66.87:8083/AElfIndexer_DApp/PortKeyIndexerCASchema/graphql',
   },
   {
     name: 'aelf Mainnet',
     walletType: 'aelf',
     networkType: 'MAIN',
     apiUrl: '',
+    graphqlUrl: '',
   },
 ];
-
-export const CHAIN_GRAPHQL_URL: Record<NetworkType, string> = {
-  ['MAIN']: '',
-  ['TESTNET']: 'http://192.168.66.255:8083/AElfIndexer_DApp/PortKeyIndexerCASchema/graphql',
-};
 
 export const ChainList = [
   {

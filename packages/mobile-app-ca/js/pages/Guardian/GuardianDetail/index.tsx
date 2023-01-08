@@ -13,7 +13,18 @@ import { useLanguage } from 'i18n/hooks';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import CommonSwitch from 'components/CommonSwitch';
 import ActionSheet from 'components/ActionSheet';
-import { useGuardiansInfo } from 'hooks/store';
+import { useCredentials, useGuardiansInfo } from 'hooks/store';
+import { useGetHolderInfo } from 'hooks/guardian';
+import Loading from 'components/Loading';
+import { randomId, sleep } from '@portkey/utils';
+import { request } from 'api';
+import CommonToast from 'components/CommonToast';
+import { VerificationType } from '@portkey/types/verifier';
+import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import { getWallet } from 'utils/redux';
+import { getELFContract } from 'contexts/utils';
+import myEvents from 'utils/deviceEvent';
 
 interface GuardianDetailProps {
   route?: any;
@@ -22,6 +33,7 @@ interface GuardianDetailProps {
 const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
   const { t } = useLanguage();
   const { params } = route;
+  const getHolderInfo = useGetHolderInfo();
   const { userGuardiansList } = useGuardiansInfo();
 
   const guardian = useMemo<UserGuardianItem | undefined>(
@@ -29,8 +41,75 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
     [params],
   );
 
+  const chainInfo = useCurrentChain('AELF');
+  const { pin } = useCredentials() || {};
+  const { caHash } = useCurrentWalletInfo();
+  const cancelLoginAccount = useCallback(async () => {
+    if (!chainInfo || !pin || !caHash || !guardian) return;
+    const wallet = getWallet(pin);
+    if (!wallet) return;
+    Loading.show();
+    const contract = await getELFContract({
+      contractAddress: chainInfo.caContractAddress,
+      rpcUrl: chainInfo.endPoint,
+      account: wallet,
+    });
+    try {
+      const req = await contract?.callSendMethod('UnsetGuardianTypeForLogin', wallet.address, {
+        caHash,
+        guardianType: {
+          type: guardian.guardiansType,
+          guardianType: guardian.loginGuardianType,
+        },
+      });
+
+      if (req && !req.error) {
+        await sleep(1000);
+        myEvents.refreshGuardiansList.emit();
+        navigationService.navigate('GuardianDetail', {
+          guardian: JSON.stringify({ ...guardian, isLoginAccount: false }),
+        });
+      } else {
+        CommonToast.failError(req?.error?.message?.Message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    Loading.hide();
+  }, [caHash, chainInfo, guardian, pin]);
+
+  const setLoginAccount = useCallback(async () => {
+    if (!guardian) return;
+    try {
+      const managerUniqueId = randomId();
+      Loading.show();
+      const req = await request.verification.sendCode({
+        baseURL: guardian.verifier?.url,
+        data: {
+          type: guardian.guardiansType,
+          loginGuardianType: guardian.loginGuardianType,
+          managerUniqueId,
+        },
+      });
+      if (req.verifierSessionId) {
+        navigationService.navigate('VerifierDetails', {
+          loginGuardianType: guardian.loginGuardianType,
+          verifierSessionId: req.verifierSessionId,
+          managerUniqueId,
+          verificationType: VerificationType.setLoginAccount,
+          guardianItem: guardian,
+        });
+      } else {
+        console.log('send fail');
+      }
+    } catch (error) {
+      CommonToast.failError(error);
+    }
+    Loading.hide();
+  }, [guardian]);
+
   const onLoginAccountChange = useCallback(
-    (value: boolean) => {
+    async (value: boolean) => {
       if (guardian === undefined || userGuardiansList === undefined) return;
       const email = guardian.loginGuardianType;
 
@@ -41,12 +120,12 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
             !(
               item.guardiansType === guardian.guardiansType &&
               item.loginGuardianType === guardian.loginGuardianType &&
-              item.verifier?.id === guardian.verifier?.id
+              item.verifier?.url === guardian.verifier?.url
             ),
         );
         if (loginIndex === -1) {
           ActionSheet.alert({
-            title2: t('This guardian is the only Login account and cannot be turn off'),
+            title2: t('This guardian is the only login account and cannot be turned off'),
             buttons: [
               {
                 title: t('Close'),
@@ -56,8 +135,30 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
           return;
         }
 
-        // TODO: add cancel login account
+        cancelLoginAccount();
         return;
+      }
+
+      if (value) {
+        Loading.show();
+        try {
+          const holderInfo = await getHolderInfo({ loginGuardianType: guardian.loginGuardianType });
+          if (holderInfo.guardians) {
+            Loading.hide();
+            ActionSheet.alert({
+              title2: t(`This account address is already a login account of other wallets and cannot be used`),
+              buttons: [
+                {
+                  title: t('Close'),
+                },
+              ],
+            });
+            return;
+          }
+        } catch (error) {
+          console.debug(error, '====error');
+        }
+        Loading.hide();
       }
 
       ActionSheet.alert({
@@ -70,14 +171,13 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
           {
             title: t('Confirm'),
             onPress: () => {
-              // TODO: add set login account
-              navigationService.navigate('VerifierDetails', { email });
+              setLoginAccount();
             },
           },
         ],
       });
     },
-    [guardian, t, userGuardiansList],
+    [cancelLoginAccount, getHolderInfo, guardian, setLoginAccount, t, userGuardiansList],
   );
 
   return (
@@ -112,13 +212,13 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
         </View>
 
         <TextM style={pageStyles.tips}>
-          {t('The login account will be able to log in and control all your assets')}
+          {t('The master account will be able to log in and control all your assets')}
         </TextM>
       </View>
       <CommonButton
         type="primary"
         onPress={() => {
-          navigationService.navigate('GuardianEdit', { guardian: JSON.stringify(guardian) });
+          navigationService.navigate('GuardianEdit', { guardian: JSON.parse(JSON.stringify(guardian)), isEdit: true });
         }}>
         {t('Edit')}
       </CommonButton>

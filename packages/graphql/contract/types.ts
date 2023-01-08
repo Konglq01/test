@@ -1,6 +1,7 @@
 import { PartialOption } from '@portkey/types/common';
 import {
   CaHolderManagerDto,
+  GetCaHolderManagerChangeRecordDto,
   GetCaHolderManagerInfoDto,
   GetCaHolderTokenBalanceDto,
   GetCaHolderTransactionAddressDto,
@@ -8,6 +9,8 @@ import {
   GetLoginGuardianTypeInfoDto,
   GetNftProtocolInfoDto,
   GetTokenInfoDto,
+  GetUserNftInfoDto,
+  GetUserNftProtocolInfoDto,
   LoginGuardianTypeDto,
 } from './__generated__/resolversTypes';
 
@@ -45,3 +48,9 @@ export type GetCaHolderTokenBalanceParamsType = GraphqlCommonOption<GetCaHolderT
 
 // CAHolderTransactionAddressInfo
 export type GetCaHolderTransactionAddressParamsType = GraphqlCommonOption<GetCaHolderTransactionAddressDto>;
+
+// UserNftInfo
+export type GetUserNftInfoParamsType = GraphqlCommonOption<GetUserNftInfoDto>;
+
+// UserNftProtocolInfo
+export type GetUserNftProtocolInfoParamsType = GraphqlCommonOption<GetUserNftProtocolInfoDto>;

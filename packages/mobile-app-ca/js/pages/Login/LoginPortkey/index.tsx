@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import PageContainer, { SafeAreaColorMapKeyUnit } from 'components/PageContainer';
 import { TextL, TextM, TextXXXL } from 'components/CommonText';
 import { pTd } from 'utils/unit';
@@ -34,6 +34,8 @@ import Loading from 'components/Loading';
 import { handleError, sleep } from '@portkey/utils';
 import myEvents from 'utils/deviceEvent';
 import { handleUserGuardiansList } from 'utils/login';
+import { useIntervalQueryCAInfoByAddress } from '@portkey/hooks/hooks-ca/graphql';
+import { handleWalletInfo } from '@portkey/utils/wallet';
 const scrollViewProps = { extraHeight: 120 };
 const safeAreaColor: SafeAreaColorMapKeyUnit[] = ['transparent', 'transparent'];
 type LoginType = 'email' | 'qr-code' | 'phone';
@@ -64,16 +66,17 @@ function LoginEmail({ setLoginType }: { setLoginType: (type: LoginType) => void 
         loginGuardianType: email,
         userGuardiansList: handleUserGuardiansList(holderInfo, verifierServers),
       });
-    } catch (error: any) {
-      console.log(error, '=====error');
-
+    } catch (error) {
       setErrorMessage(handleError(error));
       Loading.hide();
     }
   }, [chainInfo, dispatch, email, getHolderInfo, getVerifierServers]);
 
   useEffectOnce(() => {
-    const listener = myEvents.clearLoginInput.addListener(() => setEmail(''));
+    const listener = myEvents.clearLoginInput.addListener(() => {
+      setEmail('');
+      setErrorMessage(undefined);
+    });
     return () => listener.remove();
   });
   return (
@@ -109,6 +112,18 @@ function LoginEmail({ setLoginType }: { setLoginType: (type: LoginType) => void 
 function LoginQRCode({ setLoginType }: { setLoginType: (type: LoginType) => void }) {
   const { walletInfo, currentNetwork } = useCurrentWallet();
   const [newWallet, setNewWallet] = useState<WalletInfoType>();
+  console.log(newWallet, '======newWallet');
+
+  const caInfo = useIntervalQueryCAInfoByAddress(currentNetwork, newWallet?.address);
+  useEffect(() => {
+    if (caInfo) {
+      navigationService.navigate('SetPin', {
+        caInfo,
+        walletInfo: handleWalletInfo(newWallet),
+        managerInfo: caInfo.managerInfo,
+      });
+    }
+  }, [caInfo, newWallet]);
   const generateKeystore = useCallback(() => {
     try {
       const wallet = walletInfo?.address ? walletInfo : AElf.wallet.createNewWallet();
@@ -121,8 +136,19 @@ function LoginQRCode({ setLoginType }: { setLoginType: (type: LoginType) => void
     const timer = setTimeout(() => {
       generateKeystore();
     }, 10);
+    let timer2: any;
+    myEvents.clearQRWallet.addListener(() => {
+      timer2 = setTimeout(() => {
+        setNewWallet(undefined);
+        timer2 && clearTimeout(timer2);
+        timer2 = setTimeout(() => {
+          generateKeystore();
+        }, 200);
+      }, 500);
+    });
     return () => {
       timer && clearTimeout(timer);
+      timer2 && clearTimeout(timer2);
     };
   });
   const qrData = useMemo(() => {

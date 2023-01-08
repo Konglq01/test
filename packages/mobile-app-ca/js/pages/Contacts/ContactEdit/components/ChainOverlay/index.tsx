@@ -51,7 +51,7 @@ const SelectList = <ItemType extends ItemTypeBase<ItemValueType>, ItemValueType 
           inputStyle={styles.titleInput}
           leftIconContainerStyle={GStyles.marginLeft(16)}
           value={keyWord}
-          placeholder={t('Search Network')}
+          placeholder={t('Search network')}
           onChangeText={setKeyWord}
         />
       </View>
@@ -79,7 +79,7 @@ const SelectList = <ItemType extends ItemTypeBase<ItemValueType>, ItemValueType 
           })}
         </ScrollView>
       ) : (
-        <TextL style={styles.noResult}>There is no search result.</TextL>
+        <TextL style={styles.noResult}>{t('No results found')}</TextL>
       )}
     </OverlayBody>
   );

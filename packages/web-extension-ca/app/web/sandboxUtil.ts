@@ -252,7 +252,7 @@ class SandboxUtil {
       const contract = await SandboxUtil._getELFSendContract(rpcUrl, address, privateKey);
       console.log(contract, 'callSendMethod==contract===');
       const functionNameUpper = methodName.replace(methodName[0], methodName[0].toLocaleUpperCase());
-      console.log(contract, functionNameUpper, '1callSendMethod==');
+      console.log(contract, '1callSendMethod==');
       let contractMethod = contract[functionNameUpper];
       contractMethod = !isGetSignTx ? contractMethod : contractMethod.getSignedTx;
       const req = await contractMethod(...paramsOption);

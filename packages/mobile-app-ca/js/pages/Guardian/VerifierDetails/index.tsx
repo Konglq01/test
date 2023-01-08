@@ -7,7 +7,7 @@ import DigitInput, { DigitInputInterface } from 'components/DigitInput';
 import React, { useCallback, useRef, useState } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import useRouterParams from '@portkey/hooks/useRouterParams';
-import { VerificationType, VerifyStatus } from '@portkey/types/verifier';
+import { ApprovalType, VerificationType, VerifyStatus } from '@portkey/types/verifier';
 import GuardianAccountItem, { GuardiansStatusItem } from '../components/GuardianAccountItem';
 import { FontStyles } from 'assets/theme/styles';
 import { request } from 'api';
@@ -18,6 +18,16 @@ import useEffectOnce from 'hooks/useEffectOnce';
 import { LoginType } from '@portkey/types/types-ca/wallet';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import myEvents from 'utils/deviceEvent';
+import { API_REQ_FUNCTION } from 'api/types';
+import { getELFContract } from 'contexts/utils';
+import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+import { useCredentials } from 'hooks/store';
+import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import { getWallet } from 'utils/redux';
+import { sleep } from '@portkey/utils';
+
+type FetchType = Record<string, API_REQ_FUNCTION>;
+
 type RouterParams = {
   loginGuardianType?: string;
   guardianItem?: UserGuardianItem;
@@ -52,14 +62,60 @@ export default function VerifierDetails() {
     },
     [guardianKey],
   );
+
+  const chainInfo = useCurrentChain('AELF');
+  const { pin } = useCredentials() || {};
+  const { caHash } = useCurrentWalletInfo();
+
+  const setLoginAccount = useCallback(async () => {
+    if (!chainInfo || !pin || !caHash || !guardianItem) return;
+    const wallet = getWallet(pin);
+    if (!wallet) return;
+    const contract = await getELFContract({
+      contractAddress: chainInfo.caContractAddress,
+      rpcUrl: chainInfo.endPoint,
+      account: wallet,
+    });
+
+    try {
+      const req = await contract?.callSendMethod('SetGuardianTypeForLogin', wallet.address, {
+        caHash,
+        guardianType: {
+          type: guardianItem.guardiansType,
+          guardianType: guardianItem.loginGuardianType,
+        },
+      });
+
+      if (req && !req.error) {
+        await sleep(1000);
+        myEvents.refreshGuardiansList.emit();
+        navigationService.navigate('GuardianDetail', {
+          guardian: JSON.stringify({ ...guardianItem, isLoginAccount: true }),
+        });
+      } else {
+        CommonToast.failError(req?.error?.message?.Message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }, [caHash, chainInfo, guardianItem, pin]);
+
   const onFinish = useCallback(
     async (code: string) => {
       if (!stateSessionId || !loginGuardianType || !code) return;
       try {
         Loading.show();
-        let fetch = request.register;
+        let fetch: FetchType = request.register;
         if (verificationType === VerificationType.communityRecovery) fetch = request.recovery;
-        await fetch.verifyCode({
+        if (
+          verificationType === VerificationType.addGuardian ||
+          verificationType === VerificationType.editGuardianApproval ||
+          verificationType === VerificationType.setLoginAccount
+        ) {
+          fetch = request.verification;
+        }
+
+        const rst = await fetch.verifyCode({
           baseURL: guardianItem?.verifier?.url,
           data: {
             type: 0,
@@ -75,6 +131,32 @@ export default function VerifierDetails() {
             status: VerifyStatus.Verified,
           });
           navigationService.goBack();
+        } else if (verificationType === VerificationType.editGuardianApproval) {
+          if (rst.signature && rst.verifierDoc) {
+            setGuardianStatus({
+              verifierSessionId: stateSessionId,
+              status: VerifyStatus.Verified,
+              editGuardianParams: {
+                signature: rst.signature,
+                verifierDoc: rst.verifierDoc,
+              },
+            });
+            navigationService.goBack();
+          }
+        } else if (verificationType === VerificationType.addGuardian) {
+          if (rst.signature && rst.verifierDoc) {
+            navigationService.navigate('GuardianApproval', {
+              approvalType: ApprovalType.addGuardian,
+              guardianItem,
+              editGuardianParams: {
+                signature: rst.signature,
+                verifierDoc: rst.verifierDoc,
+              },
+              managerUniqueId,
+            });
+          }
+        } else if (verificationType === VerificationType.setLoginAccount) {
+          await setLoginAccount();
         } else {
           navigationService.navigate('SetPin', {
             managerInfo: {
@@ -87,15 +169,24 @@ export default function VerifierDetails() {
         }
       } catch (error) {
         CommonToast.failError(error, 'Verify Fail');
-        digitInput.current?.resetPin();
+        // TODO: check: which verificationType will execute
+        if (
+          verificationType === undefined ||
+          verificationType === VerificationType.register ||
+          verificationType === VerificationType.communityRecovery
+        ) {
+          console.log('---------resetPin-------');
+          digitInput.current?.resetPin();
+        }
       }
       Loading.hide();
     },
     [
-      guardianItem?.verifier?.url,
+      guardianItem,
       loginGuardianType,
       managerUniqueId,
       setGuardianStatus,
+      setLoginAccount,
       stateSessionId,
       verificationType,
     ],
@@ -103,8 +194,14 @@ export default function VerifierDetails() {
   const resendCode = useCallback(async () => {
     Loading.show();
     try {
-      let fetch = request.register;
+      let fetch: FetchType = request.register;
       if (verificationType === VerificationType.communityRecovery) fetch = request.recovery;
+      if (
+        verificationType === VerificationType.addGuardian ||
+        verificationType === VerificationType.editGuardianApproval ||
+        verificationType === VerificationType.setLoginAccount
+      )
+        fetch = request.verification;
       const req = await fetch.sendCode({
         baseURL: guardianItem?.verifier?.url,
         data: {

@@ -25,33 +25,36 @@ export default function ScanLogin() {
   const { address } = data || {};
 
   const { pin } = useCredentials() || {};
-  const { AELF } = useCurrentWalletInfo();
-  console.log(address, AELF, '====address');
+  const { caHash } = useCurrentWalletInfo();
   const [loading, setLoading] = useState<boolean>();
   const onLogin = useCallback(async () => {
-    if (!chainInfo || !pin || !AELF || loading) return;
-    const wallet = getWallet(pin);
-    if (!wallet) return;
-    setLoading(true);
-    const contract = await getELFContract({
-      contractAddress: chainInfo.caContractAddress,
-      rpcUrl: chainInfo.endPoint,
-      account: wallet,
-    });
-    const req = await contract?.callSendMethod('AddManager', wallet.address, {
-      caHash: AELF?.caHash,
-      manager: {
-        managerAddress: address,
-        deviceString: new Date().getTime(),
-      },
-    });
-    setLoading(false);
-    if (req && !req.error) {
-      navigationService.navigate('Tab');
-    } else {
-      CommonToast.fail(req?.error.message);
+    if (!chainInfo || !pin || !caHash || loading) return;
+    try {
+      const wallet = getWallet(pin);
+      if (!wallet) return;
+      setLoading(true);
+      const contract = await getELFContract({
+        contractAddress: chainInfo.caContractAddress,
+        rpcUrl: chainInfo.endPoint,
+        account: wallet,
+      });
+      const req = await contract?.callSendMethod('AddManager', wallet.address, {
+        caHash,
+        manager: {
+          managerAddress: address,
+          deviceString: new Date().getTime(),
+        },
+      });
+      if (req && !req.error) {
+        navigationService.navigate('Tab');
+      } else {
+        CommonToast.fail(req?.error.message);
+      }
+    } catch (error) {
+      CommonToast.failError(error);
     }
-  }, [AELF, address, chainInfo, loading, pin]);
+    setLoading(false);
+  }, [caHash, address, chainInfo, loading, pin]);
   return (
     <PageContainer
       scrollViewProps={ScrollViewProps}
@@ -69,7 +72,12 @@ export default function ScanLogin() {
       </View>
       <View style={styles.bottomBox}>
         <CommonButton type="primary" title="Log In" onPress={onLogin} loading={loading} />
-        <CommonButton buttonStyle={styles.cancelButtonStyle} type="clear" title="Cancel" />
+        <CommonButton
+          buttonStyle={styles.cancelButtonStyle}
+          type="clear"
+          title="Cancel"
+          onPress={() => navigationService.navigate('Tab')}
+        />
       </View>
     </PageContainer>
   );

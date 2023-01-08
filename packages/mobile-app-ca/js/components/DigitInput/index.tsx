@@ -92,10 +92,10 @@ const DigitInput = forwardRef(
               ref={input}
               value={text}
               maxLength={maxLength}
-              autoFocus={true}
+              // autoFocus={true}
               keyboardType={keyboardType}
               onChangeText={value => {
-                // if (value && !isValidPositiveInteger(value)) return;
+                if (value && !isValidPositiveInteger(value)) return;
                 setText(value);
                 onChangeText?.(value);
                 if (value.length === maxLength) onFinish?.(value);
