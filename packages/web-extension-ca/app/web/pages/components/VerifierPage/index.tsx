@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { setUserGuardianSessionIdAction } from '@portkey/store/store-ca/guardians/actions';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
 import { LoginType } from '@portkey/types/types-ca/wallet';
+import { useLocation } from 'react-router';
 
 const MAX_TIMER = 60;
 
@@ -29,7 +30,7 @@ interface VerifierPageProps {
   guardiansType?: LoginType;
   verificationType: VerificationType;
 
-  onSuccess?: () => void;
+  onSuccess?: (res: any) => void;
 }
 
 export default function VerifierPage({
@@ -45,6 +46,7 @@ export default function VerifierPage({
   const [pinVal, setPinVal] = useState<string>();
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const { state } = useLocation();
 
   const onFinish = useCallback(
     async (code: string) => {
@@ -68,7 +70,11 @@ export default function VerifierPage({
             verifierSessionId: currentGuardian?.sessionId,
           });
           setLoading(false);
-          if (!Object.keys(res).length) return onSuccess?.();
+          if (state && state.indexOf('guardians') !== -1) {
+            if (Object.keys(res).length) return onSuccess?.(res);
+          } else {
+            if (!Object.keys(res).length) return onSuccess?.(res);
+          }
           if (res?.error?.message) {
             message.error(t(res.error.message));
           } else {
@@ -84,7 +90,7 @@ export default function VerifierPage({
         message.error(_error);
       }
     },
-    [loginAccount, currentGuardian, setLoading, verificationType, onSuccess, t],
+    [loginAccount, currentGuardian, setLoading, verificationType, state, onSuccess, t],
   );
 
   const resendCode = useCallback(async () => {

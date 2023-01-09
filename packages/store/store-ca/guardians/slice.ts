@@ -11,6 +11,7 @@ import {
   resetUserGuardianStatus,
   setUserGuardianStatus,
   setPreGuardianAction,
+  setOpGuardianAction,
 } from './actions';
 import { GuardiansState } from './type';
 import { GUARDIAN_TYPE_TYPE } from './utils';
@@ -81,6 +82,16 @@ export const guardiansSlice = createSlice({
           };
         }
       })
+      .addCase(setOpGuardianAction, (state, action) => {
+        if (!action.payload) {
+          state.opGuardian = undefined;
+        } else {
+          state.opGuardian = {
+            ...state.userGuardianStatus?.[action.payload.key],
+            ...action.payload,
+          };
+        }
+      })
       .addCase(setCurrentGuardianAction, (state, action) => {
         state.currentGuardian = {
           ...state.userGuardianStatus?.[action.payload.key],
@@ -96,9 +107,11 @@ export const guardiansSlice = createSlice({
         state.userGuardianStatus = userStatus;
       })
       .addCase(setUserGuardianItemStatus, (state, action) => {
-        const { key, status } = action.payload;
+        const { key, status, signature, verificationDoc } = action.payload;
         if (!state.userGuardianStatus?.[key]) throw Error("Can't find this item");
         state.userGuardianStatus[key]['status'] = status;
+        state.userGuardianStatus[key]['signature'] = signature;
+        state.userGuardianStatus[key]['verificationDoc'] = verificationDoc;
         if (!state.guardianExpiredTime) {
           // && status === VerifyStatus.Verifying
           state.guardianExpiredTime = moment().add(1, 'h').subtract(2, 'minute').valueOf();

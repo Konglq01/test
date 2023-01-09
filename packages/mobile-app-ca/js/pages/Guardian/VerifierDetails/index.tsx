@@ -169,15 +169,7 @@ export default function VerifierDetails() {
         }
       } catch (error) {
         CommonToast.failError(error, 'Verify Fail');
-        // TODO: check: which verificationType will execute
-        if (
-          verificationType === undefined ||
-          verificationType === VerificationType.register ||
-          verificationType === VerificationType.communityRecovery
-        ) {
-          console.log('---------resetPin-------');
-          digitInput.current?.resetPin();
-        }
+        digitInput.current?.resetPin();
       }
       Loading.hide();
     },
