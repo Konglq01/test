@@ -31,6 +31,7 @@ import useRouterParams from '@portkey/hooks/useRouterParams';
 import { LoginType } from '@portkey/types/types-ca/wallet';
 import { useAppDispatch } from 'store/hooks';
 import { setPreGuardianAction } from '@portkey/store/store-ca/guardians/actions';
+import { VerifierImage } from '../components/VerifierImage';
 
 type RouterParams = {
   guardian?: UserGuardianItem;
@@ -271,7 +272,7 @@ const GuardianEdit: React.FC = () => {
           }}
           titleLeftElement={
             selectedVerifier && (
-              <Svg iconStyle={GStyles.marginRight(12)} icon="logo-icon" color={defaultColors.primaryColor} size={30} />
+              <VerifierImage style={GStyles.marginRight(12)} size={pTd(30)} uri={selectedVerifier.imageUrl} />
             )
           }
           titleStyle={[GStyles.flexRow, GStyles.itemCenter]}

@@ -10,6 +10,7 @@ import { pTd } from 'utils/unit';
 import { useLanguage } from 'i18n/hooks';
 import { defaultColors } from 'assets/theme';
 import OverlayBody from 'components/OverlayModal/OverlayBody';
+import { VerifierImage } from '../VerifierImage';
 
 type ValueType = string | number;
 type DefaultValueType = string;
@@ -47,13 +48,8 @@ const SelectList = <ItemType extends ItemTypeBase<ItemValueType>, ItemValueType 
                 callBack(item);
               }}>
               <View style={[GStyles.paddingLeft(24), styles.itemRow]}>
-                {/* TODO: dynamic render logo icon */}
-                <Svg
-                  iconStyle={GStyles.marginRight(12)}
-                  icon="logo-icon"
-                  color={defaultColors.primaryColor}
-                  size={pTd(36)}
-                />
+                <VerifierImage style={GStyles.marginRight(12)} size={pTd(36)} uri={item.imageUrl} />
+
                 <View style={styles.itemContent}>
                   <TextL>{item[labelAttrName]}</TextL>
                   {url !== undefined && url === item.url && (
