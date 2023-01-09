@@ -66,7 +66,7 @@ export default function VerifierPage({
             baseUrl: currentGuardian?.verifier?.url || '',
             verificationType,
             type: loginAccount.accountLoginType,
-            loginGuardianType: loginAccount?.loginGuardianType,
+            loginGuardianType: currentGuardian?.loginGuardianType,
             verifierSessionId: currentGuardian?.sessionId,
           });
           setLoading(false);
@@ -94,16 +94,16 @@ export default function VerifierPage({
   );
 
   const resendCode = useCallback(async () => {
-    if (!loginAccount?.loginGuardianType) return message.error('Missing loginGuardianType');
+    if (!currentGuardian?.loginGuardianType) return message.error('Missing loginGuardianType');
     console.log(guardiansType, 'guardiansType===');
     if (!guardiansType && guardiansType !== 0) return message.error('Missing guardiansType');
     setLoading(true);
     const res = await sendVerificationCode({
-      loginGuardianType: loginAccount.loginGuardianType,
+      loginGuardianType: currentGuardian.loginGuardianType,
       guardiansType,
       verificationType,
       baseUrl: currentGuardian?.verifier?.url || '',
-      managerUniqueId: loginAccount.managerUniqueId,
+      managerUniqueId: loginAccount?.managerUniqueId ?? '',
     });
     setLoading(false);
     if (res.verifierSessionId) {
@@ -137,12 +137,12 @@ export default function VerifierPage({
           guardiansType={currentGuardian?.guardiansType}
           verifierSrc={currentGuardian?.verifier?.imageUrl}
         />
-        <span className="login-account">{loginAccount?.loginGuardianType || ''}</span>
+        <span className="login-account">{currentGuardian?.loginGuardianType || ''}</span>
       </div>
       <div className="send-tip">
         {isPrompt || 'Please contact your guardians, and enter '}
         {t('sendCodeTip1', { codeCount: DIGIT_CODE.length })}&nbsp;
-        <span className="account">{loginAccount?.loginGuardianType}</span>
+        <span className="account">{currentGuardian?.loginGuardianType}</span>
         <br />
         {t('sendCodeTip2', { minute: DIGIT_CODE.expiration })}
       </div>
