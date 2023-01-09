@@ -21,6 +21,7 @@ import { baseRequest } from 'api';
 import descriptor from '@aelfqueen/protobufjs/ext/descriptor';
 import AElf from 'aelf-sdk';
 import { useGetHolderInfo } from 'hooks/guardian';
+import { useCurrentCAContract } from 'hooks/contract';
 
 function fileDescriptorSetFormatter(result: any) {
   const buffer = Buffer.from(result, 'base64');
@@ -43,6 +44,7 @@ export default function HomeScreen() {
   const getHolderInfo = useGetHolderInfo();
   const { pin } = useCredentials() || {};
   const chainInfo = useCurrentChain('AELF');
+  const caContract = useCurrentCAContract();
   return (
     <SafeAreaBox>
       <ScrollView>

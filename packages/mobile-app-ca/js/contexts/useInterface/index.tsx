@@ -24,7 +24,7 @@ function reducer(state: State, { type, payload }: any) {
       const { caContracts } = state;
       const { caContract, chainId } = payload;
       return Object.assign({}, state, {
-        CAContracts: Object.assign({}, caContracts, {
+        caContracts: Object.assign({}, caContracts, {
           [chainId]: { ...caContracts?.[chainId as ChainId], ...caContract },
         }),
       });

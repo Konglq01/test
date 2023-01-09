@@ -37,7 +37,7 @@ export function useCurrentCAContract(chainId: ChainId = 'AELF') {
   const { AESEncryptPrivateKey, address } = useCurrentWalletInfo();
   const [{ caContracts }, dispatch] = useInterface();
   const { pin } = useCredentials() || {};
-  const key = useMemo(() => address + chainInfo?.caContractAddress, [address, chainInfo?.caContractAddress]);
+  const key = useMemo(() => address + '_' + chainInfo?.caContractAddress, [address, chainInfo?.caContractAddress]);
 
   const caContract = useMemo(() => {
     return caContracts?.[chainId]?.[key];

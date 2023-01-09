@@ -20,7 +20,7 @@ export const basicInterfaceActions = {
   setViewContract: (viewContract: State['viewContracts']) =>
     basicActions(InterfaceActions.setViewContract, { viewContract }),
   setCAContract: (caContract: { [key: string]: ContractBasic }, chainId: ChainId) =>
-    basicActions(InterfaceActions.setViewContract, { caContract, chainId }),
+    basicActions(InterfaceActions.setCAContract, { caContract, chainId }),
   interfaceDestroy: () => basicActions(InterfaceActions.destroy),
 };
 
