@@ -1,8 +1,8 @@
 name: Extension Build
 
 on:
-  pull_request:
-    branches: [ "feature/ca-dev" ]
+  merge:
+    branches: [ "feature/ca-extension-my" ]
 
 jobs:
   build:
