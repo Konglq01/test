@@ -8,13 +8,12 @@ import { useAppDispatch } from 'store/hooks';
 import SafeAreaBox from 'components/SafeAreaBox';
 import ActionSheet from 'components/ActionSheet';
 import { useTokenContract } from 'contexts/useInterface/hooks';
-import { useCurrentWallet, useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { CrashTest } from 'Test/CrashTest';
 import Loading from 'components/Loading';
 import { queryFailAlert } from 'utils/login';
 import { contractQueries } from '@portkey/graphql/index';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network';
-import { useIntervalQueryCAInfoByAddress } from '@portkey/hooks/hooks-ca/graphql';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { getWallet } from 'utils/redux';
 import { useCredentials } from 'hooks/store';
@@ -43,24 +42,17 @@ export default function HomeScreen() {
   const tokenContract = useTokenContract();
   const dispatch = useAppDispatch();
   const wallet = useCurrentWalletInfo();
-  const { currentNetwork } = useCurrentWallet();
   const getHolderInfo = useGetHolderInfo();
   const { pin } = useCredentials() || {};
-  const caInfo = useIntervalQueryCAInfoByAddress(currentNetwork, wallet.address);
-  console.log(caInfo, '======caInfo');
-  console.log(wallet, '======wallet');
   const chainInfo = useCurrentChain('AELF');
   return (
     <SafeAreaBox>
       <ScrollView>
-        <Text>Home Screen</Text>
+        <Text>Test Screen</Text>
         {/* <Button title="Go to Element" onPress={() => navigation.navigate('Element')} /> */}
         {/* <Button title="Go to I18n" onPress={() => navigation.navigate('I18n')} /> */}
-        {/* <Button title="Go to Webview" onPress={() => navigation.navigate('WebView')} /> */}
-        <Button title="Go to Echarts" onPress={() => navigation.navigate('Echarts')} />
         <Button title="Go to ContactsHome" onPress={() => navigation.navigate('ContactsHome')} />
         <Button title="Go to Token" onPress={() => navigation.navigate('ManageTokenList')} />
-        <Button title="Go to ManageNetwork" onPress={() => navigation.navigate('ManageNetwork')} />
         <Button title="ActionSheet show" onPress={() => ActionSheet.show([{ title: '123' }, { title: '123' }])} />
         <Button
           title="getBalance"

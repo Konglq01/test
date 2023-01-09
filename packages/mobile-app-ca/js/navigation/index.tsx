@@ -17,10 +17,7 @@ import Home from 'pages/Home';
 
 import Referral from 'pages/Referral';
 import SecurityLock from 'pages/SecurityLock';
-import WebView from 'pages/WebView';
-import Echarts from 'pages/Echarts';
 import DashBoard from 'pages/DashBoard/index';
-import NetworkNav from 'pages/ManageNetwork/router';
 import SettingsNav from 'pages/SettingsPage/router';
 import Receive from 'pages/Receive';
 import NFTDetail from 'pages/NFT/NFTDetail';
@@ -33,8 +30,6 @@ export const stackNav = [
   { name: 'Referral', component: Referral },
   { name: 'Tab', component: Tab },
   { name: 'SecurityLock', component: SecurityLock, option: { gestureEnabled: false } },
-  { name: 'WebView', component: WebView },
-  { name: 'Echarts', component: Echarts },
   { name: 'DashBoard', component: DashBoard },
   { name: 'Receive', component: Receive },
   { name: 'NFTDetail', component: NFTDetail },
@@ -42,7 +37,6 @@ export const stackNav = [
   { name: 'Home', component: Home },
 
   ...ActivityNav,
-  ...NetworkNav,
   ...ContactsNav,
   ...LoginNav,
   ...AccountNav,
