@@ -1,6 +1,6 @@
 import { defaultColors } from 'assets/theme';
 import Svg from 'components/Svg';
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import { pTd } from 'utils/unit';
 import navigationService from 'utils/navigationService';
@@ -21,9 +21,8 @@ export default function GuardianHome() {
 
   const { userGuardiansList } = useGuardiansInfo();
 
-  const { AELF } = useCurrentWalletInfo();
+  const { caHash } = useCurrentWalletInfo();
   const userGuardiansListRef = useRef<UserGuardianItem[]>();
-  console.log('???', userGuardiansList);
   userGuardiansListRef.current = userGuardiansList;
 
   const getGuardiansList = useGetHolderInfo();
@@ -36,7 +35,7 @@ export default function GuardianHome() {
           times++;
           try {
             await getGuardiansList({
-              caHash: AELF?.caHash,
+              caHash,
             });
           } catch (err) {
             console.log(err);
@@ -53,15 +52,17 @@ export default function GuardianHome() {
         }, 1000);
       });
     } catch (error) {
-      console.log(error);
+      console.log('error', error);
     }
-  }, [AELF?.caHash, getGuardiansList]);
+  }, [caHash, getGuardiansList]);
 
   useEffectOnce(() => {
     getGuardiansList({
-      caHash: AELF?.caHash,
+      caHash,
     });
+  });
 
+  useEffect(() => {
     const listener = myEvents.refreshGuardiansList.addListener(() => {
       console.log('listener:refreshGuardiansList----');
       refreshGuardiansList();
@@ -69,7 +70,7 @@ export default function GuardianHome() {
     return () => {
       listener.remove();
     };
-  });
+  }, [refreshGuardiansList]);
 
   const renderGuardianBtn = useCallback(
     () => <Svg icon="right-arrow" color={defaultColors.icon1} size={pTd(16)} />,

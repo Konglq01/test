@@ -25,6 +25,7 @@ import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { getWallet } from 'utils/redux';
 import { getELFContract } from 'contexts/utils';
 import myEvents from 'utils/deviceEvent';
+import { VerifierImage } from '../components/VerifierImage';
 
 interface GuardianDetailProps {
   route?: any;
@@ -192,13 +193,7 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
             <TextM>{guardian?.loginGuardianType || ''}</TextM>
           </View>
           <View style={pageStyles.verifierInfoWrap}>
-            {/* TODO: dynamic logo icon */}
-            <Svg
-              iconStyle={GStyles.marginRight(8)}
-              icon="logo-icon"
-              color={defaultColors.primaryColor}
-              size={pTd(30)}
-            />
+            <VerifierImage style={GStyles.marginRight(8)} size={pTd(30)} uri={guardian?.verifier?.imageUrl} />
             <TextM>{guardian?.verifier?.name || ''}</TextM>
           </View>
         </View>
