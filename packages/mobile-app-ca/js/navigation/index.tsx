@@ -7,7 +7,6 @@ import navigationService from 'utils/navigationService';
 import LoginNav from 'pages/Login';
 import GuardianNav from 'pages/Guardian';
 import PinNav from 'pages/Pin';
-import AccountNav from 'pages/Account';
 import ContactsNav from 'pages/Contacts';
 import TokenNav from 'pages/Token';
 import SendNav from 'pages/Send';
@@ -39,7 +38,6 @@ export const stackNav = [
   ...ActivityNav,
   ...ContactsNav,
   ...LoginNav,
-  ...AccountNav,
   ...TokenNav,
   ...SendNav,
   ...SettingsNav,
