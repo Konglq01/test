@@ -13,7 +13,7 @@ import { useNavigate, useLocation } from 'react-router';
 import { setUserGuardianItemStatus, setCurrentGuardianAction } from '@portkey/store/store-ca/guardians/actions';
 import { UserGuardianItem, UserGuardianStatus } from '@portkey/store/store-ca/guardians/type';
 import { ZERO } from '@portkey/constants/misc';
-import BigNumber from 'bignumber.js';
+import { getApprovalCount } from '@portkey/utils/guardian';
 import './index.less';
 import PortKeyTitle from 'pages/components/PortKeyTitle';
 import VerifierPair from 'components/VerifierPair';
@@ -33,8 +33,6 @@ import { GuardianItem } from 'types/guardians';
 import { sleep } from '@portkey/utils';
 import { getAelfInstance } from '@portkey/utils/aelf';
 import { getTxResult } from 'utils/aelfUtils';
-
-const APPROVAL_COUNT = ZERO.plus(3).div(5);
 
 enum MethodType {
   'guardians/add' = GuardianMth.addGuardian,
@@ -69,8 +67,7 @@ export default function GuardianApproval() {
     return filterVerifiedList;
   }, [opGuardian, preGuardian, state, userGuardianStatus]);
   const approvalLength = useMemo(() => {
-    if (userVerifiedList.length <= 3) return userVerifiedList.length;
-    return APPROVAL_COUNT.times(userVerifiedList.length).dp(0, BigNumber.ROUND_DOWN).toNumber();
+    return getApprovalCount(userVerifiedList.length);
   }, [userVerifiedList.length]);
 
   const alreadyApprovalLength = useMemo(
@@ -132,7 +129,7 @@ export default function GuardianApproval() {
           );
         setLoading(true);
         const result = await sendVerificationCode({
-          loginGuardianType: loginAccount?.loginGuardianType,
+          loginGuardianType: item?.loginGuardianType,
           guardiansType: loginAccount?.accountLoginType,
           verificationType: VerificationType.communityRecovery,
           baseUrl: item?.verifier?.url || '',
@@ -158,7 +155,7 @@ export default function GuardianApproval() {
     [state, loginAccount, setLoading, guardianSendCode, dispatch, navigate],
   );
 
-  const formatAddGuardianValue = () => {
+  const formatAddGuardianValue = useCallback(() => {
     let guardianToAdd: GuardianItem = {} as GuardianItem;
     const guardiansApproved: GuardianItem[] = [];
     Object.values(userGuardianStatus ?? {})?.forEach((item: UserGuardianStatus) => {
@@ -174,7 +171,7 @@ export default function GuardianApproval() {
             verificationDoc: item.verificationDoc || '',
           },
         };
-      } else {
+      } else if (item.signature) {
         guardiansApproved.push({
           guardianType: {
             type: item.guardiansType,
@@ -189,9 +186,9 @@ export default function GuardianApproval() {
       }
     });
     return { guardianToAdd, guardiansApproved };
-  };
+  }, [opGuardian?.key, userGuardianStatus]);
 
-  const formatEditGuardianValue = () => {
+  const formatEditGuardianValue = useCallback(() => {
     let guardianToUpdatePre: GuardianItem = {} as GuardianItem;
     let guardianToUpdateNew: GuardianItem = {} as GuardianItem;
     const guardiansApproved: GuardianItem[] = [];
@@ -216,7 +213,7 @@ export default function GuardianApproval() {
             name: item.verifier?.name as string,
           },
         };
-      } else {
+      } else if (item.signature) {
         guardiansApproved.push({
           guardianType: {
             type: item.guardiansType,
@@ -231,9 +228,9 @@ export default function GuardianApproval() {
       }
     });
     return { guardianToUpdatePre, guardianToUpdateNew, guardiansApproved };
-  };
+  }, [opGuardian?.key, preGuardian?.key, userGuardianStatus]);
 
-  const formatDelGuardianValue = () => {
+  const formatDelGuardianValue = useCallback(() => {
     let guardianToRemove: GuardianItem = {} as GuardianItem;
     const guardiansApproved: GuardianItem[] = [];
     Object.values(userGuardianStatus ?? {})?.forEach((item: UserGuardianStatus) => {
@@ -247,7 +244,7 @@ export default function GuardianApproval() {
             name: item.verifier?.name as string,
           },
         };
-      } else {
+      } else if (item.signature) {
         guardiansApproved.push({
           guardianType: {
             type: item.guardiansType,
@@ -262,9 +259,9 @@ export default function GuardianApproval() {
       }
     });
     return { guardianToRemove, guardiansApproved };
-  };
+  }, [opGuardian?.key, userGuardianStatus]);
 
-  const handleGuardianRecovery = async () => {
+  const handleGuardianRecovery = useCallback(async () => {
     try {
       setLoading(true);
       const res = await getPrivateKeyAndMnemonic(
@@ -312,7 +309,20 @@ export default function GuardianApproval() {
       setLoading(false);
       message.error(error);
     }
-  };
+  }, [
+    currentChain,
+    currentNetwork.walletType,
+    dispatch,
+    formatAddGuardianValue,
+    formatDelGuardianValue,
+    formatEditGuardianValue,
+    navigate,
+    passwordSeed,
+    setLoading,
+    state,
+    walletInfo?.AELF?.caHash,
+    walletInfo.AESEncryptPrivateKey,
+  ]);
 
   const recoveryWallet = useCallback(() => {
     if (state && state.indexOf('guardians') !== -1) {
@@ -320,7 +330,7 @@ export default function GuardianApproval() {
     } else {
       navigate('/register/set-pin', { state: 'login' });
     }
-  }, [navigate, state]);
+  }, [handleGuardianRecovery, navigate, state]);
 
   const verifyingHandler = useCallback(
     async (item: UserGuardianItem) => {

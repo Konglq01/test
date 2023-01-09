@@ -9,7 +9,6 @@ import InternalMessageTypes from 'messages/InternalMessageTypes';
 import { useCallback } from 'react';
 import { useAppDispatch } from 'store/Provider/hooks';
 import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
-// TODO get
 
 export const useCaInfoOnChain = () => {
   const { walletInfo, chainList } = useCurrentWallet();
@@ -74,11 +73,20 @@ export const useCaInfoOnChain = () => {
       });
   }, [chainList, currentNetwork.walletType, getHolderInfoByChainId, walletInfo]);
 
-  useInterval(
+  const check = useCallback(
+    () => chainList?.every((chain) => walletInfo[chain.chainId as ChainId]),
+    [chainList, walletInfo],
+  );
+
+  const interval = useInterval(
     () => {
-      fetch();
+      if (check()) {
+        interval.remove();
+      } else {
+        fetch();
+      }
     },
-    5000,
-    [fetch],
+    1000,
+    [],
   );
 };
