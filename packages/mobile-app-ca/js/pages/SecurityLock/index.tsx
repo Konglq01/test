@@ -23,6 +23,7 @@ import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { setCAInfo } from '@portkey/store/store-ca/wallet/actions';
 import { CAInfo } from '@portkey/types/types-ca/wallet';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network';
+
 import { VerificationType } from '@portkey/types/verifier';
 import useEffectOnce from 'hooks/useEffectOnce';
 let appState: AppStateStatus;
