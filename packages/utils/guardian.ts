@@ -4,5 +4,5 @@ import BigNumber from 'bignumber.js';
 
 export function getApprovalCount(length: number) {
   if (length <= 3) return length;
-  return APPROVAL_COUNT.times(length).dp(0, BigNumber.ROUND_DOWN).plus(1);
+  return APPROVAL_COUNT.times(length).dp(0, BigNumber.ROUND_DOWN).plus(1).toNumber();
 }
