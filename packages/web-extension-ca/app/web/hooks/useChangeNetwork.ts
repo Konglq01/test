@@ -1,4 +1,4 @@
-import { NetworkItem } from '@portkey/constants/constants-ca/network';
+import { NetworkItem } from '@portkey/types/types-ca/network';
 import { useWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { changeNetworkType } from '@portkey/store/store-ca/wallet/actions';
 import InternalMessage from 'messages/InternalMessage';

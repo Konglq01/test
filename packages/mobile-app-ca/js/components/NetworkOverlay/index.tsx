@@ -7,7 +7,7 @@ import { useCurrentNetworkInfo, useNetworkList } from '@portkey/hooks/hooks-ca/n
 import Touchable from 'components/Touchable';
 import Svg from 'components/Svg';
 import { pTd } from 'utils/unit';
-import { NetworkItem } from '@portkey/constants/constants-ca/network';
+import { NetworkItem } from '@portkey/types/types-ca/network';
 import { BorderStyles } from 'assets/theme/styles';
 import { useChangeNetwork } from 'hooks/network';
 import { ParamListBase, RouteProp } from '@react-navigation/native';
