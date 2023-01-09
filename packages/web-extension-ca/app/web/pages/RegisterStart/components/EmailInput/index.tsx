@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import './index.less';
 import { useTranslation } from 'react-i18next';
 import i18n from 'i18n';
-import { NetworkItem } from '@portkey/constants/constants-ca/network';
+import { NetworkItem } from '@portkey/types/types-ca/network';
 import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
 import { ChainItemType } from '@portkey/store/store-ca/wallet/type';
 import { checkEmail, EmailError } from '@portkey/utils/check';
