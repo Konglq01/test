@@ -406,7 +406,7 @@ export default function GuardianApproval() {
               </Touchable>
             </View>
             <TextM>
-              <TextM style={FontStyles.font4}>{approvedList.length ?? 0}</TextM>/{guardianCount.toFixed(0)}
+              <TextM style={FontStyles.font4}>{approvedList.length ?? 0}</TextM>/{guardianCount}
             </TextM>
           </View>
           <View style={GStyles.flex1}>
