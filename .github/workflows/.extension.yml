@@ -2,7 +2,7 @@ name: Extension Build
 
 on:
   push:
-    branches: [ "feature/ca-dev" ]
+    branches: [ "feature/extension-publish" ]
 
 jobs:
   build:
