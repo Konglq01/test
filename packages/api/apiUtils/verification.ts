@@ -18,6 +18,9 @@ export function sendVerificationCode(params: SendVerificationCodeProps): Promise
     case VerificationType.communityRecovery:
       tmpFetch = request.verify.sendRecoveryVerificationCode;
       break;
+    case VerificationType.addGuardian:
+      tmpFetch = request.verify.sendVerificationCode;
+      break;
     default:
       throw Error('Unable to find the corresponding api');
   }
@@ -64,6 +67,9 @@ export async function checkVerificationCode({
       break;
     case VerificationType.communityRecovery:
       tmpFetch = request.verify.checkRecoveryVerificationCode;
+      break;
+    case VerificationType.addGuardian:
+      tmpFetch = request.verify.checkVerificationCode;
       break;
     default:
       throw Error('Unable to find the corresponding api');

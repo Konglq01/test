@@ -1,17 +1,28 @@
-import { setCurrentGuardianAction } from '@portkey/store/store-ca/guardians/actions';
+import {
+  resetUserGuardianStatus,
+  setCurrentGuardianAction,
+  setOpGuardianAction,
+  setPreGuardianAction,
+} from '@portkey/store/store-ca/guardians/actions';
 import { Input, Button, message } from 'antd';
 import { useNavigate, useLocation } from 'react-router';
 import CustomSvg from 'components/CustomSvg';
 import SettingHeader from 'pages/components/SettingHeader';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import CommonModal from 'components/CommonModal';
-import { useAppDispatch, useGuardiansInfo, useLoginInfo } from 'store/Provider/hooks';
+import { useAppDispatch, useGuardiansInfo, useLoading } from 'store/Provider/hooks';
 import { EmailReg } from '@portkey/utils/reg';
-import CustomSelect from 'pages/components/CustomSelect';
+import { sendVerificationCode } from '@portkey/api/apiUtils/verification';
+import { VerificationType } from '@portkey/types/verifier';
 import { LoginType } from '@portkey/types/types-ca/wallet';
+import CustomSelect from 'pages/components/CustomSelect';
+import { verifyErrorHandler } from 'utils/tryErrorHandler';
 import './index.less';
+import useGuardianList from 'hooks/useGuardianList';
+import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
+import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 
-const guardianList = [{ label: 'email', value: LoginType.email }];
+const guardianList = [{ label: 'Email', value: LoginType.email }];
 
 enum EmailError {
   noEmail = 'Please enter Email address',
@@ -23,32 +34,27 @@ export default function AddGuardian() {
   const { state } = useLocation();
   const { verifierMap, userGuardiansList, currentGuardian } = useGuardiansInfo();
   const [guardianType, setGuardianType] = useState<LoginType>();
-  const [verifierVal, setVerifierVal] = useState<string>('Portkey');
+  const [verifierVal, setVerifierVal] = useState<string>();
   const [emailVal, setEmailVal] = useState<string>();
   const [inputErr, setInputErr] = useState<string>();
   const [visible, setVisible] = useState<boolean>(false);
   const [exist, setExist] = useState<boolean>(false);
-  const { loginAccount } = useLoginInfo();
   const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    if (state?.back === 'back' && currentGuardian) {
-      setGuardianType(currentGuardian.guardiansType);
-      setEmailVal(currentGuardian.loginGuardianType);
-      setVerifierVal(currentGuardian.verifier?.name || verifierVal);
-    }
-  }, [state, currentGuardian]);
+  const { setLoading } = useLoading();
+  const { walletInfo } = useCurrentWallet();
+  const userGuardianList = useGuardianList();
 
   const disabled = useMemo(() => !emailVal || exist || !!inputErr, [emailVal, exist, inputErr]);
 
-  const selectItem = useMemo(() => verifierMap?.[verifierVal], [verifierMap, verifierVal]);
+  const selectVerifierItem = useMemo(() => verifierMap?.[verifierVal || ''], [verifierMap, verifierVal]);
+
   const verifierOptions = useMemo(
     () =>
       Object.values(verifierMap ?? {})?.map((item) => ({
         value: item.name,
         children: (
           <div className="flex select-option">
-            <CustomSvg type={item.imageUrl as any} />
+            <img src={item.imageUrl || item.url} alt="icon" />
             <span className="title">{item.name}</span>
           </div>
         ),
@@ -65,9 +71,15 @@ export default function AddGuardian() {
     [],
   );
 
+  useEffect(() => {
+    if (state === 'back' && currentGuardian) {
+      setGuardianType(currentGuardian.guardiansType);
+      setEmailVal(currentGuardian.loginGuardianType);
+      setVerifierVal(currentGuardian.verifier?.name);
+    }
+  }, [state, currentGuardian]);
+
   const guardianTypeChange = useCallback((value: LoginType) => {
-    console.log(value, 'value===');
-    console.log(`selected ${value}`);
     setExist(false);
     setGuardianType(value);
   }, []);
@@ -83,53 +95,71 @@ export default function AddGuardian() {
     setEmailVal(v);
   }, []);
 
-  const handleConfirm = () => {
-    if (guardianType === undefined) return;
-    if (!emailVal) return;
-    if (!EmailReg.test(emailVal)) {
+  const handleCheck = () => {
+    if (!EmailReg.test(emailVal as string)) {
       setInputErr(EmailError.invalidEmail);
       return;
     }
-    const flag: boolean =
+    if (!selectVerifierItem) return message.error('Can not get the current verifier message');
+    const isExist: boolean =
       Object.values(userGuardiansList ?? {})?.some((item) => {
         return item.loginGuardianType === emailVal && item.verifier?.name === verifierVal;
       }) ?? false;
-    setExist(flag);
-    if (!flag) {
-      if (!selectItem) return message.error('Can not get');
-      dispatch(
-        setCurrentGuardianAction({
-          isLoginAccount: true,
-          verifier: selectItem,
-          loginGuardianType: emailVal,
-          guardiansType: guardianType,
-          key: `${emailVal}&${selectItem.name}`,
-        }),
-      );
-      // TODO
-      setVisible(true);
-    }
+    setExist(isExist);
+    !isExist && setVisible(true);
   };
 
-  const handleVerify = useCallback(async () => {
+  const handleVerify = async () => {
     try {
-      // if (!loginAccount || !loginAccount.accountLoginType || !loginAccount.loginGuardianType)
-      //   return message.error('User registration information is invalid, please fill in the registration method again');
-      // const result = await sendVerificationCode({
-      //   loginGuardianType: loginAccount?.loginGuardianType,
-      //   guardiansType: loginAccount?.accountLoginType,
-      //   verificationType: VerificationType.addGuardian,
-      //   baseUrl: selectItem?.url || '',
-      // });
-      // if (result) {
-      //   // TODO
-      //   navigate('/setting/guardians/verifier-account', { state: 'guardians' });
-      // }
-      navigate('/setting/guardians/verifier-account', { state: 'guardians/add' });
+      dispatch(
+        setLoginAccountAction({
+          loginGuardianType: emailVal as string,
+          accountLoginType: LoginType.email,
+        }),
+      );
+      setLoading(true);
+      dispatch(resetUserGuardianStatus());
+      dispatch(setPreGuardianAction());
+      await userGuardianList(walletInfo.managerInfo?.loginGuardianType as string);
+      const result = await sendVerificationCode({
+        loginGuardianType: emailVal as string,
+        guardiansType: guardianType as LoginType,
+        verificationType: VerificationType.addGuardian,
+        baseUrl: selectVerifierItem?.url || '',
+        managerUniqueId: walletInfo.managerInfo?.managerUniqueId as string,
+      });
+      setLoading(false);
+      if (result.verifierSessionId) {
+        const _key = `${emailVal}&${selectVerifierItem?.name}`;
+        dispatch(
+          setCurrentGuardianAction({
+            isLoginAccount: false,
+            verifier: selectVerifierItem,
+            loginGuardianType: emailVal as string,
+            guardiansType: guardianType as LoginType,
+            sessionId: result.verifierSessionId,
+            key: _key,
+          }),
+        );
+        dispatch(
+          setOpGuardianAction({
+            isLoginAccount: false,
+            verifier: selectVerifierItem,
+            loginGuardianType: emailVal as string,
+            guardiansType: guardianType as LoginType,
+            sessionId: result.verifierSessionId,
+            key: _key,
+          }),
+        );
+        navigate('/setting/guardians/verifier-account', { state: 'guardians/add' });
+      }
     } catch (error) {
+      setLoading(false);
       console.log(error, 'verifyHandler');
+      const _error = verifyErrorHandler(error);
+      message.error(_error);
     }
-  }, []);
+  };
 
   return (
     <div className="add-guardians-page">
@@ -143,7 +173,7 @@ export default function AddGuardian() {
         />
       </div>
       <div className="input-item">
-        <p className="label">Verifier</p>
+        <p className="label">Guardian Type</p>
         <CustomSelect
           className="select"
           value={guardianType}
@@ -168,7 +198,7 @@ export default function AddGuardian() {
         </div>
       )}
       <div className="input-item">
-        <p className="label">Guardian Type</p>
+        <p className="label">Verifier</p>
         <CustomSelect
           className="select"
           value={verifierVal}
@@ -180,7 +210,7 @@ export default function AddGuardian() {
         {exist && <div className="error">This guardian is already exist</div>}
       </div>
       <div className="btn-wrap">
-        <Button type="primary" onClick={handleConfirm} disabled={disabled}>
+        <Button type="primary" onClick={handleCheck} disabled={disabled}>
           {'Confirm'}
         </Button>
       </div>
