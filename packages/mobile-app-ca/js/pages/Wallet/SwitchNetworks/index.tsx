@@ -11,7 +11,7 @@ import { defaultColors } from 'assets/theme';
 import { FontStyles } from 'assets/theme/styles';
 import Svg from 'components/Svg';
 import { changeNetworkType } from '@portkey/store/store-ca/wallet/actions';
-import { NetworkItem } from '@portkey/constants/constants-ca/network';
+import { NetworkItem } from '@portkey/types/types-ca/network';
 import { useNetworkList } from '@portkey/hooks/hooks-ca/network';
 
 const SwitchNetworks: React.FC = () => {

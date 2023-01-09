@@ -3,7 +3,7 @@ import { useCallback, useRef, useState } from 'react';
 import EmailInput, { EmailInputInstance } from 'pages/RegisterStart/components/EmailInput';
 import { useTranslation } from 'react-i18next';
 import './index.less';
-import { NetworkItem } from '@portkey/constants/constants-ca/network';
+import { NetworkItem } from '@portkey/types/types-ca/network';
 import { ChainItemType } from '@portkey/store/store-ca/wallet/type';
 
 interface EmailTabProps {

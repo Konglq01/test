@@ -12,33 +12,23 @@ import GStyles from 'assets/theme/GStyles';
 import CommonButton from 'components/CommonButton';
 import useRouterParams from '@portkey/hooks/useRouterParams';
 import { LoginQRData } from '@portkey/types/types-ca/qrcode';
-import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
-import { getELFContract } from 'contexts/utils';
-import { getWallet } from 'utils/redux';
-import { useCredentials } from 'hooks/store';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import CommonToast from 'components/CommonToast';
+import { useCurrentCAContract } from 'hooks/contract';
 const ScrollViewProps = { disabled: true };
 export default function ScanLogin() {
   const { data } = useRouterParams<{ data?: LoginQRData }>();
-  const chainInfo = useCurrentChain('AELF');
   const { address } = data || {};
 
-  const { pin } = useCredentials() || {};
-  const { caHash } = useCurrentWalletInfo();
+  const { caHash, address: managerAddress } = useCurrentWalletInfo();
   const [loading, setLoading] = useState<boolean>();
+  const caContract = useCurrentCAContract();
   const onLogin = useCallback(async () => {
-    if (!chainInfo || !pin || !caHash || loading) return;
+    if (!caHash || loading) return;
     try {
-      const wallet = getWallet(pin);
-      if (!wallet) return;
+      if (!caContract) throw Error('contract init error');
       setLoading(true);
-      const contract = await getELFContract({
-        contractAddress: chainInfo.caContractAddress,
-        rpcUrl: chainInfo.endPoint,
-        account: wallet,
-      });
-      const req = await contract?.callSendMethod('AddManager', wallet.address, {
+      const req = await caContract.callSendMethod('AddManager', managerAddress, {
         caHash,
         manager: {
           managerAddress: address,
@@ -54,7 +44,7 @@ export default function ScanLogin() {
       CommonToast.failError(error);
     }
     setLoading(false);
-  }, [caHash, address, chainInfo, loading, pin]);
+  }, [caHash, loading, caContract, managerAddress, address]);
   return (
     <PageContainer
       scrollViewProps={ScrollViewProps}

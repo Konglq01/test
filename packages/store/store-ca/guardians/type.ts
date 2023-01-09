@@ -16,6 +16,8 @@ export interface UserGuardianItem {
 export interface UserGuardianStatus extends UserGuardianItem {
   status?: VerifyStatus;
   sessionId?: string;
+  signature?: string;
+  verificationDoc?: string;
 }
 
 export interface GuardiansState {
@@ -23,5 +25,7 @@ export interface GuardiansState {
   userGuardiansList?: UserGuardianItem[];
   userGuardianStatus?: { [x: string]: UserGuardianStatus };
   currentGuardian?: UserGuardianItem;
+  preGuardian?: UserGuardianItem;
+  opGuardian?: UserGuardianItem;
   guardianExpiredTime?: number; // timestamp
 }

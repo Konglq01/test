@@ -1,8 +1,8 @@
 import { useCallback } from 'react';
 import {
   getCAHolderByManager,
-  searchCAHolderManagerInfo,
-  searchLoginGuardianType,
+  getCAHolderManagerInfo,
+  getLoginGuardianType,
 } from '@portkey/graphql/contract/queries';
 import { sleep } from '@portkey/utils';
 import { useCurrentWallet } from './wallet';
@@ -10,7 +10,7 @@ import { useCurrentChain } from './chainList';
 import type { LoginGuardianTypeDto } from '@portkey/graphql/contract/__generated__/resolversTypes';
 // TODO
 export const useCurrentWalletInfoByScan = () => {
-  // searchCAHolderManagerInfo;
+  // getCAHolderManagerInfo;
   // ucxifHkQcqob3zL3c2WppfEQn46oADEmm6bJdHsfNgX8ye2tw
   const { currentNetwork } = useCurrentWallet();
   const currentChain = useCurrentChain();

@@ -13,13 +13,19 @@ import { useLanguage } from 'i18n/hooks';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import CommonSwitch from 'components/CommonSwitch';
 import ActionSheet from 'components/ActionSheet';
-import { useGuardiansInfo } from 'hooks/store';
+import { useCredentials, useGuardiansInfo } from 'hooks/store';
 import { useGetHolderInfo } from 'hooks/guardian';
 import Loading from 'components/Loading';
-import { randomId } from '@portkey/utils';
+import { randomId, sleep } from '@portkey/utils';
 import { request } from 'api';
 import CommonToast from 'components/CommonToast';
 import { VerificationType } from '@portkey/types/verifier';
+import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import { getWallet } from 'utils/redux';
+import { getELFContract } from 'contexts/utils';
+import myEvents from 'utils/deviceEvent';
+import { VerifierImage } from '../components/VerifierImage';
 
 interface GuardianDetailProps {
   route?: any;
@@ -36,9 +42,42 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
     [params],
   );
 
+  const chainInfo = useCurrentChain('AELF');
+  const { pin } = useCredentials() || {};
+  const { caHash } = useCurrentWalletInfo();
   const cancelLoginAccount = useCallback(async () => {
-    // TODO: add cancel login account
-  }, []);
+    if (!chainInfo || !pin || !caHash || !guardian) return;
+    const wallet = getWallet(pin);
+    if (!wallet) return;
+    Loading.show();
+    const contract = await getELFContract({
+      contractAddress: chainInfo.caContractAddress,
+      rpcUrl: chainInfo.endPoint,
+      account: wallet,
+    });
+    try {
+      const req = await contract?.callSendMethod('UnsetGuardianTypeForLogin', wallet.address, {
+        caHash,
+        guardianType: {
+          type: guardian.guardiansType,
+          guardianType: guardian.loginGuardianType,
+        },
+      });
+
+      if (req && !req.error) {
+        await sleep(1000);
+        myEvents.refreshGuardiansList.emit();
+        navigationService.navigate('GuardianDetail', {
+          guardian: JSON.stringify({ ...guardian, isLoginAccount: false }),
+        });
+      } else {
+        CommonToast.failError(req?.error?.message?.Message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    Loading.hide();
+  }, [caHash, chainInfo, guardian, pin]);
 
   const setLoginAccount = useCallback(async () => {
     if (!guardian) return;
@@ -101,23 +140,26 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
         return;
       }
 
-      Loading.show();
-      try {
-        const holderInfo = await getHolderInfo({ loginGuardianType: guardian.loginGuardianType });
-        if (holderInfo.guardians) {
-          Loading.hide();
-          ActionSheet.alert({
-            title2: t(`This account address is already a login account of other wallets and cannot be used`),
-            buttons: [
-              {
-                title: t('Close'),
-              },
-            ],
-          });
-          return;
+      if (value) {
+        Loading.show();
+        try {
+          const holderInfo = await getHolderInfo({ loginGuardianType: guardian.loginGuardianType });
+          if (holderInfo.guardians) {
+            Loading.hide();
+            ActionSheet.alert({
+              title2: t(`This account address is already a login account of other wallets and cannot be used`),
+              buttons: [
+                {
+                  title: t('Close'),
+                },
+              ],
+            });
+            return;
+          }
+        } catch (error) {
+          console.debug(error, '====error');
         }
-      } catch (error) {
-        console.debug(error, '====error');
+        Loading.hide();
       }
 
       ActionSheet.alert({
@@ -151,13 +193,7 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
             <TextM>{guardian?.loginGuardianType || ''}</TextM>
           </View>
           <View style={pageStyles.verifierInfoWrap}>
-            {/* TODO: dynamic logo icon */}
-            <Svg
-              iconStyle={GStyles.marginRight(8)}
-              icon="logo-icon"
-              color={defaultColors.primaryColor}
-              size={pTd(30)}
-            />
+            <VerifierImage style={GStyles.marginRight(8)} size={pTd(30)} uri={guardian?.verifier?.imageUrl} />
             <TextM>{guardian?.verifier?.name || ''}</TextM>
           </View>
         </View>

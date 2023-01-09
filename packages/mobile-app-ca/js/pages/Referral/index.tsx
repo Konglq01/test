@@ -1,5 +1,5 @@
 import { useGStyles } from 'assets/theme/useGStyles';
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
 import navigationService from 'utils/navigationService';
 import { RootStackParamList } from 'navigation';
@@ -20,19 +20,17 @@ export default function Referral() {
   const { walletInfo } = useCurrentWallet();
   const gStyles = useGStyles();
   const { t } = useLanguage();
+  const init = useCallback(async () => {
+    await SplashScreen.hideAsync();
+    if (walletInfo?.address) {
+      let name: keyof RootStackParamList = 'SecurityLock';
+      if (credentials) name = 'Tab';
+      navigationService.reset(name);
+    }
+  }, [credentials, walletInfo?.address]);
   useEffect(() => {
-    const timer = setTimeout(async () => {
-      await SplashScreen.hideAsync();
-      if (walletInfo?.address) {
-        let name: keyof RootStackParamList = 'SecurityLock';
-        if (credentials) name = 'Tab';
-        navigationService.reset(name);
-      }
-    }, 200);
-    return () => {
-      timer && clearTimeout(timer);
-    };
-  }, [credentials, walletInfo]);
+    init();
+  }, [init]);
   return (
     <ImageBackground style={styles.backgroundContainer} resizeMode="cover" source={background}>
       <SafeAreaBox style={[gStyles.container, BGStyles.transparent]}>

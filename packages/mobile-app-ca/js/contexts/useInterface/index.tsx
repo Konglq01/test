@@ -1,4 +1,5 @@
 import { useCurrentNetwork } from '@portkey/hooks/network';
+import { ChainId } from '@portkey/types';
 import { getAelfInstance } from '@portkey/utils/aelf';
 import usePrevious from 'hooks/usePrevious';
 import React, { createContext, useContext, useEffect, useMemo, useReducer } from 'react';
@@ -14,14 +15,19 @@ export function useInterface(): [State, any] {
 
 //reducer
 function reducer(state: State, { type, payload }: any) {
-  console.log(payload, type, '=====payload');
-
   switch (type) {
     case InterfaceActions.setViewContract: {
-      const { viewContract } = payload;
-      console.log(viewContract, '====viewContract');
       const { viewContracts } = state;
-      return Object.assign({}, state, { viewContracts: Object.assign({}, viewContracts, viewContract) });
+      return Object.assign({}, state, { viewContracts: Object.assign({}, viewContracts, payload.viewContract) });
+    }
+    case InterfaceActions.setCAContract: {
+      const { caContracts } = state;
+      const { caContract, chainId } = payload;
+      return Object.assign({}, state, {
+        caContracts: Object.assign({}, caContracts, {
+          [chainId]: { ...caContracts?.[chainId as ChainId], ...caContract },
+        }),
+      });
     }
     default: {
       const { destroy } = payload;
