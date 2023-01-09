@@ -1,7 +1,7 @@
 name: Extension Build
 
 on:
-  merge:
+  push:
     branches: [ "feature/ca-extension-my" ]
 
 jobs:
