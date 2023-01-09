@@ -6,7 +6,6 @@ import SettingsPage from 'pages/SettingsPage';
 import Svg from 'components/Svg';
 import { defaultColors } from 'assets/theme';
 import { useNetworkInitialization } from '@portkey/hooks/network';
-import { useAccountListBalanceTimer } from 'contexts/useInterface/hooks';
 import { useLanguage } from 'i18n/hooks';
 import MyMenu from 'components/MyMenu';
 
@@ -24,7 +23,6 @@ export default function TabRoot() {
   const { t } = useLanguage();
 
   useNetworkInitialization();
-  useAccountListBalanceTimer();
   return (
     <Tab.Navigator
       initialRouteName="Wallet"
