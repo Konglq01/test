@@ -19,7 +19,6 @@ import { defaultColors } from 'assets/theme';
 import { useWallet } from 'hooks/store';
 import TokenListItem from 'components/TokenListItem';
 import { FontStyles } from 'assets/theme/styles';
-import { list } from 'pages/SettingsPage/HelpAndFeedBack/config';
 
 type onFinishSelectTokenType = (tokenItem: any) => void;
 type TokenListProps = {
@@ -131,7 +130,8 @@ const AssetList = ({ onFinishSelectToken, account }: TokenListProps) => {
       <TextXL style={[styles.title, FontStyles.font5]}>{t('Select Assets')}</TextXL>
 
       {/* no assets in this accout  */}
-      {!list.length ? (
+      {/* '{ import { list } from 'pages/SettingsPage/HelpAndFeedBack/config';' has been removed } */}
+      {/* {!list.length ? (
         <NoData noPic message={t('There are currently no assets to send')} />
       ) : (
         <CommonInput
@@ -147,7 +147,7 @@ const AssetList = ({ onFinishSelectToken, account }: TokenListProps) => {
             });
           }}
         />
-      )}
+      )} */}
 
       {listShow.length === 0 ? (
         <NoData noPic message={t('There are currently no assets to send.')} />

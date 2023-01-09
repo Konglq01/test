@@ -17,7 +17,6 @@ import Home from 'pages/Home';
 import Referral from 'pages/Referral';
 import SecurityLock from 'pages/SecurityLock';
 import DashBoard from 'pages/DashBoard/index';
-import SettingsNav from 'pages/SettingsPage/router';
 import Receive from 'pages/Receive';
 import NFTDetail from 'pages/NFT/NFTDetail';
 import { useLanguage } from 'i18n/hooks';
@@ -40,7 +39,6 @@ export const stackNav = [
   ...LoginNav,
   ...TokenNav,
   ...SendNav,
-  ...SettingsNav,
   ...GuardianNav,
   ...PinNav,
   ...WalletNav,

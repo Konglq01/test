@@ -1,10 +1,9 @@
 import { defaultColors } from 'assets/theme';
-import { TextL, TextM } from 'components/CommonText';
+import { TextL } from 'components/CommonText';
 import Svg, { IconName } from 'components/Svg';
 import React, { memo } from 'react';
 import { TouchableOpacity, StyleSheet } from 'react-native';
 import { pTd } from 'utils/unit';
-import gStyles from 'assets/theme/GStyles';
 
 interface MenuItemProps {
   title: string;

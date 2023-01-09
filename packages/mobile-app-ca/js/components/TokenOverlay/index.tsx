@@ -14,7 +14,6 @@ import fonts from 'assets/theme/fonts';
 import { pTd } from 'utils/unit';
 import { screenHeight } from '@portkey/utils/mobile/device';
 import { useLanguage } from 'i18n/hooks';
-import { list } from 'pages/SettingsPage/HelpAndFeedBack/config';
 import { useAppCommonDispatch } from '@portkey/hooks';
 import useDebounce from 'hooks/useDebounce';
 import useEffectOnce from 'hooks/useEffectOnce';
