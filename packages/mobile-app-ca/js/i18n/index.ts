@@ -24,7 +24,6 @@ const resources = {
     },
   },
 };
-console.log(commonZh, '===commonZh');
 
 export default i18n;
 

@@ -1,6 +1,6 @@
 import { randomId } from '@portkey/utils';
 import { createSlice } from '@reduxjs/toolkit';
-import { setLoginAccountAction, resetLoginInfoAction, setWalletInfoAction } from './actions';
+import { setLoginAccountAction, resetLoginInfoAction, setWalletInfoAction, setGuardianCountAction } from './actions';
 import { LoginState } from './type';
 
 const initialState: LoginState = {};
@@ -17,6 +17,9 @@ export const loginSlice = createSlice({
         const { walletInfo, caWalletInfo } = action.payload;
         state.scanWalletInfo = walletInfo;
         state.scanCaWalletInfo = caWalletInfo;
+      })
+      .addCase(setGuardianCountAction, (state, action) => {
+        state.guardianCount = action.payload;
       })
       .addCase(resetLoginInfoAction, () => initialState);
   },

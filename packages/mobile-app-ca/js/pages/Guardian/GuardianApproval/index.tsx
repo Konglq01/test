@@ -101,7 +101,8 @@ export default function GuardianApproval() {
   const onSetGuardianStatus = useCallback(
     (data: { key: string; status: GuardiansStatusItem }) => {
       setGuardianStatus(data.key, data.status);
-      if (!guardianExpiredTime.current) guardianExpiredTime.current = new Date().getTime() + GUARDIAN_EXPIRED_TIME;
+      if (!guardianExpiredTime.current && data.status?.status === VerifyStatus.Verified)
+        guardianExpiredTime.current = new Date().getTime() + GUARDIAN_EXPIRED_TIME;
     },
     [setGuardianStatus],
   );

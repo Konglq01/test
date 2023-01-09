@@ -26,7 +26,7 @@ import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 
 import { VerificationType } from '@portkey/types/verifier';
 import useEffectOnce from 'hooks/useEffectOnce';
-let appState: AppStateStatus;
+let appState: AppStateStatus, verifyTime: number;
 export default function SecurityLock() {
   const { biometrics } = useUser();
   const { apiUrl } = useCurrentNetworkInfo();
@@ -124,7 +124,7 @@ export default function SecurityLock() {
     [apiUrl, caInfo, dispatch, handleRouter, isSyncCAInfo, walletInfo.managerInfo],
   );
   const verifyBiometrics = useCallback(async () => {
-    if (!biometrics) return;
+    if (!biometrics || (verifyTime && verifyTime + 1000 > new Date().getTime())) return;
     try {
       const securePassword = await secureStore.getItemAsync('Pin');
       if (!securePassword) return;
@@ -132,6 +132,7 @@ export default function SecurityLock() {
     } catch (error) {
       console.log(error, '=====error');
     }
+    verifyTime = new Date().getTime();
   }, [biometrics, handlePassword]);
   const handleAppStateChange = useCallback(
     (nextAppState: AppStateStatus) => {

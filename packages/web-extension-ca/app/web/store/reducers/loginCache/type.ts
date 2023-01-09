@@ -9,6 +9,7 @@ export interface loginInfo {
 
 export interface LoginState {
   loginAccount?: loginInfo;
+  guardianCount?: number;
   scanWalletInfo?: any;
   scanCaWalletInfo?: CAInfoType;
 }

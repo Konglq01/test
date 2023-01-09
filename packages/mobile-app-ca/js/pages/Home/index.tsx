@@ -1,5 +1,3 @@
-import { useNavigation } from '@react-navigation/native';
-import { RootNavigationProp } from 'navigation';
 import * as React from 'react';
 import { Button, Text } from '@rneui/base';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -17,42 +15,17 @@ import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { getWallet } from 'utils/redux';
 import { useCredentials } from 'hooks/store';
 import { getAelfInstance } from '@portkey/utils/aelf';
-import { baseRequest } from 'api';
-import descriptor from '@aelfqueen/protobufjs/ext/descriptor';
-import AElf from 'aelf-sdk';
 import { useGetHolderInfo } from 'hooks/guardian';
-import { useCurrentCAContract } from 'hooks/contract';
-
-function fileDescriptorSetFormatter(result: any) {
-  const buffer = Buffer.from(result, 'base64');
-  return descriptor.FileDescriptorSet.decode(buffer);
-}
-export const getServicesFromFileDescriptors = (descriptors: any) => {
-  const root = AElf.pbjs.Root.fromDescriptor(descriptors, 'proto3').resolveAll();
-  return descriptors.file
-    .filter((f: any) => f.service.length > 0)
-    .map((f: any) => {
-      const sn = f.service[0].name;
-      const fullName = f.package ? `${f.package}.${sn}` : sn;
-      return root.lookupService(fullName);
-    });
-};
 export default function HomeScreen() {
-  const navigation = useNavigation<RootNavigationProp>();
   const dispatch = useAppDispatch();
   const wallet = useCurrentWalletInfo();
   const getHolderInfo = useGetHolderInfo();
   const { pin } = useCredentials() || {};
   const chainInfo = useCurrentChain('AELF');
-  const caContract = useCurrentCAContract();
   return (
     <SafeAreaBox>
       <ScrollView>
         <Text>Test Screen</Text>
-        {/* <Button title="Go to Element" onPress={() => navigation.navigate('Element')} /> */}
-        {/* <Button title="Go to I18n" onPress={() => navigation.navigate('I18n')} /> */}
-        <Button title="Go to ContactsHome" onPress={() => navigation.navigate('ContactsHome')} />
-        <Button title="Go to Token" onPress={() => navigation.navigate('ManageTokenList')} />
         <Button title="ActionSheet show" onPress={() => ActionSheet.show([{ title: '123' }, { title: '123' }])} />
         <Button
           title="loading show"
@@ -133,35 +106,6 @@ export default function HomeScreen() {
               ],
             });
             console.log(req, '====req');
-          }}
-        />
-        <Button
-          title="instance"
-          onPress={async () => {
-            if (!chainInfo || !pin) return;
-            const instance = getAelfInstance(chainInfo.endPoint);
-            const base64 = await baseRequest({
-              method: 'GET',
-              url: `${chainInfo.endPoint}/api/blockChain/contractFileDescriptorSet`,
-              params: { address: chainInfo.caContractAddress },
-            });
-            const fds = fileDescriptorSetFormatter(base64);
-            console.log(fds, '===fds');
-            console.log(JSON.stringify(fds.toJSON()), '===fds-toJSON');
-
-            const services = getServicesFromFileDescriptors(fds);
-            console.log(services[0].methods.AddGuardian.resolve(), '===services');
-
-            const obj: any = {};
-            Object.keys(services).forEach(key => {
-              const service = services[key];
-              // eslint-disable-next-line @typescript-eslint/no-shadow
-              Object.keys(service.methods).forEach(key => {
-                const method = service.methods[key].resolve();
-                obj[method.name] = method.resolvedRequestType;
-              });
-            });
-            console.log(base64, fds, obj, '===instance');
           }}
         />
 

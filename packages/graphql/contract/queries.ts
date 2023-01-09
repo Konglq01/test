@@ -491,8 +491,6 @@ const getCAHolderByManager = async (network: NetworkType, params: GetCAHolderByM
     skipCount: 0,
     maxResultCount: 1,
   });
-  console.log(caResult, '====caResult');
-
   if (caResult.error) throw caResult.error;
   const result: {
     caHolderManagerInfo: CaHolderWithGuardian[];

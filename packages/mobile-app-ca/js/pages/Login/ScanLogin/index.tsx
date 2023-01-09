@@ -27,6 +27,7 @@ export default function ScanLogin() {
     if (!caHash || loading) return;
     try {
       if (!caContract) throw Error('contract init error');
+      setLoading(true);
       const req = await caContract.callSendMethod('AddManager', managerAddress, {
         caHash,
         manager: {

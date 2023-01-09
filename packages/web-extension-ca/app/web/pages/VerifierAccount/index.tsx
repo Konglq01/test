@@ -23,7 +23,7 @@ import { handleGuardian } from 'utils/sandboxUtil/handleGuardian';
 import { GuardianMth } from 'types/guardians';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
-import { resetLoginInfoAction } from 'store/reducers/loginCache/actions';
+import { resetLoginInfoAction, setGuardianCountAction } from 'store/reducers/loginCache/actions';
 import { sleep } from '@portkey/utils';
 import { getAelfInstance } from '@portkey/utils/aelf';
 import { getTxResult } from 'utils/aelfUtils';
@@ -131,6 +131,7 @@ export default function VerifierAccount() {
   const onSuccess = useCallback(
     async (res: Record<string, string>) => {
       if (state === 'register') {
+        dispatch(setGuardianCountAction(1));
         navigate('/register/set-pin', { state: 'register' });
       } else if (state == 'login') {
         if (!currentGuardian) return;
