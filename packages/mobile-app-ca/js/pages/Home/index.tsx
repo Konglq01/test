@@ -7,7 +7,6 @@ import navigationService from '../../utils/navigationService';
 import { useAppDispatch } from 'store/hooks';
 import SafeAreaBox from 'components/SafeAreaBox';
 import ActionSheet from 'components/ActionSheet';
-import { useTokenContract } from 'contexts/useInterface/hooks';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { CrashTest } from 'Test/CrashTest';
 import Loading from 'components/Loading';
@@ -22,6 +21,7 @@ import { baseRequest } from 'api';
 import descriptor from '@aelfqueen/protobufjs/ext/descriptor';
 import AElf from 'aelf-sdk';
 import { useGetHolderInfo } from 'hooks/guardian';
+import { useCurrentCAContract } from 'hooks/contract';
 
 function fileDescriptorSetFormatter(result: any) {
   const buffer = Buffer.from(result, 'base64');
@@ -39,12 +39,12 @@ export const getServicesFromFileDescriptors = (descriptors: any) => {
 };
 export default function HomeScreen() {
   const navigation = useNavigation<RootNavigationProp>();
-  const tokenContract = useTokenContract();
   const dispatch = useAppDispatch();
   const wallet = useCurrentWalletInfo();
   const getHolderInfo = useGetHolderInfo();
   const { pin } = useCredentials() || {};
   const chainInfo = useCurrentChain('AELF');
+  const caContract = useCurrentCAContract();
   return (
     <SafeAreaBox>
       <ScrollView>
@@ -54,16 +54,6 @@ export default function HomeScreen() {
         <Button title="Go to ContactsHome" onPress={() => navigation.navigate('ContactsHome')} />
         <Button title="Go to Token" onPress={() => navigation.navigate('ManageTokenList')} />
         <Button title="ActionSheet show" onPress={() => ActionSheet.show([{ title: '123' }, { title: '123' }])} />
-        <Button
-          title="getBalance"
-          onPress={async () => {
-            const balance = await tokenContract?.callViewMethod('GetBalance', {
-              symbol: 'ELF',
-              owner: '5xC4AXHmVqaRNhN5LPMe9hU8t51QeHyVaUDJ6Ph6gs5mEuBNF',
-            });
-            console.log(balance, '=====balance');
-          }}
-        />
         <Button
           title="loading show"
           onPress={() => {
