@@ -1,13 +1,13 @@
 import { useCallback } from 'react';
 import { useAppDispatch } from 'store/hooks';
-import { useCurrentCAContract } from './contract';
+import { useCurrentViewCAContract } from './contract';
 import { setGuardiansAction, setVerifierListAction } from '@portkey/store/store-ca/guardians/actions';
 import { LoginInfo } from 'types/wallet';
 import { EmailError } from '@portkey/utils/check';
 import { VerifierItem } from '@portkey/types/verifier';
 export const useGetHolderInfo = () => {
   const dispatch = useAppDispatch();
-  const caContract = useCurrentCAContract();
+  const caContract = useCurrentViewCAContract();
   const getGuardiansList = useCallback(
     async (loginAccount: LoginInfo) => {
       if (!loginAccount) throw new Error('Could not find accountInfo');
@@ -34,7 +34,7 @@ export const useGetHolderInfo = () => {
 };
 export const useGetVerifierServers = () => {
   const dispatch = useAppDispatch();
-  const caContract = useCurrentCAContract();
+  const caContract = useCurrentViewCAContract();
   const getGuardiansList = useCallback(async () => {
     if (!caContract) throw new Error('Could not find chain information');
     const res = await caContract?.callViewMethod('GetVerifierServers', '');
@@ -47,7 +47,7 @@ export const useGetVerifierServers = () => {
       dispatch(setVerifierListAction(verifierList));
       return verifierList;
     } else {
-      throw res.error;
+      throw res?.error || { message: 'Could not find VerifierServers' };
     }
   }, [caContract, dispatch]);
 
