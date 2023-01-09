@@ -9,3 +9,5 @@ export const setWalletInfoAction = createAction<{
 }>('login/setWalletInfo');
 
 export const resetLoginInfoAction = createAction('login/resetLoginInfo');
+
+export const setGuardianCountAction = createAction<number>('login/setWalletInfo');

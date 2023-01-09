@@ -30,7 +30,7 @@ export default function SetWalletPin() {
   const dispatch = useAppDispatch();
   const { setLoading } = useLoading();
   const { walletInfo } = useCurrentWallet();
-  const { scanWalletInfo, scanCaWalletInfo, loginAccount } = useLoginInfo();
+  const { scanWalletInfo, scanCaWalletInfo, loginAccount, guardianCount } = useLoginInfo();
   const fetchWalletResult = useFetchWalletCAAddress();
 
   console.log(walletInfo, 'walletInfo===');
@@ -48,11 +48,11 @@ export default function SetWalletPin() {
         chainId: 'AELF',
         verificationType: state === 'login' ? VerificationType.communityRecovery : VerificationType.register,
         deviceString: Date.now().toString(), //navigator.userAgent,
-        guardianCount: 1,
+        guardianCount: guardianCount ?? 1,
       });
       return loginAccount.managerUniqueId;
     },
-    [currentNetwork.apiUrl, loginAccount, state],
+    [currentNetwork.apiUrl, guardianCount, loginAccount, state],
   );
 
   const createByScan = useCallback(

@@ -28,7 +28,7 @@ import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { LoginType } from '@portkey/types/types-ca/wallet';
-import { resetLoginInfoAction, setLoginAccountAction } from 'store/reducers/loginCache/actions';
+import { resetLoginInfoAction, setGuardianCountAction, setLoginAccountAction } from 'store/reducers/loginCache/actions';
 import { GuardianItem } from 'types/guardians';
 import { sleep } from '@portkey/utils';
 import { getAelfInstance } from '@portkey/utils/aelf';
@@ -328,9 +328,10 @@ export default function GuardianApproval() {
     if (state && state.indexOf('guardians') !== -1) {
       handleGuardianRecovery();
     } else {
+      dispatch(setGuardianCountAction(alreadyApprovalLength));
       navigate('/register/set-pin', { state: 'login' });
     }
-  }, [handleGuardianRecovery, navigate, state]);
+  }, [alreadyApprovalLength, dispatch, handleGuardianRecovery, navigate, state]);
 
   const verifyingHandler = useCallback(
     async (item: UserGuardianItem) => {
