@@ -1,8 +1,6 @@
-import { defaultColors } from 'assets/theme';
 import GStyles from 'assets/theme/GStyles';
 import CommonButton from 'components/CommonButton';
 import { TextM } from 'components/CommonText';
-import Svg from 'components/Svg';
 import React, { useCallback, useMemo } from 'react';
 import { View } from 'react-native';
 import { pTd } from 'utils/unit';
@@ -13,19 +11,19 @@ import { useLanguage } from 'i18n/hooks';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import CommonSwitch from 'components/CommonSwitch';
 import ActionSheet from 'components/ActionSheet';
-import { useCredentials, useGuardiansInfo } from 'hooks/store';
+import { useGuardiansInfo } from 'hooks/store';
 import { useGetHolderInfo } from 'hooks/guardian';
 import Loading from 'components/Loading';
 import { randomId, sleep } from '@portkey/utils';
 import { request } from 'api';
 import CommonToast from 'components/CommonToast';
 import { VerificationType } from '@portkey/types/verifier';
-import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
-import { getWallet } from 'utils/redux';
-import { getELFContract } from 'contexts/utils';
+
 import myEvents from 'utils/deviceEvent';
 import { VerifierImage } from '../components/VerifierImage';
+import { cancelLoginAccount } from 'utils/guardian';
+import { useCurrentCAContract } from 'hooks/contract';
 
 interface GuardianDetailProps {
   route?: any;
@@ -36,34 +34,20 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
   const { params } = route;
   const getHolderInfo = useGetHolderInfo();
   const { userGuardiansList } = useGuardiansInfo();
+  const { caHash, address: managerAddress } = useCurrentWalletInfo();
+  const caContract = useCurrentCAContract();
 
   const guardian = useMemo<UserGuardianItem | undefined>(
     () => (params?.guardian ? JSON.parse(params.guardian) : undefined),
     [params],
   );
 
-  const chainInfo = useCurrentChain('AELF');
-  const { pin } = useCredentials() || {};
-  const { caHash } = useCurrentWalletInfo();
-  const cancelLoginAccount = useCallback(async () => {
-    if (!chainInfo || !pin || !caHash || !guardian) return;
-    const wallet = getWallet(pin);
-    if (!wallet) return;
-    Loading.show();
-    const contract = await getELFContract({
-      contractAddress: chainInfo.caContractAddress,
-      rpcUrl: chainInfo.endPoint,
-      account: wallet,
-    });
-    try {
-      const req = await contract?.callSendMethod('UnsetGuardianTypeForLogin', wallet.address, {
-        caHash,
-        guardianType: {
-          type: guardian.guardiansType,
-          guardianType: guardian.loginGuardianType,
-        },
-      });
+  const onCancelLoginAccount = useCallback(async () => {
+    if (!caContract || !managerAddress || !caHash || !guardian) return;
 
+    Loading.show();
+    try {
+      const req = await cancelLoginAccount(caContract, managerAddress, caHash, guardian);
       if (req && !req.error) {
         await sleep(1000);
         myEvents.refreshGuardiansList.emit();
@@ -71,13 +55,13 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
           guardian: JSON.stringify({ ...guardian, isLoginAccount: false }),
         });
       } else {
-        CommonToast.failError(req?.error?.message?.Message);
+        CommonToast.fail(req?.error.message);
       }
     } catch (error) {
-      console.log(error);
+      CommonToast.failError(error);
     }
     Loading.hide();
-  }, [caHash, chainInfo, guardian, pin]);
+  }, [caContract, caHash, guardian, managerAddress]);
 
   const setLoginAccount = useCallback(async () => {
     if (!guardian) return;
@@ -136,7 +120,7 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
           return;
         }
 
-        cancelLoginAccount();
+        onCancelLoginAccount();
         return;
       }
 
@@ -178,7 +162,7 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
         ],
       });
     },
-    [cancelLoginAccount, getHolderInfo, guardian, setLoginAccount, t, userGuardiansList],
+    [onCancelLoginAccount, getHolderInfo, guardian, setLoginAccount, t, userGuardiansList],
   );
 
   return (
