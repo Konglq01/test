@@ -5,8 +5,8 @@ import { setGuardiansAction, setVerifierListAction } from '@portkey/store/store-
 import { LoginInfo } from 'types/wallet';
 import { EmailError } from '@portkey/utils/check';
 import { VerifierItem } from '@portkey/types/verifier';
-export const useGetHolderInfo = () => {
-  const dispatch = useAppDispatch();
+
+export const useGetGuardiansList = () => {
   const caContract = useCurrentViewCAContract();
   const getGuardiansList = useCallback(
     async (loginAccount: LoginInfo) => {
@@ -19,7 +19,6 @@ export const useGetHolderInfo = () => {
       console.log(res, '=====res');
 
       if (!res?.error) {
-        dispatch(setGuardiansAction(res.guardiansInfo));
         return res.guardiansInfo;
       } else {
         if (res.error?.message && res.error.message.includes('Not found ca_hash'))
@@ -27,10 +26,25 @@ export const useGetHolderInfo = () => {
         throw res.error;
       }
     },
-    [caContract, dispatch],
+    [caContract],
   );
 
   return getGuardiansList;
+};
+
+export const useGetHolderInfo = () => {
+  const dispatch = useAppDispatch();
+  const getGuardiansList = useGetGuardiansList();
+  const onGetGuardiansList = useCallback(
+    async (loginAccount: LoginInfo) => {
+      const guardiansInfo = await getGuardiansList(loginAccount);
+      dispatch(setGuardiansAction(guardiansInfo));
+      return guardiansInfo;
+    },
+    [dispatch, getGuardiansList],
+  );
+
+  return onGetGuardiansList;
 };
 export const useGetVerifierServers = () => {
   const dispatch = useAppDispatch();
