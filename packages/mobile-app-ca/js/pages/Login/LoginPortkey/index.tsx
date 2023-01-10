@@ -28,7 +28,7 @@ import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { LoginQRData } from '@portkey/types/types-ca/qrcode';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { useAppDispatch } from 'store/hooks';
-import { getChainListAsync } from '@portkey/store/store-ca/wallet/actions';
+import { getChainListAsync, setCAInfoType } from '@portkey/store/store-ca/wallet/actions';
 import { useGetHolderInfo, useGetVerifierServers } from 'hooks/guardian';
 import Loading from 'components/Loading';
 import { handleError, sleep } from '@portkey/utils';
@@ -36,6 +36,8 @@ import myEvents from 'utils/deviceEvent';
 import { handleUserGuardiansList } from 'utils/login';
 import { useIntervalQueryCAInfoByAddress } from '@portkey/hooks/hooks-ca/graphql';
 import { handleWalletInfo } from '@portkey/utils/wallet';
+import { useCredentials } from 'hooks/store';
+import CommonToast from 'components/CommonToast';
 const scrollViewProps = { extraHeight: 120 };
 const safeAreaColor: SafeAreaColorMapKeyUnit[] = ['transparent', 'transparent'];
 type LoginType = 'email' | 'qr-code' | 'phone';
@@ -112,18 +114,27 @@ function LoginEmail({ setLoginType }: { setLoginType: (type: LoginType) => void 
 function LoginQRCode({ setLoginType }: { setLoginType: (type: LoginType) => void }) {
   const { walletInfo, currentNetwork } = useCurrentWallet();
   const [newWallet, setNewWallet] = useState<WalletInfoType>();
-  console.log(newWallet, '======newWallet');
-
+  const dispatch = useAppDispatch();
+  const { pin } = useCredentials() || {};
   const caInfo = useIntervalQueryCAInfoByAddress(currentNetwork, newWallet?.address);
   useEffect(() => {
     if (caInfo) {
-      navigationService.navigate('SetPin', {
-        caInfo,
-        walletInfo: handleWalletInfo(newWallet),
-        managerInfo: caInfo.managerInfo,
-      });
+      if (pin) {
+        try {
+          dispatch(setCAInfoType({ caInfo, pin }));
+          navigationService.reset('Tab');
+        } catch (error) {
+          CommonToast.failError(error);
+        }
+      } else {
+        navigationService.navigate('SetPin', {
+          caInfo,
+          walletInfo: handleWalletInfo(newWallet),
+          managerInfo: caInfo.managerInfo,
+        });
+      }
     }
-  }, [caInfo, newWallet]);
+  }, [caInfo, dispatch, newWallet, pin, walletInfo]);
   const generateKeystore = useCallback(() => {
     try {
       const wallet = walletInfo?.address ? walletInfo : AElf.wallet.createNewWallet();

@@ -114,6 +114,7 @@ export default function ConfirmPin() {
     <PageContainer
       titleDom
       type="leftBack"
+      backTitle={oldPin ? 'Change Pin' : undefined}
       leftCallback={() => {
         myEvents.clearSetPin.emit('clearSetPin');
         navigationService.goBack();

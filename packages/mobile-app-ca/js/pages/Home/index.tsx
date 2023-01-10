@@ -2,13 +2,11 @@ import * as React from 'react';
 import { Button, Text } from '@rneui/base';
 import { ScrollView } from 'react-native-gesture-handler';
 import navigationService from '../../utils/navigationService';
-import { useAppDispatch } from 'store/hooks';
 import SafeAreaBox from 'components/SafeAreaBox';
 import ActionSheet from 'components/ActionSheet';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { CrashTest } from 'Test/CrashTest';
 import Loading from 'components/Loading';
-import { queryFailAlert } from 'utils/login';
 import { contractQueries } from '@portkey/graphql/index';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
@@ -17,7 +15,6 @@ import { useCredentials } from 'hooks/store';
 import { getAelfInstance } from '@portkey/utils/aelf';
 import { useGetHolderInfo } from 'hooks/guardian';
 export default function HomeScreen() {
-  const dispatch = useAppDispatch();
   const wallet = useCurrentWalletInfo();
   const getHolderInfo = useGetHolderInfo();
   const { pin } = useCredentials() || {};
@@ -37,11 +34,6 @@ export default function HomeScreen() {
           }}
         />
         <Button title="Account Settings" onPress={() => navigationService.navigate('AccountSettings')} />
-        <Button title="queryFailAlert" onPress={() => queryFailAlert(dispatch, true)} />
-        <Button
-          title="reset"
-          onPress={() => navigationService.reset([{ name: 'LoginPortkey' }, { name: 'SignupPortkey' }])}
-        />
         <Button
           title="getCAHolderByManager"
           onPress={async () => {

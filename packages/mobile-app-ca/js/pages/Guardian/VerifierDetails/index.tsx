@@ -4,7 +4,7 @@ import { TextM } from 'components/CommonText';
 import VerifierCountdown, { VerifierCountdownInterface } from 'components/VerifierCountdown';
 import PageContainer from 'components/PageContainer';
 import DigitInput, { DigitInputInterface } from 'components/DigitInput';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import useRouterParams from '@portkey/hooks/useRouterParams';
 import { ApprovalType, VerificationType, VerifyStatus } from '@portkey/types/verifier';
@@ -37,6 +37,25 @@ type RouterParams = {
   verificationType?: VerificationType;
   guardianKey?: string;
 };
+
+function TipText({ loginGuardianType, isRegister }: { loginGuardianType?: string; isRegister?: boolean }) {
+  const [first, last] = useMemo(() => {
+    if (!isRegister)
+      return [
+        `Please contact your guardians, and enter the ${DIGIT_CODE.length}-digit code sent to `,
+        ` within ${DIGIT_CODE.expiration} minutes.`,
+      ];
+    return [`A ${DIGIT_CODE.length}-digit code was sent to `, ` Enter it within ${DIGIT_CODE.expiration} minutes`];
+  }, [isRegister]);
+  return (
+    <TextM style={[FontStyles.font3, GStyles.marginTop(16), GStyles.marginBottom(50)]}>
+      {first}
+      <Text style={FontStyles.font4}>{loginGuardianType}</Text>
+      {last}
+    </TextM>
+  );
+}
+
 export default function VerifierDetails() {
   const {
     loginGuardianType,
@@ -220,10 +239,10 @@ export default function VerifierDetails() {
   return (
     <PageContainer type="leftBack" titleDom containerStyles={styles.containerStyles}>
       {guardianItem ? <GuardianAccountItem guardianItem={guardianItem} isButtonHide /> : null}
-      <TextM style={[FontStyles.font3, GStyles.marginTop(16), GStyles.marginBottom(50)]}>
-        A {DIGIT_CODE.length}-digit code was sent to <Text style={FontStyles.font4}>{loginGuardianType}</Text>. Enter it
-        within {DIGIT_CODE.expiration} minutes
-      </TextM>
+      <TipText
+        isRegister={!verificationType || (verificationType as VerificationType) === VerificationType.register}
+        loginGuardianType={loginGuardianType}
+      />
       <DigitInput ref={digitInput} onFinish={onFinish} maxLength={DIGIT_CODE.length} />
       <VerifierCountdown style={GStyles.marginTop(24)} onResend={resendCode} ref={countdown} />
     </PageContainer>
