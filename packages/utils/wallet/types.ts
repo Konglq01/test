@@ -19,6 +19,7 @@ export declare type GetNextBIP44Path = (privateKey: string) => string;
 export enum PasswordErrorMessage {
   passwordNotLong = 'Password not long enough (Must be at least 8 characters)',
   invalidPassword = 'Invalid Password',
+  invalidPin = 'Invalid pin',
 }
 export enum PinErrorMessage {
   invalidPin = 'Invalid Pin',

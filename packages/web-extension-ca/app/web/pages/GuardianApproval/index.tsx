@@ -33,6 +33,7 @@ import { GuardianItem } from 'types/guardians';
 import { sleep } from '@portkey/utils';
 import { getAelfInstance } from '@portkey/utils/aelf';
 import { getTxResult } from 'utils/aelfUtils';
+import { useTranslation } from 'react-i18next';
 
 enum MethodType {
   'guardians/add' = GuardianMth.addGuardian,
@@ -53,6 +54,7 @@ export default function GuardianApproval() {
   const currentNetwork = useCurrentNetworkInfo();
   const currentChain = useCurrentChain();
   const { passwordSeed } = useUserInfo();
+  const { t } = useTranslation();
 
   const userVerifiedList = useMemo(() => {
     const tempVerifiedList = Object.values(userGuardianStatus ?? {});
@@ -372,17 +374,12 @@ export default function GuardianApproval() {
     <div className={clsx('guardian-approval-wrapper', isPrompt ? 'common-page' : 'popup-page')}>
       {isPrompt ? <PortKeyTitle leftElement leftCallBack={handleBack} /> : <SettingHeader leftCallBack={handleBack} />}
       <div className="common-content1 guardian-approval-content">
-        <div className="title">Guardian approval</div>
-        <p className="description">Expire after 1 hour</p>
+        <div className="title">{t('Guardian Approval')}</div>
+        <p className="description">{t('Expire after 1 hour')}</p>
         <div className="flex-between-center approve-count">
           <span className="flex-row-center">
-            Guardian approvals
-            <CommonTooltip
-              placement="top"
-              title={
-                'You will need a certain amount of guardians to confirm your action.The numbers differ depending on the number of guardians you add. Quantity is less than or equal to 3, all need to agree；Quantity is greater than 3, at least 60% consent is required.'
-              }
-            />
+            {t("Guardians' approval")}
+            <CommonTooltip placement="top" title={t('guardianApprovalTip')} />
           </span>
           <div>
             <span className="already-approval">{alreadyApprovalLength}</span>
@@ -399,30 +396,30 @@ export default function GuardianApproval() {
                   'verifier-item-disabled',
               )}
               key={`${item.key}`}>
-              {item.isLoginAccount && <div className="login-icon">Login Account</div>}
+              {item.isLoginAccount && <div className="login-icon">{t('Login Account')}</div>}
               <div className="flex-between-center">
                 <VerifierPair guardiansType={item.guardiansType} verifierSrc={item.verifier?.imageUrl} />
                 <span className="account-text">{item.loginGuardianType}</span>
               </div>
               {isExpired && item.status !== VerifyStatus.Verified ? (
                 <Button className="expired" type="text" disabled>
-                  expired
+                  {t('Expired')}
                 </Button>
               ) : (
                 <>
                   {(!item.status || item.status === VerifyStatus.NotVerified) && (
                     <Button className="not-verified" type="primary" onClick={() => SendCode(item)}>
-                      Send
+                      {t('Send')}
                     </Button>
                   )}
                   {item.status === VerifyStatus.Verifying && (
                     <Button type="primary" className="verifying" onClick={() => verifyingHandler(item)}>
-                      Verify
+                      {t('Verify')}
                     </Button>
                   )}
                   {item.status === VerifyStatus.Verified && (
                     <Button className="verified" type="text" disabled>
-                      confirmed
+                      {t('Confirmed')}
                     </Button>
                   )}
                 </>
@@ -437,7 +434,7 @@ export default function GuardianApproval() {
               className="recovery-wallet-btn"
               disabled={alreadyApprovalLength <= 0 || alreadyApprovalLength !== approvalLength}
               onClick={recoveryWallet}>
-              {state && state.indexOf('guardians') !== -1 ? 'Request to Pass' : 'Recovery Wallet'}
+              {state && state.indexOf('guardians') !== -1 ? 'Request to Pass' : 'Recover Wallet'}
             </Button>
           </div>
         )}
