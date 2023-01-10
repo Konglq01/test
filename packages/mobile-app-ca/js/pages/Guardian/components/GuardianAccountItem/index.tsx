@@ -134,34 +134,34 @@ function GuardianItemButton({
     });
   }, [approvalType, guardianItem, managerUniqueId, verifierSessionId]);
   const buttonProps: CommonButtonProps = useMemo(() => {
+    if (isExpired && !VerifyStatus.Verified) {
+      return {
+        disabled: true,
+        type: 'clear',
+        title: 'Expired',
+        disabledStyle: BGStyles.transparent,
+        disabledTitleStyle: FontStyles.font7,
+      };
+    }
     if (!status || status === VerifyStatus.NotVerified) {
-      if (isExpired)
-        return {
-          disabled: true,
-          type: 'clear',
-          title: 'Expired',
-          disabledStyle: BGStyles.transparent,
-          disabledTitleStyle: FontStyles.font7,
-        };
-      else
-        return {
-          onPress: onSendCode,
-          title: 'Send',
-        };
-    } else if (status === VerifyStatus.Verifying) {
+      return {
+        onPress: onSendCode,
+        title: 'Send',
+      };
+    }
+    if (status === VerifyStatus.Verifying) {
       return {
         onPress: onVerifier,
         title: 'Verify',
       };
-    } else {
-      return {
-        title: 'Confirmed',
-        type: 'clear',
-        disabledTitleStyle: FontStyles.font10,
-        disabledStyle: styles.confirmedButtonStyle,
-        disabled: true,
-      };
     }
+    return {
+      title: 'Confirmed',
+      type: 'clear',
+      disabledTitleStyle: FontStyles.font10,
+      disabledStyle: styles.confirmedButtonStyle,
+      disabled: true,
+    };
   }, [isExpired, onSendCode, onVerifier, status]);
   return (
     <CommonButton

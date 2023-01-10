@@ -41,7 +41,7 @@ export default function Referral() {
               buttonStyle={[GStyles.marginBottom(40), BGStyles.bg1]}
               titleStyle={FontStyles.font4}
               type="primary"
-              title={t('Get Start')}
+              title={t('Get Started')}
               onPress={() => navigationService.reset('LoginPortkey')}
             />
           </>

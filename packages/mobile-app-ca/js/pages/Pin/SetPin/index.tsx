@@ -43,6 +43,7 @@ export default function SetPin() {
     <PageContainer
       titleDom
       type="leftBack"
+      backTitle={oldPin ? 'Change Pin' : undefined}
       leftCallback={() => {
         if (!oldPin && managerInfo) {
           ActionSheet.alert({
@@ -54,8 +55,6 @@ export default function SetPin() {
               {
                 title: 'Yes',
                 onPress: () => {
-                  if (managerInfo.verificationType === VerificationType.communityRecovery)
-                    myEvents.setGuardianStatus.emit({ key: 'resetGuardianApproval' });
                   if (managerInfo.verificationType === VerificationType.addManager) myEvents.clearQRWallet.emit();
                   navigationService.navigate(RouterMap[managerInfo.verificationType]);
                 },
@@ -67,7 +66,9 @@ export default function SetPin() {
         }
       }}>
       <View style={styles.container}>
-        <TextL style={GStyles.textAlignCenter}>Enter pin to protect your device</TextL>
+        <TextL style={GStyles.textAlignCenter}>
+          {oldPin ? 'Please enter a new pin' : 'Enter pin to protect your device'}
+        </TextL>
         <DigitInput
           ref={digitInput}
           type="pin"

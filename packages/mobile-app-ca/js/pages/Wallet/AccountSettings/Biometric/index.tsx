@@ -51,7 +51,7 @@ export default function Biometric() {
         navigationService.navigate('CheckPin', { openBiometrics: true });
       } else {
         ActionSheet.alert({
-          title2: 'Confirm to turn off fingerprint recognition? ',
+          title2: 'Disable fingerprint login?',
           buttons: [
             { type: 'outline', title: 'Cancel' },
             {
@@ -79,9 +79,9 @@ export default function Biometric() {
             switchValue={biometrics}
             style={styles.listStyle}
             onValueChange={onValueChange}
-            title={t('Biometrics')}
+            title={t('Biometric Authentication')}
           />
-          <TextM style={styles.tipText}>After opening, you can quickly unlock the device</TextM>
+          <TextM style={styles.tipText}>Enable biometric authentication to quickly unlock the device</TextM>
         </>
       )}
     </PageContainer>
