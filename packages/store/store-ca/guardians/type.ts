@@ -11,6 +11,7 @@ export interface UserGuardianItem {
   guardiansType: LoginType;
   key: string; // `${loginGuardianType}&${verifier?.name}`,
   sessionId?: string;
+  isInitStatus?: boolean;
 }
 
 export interface UserGuardianStatus extends UserGuardianItem {

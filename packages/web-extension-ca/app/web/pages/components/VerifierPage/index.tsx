@@ -16,6 +16,7 @@ import { setUserGuardianSessionIdAction } from '@portkey/store/store-ca/guardian
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
 import { LoginType } from '@portkey/types/types-ca/wallet';
 import { useLocation } from 'react-router';
+import { useEffectOnce } from 'react-use';
 
 const MAX_TIMER = 60;
 
@@ -29,7 +30,7 @@ interface VerifierPageProps {
   currentGuardian?: UserGuardianItem;
   guardiansType?: LoginType;
   verificationType: VerificationType;
-
+  isInitStatus?: boolean;
   onSuccess?: (res: any) => void;
 }
 
@@ -38,6 +39,7 @@ export default function VerifierPage({
   currentGuardian,
   guardiansType,
   verificationType,
+  isInitStatus,
   onSuccess,
 }: VerifierPageProps) {
   const { setLoading } = useLoading();
@@ -47,6 +49,10 @@ export default function VerifierPage({
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { state } = useLocation();
+
+  useEffectOnce(() => {
+    isInitStatus && setTimer(MAX_TIMER);
+  });
 
   const onFinish = useCallback(
     async (code: string) => {
