@@ -12,7 +12,7 @@ import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import CommonSwitch from 'components/CommonSwitch';
 import ActionSheet from 'components/ActionSheet';
 import { useGuardiansInfo } from 'hooks/store';
-import { useGetHolderInfo } from 'hooks/guardian';
+import { useGetGuardiansList, useGetHolderInfo } from 'hooks/guardian';
 import Loading from 'components/Loading';
 import { randomId, sleep } from '@portkey/utils';
 import { request } from 'api';
@@ -32,7 +32,7 @@ interface GuardianDetailProps {
 const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
   const { t } = useLanguage();
   const { params } = route;
-  const getHolderInfo = useGetHolderInfo();
+  const getGuardiansList = useGetGuardiansList();
   const { userGuardiansList } = useGuardiansInfo();
   const { caHash, address: managerAddress } = useCurrentWalletInfo();
   const caContract = useCurrentCAContract();
@@ -127,7 +127,7 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
       if (value) {
         Loading.show();
         try {
-          const holderInfo = await getHolderInfo({ loginGuardianType: guardian.loginGuardianType });
+          const holderInfo = await getGuardiansList({ loginGuardianType: guardian.loginGuardianType });
           if (holderInfo.guardians) {
             Loading.hide();
             ActionSheet.alert({
@@ -162,7 +162,7 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
         ],
       });
     },
-    [onCancelLoginAccount, getHolderInfo, guardian, setLoginAccount, t, userGuardiansList],
+    [getGuardiansList, guardian, onCancelLoginAccount, setLoginAccount, t, userGuardiansList],
   );
 
   return (
