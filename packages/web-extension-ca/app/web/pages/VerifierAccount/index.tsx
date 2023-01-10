@@ -41,7 +41,6 @@ export default function VerifierAccount() {
   >();
   const { isPrompt } = useCommonState();
   const { walletInfo } = useCurrentWallet();
-  console.log(userGuardianStatus, 'userGuardianStatus===');
   const currentNetwork = useCurrentNetworkInfo();
   const currentChain = useCurrentChain();
   const { setLoading } = useLoading();
@@ -170,12 +169,18 @@ export default function VerifierAccount() {
     }
   }, [dispatch, navigate, opGuardian, state]);
 
+  const isInitStatus = useMemo(() => {
+    if (state === 'register') return true;
+    return !!currentGuardian?.isInitStatus;
+  }, [currentGuardian, state]);
+
   return (
     <div className={clsx('verifier-account-wrapper', isPrompt ? 'common-page' : 'popup-page')}>
       {isPrompt ? <PortKeyTitle leftElement leftCallBack={handleBack} /> : <SettingHeader leftCallBack={handleBack} />}
       <div className="common-content1 verifier-account-content">
         <VerifierPage
           loginAccount={loginAccount}
+          isInitStatus={isInitStatus}
           currentGuardian={currentGuardian}
           verificationType={verificationType}
           guardiansType={loginAccount?.accountLoginType}
