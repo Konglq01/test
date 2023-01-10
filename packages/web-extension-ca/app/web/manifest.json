@@ -3,9 +3,9 @@
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
   },
-  "name": "PORTKEY CA",
+  "name": "Portkey: DID & Crypto & NFT",
   "version": "1.0.0",
-  "description": "__MSG_pluginDesc__",
+  "description": "Identity System for Social Recover and Asset Management Tool",
   "icons": {
     "16": "assets/images/extension_logo.png",
     "48": "assets/images/extension_logo.png",
@@ -16,7 +16,7 @@
   },
   "action": {
     "default_icon": "assets/images/extension_logo.png",
-    "default_title": "PORTKEY CA",
+    "default_title": "Portkey: DID & Crypto & NFT",
     "default_popup": "popup.html"
   },
   "sandbox": {

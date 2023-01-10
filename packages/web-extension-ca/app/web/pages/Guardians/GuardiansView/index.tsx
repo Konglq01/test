@@ -59,12 +59,20 @@ export default function GuardiansView() {
         address: currentChain?.caContractAddress as string,
         chainType: currentNetwork.walletType,
         paramsOption: {
-          loginGuardianType: currentGuardian?.loginGuardianType as string,
+          // loginGuardianType: currentGuardian?.loginGuardianType as string,
           caHash: walletInfo.caHash,
         },
       });
       if (checkResult.result.guardiansInfo?.guardians?.length > 0) {
-        setSwitchFail(SwitchFail.openFail);
+        const loginAccountIndex = checkResult.result.guardiansInfo?.loginGuardianTypeIndexes || [];
+        const index = checkResult.result.guardiansInfo?.guardians.findIndex(
+          (item: any) => item.guardianType.guardianType === currentGuardian?.guardiansType,
+        );
+        if (loginAccountIndex.includes(index)) {
+          setSwitchFail(SwitchFail.openFail);
+        } else {
+          setTipOpen(true);
+        }
       } else {
         setTipOpen(true);
       }
@@ -114,6 +122,7 @@ export default function GuardiansView() {
             }),
           );
           setLoading(false);
+          setTipOpen(false);
         } catch (error: any) {
           setLoading(false);
           message.error(error.Error);

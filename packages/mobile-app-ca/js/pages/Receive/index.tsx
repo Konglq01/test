@@ -5,7 +5,7 @@ import { useAppCASelector } from '@portkey/hooks';
 import { AccountType } from '@portkey/types/wallet';
 import { setStringAsync } from 'expo-clipboard';
 import CommonToast from 'components/CommonToast';
-import AccountCard from 'components/AccountCard';
+import AccountCard from 'pages/Receive/components/AccountCard';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { pTd } from 'utils/unit';
 import { useWallet } from 'hooks/store';

@@ -171,3 +171,54 @@ export async function editGuardian(
   console.log('UpdateGuardian: req', req);
   return req;
 }
+
+export async function setLoginAccount(
+  contract: ContractBasic,
+  address: string,
+  caHash: string,
+  guardianItem: UserGuardianItem,
+) {
+  console.log('SetGuardianTypeForLogin', {
+    caHash,
+    guardianType: {
+      type: guardianItem.guardiansType,
+      guardianType: guardianItem.loginGuardianType,
+    },
+  });
+  const req = await contract?.callSendMethod('SetGuardianTypeForLogin', address, {
+    caHash,
+    guardianType: {
+      type: guardianItem.guardiansType,
+      guardianType: guardianItem.loginGuardianType,
+    },
+  });
+  console.log('SetGuardianTypeForLogin: req', req);
+  return req;
+}
+
+export async function cancelLoginAccount(
+  contract: ContractBasic,
+  address: string,
+  caHash: string,
+  guardianItem: UserGuardianItem,
+) {
+  const req = await contract?.callSendMethod('UnsetGuardianTypeForLogin', address, {
+    caHash,
+    guardianType: {
+      type: guardianItem.guardiansType,
+      guardianType: guardianItem.loginGuardianType,
+    },
+  });
+  return req;
+}
+
+export async function removeManager(contract: ContractBasic, address: string, caHash: string) {
+  const req = await contract?.callSendMethod('RemoveManager', address, {
+    caHash,
+    manager: {
+      managerAddress: address,
+      deviceString: new Date().getTime(),
+    },
+  });
+  return req;
+}

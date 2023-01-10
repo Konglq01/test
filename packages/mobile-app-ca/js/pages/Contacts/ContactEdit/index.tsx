@@ -244,7 +244,6 @@ const ContactEdit: React.FC<ContactEditProps> = ({ route }) => {
     });
   }, [t]);
 
-  // TODO: adjust chainItem type
   const onChainChange = useCallback(
     (addressIdx: number, chainItem: ChainItemType) => {
       onAddressChange('', addressIdx);
