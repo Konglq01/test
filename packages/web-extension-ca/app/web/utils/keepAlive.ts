@@ -3,6 +3,29 @@ import { apis } from './BrowserApis';
 
 let keepAliveInterval: NodeJS.Timeout;
 let keepAliveTimer: NodeJS.Timeout;
+
+/**
+ * SERVICE WORKER LOGIC
+ */
+
+const EXTENSION_CONTEXT_INVALIDATED_CHROMIUM_ERROR = 'Extension context invalidated.';
+
+/**
+ * Sending a message to the extension to receive will keep the service worker alive.
+ *
+ * If the extension is unloaded or reloaded during a session and the user attempts to send a
+ * message to the extension, an "Extension context invalidated." error will be thrown from
+ * chromium browsers. When this happens, prompt the user to reload the extension. Note: Handling
+ * this error is not supported in Firefox here.
+ */
+const sendMessageWorkerKeepAlive = () => {
+  apis.runtime.sendMessage({ name: WORKER_KEEP_ALIVE_MESSAGE }).catch((e) => {
+    e.message === EXTENSION_CONTEXT_INVALIDATED_CHROMIUM_ERROR
+      ? console.error(`Please refresh the page. Portkey: ${e}`)
+      : console.error(`Portkey: ${e}`);
+  });
+};
+
 /**
  * Running this method will ensure the service worker is kept alive for 45 minutes.
  * The first message is sent immediately and subsequent messages are sent at an
@@ -18,11 +41,11 @@ export const runWorkerKeepAliveInterval = () => {
 
   clearInterval(keepAliveInterval);
 
-  apis.runtime.sendMessage({ name: WORKER_KEEP_ALIVE_MESSAGE });
+  sendMessageWorkerKeepAlive();
   console.log('runWorkerKeepAliveInterval==keep', keepAliveTimer);
   keepAliveInterval = setInterval(() => {
     if (apis.runtime.id) {
-      apis.runtime.sendMessage({ name: WORKER_KEEP_ALIVE_MESSAGE });
+      sendMessageWorkerKeepAlive();
     }
   }, WORKER_KEEP_ALIVE_INTERVAL);
 };
