@@ -5,12 +5,13 @@
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { useCurrentWalletInfo, useFetchWalletCAAddress } from '@portkey/hooks/hooks-ca/wallet';
 import { setCAInfo } from '@portkey/store/store-ca/wallet/actions';
+import { PinErrorMessage } from '@portkey/utils/wallet/types';
 import { message } from 'antd';
 import InternalMessage from 'messages/InternalMessage';
 import InternalMessageTypes from 'messages/InternalMessageTypes';
 import LockPage from 'pages/components/LockPage';
 import RegisterHeader from 'pages/components/RegisterHeader';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import { useEffectOnce } from 'react-use';
 import { useAppDispatch, useLoading } from 'store/Provider/hooks';
@@ -23,44 +24,46 @@ export default function QueryPage() {
   const fetchWalletResult = useFetchWalletCAAddress();
   const currentNetwork = useCurrentNetworkInfo();
   const currentWalletInfo = useCurrentWalletInfo();
-  const [password, setPassword] = useState<string>();
 
-  const fetchCreateWalletResult = useCallback(async () => {
-    if (!currentWalletInfo.managerInfo) throw 'Missing managerInfo';
-    const walletResult = await fetchWalletResult({
-      baseUrl: currentNetwork.apiUrl,
-      type: currentWalletInfo.managerInfo.type,
-      verificationType: currentWalletInfo.managerInfo.verificationType,
-      loginGuardianType: currentWalletInfo.managerInfo.loginGuardianType,
-      managerUniqueId: currentWalletInfo.managerInfo.managerUniqueId,
-    });
-    if (walletResult.status !== 'pass') {
-      const errorString = walletResult?.message || walletResult.status;
-      message.error((errorString as string) || 'Something error');
-      await setLocalStorage({
-        registerStatus: null,
+  const fetchCreateWalletResult = useCallback(
+    async (pwd: string) => {
+      if (!currentWalletInfo.managerInfo) throw 'Missing managerInfo';
+      const walletResult = await fetchWalletResult({
+        baseUrl: currentNetwork.apiUrl,
+        type: currentWalletInfo.managerInfo.type,
+        verificationType: currentWalletInfo.managerInfo.verificationType,
+        loginGuardianType: currentWalletInfo.managerInfo.loginGuardianType,
+        managerUniqueId: currentWalletInfo.managerInfo.managerUniqueId,
       });
-      setLoading(false);
-      throw 'error';
-    } else {
-      if (!password) return;
-      dispatch(
-        setCAInfo({
-          caInfo: {
-            caAddress: walletResult.caAddress,
-            caHash: walletResult.caHash,
-          },
-          pin: password,
-          chainId: 'AELF',
-        }),
-      );
-      setLoading(false);
-      await setLocalStorage({
-        registerStatus: 'Registered',
-      });
-      navigate('/register/success');
-    }
-  }, [currentWalletInfo, currentNetwork, password, dispatch, navigate, setLoading, fetchWalletResult]);
+      if (walletResult.status !== 'pass') {
+        const errorString = walletResult?.message || walletResult.status;
+        message.error((errorString as string) || 'Something error');
+        await setLocalStorage({
+          registerStatus: null,
+        });
+        setLoading(false);
+        throw 'error';
+      } else {
+        if (!pwd) return message.error(PinErrorMessage.invalidPin);
+        dispatch(
+          setCAInfo({
+            caInfo: {
+              caAddress: walletResult.caAddress,
+              caHash: walletResult.caHash,
+            },
+            pin: pwd,
+            chainId: 'AELF',
+          }),
+        );
+        setLoading(false);
+        await setLocalStorage({
+          registerStatus: 'Registered',
+        });
+        navigate('/register/success');
+      }
+    },
+    [currentWalletInfo, currentNetwork, dispatch, navigate, setLoading, fetchWalletResult],
+  );
 
   useEffectOnce(() => {
     setLoading(1);
@@ -68,8 +71,7 @@ export default function QueryPage() {
       .send()
       .then((res) => {
         if (!res?.data?.privateKey) return setLoading(false);
-        setPassword(res.data.privateKey);
-        fetchCreateWalletResult();
+        fetchCreateWalletResult(res.data.privateKey);
       });
   });
 
@@ -77,8 +79,7 @@ export default function QueryPage() {
     async (pwd: string) => {
       // get CA address
       setLoading(1);
-      setPassword(pwd);
-      await fetchCreateWalletResult();
+      await fetchCreateWalletResult(pwd);
     },
     [fetchCreateWalletResult, setLoading],
   );
