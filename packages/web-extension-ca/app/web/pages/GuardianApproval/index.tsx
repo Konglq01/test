@@ -12,7 +12,6 @@ import { VerificationType, VerifyStatus } from '@portkey/types/verifier';
 import { useNavigate, useLocation } from 'react-router';
 import { setUserGuardianItemStatus, setCurrentGuardianAction } from '@portkey/store/store-ca/guardians/actions';
 import { UserGuardianItem, UserGuardianStatus } from '@portkey/store/store-ca/guardians/type';
-import { ZERO } from '@portkey/constants/misc';
 import { getApprovalCount } from '@portkey/utils/guardian';
 import './index.less';
 import PortKeyTitle from 'pages/components/PortKeyTitle';
@@ -42,7 +41,7 @@ enum MethodType {
 }
 
 export default function GuardianApproval() {
-  const { userGuardianStatus, guardianExpiredTime, currentGuardian, opGuardian, preGuardian } = useGuardiansInfo();
+  const { userGuardianStatus, guardianExpiredTime, opGuardian, preGuardian } = useGuardiansInfo();
   const { loginAccount } = useLoginInfo();
   const [isExpired, setIsExpired] = useState<boolean>(false);
   const navigate = useNavigate();
@@ -96,7 +95,7 @@ export default function GuardianApproval() {
         });
         setLoading(false);
         if (result.verifierSessionId) {
-          dispatch(setCurrentGuardianAction({ ...item, sessionId: result.verifierSessionId }));
+          dispatch(setCurrentGuardianAction({ ...item, sessionId: result.verifierSessionId, isInitStatus: true }));
           dispatch(
             setUserGuardianItemStatus({
               key: item.key,
@@ -139,7 +138,7 @@ export default function GuardianApproval() {
         });
         setLoading(false);
         if (result.verifierSessionId) {
-          dispatch(setCurrentGuardianAction({ ...item, sessionId: result.verifierSessionId }));
+          dispatch(setCurrentGuardianAction({ ...item, sessionId: result.verifierSessionId, isInitStatus: true }));
           dispatch(
             setUserGuardianItemStatus({
               key: item.key,
@@ -337,7 +336,7 @@ export default function GuardianApproval() {
 
   const verifyingHandler = useCallback(
     async (item: UserGuardianItem) => {
-      dispatch(setCurrentGuardianAction(item));
+      dispatch(setCurrentGuardianAction({ ...item, isInitStatus: false }));
       state && state.indexOf('guardians') !== -1
         ? navigate('/setting/guardians/verifier-account', { state: state })
         : navigate('/login/verifier-account', { state: 'login' });
@@ -360,7 +359,7 @@ export default function GuardianApproval() {
   const handleBack = useCallback(() => {
     if (state && state.indexOf('guardians') !== -1) {
       if (['guardians/del', 'guardians/edit'].includes(state)) {
-        dispatch(setCurrentGuardianAction(opGuardian as UserGuardianItem));
+        dispatch(setCurrentGuardianAction({ ...(opGuardian as UserGuardianItem), isInitStatus: false }));
         navigate(`/setting/guardians/edit`);
       } else {
         navigate(`/setting/${state}`, { state: 'back' });
