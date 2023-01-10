@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import Svg from 'components/Svg';
-import { dashBoardBtnStyle, innerPageStyles } from '../SendButton/style';
+import { dashBoardBtnStyle, innerPageStyles } from '../../../components/SendButton/style';
 import navigationService from 'utils/navigationService';
 
 import { View, TouchableOpacity } from 'react-native';

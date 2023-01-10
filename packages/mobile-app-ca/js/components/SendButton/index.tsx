@@ -9,7 +9,7 @@ import { TextM } from 'components/CommonText';
 import { useLanguage } from 'i18n/hooks';
 
 import { pTd } from 'utils/unit';
-import AssetsOverlay from 'components/AssetsOverlay';
+import AssetsOverlay from 'pages/DashBoard/AssetsOverlay';
 interface SendButtonType {
   themeType?: 'dashBoard' | 'innerPage';
   sentToken?: TokenItemShowType;

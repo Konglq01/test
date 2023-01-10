@@ -6,7 +6,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useAppCASelector } from '@portkey/hooks/index';
 import SendButton from 'components/SendButton';
 import ReceiveButton from 'components/ReceiveButton';
-import ActivityButton from 'components/ActivityButton';
+import ActivityButton from 'pages/DashBoard/ActivityButton';
 
 import { TextM } from 'components/CommonText';
 import navigationService from 'utils/navigationService';
