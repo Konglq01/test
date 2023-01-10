@@ -1,13 +1,11 @@
 import React, { useState, useCallback } from 'react';
 import NoData from 'components/NoData';
-import { StyleSheet, FlatListProps, Text, View, FlatList, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, FlatList } from 'react-native';
 import { defaultColors } from 'assets/theme';
-import navigationService from 'utils/navigationService';
 import { useLanguage } from 'i18n/hooks';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { pTd } from 'utils/unit';
 import NFTItem from './NFTItem';
-import { FlashList } from '@shopify/flash-list';
 
 const mockData = {
   items: [
