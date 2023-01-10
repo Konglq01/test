@@ -88,9 +88,9 @@ export default function ConfirmPassword({
               if (!isValidPassword(value)) {
                 setCreateValidate({
                   validateStatus: 'error',
-                  errorMsg: t(PasswordErrorMessage.invalidPassword),
+                  errorMsg: t(PasswordErrorMessage.invalidPin),
                 });
-                return Promise.reject(t(PasswordErrorMessage.invalidPassword));
+                return Promise.reject(t(PasswordErrorMessage.invalidPin));
               }
               setCreateValidate({
                 validateStatus: 'success',
