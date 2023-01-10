@@ -4,7 +4,7 @@ import { TextM } from 'components/CommonText';
 import VerifierCountdown, { VerifierCountdownInterface } from 'components/VerifierCountdown';
 import PageContainer from 'components/PageContainer';
 import DigitInput, { DigitInputInterface } from 'components/DigitInput';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import useRouterParams from '@portkey/hooks/useRouterParams';
 import { ApprovalType, VerificationType, VerifyStatus } from '@portkey/types/verifier';
@@ -19,12 +19,10 @@ import { LoginType } from '@portkey/types/types-ca/wallet';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import myEvents from 'utils/deviceEvent';
 import { API_REQ_FUNCTION } from 'api/types';
-import { getELFContract } from 'contexts/utils';
-import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
-import { useCredentials } from 'hooks/store';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
-import { getWallet } from 'utils/redux';
 import { sleep } from '@portkey/utils';
+import { useCurrentCAContract } from 'hooks/contract';
+import { setLoginAccount } from 'utils/guardian';
 
 type FetchType = Record<string, API_REQ_FUNCTION>;
 
@@ -37,6 +35,25 @@ type RouterParams = {
   verificationType?: VerificationType;
   guardianKey?: string;
 };
+
+function TipText({ loginGuardianType, isRegister }: { loginGuardianType?: string; isRegister?: boolean }) {
+  const [first, last] = useMemo(() => {
+    if (!isRegister)
+      return [
+        `Please contact your guardians, and enter the ${DIGIT_CODE.length}-digit code sent to `,
+        ` within ${DIGIT_CODE.expiration} minutes.`,
+      ];
+    return [`A ${DIGIT_CODE.length}-digit code was sent to `, ` Enter it within ${DIGIT_CODE.expiration} minutes`];
+  }, [isRegister]);
+  return (
+    <TextM style={[FontStyles.font3, GStyles.marginTop(16), GStyles.marginBottom(50)]}>
+      {first}
+      <Text style={FontStyles.font4}>{loginGuardianType}</Text>
+      {last}
+    </TextM>
+  );
+}
+
 export default function VerifierDetails() {
   const {
     loginGuardianType,
@@ -63,29 +80,14 @@ export default function VerifierDetails() {
     [guardianKey],
   );
 
-  const chainInfo = useCurrentChain('AELF');
-  const { pin } = useCredentials() || {};
-  const { caHash } = useCurrentWalletInfo();
+  const { caHash, address: managerAddress } = useCurrentWalletInfo();
+  const caContract = useCurrentCAContract();
 
-  const setLoginAccount = useCallback(async () => {
-    if (!chainInfo || !pin || !caHash || !guardianItem) return;
-    const wallet = getWallet(pin);
-    if (!wallet) return;
-    const contract = await getELFContract({
-      contractAddress: chainInfo.caContractAddress,
-      rpcUrl: chainInfo.endPoint,
-      account: wallet,
-    });
+  const onSetLoginAccount = useCallback(async () => {
+    if (!caContract || !managerAddress || !caHash || !guardianItem) return;
 
     try {
-      const req = await contract?.callSendMethod('SetGuardianTypeForLogin', wallet.address, {
-        caHash,
-        guardianType: {
-          type: guardianItem.guardiansType,
-          guardianType: guardianItem.loginGuardianType,
-        },
-      });
-
+      const req = await setLoginAccount(caContract, managerAddress, caHash, guardianItem);
       if (req && !req.error) {
         await sleep(1000);
         myEvents.refreshGuardiansList.emit();
@@ -93,12 +95,12 @@ export default function VerifierDetails() {
           guardian: JSON.stringify({ ...guardianItem, isLoginAccount: true }),
         });
       } else {
-        CommonToast.failError(req?.error?.message?.Message);
+        CommonToast.fail(req?.error.message);
       }
     } catch (error) {
-      console.log(error);
+      CommonToast.failError(error);
     }
-  }, [caHash, chainInfo, guardianItem, pin]);
+  }, [caContract, caHash, guardianItem, managerAddress]);
 
   const onFinish = useCallback(
     async (code: string) => {
@@ -156,7 +158,7 @@ export default function VerifierDetails() {
             });
           }
         } else if (verificationType === VerificationType.setLoginAccount) {
-          await setLoginAccount();
+          await onSetLoginAccount();
         } else {
           navigationService.navigate('SetPin', {
             managerInfo: {
@@ -178,7 +180,7 @@ export default function VerifierDetails() {
       loginGuardianType,
       managerUniqueId,
       setGuardianStatus,
-      setLoginAccount,
+      onSetLoginAccount,
       stateSessionId,
       verificationType,
     ],
@@ -220,10 +222,10 @@ export default function VerifierDetails() {
   return (
     <PageContainer type="leftBack" titleDom containerStyles={styles.containerStyles}>
       {guardianItem ? <GuardianAccountItem guardianItem={guardianItem} isButtonHide /> : null}
-      <TextM style={[FontStyles.font3, GStyles.marginTop(16), GStyles.marginBottom(50)]}>
-        A {DIGIT_CODE.length}-digit code was sent to <Text style={FontStyles.font4}>{loginGuardianType}</Text>. Enter it
-        within {DIGIT_CODE.expiration} minutes
-      </TextM>
+      <TipText
+        isRegister={!verificationType || (verificationType as VerificationType) === VerificationType.register}
+        loginGuardianType={loginGuardianType}
+      />
       <DigitInput ref={digitInput} onFinish={onFinish} maxLength={DIGIT_CODE.length} />
       <VerifierCountdown style={GStyles.marginTop(24)} onResend={resendCode} ref={countdown} />
     </PageContainer>

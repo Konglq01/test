@@ -51,6 +51,7 @@ export default function ScanLogin() {
       titleDom
       leftDom
       containerStyles={styles.containerStyles}
+      leftCallback={() => navigationService.navigate('Tab')}
       rightDom={
         <Touchable onPress={() => navigationService.navigate('Tab')}>
           <Svg size={pTd(14)} color={FontStyles.font3.color} icon="close" />

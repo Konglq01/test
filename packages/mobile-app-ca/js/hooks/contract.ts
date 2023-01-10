@@ -15,13 +15,17 @@ export function useCurrentViewCAContract(chainId: ChainId = 'AELF') {
   const [{ viewContracts }, dispatch] = useInterface();
   const getCAContract = useCallback(async () => {
     if (!chainInfo) return;
-    const contract = await getELFContract({
-      contractAddress: chainInfo.caContractAddress,
-      rpcUrl: chainInfo.endPoint,
-      account: getDefaultWallet(),
-    });
-    if (!contract) return;
-    dispatch(setViewContract({ [chainInfo.caContractAddress]: contract }));
+    try {
+      const contract = await getELFContract({
+        contractAddress: chainInfo.caContractAddress,
+        rpcUrl: chainInfo.endPoint,
+        account: getDefaultWallet(),
+      });
+      if (!contract) return;
+      dispatch(setViewContract({ [chainInfo.caContractAddress]: contract }));
+    } catch (error) {
+      console.log(error, '=====error-getCAContract');
+    }
   }, [chainInfo, dispatch]);
   useEffect(() => {
     getCAContract();

@@ -6,7 +6,7 @@ import { defaultColors } from 'assets/theme';
 import { pTd } from 'utils/unit';
 import { useLanguage } from 'i18n/hooks';
 import { FlashList } from '@shopify/flash-list';
-import RecentContactItem from 'components/RecentContactItem';
+import RecentContactItem from 'pages/Send/components/RecentContactItem';
 import RecentList from '../components/RecentList';
 import ContactsList from 'components/ContactList';
 import NoData from 'components/NoData';

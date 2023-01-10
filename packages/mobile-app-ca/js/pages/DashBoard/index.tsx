@@ -1,17 +1,14 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { unitConverter } from '@portkey/utils/converter';
-import { ZERO } from '@portkey/constants/misc';
+import React, { useState } from 'react';
 import Card from './Card';
 // import navigationService from 'utils/navigationService';
 // import { TouchableOpacity } from 'react-native-gesture-handler';
 // import { TokenItemShowType } from '@portkey/types/types-eoa/token';
 // import Svg from 'components/Svg';
 // import { clearBalance, updateBalance } from '@portkey/store/tokenBalance/slice';
-import { useAppCommonDispatch, useAppEOASelector } from '@portkey/hooks/index';
+import { useAppCommonDispatch } from '@portkey/hooks/index';
 import DashBoardTab from './DashBoardTab';
 import SafeAreaBox from 'components/SafeAreaBox';
 import { defaultColors } from 'assets/theme';
-import Tips from './Tips';
 
 import useEffectOnce from 'hooks/useEffectOnce';
 import { MINUTE } from '@portkey/constants';

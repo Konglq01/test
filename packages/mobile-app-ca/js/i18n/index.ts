@@ -36,21 +36,21 @@ RNLocalize.addEventListener('change', async () => {
 });
 
 export async function initLanguage() {
-  let lng;
-  const customLanguageCode = await getStorageData('I18N_LANGUAGE');
-  const localLanguage = getLocalLanguage();
-  // AsyncStorage language
-  if (customLanguageCode) lng = customLanguageCode;
-  // local language
-  else if (localLanguage) lng = localLanguage;
-  // invalid language
-  if (lng && !isValidLanguage(lng as any)) lng = DEFAULT_LANGUAGE;
+  const lng = DEFAULT_LANGUAGE;
+  // const customLanguageCode = await getStorageData('I18N_LANGUAGE');
+  // const localLanguage = getLocalLanguage();
+  // // AsyncStorage language
+  // if (customLanguageCode) lng = customLanguageCode;
+  // // local language
+  // else if (localLanguage) lng = localLanguage;
+  // // invalid language
+  // if (lng && !isValidLanguage(lng as any)) lng = DEFAULT_LANGUAGE;
   i18n
     .use(initReactI18next) // passes i18n down to react-i18next
     .init({
       compatibilityJSON: 'v3', // Look like an issue on android. Need fallback to v2.
       resources,
-      lng: lng, // language to use, more information here: https://www.i18next.com/overview/configuration-options#languages-namespaces-resources
+      lng, // language to use, more information here: https://www.i18next.com/overview/configuration-options#languages-namespaces-resources
       // you can use the i18n.changeLanguage function to change the language manually: https://www.i18next.com/overview/api#changelanguage
       // if you're using a language detector, do not define the lng option
 

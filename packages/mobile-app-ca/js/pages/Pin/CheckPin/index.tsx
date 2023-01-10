@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { TextL } from 'components/CommonText';
 import PageContainer from 'components/PageContainer';
 import DigitInput, { DigitInputInterface } from 'components/DigitInput';
@@ -12,13 +12,19 @@ import useRouterParams from '@portkey/hooks/useRouterParams';
 import { checkPin } from 'utils/redux';
 import { PinErrorMessage } from '@portkey/utils/wallet/types';
 import myEvents from 'utils/deviceEvent';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function CheckPin() {
   const { openBiometrics } = useRouterParams<{ openBiometrics?: boolean }>();
   const [errorMessage, setErrorMessage] = useState<string>();
   const pinRef = useRef<DigitInputInterface>();
+  useFocusEffect(
+    useCallback(() => {
+      pinRef.current?.resetPin();
+    }, []),
+  );
   return (
-    <PageContainer titleDom type="leftBack">
+    <PageContainer titleDom type="leftBack" backTitle={!openBiometrics ? 'Change Pin' : 'Authentication'}>
       <View style={styles.container}>
         <TextL style={GStyles.textAlignCenter}>Enter Pin</TextL>
         <DigitInput

@@ -170,10 +170,10 @@ export default function GuardianApproval() {
         myEvents.refreshGuardiansList.emit();
         navigationService.navigate('GuardianHome');
       } else {
-        CommonToast.failError(req?.error?.message?.Message);
+        CommonToast.fail(req?.error.message);
       }
     } catch (error) {
-      console.log(error);
+      CommonToast.failError(error);
     }
 
     Loading.hide();
@@ -198,10 +198,10 @@ export default function GuardianApproval() {
         myEvents.refreshGuardiansList.emit();
         navigationService.navigate('GuardianHome');
       } else {
-        CommonToast.failError(req?.error?.message?.Message);
+        CommonToast.fail(req?.error.message);
       }
     } catch (error) {
-      console.log(error);
+      CommonToast.failError(error);
     }
 
     Loading.hide();
@@ -237,10 +237,10 @@ export default function GuardianApproval() {
         myEvents.refreshGuardiansList.emit();
         navigationService.navigate('GuardianHome');
       } else {
-        CommonToast.failError(req?.error?.message?.Message);
+        CommonToast.fail(req?.error.message);
       }
     } catch (error) {
-      console.log(error);
+      CommonToast.failError(error);
     }
 
     Loading.hide();

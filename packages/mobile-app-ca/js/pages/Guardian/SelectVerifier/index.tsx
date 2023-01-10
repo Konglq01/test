@@ -48,7 +48,6 @@ export default function SelectVerifier() {
           onPress: async () => {
             try {
               const managerUniqueId = randomId();
-              // TODO:Confirm
               Loading.show();
               const req = await request.register.sendCode({
                 baseURL: selectedVerifier.url,
