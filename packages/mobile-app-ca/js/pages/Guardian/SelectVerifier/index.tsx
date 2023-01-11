@@ -36,7 +36,7 @@ export default function SelectVerifier() {
   const { loginGuardianType } = useRouterParams<{ loginGuardianType?: string }>();
   const onConfirm = useCallback(async () => {
     ActionSheet.alert({
-      title2: `Portkey will send a verification code to ${loginGuardianType} to verify your email address.`,
+      title2: `${selectedVerifier.name} will send a verification code to ${loginGuardianType} to verify your email address.`,
       buttons: [
         {
           title: t('Cancel'),
