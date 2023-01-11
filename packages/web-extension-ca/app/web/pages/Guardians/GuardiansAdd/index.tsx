@@ -120,7 +120,7 @@ export default function AddGuardian() {
       setLoading(true);
       dispatch(resetUserGuardianStatus());
       dispatch(setPreGuardianAction());
-      await userGuardianList(walletInfo.managerInfo?.loginGuardianType as string);
+      await userGuardianList({ caHash: walletInfo.caHash });
       const result = await sendVerificationCode({
         loginGuardianType: emailVal as string,
         guardiansType: guardianType as LoginType,

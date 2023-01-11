@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router';
 import CustomSvg from 'components/CustomSvg';
 import SettingHeader from 'pages/components/SettingHeader';
 import { useAppDispatch, useGuardiansInfo, useLoading, useUserInfo } from 'store/Provider/hooks';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { sendVerificationCode } from '@portkey/api/apiUtils/verification';
 import { VerificationType } from '@portkey/types/verifier';
 import { useTranslation } from 'react-i18next';
@@ -22,7 +22,7 @@ import { GuardianMth } from 'types/guardians';
 import { sleep } from '@portkey/utils';
 import { getAelfInstance } from '@portkey/utils/aelf';
 import { getTxResult } from 'utils/aelfUtils';
-import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
+// import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 
 enum SwitchFail {
   default = 0,
@@ -44,52 +44,7 @@ export default function GuardiansView() {
   const { passwordSeed } = useUserInfo();
   const editable = useMemo(() => Object.keys(userGuardiansList ?? {}).length > 1, [userGuardiansList]);
 
-  const handleSwitch = async () => {
-    if (currentGuardian && currentGuardian.isLoginAccount) {
-      let loginAccountNum = 0;
-      userGuardiansList?.forEach((item) => {
-        if (item.isLoginAccount) loginAccountNum++;
-      });
-      if (loginAccountNum <= 1) {
-        setSwitchFail(SwitchFail.closeFail);
-      } else {
-        verifyHandler();
-      }
-    } else {
-      const isLogin = Object.values(userGuardiansList ?? {}).some(
-        (item: UserGuardianItem) =>
-          item.isLoginAccount && item.loginGuardianType === currentGuardian?.loginGuardianType,
-      );
-      if (isLogin) {
-        setTipOpen(true);
-        return;
-      }
-      const checkResult = await getHolderInfo({
-        rpcUrl: currentChain?.endPoint as string,
-        address: currentChain?.caContractAddress as string,
-        chainType: currentNetwork.walletType,
-        paramsOption: {
-          // loginGuardianType: currentGuardian?.loginGuardianType as string,
-          caHash: walletInfo.caHash,
-        },
-      });
-      if (checkResult.result.guardiansInfo?.guardians?.length > 0) {
-        const loginAccountIndex = checkResult.result.guardiansInfo?.loginGuardianTypeIndexes || [];
-        const index = checkResult.result.guardiansInfo?.guardians.findIndex(
-          (item: any) => item.guardianType.guardianType === currentGuardian?.guardiansType,
-        );
-        if (loginAccountIndex.includes(index)) {
-          setSwitchFail(SwitchFail.openFail);
-        } else {
-          setTipOpen(true);
-        }
-      } else {
-        setTipOpen(true);
-      }
-    }
-  };
-
-  const verifyHandler = async () => {
+  const verifyHandler = useCallback(async () => {
     try {
       if (currentGuardian?.isLoginAccount) {
         const res = await getPrivateKeyAndMnemonic(
@@ -122,23 +77,17 @@ export default function GuardiansView() {
         const { TransactionId } = result.result.message || result;
         await sleep(1000);
         const aelfInstance = getAelfInstance(currentChain.endPoint);
-        try {
-          const validTxId = await getTxResult(aelfInstance, TransactionId);
-          dispatch(resetUserGuardianStatus());
-          dispatch(
-            setCurrentGuardianAction({
-              ...currentGuardian,
-              isLoginAccount: false,
-              isInitStatus: true,
-            }),
-          );
-          setLoading(false);
-          setTipOpen(false);
-        } catch (error: any) {
-          setLoading(false);
-          console.log('---unsetLoginAccount-error', error);
-          message.error(error?.Error?.Message || error.message?.Message || error?.message);
-        }
+        await getTxResult(aelfInstance, TransactionId);
+        dispatch(resetUserGuardianStatus());
+        dispatch(
+          setCurrentGuardianAction({
+            ...currentGuardian,
+            isLoginAccount: false,
+            isInitStatus: true,
+          }),
+        );
+        setLoading(false);
+        setTipOpen(false);
       } else {
         dispatch(
           setLoginAccountAction({
@@ -175,7 +124,74 @@ export default function GuardiansView() {
       message.error(error?.Error?.Message || error.message?.Message || error?.message);
       console.log('---setLoginAccount-error', error);
     }
-  };
+  }, [
+    currentChain,
+    currentGuardian,
+    currentNetwork.walletType,
+    dispatch,
+    navigate,
+    passwordSeed,
+    setLoading,
+    walletInfo?.AELF?.caHash,
+    walletInfo.AESEncryptPrivateKey,
+    walletInfo.managerInfo?.managerUniqueId,
+  ]);
+
+  const handleSwitch = useCallback(
+    async (status: boolean) => {
+      if (status) {
+        // II TODO: this logic will be added
+        // const isLogin = Object.values(userGuardiansList ?? {}).some(
+        //   (item: UserGuardianItem) =>
+        //     item.isLoginAccount && item.loginGuardianType === currentGuardian?.loginGuardianType,
+        // );
+        // if (isLogin) {
+        //   setTipOpen(true);
+        //   return;
+        // }
+        try {
+          const checkResult = await getHolderInfo({
+            rpcUrl: currentChain?.endPoint as string,
+            address: currentChain?.caContractAddress as string,
+            chainType: currentNetwork.walletType,
+            paramsOption: {
+              loginGuardianType: currentGuardian?.loginGuardianType as string,
+              // caHash: walletInfo.caHash,
+            },
+          });
+          if (checkResult.result.guardiansInfo?.guardians?.length > 0) {
+            const loginAccountIndex = checkResult.result.guardiansInfo?.loginGuardianTypeIndexes || [];
+            const index = checkResult.result.guardiansInfo?.guardians.findIndex(
+              (item: any) => item.guardianType.guardianType === currentGuardian?.guardiansType,
+            );
+            if (loginAccountIndex.includes(index)) {
+              setSwitchFail(SwitchFail.openFail);
+            } else {
+              setTipOpen(true);
+            }
+          }
+        } catch (error: any) {
+          console.log('---setLoginAccount-err', error);
+          if (error?.Error?.Details && error?.Error?.Details?.indexOf('Not found ca_hash')) {
+            setTipOpen(true);
+          } else {
+            throw error?.Error?.Message || error.message?.Message || error?.message;
+          }
+        }
+      } else {
+        let loginAccountNum = 0;
+        userGuardiansList?.forEach((item) => {
+          if (item.isLoginAccount) loginAccountNum++;
+        });
+        if (loginAccountNum > 1) {
+          verifyHandler();
+        } else {
+          setSwitchFail(SwitchFail.closeFail);
+        }
+      }
+    },
+    [currentChain, currentGuardian, currentNetwork.walletType, userGuardiansList, verifyHandler, walletInfo.caHash],
+  );
 
   return (
     <div className="guardian-view-frame">
@@ -243,7 +259,7 @@ export default function GuardiansView() {
         <p className="modal-content">
           {switchFail === SwitchFail.closeFail
             ? t('This guardian is the only Login account and cannot be turn off')
-            : t('This account address is already the login account of other wallets and cannot be opened')}
+            : t('This account address is already a login account and cannot be used')}
         </p>
         <div style={{ padding: '15px 16px 17px 16px' }}>
           <Button style={{ borderRadius: 24 }} type="primary" onClick={() => setSwitchFail(SwitchFail.default)}>

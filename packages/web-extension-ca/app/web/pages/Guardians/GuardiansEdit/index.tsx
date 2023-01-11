@@ -76,7 +76,7 @@ export default function GuardiansEdit() {
         );
         setLoading(true);
         dispatch(resetUserGuardianStatus());
-        await userGuardianList(walletInfo.managerInfo?.loginGuardianType as string);
+        await userGuardianList({ caHash: walletInfo.caHash });
         dispatch(
           setPreGuardianAction({
             isLoginAccount: currentGuardian?.isLoginAccount,
@@ -131,7 +131,7 @@ export default function GuardiansEdit() {
       }),
     );
     dispatch(resetUserGuardianStatus());
-    await userGuardianList(walletInfo.managerInfo?.loginGuardianType as string);
+    await userGuardianList({ caHash: walletInfo.caHash });
     dispatch(
       setOpGuardianAction({
         isLoginAccount: currentGuardian?.isLoginAccount,
