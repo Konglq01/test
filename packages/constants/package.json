@@ -8,6 +8,7 @@
   "scripts": {
     "prebuild": "rm -rf dist",
     "build": "tsc",
-    "start": "tsc --watch"
+    "start": "tsc --watch",
+    "handle-network": "cd ./scripts && node handleNetwork.js && cd .."
   }
 }
