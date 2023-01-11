@@ -139,6 +139,7 @@ export default function AddGuardian() {
             guardiansType: guardianType as LoginType,
             sessionId: result.verifierSessionId,
             key: _key,
+            isInitStatus: true,
           }),
         );
         dispatch(
