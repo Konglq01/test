@@ -101,7 +101,7 @@ export default function ConfirmPin() {
       }
 
       if (confirmPin !== pin) {
-        pinRef.current?.resetPin();
+        pinRef.current?.reset();
         return setErrorMessage('Pins do not match');
       }
 

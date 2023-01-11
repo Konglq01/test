@@ -169,7 +169,7 @@ export default function VerifierDetails() {
         }
       } catch (error) {
         CommonToast.failError(error, 'Verify Fail');
-        digitInput.current?.resetPin();
+        digitInput.current?.reset();
       }
       Loading.hide();
     },
@@ -209,10 +209,10 @@ export default function VerifierDetails() {
           status: VerifyStatus.Verifying,
         });
         countdown.current?.resetTime(60);
-        digitInput.current?.resetPin();
+        digitInput.current?.reset();
       }
     } catch (error) {
-      digitInput.current?.resetPin();
+      digitInput.current?.reset();
       CommonToast.failError(error, 'Verify Fail');
     }
     Loading.hide();

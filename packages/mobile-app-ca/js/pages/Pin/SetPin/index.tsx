@@ -36,7 +36,7 @@ export default function SetPin() {
   }>();
   const digitInput = useRef<DigitInputInterface>();
   useEffectOnce(() => {
-    const listener = myEvents.clearSetPin.addListener(() => digitInput.current?.resetPin());
+    const listener = myEvents.clearSetPin.addListener(() => digitInput.current?.reset());
     return () => listener.remove();
   });
   return (
