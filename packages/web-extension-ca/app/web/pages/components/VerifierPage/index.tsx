@@ -137,7 +137,7 @@ export default function VerifierPage({
 
   return (
     <div className={clsx('verifier-page-wrapper', isPrompt || 'popup-page')}>
-      <div className="login-icon">{t('Login Account')}</div>
+      {currentGuardian?.isLoginAccount && <div className="login-icon">{t('Login Account')}</div>}
       <div className="flex-row-center login-account-wrapper">
         <VerifierPair
           guardiansType={currentGuardian?.guardiansType}

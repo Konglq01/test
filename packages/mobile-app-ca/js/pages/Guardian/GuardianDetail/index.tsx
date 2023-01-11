@@ -12,9 +12,9 @@ import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import CommonSwitch from 'components/CommonSwitch';
 import ActionSheet from 'components/ActionSheet';
 import { useGuardiansInfo } from 'hooks/store';
-import { useGetGuardiansList, useGetHolderInfo } from 'hooks/guardian';
+import { useGetGuardiansList } from 'hooks/guardian';
 import Loading from 'components/Loading';
-import { randomId, sleep } from '@portkey/utils';
+import { randomId } from '@portkey/utils';
 import { request } from 'api';
 import CommonToast from 'components/CommonToast';
 import { VerificationType } from '@portkey/types/verifier';
@@ -49,7 +49,6 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
     try {
       const req = await cancelLoginAccount(caContract, managerAddress, caHash, guardian);
       if (req && !req.error) {
-        await sleep(1000);
         myEvents.refreshGuardiansList.emit();
         navigationService.navigate('GuardianDetail', {
           guardian: JSON.stringify({ ...guardian, isLoginAccount: false }),

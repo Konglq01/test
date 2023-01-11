@@ -15,7 +15,7 @@ import { getApprovalCount } from '@portkey/utils/guardian';
 import { ApprovalType, VerificationType, VerifyStatus } from '@portkey/types/verifier';
 import GuardianAccountItem, { GuardiansStatus, GuardiansStatusItem } from '../components/GuardianAccountItem';
 import useEffectOnce from 'hooks/useEffectOnce';
-import { randomId, sleep } from '@portkey/utils';
+import { randomId } from '@portkey/utils';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import navigationService from 'utils/navigationService';
 import { LoginType, ManagerInfo } from '@portkey/types/types-ca/wallet';
@@ -165,7 +165,6 @@ export default function GuardianApproval() {
         guardiansStatus,
       );
       if (req && !req.error) {
-        await sleep(1000);
         CommonToast.success('Guardians Added');
         myEvents.refreshGuardiansList.emit();
         navigationService.navigate('GuardianHome');
@@ -194,7 +193,6 @@ export default function GuardianApproval() {
       );
 
       if (req && !req.error) {
-        await sleep(1000);
         myEvents.refreshGuardiansList.emit();
         navigationService.navigate('GuardianHome');
       } else {
@@ -233,7 +231,6 @@ export default function GuardianApproval() {
       );
       if (req && !req.error) {
         dispatch(setPreGuardianAction(undefined));
-        await sleep(1000);
         myEvents.refreshGuardiansList.emit();
         navigationService.navigate('GuardianHome');
       } else {

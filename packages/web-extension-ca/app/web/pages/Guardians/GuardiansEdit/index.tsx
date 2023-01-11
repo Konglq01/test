@@ -1,4 +1,4 @@
-import { Button } from 'antd';
+import { Button, message } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import CommonModal from 'components/CommonModal';
@@ -102,13 +102,15 @@ export default function GuardiansEdit() {
             loginGuardianType: currentGuardian?.loginGuardianType as string,
             guardiansType: currentGuardian?.guardiansType as LoginType,
             key: `${currentGuardian?.loginGuardianType}&${selectVal}`,
+            isInitStatus: true,
           }),
         );
         setLoading(false);
         navigate('/setting/guardians/guardian-approval', { state: 'guardians/edit' }); // status
-      } catch (error) {
+      } catch (error: any) {
         setLoading(false);
-        console.log(error, 'verifyHandler');
+        console.log('---edit-guardian-error', error);
+        message.error(error?.Error?.Message || error.message?.Message || error?.message);
       }
     }
   };

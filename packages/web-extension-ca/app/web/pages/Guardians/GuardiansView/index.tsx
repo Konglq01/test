@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router';
 import CustomSvg from 'components/CustomSvg';
 import SettingHeader from 'pages/components/SettingHeader';
 import { useAppDispatch, useGuardiansInfo, useLoading, useUserInfo } from 'store/Provider/hooks';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { sendVerificationCode } from '@portkey/api/apiUtils/verification';
 import { VerificationType } from '@portkey/types/verifier';
 import { useTranslation } from 'react-i18next';
@@ -22,6 +22,7 @@ import { GuardianMth } from 'types/guardians';
 import { sleep } from '@portkey/utils';
 import { getAelfInstance } from '@portkey/utils/aelf';
 import { getTxResult } from 'utils/aelfUtils';
+import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 
 enum SwitchFail {
   default = 0,
@@ -41,6 +42,7 @@ export default function GuardiansView() {
   const { setLoading } = useLoading();
   const { walletInfo } = useCurrentWallet();
   const { passwordSeed } = useUserInfo();
+  const editable = useMemo(() => Object.keys(userGuardiansList ?? {}).length > 1, [userGuardiansList]);
 
   const handleSwitch = async () => {
     if (currentGuardian && currentGuardian.isLoginAccount) {
@@ -51,9 +53,17 @@ export default function GuardiansView() {
       if (loginAccountNum <= 1) {
         setSwitchFail(SwitchFail.closeFail);
       } else {
-        setTipOpen(true);
+        verifyHandler();
       }
     } else {
+      const isLogin = Object.values(userGuardiansList ?? {}).some(
+        (item: UserGuardianItem) =>
+          item.isLoginAccount && item.loginGuardianType === currentGuardian?.loginGuardianType,
+      );
+      if (isLogin) {
+        setTipOpen(true);
+        return;
+      }
       const checkResult = await getHolderInfo({
         rpcUrl: currentChain?.endPoint as string,
         address: currentChain?.caContractAddress as string,
@@ -119,13 +129,15 @@ export default function GuardiansView() {
             setCurrentGuardianAction({
               ...currentGuardian,
               isLoginAccount: false,
+              isInitStatus: true,
             }),
           );
           setLoading(false);
           setTipOpen(false);
         } catch (error: any) {
           setLoading(false);
-          message.error(error.Error);
+          console.log('---unsetLoginAccount-error', error);
+          message.error(error?.Error?.Message || error.message?.Message || error?.message);
         }
       } else {
         dispatch(
@@ -152,14 +164,16 @@ export default function GuardiansView() {
               guardiansType: currentGuardian?.guardiansType as LoginType,
               sessionId: result.verifierSessionId,
               key: currentGuardian?.key as string,
+              isInitStatus: true,
             }),
           );
           navigate('/setting/guardians/verifier-account', { state: 'guardians/setLoginAccount' });
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       setLoading(false);
-      console.log(error, 'verifyHandler');
+      message.error(error?.Error?.Message || error.message?.Message || error?.message);
+      console.log('---setLoginAccount-error', error);
     }
   };
 
@@ -204,7 +218,7 @@ export default function GuardiansView() {
             <span className="status">{currentGuardian?.isLoginAccount ? 'Open' : 'Close'}</span>
           </div>
         </div>
-        <div className="btn-wrap">
+        <div className="btn-wrap" style={{ display: editable ? '' : 'none' }}>
           <Button
             onClick={() => {
               navigate('/setting/guardians/edit');

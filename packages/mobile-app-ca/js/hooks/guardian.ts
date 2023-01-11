@@ -6,6 +6,7 @@ import { LoginInfo } from 'types/wallet';
 import { EmailError } from '@portkey/utils/check';
 import { VerifierItem } from '@portkey/types/verifier';
 
+// TODO: adjust this hooks name
 export const useGetGuardiansList = () => {
   const caContract = useCurrentViewCAContract();
   const getGuardiansList = useCallback(
