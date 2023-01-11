@@ -105,9 +105,9 @@ export default function GuardianApproval() {
           navigate('/setting/guardians/verifier-account', { state: state });
         }
       } catch (error: any) {
-        console.log(error, 'error===');
+        console.log('---guardian-sendCode-error', error);
         setLoading(false);
-        message.error(error?.error?.message ?? 'Something error');
+        message.error(error?.Error?.Message || error.message?.Message || error?.message);
       }
     },
     [dispatch, navigate, setLoading, state, walletInfo],
@@ -308,7 +308,8 @@ export default function GuardianApproval() {
       navigate('/setting/guardians');
     } catch (error: any) {
       setLoading(false);
-      message.error(error);
+      console.log('---op-guardian-error', error);
+      message.error(error?.Error?.Message || error.message?.Message || error?.message);
     }
   }, [
     currentChain,
