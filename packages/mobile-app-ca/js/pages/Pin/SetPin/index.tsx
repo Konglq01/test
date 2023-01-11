@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { TextL } from 'components/CommonText';
 import PageContainer from 'components/PageContainer';
 import DigitInput, { DigitInputInterface } from 'components/DigitInput';
@@ -39,32 +39,29 @@ export default function SetPin() {
     const listener = myEvents.clearSetPin.addListener(() => digitInput.current?.reset());
     return () => listener.remove();
   });
+  const leftCallback = useCallback(() => {
+    if (!oldPin && managerInfo) {
+      ActionSheet.alert({
+        title: 'Leave this page?',
+        message: MessageMap[managerInfo.verificationType],
+        buttons: [
+          { title: 'No', type: 'outline' },
+          // TODO: navigate
+          {
+            title: 'Yes',
+            onPress: () => {
+              if (managerInfo.verificationType === VerificationType.addManager) myEvents.clearQRWallet.emit();
+              navigationService.navigate(RouterMap[managerInfo.verificationType]);
+            },
+          },
+        ],
+      });
+    } else {
+      navigationService.goBack();
+    }
+  }, [managerInfo, oldPin]);
   return (
-    <PageContainer
-      titleDom
-      type="leftBack"
-      backTitle={oldPin ? 'Change Pin' : undefined}
-      leftCallback={() => {
-        if (!oldPin && managerInfo) {
-          ActionSheet.alert({
-            title: 'Leave this page?',
-            message: MessageMap[managerInfo.verificationType],
-            buttons: [
-              { title: 'No', type: 'outline' },
-              // TODO: navigate
-              {
-                title: 'Yes',
-                onPress: () => {
-                  if (managerInfo.verificationType === VerificationType.addManager) myEvents.clearQRWallet.emit();
-                  navigationService.navigate(RouterMap[managerInfo.verificationType]);
-                },
-              },
-            ],
-          });
-        } else {
-          navigationService.goBack();
-        }
-      }}>
+    <PageContainer titleDom type="leftBack" backTitle={oldPin ? 'Change Pin' : undefined} leftCallback={leftCallback}>
       <View style={styles.container}>
         <TextL style={GStyles.textAlignCenter}>
           {oldPin ? 'Please enter a new pin' : 'Enter pin to protect your device'}
