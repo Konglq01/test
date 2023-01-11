@@ -72,7 +72,6 @@ function SignupEmail() {
       <CommonInput
         label="Email"
         type="general"
-        value={email}
         placeholder={t('Enter Email')}
         maxLength={30}
         containerStyle={styles.inputContainerStyle}

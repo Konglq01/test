@@ -20,7 +20,6 @@ import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import myEvents from 'utils/deviceEvent';
 import { API_REQ_FUNCTION } from 'api/types';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
-import { sleep } from '@portkey/utils';
 import { useCurrentCAContract } from 'hooks/contract';
 import { setLoginAccount } from 'utils/guardian';
 
@@ -89,7 +88,6 @@ export default function VerifierDetails() {
     try {
       const req = await setLoginAccount(caContract, managerAddress, caHash, guardianItem);
       if (req && !req.error) {
-        await sleep(1000);
         myEvents.refreshGuardiansList.emit();
         navigationService.navigate('GuardianDetail', {
           guardian: JSON.stringify({ ...guardianItem, isLoginAccount: true }),
@@ -171,7 +169,7 @@ export default function VerifierDetails() {
         }
       } catch (error) {
         CommonToast.failError(error, 'Verify Fail');
-        digitInput.current?.resetPin();
+        digitInput.current?.reset();
       }
       Loading.hide();
     },
@@ -211,10 +209,10 @@ export default function VerifierDetails() {
           status: VerifyStatus.Verifying,
         });
         countdown.current?.resetTime(60);
-        digitInput.current?.resetPin();
+        digitInput.current?.reset();
       }
     } catch (error) {
-      digitInput.current?.resetPin();
+      digitInput.current?.reset();
       CommonToast.failError(error, 'Verify Fail');
     }
     Loading.hide();

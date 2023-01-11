@@ -1,7 +1,6 @@
 import { checkVerificationCode, sendVerificationCode } from '@portkey/api/apiUtils/verification';
-import { sleep } from '@portkey/utils';
 import { Button, message } from 'antd';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAppDispatch, useCommonState, useLoading } from 'store/Provider/hooks';
 import { PasscodeInput } from 'antd-mobile';
 import { loginInfo } from 'store/reducers/loginCache/type';
@@ -43,9 +42,10 @@ export default function VerifierPage({
   onSuccess,
 }: VerifierPageProps) {
   const { setLoading } = useLoading();
-  const [timer, setTimer] = useState<number | undefined>();
+  const [timer, setTimer] = useState<number>(0);
   const { isPrompt } = useCommonState();
   const [pinVal, setPinVal] = useState<string>();
+  const timerRef = useRef<NodeJS.Timer>();
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { state } = useLocation();
@@ -123,17 +123,21 @@ export default function VerifierPage({
     }
   }, [currentGuardian, dispatch, guardiansType, loginAccount, setLoading, verificationType]);
 
-  const timerUtil = useCallback(async () => {
-    if (!timer) return setTimer(undefined);
-    await sleep(1000);
-    setTimer((v) => (v ? --v : v));
-    timerUtil();
-  }, [timer]);
-
   useEffect(() => {
     if (timer !== MAX_TIMER) return;
-    timerUtil();
-  }, [timer, timerUtil]);
+    timerRef.current && clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setTimer((t) => {
+        const newTime = t - 1;
+        if (newTime <= 0) {
+          timerRef.current && clearInterval(timerRef.current);
+          timerRef.current = undefined;
+          return 0;
+        }
+        return newTime;
+      });
+    }, 1000);
+  }, [timer]);
 
   return (
     <div className={clsx('verifier-page-wrapper', isPrompt || 'popup-page')}>

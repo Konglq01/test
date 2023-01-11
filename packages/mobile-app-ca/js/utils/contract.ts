@@ -1,4 +1,4 @@
-import { sleep } from 'utils';
+import { sleep } from '@portkey/utils';
 import { AElfInterface } from '@portkey/types/aelf';
 import { getTxResult } from './aelfUtils';
 import { ChainType } from '@portkey/types';

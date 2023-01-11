@@ -251,7 +251,6 @@ const GuardianEdit: React.FC = () => {
             type="general"
             theme="white-bg"
             label={t("Guardian's email")}
-            value={email}
             placeholder={t('Enter email')}
             maxLength={30}
             onChangeText={onEmailTextChange}

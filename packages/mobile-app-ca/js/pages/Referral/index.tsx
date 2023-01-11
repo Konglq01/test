@@ -11,9 +11,10 @@ import { useLanguage } from 'i18n/hooks';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import Welcome from './components/Welcome';
 import { ImageBackground, StyleSheet } from 'react-native';
-import { screenHeight } from '@portkey/utils/mobile/device';
+import { isIos, screenHeight } from '@portkey/utils/mobile/device';
 import background from '../Login/img/background.png';
 import { BGStyles, FontStyles } from 'assets/theme/styles';
+import { sleep } from '@portkey/utils';
 
 export default function Referral() {
   const credentials = useCredentials();
@@ -21,6 +22,7 @@ export default function Referral() {
   const gStyles = useGStyles();
   const { t } = useLanguage();
   const init = useCallback(async () => {
+    if (!isIos) await sleep(200);
     await SplashScreen.hideAsync();
     if (walletInfo?.address) {
       let name: keyof RootStackParamList = 'SecurityLock';

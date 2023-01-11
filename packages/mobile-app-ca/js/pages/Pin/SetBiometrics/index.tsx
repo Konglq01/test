@@ -24,7 +24,6 @@ import { setCAInfo } from '@portkey/store/store-ca/wallet/actions';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 import { handleError } from '@portkey/utils';
 import { VerificationType } from '@portkey/types/verifier';
-import useEffectOnce from 'hooks/useEffectOnce';
 import CommonToast from 'components/CommonToast';
 const ScrollViewProps = { disabled: true };
 export default function SetBiometrics() {
@@ -116,16 +115,9 @@ export default function SetBiometrics() {
       dispatch(setBiometrics(false));
       await getResult();
     } catch (error) {
-      console.log(error, 'onSkip');
-
       CommonToast.failError(error);
     }
   }, [dispatch, getResult]);
-  useEffectOnce(() => {
-    setTimeout(() => {
-      openBiometrics();
-    }, 100);
-  });
   return (
     <PageContainer scrollViewProps={ScrollViewProps} leftDom titleDom containerStyles={styles.containerStyles}>
       <Touchable style={GStyles.itemCenter} onPress={openBiometrics}>

@@ -167,6 +167,8 @@ function GuardianItemButton({
     <CommonButton
       type="primary"
       disabled={disabled}
+      disabledTitleStyle={styles.disabledTitleStyle}
+      disabledStyle={styles.disabledItemStyle}
       {...buttonProps}
       titleStyle={[styles.titleStyle, fonts.mediumFont, buttonProps.titleStyle]}
       buttonStyle={[styles.buttonStyle, buttonProps.buttonStyle]}
@@ -188,7 +190,7 @@ export default function GuardianAccountItem({
 }: GuardianAccountItemProps) {
   console.log(guardianItem, '=====guardianItem');
   const itemStatus = useMemo(() => guardiansStatus?.[guardianItem.key], [guardianItem.key, guardiansStatus]);
-  const disabled = isSuccess && !itemStatus;
+  const disabled = isSuccess && itemStatus?.status !== VerifyStatus.Verified;
   return (
     <View style={[styles.itemRow, isBorderHide && styles.itemWithoutBorder, disabled && styles.disabledStyle]}>
       {guardianItem.isLoginAccount && (
@@ -271,5 +273,11 @@ const styles = StyleSheet.create({
   },
   disabledStyle: {
     opacity: 0.4,
+  },
+  disabledTitleStyle: {
+    opacity: 1,
+  },
+  disabledItemStyle: {
+    opacity: 1,
   },
 });

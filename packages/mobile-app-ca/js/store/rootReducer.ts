@@ -11,7 +11,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { persistReducer } from 'redux-persist';
 import userSlice from './user/slice';
-import { counterSlice } from './counter/slice';
 import { rateApi } from '@portkey/store/rate/api';
 import { recentSlice } from '@portkey/store/store-ca/recent/slice';
 import { assetsSlice } from '@portkey/store/store-ca/assets/slice';
@@ -59,7 +58,6 @@ export const recentReducer = persistReducer(recentPersistConfig, recentSlice.red
 export const guardiansReducer = persistReducer(guardiansPersistConfig, guardiansSlice.reducer);
 
 const rootReducer = combineReducers({
-  [counterSlice.name]: counterSlice.reducer,
   [userSlice.name]: userReducer,
   [walletSlice.name]: walletSlice.reducer,
   [addressBook.name]: addressBook.reducer,

@@ -20,8 +20,27 @@ export default function CheckPin() {
   const pinRef = useRef<DigitInputInterface>();
   useFocusEffect(
     useCallback(() => {
-      pinRef.current?.resetPin();
+      pinRef.current?.reset();
     }, []),
+  );
+  const onChangeText = useCallback(
+    (pin: string) => {
+      if (pin.length === PIN_SIZE) {
+        if (!checkPin(pin)) {
+          pinRef.current?.reset();
+          return setErrorMessage(PinErrorMessage.invalidPin);
+        }
+        if (openBiometrics) {
+          myEvents.openBiometrics.emit(pin);
+          navigationService.goBack();
+        } else {
+          navigationService.navigate('SetPin', { oldPin: pin });
+        }
+      } else if (errorMessage) {
+        setErrorMessage(undefined);
+      }
+    },
+    [errorMessage, openBiometrics],
   );
   return (
     <PageContainer titleDom type="leftBack" backTitle={!openBiometrics ? 'Change Pin' : 'Authentication'}>
@@ -33,22 +52,7 @@ export default function CheckPin() {
           secureTextEntry
           style={styles.pinStyle}
           errorMessage={errorMessage}
-          onChangeText={pin => {
-            if (pin.length === PIN_SIZE) {
-              if (!checkPin(pin)) {
-                pinRef.current?.resetPin();
-                return setErrorMessage(PinErrorMessage.invalidPin);
-              }
-              if (openBiometrics) {
-                myEvents.openBiometrics.emit(pin);
-                navigationService.goBack();
-              } else {
-                navigationService.navigate('SetPin', { oldPin: pin });
-              }
-            } else if (errorMessage) {
-              setErrorMessage(undefined);
-            }
-          }}
+          onChangeText={onChangeText}
         />
       </View>
     </PageContainer>

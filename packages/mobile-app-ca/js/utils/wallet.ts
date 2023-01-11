@@ -1,11 +1,12 @@
 import { request } from 'api';
 import { CAInfo, ManagerInfo } from '@portkey/types/types-ca/wallet';
 import { VerificationType } from '@portkey/types/verifier';
-import { clearTimeoutInterval, setTimeoutInterval } from './Interval';
+import { clearTimeoutInterval, setTimeoutInterval } from '@portkey/utils/interval';
 import Loading from 'components/Loading';
 import CommonToast from 'components/CommonToast';
 import { queryFailAlert } from './login';
 import { AppDispatch } from 'store';
+import { ContractBasic } from './contract';
 
 export type TimerResult = {
   remove: () => void;
@@ -60,4 +61,24 @@ export function onResultFail(dispatch: AppDispatch, message: string, isRecovery?
   Loading.hide();
   CommonToast.fail(message);
   queryFailAlert(dispatch, isRecovery, isReset);
+}
+
+export async function addManager({
+  contract,
+  address,
+  caHash,
+  managerAddress,
+}: {
+  contract: ContractBasic;
+  address: string;
+  caHash: string;
+  managerAddress?: string;
+}) {
+  return contract.callSendMethod('AddManager', address, {
+    caHash,
+    manager: {
+      managerAddress,
+      deviceString: new Date().getTime(),
+    },
+  });
 }
