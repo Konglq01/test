@@ -17,7 +17,6 @@ import { FontStyles } from 'assets/theme/styles';
 import { getChainListAsync } from '@portkey/store/store-ca/wallet/actions';
 import { useAppDispatch } from 'store/hooks';
 import { useWallet } from 'hooks/store';
-import { ChainItemType } from '@portkey/store/store-ca/wallet/type';
 
 interface ContactDetailProps {
   route?: any;
@@ -31,15 +30,7 @@ const ContactDetail: React.FC<ContactDetailProps> = ({ route }) => {
   useEffect(() => {
     appDispatch(getChainListAsync());
   }, [appDispatch]);
-  const { chainList, currentNetwork } = useWallet();
-
-  const chainMap = useMemo(() => {
-    const _chainMap: { [k: string]: ChainItemType } = {};
-    chainList.forEach(item => {
-      _chainMap[item.chainId] = item;
-    });
-    return _chainMap;
-  }, [chainList]);
+  const { currentNetwork } = useWallet();
 
   const contact = useMemo<ContactItemType>(() => params.contact && JSON.parse(params.contact), [params]);
 
@@ -48,7 +39,7 @@ const ContactDetail: React.FC<ContactDetailProps> = ({ route }) => {
       <View key={addressItem.id} style={pageStyles.addressWrap}>
         <View style={pageStyles.addressInfo}>
           <TextM style={pageStyles.addressLabel}>
-            ELF_{addressItem.address}_{chainMap[addressItem.chainId]?.chainId}
+            ELF_{addressItem.address}_{addressItem.chainId}
           </TextM>
           <TextS style={FontStyles.font3}>AELF {currentNetwork}</TextS>
         </View>
@@ -63,7 +54,7 @@ const ContactDetail: React.FC<ContactDetailProps> = ({ route }) => {
         </Touchable>
       </View>
     ),
-    [chainMap, currentNetwork, t],
+    [currentNetwork, t],
   );
 
   return (

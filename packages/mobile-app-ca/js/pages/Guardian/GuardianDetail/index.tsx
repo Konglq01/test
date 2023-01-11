@@ -12,7 +12,7 @@ import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import CommonSwitch from 'components/CommonSwitch';
 import ActionSheet from 'components/ActionSheet';
 import { useGuardiansInfo } from 'hooks/store';
-import { useGetGuardiansList, useGetHolderInfo } from 'hooks/guardian';
+import { useGetGuardiansList } from 'hooks/guardian';
 import Loading from 'components/Loading';
 import { randomId, sleep } from '@portkey/utils';
 import { request } from 'api';
