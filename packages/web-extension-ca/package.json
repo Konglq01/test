@@ -117,6 +117,7 @@
     "node": ">=15.9.0"
   },
   "scripts": {
+    "prepro": "yarn workspace @portkey/constants run handle-network",
     "lint": "eslint .",
     "autod": "autod",
     "commit": "git-cz",
