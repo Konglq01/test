@@ -14,7 +14,7 @@ import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { useGetHolderInfo } from 'hooks/guardian';
 import useEffectOnce from 'hooks/useEffectOnce';
 import myEvents from 'utils/deviceEvent';
-import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
+import CommonToast from 'components/CommonToast';
 
 export default function GuardianHome() {
   const { t } = useLanguage();
@@ -22,44 +22,21 @@ export default function GuardianHome() {
   const { userGuardiansList } = useGuardiansInfo();
 
   const { caHash } = useCurrentWalletInfo();
-  const userGuardiansListRef = useRef<UserGuardianItem[]>();
-  userGuardiansListRef.current = userGuardiansList;
 
   const getGuardiansList = useGetHolderInfo();
   const refreshGuardiansList = useCallback(async () => {
-    const preGuardiansListString = JSON.stringify(userGuardiansListRef.current);
     try {
-      await new Promise(resolve => {
-        let times = 0;
-        const timer = setInterval(async () => {
-          times++;
-          try {
-            await getGuardiansList({
-              caHash,
-            });
-          } catch (err) {
-            console.log(err);
-          }
-
-          console.log(times, userGuardiansListRef.current);
-          if (preGuardiansListString !== JSON.stringify(userGuardiansListRef.current)) {
-            clearInterval(timer);
-            resolve(true);
-          } else if (times >= 5) {
-            console.log('too many times');
-            clearInterval(timer);
-          }
-        }, 1000);
+      await getGuardiansList({
+        caHash,
       });
     } catch (error) {
-      console.log('error', error);
+      // TODO: remove Toast
+      CommonToast.failError(error);
     }
   }, [caHash, getGuardiansList]);
 
   useEffectOnce(() => {
-    getGuardiansList({
-      caHash,
-    });
+    refreshGuardiansList();
   });
 
   useEffect(() => {
