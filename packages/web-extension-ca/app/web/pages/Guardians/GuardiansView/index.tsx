@@ -22,6 +22,7 @@ import { GuardianMth } from 'types/guardians';
 import { sleep } from '@portkey/utils';
 import { getAelfInstance } from '@portkey/utils/aelf';
 import { getTxResult } from 'utils/aelfUtils';
+import BaseVerifierIcon from 'components/BaseVerifierIcon';
 // import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 
 enum SwitchFail {
@@ -52,7 +53,6 @@ export default function GuardiansView() {
             AESEncryptPrivateKey: walletInfo.AESEncryptPrivateKey,
           },
           passwordSeed,
-          // '11111111',
         );
         if (!currentChain?.endPoint || !res?.privateKey) return message.error('error');
         setLoading(true);
@@ -140,7 +140,7 @@ export default function GuardiansView() {
   const handleSwitch = useCallback(
     async (status: boolean) => {
       if (status) {
-        // II TODO: this logic will be added
+        // TODO: this logic will be added
         // const isLogin = Object.values(userGuardiansList ?? {}).some(
         //   (item: UserGuardianItem) =>
         //     item.isLoginAccount && item.loginGuardianType === currentGuardian?.loginGuardianType,
@@ -150,26 +150,15 @@ export default function GuardiansView() {
         //   return;
         // }
         try {
-          const checkResult = await getHolderInfo({
+          await getHolderInfo({
             rpcUrl: currentChain?.endPoint as string,
             address: currentChain?.caContractAddress as string,
             chainType: currentNetwork.walletType,
             paramsOption: {
-              loginGuardianType: currentGuardian?.loginGuardianType as string,
-              // caHash: walletInfo.caHash,
+              loginGuardianType: currentGuardian?.loginGuardianType,
             },
           });
-          if (checkResult.result.guardiansInfo?.guardians?.length > 0) {
-            const loginAccountIndex = checkResult.result.guardiansInfo?.loginGuardianTypeIndexes || [];
-            const index = checkResult.result.guardiansInfo?.guardians.findIndex(
-              (item: any) => item.guardianType.guardianType === currentGuardian?.guardiansType,
-            );
-            if (loginAccountIndex.includes(index)) {
-              setSwitchFail(SwitchFail.openFail);
-            } else {
-              setTipOpen(true);
-            }
-          }
+          setSwitchFail(SwitchFail.openFail);
         } catch (error: any) {
           console.log('---setLoginAccount-err', error);
           if (error?.Error?.Details && error?.Error?.Details?.indexOf('Not found ca_hash')) {
@@ -190,7 +179,14 @@ export default function GuardiansView() {
         }
       }
     },
-    [currentChain, currentGuardian, currentNetwork.walletType, userGuardiansList, verifyHandler, walletInfo.caHash],
+    [
+      currentChain?.caContractAddress,
+      currentChain?.endPoint,
+      currentGuardian?.loginGuardianType,
+      currentNetwork.walletType,
+      userGuardiansList,
+      verifyHandler,
+    ],
   );
 
   return (
@@ -221,7 +217,7 @@ export default function GuardiansView() {
           <div className="input-item">
             <div className="label">{t('Verifier')}</div>
             <div className="control">
-              <img src={currentGuardian?.verifier?.imageUrl} alt="icon" />
+              <BaseVerifierIcon width={32} height={32} src={currentGuardian?.verifier?.imageUrl} />
               <span>{currentGuardian?.verifier?.name ?? ''}</span>
             </div>
           </div>

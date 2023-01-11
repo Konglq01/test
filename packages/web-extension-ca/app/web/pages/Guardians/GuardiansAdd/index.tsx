@@ -21,6 +21,7 @@ import './index.less';
 import useGuardianList from 'hooks/useGuardianList';
 import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import BaseVerifierIcon from 'components/BaseVerifierIcon';
 
 const guardianList = [{ label: 'Email', value: LoginType.email }];
 
@@ -54,7 +55,7 @@ export default function AddGuardian() {
         value: item.name,
         children: (
           <div className="flex select-option">
-            <img src={item.imageUrl || item.url} alt="icon" />
+            <BaseVerifierIcon width={32} height={32} src={item.imageUrl} />
             <span className="title">{item.name}</span>
           </div>
         ),

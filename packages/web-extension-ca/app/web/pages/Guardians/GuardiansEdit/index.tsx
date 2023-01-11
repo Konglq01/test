@@ -19,6 +19,7 @@ import useGuardianList from 'hooks/useGuardianList';
 import { LoginType } from '@portkey/types/types-ca/wallet';
 import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
 import { VerifierItem } from '@portkey/types/verifier';
+import BaseVerifierIcon from 'components/BaseVerifierIcon';
 
 export default function GuardiansEdit() {
   const { t } = useTranslation();
@@ -40,7 +41,7 @@ export default function GuardiansEdit() {
         value: item.name,
         children: (
           <div className="flex verifier-option">
-            <img src={item.imageUrl} alt="icon" />
+            <BaseVerifierIcon width={32} height={32} src={item.imageUrl} />
             <span className="title">{item.name}</span>
           </div>
         ),
