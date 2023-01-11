@@ -2,7 +2,7 @@ import { Form, FormInstance } from 'antd';
 import CustomPassword from 'components/CustomPassword';
 import { ReactNode, useEffect, useState } from 'react';
 import { isValidPassword } from '@portkey/utils/reg';
-import { PasswordErrorMessage } from '@portkey/utils/wallet/types';
+import { PinErrorMessage } from '@portkey/utils/wallet/types';
 import './index.less';
 import { useTranslation } from 'react-i18next';
 
@@ -81,16 +81,16 @@ export default function ConfirmPassword({
               if (value.length < 8) {
                 setCreateValidate({
                   validateStatus: 'error',
-                  errorMsg: t(PasswordErrorMessage.passwordNotLong),
+                  errorMsg: t(PinErrorMessage.PinNotLong),
                 });
-                return Promise.reject(t(PasswordErrorMessage.passwordNotLong));
+                return Promise.reject(t(PinErrorMessage.PinNotLong));
               }
               if (!isValidPassword(value)) {
                 setCreateValidate({
                   validateStatus: 'error',
-                  errorMsg: t(PasswordErrorMessage.invalidPin),
+                  errorMsg: t(PinErrorMessage.invalidPin),
                 });
-                return Promise.reject(t(PasswordErrorMessage.invalidPin));
+                return Promise.reject(t(PinErrorMessage.invalidPin));
               }
               setCreateValidate({
                 validateStatus: 'success',
