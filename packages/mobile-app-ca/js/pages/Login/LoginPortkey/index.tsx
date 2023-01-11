@@ -55,7 +55,6 @@ function LoginEmail({ setLoginType }: { setLoginType: (type: LoginType) => void 
     setErrorMessage(message);
     if (message) return;
     setErrorMessage(undefined);
-    // TODO Login
     Loading.show();
     await sleep(100);
     try {
