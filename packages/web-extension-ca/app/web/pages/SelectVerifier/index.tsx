@@ -16,7 +16,6 @@ import { verifyErrorHandler } from 'utils/tryErrorHandler';
 export default function SelectVerifier() {
   const { verifierMap } = useGuardiansInfo();
   const { loginAccount } = useLoginInfo();
-  const [selectVal, setSelectVal] = useState<string>('portkey');
   const [open, setOpen] = useState<boolean>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -27,8 +26,6 @@ export default function SelectVerifier() {
     setSelectVal(value);
   }, []);
 
-  const selectItem = useMemo(() => verifierMap?.[selectVal], [selectVal, verifierMap]);
-
   const selectOptions = useMemo(
     () =>
       Object.values(verifierMap ?? {})?.map((item) => ({
@@ -38,6 +35,10 @@ export default function SelectVerifier() {
       })),
     [verifierMap],
   );
+
+  const [selectVal, setSelectVal] = useState<string>(selectOptions?.[0]?.value);
+
+  const selectItem = useMemo(() => verifierMap?.[selectVal], [selectVal, verifierMap]);
 
   const verifyHandler = useCallback(async () => {
     try {
