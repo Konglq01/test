@@ -25,9 +25,6 @@ export function queryFailAlert(dispatch: AppDispatch, isRecovery?: boolean, isRe
   });
 }
 export function handleUserGuardiansList(holderInfo: any, verifierServers: VerifierItem[]) {
-  console.log(holderInfo, '====holderInfo');
-  console.log(verifierServers, '====verifierServers');
-
   return holderInfo.guardians.map((item: any, index: number) => {
     return {
       ...item,

@@ -158,7 +158,7 @@ export default function SecurityLock() {
     (enterPin: string) => {
       if (enterPin.length === PIN_SIZE) {
         if (!checkPin(enterPin)) {
-          digitInput.current?.resetPin();
+          digitInput.current?.reset();
           setErrorMessage('Incorrect Pin');
           return;
         }

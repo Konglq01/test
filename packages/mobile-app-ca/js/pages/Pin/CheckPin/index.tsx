@@ -20,7 +20,7 @@ export default function CheckPin() {
   const pinRef = useRef<DigitInputInterface>();
   useFocusEffect(
     useCallback(() => {
-      pinRef.current?.resetPin();
+      pinRef.current?.reset();
     }, []),
   );
   return (
@@ -36,7 +36,7 @@ export default function CheckPin() {
           onChangeText={pin => {
             if (pin.length === PIN_SIZE) {
               if (!checkPin(pin)) {
-                pinRef.current?.resetPin();
+                pinRef.current?.reset();
                 return setErrorMessage(PinErrorMessage.invalidPin);
               }
               if (openBiometrics) {
