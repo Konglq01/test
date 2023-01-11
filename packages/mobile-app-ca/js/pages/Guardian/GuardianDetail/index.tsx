@@ -138,7 +138,7 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
             if (holderInfo.guardians) {
               Loading.hide();
               ActionSheet.alert({
-                title2: t(`This account address is already a login account of other wallets and cannot be used`),
+                title2: t(`This account address is already a login account and cannot be used`),
                 buttons: [
                   {
                     title: t('Close'),
