@@ -1,4 +1,4 @@
-import { randomId } from '@portkey/utils';
+import { randomId } from '.';
 
 const timeWorker: any = {};
 

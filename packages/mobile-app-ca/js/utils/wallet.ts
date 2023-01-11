@@ -1,7 +1,7 @@
 import { request } from 'api';
 import { CAInfo, ManagerInfo } from '@portkey/types/types-ca/wallet';
 import { VerificationType } from '@portkey/types/verifier';
-import { clearTimeoutInterval, setTimeoutInterval } from './Interval';
+import { clearTimeoutInterval, setTimeoutInterval } from '@portkey/utils/interval';
 import Loading from 'components/Loading';
 import CommonToast from 'components/CommonToast';
 import { queryFailAlert } from './login';
