@@ -2,7 +2,6 @@ import { Action, configureStore, ThunkAction } from '@reduxjs/toolkit';
 import { persistReducer } from 'redux-persist';
 import storeConfig from './config';
 import rootReducer from './rootReducer';
-import { testApi } from './testApi/slice';
 import { rateApi } from '@portkey/store/rate/api';
 
 const persistedReducer = persistReducer(storeConfig.reduxPersistConfig, rootReducer);
@@ -13,7 +12,6 @@ if (__DEV__) {
   const createDebugger = require('redux-flipper').default;
   middlewareList.push(createDebugger());
 }
-middlewareList.push(testApi.middleware);
 middlewareList.push(rateApi.middleware);
 
 export const store = configureStore({
