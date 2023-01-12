@@ -86,14 +86,16 @@ function LoginEmail({ setLoginType }: { setLoginType: (type: LoginType) => void 
         <Image source={qrCode} style={styles.iconStyle} />
       </Touchable>
       <CommonInput
+        value={email}
         label="Email"
         type="general"
-        placeholder={t('Enter Email')}
         maxLength={30}
-        containerStyle={styles.inputContainerStyle}
+        autoCorrect={false}
         onChangeText={setEmail}
         errorMessage={errorMessage}
         keyboardType="email-address"
+        placeholder={t('Enter Email')}
+        containerStyle={styles.inputContainerStyle}
       />
       <CommonButton style={GStyles.marginTop(15)} disabled={!email} type="primary" loading={loading} onPress={onLogin}>
         {t('Log In')}
