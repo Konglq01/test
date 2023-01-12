@@ -111,7 +111,7 @@ export default function SelectVerifier() {
           open={open}
           width={320}
           onCancel={() => setOpen(false)}>
-          <p className="modal-content">{`${t('Portkey will send a verification code to')} ${
+          <p className="modal-content">{`${t('verificationCodeTip', { verifier: selectItem?.name })} ${
             loginAccount.loginGuardianType
           } ${t('to verify your email address.')}`}</p>
           <div className="btn-wrapper">

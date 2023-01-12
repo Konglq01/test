@@ -47,6 +47,7 @@ const allowedMethod = [
   PortkeyMessageTypes.LOCK_WALLET,
   PortkeyMessageTypes.CLOSE_PROMPT,
   PortkeyMessageTypes.REGISTER_WALLET,
+  PortkeyMessageTypes.OPEN_PROMPT,
   PortkeyMessageTypes.LOGIN_WALLET,
   PortkeyMessageTypes.CHECK_WALLET_STATUS,
   PortkeyMessageTypes.EXPAND_FULL_SCREEN,
@@ -63,6 +64,7 @@ const PortkeyMethod = [
   PortkeyMessageTypes.LOCK_WALLET,
   PortkeyMessageTypes.CHECK_WALLET_STATUS,
   PortkeyMessageTypes.CLOSE_PROMPT,
+  PortkeyMessageTypes.OPEN_PROMPT,
   PortkeyMessageTypes.REGISTER_WALLET,
   PortkeyMessageTypes.LOGIN_WALLET,
   PortkeyMessageTypes.EXPAND_FULL_SCREEN,
@@ -168,6 +170,9 @@ export default class ServiceWorkerInstantiate {
           break;
         case PortkeyMessageTypes.CLOSE_PROMPT:
           this.notificationServiceClose(sendResponse, message.payload);
+          break;
+        case PortkeyMessageTypes.OPEN_PROMPT:
+          this.openPrompt(sendResponse, message.payload);
           break;
         case PortkeyMessageTypes.REGISTER_WALLET:
           ServiceWorkerInstantiate.checkRegisterStatus();
@@ -308,6 +313,12 @@ export default class ServiceWorkerInstantiate {
         ...errorHandler(500001, error),
       });
     }
+  }
+
+  // TODO pref
+  async openPrompt(sendResponse: SendResponseFun, payload: { method: string }) {
+    await notificationService.openPrompt(payload as any, 'tabs');
+    sendResponse(errorHandler(0));
   }
 
   async checkWalletStatus(sendResponse: SendResponseFun) {

@@ -179,7 +179,7 @@ export default function AddGuardian() {
         <CustomSelect
           className="select"
           value={guardianType}
-          placeholder={'Select Guardians Type'}
+          placeholder={'Select guardian types'}
           style={{ width: '100%' }}
           onChange={guardianTypeChange}
           items={guardianTypeOptions}
@@ -204,7 +204,7 @@ export default function AddGuardian() {
         <CustomSelect
           className="select"
           value={verifierVal}
-          placeholder={'Select Guardians Verifier'}
+          placeholder={'Select guardian verifiers'}
           style={{ width: '100%' }}
           onChange={verifierChange}
           items={verifierOptions}

@@ -1,11 +1,20 @@
-import { Button } from 'antd';
+import { Button, message } from 'antd';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
 import CommonModal from 'components/CommonModal';
-// import { resetWallet } from '@portkey/store/store-ca/wallet/actions';
-// import { useAppDispatch } from 'store/Provider/hooks';
 import './index.less';
+import { useCurrentWallet, useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import getPrivateKeyAndMnemonic from 'utils/Wallet/getPrivateKeyAndMnemonic';
+import { useLoading, useUserInfo } from 'store/Provider/hooks';
+import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+import { removeManager } from 'utils/sandboxUtil/removeManager';
+import { getAelfInstance } from '@portkey/utils/aelf';
+import { getTxResult } from 'utils/aelfUtils';
+import { sleep } from '@portkey/utils';
+import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
+import InternalMessage from 'messages/InternalMessage';
+import InternalMessageTypes, { PromptRouteTypes } from 'messages/InternalMessageTypes';
+import { clearLocalStorage } from 'utils/storage/chromeStorage';
 
 interface ExitWalletProps {
   open: boolean;
@@ -14,15 +23,60 @@ interface ExitWalletProps {
 
 export default function ExitWallet({ open, onCancel }: ExitWalletProps) {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  // const dispatch = useAppDispatch();
+  const { walletInfo } = useCurrentWallet();
+  const wallet = useCurrentWalletInfo();
+  const { passwordSeed } = useUserInfo();
+  const currentChain = useCurrentChain();
+  const { setLoading } = useLoading();
+  const currentNetwork = useCurrentNetworkInfo();
 
   const onConfirm = useCallback(async () => {
-    // TODO: social recovery exist cur account
-    // dispatch(resetWallet());
-    //  recovery
-    navigate('/');
-  }, []);
+    try {
+      const res = await getPrivateKeyAndMnemonic(
+        {
+          AESEncryptPrivateKey: walletInfo.AESEncryptPrivateKey,
+        },
+        passwordSeed,
+      );
+      if (!currentChain?.endPoint || !res?.privateKey) return message.error('error');
+      setLoading(true);
+      const result = await removeManager({
+        rpcUrl: currentChain.endPoint,
+        chainType: currentNetwork.walletType,
+        address: currentChain.caContractAddress,
+        privateKey: res.privateKey,
+        paramsOption: {
+          caHash: wallet?.caHash as string,
+          manager: {
+            managerAddress: wallet.address,
+            deviceString: new Date().getTime(),
+          },
+        },
+      });
+      const { TransactionId } = result.result.message || result;
+      await sleep(1000);
+      const aelfInstance = getAelfInstance(currentChain.endPoint);
+      await getTxResult(aelfInstance, TransactionId);
+      clearLocalStorage();
+      setLoading(false);
+      InternalMessage.payload(InternalMessageTypes.OPEN_PROMPT, {
+        method: PromptRouteTypes.REGISTER_WALLET_START,
+      }).send();
+    } catch (error: any) {
+      setLoading(false);
+      message.error(error);
+      console.log('---exist wallet error', error);
+    }
+  }, [
+    currentChain?.caContractAddress,
+    currentChain?.endPoint,
+    currentNetwork.walletType,
+    passwordSeed,
+    setLoading,
+    wallet.address,
+    wallet?.caHash,
+    walletInfo.AESEncryptPrivateKey,
+  ]);
 
   return (
     <CommonModal

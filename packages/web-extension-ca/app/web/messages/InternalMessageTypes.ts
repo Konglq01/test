@@ -21,6 +21,7 @@ export const PromptRouteTypes = {
   CONNECT_WALLET: 'CONNECT_WALLET',
   SIGN_MESSAGE: 'SIGN_MESSAGE',
   EXPAND_FULL_SCREEN: 'EXPAND_FULL_SCREEN',
+  REGISTER_WALLET_START: 'REGISTER_WALLET_START',
 } as const;
 
 export const AelfMessageTypes = aelfMessage;
