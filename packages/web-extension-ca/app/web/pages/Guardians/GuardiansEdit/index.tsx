@@ -169,14 +169,14 @@ export default function GuardiansEdit() {
           onChange={handleChange}
           items={selectOptions}
         />
-        {exist && <div className="error">{t('This guardians is already exists')}</div>}
+        {exist && <div className="error">{t('This guardian already exists')}</div>}
       </div>
       <div className="btn-wrap">
         <Button className="warning" onClick={checkRemove}>
           {t('Remove')}
         </Button>
         <Button onClick={guardiansChangeHandler} disabled={disabled} type="primary">
-          {t('Guardians Approval')}
+          {t('Send Request')}
         </Button>
       </div>
       <CommonModal
@@ -185,7 +185,7 @@ export default function GuardiansEdit() {
         width={320}
         className={'remove-modal'}
         onCancel={() => setRemoveOpen(false)}>
-        <p className="modal-content">{t('The guardian is login account and cannot be remove')}</p>
+        <p className="modal-content">{t('This guardian is login account and cannot be remove')}</p>
         <div style={{ padding: '15px 16px 17px 16px' }}>
           <Button type="primary" style={{ borderRadius: 24 }} onClick={() => setRemoveClose(false)}>
             {t('OK')}
@@ -203,7 +203,7 @@ export default function GuardiansEdit() {
         <div className="btn-wrap">
           <Button onClick={() => setRemoveOpen(false)}>{t('Close')}</Button>
           <Button type="primary" onClick={removeHandler}>
-            {t('Guardians Approval')}
+            {t('Send Request')}
           </Button>
         </div>
       </CommonModal>

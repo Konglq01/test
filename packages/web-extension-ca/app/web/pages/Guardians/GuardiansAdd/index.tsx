@@ -187,11 +187,11 @@ export default function AddGuardian() {
       </div>
       {guardianType === LoginType.email && (
         <div className="input-item">
-          <p className="label">Guardian email</p>
+          <p className="label">{"Guardian's email"}</p>
           <Input
             className="login-input"
             value={emailVal}
-            placeholder="Enter Email"
+            placeholder="Enter email"
             onChange={(e) => {
               handleInputChange(e.target.value);
             }}
@@ -209,7 +209,7 @@ export default function AddGuardian() {
           onChange={verifierChange}
           items={verifierOptions}
         />
-        {exist && <div className="error">This guardian is already exist</div>}
+        {exist && <div className="error">This guardian already exists</div>}
       </div>
       <div className="btn-wrap">
         <Button type="primary" onClick={handleCheck} disabled={disabled}>

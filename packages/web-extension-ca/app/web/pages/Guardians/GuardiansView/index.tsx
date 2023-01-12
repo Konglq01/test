@@ -236,7 +236,7 @@ export default function GuardiansView() {
               navigate('/setting/guardians/edit');
             }}
             type="primary">
-            {t('Edit')}
+            {t('Change Verifier')}
           </Button>
         </div>
       </div>
@@ -254,7 +254,7 @@ export default function GuardiansView() {
       <CommonModal open={!!switchFail} closable={false} className="login-account-tip-modal">
         <p className="modal-content">
           {switchFail === SwitchFail.closeFail
-            ? t('This guardian is the only Login account and cannot be turn off')
+            ? t('This guardian is the only login account and cannot be turned off')
             : t('This account address is already a login account and cannot be used')}
         </p>
         <div style={{ padding: '15px 16px 17px 16px' }}>
