@@ -148,7 +148,6 @@ export default function GuardianApproval() {
     Loading.show();
     try {
       const caContract = await getCurrentCAContract();
-
       const req = await addGuardian(
         caContract,
         managerAddress,
@@ -185,7 +184,6 @@ export default function GuardianApproval() {
     Loading.show();
     try {
       const caContract = await getCurrentCAContract();
-
       const req = await deleteGuardian(
         caContract,
         managerAddress,
@@ -216,7 +214,6 @@ export default function GuardianApproval() {
     Loading.show();
     try {
       const caContract = await getCurrentCAContract();
-
       const req = await editGuardian(
         caContract,
         managerAddress,
