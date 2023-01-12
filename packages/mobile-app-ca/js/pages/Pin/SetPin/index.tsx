@@ -40,8 +40,8 @@ export default function SetPin() {
     return () => listener.remove();
   });
   const leftCallback = useCallback(() => {
-    if (!oldPin && managerInfo) {
-      ActionSheet.alert({
+    if (!oldPin && managerInfo && managerInfo.verificationType !== VerificationType.communityRecovery)
+      return ActionSheet.alert({
         title: 'Leave this page?',
         message: MessageMap[managerInfo.verificationType],
         buttons: [
@@ -56,9 +56,11 @@ export default function SetPin() {
           },
         ],
       });
-    } else {
-      navigationService.goBack();
-    }
+
+    if (managerInfo && MessageMap[managerInfo.verificationType])
+      return navigationService.navigate(RouterMap[managerInfo.verificationType]);
+
+    navigationService.goBack();
   }, [managerInfo, oldPin]);
   return (
     <PageContainer titleDom type="leftBack" backTitle={oldPin ? 'Change Pin' : undefined} leftCallback={leftCallback}>
