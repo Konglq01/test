@@ -14,7 +14,7 @@ import useRouterParams from '@portkey/hooks/useRouterParams';
 import { LoginQRData } from '@portkey/types/types-ca/qrcode';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import CommonToast from 'components/CommonToast';
-import { useCurrentCAContract } from 'hooks/contract';
+import { useGetCurrentCAContract } from 'hooks/contract';
 import { addManager } from 'utils/wallet';
 const ScrollViewProps = { disabled: true };
 export default function ScanLogin() {
@@ -23,20 +23,20 @@ export default function ScanLogin() {
 
   const { caHash, address } = useCurrentWalletInfo();
   const [loading, setLoading] = useState<boolean>();
-  const caContract = useCurrentCAContract();
+  const getCurrentCAContract = useGetCurrentCAContract();
   const onLogin = useCallback(async () => {
     if (!caHash || loading) return;
     try {
-      if (!caContract) throw Error('contract init error');
+      const contract = await getCurrentCAContract();
       setLoading(true);
-      const req = await addManager({ contract: caContract, caHash, address, managerAddress });
+      const req = await addManager({ contract, caHash, address, managerAddress });
       if (req?.error) throw req?.error;
       navigationService.navigate('Tab');
     } catch (error) {
       CommonToast.failError(error);
     }
     setLoading(false);
-  }, [caHash, loading, caContract, managerAddress, address]);
+  }, [caHash, loading, getCurrentCAContract, address, managerAddress]);
   return (
     <PageContainer
       scrollViewProps={ScrollViewProps}
