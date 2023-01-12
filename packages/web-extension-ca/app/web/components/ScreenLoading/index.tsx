@@ -1,4 +1,4 @@
-import CustomSvg from 'components/CustomSvg';
+import Loading from 'components/Loading';
 import { useAppSelector } from 'store/Provider/hooks';
 import './index.less';
 
@@ -15,13 +15,11 @@ export default function ScreenLoading() {
             typeof isLoading !== 'number'
               ? {}
               : {
-                  backgroundColor: `rgb(255 255 255 / ${isLoading * 100}%)`,
+                  backgroundColor: `rgb(00 00 00 / ${isLoading * 100}%)`,
                 }
           }>
-          <div>
-            <CustomSvg className="loading" type="PortKey" />
-            <div className="loading-text">Loading...</div>
-          </div>
+          <Loading />
+          <div className="loading-text">Loading...</div>
         </div>
       )}
     </>

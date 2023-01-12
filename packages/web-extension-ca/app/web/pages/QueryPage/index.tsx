@@ -66,7 +66,7 @@ export default function QueryPage() {
   );
 
   useEffectOnce(() => {
-    setLoading(1);
+    setLoading(0.5);
     InternalMessage.payload(InternalMessageTypes.GET_SEED)
       .send()
       .then((res) => {
@@ -78,7 +78,7 @@ export default function QueryPage() {
   const onUnLockHandler = useCallback(
     async (pwd: string) => {
       // get CA address
-      setLoading(1);
+      setLoading(0.5);
       await fetchCreateWalletResult(pwd);
     },
     [fetchCreateWalletResult, setLoading],
