@@ -94,13 +94,13 @@ export default function SignupPortkey() {
   return (
     <ImageBackground style={styles.backgroundContainer} resizeMode="cover" source={background}>
       <PageContainer
-        type="leftBack"
         titleDom
+        type="leftBack"
         themeType="blue"
         style={BGStyles.transparent}
-        containerStyles={styles.containerStyles}
         safeAreaColor={safeAreaColor}
         scrollViewProps={scrollViewProps}
+        containerStyles={styles.containerStyles}
         leftCallback={() => {
           myEvents.clearLoginInput.emit();
           navigationService.goBack();
