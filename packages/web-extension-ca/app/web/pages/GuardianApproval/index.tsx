@@ -346,14 +346,17 @@ export default function GuardianApproval() {
   );
 
   useEffect(() => {
+    if (!guardianExpiredTime) return setIsExpired(false);
     const timeGap = (guardianExpiredTime ?? 0) - Date.now();
-    if (timeGap <= 0) return setIsExpired(false);
+    if (timeGap <= 0) return setIsExpired(true);
 
-    const timeout = setTimeout(() => {
-      setIsExpired(true);
-    }, timeGap);
+    const timer = setInterval(() => {
+      const timeGap = (guardianExpiredTime ?? 0) - Date.now();
+      if (timeGap <= 0) return setIsExpired(true);
+      setIsExpired(false);
+    }, 1000);
     return () => {
-      clearTimeout(timeout);
+      clearInterval(timer);
     };
   }, [guardianExpiredTime]);
 
@@ -375,7 +378,7 @@ export default function GuardianApproval() {
       {isPrompt ? <PortKeyTitle leftElement leftCallBack={handleBack} /> : <SettingHeader leftCallBack={handleBack} />}
       <div className="common-content1 guardian-approval-content">
         <div className="title">{t('Guardian Approval')}</div>
-        <p className="description">{t('Expire after 1 hour')}</p>
+        <p className="description">{isExpired ? t('Expired') : t('Expire after 1 hour')}</p>
         <div className="flex-between-center approve-count">
           <span className="flex-row-center">
             {t("Guardians' approval")}

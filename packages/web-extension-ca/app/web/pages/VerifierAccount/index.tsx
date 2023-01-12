@@ -143,6 +143,7 @@ export default function VerifierAccount() {
         navigate('/login/guardian-approval');
       } else if (state?.indexOf('guardians') !== -1) {
         onSuccessInGuardian(res);
+        message.success('Verified Successful');
       } else {
         message.error('Router state error');
       }
@@ -155,19 +156,10 @@ export default function VerifierAccount() {
       navigate('/register/select-verifier');
     } else if (state === 'login') {
       navigate('/login/guardian-approval');
-    } else if (state?.indexOf('guardians') !== -1) {
-      if ('guardians/setLoginAccount' === state) {
-        navigate('/setting/guardians/view');
-      } else if (['guardians/edit', 'guardians/del'].includes(state)) {
-        dispatch(setCurrentGuardianAction(opGuardian as UserGuardianItem));
-        navigate('/setting/guardians/edit');
-      } else {
-        navigate(`/setting/${state}`, { state: 'back' });
-      }
     } else {
       navigate(-1);
     }
-  }, [dispatch, navigate, opGuardian, state]);
+  }, [navigate, state]);
 
   const isInitStatus = useMemo(() => {
     if (state === 'register') return true;

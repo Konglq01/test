@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import CustomSvg from 'components/CustomSvg';
 import { useTranslation } from 'react-i18next';
 import useGuardianList from 'hooks/useGuardianList';
@@ -19,6 +19,11 @@ export default function Guardians() {
   const { userGuardiansList } = useGuardiansInfo();
   const { walletInfo } = useCurrentWallet();
   const getGuardianList = useGuardianList();
+
+  const formatGuardianList = useMemo(() => {
+    const temp = [...(userGuardiansList || [])];
+    return temp.reverse();
+  }, [userGuardiansList]);
 
   useVerifierList();
   useEffect(() => {
@@ -43,7 +48,7 @@ export default function Guardians() {
       </div>
       <div className="guardians-content">
         <ul>
-          {userGuardiansList?.map((item, key) => (
+          {formatGuardianList?.map((item, key) => (
             <li
               key={key}
               onClick={() => {
