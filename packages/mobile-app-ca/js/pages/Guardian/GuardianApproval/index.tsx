@@ -29,7 +29,7 @@ import CommonToast from 'components/CommonToast';
 import { useAppDispatch } from 'store/hooks';
 import { setPreGuardianAction } from '@portkey/store/store-ca/guardians/actions';
 import { addGuardian, deleteGuardian, editGuardian } from 'utils/guardian';
-import { useCurrentCAContract } from 'hooks/contract';
+import { useGetCurrentCAContract } from 'hooks/contract';
 
 export interface EditGuardianParamsType {
   signature: string;
@@ -68,7 +68,7 @@ export default function GuardianApproval() {
 
   const { t } = useLanguage();
   const { caHash, address: managerAddress } = useCurrentWalletInfo();
-  const caContract = useCurrentCAContract();
+  const getCurrentCAContract = useGetCurrentCAContract();
 
   const [managerUniqueId, setManagerUniqueId] = useState<string>();
   const [guardiansStatus, setApproved] = useState<GuardiansStatus>();
@@ -142,19 +142,12 @@ export default function GuardianApproval() {
   }, [guardianCount, loginGuardianType, managerUniqueId]);
 
   const onAddGuardian = useCallback(async () => {
-    if (
-      !caContract ||
-      !managerAddress ||
-      !caHash ||
-      !editGuardianParams ||
-      !guardianItem ||
-      !guardiansStatus ||
-      !userGuardiansList
-    )
+    if (!managerAddress || !caHash || !editGuardianParams || !guardianItem || !guardiansStatus || !userGuardiansList)
       return;
 
     Loading.show();
     try {
+      const caContract = await getCurrentCAContract();
       const req = await addGuardian(
         caContract,
         managerAddress,
@@ -174,15 +167,23 @@ export default function GuardianApproval() {
     } catch (error) {
       CommonToast.failError(error);
     }
-
     Loading.hide();
-  }, [caContract, caHash, editGuardianParams, guardianItem, guardiansStatus, managerAddress, userGuardiansList]);
+  }, [
+    caHash,
+    editGuardianParams,
+    getCurrentCAContract,
+    guardianItem,
+    guardiansStatus,
+    managerAddress,
+    userGuardiansList,
+  ]);
 
   const onDeleteGuardian = useCallback(async () => {
-    if (!caContract || !managerAddress || !caHash || !guardianItem || !userGuardiansList || !guardiansStatus) return;
+    if (!managerAddress || !caHash || !guardianItem || !userGuardiansList || !guardiansStatus) return;
 
     Loading.show();
     try {
+      const caContract = await getCurrentCAContract();
       const req = await deleteGuardian(
         caContract,
         managerAddress,
@@ -203,23 +204,16 @@ export default function GuardianApproval() {
     }
 
     Loading.hide();
-  }, [caContract, caHash, guardianItem, guardiansStatus, managerAddress, userGuardiansList]);
+  }, [caHash, getCurrentCAContract, guardianItem, guardiansStatus, managerAddress, userGuardiansList]);
 
   const onEditGuardian = useCallback(async () => {
-    if (
-      !caContract ||
-      !managerAddress ||
-      !caHash ||
-      !preGuardian ||
-      !guardianItem ||
-      !userGuardiansList ||
-      !guardiansStatus
-    ) {
+    if (!managerAddress || !caHash || !preGuardian || !guardianItem || !userGuardiansList || !guardiansStatus) {
       return;
     }
 
     Loading.show();
     try {
+      const caContract = await getCurrentCAContract();
       const req = await editGuardian(
         caContract,
         managerAddress,
@@ -241,7 +235,16 @@ export default function GuardianApproval() {
     }
 
     Loading.hide();
-  }, [caContract, caHash, dispatch, guardianItem, guardiansStatus, managerAddress, preGuardian, userGuardiansList]);
+  }, [
+    caHash,
+    dispatch,
+    getCurrentCAContract,
+    guardianItem,
+    guardiansStatus,
+    managerAddress,
+    preGuardian,
+    userGuardiansList,
+  ]);
 
   const onFinish = useCallback(async () => {
     switch (approvalType) {

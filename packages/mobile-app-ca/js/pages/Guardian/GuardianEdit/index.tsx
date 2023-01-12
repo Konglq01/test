@@ -1,4 +1,3 @@
-import { defaultColors } from 'assets/theme';
 import GStyles from 'assets/theme/GStyles';
 import CommonButton from 'components/CommonButton';
 import { TextM, TextS } from 'components/CommonText';
@@ -110,7 +109,7 @@ const GuardianEdit: React.FC = () => {
     if (selectedVerifier === undefined || selectedType === undefined) return;
 
     ActionSheet.alert({
-      title2: `Portkey will send a verification code to ${email} to verify your email address.`,
+      title2: `${selectedVerifier.name} will send a verification code to ${email} to verify your email address.`,
       buttons: [
         {
           title: t('Cancel'),
@@ -251,6 +250,7 @@ const GuardianEdit: React.FC = () => {
             type="general"
             theme="white-bg"
             label={t("Guardian's email")}
+            value={email}
             placeholder={t('Enter email')}
             maxLength={30}
             onChangeText={onEmailTextChange}

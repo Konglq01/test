@@ -23,7 +23,7 @@ import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import myEvents from 'utils/deviceEvent';
 import { VerifierImage } from '../components/VerifierImage';
 import { cancelLoginAccount } from 'utils/guardian';
-import { useCurrentCAContract } from 'hooks/contract';
+import { useGetCurrentCAContract } from 'hooks/contract';
 
 interface GuardianDetailProps {
   route?: any;
@@ -35,7 +35,7 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
   const getGuardiansList = useGetGuardiansList();
   const { userGuardiansList } = useGuardiansInfo();
   const { caHash, address: managerAddress } = useCurrentWalletInfo();
-  const caContract = useCurrentCAContract();
+  const getCurrentCAContract = useGetCurrentCAContract();
 
   const guardian = useMemo<UserGuardianItem | undefined>(
     () => (params?.guardian ? JSON.parse(params.guardian) : undefined),
@@ -43,10 +43,11 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
   );
 
   const onCancelLoginAccount = useCallback(async () => {
-    if (!caContract || !managerAddress || !caHash || !guardian) return;
+    if (!managerAddress || !caHash || !guardian) return;
 
     Loading.show();
     try {
+      const caContract = await getCurrentCAContract();
       const req = await cancelLoginAccount(caContract, managerAddress, caHash, guardian);
       if (req && !req.error) {
         myEvents.refreshGuardiansList.emit();
@@ -60,7 +61,7 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
       CommonToast.failError(error);
     }
     Loading.hide();
-  }, [caContract, caHash, guardian, managerAddress]);
+  }, [caHash, getCurrentCAContract, guardian, managerAddress]);
 
   const setLoginAccount = useCallback(async () => {
     if (!guardian) return;
@@ -154,7 +155,7 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
       }
 
       ActionSheet.alert({
-        title2: `Portkey will send a verification code to ${email} to verify your email address.`,
+        title2: `${guardian.verifier?.name} will send a verification code to ${email} to verify your email address.`,
         buttons: [
           {
             title: t('Cancel'),

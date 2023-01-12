@@ -114,7 +114,7 @@ export default function SelectVerifier() {
         />
         <TextM style={fonts.mediumFont}>Popular</TextM>
         <View style={styles.verifierRow}>
-          {verifierList.map(item => {
+          {verifierList.slice(0, 3).map(item => {
             return (
               <Touchable style={GStyles.center} key={item.name} onPress={() => setSelectedVerifier(item)}>
                 <VerifierImage uri={item.imageUrl} size={42} />
