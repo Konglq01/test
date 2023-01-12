@@ -11,16 +11,14 @@ const useGuardiansList = () => {
   const currentChain = useCurrentChain();
 
   const fetch = useCallback(
-    async (loginGuardianType: string) => {
+    async (paramsOption: { loginGuardianType?: string; caHash?: string }) => {
       try {
         if (!currentChain?.endPoint) throw 'Could not find chain information';
         const res = await getHolderInfo({
           rpcUrl: currentChain.endPoint,
           chainType: currentNetwork.walletType,
           address: currentChain.caContractAddress,
-          paramsOption: {
-            loginGuardianType,
-          },
+          paramsOption,
         });
         dispatch(setGuardiansAction(res.result.guardiansInfo));
       } catch (error: any) {
