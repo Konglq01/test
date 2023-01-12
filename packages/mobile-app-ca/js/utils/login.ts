@@ -2,6 +2,7 @@ import { resetWallet } from '@portkey/store/store-ca/wallet/actions';
 import { VerifierItem } from '@portkey/types/verifier';
 import ActionSheet from 'components/ActionSheet';
 import { AppDispatch } from 'store';
+import { resetUser } from 'store/user/actions';
 import navigationService from './navigationService';
 
 export function queryFailAlert(dispatch: AppDispatch, isRecovery?: boolean, isReset?: boolean) {
@@ -12,6 +13,7 @@ export function queryFailAlert(dispatch: AppDispatch, isRecovery?: boolean, isRe
         title: isRecovery ? 'Re-login' : 'Re-register',
         onPress: () => {
           dispatch(resetWallet());
+          dispatch(resetUser());
           if (isRecovery) {
             if (isReset) navigationService.reset('LoginPortkey');
             else navigationService.navigate('LoginPortkey');
