@@ -22,7 +22,7 @@ export default function Guardians() {
 
   useVerifierList();
   useEffect(() => {
-    getGuardianList(walletInfo.managerInfo?.loginGuardianType as string);
+    getGuardianList({ caHash: walletInfo.caHash });
   }, [getGuardianList, walletInfo]);
 
   return (
