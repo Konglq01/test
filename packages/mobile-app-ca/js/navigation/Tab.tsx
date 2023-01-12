@@ -12,7 +12,6 @@ const Tab = createBottomTabNavigator();
 
 export const tabMenuList = [
   { name: 'Wallet', label: 'Wallet', index: 0, icon: 'logo-icon', component: DashBoard },
-  { name: 'Discover', label: 'Discover', index: 1, icon: 'discover', component: HomeScreen },
   { name: 'Settings', label: 'My', index: 2, icon: 'my', component: MyMenu },
 ] as const;
 

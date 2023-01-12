@@ -20,7 +20,7 @@ import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import myEvents from 'utils/deviceEvent';
 import { API_REQ_FUNCTION } from 'api/types';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
-import { useCurrentCAContract } from 'hooks/contract';
+import { useGetCurrentCAContract } from 'hooks/contract';
 import { setLoginAccount } from 'utils/guardian';
 
 type FetchType = Record<string, API_REQ_FUNCTION>;
@@ -80,12 +80,14 @@ export default function VerifierDetails() {
   );
 
   const { caHash, address: managerAddress } = useCurrentWalletInfo();
-  const caContract = useCurrentCAContract();
+  const getCurrentCAContract = useGetCurrentCAContract();
 
   const onSetLoginAccount = useCallback(async () => {
-    if (!caContract || !managerAddress || !caHash || !guardianItem) return;
+    if (!managerAddress || !caHash || !guardianItem) return;
 
     try {
+      const caContract = await getCurrentCAContract();
+
       const req = await setLoginAccount(caContract, managerAddress, caHash, guardianItem);
       if (req && !req.error) {
         myEvents.refreshGuardiansList.emit();
@@ -98,7 +100,7 @@ export default function VerifierDetails() {
     } catch (error) {
       CommonToast.failError(error);
     }
-  }, [caContract, caHash, guardianItem, managerAddress]);
+  }, [caHash, getCurrentCAContract, guardianItem, managerAddress]);
 
   const onFinish = useCallback(
     async (code: string) => {

@@ -13,6 +13,7 @@ import { defaultColors } from 'assets/theme';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { MINUTE } from '@portkey/constants';
 import { fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
+import { useGetCurrentCAViewContract } from 'hooks/contract';
 
 interface DashBoardTypes {
   navigation: any;
@@ -24,6 +25,10 @@ let timer: any;
 const DashBoard: React.FC<DashBoardTypes> = () => {
   const [closed, setClosed] = useState<boolean>(false);
   const [balanceUSD, setBalanceUSD] = useState<string | number>('--');
+  const getCurrentCAViewContract = useGetCurrentCAViewContract();
+  useEffectOnce(() => {
+    getCurrentCAViewContract();
+  });
 
   // const [balances, onGetBalance] = useBalances({
   //   tokens: localTokenList,
