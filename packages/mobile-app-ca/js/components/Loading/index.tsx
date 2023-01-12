@@ -3,10 +3,11 @@ import Overlay from 'teaset/components/Overlay/Overlay';
 import { View, StyleSheet, Animated, Keyboard } from 'react-native';
 import { TextL } from '../CommonText';
 import { defaultColors } from 'assets/theme';
-import Svg from 'components/Svg';
-import { pTd } from 'utils/unit';
 import useEffectOnce from 'hooks/useEffectOnce';
 import GStyles from 'assets/theme/GStyles';
+import Spinner from 'react-native-spinkit';
+import { FontStyles } from 'assets/theme/styles';
+
 let elements: any = [];
 let timer: NodeJS.Timeout | null = null;
 
@@ -35,9 +36,7 @@ function LoadingBody({ text = 'Loading...' }: { text?: string }) {
   });
   return (
     <View style={GStyles.center}>
-      <Animated.View style={{ transform: [{ scale: fadeAnim }] }}>
-        <Svg icon="logo-icon" color={defaultColors.primaryColor} size={pTd(80)} />
-      </Animated.View>
+      <Spinner type="Circle" color={FontStyles.font11.color} size={40} />
       <TextL style={styles.textStyles}>{text}</TextL>
     </View>
   );
@@ -53,6 +52,7 @@ export default class Loading extends React.Component {
         type="zoomIn"
         ref={(v: any) => elements.push(v)}
         style={styles.container}
+        overlayOpacity={0}
         {...overlayProps}>
         <LoadingBody text={text} />
       </Overlay.PopView>
@@ -89,10 +89,10 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#ffffff82',
+    backgroundColor: '#00000030',
   },
   textStyles: {
-    color: defaultColors.font5,
+    color: defaultColors.font11,
     marginTop: 20,
   },
 });
