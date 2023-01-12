@@ -22,7 +22,7 @@ export default function GuardianHome() {
   const { userGuardiansList } = useGuardiansInfo();
   const guardianList = useMemo(() => {
     if (!userGuardiansList) return [];
-    return userGuardiansList.reverse();
+    return [...userGuardiansList].reverse();
   }, [userGuardiansList]);
 
   const { caHash } = useCurrentWalletInfo();
