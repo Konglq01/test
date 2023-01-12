@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import 'react-native-gesture-handler';
 import 'react-native-get-random-values';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { StatusBar, StatusBarProps, useColorScheme } from 'react-native';
+import { StatusBar, StatusBarProps } from 'react-native';
 import { ThemeProvider } from '@rneui/themed';
 import NavigationRoot from './js/navigation';
 import { useMemo } from 'react';
@@ -31,16 +31,14 @@ secureStore.init(Config.PORT_KEY_CODE || 'EXAMPLE_PORT_KEY_CODE');
 const persistor = persistStore(store);
 
 const App = () => {
-  const isDarkMode = useColorScheme() === 'dark';
-
   const statusBarProps = useMemo(() => {
-    const barProps: StatusBarProps = { barStyle: isDarkMode ? 'light-content' : 'dark-content' };
+    const barProps: StatusBarProps = { barStyle: 'light-content' };
     if (!isIos) {
       barProps.translucent = true;
       barProps.backgroundColor = 'transparent';
     }
     return barProps;
-  }, [isDarkMode]);
+  }, []);
   useEffect(() => {
     // Lock the screen orientation Right-side up portrait only.
     lockScreenOrientation();
