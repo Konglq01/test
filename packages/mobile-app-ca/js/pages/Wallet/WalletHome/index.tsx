@@ -17,7 +17,7 @@ import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import CommonToast from 'components/CommonToast';
 import useLogOut from 'hooks/useLogOut';
 import { removeManager } from 'utils/guardian';
-import { useCurrentCAContract } from 'hooks/contract';
+import { useGetCurrentCAContract } from 'hooks/contract';
 
 interface WalletHomeProps {
   name?: string;
@@ -27,14 +27,15 @@ const WalletHome: React.FC<WalletHomeProps> = () => {
   const { t } = useLanguage();
   const { walletAvatar, walletName } = useWallet();
   const { caHash, address: managerAddress } = useCurrentWalletInfo();
-  const caContract = useCurrentCAContract();
+  const getCurrentCAContract = useGetCurrentCAContract();
   const logout = useLogOut();
 
   const onExitClick = useCallback(
     async (isConfirm: boolean) => {
-      if (!isConfirm || !caContract || !managerAddress || !caHash) return;
+      if (!isConfirm || !managerAddress || !caHash) return;
+      Loading.show();
       try {
-        Loading.show();
+        const caContract = await getCurrentCAContract();
         const req = await removeManager(caContract, managerAddress, caHash);
         if (req && !req.error) {
           console.log('logout success', req);
@@ -47,7 +48,7 @@ const WalletHome: React.FC<WalletHomeProps> = () => {
       }
       Loading.hide();
     },
-    [caContract, caHash, logout, managerAddress],
+    [caHash, getCurrentCAContract, logout, managerAddress],
   );
 
   return (

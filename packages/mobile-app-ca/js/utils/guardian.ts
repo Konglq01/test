@@ -39,7 +39,7 @@ export async function deleteGuardian(
       };
     })
     .filter(item => item !== null);
-
+  // TODO: remove console&req in this page
   console.log('RemoveGuardian', {
     caHash,
     guardianToRemove,
@@ -213,12 +213,11 @@ export async function cancelLoginAccount(
 }
 
 export async function removeManager(contract: ContractBasic, address: string, caHash: string) {
-  const req = await contract?.callSendMethod('RemoveManager', address, {
+  return await contract?.callSendMethod('RemoveManager', address, {
     caHash,
     manager: {
       managerAddress: address,
       deviceString: new Date().getTime(),
     },
   });
-  return req;
 }
