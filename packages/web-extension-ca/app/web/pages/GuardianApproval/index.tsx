@@ -150,7 +150,7 @@ export default function GuardianApproval() {
       } catch (error: any) {
         console.log(error, 'error===');
         setLoading(false);
-        message.error(error?.error?.message ?? 'Something error');
+        message.error(error?.error?.message ?? error?.type ?? 'Something error');
       }
     },
     [state, loginAccount, setLoading, guardianSendCode, dispatch, navigate],

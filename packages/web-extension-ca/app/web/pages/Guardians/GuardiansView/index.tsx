@@ -121,7 +121,7 @@ export default function GuardiansView() {
       }
     } catch (error: any) {
       setLoading(false);
-      message.error(error?.Error?.Message || error.message?.Message || error?.message);
+      message.error(error?.Error?.Message || error.message?.Message || error?.message || error?.type);
       console.log('---setLoginAccount-error', error);
     }
   }, [
