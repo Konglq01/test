@@ -6,9 +6,8 @@ import SettingHeader from 'pages/components/SettingHeader';
 import { useNavigate } from 'react-router';
 import { useAppDispatch, useGuardiansInfo } from 'store/Provider/hooks';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
-import { setCurrentGuardianAction } from '@portkey/store/store-ca/guardians/actions';
+import { setCurrentGuardianAction, setOpGuardianAction } from '@portkey/store/store-ca/guardians/actions';
 import VerifierPair from 'components/VerifierPair';
-import useVerifierList from 'hooks/useVerifierList';
 import './index.less';
 import { Button } from 'antd';
 
@@ -22,10 +21,10 @@ export default function Guardians() {
 
   const formatGuardianList = useMemo(() => {
     const temp = [...(userGuardiansList || [])];
-    return temp.reverse();
+    temp.reverse();
+    return temp;
   }, [userGuardiansList]);
 
-  useVerifierList();
   useEffect(() => {
     getGuardianList({ caHash: walletInfo.caHash });
   }, [getGuardianList, walletInfo]);
@@ -48,11 +47,12 @@ export default function Guardians() {
       </div>
       <div className="guardians-content">
         <ul>
-          {formatGuardianList?.map((item, key) => (
+          {formatGuardianList.map((item, key) => (
             <li
               key={key}
               onClick={() => {
                 dispatch(setCurrentGuardianAction({ ...item, isLoginAccount: !!item.isLoginAccount }));
+                dispatch(setOpGuardianAction({ ...item, isLoginAccount: !!item.isLoginAccount }));
                 navigate('/setting/guardians/view');
               }}>
               <div className="flex-between-center guardian">
