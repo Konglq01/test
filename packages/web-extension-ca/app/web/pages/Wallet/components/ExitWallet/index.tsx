@@ -59,9 +59,6 @@ export default function ExitWallet({ open, onCancel }: ExitWalletProps) {
       await getTxResult(aelfInstance, TransactionId);
       clearLocalStorage();
       setLoading(false);
-      InternalMessage.payload(InternalMessageTypes.OPEN_PROMPT, {
-        method: PromptRouteTypes.REGISTER_WALLET_START,
-      }).send();
     } catch (error: any) {
       setLoading(false);
       message.error(error);
