@@ -17,11 +17,9 @@ const createApolloClient = (networkType: NetworkType) =>
     link: new HttpLink({ uri: NetworkList.find(item => item.networkType === networkType)?.graphqlUrl || '' }),
   });
 
-export const networkClientMap: Record<string, ApolloClient<NormalizedCacheObject> | undefined> = {};
+export const networkClientMap: Record<string, ApolloClient<NormalizedCacheObject>> = {};
 
 export const getApolloClient = (networkType: NetworkType) => {
-  if (networkClientMap[networkType]) return networkClientMap[networkType];
-  const networkClient = createApolloClient(networkType);
-  networkClientMap[networkType] = networkClient;
-  return networkClient;
+  if (!networkClientMap[networkType]) networkClientMap[networkType] = createApolloClient(networkType);
+  return networkClientMap[networkType];
 };
