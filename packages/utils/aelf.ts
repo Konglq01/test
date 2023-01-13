@@ -53,7 +53,7 @@ export function getWallet(privateKey = COMMON_PRIVATE) {
 }
 
 export const getAelfInstance = (rpcUrl: string) => {
-  return new AElf(new AElf.providers.HttpProvider(rpcUrl));
+  return new AElf(new AElf.providers.HttpProvider(rpcUrl, 20000));
 };
 
 export const getELFContract = async (rpcUrl: string, tokenAddress: string, privateKey?: string) => {
