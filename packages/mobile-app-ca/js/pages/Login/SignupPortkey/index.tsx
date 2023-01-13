@@ -14,7 +14,7 @@ import background from '../img/background.png';
 import Svg from 'components/Svg';
 import { BGStyles, FontStyles } from 'assets/theme/styles';
 import { screenHeight, screenWidth } from '@portkey/utils/mobile/device';
-import { useGetHolderInfo, useGetVerifierServers } from 'hooks/guardian';
+import { useGetGuardiansList, useGetVerifierServers } from 'hooks/guardian';
 import { handleError } from '@portkey/utils';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { useAppDispatch } from 'store/hooks';
@@ -31,7 +31,7 @@ function SignupEmail() {
   const [loading] = useState<boolean>();
   const [email, setEmail] = useState<string>();
   const [errorMessage, setErrorMessage] = useState<string>();
-  const getHolderInfo = useGetHolderInfo();
+  const getGuardiansList = useGetGuardiansList();
   const getVerifierServers = useGetVerifierServers();
   const chainInfo = useCurrentChain('AELF');
   const dispatch = useAppDispatch();
@@ -44,7 +44,7 @@ function SignupEmail() {
       if (!chainInfo) await dispatch(getChainListAsync());
       await getVerifierServers();
       try {
-        const holderInfo = await getHolderInfo({ loginGuardianType: email });
+        const holderInfo = await getGuardiansList({ loginGuardianType: email });
         if (holderInfo.guardians) {
           Loading.hide();
           return setErrorMessage(EmailError.alreadyRegistered);
@@ -57,7 +57,7 @@ function SignupEmail() {
       setErrorMessage(handleError(error));
     }
     Loading.hide();
-  }, [chainInfo, dispatch, email, getHolderInfo, getVerifierServers]);
+  }, [chainInfo, dispatch, email, getGuardiansList, getVerifierServers]);
   useEffectOnce(() => {
     const listener = myEvents.clearSignupInput.addListener(() => {
       setEmail('');
