@@ -28,9 +28,10 @@
     "extension:ca": "yarn workspace web-extension-ca run",
     "graphql": "yarn workspace @portkey/graphql run",
     "page": "yarn workspace web-page run",
-    "test": "jest -coverage"
+    "test": "jest --coverage"
   },
   "devDependencies": {
+    "@testing-library/react": "^13.4.0",
     "@types/jest": "^29.2.5",
     "eslint": "^8.23.1",
     "eslint-plugin-react": "^7.31.8",
