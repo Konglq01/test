@@ -14,7 +14,7 @@ import { PIN_SIZE } from '@portkey/constants/misc';
 import { checkPin } from 'utils/redux';
 import { useNavigation } from '@react-navigation/native';
 import navigationService from 'utils/navigationService';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import Loading from 'components/Loading';
 import useBiometricsReady from 'hooks/useBiometrics';
 import { usePreventHardwareBack } from '@portkey/hooks/mobile';
@@ -37,26 +37,23 @@ export default function SecurityLock() {
 
   const digitInput = useRef<DigitInputInterface>();
   const [errorMessage, setErrorMessage] = useState<string>();
-  const { walletInfo } = useCurrentWallet();
+  const { managerInfo, address, caHash } = useCurrentWalletInfo();
   const dispatch = useAppDispatch();
-  const isSyncCAInfo = useMemo(
-    () => walletInfo.address && walletInfo.managerInfo && !walletInfo.AELF?.caAddress,
-    [walletInfo.AELF?.caAddress, walletInfo.address, walletInfo.managerInfo],
-  );
+  const isSyncCAInfo = useMemo(() => address && managerInfo && !caHash, [address, caHash, managerInfo]);
   const navigation = useNavigation();
   useEffect(() => {
     if (isSyncCAInfo) {
       setTimeout(() => {
-        if (walletInfo.managerInfo && apiUrl)
+        if (managerInfo && apiUrl)
           timer.current = intervalGetResult({
             apiUrl,
-            managerInfo: walletInfo.managerInfo,
+            managerInfo: managerInfo,
             onPass: setStateCAInfo,
             onFail: message =>
               onResultFail(
                 dispatch,
                 message,
-                walletInfo.managerInfo?.verificationType === VerificationType.communityRecovery,
+                managerInfo?.verificationType === VerificationType.communityRecovery,
                 true,
               ),
           });
@@ -83,13 +80,13 @@ export default function SecurityLock() {
   const handlePassword = useCallback(
     (pwd: string) => {
       dispatch(setCredentials({ pin: pwd }));
-      if (!walletInfo.managerInfo) return;
+      if (!managerInfo) return;
       if (isSyncCAInfo && !caInfo) {
         timer.current?.remove();
         Loading.show();
         timer.current = intervalGetResult({
           apiUrl,
-          managerInfo: walletInfo.managerInfo,
+          managerInfo: managerInfo,
           onPass: (info: CAInfo) => {
             dispatch(
               setCAInfo({
@@ -102,12 +99,7 @@ export default function SecurityLock() {
             handleRouter(pwd);
           },
           onFail: message =>
-            onResultFail(
-              dispatch,
-              message,
-              walletInfo.managerInfo?.verificationType === VerificationType.communityRecovery,
-              true,
-            ),
+            onResultFail(dispatch, message, managerInfo?.verificationType === VerificationType.communityRecovery, true),
         });
         return;
       } else if (caInfo) {
@@ -121,7 +113,7 @@ export default function SecurityLock() {
       }
       handleRouter(pwd);
     },
-    [apiUrl, caInfo, dispatch, handleRouter, isSyncCAInfo, walletInfo.managerInfo],
+    [apiUrl, caInfo, dispatch, handleRouter, isSyncCAInfo, managerInfo],
   );
   const verifyBiometrics = useCallback(async () => {
     if (!biometrics || (verifyTime && verifyTime + 1000 > new Date().getTime())) return;
