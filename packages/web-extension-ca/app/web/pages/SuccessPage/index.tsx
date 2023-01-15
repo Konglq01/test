@@ -1,6 +1,7 @@
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { usePreventHardwareBack } from 'hooks/useHardwareBack';
 import useLocationState from 'hooks/useLocationState';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useEffectOnce } from 'react-use';
 import { useAppDispatch } from 'store/Provider/hooks';
 import { resetLoginInfoAction } from 'store/reducers/loginCache/actions';
@@ -22,17 +23,7 @@ export default function SuccessPage() {
     }
   }, [state]);
 
-  const backCallBack = useCallback(() => {
-    //
-  }, []);
-
-  useEffect(() => {
-    window.history.pushState(null, '', document.URL);
-    window.addEventListener('popstate', backCallBack, false);
-    return () => {
-      window.removeEventListener('popstate', backCallBack, false);
-    };
-  }, [backCallBack]);
+  usePreventHardwareBack();
 
   useEffectOnce(() => {
     dispatch(resetLoginInfoAction());
