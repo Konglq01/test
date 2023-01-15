@@ -2,7 +2,7 @@ import { Button, Form, message } from 'antd';
 import { FormItem } from 'components/BaseAntd';
 import ConfirmPassword from 'components/ConfirmPassword';
 import PortKeyTitle from 'pages/components/PortKeyTitle';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useAppDispatch, useLoading, useLoginInfo } from 'store/Provider/hooks';
 import { setPinAction } from 'utils/lib/serviceWorkerAction';
@@ -17,11 +17,13 @@ import { VerificationType } from '@portkey/types/verifier';
 import { isWalletError } from '@portkey/store/wallet/utils';
 import AElf from 'aelf-sdk';
 import './index.less';
+import { useHardwareBack } from 'hooks/useHardwareBack';
+import CommonModal from 'components/CommonModal';
 
 export default function SetWalletPin() {
   const [form] = Form.useForm();
   const { t } = useTranslation();
-  const { state } = useLocationState<'login' | 'register' | 'scan'>();
+  const { state, pathname } = useLocationState<'login' | 'register' | 'scan'>();
   // const { state } = useLocation();
   const currentNetwork = useCurrentNetworkInfo();
 
@@ -30,6 +32,7 @@ export default function SetWalletPin() {
   const dispatch = useAppDispatch();
   const { setLoading } = useLoading();
   const { walletInfo } = useCurrentWallet();
+  const [returnOpen, setReturnOpen] = useState<boolean>();
   const { scanWalletInfo, scanCaWalletInfo, loginAccount, guardianCount } = useLoginInfo();
   const fetchWalletResult = useFetchWalletCAAddress();
 
@@ -174,16 +177,32 @@ export default function SetWalletPin() {
   }, []);
 
   const backHandler = useCallback(async () => {
-    if (state === 'register') {
-      navigate('/register/select-verifier');
-    } else if (state === 'login') {
-      navigate('/login/guardian-approval');
+    switch (state) {
+      case 'register':
+        navigate('/register/select-verifier');
+        break;
+      case 'login':
+        navigate('/login/guardian-approval');
+        break;
+      default:
+        if (pathname.startsWith('/register')) return navigate('/register/select-verifier');
+        navigate(-1);
     }
-  }, [navigate, state]);
+  }, [navigate, pathname, state]);
+
+  const leftCallBack = useCallback(() => setReturnOpen(true), []);
+
+  useHardwareBack(() => {
+    if (state === 'register') {
+      leftCallBack();
+      return;
+    }
+    backHandler();
+  });
 
   return (
     <div className="common-page set-pin-wrapper" id="set-pin-wrapper">
-      <PortKeyTitle leftElement leftCallBack={backHandler} />
+      <PortKeyTitle leftElement leftCallBack={leftCallBack} />
       <div className="common-content1 set-pin-content">
         <div className="title">{t('Enter Pin to Protect Your Wallet')}</div>
         <Form
@@ -214,6 +233,23 @@ export default function SetWalletPin() {
           </FormItem>
         </Form>
       </div>
+
+      <CommonModal
+        closable={false}
+        open={returnOpen}
+        className="set-pin-modal"
+        title={' Confirm return'}
+        getContainer={'#set-pin-wrapper'}>
+        <p className="modal-content">
+          After returning, you will need to re-select the operator and re-do the code verification.
+        </p>
+        <div className="btn-wrapper">
+          <Button onClick={() => setReturnOpen(false)}>No</Button>
+          <Button type="primary" onClick={backHandler}>
+            Yes
+          </Button>
+        </div>
+      </CommonModal>
     </div>
   );
 }
