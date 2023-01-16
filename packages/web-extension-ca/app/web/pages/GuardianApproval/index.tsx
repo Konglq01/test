@@ -10,7 +10,13 @@ import {
 } from 'store/Provider/hooks';
 import { VerificationType, VerifyStatus } from '@portkey/types/verifier';
 import { useNavigate, useLocation } from 'react-router';
-import { setUserGuardianItemStatus, setCurrentGuardianAction } from '@portkey/store/store-ca/guardians/actions';
+import {
+  setUserGuardianItemStatus,
+  setCurrentGuardianAction,
+  resetUserGuardianStatus,
+  setPreGuardianAction,
+  setOpGuardianAction,
+} from '@portkey/store/store-ca/guardians/actions';
 import { UserGuardianItem, UserGuardianStatus } from '@portkey/store/store-ca/guardians/type';
 import { getApprovalCount } from '@portkey/utils/guardian';
 import './index.less';
@@ -59,10 +65,8 @@ export default function GuardianApproval() {
     const tempVerifiedList = Object.values(userGuardianStatus ?? {});
     let filterVerifiedList: UserGuardianStatus[] = tempVerifiedList;
     if (state === 'guardians/edit') {
-      filterVerifiedList = tempVerifiedList.filter((item) => ![opGuardian?.key, preGuardian?.key].includes(item.key));
-    } else if (state === 'guardians/del') {
-      filterVerifiedList = tempVerifiedList.filter((item) => item.key !== opGuardian?.key);
-    } else if (state === 'guardians/add') {
+      filterVerifiedList = tempVerifiedList.filter((item) => item.key !== preGuardian?.key);
+    } else if (['guardians/del', 'guardians/add'].includes(state)) {
       filterVerifiedList = tempVerifiedList.filter((item) => item.key !== opGuardian?.key);
     }
     return filterVerifiedList;
@@ -83,7 +87,7 @@ export default function GuardianApproval() {
         dispatch(
           setLoginAccountAction({
             loginGuardianType: item.loginGuardianType,
-            accountLoginType: LoginType.email,
+            accountLoginType: item.guardiansType,
           }),
         );
         const result = await sendVerificationCode({
@@ -150,7 +154,7 @@ export default function GuardianApproval() {
       } catch (error: any) {
         console.log(error, 'error===');
         setLoading(false);
-        message.error(error?.error?.message ?? 'Something error');
+        message.error(error?.error?.message ?? error?.type ?? 'Something error');
       }
     },
     [state, loginAccount, setLoading, guardianSendCode, dispatch, navigate],
@@ -190,31 +194,27 @@ export default function GuardianApproval() {
   }, [opGuardian?.key, userGuardianStatus]);
 
   const formatEditGuardianValue = useCallback(() => {
-    let guardianToUpdatePre: GuardianItem = {} as GuardianItem;
-    let guardianToUpdateNew: GuardianItem = {} as GuardianItem;
+    const guardianToUpdatePre: GuardianItem = {
+      guardianType: {
+        type: preGuardian?.guardiansType as LoginType,
+        guardianType: preGuardian?.loginGuardianType as string,
+      },
+      verifier: {
+        name: preGuardian?.verifier?.name as string,
+      },
+    };
+    const guardianToUpdateNew: GuardianItem = {
+      guardianType: {
+        type: opGuardian?.guardiansType as LoginType,
+        guardianType: opGuardian?.loginGuardianType as string,
+      },
+      verifier: {
+        name: opGuardian?.verifier?.name as string,
+      },
+    };
     const guardiansApproved: GuardianItem[] = [];
     Object.values(userGuardianStatus ?? {})?.forEach((item: UserGuardianStatus) => {
-      if (item.key === opGuardian?.key) {
-        guardianToUpdateNew = {
-          guardianType: {
-            type: item.guardiansType,
-            guardianType: item.loginGuardianType,
-          },
-          verifier: {
-            name: item.verifier?.name as string,
-          },
-        };
-      } else if (item.key === preGuardian?.key) {
-        guardianToUpdatePre = {
-          guardianType: {
-            type: item.guardiansType,
-            guardianType: item.loginGuardianType,
-          },
-          verifier: {
-            name: item.verifier?.name as string,
-          },
-        };
-      } else if (item.signature) {
+      if (item.signature) {
         guardiansApproved.push({
           guardianType: {
             type: item.guardiansType,
@@ -229,23 +229,21 @@ export default function GuardianApproval() {
       }
     });
     return { guardianToUpdatePre, guardianToUpdateNew, guardiansApproved };
-  }, [opGuardian?.key, preGuardian?.key, userGuardianStatus]);
+  }, [opGuardian, preGuardian, userGuardianStatus]);
 
   const formatDelGuardianValue = useCallback(() => {
-    let guardianToRemove: GuardianItem = {} as GuardianItem;
+    const guardianToRemove: GuardianItem = {
+      guardianType: {
+        type: opGuardian?.guardiansType as LoginType,
+        guardianType: opGuardian?.loginGuardianType as string,
+      },
+      verifier: {
+        name: opGuardian?.verifier?.name as string,
+      },
+    };
     const guardiansApproved: GuardianItem[] = [];
     Object.values(userGuardianStatus ?? {})?.forEach((item: UserGuardianStatus) => {
-      if (item.key === opGuardian?.key) {
-        guardianToRemove = {
-          guardianType: {
-            type: item.guardiansType,
-            guardianType: item.loginGuardianType,
-          },
-          verifier: {
-            name: item.verifier?.name as string,
-          },
-        };
-      } else if (item.signature) {
+      if (item.signature) {
         guardiansApproved.push({
           guardianType: {
             type: item.guardiansType,
@@ -260,7 +258,7 @@ export default function GuardianApproval() {
       }
     });
     return { guardianToRemove, guardiansApproved };
-  }, [opGuardian?.key, userGuardianStatus]);
+  }, [opGuardian, userGuardianStatus]);
 
   const handleGuardianRecovery = useCallback(async () => {
     try {
@@ -269,19 +267,22 @@ export default function GuardianApproval() {
         {
           AESEncryptPrivateKey: walletInfo.AESEncryptPrivateKey,
         },
-        // '11111111',
         passwordSeed,
       );
-      if (!currentChain?.endPoint || !res?.privateKey) return message.error('error');
+      if (!currentChain?.endPoint || !res?.privateKey) return message.error('handle guardian error');
       let value;
-      if (state === 'guardians/add') {
-        value = formatAddGuardianValue();
-      } else if (state === 'guardians/edit') {
-        value = formatEditGuardianValue();
-      } else if (state === 'guardians/del') {
-        value = formatDelGuardianValue();
-      } else {
-        value = {};
+      switch (state) {
+        case 'guardians/add':
+          value = formatAddGuardianValue();
+          break;
+        case 'guardians/edit':
+          value = formatEditGuardianValue();
+          break;
+        case 'guardians/del':
+          value = formatDelGuardianValue();
+          break;
+        default:
+          value = {};
       }
       const result = await handleGuardian({
         rpcUrl: currentChain.endPoint,
@@ -301,8 +302,11 @@ export default function GuardianApproval() {
       const { TransactionId } = result.result.message || result;
       await sleep(1000);
       const aelfInstance = getAelfInstance(currentChain.endPoint);
-      const validTxId = await getTxResult(aelfInstance, TransactionId);
+      await getTxResult(aelfInstance, TransactionId);
       dispatch(resetLoginInfoAction());
+      dispatch(resetUserGuardianStatus());
+      dispatch(setPreGuardianAction());
+      dispatch(setOpGuardianAction());
       setLoading(false);
       state === 'guardians/add' && message.success('Guardians Added');
       navigate('/setting/guardians');
@@ -346,36 +350,38 @@ export default function GuardianApproval() {
   );
 
   useEffect(() => {
+    if (!guardianExpiredTime) return setIsExpired(false);
     const timeGap = (guardianExpiredTime ?? 0) - Date.now();
-    if (timeGap <= 0) return setIsExpired(false);
+    if (timeGap <= 0) return setIsExpired(true);
 
-    const timeout = setTimeout(() => {
-      setIsExpired(true);
-    }, timeGap);
+    const timer = setInterval(() => {
+      const timeGap = (guardianExpiredTime ?? 0) - Date.now();
+      if (timeGap <= 0) return setIsExpired(true);
+      setIsExpired(false);
+    }, 1000);
     return () => {
-      clearTimeout(timeout);
+      clearInterval(timer);
     };
   }, [guardianExpiredTime]);
 
   const handleBack = useCallback(() => {
     if (state && state.indexOf('guardians') !== -1) {
       if (['guardians/del', 'guardians/edit'].includes(state)) {
-        dispatch(setCurrentGuardianAction({ ...(opGuardian as UserGuardianItem), isInitStatus: false }));
         navigate(`/setting/guardians/edit`);
-      } else {
-        navigate(`/setting/${state}`, { state: 'back' });
+      } else if ('guardians/add' === state) {
+        navigate('/setting/guardians/add', { state: 'back' });
       }
     } else {
       navigate('/register/start');
     }
-  }, [dispatch, navigate, opGuardian, state]);
+  }, [navigate, state]);
 
   return (
     <div className={clsx('guardian-approval-wrapper', isPrompt ? 'common-page' : 'popup-page')}>
       {isPrompt ? <PortKeyTitle leftElement leftCallBack={handleBack} /> : <SettingHeader leftCallBack={handleBack} />}
       <div className="common-content1 guardian-approval-content">
         <div className="title">{t('Guardian Approval')}</div>
-        <p className="description">{t('Expire after 1 hour')}</p>
+        <p className="description">{isExpired ? t('Expired') : t('Expire after 1 hour')}</p>
         <div className="flex-between-center approve-count">
           <span className="flex-row-center">
             {t("Guardians' approval")}
@@ -434,7 +440,7 @@ export default function GuardianApproval() {
               className="recovery-wallet-btn"
               disabled={alreadyApprovalLength <= 0 || alreadyApprovalLength !== approvalLength}
               onClick={recoveryWallet}>
-              {state && state.indexOf('guardians') !== -1 ? 'Request to Pass' : 'Recover Wallet'}
+              {state && state.indexOf('guardians') !== -1 ? 'Confirm' : 'Recover Wallet'}
             </Button>
           </div>
         )}

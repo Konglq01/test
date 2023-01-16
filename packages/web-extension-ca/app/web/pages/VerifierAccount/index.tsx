@@ -10,7 +10,7 @@ import {
 } from 'store/Provider/hooks';
 import { useCallback, useMemo } from 'react';
 import { message } from 'antd';
-import { setCurrentGuardianAction, setUserGuardianItemStatus } from '@portkey/store/store-ca/guardians/actions';
+import { setOpGuardianAction, setUserGuardianItemStatus } from '@portkey/store/store-ca/guardians/actions';
 import { VerificationType, VerifyStatus } from '@portkey/types/verifier';
 import './index.less';
 import PortKeyTitle from 'pages/components/PortKeyTitle';
@@ -28,14 +28,12 @@ import { sleep } from '@portkey/utils';
 import { getAelfInstance } from '@portkey/utils/aelf';
 import { getTxResult } from 'utils/aelfUtils';
 import useGuardianList from 'hooks/useGuardianList';
-import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 
 export default function VerifierAccount() {
   const { loginAccount } = useLoginInfo();
   const { userGuardianStatus, currentGuardian, opGuardian } = useGuardiansInfo();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const userGuardianList = useGuardianList();
   const { state } = useLocationState<
     'register' | 'login' | 'guardians/add' | 'guardians/edit' | 'guardians/del' | 'guardians/setLoginAccount'
   >();
@@ -74,9 +72,8 @@ export default function VerifierAccount() {
               AESEncryptPrivateKey: walletInfo.AESEncryptPrivateKey,
             },
             passwordSeed,
-            // '11111111',
           );
-          if (!currentChain?.endPoint || !res?.privateKey) return message.error('error');
+          if (!currentChain?.endPoint || !res?.privateKey) return message.error('set login account error');
           const result = await handleGuardian({
             rpcUrl: currentChain.endPoint,
             chainType: currentNetwork.walletType,
@@ -98,18 +95,20 @@ export default function VerifierAccount() {
           const { TransactionId } = result.result.message || result;
           await sleep(1000);
           const aelfInstance = getAelfInstance(currentChain.endPoint);
-          const validTxId = await getTxResult(aelfInstance, TransactionId);
-          dispatch(
-            setCurrentGuardianAction({
-              ...currentGuardian,
-              isLoginAccount: true,
-            } as UserGuardianItem),
-          );
+          await getTxResult(aelfInstance, TransactionId);
+          opGuardian &&
+            dispatch(
+              setOpGuardianAction({
+                ...opGuardian,
+                isLoginAccount: true,
+              }),
+            );
           setLoading(false);
           navigate('/setting/guardians/view');
         } catch (error: any) {
           setLoading(false);
-          message.error(error.Error);
+          message.error(error?.Error?.Message || error.message?.Message || error?.message);
+          console.log('---set login account error', error);
         }
       } else {
         if (!currentGuardian) return;
@@ -124,7 +123,19 @@ export default function VerifierAccount() {
         navigate('/setting/guardians/guardian-approval', { state: state });
       }
     },
-    [currentChain, currentGuardian, currentNetwork, dispatch, navigate, passwordSeed, setLoading, state, walletInfo],
+    [
+      currentChain,
+      currentGuardian,
+      currentNetwork.walletType,
+      dispatch,
+      navigate,
+      opGuardian,
+      passwordSeed,
+      setLoading,
+      state,
+      walletInfo?.AELF?.caHash,
+      walletInfo.AESEncryptPrivateKey,
+    ],
   );
 
   const onSuccess = useCallback(
@@ -143,6 +154,7 @@ export default function VerifierAccount() {
         navigate('/login/guardian-approval');
       } else if (state?.indexOf('guardians') !== -1) {
         onSuccessInGuardian(res);
+        message.success('Verified Successful');
       } else {
         message.error('Router state error');
       }
@@ -155,19 +167,12 @@ export default function VerifierAccount() {
       navigate('/register/select-verifier');
     } else if (state === 'login') {
       navigate('/login/guardian-approval');
-    } else if (state?.indexOf('guardians') !== -1) {
-      if ('guardians/setLoginAccount' === state) {
-        navigate('/setting/guardians/view');
-      } else if (['guardians/edit', 'guardians/del'].includes(state)) {
-        dispatch(setCurrentGuardianAction(opGuardian as UserGuardianItem));
-        navigate('/setting/guardians/edit');
-      } else {
-        navigate(`/setting/${state}`, { state: 'back' });
-      }
+    } else if (state === 'guardians/add' && !userGuardianStatus?.[opGuardian?.key || ''].signature) {
+      navigate('/setting/guardians/add', { state: 'back' });
     } else {
       navigate(-1);
     }
-  }, [dispatch, navigate, opGuardian, state]);
+  }, [navigate, opGuardian?.key, state, userGuardianStatus]);
 
   const isInitStatus = useMemo(() => {
     if (state === 'register') return true;
