@@ -23,7 +23,6 @@ import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { setCAInfo } from '@portkey/store/store-ca/wallet/actions';
 import { CAInfo } from '@portkey/types/types-ca/wallet';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network';
-
 import { VerificationType } from '@portkey/types/verifier';
 import useEffectOnce from 'hooks/useEffectOnce';
 let appState: AppStateStatus, verifyTime: number;
@@ -44,7 +43,8 @@ export default function SecurityLock() {
   useEffect(() => {
     if (isSyncCAInfo) {
       setTimeout(() => {
-        if (managerInfo && apiUrl)
+        if (managerInfo && apiUrl) {
+          timer.current?.remove();
           timer.current = intervalGetResult({
             apiUrl,
             managerInfo: managerInfo,
@@ -57,10 +57,11 @@ export default function SecurityLock() {
                 true,
               ),
           });
+        }
       }, 100);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSyncCAInfo]);
+  }, [isSyncCAInfo, apiUrl]);
   const handleRouter = useCallback(
     (pinInput: string) => {
       Loading.hide();
