@@ -367,22 +367,31 @@ export default class ServiceWorkerInstantiate {
       setLocalStorage({
         [storage.lastMessageTime]: moment().add(pageState.lockTime, 'm').format(),
       });
-      lastTime && timeLock && ServiceWorkerInstantiate.lockWallet(sendResponse);
+      console.log(
+        timeLock,
+        lastTime,
+        pageState.lockTime,
+        moment().format(),
+        moment().add(pageState.lockTime, 'm').format(),
+        'timeLock==',
+      );
+      lastTime && timeLock && ServiceWorkerInstantiate.lockWallet(sendResponse, 'timingLock');
       // MV2 -> MV3 setTimeout -> alarms.create
-      // apis.alarms.create('timingLock', {
-      //   delayInMinutes: pageState.lockTime ?? AutoLockDataType.OneHour,
-      // });
-      // apis.alarms.onAlarm.addListener((alarm) => {
-      //   if (alarm.name !== 'timingLock') return;
-      //   apis.alarms.clear(alarm.name);
-      //   if (pageState.lockTime === AutoLockDataType.Never) return;
-      //   ServiceWorkerInstantiate.lockWallet(sendResponse);
-      // });
+      apis.alarms.create('timingLock', {
+        delayInMinutes: pageState.lockTime ?? AutoLockDataType.OneHour,
+      });
+      apis.alarms.onAlarm.addListener((alarm) => {
+        if (alarm.name !== 'timingLock') return;
+        apis.alarms.clear(alarm.name);
+        if (pageState.lockTime === AutoLockDataType.Never) return;
+        ServiceWorkerInstantiate.lockWallet(sendResponse, 'timingLock');
+      });
     }
   }
 
-  static lockWallet(sendResponse?: SendResponseFun) {
+  static lockWallet(sendResponse?: SendResponseFun, message?: any) {
     try {
+      console.log('lockWallet', message);
       seed = null;
       SWEventController.lockStateChanged(true, sendResponse);
     } catch (e) {
