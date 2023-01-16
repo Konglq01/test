@@ -66,7 +66,6 @@ export const unrestrictedMethods = Object.freeze([
   PortkeyMessageTypes.CLOSE_PROMPT,
   PortkeyMessageTypes.REGISTER_WALLET,
   PortkeyMessageTypes.LOCK_WALLET,
-  PortkeyMessageTypes.OPEN_PROMPT,
   MethodMessageTypes.GET_WALLET_STATE,
   AelfMessageTypes.INIT_AELF_CONTRACT,
   AelfMessageTypes.GET_SIGNATURE,

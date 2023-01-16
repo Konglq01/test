@@ -115,8 +115,7 @@ export const guardiansSlice = createSlice({
         state.userGuardianStatus[key]['verificationDoc'] = verificationDoc;
         if (!state.guardianExpiredTime) {
           // && status === VerifyStatus.Verifying
-          // TODO
-          state.guardianExpiredTime = moment().add(3, 'minute').subtract(2, 'minute').valueOf();
+          state.guardianExpiredTime = moment().add(1, 'h').subtract(2, 'minute').valueOf();
         }
       })
       .addCase(resetUserGuardianStatus, state => {
