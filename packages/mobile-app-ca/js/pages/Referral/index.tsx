@@ -8,7 +8,7 @@ import { useCredentials } from 'hooks/store';
 import CommonButton from 'components/CommonButton';
 import GStyles from 'assets/theme/GStyles';
 import { useLanguage } from 'i18n/hooks';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import Welcome from './components/Welcome';
 import { ImageBackground, StyleSheet } from 'react-native';
 import { isIos, screenHeight } from '@portkey/utils/mobile/device';
@@ -18,25 +18,25 @@ import { sleep } from '@portkey/utils';
 
 export default function Referral() {
   const credentials = useCredentials();
-  const { walletInfo } = useCurrentWallet();
+  const { address } = useCurrentWalletInfo();
   const gStyles = useGStyles();
   const { t } = useLanguage();
   const init = useCallback(async () => {
     if (!isIos) await sleep(200);
     await SplashScreen.hideAsync();
-    if (walletInfo?.address) {
+    if (address) {
       let name: keyof RootStackParamList = 'SecurityLock';
       if (credentials) name = 'Tab';
       navigationService.reset(name);
     }
-  }, [credentials, walletInfo?.address]);
+  }, [credentials, address]);
   useEffect(() => {
     init();
   }, [init]);
   return (
     <ImageBackground style={styles.backgroundContainer} resizeMode="cover" source={background}>
       <SafeAreaBox style={[gStyles.container, BGStyles.transparent]}>
-        {!walletInfo?.address ? (
+        {!address ? (
           <>
             <Welcome />
             <CommonButton
