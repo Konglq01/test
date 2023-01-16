@@ -36,7 +36,7 @@
       "@rneui/themed/**",
       "base-64",
       "buffer",
-      "teaset",
+      "rn-teaset",
       "@shopify/flash-list"
     ]
   },
@@ -120,7 +120,7 @@
     "rn-nodeify": "^10.3.0",
     "seamless-immutable": "^7.1.4",
     "stream": "^0.0.2",
-    "teaset": "git+https://github.com/mason-hz/teaset",
+    "rn-teaset": "^0.1.1",
     "uuid": "^8.3.2",
     "web3-utils": "^1.8.0"
   },

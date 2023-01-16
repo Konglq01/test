@@ -1,6 +1,6 @@
 'use strict';
 import React, { ReactNode } from 'react';
-import Overlay from 'teaset/components/Overlay/Overlay';
+import Overlay from 'rn-teaset/components/Overlay/Overlay';
 import { StyleProp, StyleSheet, ViewStyle } from 'react-native';
 import { bottomBarHeight, screenHeight, screenWidth, statusBarHeight } from '@portkey/utils/mobile/device';
 import { defaultColors } from 'assets/theme';
