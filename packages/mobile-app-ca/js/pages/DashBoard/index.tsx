@@ -1,21 +1,21 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { unitConverter } from '@portkey/utils/converter';
-import { ZERO } from '@portkey/constants/misc';
+import React, { useState } from 'react';
 import Card from './Card';
+import { StyleSheet } from 'react-native';
 // import navigationService from 'utils/navigationService';
 // import { TouchableOpacity } from 'react-native-gesture-handler';
 // import { TokenItemShowType } from '@portkey/types/types-eoa/token';
 // import Svg from 'components/Svg';
 // import { clearBalance, updateBalance } from '@portkey/store/tokenBalance/slice';
-import { useAppCommonDispatch, useAppEOASelector } from '@portkey/hooks/index';
+import { useAppCommonDispatch } from '@portkey/hooks/index';
 import DashBoardTab from './DashBoardTab';
 import SafeAreaBox from 'components/SafeAreaBox';
 import { defaultColors } from 'assets/theme';
-import Tips from './Tips';
 
 import useEffectOnce from 'hooks/useEffectOnce';
 import { MINUTE } from '@portkey/constants';
 import { fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
+import { useGetCurrentCAViewContract } from 'hooks/contract';
+import PageContainer from 'components/PageContainer';
 
 interface DashBoardTypes {
   navigation: any;
@@ -27,6 +27,10 @@ let timer: any;
 const DashBoard: React.FC<DashBoardTypes> = () => {
   const [closed, setClosed] = useState<boolean>(false);
   const [balanceUSD, setBalanceUSD] = useState<string | number>('--');
+  const getCurrentCAViewContract = useGetCurrentCAViewContract();
+  useEffectOnce(() => {
+    getCurrentCAViewContract();
+  });
 
   // const [balances, onGetBalance] = useBalances({
   //   tokens: localTokenList,
@@ -73,13 +77,26 @@ const DashBoard: React.FC<DashBoardTypes> = () => {
     dispatch(fetchTokenListAsync({ type: 'MAIN' }));
   });
 
-  // return <View style={{ backgroundColor: 'red', height: '100%' }} />;
   return (
-    <SafeAreaBox edges={['top', 'left', 'right']} style={{ backgroundColor: defaultColors.bg5 }}>
+    <PageContainer
+      hideHeader
+      safeAreaColor={['blue', 'white']}
+      containerStyles={styles.container}
+      scrollViewProps={{ disabled: true }}>
       <Card balanceUSD={balanceUSD} />
       <DashBoardTab />
-    </SafeAreaBox>
+    </PageContainer>
   );
+
+  // return <SafeAreaBox edges={['top', 'left', 'right']} style={{ backgroundColor: defaultColors.bg5 }} />;
 };
 
 export default DashBoard;
+
+const styles = StyleSheet.create({
+  container: {
+    paddingLeft: 0,
+    paddingRight: 0,
+    height: '100%',
+  },
+});

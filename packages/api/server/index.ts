@@ -24,7 +24,6 @@ class ServiceInit {
    */
 
   send = (url: string, config?: BaseConfig) => {
-    //TODO networkType
     const { method = DEFAULT_METHOD, baseURL, ...fetchConfig } = config || {};
     const _baseURL = baseURL ?? '';
     const _url = url;

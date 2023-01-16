@@ -17,7 +17,7 @@ type DigitInputProps = {
 } & InputProps;
 
 export type DigitInputInterface = {
-  resetPin: () => void;
+  reset: () => void;
 };
 
 function InputItem({
@@ -79,8 +79,8 @@ const DigitInput = forwardRef(
       }
       return inputItem;
     }, [iconStyle, inputItemStyle, maxLength, secureTextEntry, styleProps.inputItem, text, type]);
-    const resetPin = useCallback(() => setText(''), []);
-    useImperativeHandle(forwardedRef, () => ({ resetPin }), [resetPin]);
+    const reset = useCallback(() => setText(''), []);
+    useImperativeHandle(forwardedRef, () => ({ reset }), [reset]);
 
     return (
       <TouchableHighlight onPress={() => input.current?.focus()} activeOpacity={1} underlayColor="transparent">
@@ -92,10 +92,10 @@ const DigitInput = forwardRef(
               ref={input}
               value={text}
               maxLength={maxLength}
-              autoFocus={true}
+              // autoFocus={true}
               keyboardType={keyboardType}
               onChangeText={value => {
-                // if (value && !isValidPositiveInteger(value)) return;
+                if (value && !isValidPositiveInteger(value)) return;
                 setText(value);
                 onChangeText?.(value);
                 if (value.length === maxLength) onFinish?.(value);

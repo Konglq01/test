@@ -1,54 +1,29 @@
-import { useNavigation } from '@react-navigation/native';
-import { RootNavigationProp } from 'navigation';
 import * as React from 'react';
 import { Button, Text } from '@rneui/base';
 import { ScrollView } from 'react-native-gesture-handler';
 import navigationService from '../../utils/navigationService';
-import { useAppDispatch, useAppSelector } from 'store/hooks';
 import SafeAreaBox from 'components/SafeAreaBox';
 import ActionSheet from 'components/ActionSheet';
-import useLogOut from 'hooks/useLogOut';
-import { useTokenContract } from 'contexts/useInterface/hooks';
-import { setCAInfo } from '@portkey/store/store-ca/wallet/actions';
-import { useCurrentWallet, useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { CrashTest } from 'Test/CrashTest';
-import { useUser } from 'hooks/store';
 import Loading from 'components/Loading';
-
+import { contractQueries } from '@portkey/graphql/index';
+import { DefaultChainId } from '@portkey/constants/constants-ca/network';
+import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+import { getWallet } from 'utils/redux';
+import { useCredentials } from 'hooks/store';
+import { getAelfInstance } from '@portkey/utils/aelf';
+import { useGetHolderInfo } from 'hooks/guardian';
 export default function HomeScreen() {
-  const navigation = useNavigation<RootNavigationProp>();
-  const onLogOut = useLogOut();
-  const tokenContract = useTokenContract();
-  const dispatch = useAppDispatch();
   const wallet = useCurrentWalletInfo();
-  const { currentNetwork } = useCurrentWallet();
-  const stateWallet = useAppSelector(state => state.wallet);
-  const user = useUser();
-  console.log(user, currentNetwork, wallet, stateWallet, '====wallet-HomeScreen');
-
+  const getHolderInfo = useGetHolderInfo();
+  const { pin } = useCredentials() || {};
+  const chainInfo = useCurrentChain('AELF');
   return (
     <SafeAreaBox>
       <ScrollView>
-        <Text>Home Screen</Text>
-        <Button onPress={onLogOut}>reSetWallet</Button>
-        {/* <Button title="Go to Element" onPress={() => navigation.navigate('Element')} /> */}
-        {/* <Button title="Go to I18n" onPress={() => navigation.navigate('I18n')} /> */}
-        {/* <Button title="Go to Webview" onPress={() => navigation.navigate('WebView')} /> */}
-        <Button title="Go to Echarts" onPress={() => navigation.navigate('Echarts')} />
-        <Button title="Go to ContactsHome" onPress={() => navigation.navigate('ContactsHome')} />
-        <Button title="Go to Token" onPress={() => navigation.navigate('ManageTokenList')} />
-        <Button title="Go to ManageNetwork" onPress={() => navigation.navigate('ManageNetwork')} />
+        <Text>Test Screen</Text>
         <Button title="ActionSheet show" onPress={() => ActionSheet.show([{ title: '123' }, { title: '123' }])} />
-        <Button
-          title="getBalance"
-          onPress={async () => {
-            const balance = await tokenContract?.callViewMethod('GetBalance', {
-              symbol: 'ELF',
-              owner: '2BC7WWMNBp4LjmJ48VAfDocEU2Rjg5yhELxT2HewfYxPPrdxA9',
-            });
-            console.log(balance, '=====balance');
-          }}
-        />
         <Button
           title="loading show"
           onPress={() => {
@@ -60,18 +35,72 @@ export default function HomeScreen() {
         />
         <Button title="Account Settings" onPress={() => navigationService.navigate('AccountSettings')} />
         <Button
-          title="setCAInfo"
+          title="getCAHolderByManager"
           onPress={async () => {
             try {
-              await dispatch(
-                setCAInfo({ caInfo: { caAddress: 'aaaa', caHash: 'xxx' }, pin: '123456', chainId: 'tDVV' }),
-              );
-              console.log('setCAInfo');
+              const { caHolderManagerInfo } = await contractQueries.getCAHolderByManager('TESTNET', {
+                chainId: DefaultChainId,
+                manager: wallet.address,
+              });
+              console.log(caHolderManagerInfo, '=====caHolderManagerInfo');
             } catch (error) {
-              console.log(error, '====error');
+              console.log(error, '=====error');
             }
           }}
         />
+        <Button
+          title="getCAContract"
+          onPress={async () => {
+            if (!chainInfo || !pin) return;
+            console.log(chainInfo, '==chainInfo.caContractAddress');
+            getHolderInfo({ caHash: wallet.AELF?.caHash as any });
+            const account = getWallet(pin);
+            // const contract = await getELFContract({
+            //   contractAddress: chainInfo.caContractAddress,
+            //   rpcUrl: chainInfo.endPoint,
+            //   account: account,
+            // });
+            const instance = getAelfInstance('http://192.168.67.35:8000');
+            const aelfContract = await instance.chain.contractAt(
+              '2LUmicHyH4RXrMjG4beDwuDsiWJESyLkgkwPdGTR8kahRzq5XS',
+              account,
+            );
+
+            const req = await aelfContract.AddGuardian({
+              caHash: '2045f9b4859d0b9eb6015ec90cabdfb31939ae19500ef0b9970aade32f310650',
+              guardianToAdd: {
+                guardianType: {
+                  // type: 0,
+                  // guardianType: 'hong.lin@aelf.io',
+                },
+                verifier: {
+                  name: 'Verifier-002',
+                  signature:
+                    '4cafb0a1f39260fc4778f06d79a7894dc841d8627d463e4d65c84fadb5a011180265b69037c6863a9f2d387677edeaa6cc72ed0eb10e55bf3d26e2f3746357f000',
+                  verificationDoc:
+                    '0,hong.lin@aelf.io,01/05/2023 07:45:55,2mBnRTqXMb5Afz4CWM2QakLRVDfaq2doJNRNQT1MXoi2uc6Zy3',
+                },
+              },
+              guardiansApproved: [
+                {
+                  guardianType: {
+                    // type: 0,
+                    // guardianType: 'hong.lin@hoopox.com',
+                  },
+                  verifier: {
+                    name: 'Verifier-002',
+                    signature:
+                      '3ede00fb1865e01b48f7165d3e7e6b5ad0ce1e0ea0562ff39b3779bbadb43bd3150356144a6410659dffe87a636257d663b6e72fdc691c5407571b4d3f01dc6900',
+                    verificationDoc:
+                      '0,hong.lin@hoopox.com,01/05/2023 07:46:11,2mBnRTqXMb5Afz4CWM2QakLRVDfaq2doJNRNQT1MXoi2uc6Zy3',
+                  },
+                },
+              ],
+            });
+            console.log(req, '====req');
+          }}
+        />
+
         <CrashTest />
       </ScrollView>
     </SafeAreaBox>

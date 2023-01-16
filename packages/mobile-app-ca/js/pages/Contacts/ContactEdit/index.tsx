@@ -22,14 +22,13 @@ import { isValidCAWalletName } from '@portkey/utils/reg';
 import ChainOverlay from './components/ChainOverlay';
 import { getAelfAddress, isAelfAddress } from '@portkey/utils/aelf';
 import { getChainListAsync } from '@portkey/store/store-ca/wallet/actions';
-import { useWallet } from 'hooks/store';
 import { ChainItemType } from '@portkey/store/store-ca/wallet/type';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import CommonToast from 'components/CommonToast';
 import ActionSheet from 'components/ActionSheet';
+import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 
 interface ContactEditProps {
-  netWork?: string;
   route?: any;
 }
 
@@ -50,7 +49,7 @@ const initEditContact: EditContactType = {
 
 const ContactEdit: React.FC<ContactEditProps> = ({ route }) => {
   const { t } = useLanguage();
-  const appDispatch = useAppDispatch();
+  // const appDispatch = useAppDispatch();
   const { contactIndexList } = useAppSelector(state => state.contact);
   const [editContact, setEditContact] = useState<EditContactType>(initEditContact);
 
@@ -70,10 +69,10 @@ const ContactEdit: React.FC<ContactEditProps> = ({ route }) => {
 
   const isEdit = useMemo(() => params?.contact !== undefined, [params?.contact]);
 
-  useEffect(() => {
-    appDispatch(getChainListAsync());
-  }, [appDispatch]);
-  const { chainList, currentNetwork } = useWallet();
+  // useEffect(() => {
+  //   appDispatch(getChainListAsync());
+  // }, [appDispatch]);
+  const { chainList = [], currentNetwork } = useCurrentWallet();
 
   const chainMap = useMemo(() => {
     const _chainMap: { [k: string]: ChainItemType } = {};
@@ -111,21 +110,20 @@ const ContactEdit: React.FC<ContactEditProps> = ({ route }) => {
   const addAddress = useCallback(() => {
     if (editContact.addresses.length >= ADDRESS_NUM_LIMIT) return;
     if (chainList.length < 1) return;
-    // TODO: add network init insert
     setEditContact(preEditContact => ({
       ...preEditContact,
       addresses: [
         ...preEditContact.addresses,
         {
           id: '',
-          chainType: 'MAIN',
+          chainType: currentNetwork,
           chainId: chainList[0].chainId,
           address: '',
           error: { ...INIT_HAS_ERROR },
         },
       ],
     }));
-  }, [chainList, editContact.addresses.length]);
+  }, [chainList, currentNetwork, editContact.addresses.length]);
 
   const deleteAddress = useCallback((deleteIdx: number) => {
     setEditContact(preEditContact => ({
@@ -169,13 +167,13 @@ const ContactEdit: React.FC<ContactEditProps> = ({ route }) => {
       _editContact.name = _nameValue;
       _editContact.error = {
         ...INIT_HAS_ERROR,
-        errorMsg: t('Please Enter Wallet Name'),
+        errorMsg: t('Please enter contact name'),
       };
     } else if (!isValidCAWalletName(_nameValue)) {
       isErrorExist = true;
       _editContact.error = {
         ...INIT_HAS_ERROR,
-        errorMsg: t('only a-z, A-Z,0-9 and "_"allowed'),
+        errorMsg: t('Only a-z, A-Z, 0-9 and "_"  allowed'),
       };
     } else {
       let isContactNameExist = false;
@@ -228,8 +226,8 @@ const ContactEdit: React.FC<ContactEditProps> = ({ route }) => {
 
   const onDelete = useCallback(() => {
     ActionSheet.alert({
-      title: t('Confirm Delete?'),
-      message: t('After the contact is deleted, all relevant information of the contact will be deleted synchronously'),
+      title: t('Delete Contact?'),
+      message: t('After the contact is deleted, all relevant information will also be removed.'),
       buttons: [
         {
           title: t('No'),
@@ -246,7 +244,6 @@ const ContactEdit: React.FC<ContactEditProps> = ({ route }) => {
     });
   }, [t]);
 
-  // TODO: adjust chainItem type
   const onChainChange = useCallback(
     (addressIdx: number, chainItem: ChainItemType) => {
       onAddressChange('', addressIdx);
@@ -262,7 +259,7 @@ const ContactEdit: React.FC<ContactEditProps> = ({ route }) => {
   return (
     <PageContainer
       safeAreaColor={['blue', 'gray']}
-      titleDom={isEdit ? t('Edit Contact') : t('New Contact')}
+      titleDom={isEdit ? t('Edit Contact') : t('Add New Contacts')}
       containerStyles={pageStyles.pageWrap}
       scrollViewProps={{ disabled: true }}>
       <Input
@@ -270,7 +267,7 @@ const ContactEdit: React.FC<ContactEditProps> = ({ route }) => {
         theme="white-bg"
         maxLength={16}
         label={t('Name')}
-        placeholder={t('Enter address name')}
+        placeholder={t('Enter name')}
         inputStyle={pageStyles.nameInputStyle}
         value={editContact.name}
         onChangeText={onNameChange}

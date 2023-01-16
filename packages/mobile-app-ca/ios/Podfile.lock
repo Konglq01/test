@@ -529,6 +529,8 @@ PODS:
     - RCTTypeSafety
     - React-Core
     - ReactCommon/turbomodule/core
+  - react-native-spinkit (1.4.1):
+    - React
   - react-native-webview (11.23.1):
     - React-Core
   - React-perflogger (0.69.7)
@@ -733,6 +735,7 @@ DEPENDENCIES:
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
   - react-native-randombytes (from `../node_modules/react-native-randombytes`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
+  - react-native-spinkit (from `../node_modules/react-native-spinkit`)
   - react-native-webview (from `../node_modules/react-native-webview`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
@@ -898,6 +901,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-randombytes"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
+  react-native-spinkit:
+    :path: "../node_modules/react-native-spinkit"
   react-native-webview:
     :path: "../node_modules/react-native-webview"
   React-perflogger:
@@ -1038,6 +1043,7 @@ SPEC CHECKSUMS:
   react-native-pager-view: 592421df0259bf7a7a4fe85b74c24f3f39905605
   react-native-randombytes: 421f1c7d48c0af8dbcd471b0324393ebf8fe7846
   react-native-safe-area-context: 99b24a0c5acd0d5dcac2b1a7f18c49ea317be99a
+  react-native-spinkit: da294fd828216ad211fe36a5c14c1e09f09e62db
   react-native-webview: d33e2db8925d090871ffeb232dfa50cb3a727581
   React-perflogger: 8e832d4e21fdfa613033c76d58d7e617341e804b
   React-RCTActionSheet: 9ca778182a9523991bff6381045885b6e808bb73
@@ -1070,6 +1076,6 @@ SPEC CHECKSUMS:
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
   ZXingObjC: fdbb269f25dd2032da343e06f10224d62f537bdb
 
-PODFILE CHECKSUM: 7fb7fc5575f809dbe7f5d5d50f33cdf7a260f8fe
+PODFILE CHECKSUM: a537a95fbfc8a0ce18d48190bee3e109d6d2b758
 
 COCOAPODS: 1.11.3

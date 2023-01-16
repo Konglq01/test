@@ -2,19 +2,16 @@ import * as React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from 'pages/Home';
 import DashBoard from 'pages/DashBoard';
-import SettingsPage from 'pages/SettingsPage';
 import Svg from 'components/Svg';
 import { defaultColors } from 'assets/theme';
 import { useNetworkInitialization } from '@portkey/hooks/network';
-import { useAccountListBalanceTimer } from 'contexts/useInterface/hooks';
 import { useLanguage } from 'i18n/hooks';
-import MyMenu from 'components/MyMenu';
+import MyMenu from 'pages/MyMenu';
 
 const Tab = createBottomTabNavigator();
 
 export const tabMenuList = [
   { name: 'Wallet', label: 'Wallet', index: 0, icon: 'logo-icon', component: DashBoard },
-  { name: 'Discover', label: 'Discover', index: 1, icon: 'discover', component: HomeScreen },
   { name: 'Settings', label: 'My', index: 2, icon: 'my', component: MyMenu },
 ] as const;
 
@@ -24,7 +21,6 @@ export default function TabRoot() {
   const { t } = useLanguage();
 
   useNetworkInitialization();
-  useAccountListBalanceTimer();
   return (
     <Tab.Navigator
       initialRouteName="Wallet"

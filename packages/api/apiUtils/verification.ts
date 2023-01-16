@@ -1,4 +1,5 @@
-import { LoginType, VerificationType } from '@portkey/types/verifier';
+import { LoginType } from '@portkey/types/types-ca/wallet';
+import { VerificationType } from '@portkey/types/verifier';
 import { request } from '..';
 
 interface SendVerificationCodeProps {
@@ -16,6 +17,9 @@ export function sendVerificationCode(params: SendVerificationCodeProps): Promise
       break;
     case VerificationType.communityRecovery:
       tmpFetch = request.verify.sendRecoveryVerificationCode;
+      break;
+    case VerificationType.addGuardian:
+      tmpFetch = request.verify.sendVerificationCode;
       break;
     default:
       throw Error('Unable to find the corresponding api');
@@ -63,6 +67,9 @@ export async function checkVerificationCode({
       break;
     case VerificationType.communityRecovery:
       tmpFetch = request.verify.checkRecoveryVerificationCode;
+      break;
+    case VerificationType.addGuardian:
+      tmpFetch = request.verify.checkVerificationCode;
       break;
     default:
       throw Error('Unable to find the corresponding api');

@@ -1,6 +1,6 @@
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { GuardiansInfo, VerifierItem, VerifyStatus } from '@portkey/types/verifier';
-import { UserGuardianItem } from './type';
+import { UserGuardianItem, UserGuardianStatus } from './type';
 
 export const resetVerifierState = createAction('verifier/resetVerifierState');
 
@@ -23,14 +23,19 @@ export const setVerifierListAction = createAction<VerifierItem[] | null>('verifi
 export const setGuardiansAction = createAction<GuardiansInfo | null>('verifier/setGuardians');
 
 export const setCurrentGuardianAction = createAction<UserGuardianItem>('verifier/setCurrentGuardian');
-export const setUserGuardianItemStatus = createAction<{ key: string; status: VerifyStatus }>(
-  'verifier/setUserGuardianItemStatus',
-);
-export const setUserGuardianStatus = createAction<{ key: string; status: VerifyStatus }>(
+export const setUserGuardianItemStatus = createAction<{
+  key: string;
+  status: VerifyStatus;
+  signature?: string;
+  verificationDoc?: string;
+}>('verifier/setUserGuardianItemStatus');
+export const setUserGuardianStatus = createAction<{ [x: string]: UserGuardianStatus }>(
   'verifier/setUserGuardianStatus',
 );
-export const resetUserGuardianItemStatus = createAction('verifier/resetUserGuardianItemStatus');
+export const resetUserGuardianStatus = createAction('verifier/resetUserGuardianStatus');
 
 export const setUserGuardianSessionIdAction = createAction<{ key: string; sessionId: string }>(
   'verifier/setUserGuardianSessionId',
 );
+export const setOpGuardianAction = createAction<UserGuardianItem | undefined>('verifier/setOpGuardian');
+export const setPreGuardianAction = createAction<UserGuardianItem | undefined>('verifier/setPreGuardian');

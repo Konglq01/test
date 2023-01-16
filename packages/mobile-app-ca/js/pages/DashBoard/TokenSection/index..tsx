@@ -1,21 +1,14 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import navigationService from 'utils/navigationService';
-import { useAppDispatch } from 'store/hooks';
 import { useAppCASelector, useAppCommonDispatch } from '@portkey/hooks/index';
-import { useCurrentAccountTokenList } from '@portkey/hooks/hooks-ca/useToken';
 import { View, TouchableOpacity, FlatList } from 'react-native';
 import Svg from 'components/Svg';
 import { TokenItemShowType } from '@portkey/types/types-ca/token';
-import { updateBalance } from '@portkey/store/tokenBalance/slice';
-import { clearMarketToken } from '@portkey/store/token/slice';
 import { TextM } from 'components/CommonText';
 import { defaultColors } from 'assets/theme';
 import { pTd } from 'utils/unit';
 import TokenListItem from 'components/TokenListItem';
-import CommonToast from 'components/CommonToast';
-import { useGetELFRateQuery } from '@portkey/store/rate/api';
-import { useTokenContract } from 'contexts/useInterface/hooks';
 import { useLanguage } from 'i18n/hooks';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { fetchTokenList } from '@portkey/store/store-ca/assets/api';
@@ -25,7 +18,7 @@ const mockData = {
     {
       chainId: 'AELF',
       token: {
-        id: Math.random(),
+        id: 1,
         chainId: 'AELF',
         symbol: 'ELF',
         address: 'xxxxxx',
@@ -36,7 +29,7 @@ const mockData = {
     {
       chainId: 'AELF',
       token: {
-        id: Math.random(),
+        id: 2,
         chainId: 'AELF',
         symbol: 'ELF',
         address: 'xxxxxx',
@@ -47,7 +40,7 @@ const mockData = {
     {
       chainId: 'AELF',
       token: {
-        id: Math.random(),
+        id: 3,
         chainId: 'AELF',
         symbol: 'ELF',
         address: 'xxxxxx',
@@ -70,8 +63,8 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
     accountToken: { accountTokenList },
   } = useAppCASelector(state => state.assets);
 
-  const [tokenList, setTokenList] = useState<any[]>([]);
-  const [tokenNum, setTokenNumber] = useState(0);
+  const [, setTokenList] = useState<any[]>([]);
+  const [, setTokenNumber] = useState(0);
 
   const [refreshing, setRefreshing] = useState(false);
   const { accountToken } = useAppCASelector(state => state.assets);
@@ -110,7 +103,7 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
         refreshing={refreshing}
         data={accountTokenList || []}
         renderItem={renderItem}
-        keyExtractor={(item: TokenItemShowType) => item?.id || ''}
+        keyExtractor={(item: any) => item?.token?.id}
         onRefresh={() => {
           setRefreshing(true);
           getAccountBalance?.();

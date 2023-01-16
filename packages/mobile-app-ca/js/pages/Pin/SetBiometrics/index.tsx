@@ -15,79 +15,102 @@ import { setBiometrics } from 'store/user/actions';
 import { usePreventHardwareBack } from '@portkey/hooks/mobile';
 import biometric from 'assets/image/pngs/biometric.png';
 import { pTd } from 'utils/unit';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { intervalGetRegisterResult, TimerResult } from 'utils/wallet';
+import { intervalGetResult, onResultFail, TimerResult } from 'utils/wallet';
 import { CAInfo } from '@portkey/types/types-ca/wallet';
 import Loading from 'components/Loading';
 import { setCAInfo } from '@portkey/store/store-ca/wallet/actions';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 import { handleError } from '@portkey/utils';
+import { VerificationType } from '@portkey/types/verifier';
+import CommonToast from 'components/CommonToast';
 const ScrollViewProps = { disabled: true };
 export default function SetBiometrics() {
   usePreventHardwareBack();
   const dispatch = useAppDispatch();
   const timer = useRef<TimerResult>();
-  const { pin } = useRouterParams<{ pin?: string }>();
+  const { pin, caInfo: paramsCAInfo } = useRouterParams<{ pin?: string; caInfo?: CAInfo }>();
   const [errorMessage, setErrorMessage] = useState<string>();
-  const { walletInfo } = useCurrentWallet();
+  const { address, managerInfo, caHash } = useCurrentWalletInfo();
   const { apiUrl } = useCurrentNetworkInfo();
-  const [caInfo, setStateCAInfo] = useState<CAInfo>();
-  const isSyncCAInfo = useMemo(
-    () => walletInfo.address && walletInfo.managerInfo && !walletInfo.AELF?.caAddress,
-    [walletInfo.AELF?.caAddress, walletInfo.address, walletInfo.managerInfo],
-  );
+  const [caInfo, setStateCAInfo] = useState<CAInfo | undefined>(paramsCAInfo);
+
+  const isSyncCAInfo = useMemo(() => address && managerInfo && !caHash, [address, caHash, managerInfo]);
+
   useEffect(() => {
     if (isSyncCAInfo) {
       setTimeout(() => {
-        if (walletInfo.managerInfo && apiUrl)
-          timer.current = intervalGetRegisterResult({
+        if (managerInfo && apiUrl)
+          timer.current = intervalGetResult({
             apiUrl,
-            managerInfo: walletInfo.managerInfo,
+            managerInfo,
             onPass: setStateCAInfo,
+            onFail: message =>
+              onResultFail(
+                dispatch,
+                message,
+                managerInfo?.verificationType === VerificationType.communityRecovery,
+                true,
+              ),
           });
       }, 100);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSyncCAInfo]);
+  const getResult = useCallback(async () => {
+    if (!pin) return;
+    if (!isSyncCAInfo) return navigationService.reset('Tab');
+    if (caInfo) {
+      dispatch(
+        setCAInfo({
+          caInfo,
+          pin,
+          chainId: DefaultChainId,
+        }),
+      );
+      return navigationService.reset('Tab');
+    }
+    if (managerInfo) {
+      timer.current?.remove();
+      Loading.show();
+      timer.current = intervalGetResult({
+        apiUrl,
+        managerInfo,
+        onPass: (info: CAInfo) => {
+          dispatch(
+            setCAInfo({
+              caInfo: info,
+              pin,
+              chainId: DefaultChainId,
+            }),
+          );
+          Loading.hide();
+          navigationService.reset('Tab');
+        },
+        onFail: message =>
+          onResultFail(dispatch, message, managerInfo?.verificationType === VerificationType.communityRecovery, true),
+      });
+    }
+  }, [apiUrl, caInfo, dispatch, isSyncCAInfo, managerInfo, pin]);
   const openBiometrics = useCallback(async () => {
     if (!pin) return;
     try {
       await setSecureStoreItem('Pin', pin);
       dispatch(setBiometrics(true));
-      if (isSyncCAInfo && !caInfo && walletInfo.managerInfo) {
-        timer.current?.remove();
-        Loading.show();
-        timer.current = intervalGetRegisterResult({
-          apiUrl,
-          managerInfo: walletInfo.managerInfo,
-          onPass: (info: CAInfo) => {
-            dispatch(
-              setCAInfo({
-                caInfo: info,
-                pin,
-                chainId: DefaultChainId,
-              }),
-            );
-            Loading.hide();
-            navigationService.reset('Tab');
-          },
-        });
-        return;
-      } else if (caInfo) {
-        dispatch(
-          setCAInfo({
-            caInfo,
-            pin,
-            chainId: DefaultChainId,
-          }),
-        );
-        navigationService.reset('Tab');
-      }
+      await getResult();
     } catch (error) {
       setErrorMessage(handleError(error, 'Failed To Verify'));
     }
-  }, [apiUrl, caInfo, dispatch, isSyncCAInfo, pin, walletInfo.managerInfo]);
+  }, [dispatch, getResult, pin]);
+  const onSkip = useCallback(async () => {
+    try {
+      dispatch(setBiometrics(false));
+      await getResult();
+    } catch (error) {
+      CommonToast.failError(error);
+    }
+  }, [dispatch, getResult]);
   return (
     <PageContainer scrollViewProps={ScrollViewProps} leftDom titleDom containerStyles={styles.containerStyles}>
       <Touchable style={GStyles.itemCenter} onPress={openBiometrics}>
@@ -95,12 +118,7 @@ export default function SetBiometrics() {
         <TextL style={styles.tipText}>Enable biometric authentication</TextL>
         {errorMessage ? <TextS style={styles.errorText}>{errorMessage}</TextS> : null}
       </Touchable>
-      <CommonButton
-        type="clear"
-        title="Skip"
-        buttonStyle={BGStyles.transparent}
-        onPress={() => navigationService.navigate('Tab')}
-      />
+      <CommonButton type="clear" title="Skip" buttonStyle={BGStyles.transparent} onPress={onSkip} />
     </PageContainer>
   );
 }

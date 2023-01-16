@@ -9,7 +9,7 @@ export const useAppDispatch: () => AppDispatch = useDispatch;
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
 export const useWalletInfo = () => useAppSelector((state) => state.wallet);
-export const useLoginInfo = () => useAppSelector((state) => state.login);
+export const useLoginInfo = () => useAppSelector((state) => state.loginCache);
 export const useContact = () => useAppSelector((state) => state.contact);
 
 export const useTokenBalance = () => useAppSelector((state) => state.tokenBalance);

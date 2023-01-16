@@ -1,24 +1,57 @@
 import { defaultColors } from 'assets/theme';
 import Svg from 'components/Svg';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import { pTd } from 'utils/unit';
 import navigationService from 'utils/navigationService';
 import PageContainer from 'components/PageContainer';
 import { pageStyles } from './style';
 import { useLanguage } from 'i18n/hooks';
-import { useGuardianList } from 'hooks/useGuardianList';
 import { useGuardiansInfo } from 'hooks/store';
-import GuardianAccountItem from '../GuardianAccountItem';
-import useVerifierList from 'hooks/useVerifierList';
+import GuardianAccountItem from '../components/GuardianAccountItem';
 import Touchable from 'components/Touchable';
+import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import { useGetHolderInfo } from 'hooks/guardian';
+import useEffectOnce from 'hooks/useEffectOnce';
+import myEvents from 'utils/deviceEvent';
+import CommonToast from 'components/CommonToast';
 
 export default function GuardianHome() {
   const { t } = useLanguage();
-  useVerifierList();
-  useGuardianList();
 
   const { userGuardiansList } = useGuardiansInfo();
+  const guardianList = useMemo(() => {
+    if (!userGuardiansList) return [];
+    return [...userGuardiansList].reverse();
+  }, [userGuardiansList]);
+
+  const { caHash } = useCurrentWalletInfo();
+
+  const getGuardiansList = useGetHolderInfo();
+  const refreshGuardiansList = useCallback(async () => {
+    try {
+      await getGuardiansList({
+        caHash,
+      });
+    } catch (error) {
+      // TODO: remove Toast
+      CommonToast.failError(error);
+    }
+  }, [caHash, getGuardiansList]);
+
+  useEffectOnce(() => {
+    refreshGuardiansList();
+  });
+
+  useEffect(() => {
+    const listener = myEvents.refreshGuardiansList.addListener(() => {
+      console.log('listener:refreshGuardiansList----');
+      refreshGuardiansList();
+    });
+    return () => {
+      listener.remove();
+    };
+  }, [refreshGuardiansList]);
 
   const renderGuardianBtn = useCallback(
     () => <Svg icon="right-arrow" color={defaultColors.icon1} size={pTd(16)} />,
@@ -40,7 +73,7 @@ export default function GuardianHome() {
         </TouchableOpacity>
       }>
       <View>
-        {userGuardiansList?.map((guardian, idx) => (
+        {guardianList.map((guardian, idx) => (
           <Touchable
             key={idx}
             onPress={() => {
@@ -48,8 +81,9 @@ export default function GuardianHome() {
             }}>
             <GuardianAccountItem
               guardianItem={guardian}
+              isButtonHide
               renderBtn={renderGuardianBtn}
-              isBorderHide={idx === userGuardiansList.length - 1}
+              isBorderHide={idx === guardianList.length - 1}
             />
           </Touchable>
         ))}

@@ -12,8 +12,8 @@ import { BorderStyles, FontStyles } from 'assets/theme/styles';
 import Svg from 'components/Svg';
 import { pTd } from 'utils/unit';
 import { getApprovalCount } from '@portkey/utils/guardian';
-import { VerificationType, VerifyStatus } from '@portkey/types/verifier';
-import GuardianAccountItem, { GuardiansStatus, GuardiansStatusItem } from '../GuardianAccountItem';
+import { ApprovalType, VerificationType, VerifyStatus } from '@portkey/types/verifier';
+import GuardianAccountItem, { GuardiansStatus, GuardiansStatusItem } from '../components/GuardianAccountItem';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { randomId } from '@portkey/utils';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
@@ -22,49 +22,92 @@ import { LoginType, ManagerInfo } from '@portkey/types/types-ca/wallet';
 import Touchable from 'components/Touchable';
 import ActionSheet from 'components/ActionSheet';
 import myEvents from 'utils/deviceEvent';
+import Loading from 'components/Loading';
+import { useGuardiansInfo } from 'hooks/store';
+import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import CommonToast from 'components/CommonToast';
+import { useAppDispatch } from 'store/hooks';
+import { setPreGuardianAction } from '@portkey/store/store-ca/guardians/actions';
+import { addGuardian, deleteGuardian, editGuardian } from 'utils/guardian';
+import { useGetCurrentCAContract } from 'hooks/contract';
+
+export interface EditGuardianParamsType {
+  signature: string;
+  verifierDoc: string;
+}
+
+type RouterParams = {
+  loginGuardianType?: string;
+  userGuardiansList?: UserGuardianItem[];
+  approvalType?: ApprovalType;
+  guardianItem?: UserGuardianItem;
+  editGuardianParams?: EditGuardianParamsType;
+  managerUniqueId?: string;
+};
+
 export default function GuardianApproval() {
+  const {
+    loginGuardianType,
+    userGuardiansList: paramUserGuardiansList,
+    approvalType = ApprovalType.register,
+    guardianItem,
+    editGuardianParams,
+    managerUniqueId: paramManagerUniqueId,
+  } = useRouterParams<RouterParams>();
+  const dispatch = useAppDispatch();
+
+  const { userGuardiansList: storeUserGuardiansList, preGuardian } = useGuardiansInfo();
+
+  const userGuardiansList = useMemo(() => {
+    if (paramUserGuardiansList) return paramUserGuardiansList;
+    if (approvalType === ApprovalType.deleteGuardian || approvalType === ApprovalType.editGuardian) {
+      return storeUserGuardiansList?.filter(item => item.key !== guardianItem?.key);
+    }
+    return storeUserGuardiansList;
+  }, [approvalType, guardianItem?.key, paramUserGuardiansList, storeUserGuardiansList]);
+
   const { t } = useLanguage();
+  const { caHash, address: managerAddress } = useCurrentWalletInfo();
+  const getCurrentCAContract = useGetCurrentCAContract();
 
   const [managerUniqueId, setManagerUniqueId] = useState<string>();
   const [guardiansStatus, setApproved] = useState<GuardiansStatus>();
   const [isExpired, setIsExpired] = useState<boolean>();
 
   const guardianExpiredTime = useRef<number>();
-  console.log(managerUniqueId, guardianExpiredTime, '====managerUniqueId');
-
-  const { loginGuardianType, userGuardiansList } = useRouterParams<{
-    loginGuardianType?: string;
-    userGuardiansList?: UserGuardianItem[];
-  }>();
-  console.log(userGuardiansList, '====userGuardiansList');
-
   const approvedList = useMemo(() => {
     return Object.values(guardiansStatus || {}).filter(guardian => guardian.status === VerifyStatus.Verified);
   }, [guardiansStatus]);
 
-  const setGuardianStatus = useCallback(
-    (key: string, status: GuardiansStatusItem) => {
-      if (key === 'resetGuardianApproval') {
-        setApproved(undefined);
-        guardianExpiredTime.current = undefined;
-      } else {
-        setApproved({ ...guardiansStatus, [key]: status });
-      }
-    },
-    [guardiansStatus],
+  const isGuardianOpt = useMemo(
+    () =>
+      approvalType === ApprovalType.addGuardian ||
+      approvalType === ApprovalType.deleteGuardian ||
+      approvalType === ApprovalType.editGuardian,
+    [approvalType],
   );
+
+  const setGuardianStatus = useCallback((key: string, status: GuardiansStatusItem) => {
+    if (key === 'resetGuardianApproval') {
+      setApproved(undefined);
+      guardianExpiredTime.current = undefined;
+    } else {
+      setApproved(preGuardiansStatus => ({ ...preGuardiansStatus, [key]: status }));
+    }
+  }, []);
 
   const guardianCount = useMemo(() => getApprovalCount(userGuardiansList?.length || 0), [userGuardiansList?.length]);
   const isSuccess = useMemo(() => guardianCount <= approvedList.length, [guardianCount, approvedList.length]);
   const onSetGuardianStatus = useCallback(
     (data: { key: string; status: GuardiansStatusItem }) => {
       setGuardianStatus(data.key, data.status);
-      if (!guardianExpiredTime.current) guardianExpiredTime.current = new Date().getTime() + GUARDIAN_EXPIRED_TIME;
+      if (!guardianExpiredTime.current && data.status?.status === VerifyStatus.Verified)
+        guardianExpiredTime.current = new Date().getTime() + GUARDIAN_EXPIRED_TIME;
     },
     [setGuardianStatus],
   );
   useEffectOnce(() => {
-    setManagerUniqueId(randomId());
+    setManagerUniqueId(paramManagerUniqueId || randomId());
     const listener = myEvents.setGuardianStatus.addListener(onSetGuardianStatus);
     const expiredTimer = setInterval(() => {
       if (guardianExpiredTime.current && new Date().getTime() > guardianExpiredTime.current) setIsExpired(true);
@@ -74,19 +117,168 @@ export default function GuardianApproval() {
       expiredTimer && clearInterval(expiredTimer);
     };
   });
+
+  const onBack = useCallback(() => {
+    switch (approvalType) {
+      case ApprovalType.addGuardian:
+        navigationService.navigate('GuardianEdit');
+        break;
+      default:
+        navigationService.goBack();
+        break;
+    }
+  }, [approvalType]);
+
+  const registerAccount = useCallback(() => {
+    navigationService.navigate('SetPin', {
+      managerInfo: {
+        verificationType: VerificationType.communityRecovery,
+        loginGuardianType,
+        type: LoginType.email,
+        managerUniqueId,
+      } as ManagerInfo,
+      guardianCount,
+    });
+  }, [guardianCount, loginGuardianType, managerUniqueId]);
+
+  const onAddGuardian = useCallback(async () => {
+    if (!managerAddress || !caHash || !editGuardianParams || !guardianItem || !guardiansStatus || !userGuardiansList)
+      return;
+
+    Loading.show();
+    try {
+      const caContract = await getCurrentCAContract();
+      const req = await addGuardian(
+        caContract,
+        managerAddress,
+        caHash,
+        editGuardianParams,
+        guardianItem,
+        userGuardiansList,
+        guardiansStatus,
+      );
+      if (req && !req.error) {
+        CommonToast.success('Guardians Added');
+        myEvents.refreshGuardiansList.emit();
+        navigationService.navigate('GuardianHome');
+      } else {
+        CommonToast.fail(req?.error.message);
+      }
+    } catch (error) {
+      CommonToast.failError(error);
+    }
+    Loading.hide();
+  }, [
+    caHash,
+    editGuardianParams,
+    getCurrentCAContract,
+    guardianItem,
+    guardiansStatus,
+    managerAddress,
+    userGuardiansList,
+  ]);
+
+  const onDeleteGuardian = useCallback(async () => {
+    if (!managerAddress || !caHash || !guardianItem || !userGuardiansList || !guardiansStatus) return;
+
+    Loading.show();
+    try {
+      const caContract = await getCurrentCAContract();
+      const req = await deleteGuardian(
+        caContract,
+        managerAddress,
+        caHash,
+        guardianItem,
+        userGuardiansList,
+        guardiansStatus,
+      );
+
+      if (req && !req.error) {
+        myEvents.refreshGuardiansList.emit();
+        navigationService.navigate('GuardianHome');
+      } else {
+        CommonToast.fail(req?.error.message);
+      }
+    } catch (error) {
+      CommonToast.failError(error);
+    }
+
+    Loading.hide();
+  }, [caHash, getCurrentCAContract, guardianItem, guardiansStatus, managerAddress, userGuardiansList]);
+
+  const onEditGuardian = useCallback(async () => {
+    if (!managerAddress || !caHash || !preGuardian || !guardianItem || !userGuardiansList || !guardiansStatus) {
+      return;
+    }
+
+    Loading.show();
+    try {
+      const caContract = await getCurrentCAContract();
+      const req = await editGuardian(
+        caContract,
+        managerAddress,
+        caHash,
+        preGuardian,
+        guardianItem,
+        userGuardiansList,
+        guardiansStatus,
+      );
+      if (req && !req.error) {
+        dispatch(setPreGuardianAction(undefined));
+        myEvents.refreshGuardiansList.emit();
+        navigationService.navigate('GuardianHome');
+      } else {
+        CommonToast.fail(req?.error.message);
+      }
+    } catch (error) {
+      CommonToast.failError(error);
+    }
+
+    Loading.hide();
+  }, [
+    caHash,
+    dispatch,
+    getCurrentCAContract,
+    guardianItem,
+    guardiansStatus,
+    managerAddress,
+    preGuardian,
+    userGuardiansList,
+  ]);
+
+  const onFinish = useCallback(async () => {
+    switch (approvalType) {
+      case ApprovalType.register:
+        registerAccount();
+        break;
+      case ApprovalType.addGuardian:
+        onAddGuardian();
+        break;
+      case ApprovalType.deleteGuardian:
+        onDeleteGuardian();
+        break;
+      case ApprovalType.editGuardian:
+        onEditGuardian();
+        break;
+      default:
+        break;
+    }
+  }, [onAddGuardian, approvalType, onDeleteGuardian, onEditGuardian, registerAccount]);
+
   return (
     <PageContainer
       scrollViewProps={{ disabled: true }}
       containerStyles={styles.containerStyle}
       leftIconType="close"
-      backTitle="Wallet Login"
+      leftCallback={onBack}
+      backTitle={approvalType === ApprovalType.register ? 'Wallet Login' : undefined}
       type="leftBack"
       titleDom
       hideTouchable>
       <View style={GStyles.flex1}>
         <TextXXXL style={GStyles.alignCenter}>{t(`Guardians' approval`)}</TextXXXL>
         <TextM style={[styles.expireText, GStyles.alignCenter, FontStyles.font3]}>
-          Expire after {VERIFIER_EXPIRATION} hour
+          {isExpired ? 'Expired' : `Expire after ${VERIFIER_EXPIRATION} hour`}
         </TextM>
         <View style={[styles.verifierBody, GStyles.flex1]}>
           <View style={[GStyles.itemCenter, GStyles.flexRow, BorderStyles.border6, styles.approvalTitleRow]}>
@@ -103,7 +295,7 @@ export default function GuardianApproval() {
               </Touchable>
             </View>
             <TextM>
-              <TextM style={FontStyles.font4}>{approvedList.length ?? 0}</TextM>/{guardianCount.toFixed(0)}
+              <TextM style={FontStyles.font4}>{approvedList.length ?? 0}</TextM>/{guardianCount}
             </TextM>
           </View>
           <View style={GStyles.flex1}>
@@ -117,6 +309,8 @@ export default function GuardianApproval() {
                     managerUniqueId={managerUniqueId as string}
                     guardiansStatus={guardiansStatus}
                     isExpired={isExpired}
+                    isSuccess={isSuccess}
+                    approvalType={approvalType}
                   />
                 );
               })}
@@ -126,20 +320,10 @@ export default function GuardianApproval() {
       </View>
       {!isExpired && (
         <CommonButton
-          onPress={() => {
-            navigationService.navigate('SetPin', {
-              managerInfo: {
-                verificationType: VerificationType.communityRecovery,
-                loginGuardianType,
-                type: LoginType.email,
-                managerUniqueId,
-              } as ManagerInfo,
-              guardianCount,
-            });
-          }}
+          onPress={onFinish}
           disabled={!isSuccess}
           type="primary"
-          title="Recover wallet"
+          title={isGuardianOpt ? 'Confirm' : 'Recover wallet'}
         />
       )}
     </PageContainer>

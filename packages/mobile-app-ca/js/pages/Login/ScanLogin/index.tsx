@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import PageContainer from 'components/PageContainer';
 import Svg from 'components/Svg';
 import { pTd } from 'utils/unit';
@@ -10,26 +10,57 @@ import navigationService from 'utils/navigationService';
 import { TextXXXL } from 'components/CommonText';
 import GStyles from 'assets/theme/GStyles';
 import CommonButton from 'components/CommonButton';
+import useRouterParams from '@portkey/hooks/useRouterParams';
+import { LoginQRData } from '@portkey/types/types-ca/qrcode';
+import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import CommonToast from 'components/CommonToast';
+import { useGetCurrentCAContract } from 'hooks/contract';
+import { addManager } from 'utils/wallet';
 const ScrollViewProps = { disabled: true };
 export default function ScanLogin() {
+  const { data } = useRouterParams<{ data?: LoginQRData }>();
+  const { address: managerAddress } = data || {};
+
+  const { caHash, address } = useCurrentWalletInfo();
+  const [loading, setLoading] = useState<boolean>();
+  const getCurrentCAContract = useGetCurrentCAContract();
+  const onLogin = useCallback(async () => {
+    if (!caHash || loading) return;
+    try {
+      const contract = await getCurrentCAContract();
+      setLoading(true);
+      const req = await addManager({ contract, caHash, address, managerAddress });
+      if (req?.error) throw req?.error;
+      navigationService.navigate('Tab');
+    } catch (error) {
+      CommonToast.failError(error);
+    }
+    setLoading(false);
+  }, [caHash, loading, getCurrentCAContract, address, managerAddress]);
   return (
     <PageContainer
       scrollViewProps={ScrollViewProps}
       titleDom
       leftDom
       containerStyles={styles.containerStyles}
+      leftCallback={() => navigationService.navigate('Tab')}
       rightDom={
-        <Touchable onPress={() => navigationService.goBack()}>
+        <Touchable onPress={() => navigationService.navigate('Tab')}>
           <Svg size={pTd(14)} color={FontStyles.font3.color} icon="close" />
         </Touchable>
       }>
       <View style={GStyles.itemCenter}>
         <Svg size={pTd(100)} icon="logo-icon" color={defaultColors.primaryColor} />
-        <TextXXXL style={styles.title}>Confirm Your Log In To Portkey</TextXXXL>
+        <TextXXXL style={[styles.title, GStyles.textAlignCenter]}>Confirm Your Log In To Portkey</TextXXXL>
       </View>
       <View style={styles.bottomBox}>
-        <CommonButton type="primary" title="Log In" />
-        <CommonButton buttonStyle={styles.cancelButtonStyle} type="clear" title="Cancel" />
+        <CommonButton type="primary" title="Log In" onPress={onLogin} loading={loading} />
+        <CommonButton
+          buttonStyle={styles.cancelButtonStyle}
+          type="clear"
+          title="Cancel"
+          onPress={() => navigationService.navigate('Tab')}
+        />
       </View>
     </PageContainer>
   );

@@ -1,4 +1,3 @@
-import { defaultColors } from 'assets/theme';
 import GStyles from 'assets/theme/GStyles';
 import CommonButton from 'components/CommonButton';
 import { TextM, TextS } from 'components/CommonText';
@@ -15,7 +14,7 @@ import CommonInput from 'components/CommonInput';
 import { checkEmail } from '@portkey/utils/check';
 import { useGuardiansInfo } from 'hooks/store';
 import { LOGIN_TYPE_LIST } from '@portkey/constants/verifier';
-import { LoginType, VerifierItem } from '@portkey/types/verifier';
+import { ApprovalType, VerificationType, VerifierItem } from '@portkey/types/verifier';
 import { INIT_HAS_ERROR, INIT_NONE_ERROR } from 'constants/common';
 import GuardianTypeSelectOverlay from '../components/GuardianTypeSelectOverlay';
 import VerifierSelectOverlay from '../components/VerifierSelectOverlay';
@@ -23,19 +22,26 @@ import ActionSheet from 'components/ActionSheet';
 import { ErrorType } from 'types/common';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import { FontStyles } from 'assets/theme/styles';
+import { request } from 'api';
+import { randomId } from '@portkey/utils';
+import Loading from 'components/Loading';
+import CommonToast from 'components/CommonToast';
+import useRouterParams from '@portkey/hooks/useRouterParams';
+import { LoginType } from '@portkey/types/types-ca/wallet';
+import { useAppDispatch } from 'store/hooks';
+import { setPreGuardianAction } from '@portkey/store/store-ca/guardians/actions';
+import { VerifierImage } from '../components/VerifierImage';
 
-interface GuardianEditProps {
-  route?: any;
-}
+type RouterParams = {
+  guardian?: UserGuardianItem;
+  isEdit?: boolean;
+};
 
-const GuardianEdit: React.FC<GuardianEditProps> = ({ route }) => {
+const GuardianEdit: React.FC = () => {
   const { t } = useLanguage();
-  const { params } = route;
-  const editGuardian = useMemo<UserGuardianItem | undefined>(
-    () => (params?.guardian ? JSON.parse(params.guardian) : undefined),
-    [params],
-  );
-  const isEdit = useMemo(() => editGuardian !== undefined, [editGuardian]);
+  const dispatch = useAppDispatch();
+
+  const { guardian: editGuardian, isEdit = false } = useRouterParams<RouterParams>();
 
   const { verifierMap, userGuardiansList } = useGuardiansInfo();
   const verifierList = useMemo(() => (verifierMap ? Object.values(verifierMap) : []), [verifierMap]);
@@ -47,18 +53,18 @@ const GuardianEdit: React.FC<GuardianEditProps> = ({ route }) => {
   const [guardianError, setGuardianError] = useState<ErrorType>({ ...INIT_NONE_ERROR });
 
   useEffect(() => {
-    if (isEdit) {
+    if (editGuardian) {
       setSelectedType(LOGIN_TYPE_LIST.find(item => item.value === editGuardian?.guardiansType));
       setEmail(editGuardian?.loginGuardianType);
       setSelectedVerifier(verifierList.find(item => item.name === editGuardian?.verifier?.name));
     }
-  }, [editGuardian, isEdit, verifierList]);
+  }, [editGuardian, verifierList]);
 
   const onEmailTextChange = useCallback(
     (value: string) => {
       const _value = value.trim();
       if (_value === '') {
-        setGuardianTypeError({ ...INIT_HAS_ERROR, errorMsg: t('Please enter Email address') });
+        setGuardianTypeError({ ...INIT_HAS_ERROR, errorMsg: t(' Please enter email address') });
       }
       setEmail(value);
       setGuardianTypeError({ ...INIT_NONE_ERROR });
@@ -77,10 +83,10 @@ const GuardianEdit: React.FC<GuardianEditProps> = ({ route }) => {
         guardian =>
           guardian.guardiansType === selectedType?.value &&
           guardian.loginGuardianType === email &&
-          guardian.verifier?.id === selectedVerifier?.id,
+          guardian.verifier?.url === selectedVerifier?.url,
       ) !== -1
     ) {
-      return { ...INIT_HAS_ERROR, errorMsg: t('This guardians is already exists') };
+      return { ...INIT_HAS_ERROR, errorMsg: t('This guardian already exists') };
     } else {
       return { ...INIT_NONE_ERROR };
     }
@@ -93,15 +99,17 @@ const GuardianEdit: React.FC<GuardianEditProps> = ({ route }) => {
         isError: true,
         errorMsg: guardianErrorMsg,
       });
+      setGuardianError({ ...INIT_NONE_ERROR });
       return;
     }
 
     const _guardianError = checkCurGuardianRepeat();
     setGuardianError(_guardianError);
     if (_guardianError.isError) return;
+    if (selectedVerifier === undefined || selectedType === undefined) return;
 
     ActionSheet.alert({
-      title2: `Portkey will send a verification code to ${email} to verify your email address.`,
+      title2: `${selectedVerifier.name} will send a verification code to ${email} to verify your email address.`,
       buttons: [
         {
           title: t('Cancel'),
@@ -109,42 +117,93 @@ const GuardianEdit: React.FC<GuardianEditProps> = ({ route }) => {
         },
         {
           title: t('Confirm'),
-          onPress: () => {
-            // TODO:Confirm
-            navigationService.navigate('VerifierDetails', { email });
+          onPress: async () => {
+            try {
+              const managerUniqueId = randomId();
+              Loading.show();
+              const req = await request.verification.sendCode({
+                baseURL: selectedVerifier.url,
+                data: {
+                  type: selectedType.value,
+                  loginGuardianType: email,
+                  managerUniqueId,
+                },
+              });
+              if (req.verifierSessionId) {
+                navigationService.navigate('VerifierDetails', {
+                  loginGuardianType: email,
+                  verifierSessionId: req.verifierSessionId,
+                  managerUniqueId,
+                  verificationType: VerificationType.addGuardian,
+                  guardianItem: {
+                    isLoginAccount: false,
+                    verifier: selectedVerifier,
+                    loginGuardianType: email,
+                    guardiansType: LoginType.email,
+                  },
+                });
+              } else {
+                throw new Error('send fail');
+              }
+            } catch (error) {
+              CommonToast.failError(error);
+            }
+            Loading.hide();
           },
         },
       ],
     });
-  }, [checkCurGuardianRepeat, email, t]);
+  }, [checkCurGuardianRepeat, email, selectedType, selectedVerifier, t]);
 
   const onApproval = useCallback(() => {
     const _guardianError = checkCurGuardianRepeat();
     setGuardianError(_guardianError);
-    if (_guardianError.isError) return;
-    // TODO: add callback or next step
-    navigationService.navigate('SelectVerifier', { loginGuardianType: email });
-  }, [checkCurGuardianRepeat, email]);
+    if (_guardianError.isError || !editGuardian || !selectedVerifier) return;
+    dispatch(setPreGuardianAction(editGuardian));
+
+    navigationService.navigate('GuardianApproval', {
+      approvalType: ApprovalType.editGuardian,
+      guardianItem: {
+        ...editGuardian,
+        verifier: selectedVerifier,
+      },
+    });
+  }, [checkCurGuardianRepeat, dispatch, editGuardian, selectedVerifier]);
 
   const onRemove = useCallback(() => {
+    if (!editGuardian) return;
+    if (editGuardian.isLoginAccount) {
+      ActionSheet.alert({
+        title2: t(`This guardian is login account and cannot be remove`),
+        buttons: [
+          {
+            title: t('OK'),
+          },
+        ],
+      });
+      return;
+    }
+
     ActionSheet.alert({
       title: t('Are you sure you want to remove this guardian?'),
-      message: t('Removing a guardian requires guardian approval'),
+      message: t(`Removing a guardian requires guardians' approval`),
       buttons: [
         {
-          title: t('No'),
+          title: t('Close'),
           type: 'outline',
         },
         {
-          title: t('Yes'),
+          title: t('Send Request'),
           onPress: () => {
-            // TODO: add callback or next step
-            navigationService.navigate('SelectVerifier', { loginGuardianType: email });
+            navigationService.navigate('GuardianApproval', {
+              approvalType: ApprovalType.deleteGuardian,
+              guardianItem: editGuardian,
+            });
           },
         },
       ],
     });
-  }, [email, t]);
+  }, [editGuardian, t]);
 
   const isConfirmDisable = useMemo(
     () => !selectedVerifier || !selectedType || !email,
@@ -152,14 +211,15 @@ const GuardianEdit: React.FC<GuardianEditProps> = ({ route }) => {
   );
 
   const isApprovalDisable = useMemo(
-    () => selectedVerifier?.id === editGuardian?.verifier?.id,
+    () => selectedVerifier?.url === editGuardian?.verifier?.url,
     [editGuardian, selectedVerifier],
   );
 
   return (
     <PageContainer
       safeAreaColor={['blue', 'gray']}
-      titleDom={isEdit ? t('guardians') : t('Add Guardians')}
+      titleDom={isEdit ? t('Edit Guardians') : t('Add Guardians')}
+      leftCallback={() => navigationService.navigate('GuardianHome')}
       containerStyles={pageStyles.pageWrap}
       scrollViewProps={{ disabled: true }}>
       <View style={pageStyles.contentWrap}>
@@ -178,7 +238,7 @@ const GuardianEdit: React.FC<GuardianEditProps> = ({ route }) => {
               titleStyle={[GStyles.flexRow, GStyles.itemCenter]}
               titleTextStyle={pageStyles.titleTextStyle}
               style={GStyles.marginBottom(24)}
-              title={selectedType?.name || 'Select Guardians Type'}
+              title={selectedType?.name || t('Select guardian types')}
               rightElement={<Svg size={pTd(16)} icon="down-arrow" />}
             />
           </>
@@ -189,9 +249,9 @@ const GuardianEdit: React.FC<GuardianEditProps> = ({ route }) => {
             disabled={isEdit}
             type="general"
             theme="white-bg"
-            label="Guardian Email"
+            label={t("Guardian's email")}
             value={email}
-            placeholder={t('Enter Email')}
+            placeholder={t('Enter email')}
             maxLength={30}
             onChangeText={onEmailTextChange}
             errorMessage={guardianTypeError.isError ? guardianTypeError.errorMsg : ''}
@@ -203,7 +263,7 @@ const GuardianEdit: React.FC<GuardianEditProps> = ({ route }) => {
         <ListItem
           onPress={() => {
             VerifierSelectOverlay.showList({
-              id: selectedVerifier?.id,
+              url: selectedVerifier?.url,
               labelAttrName: 'name',
               list: verifierList,
               callBack: onSelectedVerifier,
@@ -211,13 +271,13 @@ const GuardianEdit: React.FC<GuardianEditProps> = ({ route }) => {
           }}
           titleLeftElement={
             selectedVerifier && (
-              <Svg iconStyle={GStyles.marginRight(12)} icon="logo-icon" color={defaultColors.primaryColor} size={30} />
+              <VerifierImage style={GStyles.marginRight(12)} size={pTd(30)} uri={selectedVerifier.imageUrl} />
             )
           }
           titleStyle={[GStyles.flexRow, GStyles.itemCenter]}
           titleTextStyle={pageStyles.titleTextStyle}
           style={GStyles.marginBottom(4)}
-          title={selectedVerifier?.name || 'Select Guardians Verifier'}
+          title={selectedVerifier?.name || t('Select guardian verifiers')}
           rightElement={<Svg size={pTd(16)} icon="down-arrow" />}
         />
         {guardianError.isError && <TextS style={pageStyles.errorTips}>{guardianError.errorMsg || ''}</TextS>}
@@ -227,7 +287,7 @@ const GuardianEdit: React.FC<GuardianEditProps> = ({ route }) => {
         {isEdit ? (
           <>
             <CommonButton disabled={isApprovalDisable} type="primary" onPress={onApproval}>
-              {t('Guardians Approval')}
+              {t('Send Request')}
             </CommonButton>
             <CommonButton style={GStyles.marginTop(8)} type="clear" onPress={onRemove} titleStyle={FontStyles.font12}>
               {t('Remove')}

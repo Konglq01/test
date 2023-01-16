@@ -22,6 +22,7 @@ export enum PasswordErrorMessage {
 }
 export enum PinErrorMessage {
   invalidPin = 'Invalid Pin',
+  PinNotLong = 'Pin is not long enough! (Must be at least 8 characters)',
 }
 
 export enum WalletNameErrorMessage {

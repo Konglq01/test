@@ -1,7 +1,7 @@
 import { useCurrentWallet } from './wallet';
 import { useMemo } from 'react';
 import { NetworkList } from '@portkey/constants/constants-ca/network';
-import { useGuardiansInfo } from 'hooks/store';
+import { useAppCASelector } from '.';
 
 export function useNetworkList() {
   return NetworkList;
@@ -17,6 +17,6 @@ export function useCurrentNetworkInfo() {
 }
 
 export function useVerifierList() {
-  const { verifierMap } = useGuardiansInfo();
+  const { verifierMap } = useAppCASelector(state => state.guardians);
   return useMemo(() => (verifierMap ? Object.values(verifierMap) : []), [verifierMap]);
 }

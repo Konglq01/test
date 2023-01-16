@@ -65,7 +65,7 @@ export function isValidEmail(email?: string) {
   return EmailReg.test(email);
 }
 
-export const POSITIVE_INTEGER = /^\+?[1-9][0-9]*$/;
+export const POSITIVE_INTEGER = /^\+?[0-9][0-9]*$/;
 
 export function isValidPositiveInteger(num?: string) {
   if (!num) return false;

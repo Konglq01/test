@@ -7,25 +7,26 @@ import Loading from 'components/Loading';
 import AElf from 'aelf-sdk';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 import { request } from 'api';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { useAppDispatch } from 'store/hooks';
 import useBiometricsReady from './useBiometrics';
 import navigationService from 'utils/navigationService';
-import { intervalGetRegisterResult, TimerResult } from 'utils/wallet';
+import { intervalGetResult, onResultFail, TimerResult } from 'utils/wallet';
 import CommonToast from 'components/CommonToast';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { queryFailAlert } from 'utils/login';
+import useEffectOnce from './useEffectOnce';
+import { setCredentials } from 'store/user/actions';
 
 export function useOnManagerAddressAndQueryResult() {
   const dispatch = useAppDispatch();
   const biometricsReady = useBiometricsReady();
   const timer = useRef<TimerResult>();
   const { apiUrl } = useCurrentNetworkInfo();
-  useEffect(() => {
+  useEffectOnce(() => {
     return () => {
       timer.current?.remove();
     };
-  }, []);
+  });
   return useCallback(
     async ({
       managerInfo,
@@ -62,13 +63,14 @@ export function useOnManagerAddressAndQueryResult() {
         if (walletInfo?.address) {
           dispatch(setManagerInfo({ managerInfo, pin: confirmPin }));
         } else {
-          dispatch(createWallet({ walletInfo: tmpWalletInfo, managerInfo: managerInfo, pin: confirmPin }));
+          dispatch(createWallet({ walletInfo: tmpWalletInfo, caInfo: { managerInfo }, pin: confirmPin }));
         }
+        dispatch(setCredentials({ pin: confirmPin }));
         if (biometricsReady) {
           Loading.hide();
           navigationService.navigate('SetBiometrics', { pin: confirmPin });
         } else {
-          timer.current = intervalGetRegisterResult({
+          timer.current = intervalGetResult({
             apiUrl,
             managerInfo,
             onPass: (caInfo: CAInfo) => {
@@ -83,16 +85,10 @@ export function useOnManagerAddressAndQueryResult() {
               );
               navigationService.reset('Tab');
             },
-            onFail: (message: string) => {
-              Loading.hide();
-              CommonToast.fail(message);
-              queryFailAlert(dispatch, isRecovery);
-            },
+            onFail: (message: string) => onResultFail(dispatch, message, isRecovery),
           });
         }
       } catch (error) {
-        console.log(error, '=====error');
-
         Loading.hide();
         CommonToast.failError(error);
       }

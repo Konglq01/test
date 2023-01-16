@@ -10,6 +10,7 @@ import { TextL } from 'components/CommonText';
 import type { SafeAreaColorMapKeyUnit } from 'components/PageContainer';
 import { useLanguage } from 'i18n/hooks';
 import { ViewStyleType } from 'types/styles';
+import { useHardwareBackPress } from '@portkey/hooks/mobile';
 
 export type CustomHeaderProps = {
   themeType?: SafeAreaColorMapKeyUnit;
@@ -57,7 +58,13 @@ const CustomHeader: React.FC<CustomHeaderProps> = props => {
       />
     );
   }, [leftIconType, styles.leftBackTitle.color]);
-
+  useHardwareBackPress(() => {
+    if (leftCallback) {
+      leftCallback();
+      return true;
+    }
+    return false;
+  });
   const letElement = useMemo(() => {
     if (leftDom) return leftDom;
     if (!isCanGoBack) return null;

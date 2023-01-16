@@ -2,7 +2,7 @@ import { Form, FormInstance } from 'antd';
 import CustomPassword from 'components/CustomPassword';
 import { ReactNode, useEffect, useState } from 'react';
 import { isValidPassword } from '@portkey/utils/reg';
-import { PasswordErrorMessage } from '@portkey/utils/wallet/types';
+import { PinErrorMessage } from '@portkey/utils/wallet/types';
 import './index.less';
 import { useTranslation } from 'react-i18next';
 
@@ -68,29 +68,29 @@ export default function ConfirmPassword({
         validateTrigger="onBlur"
         help={createValidate.errorMsg || (isPasswordLengthTipShow ? t('Must be at least 8 characters') : undefined)}
         rules={[
-          { required: true, message: t('Please enter Pin!') },
+          { required: true, message: t('Please enter Pin') },
           () => ({
             validator(_, value) {
               if (!value) {
                 setCreateValidate({
                   validateStatus: 'error',
-                  errorMsg: t('Please enter Pin!'),
+                  errorMsg: t('Please enter Pin'),
                 });
-                return Promise.reject(t('Please enter Pin!'));
+                return Promise.reject(t('Please enter Pin'));
               }
               if (value.length < 8) {
                 setCreateValidate({
                   validateStatus: 'error',
-                  errorMsg: t(PasswordErrorMessage.passwordNotLong),
+                  errorMsg: t(PinErrorMessage.PinNotLong),
                 });
-                return Promise.reject(t(PasswordErrorMessage.passwordNotLong));
+                return Promise.reject(t(PinErrorMessage.PinNotLong));
               }
               if (!isValidPassword(value)) {
                 setCreateValidate({
                   validateStatus: 'error',
-                  errorMsg: t(PasswordErrorMessage.invalidPassword),
+                  errorMsg: t(PinErrorMessage.invalidPin),
                 });
-                return Promise.reject(t(PasswordErrorMessage.invalidPassword));
+                return Promise.reject(t(PinErrorMessage.invalidPin));
               }
               setCreateValidate({
                 validateStatus: 'success',
@@ -111,7 +111,7 @@ export default function ConfirmPassword({
         name="confirmPassword"
         validateTrigger="onBlur"
         rules={[
-          { required: true, message: t('Please enter Pin!') },
+          { required: true, message: t('Please enter Pin') },
           () => ({
             validator(_, value) {
               if (!value || password === value) {

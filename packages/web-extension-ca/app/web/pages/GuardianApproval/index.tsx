@@ -1,12 +1,24 @@
 import { Button, message } from 'antd';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useAppDispatch, useLoginInfo, useGuardiansInfo, useCommonState, useLoading } from 'store/Provider/hooks';
+import {
+  useAppDispatch,
+  useLoginInfo,
+  useGuardiansInfo,
+  useCommonState,
+  useLoading,
+  useUserInfo,
+} from 'store/Provider/hooks';
 import { VerificationType, VerifyStatus } from '@portkey/types/verifier';
 import { useNavigate, useLocation } from 'react-router';
-import { setUserGuardianItemStatus, setCurrentGuardianAction } from '@portkey/store/store-ca/guardians/actions';
-import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
-import { ZERO } from '@portkey/constants/misc';
-import BigNumber from 'bignumber.js';
+import {
+  setUserGuardianItemStatus,
+  setCurrentGuardianAction,
+  resetUserGuardianStatus,
+  setPreGuardianAction,
+  setOpGuardianAction,
+} from '@portkey/store/store-ca/guardians/actions';
+import { UserGuardianItem, UserGuardianStatus } from '@portkey/store/store-ca/guardians/type';
+import { getApprovalCount } from '@portkey/utils/guardian';
 import './index.less';
 import PortKeyTitle from 'pages/components/PortKeyTitle';
 import VerifierPair from 'components/VerifierPair';
@@ -14,11 +26,28 @@ import clsx from 'clsx';
 import CommonTooltip from 'components/CommonTooltip';
 import { sendVerificationCode } from '@portkey/api/apiUtils/verification';
 import SettingHeader from 'pages/components/SettingHeader';
+import getPrivateKeyAndMnemonic from 'utils/Wallet/getPrivateKeyAndMnemonic';
+import { handleGuardian } from 'utils/sandboxUtil/handleGuardian';
+import { GuardianMth } from 'types/guardians';
+import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
+import { LoginType } from '@portkey/types/types-ca/wallet';
+import { resetLoginInfoAction, setGuardianCountAction, setLoginAccountAction } from 'store/reducers/loginCache/actions';
+import { GuardianItem } from 'types/guardians';
+import { sleep } from '@portkey/utils';
+import { getAelfInstance } from '@portkey/utils/aelf';
+import { getTxResult } from 'utils/aelfUtils';
+import { useTranslation } from 'react-i18next';
 
-const APPROVAL_COUNT = ZERO.plus(3).div(5);
+enum MethodType {
+  'guardians/add' = GuardianMth.addGuardian,
+  'guardians/edit' = GuardianMth.UpdateGuardian,
+  'guardians/del' = GuardianMth.RemoveGuardian,
+}
 
 export default function GuardianApproval() {
-  const { userGuardianStatus, guardianExpiredTime } = useGuardiansInfo();
+  const { userGuardianStatus, guardianExpiredTime, opGuardian, preGuardian } = useGuardiansInfo();
   const { loginAccount } = useLoginInfo();
   const [isExpired, setIsExpired] = useState<boolean>(false);
   const navigate = useNavigate();
@@ -26,11 +55,24 @@ export default function GuardianApproval() {
   const dispatch = useAppDispatch();
   const { isPrompt } = useCommonState();
   const { setLoading } = useLoading();
+  const { walletInfo } = useCurrentWallet();
+  const currentNetwork = useCurrentNetworkInfo();
+  const currentChain = useCurrentChain();
+  const { passwordSeed } = useUserInfo();
+  const { t } = useTranslation();
 
-  const userVerifiedList = useMemo(() => Object.values(userGuardianStatus ?? {}), [userGuardianStatus]);
+  const userVerifiedList = useMemo(() => {
+    const tempVerifiedList = Object.values(userGuardianStatus ?? {});
+    let filterVerifiedList: UserGuardianStatus[] = tempVerifiedList;
+    if (state === 'guardians/edit') {
+      filterVerifiedList = tempVerifiedList.filter((item) => item.key !== preGuardian?.key);
+    } else if (['guardians/del', 'guardians/add'].includes(state)) {
+      filterVerifiedList = tempVerifiedList.filter((item) => item.key !== opGuardian?.key);
+    }
+    return filterVerifiedList;
+  }, [opGuardian, preGuardian, state, userGuardianStatus]);
   const approvalLength = useMemo(() => {
-    if (userVerifiedList.length <= 3) return userVerifiedList.length;
-    return APPROVAL_COUNT.times(userVerifiedList.length).dp(0, BigNumber.ROUND_DOWN).toNumber();
+    return getApprovalCount(userVerifiedList.length);
   }, [userVerifiedList.length]);
 
   const alreadyApprovalLength = useMemo(
@@ -38,9 +80,50 @@ export default function GuardianApproval() {
     [userVerifiedList],
   );
 
+  const guardianSendCode = useCallback(
+    async (item: UserGuardianItem) => {
+      try {
+        setLoading(true);
+        dispatch(
+          setLoginAccountAction({
+            loginGuardianType: item.loginGuardianType,
+            accountLoginType: item.guardiansType,
+          }),
+        );
+        const result = await sendVerificationCode({
+          loginGuardianType: item?.loginGuardianType,
+          guardiansType: item.guardiansType,
+          verificationType: VerificationType.addGuardian,
+          baseUrl: item?.verifier?.url || '',
+          managerUniqueId: walletInfo.managerInfo?.managerUniqueId as string,
+        });
+        setLoading(false);
+        if (result.verifierSessionId) {
+          dispatch(setCurrentGuardianAction({ ...item, sessionId: result.verifierSessionId, isInitStatus: true }));
+          dispatch(
+            setUserGuardianItemStatus({
+              key: item.key,
+              status: VerifyStatus.Verifying,
+            }),
+          );
+          navigate('/setting/guardians/verifier-account', { state: state });
+        }
+      } catch (error: any) {
+        console.log('---guardian-sendCode-error', error);
+        setLoading(false);
+        message.error(error?.Error?.Message || error.message?.Message || error?.message);
+      }
+    },
+    [dispatch, navigate, setLoading, state, walletInfo],
+  );
+
   const SendCode = useCallback(
     async (item: UserGuardianItem) => {
       try {
+        if (state && state.indexOf('guardians') !== -1) {
+          guardianSendCode(item);
+          return;
+        }
         if (
           !loginAccount ||
           (!loginAccount.accountLoginType && loginAccount.accountLoginType !== 0) ||
@@ -51,7 +134,7 @@ export default function GuardianApproval() {
           );
         setLoading(true);
         const result = await sendVerificationCode({
-          loginGuardianType: loginAccount?.loginGuardianType,
+          loginGuardianType: item?.loginGuardianType,
           guardiansType: loginAccount?.accountLoginType,
           verificationType: VerificationType.communityRecovery,
           baseUrl: item?.verifier?.url || '',
@@ -59,36 +142,206 @@ export default function GuardianApproval() {
         });
         setLoading(false);
         if (result.verifierSessionId) {
-          dispatch(setCurrentGuardianAction({ ...item, sessionId: result.verifierSessionId }));
+          dispatch(setCurrentGuardianAction({ ...item, sessionId: result.verifierSessionId, isInitStatus: true }));
           dispatch(
             setUserGuardianItemStatus({
               key: item.key,
               status: VerifyStatus.Verifying,
             }),
           );
-          state && state.indexOf('guardians') !== -1
-            ? navigate('/setting/guardians/verifier-account', { state: state })
-            : navigate('/login/verifier-account', { state: 'login' });
+          navigate('/login/verifier-account', { state: 'login' });
         }
       } catch (error: any) {
         console.log(error, 'error===');
         setLoading(false);
-        message.error(error?.error?.message ?? 'Something error');
+        message.error(error?.error?.message ?? error?.type ?? 'Something error');
       }
     },
-    [loginAccount, setLoading, dispatch, state, navigate],
+    [state, loginAccount, setLoading, guardianSendCode, dispatch, navigate],
   );
 
+  const formatAddGuardianValue = useCallback(() => {
+    let guardianToAdd: GuardianItem = {} as GuardianItem;
+    const guardiansApproved: GuardianItem[] = [];
+    Object.values(userGuardianStatus ?? {})?.forEach((item: UserGuardianStatus) => {
+      if (item.key === opGuardian?.key) {
+        guardianToAdd = {
+          guardianType: {
+            type: item.guardiansType,
+            guardianType: item.loginGuardianType,
+          },
+          verifier: {
+            name: item.verifier?.name as string,
+            signature: Object.values(Buffer.from(item.signature as any, 'hex')),
+            verificationDoc: item.verificationDoc || '',
+          },
+        };
+      } else if (item.signature) {
+        guardiansApproved.push({
+          guardianType: {
+            type: item.guardiansType,
+            guardianType: item.loginGuardianType,
+          },
+          verifier: {
+            name: item.verifier?.name as string,
+            signature: Object.values(Buffer.from(item.signature as any, 'hex')),
+            verificationDoc: item.verificationDoc as string,
+          },
+        });
+      }
+    });
+    return { guardianToAdd, guardiansApproved };
+  }, [opGuardian?.key, userGuardianStatus]);
+
+  const formatEditGuardianValue = useCallback(() => {
+    const guardianToUpdatePre: GuardianItem = {
+      guardianType: {
+        type: preGuardian?.guardiansType as LoginType,
+        guardianType: preGuardian?.loginGuardianType as string,
+      },
+      verifier: {
+        name: preGuardian?.verifier?.name as string,
+      },
+    };
+    const guardianToUpdateNew: GuardianItem = {
+      guardianType: {
+        type: opGuardian?.guardiansType as LoginType,
+        guardianType: opGuardian?.loginGuardianType as string,
+      },
+      verifier: {
+        name: opGuardian?.verifier?.name as string,
+      },
+    };
+    const guardiansApproved: GuardianItem[] = [];
+    Object.values(userGuardianStatus ?? {})?.forEach((item: UserGuardianStatus) => {
+      if (item.signature) {
+        guardiansApproved.push({
+          guardianType: {
+            type: item.guardiansType,
+            guardianType: item.loginGuardianType,
+          },
+          verifier: {
+            name: item.verifier?.name as string,
+            signature: Object.values(Buffer.from(item.signature as any, 'hex')),
+            verificationDoc: item.verificationDoc as string,
+          },
+        });
+      }
+    });
+    return { guardianToUpdatePre, guardianToUpdateNew, guardiansApproved };
+  }, [opGuardian, preGuardian, userGuardianStatus]);
+
+  const formatDelGuardianValue = useCallback(() => {
+    const guardianToRemove: GuardianItem = {
+      guardianType: {
+        type: opGuardian?.guardiansType as LoginType,
+        guardianType: opGuardian?.loginGuardianType as string,
+      },
+      verifier: {
+        name: opGuardian?.verifier?.name as string,
+      },
+    };
+    const guardiansApproved: GuardianItem[] = [];
+    Object.values(userGuardianStatus ?? {})?.forEach((item: UserGuardianStatus) => {
+      if (item.signature) {
+        guardiansApproved.push({
+          guardianType: {
+            type: item.guardiansType,
+            guardianType: item.loginGuardianType,
+          },
+          verifier: {
+            name: item.verifier?.name as string,
+            signature: Object.values(Buffer.from(item.signature as any, 'hex')),
+            verificationDoc: item.verificationDoc as string,
+          },
+        });
+      }
+    });
+    return { guardianToRemove, guardiansApproved };
+  }, [opGuardian, userGuardianStatus]);
+
+  const handleGuardianRecovery = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await getPrivateKeyAndMnemonic(
+        {
+          AESEncryptPrivateKey: walletInfo.AESEncryptPrivateKey,
+        },
+        passwordSeed,
+      );
+      if (!currentChain?.endPoint || !res?.privateKey) return message.error('handle guardian error');
+      let value;
+      switch (state) {
+        case 'guardians/add':
+          value = formatAddGuardianValue();
+          break;
+        case 'guardians/edit':
+          value = formatEditGuardianValue();
+          break;
+        case 'guardians/del':
+          value = formatDelGuardianValue();
+          break;
+        default:
+          value = {};
+      }
+      const result = await handleGuardian({
+        rpcUrl: currentChain.endPoint,
+        chainType: currentNetwork.walletType,
+        address: currentChain.caContractAddress,
+        privateKey: res.privateKey,
+        paramsOption: {
+          method: MethodType[state],
+          params: [
+            {
+              caHash: walletInfo?.AELF?.caHash,
+              ...value,
+            },
+          ],
+        },
+      });
+      const { TransactionId } = result.result.message || result;
+      await sleep(1000);
+      const aelfInstance = getAelfInstance(currentChain.endPoint);
+      await getTxResult(aelfInstance, TransactionId);
+      dispatch(resetLoginInfoAction());
+      dispatch(resetUserGuardianStatus());
+      dispatch(setPreGuardianAction());
+      dispatch(setOpGuardianAction());
+      setLoading(false);
+      state === 'guardians/add' && message.success('Guardians Added');
+      navigate('/setting/guardians');
+    } catch (error: any) {
+      setLoading(false);
+      console.log('---op-guardian-error', error);
+      message.error(error?.Error?.Message || error.message?.Message || error?.message);
+    }
+  }, [
+    currentChain,
+    currentNetwork.walletType,
+    dispatch,
+    formatAddGuardianValue,
+    formatDelGuardianValue,
+    formatEditGuardianValue,
+    navigate,
+    passwordSeed,
+    setLoading,
+    state,
+    walletInfo?.AELF?.caHash,
+    walletInfo.AESEncryptPrivateKey,
+  ]);
+
   const recoveryWallet = useCallback(() => {
-    // TODO
-    state && state.indexOf('guardians') !== -1
-      ? navigate('/setting/guardians')
-      : navigate('/register/set-pin', { state: 'login' });
-  }, [navigate, state]);
+    if (state && state.indexOf('guardians') !== -1) {
+      handleGuardianRecovery();
+    } else {
+      dispatch(setGuardianCountAction(alreadyApprovalLength));
+      navigate('/register/set-pin', { state: 'login' });
+    }
+  }, [alreadyApprovalLength, dispatch, handleGuardianRecovery, navigate, state]);
 
   const verifyingHandler = useCallback(
     async (item: UserGuardianItem) => {
-      dispatch(setCurrentGuardianAction(item));
+      dispatch(setCurrentGuardianAction({ ...item, isInitStatus: false }));
       state && state.indexOf('guardians') !== -1
         ? navigate('/setting/guardians/verifier-account', { state: state })
         : navigate('/login/verifier-account', { state: 'login' });
@@ -97,49 +350,42 @@ export default function GuardianApproval() {
   );
 
   useEffect(() => {
-    const timeGap = guardianExpiredTime ?? 0 - Date.now();
-    if (timeGap <= 0) return setIsExpired(false);
+    if (!guardianExpiredTime) return setIsExpired(false);
+    const timeGap = (guardianExpiredTime ?? 0) - Date.now();
+    if (timeGap <= 0) return setIsExpired(true);
 
-    const timeout = setTimeout(() => {
-      setIsExpired(true);
-    }, timeGap);
+    const timer = setInterval(() => {
+      const timeGap = (guardianExpiredTime ?? 0) - Date.now();
+      if (timeGap <= 0) return setIsExpired(true);
+      setIsExpired(false);
+    }, 1000);
     return () => {
-      clearTimeout(timeout);
+      clearInterval(timer);
     };
   }, [guardianExpiredTime]);
 
+  const handleBack = useCallback(() => {
+    if (state && state.indexOf('guardians') !== -1) {
+      if (['guardians/del', 'guardians/edit'].includes(state)) {
+        navigate(`/setting/guardians/edit`);
+      } else if ('guardians/add' === state) {
+        navigate('/setting/guardians/add', { state: 'back' });
+      }
+    } else {
+      navigate('/register/start');
+    }
+  }, [navigate, state]);
+
   return (
     <div className={clsx('guardian-approval-wrapper', isPrompt ? 'common-page' : 'popup-page')}>
-      {isPrompt ? (
-        <PortKeyTitle
-          leftElement
-          leftCallBack={() =>
-            state && state.indexOf('guardians') !== -1
-              ? navigate(`/setting/${state}`, { state: { back: 'back' } })
-              : navigate('/register/start')
-          }
-        />
-      ) : (
-        <SettingHeader
-          leftCallBack={() =>
-            state && state.indexOf('guardians') !== -1
-              ? navigate(`/setting/${state}`, { state: { back: 'back' } })
-              : navigate('/register/start')
-          }
-        />
-      )}
+      {isPrompt ? <PortKeyTitle leftElement leftCallBack={handleBack} /> : <SettingHeader leftCallBack={handleBack} />}
       <div className="common-content1 guardian-approval-content">
-        <div className="title">Guardian approval</div>
-        <p className="description">Expire after 1 hour</p>
+        <div className="title">{t('Guardian Approval')}</div>
+        <p className="description">{isExpired ? t('Expired') : t('Expire after 1 hour')}</p>
         <div className="flex-between-center approve-count">
           <span className="flex-row-center">
-            Guardian approvals
-            <CommonTooltip
-              placement="top"
-              title={
-                'You will need a certain amount of guardians to confirm your action.The numbers differ depending on the number of guardians you add. Quantity is less than or equal to 3, all need to agree；Quantity is greater than 3, at least 60% consent is required.'
-              }
-            />
+            {t("Guardians' approval")}
+            <CommonTooltip placement="top" title={t('guardianApprovalTip')} />
           </span>
           <div>
             <span className="already-approval">{alreadyApprovalLength}</span>
@@ -155,31 +401,31 @@ export default function GuardianApproval() {
                   item.status !== VerifyStatus.Verified &&
                   'verifier-item-disabled',
               )}
-              key={item.verifier?.name}>
-              {item.isLoginAccount && <div className="login-icon">Login Account</div>}
+              key={`${item.key}`}>
+              {item.isLoginAccount && <div className="login-icon">{t('Login Account')}</div>}
               <div className="flex-between-center">
                 <VerifierPair guardiansType={item.guardiansType} verifierSrc={item.verifier?.imageUrl} />
                 <span className="account-text">{item.loginGuardianType}</span>
               </div>
               {isExpired && item.status !== VerifyStatus.Verified ? (
                 <Button className="expired" type="text" disabled>
-                  expired
+                  {t('Expired')}
                 </Button>
               ) : (
                 <>
                   {(!item.status || item.status === VerifyStatus.NotVerified) && (
                     <Button className="not-verified" type="primary" onClick={() => SendCode(item)}>
-                      Send
+                      {t('Send')}
                     </Button>
                   )}
                   {item.status === VerifyStatus.Verifying && (
                     <Button type="primary" className="verifying" onClick={() => verifyingHandler(item)}>
-                      Verify
+                      {t('Verify')}
                     </Button>
                   )}
                   {item.status === VerifyStatus.Verified && (
                     <Button className="verified" type="text" disabled>
-                      confirmed
+                      {t('Confirmed')}
                     </Button>
                   )}
                 </>
@@ -194,7 +440,7 @@ export default function GuardianApproval() {
               className="recovery-wallet-btn"
               disabled={alreadyApprovalLength <= 0 || alreadyApprovalLength !== approvalLength}
               onClick={recoveryWallet}>
-              {state === 'guardians' ? 'Request to Pass' : 'Recovery Wallet'}
+              {state && state.indexOf('guardians') !== -1 ? 'Confirm' : 'Recover Wallet'}
             </Button>
           </div>
         )}

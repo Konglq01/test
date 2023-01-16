@@ -1,4 +1,5 @@
-import { LoginType, VerificationType } from '@portkey/types/verifier';
+import { LoginType } from '@portkey/types/types-ca/wallet';
+import { VerificationType } from '@portkey/types/verifier';
 import { request } from '..';
 
 interface CreateWalletInfoParams {
@@ -9,6 +10,8 @@ interface CreateWalletInfoParams {
   managerAddress: string;
   deviceString: string;
   verificationType: VerificationType;
+  chainId: string;
+  guardianCount?: number;
 }
 
 export const createWalletInfo = async ({
@@ -19,27 +22,34 @@ export const createWalletInfo = async ({
   managerAddress,
   verificationType,
   deviceString,
+  chainId,
+  guardianCount,
 }: CreateWalletInfoParams) => {
   let tmpFetch;
+  let params = {
+    type,
+    loginGuardianType,
+    managerUniqueId,
+    managerAddress,
+    deviceString,
+    chainId,
+  };
   switch (verificationType) {
     case VerificationType.register:
       tmpFetch = request.wallet.registerWallet;
       break;
     case VerificationType.communityRecovery:
       tmpFetch = request.wallet.recoveryWallet;
+      Object.assign(params, {
+        guardianCount,
+      });
       break;
     default:
       throw Error('Unable to find the corresponding api');
   }
   return tmpFetch({
     baseURL: baseUrl,
-    params: {
-      type,
-      loginGuardianType,
-      managerUniqueId,
-      managerAddress,
-      deviceString,
-    },
+    params,
   });
 };
 // TODO

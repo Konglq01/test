@@ -14,17 +14,18 @@ import { PIN_SIZE } from '@portkey/constants/misc';
 import { checkPin } from 'utils/redux';
 import { useNavigation } from '@react-navigation/native';
 import navigationService from 'utils/navigationService';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import Loading from 'components/Loading';
 import useBiometricsReady from 'hooks/useBiometrics';
 import { usePreventHardwareBack } from '@portkey/hooks/mobile';
-import { intervalGetRegisterResult, TimerResult } from 'utils/wallet';
+import { intervalGetResult, onResultFail, TimerResult } from 'utils/wallet';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import CommonButton from 'components/CommonButton';
-import { resetWallet, setCAInfo } from '@portkey/store/store-ca/wallet/actions';
+import { setCAInfo } from '@portkey/store/store-ca/wallet/actions';
 import { CAInfo } from '@portkey/types/types-ca/wallet';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network';
-let appState: AppStateStatus;
+import { VerificationType } from '@portkey/types/verifier';
+import useEffectOnce from 'hooks/useEffectOnce';
+let appState: AppStateStatus, verifyTime: number;
 export default function SecurityLock() {
   const { biometrics } = useUser();
   const { apiUrl } = useCurrentNetworkInfo();
@@ -35,26 +36,32 @@ export default function SecurityLock() {
 
   const digitInput = useRef<DigitInputInterface>();
   const [errorMessage, setErrorMessage] = useState<string>();
-  const { walletInfo } = useCurrentWallet();
+  const { managerInfo, address, caHash } = useCurrentWalletInfo();
   const dispatch = useAppDispatch();
-  const isSyncCAInfo = useMemo(
-    () => walletInfo.address && walletInfo.managerInfo && !walletInfo.AELF?.caAddress,
-    [walletInfo.AELF?.caAddress, walletInfo.address, walletInfo.managerInfo],
-  );
+  const isSyncCAInfo = useMemo(() => address && managerInfo && !caHash, [address, caHash, managerInfo]);
   const navigation = useNavigation();
   useEffect(() => {
     if (isSyncCAInfo) {
       setTimeout(() => {
-        if (walletInfo.managerInfo && apiUrl)
-          timer.current = intervalGetRegisterResult({
+        if (managerInfo && apiUrl) {
+          timer.current?.remove();
+          timer.current = intervalGetResult({
             apiUrl,
-            managerInfo: walletInfo.managerInfo,
+            managerInfo: managerInfo,
             onPass: setStateCAInfo,
+            onFail: message =>
+              onResultFail(
+                dispatch,
+                message,
+                managerInfo?.verificationType === VerificationType.communityRecovery,
+                true,
+              ),
           });
+        }
       }, 100);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSyncCAInfo]);
+  }, [isSyncCAInfo, apiUrl]);
   const handleRouter = useCallback(
     (pinInput: string) => {
       Loading.hide();
@@ -74,13 +81,13 @@ export default function SecurityLock() {
   const handlePassword = useCallback(
     (pwd: string) => {
       dispatch(setCredentials({ pin: pwd }));
-      if (!walletInfo.managerInfo) return;
+      if (!managerInfo) return;
       if (isSyncCAInfo && !caInfo) {
         timer.current?.remove();
         Loading.show();
-        timer.current = intervalGetRegisterResult({
+        timer.current = intervalGetResult({
           apiUrl,
-          managerInfo: walletInfo.managerInfo,
+          managerInfo: managerInfo,
           onPass: (info: CAInfo) => {
             dispatch(
               setCAInfo({
@@ -92,6 +99,8 @@ export default function SecurityLock() {
             Loading.hide();
             handleRouter(pwd);
           },
+          onFail: message =>
+            onResultFail(dispatch, message, managerInfo?.verificationType === VerificationType.communityRecovery, true),
         });
         return;
       } else if (caInfo) {
@@ -105,10 +114,10 @@ export default function SecurityLock() {
       }
       handleRouter(pwd);
     },
-    [apiUrl, caInfo, dispatch, handleRouter, isSyncCAInfo, walletInfo.managerInfo],
+    [apiUrl, caInfo, dispatch, handleRouter, isSyncCAInfo, managerInfo],
   );
   const verifyBiometrics = useCallback(async () => {
-    if (!biometrics) return;
+    if (!biometrics || (verifyTime && verifyTime + 1000 > new Date().getTime())) return;
     try {
       const securePassword = await secureStore.getItemAsync('Pin');
       if (!securePassword) return;
@@ -116,6 +125,7 @@ export default function SecurityLock() {
     } catch (error) {
       console.log(error, '=====error');
     }
+    verifyTime = new Date().getTime();
   }, [biometrics, handlePassword]);
   const handleAppStateChange = useCallback(
     (nextAppState: AppStateStatus) => {
@@ -126,6 +136,9 @@ export default function SecurityLock() {
     },
     [verifyBiometrics],
   );
+  useEffectOnce(() => {
+    if (!navigation.canGoBack()) verifyBiometrics();
+  });
   useEffect(() => {
     const listener = AppState.addEventListener('change', handleAppStateChange);
     return () => {
@@ -138,7 +151,7 @@ export default function SecurityLock() {
     (enterPin: string) => {
       if (enterPin.length === PIN_SIZE) {
         if (!checkPin(enterPin)) {
-          digitInput.current?.resetPin();
+          digitInput.current?.reset();
           setErrorMessage('Incorrect Pin');
           return;
         }
@@ -160,14 +173,6 @@ export default function SecurityLock() {
           style={styles.pinStyle}
           onChangeText={onChangeText}
           errorMessage={errorMessage}
-        />
-        <CommonButton
-          title="resetWallet"
-          type="primary"
-          onPress={() => {
-            dispatch(resetWallet());
-            navigationService.reset('Referral');
-          }}
         />
       </View>
     </PageContainer>

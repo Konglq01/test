@@ -13,8 +13,8 @@ export default function SuccessPageUI({ type }: { type?: SuccessPageType; onConf
         <PortKeyTitle />
         <div className="success-page-content">
           <CustomSvg type="Congratulations" className="congratulations-icon" />
-          {type === SuccessPageType.Created && <h1>{t('Sign up success !')}</h1>}
-          {type === SuccessPageType.Login && <h1>{t('Login success !')}</h1>}
+          {type === SuccessPageType.Created && <h1>{t('Successfully signed up')}</h1>}
+          {type === SuccessPageType.Login && <h1>{t('Successfully logged in')}</h1>}
         </div>
       </div>
       <div className="flex created-tip-wrapper">

@@ -10,17 +10,18 @@ import { pTd } from 'utils/unit';
 import { useLanguage } from 'i18n/hooks';
 import { defaultColors } from 'assets/theme';
 import OverlayBody from 'components/OverlayModal/OverlayBody';
+import { VerifierImage } from '../VerifierImage';
 
 type ValueType = string | number;
 type DefaultValueType = string;
 
 type ItemTypeBase<T extends ValueType = DefaultValueType> = {
-  id: T;
+  url: T;
   [key: string]: any;
 };
 
 type SelectListProps<ItemType extends ItemTypeBase<ItemValueType>, ItemValueType extends ValueType> = {
-  id?: ItemValueType;
+  url?: ItemValueType;
   list: Array<ItemType>;
   callBack: (item: ItemType) => void;
   labelAttrName?: string;
@@ -29,34 +30,29 @@ type SelectListProps<ItemType extends ItemTypeBase<ItemValueType>, ItemValueType
 const SelectList = <ItemType extends ItemTypeBase<ItemValueType>, ItemValueType extends ValueType>({
   list,
   callBack,
-  id,
-  labelAttrName = 'id',
+  url,
+  labelAttrName = 'url',
 }: SelectListProps<ItemType, ItemValueType>) => {
   const { t } = useLanguage();
 
   return (
     <OverlayBody>
-      <TextXL style={styles.typeOverlayTitleLabel}>{t('Select Verifier')}</TextXL>
+      <TextXL style={styles.typeOverlayTitleLabel}>{t('Select verifiers')}</TextXL>
       <ScrollView alwaysBounceVertical={false}>
         {list.map(item => {
           return (
             <Touchable
-              key={item.id}
+              key={item.url}
               onPress={() => {
                 OverlayModal.hide();
                 callBack(item);
               }}>
               <View style={[GStyles.paddingLeft(24), styles.itemRow]}>
-                {/* TODO: dynamic render logo icon */}
-                <Svg
-                  iconStyle={GStyles.marginRight(12)}
-                  icon="logo-icon"
-                  color={defaultColors.primaryColor}
-                  size={pTd(36)}
-                />
+                <VerifierImage style={GStyles.marginRight(12)} size={pTd(36)} uri={item.imageUrl} />
+
                 <View style={styles.itemContent}>
                   <TextL>{item[labelAttrName]}</TextL>
-                  {id !== undefined && id === item.id && (
+                  {url !== undefined && url === item.url && (
                     <Svg iconStyle={styles.itemIcon} icon="selected" size={pTd(24)} />
                   )}
                 </View>

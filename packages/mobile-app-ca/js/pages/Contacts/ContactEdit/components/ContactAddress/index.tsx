@@ -74,7 +74,7 @@ const ContactAddress: React.FC<ContactAddressProps> = ({
         rightElement={<Svg size={pTd(16)} icon="right-arrow" color={defaultColors.icon1} />}
       />
       <AddressInput
-        placeholder={t("Enter Contact's Address")}
+        placeholder={t("Enter contact's address")}
         value={addressValue}
         affix={affix}
         onChangeText={_onAddressChange}

@@ -10,11 +10,11 @@ import SetWalletPin from 'pages/SetWalletPin';
 import SuccessPage from 'pages/SuccessPage';
 import GuardianApproval from 'pages/GuardianApproval';
 import Guardians from 'pages/Guardians';
-import GuardiansEdit from 'pages/GuardiansEdit';
-import GuardiansView from 'pages/GuardiansView';
+import GuardiansEdit from 'pages/Guardians/GuardiansEdit';
+import GuardiansView from 'pages/Guardians/GuardiansView';
 import AddToken from 'pages/Token/Manage';
 import Receive from 'pages/Receive';
-import AddGuardian from 'pages/AddGuardian';
+import AddGuardian from 'pages/Guardians/GuardiansAdd';
 import TokenDetail from 'pages/Token/Detail';
 import AccountSetting from 'pages/AccountSetting';
 import Contact from 'pages/ContactDetail';
@@ -23,7 +23,7 @@ import Send from 'pages/Send';
 import Transaction from 'pages/Transaction';
 import NFT from 'pages/NFT';
 import Unlock from 'pages/Unlock';
-import BlankPage from 'pages/BlankPage';
+import QueryPage from 'pages/QueryPage';
 
 // TODO delete unnecessary pages
 export const PageRouter = () =>
@@ -145,8 +145,8 @@ export const PageRouter = () =>
       element: <Unlock />,
     },
     {
-      path: 'blank-page',
-      element: <BlankPage />,
+      path: 'query-page',
+      element: <QueryPage />,
     },
     {
       path: '*',

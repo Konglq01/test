@@ -1,13 +1,5 @@
 import dayjs from 'dayjs';
 
-export const sleep = (time: number) => {
-  return new Promise<'sleep'>(resolve => {
-    setTimeout(() => {
-      resolve('sleep');
-    }, time);
-  });
-};
-
 /**
  * this function is to format address,just like "formatStr2EllipsisStr" ---> "for...ess"
  * @param address

@@ -406,5 +406,8 @@
   "Portkey Team": "Portkey Team",
   "sendCodeTip1": "A {{codeCount}}-digit code was sent to",
   "sendCodeTip2": "Enter it within {{minute}} minutes",
-  "Resend after": "Resend after {{timer}}s"
+  "Resend after": "Resend after {{timer}}s",
+  "guardianApprovalTip": "You will need a certain number of guardians to confirm your action. The requirements differ depending on your guardian counts. ",
+  "verificationCodeTip": "{{verifier}} will send a verification code to"
+
 }

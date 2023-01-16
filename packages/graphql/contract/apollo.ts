@@ -1,6 +1,6 @@
 import { ApolloClient, HttpLink, InMemoryCache, NormalizedCacheObject } from '@apollo/client';
 import { NetworkType } from '@portkey/types';
-import { CHAIN_GRAPHQL_URL } from '@portkey/constants/constants-ca/network';
+import { NetworkList } from '@portkey/constants/constants-ca/network';
 
 const createApolloClient = (networkType: NetworkType) =>
   new ApolloClient({
@@ -14,14 +14,12 @@ const createApolloClient = (networkType: NetworkType) =>
         fetchPolicy: 'network-only',
       },
     },
-    link: new HttpLink({ uri: CHAIN_GRAPHQL_URL[networkType] }),
+    link: new HttpLink({ uri: NetworkList.find(item => item.networkType === networkType)?.graphqlUrl || '' }),
   });
 
-export const networkClientMap: Record<NetworkType, ApolloClient<NormalizedCacheObject>> = {
-  ['MAIN']: createApolloClient('MAIN'),
-  ['TESTNET']: createApolloClient('TESTNET'),
-};
+export const networkClientMap: Record<string, ApolloClient<NormalizedCacheObject>> = {};
 
 export const getApolloClient = (networkType: NetworkType) => {
+  if (!networkClientMap[networkType]) networkClientMap[networkType] = createApolloClient(networkType);
   return networkClientMap[networkType];
 };
