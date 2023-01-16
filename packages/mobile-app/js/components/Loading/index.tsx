@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import Overlay from 'teaset/components/Overlay/Overlay';
+import Overlay from 'rn-teaset/components/Overlay/Overlay';
 import { View, StyleSheet, Animated } from 'react-native';
 import { TextL } from '../CommonText';
 import { defaultColors } from 'assets/theme';
