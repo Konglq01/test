@@ -131,7 +131,7 @@ const AssetList = ({ onFinishSelectToken, account }: TokenListProps) => {
 
       {/* no assets in this accout  */}
       {/* '{ import { list } from 'pages/SettingsPage/HelpAndFeedBack/config';' has been removed } */}
-      {/* {!list.length ? (
+      {filterListInfo?.list?.length ? (
         <NoData noPic message={t('There are currently no assets to send')} />
       ) : (
         <CommonInput
@@ -147,7 +147,7 @@ const AssetList = ({ onFinishSelectToken, account }: TokenListProps) => {
             });
           }}
         />
-      )} */}
+      )}
 
       {listShow.length === 0 ? (
         <NoData noPic message={t('There are currently no assets to send.')} />
