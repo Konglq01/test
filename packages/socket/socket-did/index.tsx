@@ -1,5 +1,5 @@
-import Signalr, { ISignalrOption } from '..';
-import { SocketUrl, listenList } from '@portkey/constants/constants-ca/socket';
+import Signalr from '..';
+import { listenList } from '@portkey/constants/constants-ca/socket';
 
 class SignalrDid extends Signalr {
   public RequestTradeRecord(chainId: string, tradePairId: string, maxResultCount?: number) {
