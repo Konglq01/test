@@ -15,7 +15,11 @@ import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
 import { LoginType } from '@portkey/types/types-ca/wallet';
-import { resetUserGuardianStatus, setCurrentGuardianAction } from '@portkey/store/store-ca/guardians/actions';
+import {
+  setCurrentGuardianAction,
+  setOpGuardianAction,
+  setPreGuardianAction,
+} from '@portkey/store/store-ca/guardians/actions';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import getPrivateKeyAndMnemonic from 'utils/Wallet/getPrivateKeyAndMnemonic';
 import { GuardianMth } from 'types/guardians';
@@ -34,7 +38,7 @@ enum SwitchFail {
 export default function GuardiansView() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { currentGuardian, userGuardiansList } = useGuardiansInfo();
+  const { currentGuardian, opGuardian, userGuardiansList } = useGuardiansInfo();
   const [tipOpen, setTipOpen] = useState<boolean>(false);
   const [switchFail, setSwitchFail] = useState<SwitchFail>(SwitchFail.default);
   const currentNetwork = useCurrentNetworkInfo();
@@ -47,14 +51,14 @@ export default function GuardiansView() {
 
   const verifyHandler = useCallback(async () => {
     try {
-      if (currentGuardian?.isLoginAccount) {
+      if (opGuardian?.isLoginAccount) {
         const res = await getPrivateKeyAndMnemonic(
           {
             AESEncryptPrivateKey: walletInfo.AESEncryptPrivateKey,
           },
           passwordSeed,
         );
-        if (!currentChain?.endPoint || !res?.privateKey) return message.error('error');
+        if (!currentChain?.endPoint || !res?.privateKey) return message.error('unset login account error');
         setLoading(true);
         const result = await handleGuardian({
           rpcUrl: currentChain.endPoint,
@@ -78,12 +82,10 @@ export default function GuardiansView() {
         await sleep(1000);
         const aelfInstance = getAelfInstance(currentChain.endPoint);
         await getTxResult(aelfInstance, TransactionId);
-        dispatch(resetUserGuardianStatus());
         dispatch(
-          setCurrentGuardianAction({
-            ...currentGuardian,
+          setOpGuardianAction({
+            ...opGuardian,
             isLoginAccount: false,
-            isInitStatus: true,
           }),
         );
         setLoading(false);
@@ -91,28 +93,28 @@ export default function GuardiansView() {
       } else {
         dispatch(
           setLoginAccountAction({
-            loginGuardianType: currentGuardian?.loginGuardianType as string,
-            accountLoginType: LoginType.email,
+            loginGuardianType: opGuardian?.loginGuardianType as string,
+            accountLoginType: opGuardian?.guardiansType as LoginType,
           }),
         );
         setLoading(true);
         const result = await sendVerificationCode({
-          loginGuardianType: currentGuardian?.loginGuardianType as string,
-          guardiansType: currentGuardian?.guardiansType as LoginType,
+          loginGuardianType: opGuardian?.loginGuardianType as string,
+          guardiansType: opGuardian?.guardiansType as LoginType,
           verificationType: VerificationType.addGuardian,
-          baseUrl: currentGuardian?.verifier?.url || '',
+          baseUrl: opGuardian?.verifier?.url || '',
           managerUniqueId: walletInfo.managerInfo?.managerUniqueId as string,
         });
         setLoading(false);
         if (result.verifierSessionId) {
           dispatch(
             setCurrentGuardianAction({
-              isLoginAccount: currentGuardian?.isLoginAccount,
-              verifier: currentGuardian?.verifier,
-              loginGuardianType: currentGuardian?.loginGuardianType as string,
-              guardiansType: currentGuardian?.guardiansType as LoginType,
+              isLoginAccount: opGuardian?.isLoginAccount,
+              verifier: opGuardian?.verifier,
+              loginGuardianType: opGuardian?.loginGuardianType as string,
+              guardiansType: opGuardian?.guardiansType as LoginType,
               sessionId: result.verifierSessionId,
-              key: currentGuardian?.key as string,
+              key: opGuardian?.key as string,
               isInitStatus: true,
             }),
           );
@@ -121,7 +123,7 @@ export default function GuardiansView() {
       }
     } catch (error: any) {
       setLoading(false);
-      message.error(error?.Error?.Message || error.message?.Message || error?.message);
+      message.error(error?.Error?.Message || error.message?.Message || error?.message || error?.type);
       console.log('---setLoginAccount-error', error);
     }
   }, [
@@ -130,11 +132,10 @@ export default function GuardiansView() {
     currentNetwork.walletType,
     dispatch,
     navigate,
+    opGuardian,
     passwordSeed,
     setLoading,
-    walletInfo?.AELF?.caHash,
-    walletInfo.AESEncryptPrivateKey,
-    walletInfo.managerInfo?.managerUniqueId,
+    walletInfo,
   ]);
 
   const handleSwitch = useCallback(
@@ -155,16 +156,16 @@ export default function GuardiansView() {
             address: currentChain?.caContractAddress as string,
             chainType: currentNetwork.walletType,
             paramsOption: {
-              loginGuardianType: currentGuardian?.loginGuardianType,
+              loginGuardianType: opGuardian?.loginGuardianType,
             },
           });
           setSwitchFail(SwitchFail.openFail);
         } catch (error: any) {
-          console.log('---setLoginAccount-err', error);
           if (error?.Error?.Details && error?.Error?.Details?.indexOf('Not found ca_hash')) {
             setTipOpen(true);
           } else {
-            throw error?.Error?.Message || error.message?.Message || error?.message;
+            message.error(error?.Error?.Message || error.message?.Message || error?.message);
+            throw error;
           }
         }
       } else {
@@ -182,8 +183,8 @@ export default function GuardiansView() {
     [
       currentChain?.caContractAddress,
       currentChain?.endPoint,
-      currentGuardian?.loginGuardianType,
       currentNetwork.walletType,
+      opGuardian?.loginGuardianType,
       userGuardiansList,
       verifyHandler,
     ],
@@ -193,7 +194,7 @@ export default function GuardiansView() {
     <div className="guardian-view-frame">
       <div className="guardian-view-title">
         <SettingHeader
-          title="Guardians"
+          title={t('Guardians')}
           leftCallBack={() => {
             navigate('/setting/guardians');
           }}
@@ -211,14 +212,14 @@ export default function GuardiansView() {
       <div className="guardian-view-content">
         <div className="input-content">
           <div className="input-item">
-            <p className="label">Guardian Type</p>
-            <p className="control">{currentGuardian?.loginGuardianType}</p>
+            <p className="label">{t('Guardian Type')}</p>
+            <p className="control">{opGuardian?.loginGuardianType}</p>
           </div>
           <div className="input-item">
             <div className="label">{t('Verifier')}</div>
             <div className="control">
-              <BaseVerifierIcon width={32} height={32} src={currentGuardian?.verifier?.imageUrl} />
-              <span>{currentGuardian?.verifier?.name ?? ''}</span>
+              <BaseVerifierIcon width={32} height={32} src={opGuardian?.verifier?.imageUrl} />
+              <span className="name">{opGuardian?.verifier?.name ?? ''}</span>
             </div>
           </div>
         </div>
@@ -226,23 +227,24 @@ export default function GuardiansView() {
           <span className="label">{t('Login account')}</span>
           <span className="value">{t('The login account will be able to log in and control all your assets')}</span>
           <div className="status-wrap">
-            <Switch className="login-switch" checked={currentGuardian?.isLoginAccount} onChange={handleSwitch} />
-            <span className="status">{currentGuardian?.isLoginAccount ? 'Open' : 'Close'}</span>
+            <Switch className="login-switch" checked={opGuardian?.isLoginAccount} onChange={handleSwitch} />
+            <span className="status">{opGuardian?.isLoginAccount ? 'Open' : 'Close'}</span>
           </div>
         </div>
         <div className="btn-wrap" style={{ display: editable ? '' : 'none' }}>
           <Button
             onClick={() => {
+              dispatch(setPreGuardianAction(opGuardian));
               navigate('/setting/guardians/edit');
             }}
             type="primary">
-            {t('Edit')}
+            {t('Change Verifier')}
           </Button>
         </div>
       </div>
       <CommonModal className="verify-confirm-modal" closable={false} open={tipOpen} onCancel={() => setTipOpen(false)}>
-        <p className="modal-content">{`${currentGuardian?.verifier?.name ?? ''} will send a verification code to ${
-          currentGuardian?.loginGuardianType
+        <p className="modal-content">{`${opGuardian?.verifier?.name ?? ''} will send a verification code to ${
+          opGuardian?.loginGuardianType
         } to verify your email address.`}</p>
         <div className="btn-wrapper">
           <Button onClick={() => setTipOpen(false)}>{t('Cancel')}</Button>
@@ -254,7 +256,7 @@ export default function GuardiansView() {
       <CommonModal open={!!switchFail} closable={false} className="login-account-tip-modal">
         <p className="modal-content">
           {switchFail === SwitchFail.closeFail
-            ? t('This guardian is the only Login account and cannot be turn off')
+            ? t('This guardian is the only login account and cannot be turned off')
             : t('This account address is already a login account and cannot be used')}
         </p>
         <div style={{ padding: '15px 16px 17px 16px' }}>

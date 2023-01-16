@@ -71,6 +71,7 @@ export const guardiansSlice = createSlice({
         });
         state.userGuardiansList = guardiansList;
         state.userGuardianStatus = userStatus;
+        state.guardianExpiredTime = undefined;
       })
       .addCase(setPreGuardianAction, (state, action) => {
         if (!action.payload) {
