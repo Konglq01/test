@@ -1,24 +1,24 @@
 import { DeviceEventEmitter, EmitterSubscription } from 'react-native';
 
-const EventMap = {
-  setGuardianStatus: 'setGuardianStatus',
-  openBiometrics: 'openBiometrics',
-  clearLoginInput: 'clearLoginInput',
-  clearSetPin: 'clearSetPin',
-  clearQRWallet: 'clearQRWallet',
-  clearSignupInput: 'clearSignupInput',
-  refreshGuardiansList: 'refreshGuardiansList',
-};
+const EventList = [
+  'setGuardianStatus',
+  'openBiometrics',
+  'clearLoginInput',
+  'clearSetPin',
+  'clearQRWallet',
+  'clearSignupInput',
+  'refreshGuardiansList',
+] as const;
 
 // eslint-disable-next-line no-new-func
 const eventsServer = new Function();
 
-eventsServer.prototype.parseEvent = function (name: string, eventMap: any) {
+eventsServer.prototype.parseEvent = function (name: string, eventMap: string[]) {
   const obj: any = (this[name] = {});
-  Object.keys(eventMap).forEach(key => {
-    obj[key] = {
-      emit: this.emit.bind(this, eventMap[key]),
-      addListener: this.addListener.bind(this, eventMap[key]),
+  eventMap.forEach(item => {
+    obj[item] = {
+      emit: this.emit.bind(this, item.toLocaleUpperCase()),
+      addListener: this.addListener.bind(this, item.toLocaleUpperCase()),
     };
   });
 };
@@ -30,10 +30,10 @@ eventsServer.prototype.addListener = function (eventType: string, listener: (dat
   return DeviceEventEmitter.addListener(eventType, listener);
 };
 
-eventsServer.prototype.parseEvent('base', EventMap);
+eventsServer.prototype.parseEvent('base', EventList);
 
 export type MyEventsTypes = {
-  [x in keyof typeof EventMap]: {
+  [x in typeof EventList[number]]: {
     emit: (...params: any[]) => void;
     addListener: (listener: (data: any) => void) => EmitterSubscription;
   };
