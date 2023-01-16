@@ -89,8 +89,6 @@ export function useOnManagerAddressAndQueryResult() {
           });
         }
       } catch (error) {
-        console.log(error, '=====error');
-
         Loading.hide();
         CommonToast.failError(error);
       }

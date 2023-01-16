@@ -30,6 +30,7 @@ export function intervalGetResult({
         baseURL: apiUrl,
         data: managerInfo,
       });
+      CommonToast.success(`${JSON.stringify(req)}\n${JSON.stringify(managerInfo)}\n${apiUrl}`);
       console.log(req, '====req');
 
       switch (req.recoveryStatus || req.registerStatus) {

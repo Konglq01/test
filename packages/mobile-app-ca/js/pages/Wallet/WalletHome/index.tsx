@@ -44,6 +44,8 @@ const WalletHome: React.FC<WalletHomeProps> = () => {
           CommonToast.fail(req?.error.message);
         }
       } catch (error) {
+        console.log(error, '=====error');
+
         CommonToast.failError(error);
       }
       Loading.hide();

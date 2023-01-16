@@ -114,7 +114,7 @@ export const isExtension = () => process.env.DEVICE === 'extension';
 export const randomId = () => uuid.v4().replace(/-/g, '');
 
 export const handleError = (error: any, errorText?: string) => {
-  let text = errorText;
-  if (typeof error.message === 'string') text = error.message;
-  return text;
+  if (typeof error === 'string') return error;
+  if (typeof error.message === 'string') return error.message;
+  return errorText;
 };
