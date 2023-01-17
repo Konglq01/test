@@ -1,16 +1,16 @@
 import { randomId } from '.';
 
-const timeWorker: any = {};
+const timeWorker: { [key: string]: NodeJS.Timeout } = {};
 
-export function setTimeoutInterval(fn: any, time: number) {
+export function setTimeoutInterval(callback: () => void, time: number) {
   const key = randomId();
-  const execute = function (executeFn: any, executeTime: number) {
+  const execute = function (executeFn: () => void, executeTime: number) {
     timeWorker[key] = setTimeout(() => {
-      fn();
+      callback();
       execute(executeFn, executeTime);
     }, time);
   };
-  execute(fn, time);
+  execute(callback, time);
   return key;
 }
 

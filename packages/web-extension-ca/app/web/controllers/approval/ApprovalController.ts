@@ -94,10 +94,7 @@ export default class ApprovalController {
     const connections = (await getLocalStorage('connections')) ?? {};
     const pageState: any = this._getPageState();
     let connectAccount: string[];
-    if (!connections[origin])
-      return {
-        ...errorHandler(600001),
-      };
+    if (!connections[origin]) return errorHandler(600001);
     const permission = connections[origin].permission;
 
     if (!permission || !permission?.accountList || !permission?.accountList?.length) {

@@ -5,7 +5,7 @@ import Svg from 'components/Svg';
 import { useLanguage } from 'i18n/hooks';
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
-import Carousel from 'teaset/components/Carousel/Carousel';
+import Carousel from 'rn-teaset/components/Carousel/Carousel';
 import { screenWidth, windowHeight } from '@portkey/utils/mobile/device';
 import Guide1Logo from '../../img/guide-1.png';
 import Guide2Logo from '../../img/guide-2.png';

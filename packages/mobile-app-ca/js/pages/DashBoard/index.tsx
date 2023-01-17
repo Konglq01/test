@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Card from './Card';
+import { StyleSheet } from 'react-native';
 // import navigationService from 'utils/navigationService';
 // import { TouchableOpacity } from 'react-native-gesture-handler';
 // import { TokenItemShowType } from '@portkey/types/types-eoa/token';
@@ -14,6 +15,7 @@ import useEffectOnce from 'hooks/useEffectOnce';
 import { MINUTE } from '@portkey/constants';
 import { fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
 import { useGetCurrentCAViewContract } from 'hooks/contract';
+import PageContainer from 'components/PageContainer';
 
 interface DashBoardTypes {
   navigation: any;
@@ -75,13 +77,26 @@ const DashBoard: React.FC<DashBoardTypes> = () => {
     dispatch(fetchTokenListAsync({ type: 'MAIN' }));
   });
 
-  // return <View style={{ backgroundColor: 'red', height: '100%' }} />;
   return (
-    <SafeAreaBox edges={['top', 'left', 'right']} style={{ backgroundColor: defaultColors.bg5 }}>
+    <PageContainer
+      hideHeader
+      safeAreaColor={['blue', 'white']}
+      containerStyles={styles.container}
+      scrollViewProps={{ disabled: true }}>
       <Card balanceUSD={balanceUSD} />
       <DashBoardTab />
-    </SafeAreaBox>
+    </PageContainer>
   );
+
+  // return <SafeAreaBox edges={['top', 'left', 'right']} style={{ backgroundColor: defaultColors.bg5 }} />;
 };
 
 export default DashBoard;
+
+const styles = StyleSheet.create({
+  container: {
+    paddingLeft: 0,
+    paddingRight: 0,
+    height: '100%',
+  },
+});

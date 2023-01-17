@@ -10,7 +10,7 @@ import { TextM } from 'components/CommonText';
 import Svg from 'components/Svg';
 import { pTd } from 'utils/unit';
 import navigationService from 'utils/navigationService';
-import { useAppDispatch, useAppSelector } from 'store/hooks';
+import { useAppSelector } from 'store/hooks';
 import { ErrorType } from 'types/common';
 import { FontStyles } from 'assets/theme/styles';
 import Touchable from 'components/Touchable';
@@ -21,7 +21,6 @@ import ContactAddress from './components/ContactAddress';
 import { isValidCAWalletName } from '@portkey/utils/reg';
 import ChainOverlay from './components/ChainOverlay';
 import { getAelfAddress, isAelfAddress } from '@portkey/utils/aelf';
-import { getChainListAsync } from '@portkey/store/store-ca/wallet/actions';
 import { ChainItemType } from '@portkey/store/store-ca/wallet/type';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import CommonToast from 'components/CommonToast';
@@ -69,9 +68,6 @@ const ContactEdit: React.FC<ContactEditProps> = ({ route }) => {
 
   const isEdit = useMemo(() => params?.contact !== undefined, [params?.contact]);
 
-  // useEffect(() => {
-  //   appDispatch(getChainListAsync());
-  // }, [appDispatch]);
   const { chainList = [], currentNetwork } = useCurrentWallet();
 
   const chainMap = useMemo(() => {
@@ -99,6 +95,7 @@ const ContactEdit: React.FC<ContactEditProps> = ({ route }) => {
     });
   }, [chainList, currentNetwork, isEdit]);
 
+  // TODO: should check that Why init error as INIT_HAS_ERROR
   const onNameChange = useCallback((value: string) => {
     setEditContact(preEditContact => ({
       ...preEditContact,

@@ -1,6 +1,6 @@
 import { CAInfoType, LoginType } from '@portkey/types/types-ca/wallet';
 
-export interface loginInfo {
+export interface LoginInfo {
   loginGuardianType: string; // account
   accountLoginType: LoginType;
   createType?: 'register' | 'login' | 'scan';
@@ -8,7 +8,7 @@ export interface loginInfo {
 }
 
 export interface LoginState {
-  loginAccount?: loginInfo;
+  loginAccount?: LoginInfo;
   guardianCount?: number;
   scanWalletInfo?: any;
   scanCaWalletInfo?: CAInfoType;

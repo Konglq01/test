@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import PageContainer from 'components/PageContainer';
-import { Text, View, StyleSheet, TouchableOpacity, Linking } from 'react-native';
+import { Text, View, StyleSheet, TouchableOpacity, StatusBar } from 'react-native';
 import Svg from 'components/Svg';
 import { pTd } from 'utils/unit';
 import { getExploreLink } from '@portkey/utils';
@@ -46,10 +46,10 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ route, transfer }) => {
   return (
     <PageContainer
       hideHeader
-      titleDom={<Text />}
-      leftDom={<Text />}
+      safeAreaColor={['white']}
       containerStyles={styles.containerStyle}
       scrollViewProps={{ disabled: true }}>
+      <StatusBar barStyle={'dark-content'} />
       <TouchableOpacity style={styles.closeWrap} onPress={() => navigationService.goBack()}>
         <Svg icon="close" size={pTd(16)} />
       </TouchableOpacity>

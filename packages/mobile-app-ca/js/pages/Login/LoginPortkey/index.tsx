@@ -31,7 +31,7 @@ import { useAppDispatch } from 'store/hooks';
 import { getChainListAsync, setCAInfoType } from '@portkey/store/store-ca/wallet/actions';
 import { useGetHolderInfo, useGetVerifierServers } from 'hooks/guardian';
 import Loading from 'components/Loading';
-import { handleError, sleep } from '@portkey/utils';
+import { handleError } from '@portkey/utils';
 import myEvents from 'utils/deviceEvent';
 import { handleUserGuardiansList } from 'utils/login';
 import { useIntervalQueryCAInfoByAddress } from '@portkey/hooks/hooks-ca/graphql';
@@ -54,19 +54,16 @@ function LoginEmail({ setLoginType }: { setLoginType: (type: LoginType) => void 
     const message = checkEmail(email);
     setErrorMessage(message);
     if (message) return;
-    setErrorMessage(undefined);
     Loading.show();
-    await sleep(100);
     try {
       if (!chainInfo) await dispatch(getChainListAsync());
       const verifierServers = await getVerifierServers();
       const holderInfo = await getHolderInfo({ loginGuardianType: email });
-      Loading.hide();
-      await sleep(200);
       navigationService.navigate('GuardianApproval', {
         loginGuardianType: email,
         userGuardiansList: handleUserGuardiansList(holderInfo, verifierServers),
       });
+      Loading.hide();
     } catch (error) {
       setErrorMessage(handleError(error));
       Loading.hide();

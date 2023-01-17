@@ -40,7 +40,6 @@ export function useOnManagerAddressAndQueryResult() {
       confirmPin: string;
     }) => {
       Loading.show();
-      await sleep(1000);
       const isRecovery = managerInfo.verificationType === VerificationType.communityRecovery;
       try {
         const tmpWalletInfo = walletInfo?.address ? walletInfo : AElf.wallet.createNewWallet();
@@ -48,7 +47,7 @@ export function useOnManagerAddressAndQueryResult() {
           ...managerInfo,
           chainId: DefaultChainId,
           managerAddress: tmpWalletInfo.address,
-          deviceString: JSON.stringify(new Date().getTime()),
+          deviceString: new Date().getTime(),
         };
         let fetch = request.register;
         if (isRecovery) {
@@ -89,8 +88,6 @@ export function useOnManagerAddressAndQueryResult() {
           });
         }
       } catch (error) {
-        console.log(error, '=====error');
-
         Loading.hide();
         CommonToast.failError(error);
       }
