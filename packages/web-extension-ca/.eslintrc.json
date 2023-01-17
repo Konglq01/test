@@ -30,7 +30,8 @@
     "@typescript-eslint/no-unused-vars": 1,
     "@typescript-eslint/explicit-module-boundary-types": 0,
     "@typescript-eslint/ban-types": 0,
-    "@typescript-eslint/no-explicit-any": 0
+    "@typescript-eslint/no-explicit-any": 0,
+    "no-inline-styles/no-inline-styles": 2
   },
   "env": {
     "browser": true,
@@ -42,5 +43,5 @@
     "browser": "readonly"
   },
 
-  "plugins": ["react"]
+  "plugins": ["react", "eslint-plugin-no-inline-styles"]
 }

@@ -92,6 +92,7 @@ export default function PermissionCheck({
   }, [pageType, noCheckRegister, isRegisterPage, getPassword]);
 
   useEffect(() => {
+    if (location.pathname.includes('/test')) return;
     if (locked && !noCheckRegister && !isRegisterPage) return navigate('/unlock');
     checkRegisterHandler();
   }, [isRegisterPage, locked, noCheckRegister, navigate, getPassword, checkRegisterHandler]);
