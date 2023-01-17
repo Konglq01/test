@@ -59,10 +59,10 @@ export default function SwitchNetwork() {
           className={clsx('network-item', net.disabled ? 'disabled' : '')}
           onClick={() => handleChangeNet(net)}>
           <div className="network-item-checked">
-            {curNet === net.key && <CustomSvg type="selected" style={{ width: 16, height: 16 }} />}
+            {curNet === net.key && <CustomSvg type="selected" className="selected-svg" />}
           </div>
           <div className="network-item-icon">
-            <CustomSvg type="Aelf" style={{ width: 32, height: 32 }} />
+            <CustomSvg type="Aelf" />
           </div>
           {t(net.name)}
         </div>

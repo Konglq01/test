@@ -50,7 +50,7 @@ export default function SetPin({ open, close }: CheckPinProps) {
         setDisable(true);
       }
     },
-    [form],
+    [form, passwordSeed],
   );
 
   const handleSave = useCallback(
@@ -68,7 +68,7 @@ export default function SetPin({ open, close }: CheckPinProps) {
       close();
       setDisable(true);
     },
-    [close, form],
+    [close, dispatch, form, passwordSeed],
   );
 
   const onFinishFailed = useCallback((errorInfo: any) => {

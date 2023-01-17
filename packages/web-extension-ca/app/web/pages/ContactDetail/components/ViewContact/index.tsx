@@ -58,12 +58,7 @@ export default function ViewContact() {
                 <div className="address">{`ELF_${ads?.address}_${ads?.chainId}`}</div>
                 <div className="chain">{`${ads?.chainType} ${ads?.chainId}`}</div>
               </div>
-              <CustomSvg
-                onClick={() => handleCopy(ads?.address)}
-                type="Copy2"
-                className="address-copy-icon"
-                style={{ width: 18, height: 18 }}
-              />
+              <CustomSvg onClick={() => handleCopy(ads?.address)} type="Copy2" className="address-copy-icon" />
             </div>
           ))}
         </div>

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Form, Input, message } from 'antd';
 import { useNavigate, useLocation, useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
@@ -65,7 +65,7 @@ export default function EditContact() {
     form.setFieldValue('addresses', cusAddresses);
     setAddressArr(cusAddresses);
     isEdit && setDisabled(false);
-  }, [state]);
+  }, [form, isEdit, state]);
 
   const handleSelectNetwork = (i: number) => {
     setNetOpen(true);
@@ -123,7 +123,7 @@ export default function EditContact() {
     if (isEdit && state.name === v) {
       return false;
     }
-    return contactIndexList.some(({ index, contacts }) => contacts.some((contact) => contact.name === v));
+    return contactIndexList.some(({ contacts }) => contacts.some((contact) => contact.name === v));
   };
 
   const handleCheckName = (v: string) => {
@@ -238,7 +238,7 @@ export default function EditContact() {
                       <FormItem {...restField} name={[name, 'networkName']} noStyle>
                         <Input
                           placeholder="Select Network"
-                          prefix={<CustomSvg type="Aelf" style={{ height: 24, width: 24 }} />}
+                          prefix={<CustomSvg type="Aelf" className="select-svg" />}
                           suffix={
                             <CustomSvg
                               type="Down"
@@ -275,7 +275,7 @@ export default function EditContact() {
                       setDisabled(true);
                       setAddressArr([...addressArr, initAddress]);
                     }}>
-                    <CustomSvg type="PlusFilled" style={{ width: 20, height: 20 }} />
+                    <CustomSvg type="PlusFilled" className="plus-svg" />
                     <span>{t('Add Address')}</span>
                   </div>
                 )}

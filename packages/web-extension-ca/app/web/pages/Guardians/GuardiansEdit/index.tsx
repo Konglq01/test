@@ -152,13 +152,7 @@ export default function GuardiansEdit() {
       </div>
       <div className="input-item">
         <p className="label">{t('Verifier')}</p>
-        <CustomSelect
-          className="select"
-          value={selectVal}
-          style={{ width: '100%' }}
-          onChange={handleChange}
-          items={selectOptions}
-        />
+        <CustomSelect className="select" value={selectVal} onChange={handleChange} items={selectOptions} />
         {exist && <div className="error">{t('This guardian already exists')}</div>}
       </div>
       <div className="btn-wrap">
@@ -176,8 +170,8 @@ export default function GuardiansEdit() {
         className={'remove-modal'}
         onCancel={() => setRemoveOpen(false)}>
         <p className="modal-content">{t('This guardian is login account and cannot be remove')}</p>
-        <div style={{ padding: '15px 16px 17px 16px' }}>
-          <Button type="primary" style={{ borderRadius: 24 }} onClick={() => setRemoveClose(false)}>
+        <div className="only-login-account">
+          <Button type="primary" onClick={() => setRemoveClose(false)}>
             {t('OK')}
           </Button>
         </div>
