@@ -127,47 +127,54 @@ export default function VerifierDetails() {
           },
         });
         CommonToast.success('Verified Successfully');
-        if (verificationType === VerificationType.communityRecovery) {
-          setGuardianStatus({
-            verifierSessionId: stateSessionId,
-            status: VerifyStatus.Verified,
-          });
-          navigationService.goBack();
-        } else if (verificationType === VerificationType.editGuardianApproval) {
-          if (rst.signature && rst.verifierDoc) {
+
+        switch (verificationType) {
+          case VerificationType.communityRecovery:
             setGuardianStatus({
               verifierSessionId: stateSessionId,
               status: VerifyStatus.Verified,
-              editGuardianParams: {
-                signature: rst.signature,
-                verifierDoc: rst.verifierDoc,
-              },
             });
             navigationService.goBack();
-          }
-        } else if (verificationType === VerificationType.addGuardian) {
-          if (rst.signature && rst.verifierDoc) {
-            navigationService.navigate('GuardianApproval', {
-              approvalType: ApprovalType.addGuardian,
-              guardianItem,
-              editGuardianParams: {
-                signature: rst.signature,
-                verifierDoc: rst.verifierDoc,
+            break;
+          case VerificationType.editGuardianApproval:
+            if (rst.signature && rst.verifierDoc) {
+              setGuardianStatus({
+                verifierSessionId: stateSessionId,
+                status: VerifyStatus.Verified,
+                editGuardianParams: {
+                  signature: rst.signature,
+                  verifierDoc: rst.verifierDoc,
+                },
+              });
+              navigationService.goBack();
+            }
+            break;
+          case VerificationType.addGuardian:
+            if (rst.signature && rst.verifierDoc) {
+              navigationService.navigate('GuardianApproval', {
+                approvalType: ApprovalType.addGuardian,
+                guardianItem,
+                editGuardianParams: {
+                  signature: rst.signature,
+                  verifierDoc: rst.verifierDoc,
+                },
+                managerUniqueId,
+              });
+            }
+            break;
+          case VerificationType.setLoginAccount:
+            await onSetLoginAccount();
+            break;
+          default:
+            navigationService.navigate('SetPin', {
+              managerInfo: {
+                verificationType: VerificationType.register,
+                loginGuardianType,
+                type: LoginType.email,
+                managerUniqueId,
               },
-              managerUniqueId,
             });
-          }
-        } else if (verificationType === VerificationType.setLoginAccount) {
-          await onSetLoginAccount();
-        } else {
-          navigationService.navigate('SetPin', {
-            managerInfo: {
-              verificationType: VerificationType.register,
-              loginGuardianType,
-              type: LoginType.email,
-              managerUniqueId,
-            },
-          });
+            break;
         }
       } catch (error) {
         CommonToast.failError(error, 'Verify Fail');
