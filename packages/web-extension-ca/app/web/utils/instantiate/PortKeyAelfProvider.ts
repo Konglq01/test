@@ -105,9 +105,10 @@ export default class PortKeyAelfProvider extends BaseProvider {
 
   /** @deprecated */
   getExtensionInfo() {
-    const result = {
-      ...errorHandler(700001, "GetExtensionInfo is no longer supported, please use the 'getAddress' method to get it"),
-    };
+    const result = errorHandler(
+      700001,
+      "GetExtensionInfo is no longer supported, please use the 'getAddress' method to get it",
+    );
     return Promise.reject(result);
   }
 
@@ -199,9 +200,10 @@ export default class PortKeyAelfProvider extends BaseProvider {
         const httpProvider = this?.httpProvider?.[0];
         // Not have httpProvider
         if (!httpProvider) {
-          const result = {
-            ...errorHandler(400001, 'The current network is not obtained, please refresh the page and try again'),
-          };
+          const result = errorHandler(
+            400001,
+            'The current network is not obtained, please refresh the page and try again',
+          );
           callback(null, result);
           return result;
         }
@@ -267,14 +269,14 @@ export default class PortKeyAelfProvider extends BaseProvider {
           },
         });
 
-        if (!result) return this._callbackWrap({ ...errorHandler(500001) }, callback);
+        if (!result) return this._callbackWrap(errorHandler(500001), callback);
         if (result.error === 300000) return contractAt(contractAddress, wallet, ...otherArgsArray);
         if (result.error) return this._callbackWrap(result, callback);
         callback(null, contractMethods);
         return contractMethods;
       } catch (error) {
         if (!error) {
-          this._callbackWrap({ ...errorHandler(200017) }, callback);
+          this._callbackWrap(errorHandler(200017), callback);
           return;
         }
         this._callbackWrap(error, callback);
@@ -312,19 +314,12 @@ export default class PortKeyAelfProvider extends BaseProvider {
     const httpProvider = this?.httpProvider?.[0];
     // Not have httpProvider
     if (!httpProvider) {
-      result = {
-        ...errorHandler(400001, 'The current network is not obtained, please refresh the page and try again'),
-      };
+      result = errorHandler(400001, 'The current network is not obtained, please refresh the page and try again');
       return this._callbackWrap(result, callback);
     }
     // TODO when lock
     if (methodName === 'sendTransaction' || methodName === 'sendTransactions') {
-      return this._callbackWrap(
-        {
-          ...errorHandler(410001),
-        },
-        callback,
-      );
+      return this._callbackWrap(errorHandler(410001), callback);
     }
 
     const aelf = this._getAelfInstance(httpProvider);
@@ -332,12 +327,7 @@ export default class PortKeyAelfProvider extends BaseProvider {
     const resultCallback = (error: any, result: any) => {
       console.log(result, 'resultCallback');
       if (error || result.error) {
-        return this._callbackWrap(
-          {
-            ...errorHandler(700001, error || result.error),
-          },
-          callback,
-        );
+        return this._callbackWrap(errorHandler(700001, error || result.error), callback);
       } else {
         return this._callbackWrap(
           {
@@ -353,12 +343,7 @@ export default class PortKeyAelfProvider extends BaseProvider {
       if (methodName === 'chainId') throw 'methodName error';
       return aelf.chain[methodName](...params, resultCallback);
     } catch (error) {
-      return this._callbackWrap(
-        {
-          ...errorHandler(100001, error),
-        },
-        callback,
-      );
+      return this._callbackWrap(errorHandler(100001, error), callback);
     }
   };
 
@@ -397,14 +382,9 @@ export default class PortKeyAelfProvider extends BaseProvider {
   }): Promise<any> => {
     const { filterParams, callback } = this._formatParams(params);
     try {
-      if (!contractMethodMap[httpProvider]?.[contractAddress])
-        return { ...errorHandler(700001, 'Could not find contract') };
+      if (!contractMethodMap[httpProvider]?.[contractAddress]) return errorHandler(700001, 'Could not find contract');
       const contract = contractMethodMap[httpProvider]?.[contractAddress];
-      if (!contract[methodName]) {
-        return {
-          ...errorHandler(400001, `Method ${methodName} is not exist in the contract.`),
-        };
-      }
+      if (!contract[methodName]) return errorHandler(400001, `Method ${methodName} is not exist in the contract.`);
       const result = await window.portkey_ca?.request({
         method: requestMethod,
         params: {
@@ -433,7 +413,7 @@ export default class PortKeyAelfProvider extends BaseProvider {
       // console.log(result, 'result==');
       // return this._callbackWrap(result, callback);
     } catch (error) {
-      return this._callbackWrap({ ...errorHandler(100001, error) }, callback);
+      return this._callbackWrap(errorHandler(100001, error), callback);
     }
   };
 
@@ -450,20 +430,15 @@ export default class PortKeyAelfProvider extends BaseProvider {
   }) => {
     const { filterParams, callback } = this._formatParams(params);
     try {
-      if (!contractMethodMap[httpProvider]?.[contractAddress])
-        return { ...errorHandler(700001, 'Could not find contract') };
+      if (!contractMethodMap[httpProvider]?.[contractAddress]) return errorHandler(700001, 'Could not find contract');
       const contract = contractMethodMap[httpProvider]?.[contractAddress];
 
-      if (!contract[methodName]) {
-        return {
-          ...errorHandler(400001, `Method ${methodName} is not exist in the contract.`),
-        };
-      }
+      if (!contract[methodName]) return errorHandler(400001, `Method ${methodName} is not exist in the contract.`);
       const result = await contract[methodName].call(...filterParams);
       console.log(result, 'result==');
       return this._callbackWrap(result, callback);
     } catch (error) {
-      return this._callbackWrap({ ...errorHandler(100001, error) }, callback);
+      return this._callbackWrap(errorHandler(100001, error), callback);
     }
   };
 
@@ -522,9 +497,7 @@ export default class PortKeyAelfProvider extends BaseProvider {
   };
 
   private _deprecatedResult(errorFunctionName: string, callback: (...args: any[]) => void) {
-    const result = {
-      ...errorHandler(700001, `${errorFunctionName} is not supported`),
-    };
+    const result = errorHandler(700001, `${errorFunctionName} is not supported`);
     callback(result);
     return Promise.reject(result);
   }
