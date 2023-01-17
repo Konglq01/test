@@ -249,13 +249,16 @@ android {
             keyPassword 'android'
         }
         release{
-            if(project.env.get("LOCAL_STORE_FILE")){
-                storeFile file(project.env.get("RELEASE_STORE_FILE"))
-                storePassword project.env.get("RELEASE_STORE_PASSWORD")
-                keyAlias project.env.get("RELEASE_KEY_ALIAS")
-                keyPassword project.env.get("RELEASE_KEY_PASSWORD")
-            } 
-           
+            storeFile file(project.env.get("RELEASE_STORE_FILE"))
+            storePassword project.env.get("RELEASE_STORE_PASSWORD")
+            keyAlias project.env.get("RELEASE_KEY_ALIAS")
+            keyPassword project.env.get("RELEASE_KEY_PASSWORD")
+        }
+        releaseSigningConfigAppcenter {
+            storeFile rootProject.file("app/release-key.keystore")
+            storePassword System.getProperty("APPCENTER_KEYSTORE_PASSWORD")
+            keyAlias System.getProperty("APPCENTER_KEY_ALIAS")
+            keyPassword System.getProperty("APPCENTER_KEY_PASSWORD")
         }
     }
     buildTypes {
@@ -265,7 +268,7 @@ android {
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.release
+            signingConfig signingConfigs.releaseSigningConfigAppcenter
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
 
