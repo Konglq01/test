@@ -62,7 +62,6 @@ export default function RegisterStart() {
                   value={currentNetwork.networkType}
                   items={selectItems}
                   onChange={networkChange}
-                  style={{ width: 366 }}
                   showArrow={false}
                   getPopupContainer={(triggerNode) => triggerNode.parentElement}
                 />

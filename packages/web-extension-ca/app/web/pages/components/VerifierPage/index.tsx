@@ -3,7 +3,7 @@ import { Button, message } from 'antd';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAppDispatch, useCommonState, useLoading } from 'store/Provider/hooks';
 import { PasscodeInput } from 'antd-mobile';
-import { loginInfo } from 'store/reducers/loginCache/type';
+import { LoginInfo } from 'store/reducers/loginCache/type';
 import { VerificationType } from '@portkey/types/verifier';
 import { DIGIT_CODE } from '@portkey/constants/misc';
 import clsx from 'clsx';
@@ -25,7 +25,7 @@ enum VerificationError {
 }
 
 interface VerifierPageProps {
-  loginAccount?: loginInfo;
+  loginAccount?: LoginInfo;
   currentGuardian?: UserGuardianItem;
   guardiansType?: LoginType;
   verificationType: VerificationType;

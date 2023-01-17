@@ -55,7 +55,7 @@ export default function connectListener() {
   apis.runtime.onMessage.addListener((message: any, sender: any, sendResponse: (response?: any) => void) => {
     if (message.name === WORKER_KEEP_ALIVE_MESSAGE) {
       // console.log('runWorkerKeepAliveInterval==onMessage');
-      sendResponse({ ...errorHandler(0) });
+      sendResponse(errorHandler(0));
     }
   });
 }

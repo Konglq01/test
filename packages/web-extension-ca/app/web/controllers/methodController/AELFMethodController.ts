@@ -28,7 +28,7 @@ export default class AELFMethodController {
     this._getPassword = getPassword;
   }
   dispenseMessage = (message: InternalMessageData, sendResponse: SendResponseFun) => {
-    const pageState = this._getPageState();
+    // const pageState = this._getPageState();
     switch (message.type) {
       case AelfMessageTypes.INIT_AELF_CONTRACT:
         this.initAelfContractCallOnly(sendResponse, message.payload);
@@ -43,13 +43,13 @@ export default class AELFMethodController {
         this.getSignature(sendResponse, message.payload);
         break;
       default:
-        sendResponse({
-          ...errorHandler(
+        sendResponse(
+          errorHandler(
             700001,
             'Not Support',
             // `The current network is ${pageState.chain.currentChain.chainType}, which cannot match this method  (${message.type})`,
           ),
-        });
+        );
         break;
     }
   };
@@ -141,14 +141,14 @@ export default class AELFMethodController {
     console.log(permission, 'permission===');
     const { contracts = {} } = permission;
     if (!contracts[contractAddress]?.[account])
-      return sendResponse({ ...errorHandler(700001, 'Please initialize the contract first') });
+      return sendResponse(errorHandler(700001, 'Please initialize the contract first'));
     // When methodName is Transfer, parameters need to be verified
     if (methodName === 'Transfer') {
       const transferInfo = paramsOption[0];
       if (transferInfo && transferInfo.amount && transferInfo.to && transferInfo.symbol) {
         // isVerified = true;
       } else {
-        return sendResponse({ ...errorHandler(400001, 'Missing params') });
+        return sendResponse(errorHandler(400001, 'Missing params'));
       }
     }
     const signResult = await this.notificationService.openPrompt({
@@ -176,22 +176,16 @@ export default class AELFMethodController {
     },
   ) => {
     console.log(signatureInfo);
-    sendResponse({ ...errorHandler(700001) });
+    sendResponse(errorHandler(700001));
   };
 
   _checkParamsAndReturnPermission = async (
     params: any,
     origin: string,
   ): Promise<PortKeyResultType & { data?: ConnectionsType }> => {
-    const pageState = this._getPageState();
-    if (!params.contractAddress)
-      return {
-        ...errorHandler(410003),
-      };
-    if (!params.account)
-      return {
-        ...errorHandler(410002),
-      };
+    // const pageState = this._getPageState();
+    if (!params.contractAddress) return errorHandler(410003);
+    if (!params.account) return errorHandler(410002);
     // if (params.rpcUrl !== pageState.chain.currentChain.rpcUrl)
     //   return {
     //     ...errorHandler(200017),
@@ -201,9 +195,7 @@ export default class AELFMethodController {
     const accountList = permission?.accountList ?? [];
     console.log(accountList, connections, '_checkParamsAndReturnPermission');
     if (!accountList?.some((address) => params.account === address)) {
-      return {
-        ...errorHandler(200016, `${params.account} is not connected to Portkey, please connect the user first`),
-      };
+      return errorHandler(200016, `${params.account} is not connected to Portkey, please connect the user first`);
     }
     return {
       ...errorHandler(0),

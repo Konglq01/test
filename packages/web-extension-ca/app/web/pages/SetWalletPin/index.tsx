@@ -214,6 +214,7 @@ export default function SetWalletPin() {
           layout="vertical"
           onFinishFailed={onFinishFailed}
           autoComplete="off">
+          {/* eslint-disable-next-line no-inline-styles/no-inline-styles */}
           <FormItem name="pin" style={{ marginBottom: 16 }}>
             <ConfirmPassword validateFields={form.validateFields} isPasswordLengthTipShow={false} />
           </FormItem>
