@@ -36,9 +36,9 @@ function SignupEmail() {
   const chainInfo = useCurrentChain('AELF');
   const dispatch = useAppDispatch();
   const onSignup = useCallback(async () => {
-    setErrorMessage(undefined);
     const message = checkEmail(email);
-    if (message) return setErrorMessage(message);
+    setErrorMessage(message);
+    if (message) return;
     Loading.show();
     try {
       if (!chainInfo) await dispatch(getChainListAsync());
