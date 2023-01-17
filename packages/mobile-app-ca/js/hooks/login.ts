@@ -47,7 +47,7 @@ export function useOnManagerAddressAndQueryResult() {
           ...managerInfo,
           chainId: DefaultChainId,
           managerAddress: tmpWalletInfo.address,
-          deviceString: JSON.stringify(new Date().getTime()),
+          deviceString: new Date().getTime(),
         };
         let fetch = request.register;
         if (isRecovery) {
