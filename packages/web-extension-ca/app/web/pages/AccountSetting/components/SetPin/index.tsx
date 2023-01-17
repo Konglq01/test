@@ -76,14 +76,14 @@ export default function SetPin({ open, close }: CheckPinProps) {
     message.error('Something error');
   }, []);
 
-  const handleInputChange = (v: string) => {
+  const handleInputChange = useCallback((v: string) => {
     setPinValidate({ validateStatus: '', errorMsg: '' });
     if (!v) {
       setDisable(true);
     } else {
       setDisable(false);
     }
-  };
+  }, []);
 
   const handleClose = useCallback(() => {
     if (step === SetPinStatus.Step1) {

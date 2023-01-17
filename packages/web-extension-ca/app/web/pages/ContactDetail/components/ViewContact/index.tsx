@@ -7,6 +7,7 @@ import { AddressItem } from '@portkey/types/types-ca/contact';
 import { useCopyToClipboard } from 'react-use';
 import { uniqueId } from 'lodash';
 import './index.less';
+import { useCallback } from 'react';
 
 export default function ViewContact() {
   const { state } = useLocation();
@@ -15,10 +16,13 @@ export default function ViewContact() {
   const { name, addresses, index } = state;
   const [, setCopied] = useCopyToClipboard();
 
-  const handleCopy = (v: string) => {
-    setCopied(v);
-    message.success(t('Copy Success'));
-  };
+  const handleCopy = useCallback(
+    (v: string) => {
+      setCopied(v);
+      message.success(t('Copy Success'));
+    },
+    [setCopied, t],
+  );
 
   return (
     <div className="view-contact-frame">

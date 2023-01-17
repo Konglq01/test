@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { NetworkType } from '@portkey/types';
@@ -43,13 +43,16 @@ export default function SwitchNetwork() {
     [],
   );
 
-  const handleChangeNet = (net: Network) => {
-    if (!net.disabled) {
-      // TODO: judge userInfo login status
-      setCurNet(net.key);
-      appDispatch(changeNetworkType(net.networkType));
-    }
-  };
+  const handleChangeNet = useCallback(
+    (net: Network) => {
+      if (!net.disabled) {
+        // TODO: judge userInfo login status
+        setCurNet(net.key);
+        appDispatch(changeNetworkType(net.networkType));
+      }
+    },
+    [appDispatch],
+  );
 
   return (
     <div className="flex-column switch-networks-drawer">
