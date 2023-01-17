@@ -40,7 +40,6 @@ export function useOnManagerAddressAndQueryResult() {
       confirmPin: string;
     }) => {
       Loading.show();
-      await sleep(1000);
       const isRecovery = managerInfo.verificationType === VerificationType.communityRecovery;
       try {
         const tmpWalletInfo = walletInfo?.address ? walletInfo : AElf.wallet.createNewWallet();
