@@ -5,7 +5,7 @@ import { pTd } from 'utils/unit';
 import { defaultColors } from 'assets/theme';
 import { Image, ImageBackground, StyleSheet, Text, View } from 'react-native';
 import CommonButton from 'components/CommonButton';
-import { screenHeight, screenWidth, windowHeight } from '@portkey/utils/mobile/device';
+import { isIos, screenHeight, screenWidth, windowHeight } from '@portkey/utils/mobile/device';
 import GStyles from 'assets/theme/GStyles';
 import { useLanguage } from 'i18n/hooks';
 import { checkEmail } from '@portkey/utils/check';
@@ -196,7 +196,7 @@ export default function LoginPortkey() {
   return (
     <ImageBackground style={styles.backgroundContainer} resizeMode="cover" source={background}>
       <PageContainer
-        pageSafeBottomPadding
+        pageSafeBottomPadding={!isIos}
         containerStyles={styles.containerStyles}
         safeAreaColor={safeAreaColor}
         scrollViewProps={scrollViewProps}

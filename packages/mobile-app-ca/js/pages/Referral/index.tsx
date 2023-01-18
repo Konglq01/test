@@ -34,7 +34,7 @@ export default function Referral() {
   }, [init]);
   return (
     <ImageBackground style={styles.backgroundContainer} resizeMode="cover" source={background}>
-      <SafeAreaBox pageSafeBottomPadding style={[gStyles.container, BGStyles.transparent]}>
+      <SafeAreaBox pageSafeBottomPadding={!isIos} style={[gStyles.container, BGStyles.transparent]}>
         {!address ? (
           <>
             <Welcome />
