@@ -1,3 +1,4 @@
+import { bottomBarHeight } from '@portkey/utils/mobile/device';
 import { defaultColors } from 'assets/theme';
 import { StyleSheet } from 'react-native';
 
@@ -6,6 +7,9 @@ const styles = StyleSheet.create({
     backgroundColor: defaultColors.bg1,
     width: '100%',
     height: '100%',
+  },
+  pageSafeBottom: {
+    paddingBottom: bottomBarHeight || 25,
   },
 });
 

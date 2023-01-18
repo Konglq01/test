@@ -1,9 +1,9 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 import CustomHeader, { CustomHeaderProps } from 'components/CustomHeader';
 import SafeAreaBox, { SafeAreaBoxProps } from 'components/SafeAreaBox';
 import { useGStyles } from 'assets/theme/useGStyles';
 import { KeyboardAwareScrollView, KeyboardAwareScrollViewProps } from 'react-native-keyboard-aware-scroll-view';
-import { TouchableWithoutFeedback, View, Keyboard } from 'react-native';
+import { TouchableWithoutFeedback, View, Keyboard, StatusBar } from 'react-native';
 import { defaultColors } from 'assets/theme';
 import { ViewStyleType } from 'types/styles';
 
@@ -24,6 +24,7 @@ export default function PageContainer({
   scrollViewProps,
   hideHeader,
   hideTouchable,
+  pageSafeBottomPadding,
   ...props
 }: CustomHeaderProps & {
   safeAreaColor?: SafeAreaColorMapKeyUnit[]; // top and bottom safeArea color
@@ -35,9 +36,10 @@ export default function PageContainer({
   containerStyles?: ViewStyleType;
   hideHeader?: boolean;
   hideTouchable?: boolean;
+  pageSafeBottomPadding?: boolean;
 }) {
   const gStyles = useGStyles();
-
+  const themeType = useMemo(() => safeAreaColor[0], [safeAreaColor]);
   return (
     <SafeAreaBox
       {...safeAreaProps}
@@ -45,8 +47,10 @@ export default function PageContainer({
       style={[{ backgroundColor: safeAreaColorMap[safeAreaColor[0]] }, safeAreaProps?.[0]?.style]}>
       <SafeAreaBox
         edges={['bottom']}
+        pageSafeBottomPadding={pageSafeBottomPadding}
         style={[{ backgroundColor: safeAreaColorMap[safeAreaColor[1]] }, safeAreaProps?.[1]?.style]}>
-        {!hideHeader && <CustomHeader themeType={safeAreaColor[0]} {...props} />}
+        {!hideHeader && <CustomHeader themeType={themeType} {...props} />}
+        {themeType === 'white' && <StatusBar barStyle="dark-content" />}
         {scrollViewProps?.disabled ? (
           hideTouchable ? (
             <View style={[gStyles.container, containerStyles]}>{children}</View>

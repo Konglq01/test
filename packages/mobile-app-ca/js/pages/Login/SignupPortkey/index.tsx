@@ -97,6 +97,7 @@ export default function SignupPortkey() {
         titleDom
         type="leftBack"
         themeType="blue"
+        pageSafeBottomPadding
         style={BGStyles.transparent}
         safeAreaColor={safeAreaColor}
         scrollViewProps={scrollViewProps}
