@@ -6,7 +6,6 @@ const { font4, font2, primaryColor, bg5, bg6 } = defaultColors;
 
 export const styles = StyleSheet.create({
   buttonStyle: {
-    borderWidth: pTd(1),
     height: pTd(48),
     backgroundColor: bg6,
   },
