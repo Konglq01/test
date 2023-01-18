@@ -13,7 +13,6 @@ import { BorderStyles, FontStyles } from 'assets/theme/styles';
 import ListItem from 'components/ListItem';
 import { pTd } from 'utils/unit';
 import fonts from 'assets/theme/fonts';
-import { isIos } from '@portkey/utils/mobile/device';
 import navigationService from 'utils/navigationService';
 import useRouterParams from '@portkey/hooks/useRouterParams';
 import { request } from 'api';
@@ -134,7 +133,7 @@ export default function SelectVerifier() {
 const styles = StyleSheet.create({
   containerStyles: {
     justifyContent: 'space-between',
-    paddingBottom: isIos ? 16 : 40,
+    paddingBottom: 16,
   },
   selectedItem: {
     borderWidth: 1,

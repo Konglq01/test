@@ -50,7 +50,7 @@ export default function My() {
   const handleLock = useCallback(() => {
     lockWallet();
     navigate('/unlock');
-  }, []);
+  }, [lockWallet, navigate]);
 
   return (
     <div className="flex-column my-frame">
@@ -71,7 +71,7 @@ export default function My() {
           <MenuItem
             key={item.label}
             height={53}
-            icon={<CustomSvg type={item.icon || 'Aelf'} style={{ width: 20, height: 20 }} />}
+            icon={<CustomSvg type={item.icon || 'Aelf'} />}
             onClick={() => {
               navigate(item.router);
             }}>

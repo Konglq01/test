@@ -1,6 +1,4 @@
 import React, { useEffect } from 'react';
-import 'react-native-gesture-handler';
-import 'react-native-get-random-values';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar, StatusBarProps } from 'react-native';
 import { ThemeProvider } from '@rneui/themed';

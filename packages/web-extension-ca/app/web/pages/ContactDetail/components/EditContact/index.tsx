@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Button, Form, Input, message } from 'antd';
 import { useNavigate, useLocation, useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
@@ -65,133 +65,157 @@ export default function EditContact() {
     form.setFieldValue('addresses', cusAddresses);
     setAddressArr(cusAddresses);
     isEdit && setDisabled(false);
-  }, [state]);
+  }, [form, isEdit, state]);
 
-  const handleSelectNetwork = (i: number) => {
+  const handleSelectNetwork = useCallback((i: number) => {
     setNetOpen(true);
     setIndex(i);
-  };
+  }, []);
 
-  const handleNetworkChange = (v: any) => {
-    const prevAddresses = form.getFieldValue('addresses');
-    prevAddresses.splice(index, 1, {
-      address: '',
-      networkName: v.networkName,
-      validData: { validateStatus: '', errorMsg: '' },
-    });
-    form.setFieldValue('addresses', [...prevAddresses]);
-    const newAddresses = Object.assign(addressArr);
-    newAddresses.splice(index, 1, v);
-    // addressArr.splice(index, 1, v);
-    setAddressArr(newAddresses);
-    setNetOpen(false);
-    setDisabled(true);
-  };
-
-  const handleRemoveAds = (i: number) => {
-    setAddressArr(addressArr.filter((_, j) => j !== i));
-  };
-
-  const handleInputValueChange = (v: string) => {
-    setValidName({ validateStatus: '', errorMsg: '' });
-    if (!v) {
+  const handleNetworkChange = useCallback(
+    (v: any) => {
+      const prevAddresses = form.getFieldValue('addresses');
+      prevAddresses.splice(index, 1, {
+        address: '',
+        networkName: v.networkName,
+        validData: { validateStatus: '', errorMsg: '' },
+      });
+      form.setFieldValue('addresses', [...prevAddresses]);
+      const newAddresses = Object.assign(addressArr);
+      newAddresses.splice(index, 1, v);
+      // addressArr.splice(index, 1, v);
+      setAddressArr(newAddresses);
+      setNetOpen(false);
       setDisabled(true);
-    } else {
-      handleFormValueChange();
-    }
-  };
+    },
+    [addressArr, form, index],
+  );
 
-  const handleAddressChange = (i: number, value: string) => {
-    value = getAelfAddress(value.trim());
-    const { addresses } = form.getFieldsValue();
-    addresses[i].address = value;
-    const newAddresses = Object.assign(addressArr);
-    newAddresses[i].validData = { validateStatus: '', errorMsg: '' };
-    setAddressArr(newAddresses);
-    form.setFieldValue('addresses', [...addresses]);
-    handleFormValueChange();
-  };
+  const handleRemoveAds = useCallback(
+    (i: number) => {
+      setAddressArr(addressArr.filter((_, j) => j !== i));
+    },
+    [addressArr],
+  );
 
-  const handleFormValueChange = () => {
+  const handleFormValueChange = useCallback(() => {
     const { name, addresses } = form.getFieldsValue();
     const flag = addresses.some((ads: Record<string, string>) => !ads?.address);
     const err = addressArr.some((ads) => ads.validData.validateStatus === 'error');
     setDisabled(!name || !addresses.length || flag || err);
-  };
+  }, [addressArr, form]);
 
-  const checkExistName = (v: string) => {
-    if (isEdit && state.name === v) {
-      return false;
-    }
-    return contactIndexList.some(({ index, contacts }) => contacts.some((contact) => contact.name === v));
-  };
-
-  const handleCheckName = (v: string) => {
-    if (!v) {
-      form.setFieldValue('name', '');
-      setValidName({ validateStatus: 'error', errorMsg: ContactInfoError.noName });
-      setDisabled(true);
-      return false;
-    } else if (checkExistName(v)) {
-      setDisabled(true);
-      setValidName({ validateStatus: 'error', errorMsg: ContactInfoError.alreadyExists });
-      return false;
-    } else if (!isValidCAWalletName(v)) {
-      setDisabled(true);
-      setValidName({ validateStatus: 'error', errorMsg: ContactInfoError.inValidName });
-      return false;
-    }
-    setDisabled(false);
-    setValidName({ validateStatus: '', errorMsg: '' });
-    return true;
-  };
-
-  const handleCheckAddress = (addresses: AddressItem[]) => {
-    let flag = 0;
-    const newAddress = Object.assign(addressArr);
-    addresses.forEach((ads, i) => {
-      if (!isAelfAddress(ads.address)) {
-        flag++;
-        newAddress[i].validData = { validateStatus: 'error', errorMsg: ContactInfoError.invalidAddress };
+  const handleInputValueChange = useCallback(
+    (v: string) => {
+      setValidName({ validateStatus: '', errorMsg: '' });
+      if (!v) {
+        setDisabled(true);
+      } else {
+        handleFormValueChange();
       }
-    });
-    if (!flag) {
-      setAddressArr(newAddress);
-      setDisabled(true);
-    }
-    return !flag;
-  };
+    },
+    [handleFormValueChange],
+  );
 
-  const onFinish = async (values: ContactItemType) => {
-    const { name, addresses } = values;
-    try {
-      const checkName = handleCheckName(name.trim());
-      const checkAddress = handleCheckAddress(addresses);
-      if (checkName && checkAddress) {
-        // TODO: add or edit to save
-        appDispatch(fetchContractListAsync());
-        navigate('/setting/contacts');
-        message.success(isEdit ? 'Edit Contact successful' : 'Add Contact successful');
+  const handleAddressChange = useCallback(
+    (i: number, value: string) => {
+      value = getAelfAddress(value.trim());
+      const { addresses } = form.getFieldsValue();
+      addresses[i].address = value;
+      const newAddresses = Object.assign(addressArr);
+      newAddresses[i].validData = { validateStatus: '', errorMsg: '' };
+      setAddressArr(newAddresses);
+      form.setFieldValue('addresses', [...addresses]);
+      handleFormValueChange();
+    },
+    [addressArr, form, handleFormValueChange],
+  );
+
+  const checkExistName = useCallback(
+    (v: string) => {
+      if (isEdit && state.name === v) {
+        return false;
       }
-    } catch (e: any) {
-      console.log((e.errorMessage || {}).message || e.message || 'Please input the required form field', 'onFinish');
-      message.error(t((e.errorMessage || {}).message || e.message || 'Please input the required form field'));
-    }
-  };
+      return contactIndexList.some(({ contacts }) => contacts.some((contact) => contact.name === v));
+    },
+    [contactIndexList, isEdit, state.name],
+  );
 
-  const handleGoBack = () => {
+  const handleCheckName = useCallback(
+    (v: string) => {
+      if (!v) {
+        form.setFieldValue('name', '');
+        setValidName({ validateStatus: 'error', errorMsg: ContactInfoError.noName });
+        setDisabled(true);
+        return false;
+      } else if (checkExistName(v)) {
+        setDisabled(true);
+        setValidName({ validateStatus: 'error', errorMsg: ContactInfoError.alreadyExists });
+        return false;
+      } else if (!isValidCAWalletName(v)) {
+        setDisabled(true);
+        setValidName({ validateStatus: 'error', errorMsg: ContactInfoError.inValidName });
+        return false;
+      }
+      setDisabled(false);
+      setValidName({ validateStatus: '', errorMsg: '' });
+      return true;
+    },
+    [checkExistName, form],
+  );
+
+  const handleCheckAddress = useCallback(
+    (addresses: AddressItem[]) => {
+      let flag = 0;
+      const newAddress = Object.assign(addressArr);
+      addresses.forEach((ads, i) => {
+        if (!isAelfAddress(ads.address)) {
+          flag++;
+          newAddress[i].validData = { validateStatus: 'error', errorMsg: ContactInfoError.invalidAddress };
+        }
+      });
+      if (!flag) {
+        setAddressArr(newAddress);
+        setDisabled(true);
+      }
+      return !flag;
+    },
+    [addressArr],
+  );
+
+  const onFinish = useCallback(
+    async (values: ContactItemType) => {
+      const { name, addresses } = values;
+      try {
+        const checkName = handleCheckName(name.trim());
+        const checkAddress = handleCheckAddress(addresses);
+        if (checkName && checkAddress) {
+          // TODO: add or edit to save
+          appDispatch(fetchContractListAsync());
+          navigate('/setting/contacts');
+          message.success(isEdit ? 'Edit Contact successful' : 'Add Contact successful');
+        }
+      } catch (e: any) {
+        console.log((e.errorMessage || {}).message || e.message || 'Please input the required form field', 'onFinish');
+        message.error(t((e.errorMessage || {}).message || e.message || 'Please input the required form field'));
+      }
+    },
+    [appDispatch, handleCheckAddress, handleCheckName, isEdit, navigate, t],
+  );
+
+  const handleGoBack = useCallback(() => {
     if (isEdit) {
       navigate('/setting/contacts/view', { state: state });
     } else {
       navigate('/setting/contacts');
     }
-  };
+  }, [isEdit, navigate, state]);
 
-  const handleDelConfirm = () => {
+  const handleDelConfirm = useCallback(() => {
     // TODO
     navigate('/setting/contacts');
     message.success('Contact deleted successfully');
-  };
+  }, [navigate]);
 
   return (
     <div className="edit-contact-frame">
@@ -238,7 +262,7 @@ export default function EditContact() {
                       <FormItem {...restField} name={[name, 'networkName']} noStyle>
                         <Input
                           placeholder="Select Network"
-                          prefix={<CustomSvg type="Aelf" style={{ height: 24, width: 24 }} />}
+                          prefix={<CustomSvg type="Aelf" className="select-svg" />}
                           suffix={
                             <CustomSvg
                               type="Down"
@@ -275,7 +299,7 @@ export default function EditContact() {
                       setDisabled(true);
                       setAddressArr([...addressArr, initAddress]);
                     }}>
-                    <CustomSvg type="PlusFilled" style={{ width: 20, height: 20 }} />
+                    <CustomSvg type="PlusFilled" className="plus-svg" />
                     <span>{t('Add Address')}</span>
                   </div>
                 )}

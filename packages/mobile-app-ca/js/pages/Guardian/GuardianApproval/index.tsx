@@ -7,7 +7,6 @@ import { GUARDIAN_EXPIRED_TIME, VERIFIER_EXPIRATION } from '@portkey/constants/m
 import { ScrollView, StyleSheet, View } from 'react-native';
 import GStyles from 'assets/theme/GStyles';
 import CommonButton from 'components/CommonButton';
-import { isIphoneX } from '@portkey/utils/mobile/device';
 import { BorderStyles, FontStyles } from 'assets/theme/styles';
 import Svg from 'components/Svg';
 import { pTd } from 'utils/unit';
@@ -332,7 +331,7 @@ export default function GuardianApproval() {
 const styles = StyleSheet.create({
   containerStyle: {
     paddingTop: 8,
-    paddingBottom: isIphoneX ? 16 : 36,
+    paddingBottom: 16,
     justifyContent: 'space-between',
   },
   expireText: {
