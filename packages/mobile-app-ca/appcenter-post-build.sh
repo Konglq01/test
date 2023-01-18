@@ -1,7 +1,7 @@
 if [ "$AGENT_JOBSTATUS" == "Succeeded" ]; then
 
     # Example: Upload main branch app binary to HockeyApp using the API
-    if [ "$APPCENTER_BRANCH" == "feature/ca-appcenter-android-build" ];
+    if [ "$PLATFORM_TYPE" == "android" ];
      then
         curl -X POST -H "Content-Type: application/json" \
         -d '{"msg_type":"text","content":{"text":"android端 （$APPCENTER_BUILD_ID） build成功, 可在appcenter中下载最新包进行测试"}}' \
@@ -12,7 +12,7 @@ if [ "$AGENT_JOBSTATUS" == "Succeeded" ]; then
 
 
     # Example: Upload main branch app binary to HockeyApp using the API
-    if [ "$APPCENTER_BRANCH" == "feature/ca-appcenter-ios-build" ];
+    if [ "$PLATFORM_TYPE" == "ios" ];
      then
         curl -X POST -H "Content-Type: application/json" \
         -d '{"msg_type":"text","content":{"text":"IOS端最新包（$APPCENTER_BUILD_ID） build 成功, 可在appcenter中下载最新包进行测试"}}' \
