@@ -4,7 +4,7 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
   coverageDirectory: 'coverage',
-  testMatch: ['<rootDir>/test/**/*.test.tsx'],
+  testMatch: ['<rootDir>/test/**/*.test.tsx', '<rootDir>/packages/hooks/**/*.test.tsx'],
   // projects: [
   //   {
   //     displayName: 'hooks',
@@ -23,5 +23,4 @@ module.exports = {
   //     testEnvironment: 'jsdom',
   //   }
   // ]
-
 };

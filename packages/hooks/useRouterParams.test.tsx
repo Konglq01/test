@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import useRouterParams from '../packages/hooks/useRouterParams';
+import useRouterParams from './useRouterParams';
 
 jest.mock('@react-navigation/native', () => {
   return {
