@@ -119,7 +119,7 @@
   },
   "scripts": {
     "prepro": "yarn workspace @portkey/constants run handle-network",
-    "lint": "eslint .",
+    "lint": "eslint . --ext .tsx",
     "autod": "autod",
     "commit": "git-cz",
     "start:dev": "webpack-dev-server",

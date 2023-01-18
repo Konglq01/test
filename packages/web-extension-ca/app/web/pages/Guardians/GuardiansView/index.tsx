@@ -201,7 +201,6 @@ export default function GuardiansView() {
           rightElement={
             <CustomSvg
               type="Close2"
-              style={{ width: 18, height: 18 }}
               onClick={() => {
                 navigate('/setting/guardians');
               }}
@@ -259,8 +258,8 @@ export default function GuardiansView() {
             ? t('This guardian is the only login account and cannot be turned off')
             : t('This account address is already a login account and cannot be used')}
         </p>
-        <div style={{ padding: '15px 16px 17px 16px' }}>
-          <Button style={{ borderRadius: 24 }} type="primary" onClick={() => setSwitchFail(SwitchFail.default)}>
+        <div className="login-account-btn">
+          <Button type="primary" onClick={() => setSwitchFail(SwitchFail.default)}>
             {t('Close')}
           </Button>
         </div>

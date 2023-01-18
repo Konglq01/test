@@ -24,7 +24,7 @@ export default function AccountName(props: AccountNameProps) {
     errorMsg: '',
   });
 
-  const handleInputChange = (value: string) => {
+  const handleInputChange = useCallback((value: string) => {
     setValidName({
       validateStatus: '',
       errorMsg: '',
@@ -34,26 +34,29 @@ export default function AccountName(props: AccountNameProps) {
     } else {
       setDisable(false);
     }
-  };
+  }, []);
 
-  const handleSave = (name: string) => {
-    if (!name) {
-      setValidName({
-        validateStatus: 'error',
-        errorMsg: 'Please Enter Wallet Name',
-      });
-      form.setFieldValue('name', '');
-      setDisable(true);
-    } else if (!isValidCAWalletName(name)) {
-      setValidName({
-        validateStatus: 'error',
-        errorMsg: 'only a-z, A-Z, 0-9 and "_" "空格" allowed',
-      });
-      setDisable(true);
-    } else {
-      onSave(name);
-    }
-  };
+  const handleSave = useCallback(
+    (name: string) => {
+      if (!name) {
+        setValidName({
+          validateStatus: 'error',
+          errorMsg: 'Please Enter Wallet Name',
+        });
+        form.setFieldValue('name', '');
+        setDisable(true);
+      } else if (!isValidCAWalletName(name)) {
+        setValidName({
+          validateStatus: 'error',
+          errorMsg: 'only a-z, A-Z, 0-9 and "_" "空格" allowed',
+        });
+        setDisable(true);
+      } else {
+        onSave(name);
+      }
+    },
+    [form, onSave],
+  );
 
   const onFinishFailed = useCallback((errorInfo: any) => {
     console.error(errorInfo, 'onFinishFailed==');
