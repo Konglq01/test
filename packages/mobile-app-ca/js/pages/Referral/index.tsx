@@ -6,7 +6,6 @@ import { RootStackParamList } from 'navigation';
 import SafeAreaBox from 'components/SafeAreaBox';
 import { useCredentials } from 'hooks/store';
 import CommonButton from 'components/CommonButton';
-import GStyles from 'assets/theme/GStyles';
 import { useLanguage } from 'i18n/hooks';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import Welcome from './components/Welcome';
@@ -40,7 +39,7 @@ export default function Referral() {
           <>
             <Welcome />
             <CommonButton
-              buttonStyle={[GStyles.marginBottom(40), BGStyles.bg1]}
+              buttonStyle={[styles.buttonStyle, BGStyles.bg1]}
               titleStyle={FontStyles.font4}
               type="primary"
               title={t('Get Started')}
@@ -56,5 +55,9 @@ export default function Referral() {
 const styles = StyleSheet.create({
   backgroundContainer: {
     height: screenHeight,
+  },
+  buttonStyle: {
+    height: 56,
+    marginBottom: 40,
   },
 });

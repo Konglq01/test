@@ -1,15 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AppState, AppStateStatus, StyleSheet, View } from 'react-native';
-import { TextL } from 'components/CommonText';
+import { AppState, AppStateStatus } from 'react-native';
 import { useAppDispatch } from 'store/hooks';
 import { setCredentials } from 'store/user/actions';
 import { useUser } from 'hooks/store';
 import secureStore from '@portkey/utils/mobile/secureStore';
-import GStyles from 'assets/theme/GStyles';
-import { windowHeight } from '@portkey/utils/mobile/device';
-import { pTd } from 'utils/unit';
 import PageContainer from 'components/PageContainer';
-import DigitInput, { DigitInputInterface } from 'components/DigitInput';
+import { DigitInputInterface } from 'components/DigitInput';
 import { PIN_SIZE } from '@portkey/constants/misc';
 import { checkPin } from 'utils/redux';
 import { useNavigation } from '@react-navigation/native';
@@ -25,6 +21,7 @@ import { CAInfo } from '@portkey/types/types-ca/wallet';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 import { VerificationType } from '@portkey/types/verifier';
 import useEffectOnce from 'hooks/useEffectOnce';
+import PinContainer from 'components/PinContainer';
 let appState: AppStateStatus, verifyTime: number;
 export default function SecurityLock() {
   const { biometrics } = useUser();
@@ -164,28 +161,7 @@ export default function SecurityLock() {
   );
   return (
     <PageContainer hideHeader>
-      <View style={styles.container}>
-        <TextL style={GStyles.textAlignCenter}>Enter Pin</TextL>
-        <DigitInput
-          ref={digitInput}
-          type="pin"
-          secureTextEntry
-          style={styles.pinStyle}
-          onChangeText={onChangeText}
-          errorMessage={errorMessage}
-        />
-      </View>
+      <PinContainer ref={digitInput} title="Enter Pin" onChangeText={onChangeText} errorMessage={errorMessage} />
     </PageContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    width: pTd(230),
-    alignSelf: 'center',
-    marginTop: windowHeight * 0.35,
-  },
-  pinStyle: {
-    marginTop: 24,
-  },
-});

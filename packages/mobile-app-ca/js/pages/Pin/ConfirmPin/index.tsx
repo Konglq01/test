@@ -1,14 +1,9 @@
 import { PIN_SIZE } from '@portkey/constants/misc';
-import { TextL } from 'components/CommonText';
 import PageContainer from 'components/PageContainer';
-import DigitInput, { DigitInputInterface } from 'components/DigitInput';
+import { DigitInputInterface } from 'components/DigitInput';
 import useRouterParams from '@portkey/hooks/useRouterParams';
 import React, { useCallback, useRef, useState } from 'react';
 import navigationService from 'utils/navigationService';
-import { StyleSheet, View } from 'react-native';
-import { windowHeight } from '@portkey/utils/mobile/device';
-import { pTd } from 'utils/unit';
-import GStyles from 'assets/theme/GStyles';
 import { useAppDispatch } from 'store/hooks';
 import { changePin, createWallet } from '@portkey/store/store-ca/wallet/actions';
 import CommonToast from 'components/CommonToast';
@@ -22,6 +17,7 @@ import myEvents from 'utils/deviceEvent';
 import { AElfWallet } from '@portkey/types/aelf';
 import { VerificationType } from '@portkey/types/verifier';
 import useBiometricsReady from 'hooks/useBiometrics';
+import PinContainer from 'components/PinContainer';
 
 export default function ConfirmPin() {
   const { walletInfo } = useCurrentWallet();
@@ -119,28 +115,7 @@ export default function ConfirmPin() {
         myEvents.clearSetPin.emit('clearSetPin');
         navigationService.goBack();
       }}>
-      <View style={styles.container}>
-        <TextL style={GStyles.textAlignCenter}>Confirm Pin</TextL>
-        <DigitInput
-          type="pin"
-          ref={pinRef}
-          secureTextEntry
-          style={styles.pinStyle}
-          onChangeText={onChangeText}
-          errorMessage={errorMessage}
-        />
-      </View>
+      <PinContainer ref={pinRef} title="Confirm Pin" errorMessage={errorMessage} onChangeText={onChangeText} />
     </PageContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    width: pTd(230),
-    alignSelf: 'center',
-    marginTop: windowHeight * 0.3,
-  },
-  pinStyle: {
-    marginTop: 24,
-  },
-});
