@@ -13,7 +13,7 @@ import navigationService from 'utils/navigationService';
 import background from '../img/background.png';
 import Svg from 'components/Svg';
 import { BGStyles, FontStyles } from 'assets/theme/styles';
-import { screenHeight, screenWidth } from '@portkey/utils/mobile/device';
+import { isIos, screenHeight, screenWidth } from '@portkey/utils/mobile/device';
 import { useGetGuardiansList, useGetVerifierServers } from 'hooks/guardian';
 import { handleError } from '@portkey/utils';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
@@ -97,6 +97,7 @@ export default function SignupPortkey() {
         titleDom
         type="leftBack"
         themeType="blue"
+        pageSafeBottomPadding={!isIos}
         style={BGStyles.transparent}
         safeAreaColor={safeAreaColor}
         scrollViewProps={scrollViewProps}
