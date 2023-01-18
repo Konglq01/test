@@ -23,6 +23,7 @@ const Touchable: React.FC<TouchableOpacityProps & TouchableProps> = props => {
 
   return (
     <TouchableOpacity
+      activeOpacity={0.7}
       {...props}
       onPressIn={onPressIn ? handleOnPressIn : undefined}
       onPress={onPress ? handleOnPress : undefined}

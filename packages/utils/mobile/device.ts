@@ -12,27 +12,34 @@ export const isIos = Platform.OS === 'ios';
 
 export const statusBarHeight = isIos ? 20 : StatusBar.currentHeight ?? 20;
 
-export const isIphoneX = (function () {
+export const isIphoneX = (() => {
   return (
     Platform.OS === 'ios' &&
     ((screenHeight >= X_HEIGHT && screenWidth >= X_WIDTH) || (screenHeight >= X_WIDTH && screenWidth >= X_HEIGHT))
   );
 })();
 
-export const isIphone12 = (function () {
+export const isIphone12 = (() => {
   const model = Device.modelName || '';
   const models = ['iPhone 12', 'iPhone 12 Pro', 'iPhone 12 Pro Max'];
   return models.includes(model);
 })();
 
-export const bottomBarHeight = (function () {
-  let Height = 0;
+export const isXiaoMi = (() => {
+  const manufacturer = (Device.manufacturer || '').toLocaleLowerCase();
+  const modelName = (Device.modelName || '').toLocaleLowerCase();
+  return manufacturer.includes('xiaomi') || modelName.includes('xiaomi') || modelName.includes('redmi');
+})();
+
+export const bottomBarHeight = (() => {
+  let height = 0;
   if (!isIos) {
-    Height = screenHeight - Dimensions.get('window').height - statusBarHeight;
+    height = screenHeight - Dimensions.get('window').height - (isXiaoMi ? 0 : statusBarHeight);
+    if (height > 55) height = 55;
   } else if (isIos && isIphoneX) {
-    Height = 34;
+    height = 34;
   }
-  return Height;
+  return height;
 })();
 
 export const windowHeight = isIos ? screenHeight - statusBarHeight - bottomBarHeight : Dimensions.get('window').height;

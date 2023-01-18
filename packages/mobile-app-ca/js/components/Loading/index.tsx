@@ -1,5 +1,5 @@
 import React from 'react';
-import Overlay from 'teaset/components/Overlay/Overlay';
+import Overlay from 'rn-teaset/components/Overlay/Overlay';
 import { View, StyleSheet, Keyboard } from 'react-native';
 import { TextL } from '../CommonText';
 import { defaultColors } from 'assets/theme';
@@ -7,7 +7,7 @@ import GStyles from 'assets/theme/GStyles';
 import Spinner from 'react-native-spinkit';
 import { FontStyles } from 'assets/theme/styles';
 
-let elements: any = [];
+let elements: number[] = [];
 let timer: NodeJS.Timeout | null = null;
 
 function LoadingBody({ text = 'Loading...' }: { text?: string }) {
@@ -24,17 +24,11 @@ export default class Loading extends React.Component {
     Keyboard.dismiss();
     Loading.hide();
     const overlayView = (
-      <Overlay.PopView
-        modal={true}
-        type="zoomIn"
-        ref={(v: any) => elements.push(v)}
-        style={styles.container}
-        overlayOpacity={0}
-        {...overlayProps}>
+      <Overlay.PopView modal={true} type="zoomIn" style={styles.container} overlayOpacity={0} {...overlayProps}>
         <LoadingBody text={text} />
       </Overlay.PopView>
     );
-    Overlay.show(overlayView);
+    elements.push(Overlay.show(overlayView));
     // timer && clearBackgroundTimeout(timer);
     // timer = setBackgroundTimeout(() => {
     //   Loading.hide();
@@ -44,17 +38,15 @@ export default class Loading extends React.Component {
   static hide() {
     timer && clearTimeout(timer);
     timer = null;
-    elements = elements.filter((item: any) => item); //Discard invalid data
-    const key = elements.pop();
-    key && key.close && key.close();
+    elements = elements.filter(item => item); // Discard invalid data
+    const topItem = elements.pop();
+    Overlay.hide(topItem);
   }
 
   static destroy() {
     timer && clearTimeout(timer);
     timer = null;
-    elements.forEach((item: { close: () => any }) => {
-      item && item.close && item.close();
-    });
+    elements.forEach(item => Overlay.hide(item));
     elements = [];
   }
 

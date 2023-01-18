@@ -180,7 +180,6 @@ export default function AddGuardian() {
           className="select"
           value={guardianType}
           placeholder={t('Select guardian types')}
-          style={{ width: '100%' }}
           onChange={guardianTypeChange}
           items={guardianTypeOptions}
         />
@@ -196,7 +195,7 @@ export default function AddGuardian() {
               handleInputChange(e.target.value);
             }}
           />
-          {inputErr && <span style={{ color: 'red' }}>{inputErr}</span>}
+          {inputErr && <span className="err-text">{inputErr}</span>}
         </div>
       )}
       <div className="input-item">
@@ -205,7 +204,6 @@ export default function AddGuardian() {
           className="select"
           value={verifierVal}
           placeholder={t('Select guardian verifiers')}
-          style={{ width: '100%' }}
           onChange={verifierChange}
           items={verifierOptions}
         />

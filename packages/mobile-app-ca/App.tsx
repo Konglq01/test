@@ -1,6 +1,4 @@
 import React, { useEffect } from 'react';
-import 'react-native-gesture-handler';
-import 'react-native-get-random-values';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar, StatusBarProps } from 'react-native';
 import { ThemeProvider } from '@rneui/themed';
@@ -16,7 +14,7 @@ import { initLanguage } from 'i18n';
 import * as SplashScreen from 'expo-splash-screen';
 import secureStore from '@portkey/utils/mobile/secureStore';
 import Config from 'react-native-config';
-import TopView from 'teaset/components/Overlay/TopView';
+import TopView from 'rn-teaset/components/Overlay/TopView';
 import AppListener from 'components/AppListener/index';
 import InterfaceProvider from 'contexts/useInterface';
 import GlobalStyleHandler from 'components/GlobalStyleHandler';

@@ -6,6 +6,8 @@ interface ErrorBoundaryProps {
   children?: React.ReactNode;
 }
 
+const whiteSpace = 'pre-wrap';
+
 export default class ErrorBoundary extends Component<
   ErrorBoundaryProps,
   {
@@ -36,7 +38,7 @@ export default class ErrorBoundary extends Component<
       return (
         <>
           <h1>Something went wrong.</h1>
-          <details style={{ whiteSpace: 'pre-wrap' }}>
+          <details style={{ whiteSpace: whiteSpace }}>
             {this.state.error && this.state.error.toString()}
             <br />
             {this.state.info.componentStack}

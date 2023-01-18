@@ -36,7 +36,6 @@ export default function AutoLock({ className }: { className?: string }) {
         defaultValue={DefaultLock}
         value={lockValue}
         onChange={onLockChange}
-        style={{ width: '100%' }}
       />
     </div>
   );

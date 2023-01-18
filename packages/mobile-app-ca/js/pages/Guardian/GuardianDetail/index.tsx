@@ -98,7 +98,7 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
       if (guardian === undefined || userGuardiansList === undefined) return;
       const email = guardian.loginGuardianType;
 
-      if (value === false) {
+      if (!value) {
         const loginIndex = userGuardiansList.findIndex(
           item =>
             item.isLoginAccount &&
@@ -124,35 +124,33 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
         return;
       }
 
-      if (value) {
-        // const loginIndex = userGuardiansList.findIndex(
-        //   item =>
-        //     item.isLoginAccount &&
-        //     item.guardiansType === guardian.guardiansType &&
-        //     item.loginGuardianType === guardian.loginGuardianType &&
-        //     item.verifier?.url !== guardian.verifier?.url,
-        // );
-        // if (loginIndex === -1) {}
-        Loading.show();
-        try {
-          const holderInfo = await getGuardiansList({ loginGuardianType: guardian.loginGuardianType });
-          if (holderInfo.guardians) {
-            Loading.hide();
-            ActionSheet.alert({
-              title2: t(`This account address is already a login account and cannot be used`),
-              buttons: [
-                {
-                  title: t('Close'),
-                },
-              ],
-            });
-            return;
-          }
-        } catch (error) {
-          console.debug(error, '====error');
+      // const loginIndex = userGuardiansList.findIndex(
+      //   item =>
+      //     item.isLoginAccount &&
+      //     item.guardiansType === guardian.guardiansType &&
+      //     item.loginGuardianType === guardian.loginGuardianType &&
+      //     item.verifier?.url !== guardian.verifier?.url,
+      // );
+      // if (loginIndex === -1) {}
+      Loading.show();
+      try {
+        const holderInfo = await getGuardiansList({ loginGuardianType: guardian.loginGuardianType });
+        if (holderInfo.guardians) {
+          Loading.hide();
+          ActionSheet.alert({
+            title2: t(`This account address is already a login account and cannot be used`),
+            buttons: [
+              {
+                title: t('Close'),
+              },
+            ],
+          });
+          return;
         }
-        Loading.hide();
+      } catch (error) {
+        console.debug(error, '====error');
       }
+      Loading.hide();
 
       ActionSheet.alert({
         title2: `${guardian.verifier?.name} will send a verification code to ${email} to verify your email address.`,
@@ -163,9 +161,7 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
           },
           {
             title: t('Confirm'),
-            onPress: () => {
-              setLoginAccount();
-            },
+            onPress: setLoginAccount,
           },
         ],
       });
