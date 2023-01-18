@@ -12,8 +12,6 @@ import { getAelfInstance } from '@portkey/utils/aelf';
 import { getTxResult } from 'utils/aelfUtils';
 import { sleep } from '@portkey/utils';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import InternalMessage from 'messages/InternalMessage';
-import InternalMessageTypes, { PromptRouteTypes } from 'messages/InternalMessageTypes';
 import { clearLocalStorage } from 'utils/storage/chromeStorage';
 
 interface ExitWalletProps {
@@ -93,7 +91,7 @@ export default function ExitWallet({ open, onCancel }: ExitWalletProps) {
         </div>
       }>
       <div className="text-center modal-content">
-        <div style={{ marginBottom: 12 }}>
+        <div className="tip-title">
           {t('Your current wallet and assets will be removed from this app permanently. This action cannot be undone.')}
         </div>
         <div>{t('You can ONLY recover this wallet with your guardians.')}</div>

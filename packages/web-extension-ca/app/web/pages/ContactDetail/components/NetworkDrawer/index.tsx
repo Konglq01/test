@@ -60,7 +60,7 @@ export default function NetworkDrawer({ onChange, onClose, ...props }: CustomSel
             onClick={() => {
               onChange(net);
             }}>
-            <CustomSvg type="Aelf" style={{ width: 32, height: 32, marginRight: 8 }} />
+            <CustomSvg type="Aelf" className="aelf-svg" />
             <div className="info">{net?.networkName}</div>
           </div>
         ))}

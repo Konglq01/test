@@ -16,6 +16,7 @@ import CommonToast from 'components/CommonToast';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import useEffectOnce from './useEffectOnce';
 import { setCredentials } from 'store/user/actions';
+import { DigitInputInterface } from 'components/DigitInput';
 
 export function useOnManagerAddressAndQueryResult() {
   const dispatch = useAppDispatch();
@@ -33,13 +34,16 @@ export function useOnManagerAddressAndQueryResult() {
       walletInfo,
       guardianCount,
       confirmPin,
+      pinRef,
     }: {
       managerInfo: ManagerInfo;
       walletInfo?: CurrentWalletType;
       guardianCount?: number;
       confirmPin: string;
+      pinRef?: React.MutableRefObject<DigitInputInterface | undefined>;
     }) => {
       Loading.show();
+      await sleep(1000);
       const isRecovery = managerInfo.verificationType === VerificationType.communityRecovery;
       try {
         const tmpWalletInfo = walletInfo?.address ? walletInfo : AElf.wallet.createNewWallet();
@@ -90,6 +94,7 @@ export function useOnManagerAddressAndQueryResult() {
       } catch (error) {
         Loading.hide();
         CommonToast.failError(error);
+        pinRef?.current?.reset();
       }
     },
     [apiUrl, biometricsReady, dispatch],
