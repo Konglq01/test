@@ -6,9 +6,9 @@ import { TextL } from 'components/CommonText';
 import DigitInput, { DigitInputProps } from 'components/DigitInput';
 import { pTd } from 'utils/unit';
 function getMarginTop() {
-  if (screenHeight > 800) return 0.3;
-  if (screenHeight > 700) return 0.25;
-  return 0.2;
+  if (screenHeight > 800) return 0.35;
+  if (screenHeight > 700) return 0.3;
+  return 0.25;
 }
 
 type PinContainerProps = {

@@ -74,6 +74,7 @@ export default function ConfirmPin() {
           confirmPin,
           walletInfo,
           guardianCount,
+          pinRef,
         });
       }
     },
