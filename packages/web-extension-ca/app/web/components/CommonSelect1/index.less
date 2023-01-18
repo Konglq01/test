@@ -29,6 +29,11 @@
     background: url('../../assets/svgIcon/Down.svg') center no-repeat;
     background-size: 16px;
   }
+  &.@{app-prefix}-select-open {
+    .@{app-prefix}-select-selector::after {
+      transform: rotate(180deg);
+    }
+  }
 }
 .label-item {
   .label-icon {
