@@ -44,9 +44,7 @@ export default class NotificationService {
         this.openWindow = null;
       }
       if (this.closeSender?.[number]) {
-        this.closeSender?.[number]?.sendResponse?.({
-          ...errorHandler(200010),
-        });
+        this.closeSender?.[number]?.sendResponse?.(errorHandler(200010));
         delete this.closeSender?.[number];
       }
     });
@@ -56,9 +54,7 @@ export default class NotificationService {
         this.openTag = null;
       }
       if (this.closeSender?.[number]) {
-        this.closeSender?.[number]?.sendResponse?.({
-          ...errorHandler(200010),
-        });
+        this.closeSender?.[number]?.sendResponse?.(errorHandler(200010));
         delete this.closeSender?.[number];
       }
     });
@@ -107,9 +103,7 @@ export default class NotificationService {
       console.log(this.closeSender, popupWindow, 'getPopup===');
       return popupWindow;
     } catch (error) {
-      notification.sendResponse?.({
-        ...errorHandler(500002, error),
-      });
+      notification.sendResponse?.(errorHandler(500002, error));
     }
   };
 
@@ -165,9 +159,7 @@ export default class NotificationService {
           }
           resolve(res);
         } catch (error) {
-          notification.sendResponse?.({
-            ...errorHandler(500002, error),
-          });
+          notification.sendResponse?.(errorHandler(500002, error));
         }
       }, 100);
     });

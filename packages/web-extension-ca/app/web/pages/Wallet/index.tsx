@@ -39,7 +39,7 @@ export default function Wallet() {
         message.success(t('Saved Successful'));
       }
     },
-    [t],
+    [appDispatch, t],
   );
 
   const MenuList: MenuItemInfo[] = useMemo(
@@ -84,7 +84,7 @@ export default function Wallet() {
         />
       </div>
       <div className="flex-center wallet-icon">
-        <CustomSvg type={(walletAvatar as WalletAvatar) || 'master1'} style={{ width: 64, height: 64 }} />
+        <CustomSvg type={(walletAvatar as WalletAvatar) || 'master1'} className="wallet-svg" />
       </div>
       <div className="menu-list">
         {MenuList.map((item) => (
