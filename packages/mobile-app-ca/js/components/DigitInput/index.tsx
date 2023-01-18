@@ -7,7 +7,7 @@ import { StyleSheet, View, TextInput, TouchableHighlight, StyleProp, ViewStyle }
 import { screenWidth } from '@portkey/utils/mobile/device';
 import { isValidPositiveInteger } from '@portkey/utils/reg';
 
-type DigitInputProps = {
+export type DigitInputProps = {
   maxLength?: number;
   inputItemStyle?: StyleProp<ViewStyle>;
   iconStyle?: StyleProp<ViewStyle>;
