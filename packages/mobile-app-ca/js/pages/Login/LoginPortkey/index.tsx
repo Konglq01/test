@@ -38,6 +38,7 @@ import { useIntervalQueryCAInfoByAddress } from '@portkey/hooks/hooks-ca/graphql
 import { handleWalletInfo } from '@portkey/utils/wallet';
 import { useCredentials } from 'hooks/store';
 import CommonToast from 'components/CommonToast';
+import { request } from '@portkey/api';
 const scrollViewProps = { extraHeight: 120 };
 const safeAreaColor: SafeAreaColorMapKeyUnit[] = ['transparent', 'transparent'];
 type LoginType = 'email' | 'qr-code' | 'phone';
@@ -48,6 +49,8 @@ function LoginEmail({ setLoginType }: { setLoginType: (type: LoginType) => void 
   const [email, setEmail] = useState<string>();
   const [errorMessage, setErrorMessage] = useState<string>();
   const chainInfo = useCurrentChain('AELF');
+  console.log(chainInfo, '===chainInfo');
+
   const getVerifierServers = useGetVerifierServers();
   const getHolderInfo = useGetHolderInfo();
   const onLogin = useCallback(async () => {
@@ -56,14 +59,23 @@ function LoginEmail({ setLoginType }: { setLoginType: (type: LoginType) => void 
     if (message) return;
     Loading.show();
     try {
-      if (!chainInfo) await dispatch(getChainListAsync());
-      const verifierServers = await getVerifierServers();
-      const holderInfo = await getHolderInfo({ loginGuardianType: email });
-      navigationService.navigate('GuardianApproval', {
-        loginGuardianType: email,
-        userGuardiansList: handleUserGuardiansList(holderInfo, verifierServers),
-      });
-      Loading.hide();
+      const req = await request.es.getUserTokenList({ baseURL: 'http://192.168.10.70:5577' });
+      console.log(req, '====req');
+
+      // if (!chainInfo) await dispatch(getChainListAsync());
+      // const verifierServers = await getVerifierServers();
+      // const holderInfo = await getHolderInfo({ loginGuardianType: email });
+      // console.log(holderInfo, '====holderInfo');
+      // console.log(
+      //   handleUserGuardiansList(holderInfo, verifierServers),
+      //   '=handleUserGuardiansList(holderInfo, verifierServers)',
+      // );
+
+      // // navigationService.navigate('GuardianApproval', {
+      // //   loginGuardianType: email,
+      // //   userGuardiansList: handleUserGuardiansList(holderInfo, verifierServers),
+      // // });
+      // Loading.hide();
     } catch (error) {
       setErrorMessage(handleError(error));
       Loading.hide();

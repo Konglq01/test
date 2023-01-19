@@ -1,7 +1,7 @@
 import { customFetch } from '@portkey/utils/fetch';
 import { DEFAULT_METHOD } from '..';
-import { BaseConfig, UrlObj } from '../types';
-import { spliceUrl } from '../utils';
+import { BaseConfig, RequestConfig, UrlObj } from '../types';
+import { getRequestConfig, spliceUrl } from '../utils';
 
 class ServiceInit {
   [x: string]: any;
@@ -19,14 +19,15 @@ class ServiceInit {
   };
   /**
    * @method send
-   * @param  {BaseConfig} config
+   * @param  {RequestConfig} config
    * @return {Promise<any>}
    */
 
-  send = (url: string, config?: BaseConfig) => {
-    const { method = DEFAULT_METHOD, baseURL, ...fetchConfig } = config || {};
+  send = (base: BaseConfig, config?: RequestConfig) => {
+    const { method = DEFAULT_METHOD, url, baseURL, ...fetchConfig } = getRequestConfig(base, config) || {};
     const _baseURL = baseURL ?? '';
-    const _url = url;
+    const _url = typeof base === 'string' ? base : base.target;
+
     const URL = spliceUrl(_baseURL, _url);
     return customFetch(URL, {
       ...fetchConfig,
@@ -38,10 +39,3 @@ class ServiceInit {
 const myServer = new ServiceInit();
 
 export default myServer;
-
-const a = (a: string) => {
-  console.log(a);
-};
-const b = a.bind(this);
-
-b('2');

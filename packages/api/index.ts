@@ -2,6 +2,7 @@ import walletApi from './wallet';
 import verificationApi from './verification';
 import contactApi from './contact';
 import chainApi from './chain';
+import esApi from './es';
 import myServer from './server';
 import { API_REQ_FUNCTION } from './types';
 
@@ -23,7 +24,13 @@ export const DEFAULT_METHOD = 'POST';
 
 export const BASE_APIS = {};
 
-export const EXPAND_APIS = { wallet: walletApi, verify: verificationApi, contact: contactApi, chain: chainApi };
+export const EXPAND_APIS = {
+  wallet: walletApi,
+  verify: verificationApi,
+  contact: contactApi,
+  chain: chainApi,
+  es: esApi,
+};
 
 export type BASE_REQ_TYPES = {
   [x in keyof typeof BASE_APIS]: API_REQ_FUNCTION;

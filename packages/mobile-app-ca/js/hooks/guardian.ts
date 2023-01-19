@@ -14,10 +14,11 @@ export const useGetGuardiansList = () => {
       if (!loginAccount) throw new Error('Could not find accountInfo');
       const caContract = await getCurrentCAViewContract();
       const res = await caContract?.callViewMethod('GetHolderInfo', {
-        caHash: loginAccount.caHash,
-        loginGuardianType: loginAccount.loginGuardianType,
+        // caHash: loginAccount.caHash,
+        // loginGuardianType: loginAccount.loginGuardianType,
+        caHash: 'f603f5cf3d88dea80b4495ac9a78275be32e038e06535a6785c766dc9c9d55c8',
       });
-      console.log(res, '=====res');
+      console.log(res, '=====res-GetHolderInfo');
 
       if (!res?.error) {
         return res.guardiansInfo;
@@ -39,7 +40,7 @@ export const useGetHolderInfo = () => {
   const onGetGuardiansList = useCallback(
     async (loginAccount: LoginInfo) => {
       const guardiansInfo = await getGuardiansList(loginAccount);
-      dispatch(setGuardiansAction(guardiansInfo));
+      // dispatch(setGuardiansAction(guardiansInfo));
       return guardiansInfo;
     },
     [dispatch, getGuardiansList],
@@ -54,10 +55,9 @@ export const useGetVerifierServers = () => {
     const caContract = await getCurrentCAViewContract();
     const res = await caContract?.callViewMethod('GetVerifierServers', '');
     if (res && !res.error) {
-      const verifierList: VerifierItem[] = res.verifierServers.map((item: any) => ({
-        name: item.name,
+      const verifierList: VerifierItem[] = res.verifierServers.map((item: VerifierItem) => ({
+        ...item,
         url: item.endPoints[0],
-        imageUrl: item.imageUrl,
       }));
       dispatch(setVerifierListAction(verifierList));
       return verifierList;
