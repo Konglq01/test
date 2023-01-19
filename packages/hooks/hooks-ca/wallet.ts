@@ -4,7 +4,7 @@ import { WalletInfoType } from '@portkey/types/wallet';
 import { CAInfo, CAInfoType, LoginType, TLoginStrType } from '@portkey/types/types-ca/wallet';
 import { WalletState } from '@portkey/store/store-ca/wallet/type';
 import { VerificationType } from '@portkey/types/verifier';
-import { fetchCreateWalletResult } from '@portkey/api/apiUtils/wallet';
+import { fetchCreateWalletResult } from '@portkey/api/api-did/apiUtils/wallet';
 import { sleep } from '@portkey/utils';
 
 export interface CurrentWalletType extends WalletInfoType, CAInfoType {

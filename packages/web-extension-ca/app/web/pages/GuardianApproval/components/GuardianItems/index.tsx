@@ -1,4 +1,4 @@
-import { sendVerificationCode } from '@portkey/api/apiUtils/verification';
+import { sendVerificationCode } from '@portkey/api/api-did/apiUtils/verification';
 import { setCurrentGuardianAction, setUserGuardianItemStatus } from '@portkey/store/store-ca/guardians/actions';
 import { UserGuardianItem, UserGuardianStatus } from '@portkey/store/store-ca/guardians/type';
 import { LoginStrType } from '@portkey/store/store-ca/guardians/utils';

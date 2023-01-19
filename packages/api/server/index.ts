@@ -1,5 +1,4 @@
 import { customFetch } from '@portkey/utils/fetch';
-import { DEFAULT_METHOD } from '..';
 import { BaseConfig, RequestConfig, UrlObj } from '../types';
 import { getRequestConfig, spliceUrl } from '../utils';
 
@@ -24,7 +23,7 @@ class ServiceInit {
    */
 
   send = (base: BaseConfig, config?: RequestConfig) => {
-    const { method = DEFAULT_METHOD, url, baseURL, ...fetchConfig } = getRequestConfig(base, config) || {};
+    const { method = 'POST', url, baseURL, ...fetchConfig } = getRequestConfig(base, config) || {};
     const _baseURL = baseURL ?? '';
     const _url = typeof base === 'string' ? base : base.target;
 

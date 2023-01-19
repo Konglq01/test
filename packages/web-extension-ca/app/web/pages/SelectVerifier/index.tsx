@@ -7,7 +7,7 @@ import { useAppDispatch, useLoginInfo, useGuardiansInfo, useLoading } from 'stor
 import PortKeyTitle from 'pages/components/PortKeyTitle';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
 import './index.less';
-import { sendVerificationCode } from '@portkey/api/apiUtils/verification';
+import { sendVerificationCode } from '@portkey/api/api-did/apiUtils/verification';
 import CommonSelect from 'components/CommonSelect1';
 import { useTranslation } from 'react-i18next';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';

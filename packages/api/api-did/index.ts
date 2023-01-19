@@ -3,8 +3,8 @@ import verificationApi from './verification';
 import contactApi from './contact';
 import chainApi from './chain';
 import esApi from './es';
-import myServer from './server';
-import { API_REQ_FUNCTION } from './types';
+import myServer from '../server';
+import { API_REQ_FUNCTION } from '../types';
 
 export const DEFAULT_METHOD = 'POST';
 

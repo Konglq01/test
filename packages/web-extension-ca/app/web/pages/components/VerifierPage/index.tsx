@@ -1,4 +1,4 @@
-import { checkVerificationCode, sendVerificationCode } from '@portkey/api/apiUtils/verification';
+import { checkVerificationCode, sendVerificationCode } from '@portkey/api/api-did/apiUtils/verification';
 import { Button, message } from 'antd';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAppDispatch, useCommonState, useLoading } from 'store/Provider/hooks';

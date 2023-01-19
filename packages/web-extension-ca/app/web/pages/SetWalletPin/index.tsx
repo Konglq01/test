@@ -11,7 +11,7 @@ import { setLocalStorage } from 'utils/storage/chromeStorage';
 import { createWallet, setCAInfo, setManagerInfo } from '@portkey/store/store-ca/wallet/actions';
 import useLocationState from 'hooks/useLocationState';
 import { useTranslation } from 'react-i18next';
-import { recoveryDIDWallet, registerDIDWallet } from '@portkey/api/apiUtils/wallet';
+import { recoveryDIDWallet, registerDIDWallet } from '@portkey/api/api-did/apiUtils/wallet';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { VerificationType } from '@portkey/types/verifier';
 import { isWalletError } from '@portkey/store/wallet/utils';
