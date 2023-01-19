@@ -15,8 +15,8 @@ export const formatDelGuardianValue = ({
 }) => {
   const guardianToRemove: GuardianItem = {
     guardianType: {
-      type: opGuardian?.guardiansType as LoginType,
-      guardianType: opGuardian?.loginGuardianType as string,
+      type: opGuardian?.guardianType as LoginType,
+      guardianType: opGuardian?.guardianAccount as string,
     },
     verifier: {
       name: opGuardian?.verifier?.name as string,
@@ -27,8 +27,8 @@ export const formatDelGuardianValue = ({
     if (item.signature) {
       guardiansApproved.push({
         guardianType: {
-          type: item.guardiansType,
-          guardianType: item.loginGuardianType,
+          type: item.guardianType,
+          guardianType: item.guardianAccount,
         },
         verifier: {
           name: item.verifier?.name as string,

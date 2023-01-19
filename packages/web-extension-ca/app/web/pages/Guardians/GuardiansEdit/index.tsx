@@ -63,15 +63,15 @@ export default function GuardiansEdit() {
   const guardiansChangeHandler = useCallback(async () => {
     const flag: boolean =
       Object.values(userGuardiansList ?? {})?.some((item) => {
-        return item.key === `${currentGuardian?.loginGuardianType}&${selectVal}`;
+        return item.key === `${currentGuardian?.guardianAccount}&${selectVal}`;
       }) ?? false;
     setExist(flag);
     if (flag) return;
     try {
       dispatch(
         setLoginAccountAction({
-          loginGuardianType: opGuardian?.loginGuardianType as string,
-          accountLoginType: opGuardian?.guardiansType as LoginType,
+          guardianAccount: opGuardian?.guardianAccount as string,
+          loginType: opGuardian?.guardianType as LoginType,
         }),
       );
       setLoading(true);
@@ -79,11 +79,11 @@ export default function GuardiansEdit() {
       await userGuardianList({ caHash: walletInfo.caHash });
       dispatch(
         setOpGuardianAction({
-          key: `${currentGuardian?.loginGuardianType}&${selectVal}`,
+          key: `${currentGuardian?.guardianAccount}&${selectVal}`,
           verifier: targetVerifier()?.[0],
           isLoginAccount: opGuardian?.isLoginAccount,
-          loginGuardianType: opGuardian?.loginGuardianType as string,
-          guardiansType: opGuardian?.guardiansType as LoginType,
+          guardianAccount: opGuardian?.guardianAccount as string,
+          guardianType: opGuardian?.guardianType as LoginType,
         }),
       );
       setLoading(false);
@@ -117,8 +117,8 @@ export default function GuardiansEdit() {
   const removeHandler = useCallback(async () => {
     dispatch(
       setLoginAccountAction({
-        loginGuardianType: opGuardian?.loginGuardianType as string,
-        accountLoginType: opGuardian?.guardiansType as LoginType,
+        guardianAccount: opGuardian?.guardianAccount as string,
+        loginType: opGuardian?.guardianType as LoginType,
       }),
     );
     dispatch(resetUserGuardianStatus());
@@ -127,8 +127,8 @@ export default function GuardiansEdit() {
       setCurrentGuardianAction({
         isLoginAccount: opGuardian?.isLoginAccount,
         verifier: opGuardian?.verifier,
-        loginGuardianType: opGuardian?.loginGuardianType as string,
-        guardiansType: opGuardian?.guardiansType as LoginType,
+        guardianAccount: opGuardian?.guardianAccount as string,
+        guardianType: opGuardian?.guardianType as LoginType,
         key: opGuardian?.key as string,
       }),
     );
@@ -148,7 +148,7 @@ export default function GuardiansEdit() {
       </div>
       <div className="input-item">
         <p className="label">{t('Guardian Type')}</p>
-        <p className="control">{currentGuardian?.loginGuardianType}</p>
+        <p className="control">{currentGuardian?.guardianAccount}</p>
       </div>
       <div className="input-item">
         <p className="label">{t('Verifier')}</p>

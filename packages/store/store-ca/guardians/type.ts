@@ -7,8 +7,8 @@ type UserGuardianItemKey = string;
 export interface UserGuardianItem {
   isLoginAccount: boolean | undefined;
   verifier?: VerifierItem;
-  loginGuardianType: string;
-  guardiansType: LoginType;
+  guardianAccount: string;
+  guardianType: LoginType;
   key: string; // `${loginGuardianType}&${verifier?.name}`,
   sessionId?: string;
   isInitStatus?: boolean;

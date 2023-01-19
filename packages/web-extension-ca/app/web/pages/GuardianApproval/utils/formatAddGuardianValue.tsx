@@ -16,8 +16,8 @@ export const formatAddGuardianValue = ({
     if (item.key === opGuardian?.key) {
       guardianToAdd = {
         guardianType: {
-          type: item.guardiansType,
-          guardianType: item.loginGuardianType,
+          type: item.guardianType,
+          guardianType: item.guardianAccount,
         },
         verifier: {
           name: item.verifier?.name as string,
@@ -28,8 +28,8 @@ export const formatAddGuardianValue = ({
     } else if (item.signature) {
       guardiansApproved.push({
         guardianType: {
-          type: item.guardiansType,
-          guardianType: item.loginGuardianType,
+          type: item.guardianType,
+          guardianType: item.guardianAccount,
         },
         verifier: {
           name: item.verifier?.name as string,

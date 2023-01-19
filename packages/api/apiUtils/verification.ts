@@ -1,47 +1,30 @@
-import { LoginType } from '@portkey/types/types-ca/wallet';
+import { LoginType, TLoginStrType } from '@portkey/types/types-ca/wallet';
 import { VerificationType } from '@portkey/types/verifier';
 import { request } from '..';
 
-interface SendVerificationCodeProps {
-  verificationType: VerificationType;
-  guardiansType: LoginType;
-  loginGuardianType: string;
+interface SendVerificationCodeParams {
   baseUrl: string;
-  managerUniqueId: string;
+  type: TLoginStrType;
+  guardianAccount: string;
+  // TODO
+  verifierName: string;
 }
-export function sendVerificationCode(params: SendVerificationCodeProps): Promise<any> {
-  let tmpFetch;
-  switch (params.verificationType) {
-    case VerificationType.register:
-      tmpFetch = request.verify.sendRegisterVerificationCode;
-      break;
-    case VerificationType.communityRecovery:
-      tmpFetch = request.verify.sendRecoveryVerificationCode;
-      break;
-    case VerificationType.addGuardian:
-      tmpFetch = request.verify.sendVerificationCode;
-      break;
-    default:
-      throw Error('Unable to find the corresponding api');
-  }
-
-  return tmpFetch({
+export function sendVerificationCode(params: SendVerificationCodeParams): Promise<any> {
+  return request.verify.sendVerificationRequest({
     baseURL: params.baseUrl,
     params: {
-      type: params.guardiansType,
-      loginGuardianType: params.loginGuardianType,
-      managerUniqueId: params.managerUniqueId,
+      type: params.type,
+      guardianAccount: params.guardianAccount,
+      verifierName: params.verifierName,
     },
   });
 }
 
 interface CheckVerificationCodeProps {
-  loginGuardianType: string;
-  code: string; // Captcha Verification
-  verificationType: VerificationType;
-  type: LoginType;
   baseUrl: string;
+  endPoint: string;
   verifierSessionId: string;
+  verificationCode: string;
 }
 
 interface ErrorBack {
@@ -50,36 +33,20 @@ interface ErrorBack {
 }
 
 export async function checkVerificationCode({
-  verificationType,
-  type,
   baseUrl,
-  code,
-  loginGuardianType,
+  endPoint,
+  verificationCode,
   verifierSessionId,
 }: CheckVerificationCodeProps): Promise<{
-  verifierSessionId?: string;
+  verificationDoc: string;
+  signature: string;
   error?: ErrorBack;
 }> {
-  let tmpFetch;
-  switch (verificationType) {
-    case VerificationType.register:
-      tmpFetch = request.verify.checkRegisterVerificationCode;
-      break;
-    case VerificationType.communityRecovery:
-      tmpFetch = request.verify.checkRecoveryVerificationCode;
-      break;
-    case VerificationType.addGuardian:
-      tmpFetch = request.verify.checkVerificationCode;
-      break;
-    default:
-      throw Error('Unable to find the corresponding api');
-  }
-  return await tmpFetch({
+  return await request.verify.checkVerificationCode({
     baseURL: baseUrl,
     params: {
-      type,
-      code,
-      loginGuardianType,
+      endPoint,
+      verificationCode,
       verifierSessionId,
     },
   });
@@ -94,12 +61,3 @@ interface loginGuardianTypeCheckParams {
   loginGuardianType: string;
   apiUrl?: string;
 }
-
-export const loginGuardianTypeCheck = async (params: loginGuardianTypeCheckParams): Promise<{ result: boolean }> => {
-  const apiUrl = params.apiUrl;
-  delete params.apiUrl;
-
-  return {
-    result: true,
-  };
-};

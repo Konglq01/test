@@ -7,3 +7,12 @@ export type UrlObj = { [key: string]: RequestConfig };
 export type API_REQ_FUNCTION = (config: RequestConfig) => Promise<{ type: 'timeout' } | any>;
 
 export type BaseConfig = string | { target: string; config: CustomFetchConfig };
+
+export interface BaseContext {
+  clientId: string;
+  requestId: string;
+}
+
+export interface IContext {
+  context: BaseContext;
+}

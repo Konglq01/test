@@ -22,9 +22,8 @@ const useVerifierList = () => {
       .then((res) => {
         console.log(res, 'getVerifierList===');
         const verifierList = res.result.verifierList?.map((item: any) => ({
-          name: item.name,
+          ...item,
           url: item.endPoints[0],
-          imageUrl: item.imageUrl,
         }));
         dispatch(setVerifierListAction(verifierList));
       })
