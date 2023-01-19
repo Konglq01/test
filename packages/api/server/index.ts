@@ -38,10 +38,3 @@ class ServiceInit {
 const myServer = new ServiceInit();
 
 export default myServer;
-
-const a = (a: string) => {
-  console.log(a);
-};
-const b = a.bind(this);
-
-b('2');

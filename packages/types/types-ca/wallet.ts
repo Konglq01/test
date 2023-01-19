@@ -14,6 +14,8 @@ export enum LoginType {
   phone,
 }
 
+export type TLoginStrType = 'Email' | 'PhoneNumber';
+
 export interface CAInfo {
   caAddress: string;
   caHash: string;

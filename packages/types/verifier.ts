@@ -6,9 +6,13 @@ export enum VerifyStatus {
   Verified = 'Verified',
 }
 export interface VerifierItem {
+  id: string; // aelf.Hash
   name: string;
   imageUrl: string;
+  // TODO Is the URL necessary
   url: string;
+  endPoints: string[];
+  verifierAddress: string[];
 }
 
 // 0: register, 1: community recovery, 2: Add Guardian 3: Set LoginAccount 4: addManager
@@ -28,16 +32,8 @@ export enum ApprovalType {
   editGuardian,
 }
 
-export interface GuardiansInfo {
-  guardians: {
-    guardianType: {
-      type: LoginType;
-      guardianType: string;
-    };
-    verifier: {
-      name: string;
-      signature: string;
-    };
-  }[];
-  loginGuardianTypeIndexes: number[];
+export interface VerifierInfo {
+  verifierId: string;
+  verificationDoc: string;
+  signature: string;
 }

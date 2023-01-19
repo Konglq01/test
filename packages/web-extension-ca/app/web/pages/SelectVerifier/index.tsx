@@ -8,10 +8,10 @@ import PortKeyTitle from 'pages/components/PortKeyTitle';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
 import './index.less';
 import { sendVerificationCode } from '@portkey/api/apiUtils/verification';
-import { VerificationType } from '@portkey/types/verifier';
 import CommonSelect from 'components/CommonSelect1';
 import { useTranslation } from 'react-i18next';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
+import { LoginStrType } from '@portkey/store/store-ca/guardians/utils';
 
 export default function SelectVerifier() {
   const { verifierMap } = useGuardiansInfo();
@@ -42,31 +42,27 @@ export default function SelectVerifier() {
 
   const verifyHandler = useCallback(async () => {
     try {
-      if (
-        !loginAccount ||
-        (!loginAccount.accountLoginType && loginAccount.accountLoginType !== 0) ||
-        !loginAccount.loginGuardianType
-      )
+      if (!loginAccount || !LoginStrType[loginAccount.loginType] || !loginAccount.guardianAccount)
         return message.error('User registration information is invalid, please fill in the registration method again');
       if (!selectItem) return message.error('Can not get verification');
 
       setLoading(true);
       const result = await sendVerificationCode({
-        loginGuardianType: loginAccount.loginGuardianType,
-        guardiansType: loginAccount?.accountLoginType,
-        verificationType: VerificationType.register,
+        guardianAccount: loginAccount.guardianAccount,
+        type: LoginStrType[loginAccount.loginType],
         baseUrl: selectItem?.url || '',
-        managerUniqueId: loginAccount.managerUniqueId,
+        // TODO
+        verifierName: selectItem.name,
       });
       setLoading(false);
       if (result.verifierSessionId) {
-        const _key = `${loginAccount.loginGuardianType}&${selectItem.name}`;
+        const _key = `${loginAccount.guardianAccount}&${selectItem.name}`;
         dispatch(
           setCurrentGuardianAction({
             isLoginAccount: true,
             verifier: selectItem,
-            loginGuardianType: loginAccount.loginGuardianType,
-            guardiansType: loginAccount.accountLoginType,
+            guardianAccount: loginAccount.guardianAccount,
+            guardianType: loginAccount.loginType,
             sessionId: result.verifierSessionId,
             key: _key,
           }),
@@ -114,7 +110,7 @@ export default function SelectVerifier() {
           width={320}
           onCancel={() => setOpen(false)}>
           <p className="modal-content">{`${t('verificationCodeTip', { verifier: selectItem?.name })} ${
-            loginAccount.loginGuardianType
+            loginAccount.guardianAccount
           } ${t('to verify your email address.')}`}</p>
           <div className="btn-wrapper">
             <Button onClick={() => setOpen(false)}>{t('Cancel')}</Button>

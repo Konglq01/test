@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAppDispatch, useCommonState, useLoading } from 'store/Provider/hooks';
 import { PasscodeInput } from 'antd-mobile';
 import { LoginInfo } from 'store/reducers/loginCache/type';
-import { VerificationType } from '@portkey/types/verifier';
 import { DIGIT_CODE } from '@portkey/constants/misc';
 import clsx from 'clsx';
 import VerifierPair from 'components/VerifierPair';
@@ -14,8 +13,9 @@ import { useTranslation } from 'react-i18next';
 import { setUserGuardianSessionIdAction } from '@portkey/store/store-ca/guardians/actions';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
 import { LoginType } from '@portkey/types/types-ca/wallet';
-import { useLocation } from 'react-router';
 import { useEffectOnce } from 'react-use';
+import { LoginStrType } from '@portkey/store/store-ca/guardians/utils';
+import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 
 const MAX_TIMER = 60;
 
@@ -27,17 +27,15 @@ enum VerificationError {
 interface VerifierPageProps {
   loginAccount?: LoginInfo;
   currentGuardian?: UserGuardianItem;
-  guardiansType?: LoginType;
-  verificationType: VerificationType;
+  guardianType?: LoginType;
   isInitStatus?: boolean;
-  onSuccess?: (res: any) => void;
+  onSuccess?: (res: { verificationDoc: string; signature: string; verifierId: string }) => void;
 }
 
 export default function VerifierPage({
   loginAccount,
   currentGuardian,
-  guardiansType,
-  verificationType,
+  guardianType,
   isInitStatus,
   onSuccess,
 }: VerifierPageProps) {
@@ -48,7 +46,7 @@ export default function VerifierPage({
   const timerRef = useRef<NodeJS.Timer>();
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const { state } = useLocation();
+  const currentNetwork = useCurrentNetworkInfo();
 
   useEffectOnce(() => {
     isInitStatus && setTimer(MAX_TIMER);
@@ -59,28 +57,20 @@ export default function VerifierPage({
       try {
         console.log(code);
         if (code && code.length === 6) {
-          if (
-            !loginAccount?.loginGuardianType ||
-            (!loginAccount.accountLoginType && loginAccount.accountLoginType !== 0)
-          )
-            throw 'Missing account!!!';
+          if (!loginAccount?.guardianAccount) throw 'Missing account!!!';
           if (!currentGuardian?.sessionId) throw 'Missing verifierSessionId!!!';
           setLoading(true);
 
           const res = await checkVerificationCode({
-            code,
-            baseUrl: currentGuardian?.verifier?.url || '',
-            verificationType,
-            type: loginAccount.accountLoginType,
-            loginGuardianType: currentGuardian?.loginGuardianType,
+            baseUrl: currentNetwork.apiUrl,
             verifierSessionId: currentGuardian?.sessionId,
+            verificationCode: code,
+            endPoint: currentGuardian.verifier?.url || '',
           });
+
           setLoading(false);
-          if (state && state.indexOf('guardians') !== -1) {
-            if (Object.keys(res).length) return onSuccess?.(res);
-          } else {
-            if (!Object.keys(res).length) return onSuccess?.(res);
-          }
+          if (res.signature) return onSuccess?.({ ...res, verifierId: currentGuardian.verifier?.id || '' });
+
           if (res?.error?.message) {
             message.error(t(res.error.message));
           } else {
@@ -96,32 +86,30 @@ export default function VerifierPage({
         message.error(_error);
       }
     },
-    [loginAccount, currentGuardian, setLoading, verificationType, state, onSuccess, t],
+    [loginAccount, currentGuardian, setLoading, currentNetwork.apiUrl, onSuccess, t],
   );
 
   const resendCode = useCallback(async () => {
-    if (!currentGuardian?.loginGuardianType) return message.error('Missing loginGuardianType');
-    console.log(guardiansType, 'guardiansType===');
-    if (!guardiansType && guardiansType !== 0) return message.error('Missing guardiansType');
+    if (!currentGuardian?.guardianAccount) return message.error('Missing loginGuardianType');
+    if (!guardianType && guardianType !== 0) return message.error('Missing guardiansType');
     setLoading(true);
     const res = await sendVerificationCode({
-      loginGuardianType: currentGuardian.loginGuardianType,
-      guardiansType,
-      verificationType,
+      guardianAccount: currentGuardian.guardianAccount,
+      type: LoginStrType[guardianType],
       baseUrl: currentGuardian?.verifier?.url || '',
-      managerUniqueId: loginAccount?.managerUniqueId ?? '',
+      verifierName: '',
     });
     setLoading(false);
     if (res.verifierSessionId) {
       setTimer(MAX_TIMER);
       dispatch(
         setUserGuardianSessionIdAction({
-          key: currentGuardian?.key ?? `${currentGuardian?.loginGuardianType}&${currentGuardian?.verifier?.name}`,
+          key: currentGuardian?.key ?? `${currentGuardian?.guardianAccount}&${currentGuardian?.verifier?.name}`,
           sessionId: res.verifierSessionId,
         }),
       );
     }
-  }, [currentGuardian, dispatch, guardiansType, loginAccount, setLoading, verificationType]);
+  }, [currentGuardian, dispatch, guardianType, setLoading]);
 
   useEffect(() => {
     if (timer !== MAX_TIMER) return;
@@ -143,16 +131,13 @@ export default function VerifierPage({
     <div className={clsx('verifier-page-wrapper', isPrompt || 'popup-page')}>
       {currentGuardian?.isLoginAccount && <div className="login-icon">{t('Login Account')}</div>}
       <div className="flex-row-center login-account-wrapper">
-        <VerifierPair
-          guardiansType={currentGuardian?.guardiansType}
-          verifierSrc={currentGuardian?.verifier?.imageUrl}
-        />
-        <span className="login-account">{currentGuardian?.loginGuardianType || ''}</span>
+        <VerifierPair guardianType={currentGuardian?.guardianType} verifierSrc={currentGuardian?.verifier?.imageUrl} />
+        <span className="login-account">{currentGuardian?.guardianAccount || ''}</span>
       </div>
       <div className="send-tip">
         {isPrompt || 'Please contact your guardians, and enter '}
         {t('sendCodeTip1', { codeCount: DIGIT_CODE.length })}&nbsp;
-        <span className="account">{currentGuardian?.loginGuardianType}</span>
+        <span className="account">{currentGuardian?.guardianAccount}</span>
         <br />
         {t('sendCodeTip2', { minute: DIGIT_CODE.expiration })}
       </div>

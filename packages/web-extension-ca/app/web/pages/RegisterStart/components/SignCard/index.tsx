@@ -1,5 +1,5 @@
 import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
-import { resetVerifierState } from '@portkey/store/store-ca/guardians/actions';
+import { resetGuardiansState } from '@portkey/store/store-ca/guardians/actions';
 import CustomSvg from 'components/CustomSvg';
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
@@ -22,12 +22,12 @@ export default function SignCard() {
       console.log('onEmailTabSuccess');
       dispatch(
         setLoginAccountAction({
-          loginGuardianType: email,
-          accountLoginType: LoginType.email,
+          guardianAccount: email,
+          loginType: LoginType.email,
           createType: 'register',
         }),
       );
-      dispatch(resetVerifierState());
+      dispatch(resetGuardiansState());
       navigate('/register/select-verifier');
     },
     [dispatch, navigate],

@@ -6,7 +6,6 @@ import SettingHeader from 'pages/components/SettingHeader';
 import { useAppDispatch, useGuardiansInfo, useLoading, useUserInfo } from 'store/Provider/hooks';
 import { useState, useMemo, useCallback } from 'react';
 import { sendVerificationCode } from '@portkey/api/apiUtils/verification';
-import { VerificationType } from '@portkey/types/verifier';
 import { useTranslation } from 'react-i18next';
 import { handleGuardian } from 'utils/sandboxUtil/handleGuardian';
 import './index.less';
@@ -27,6 +26,7 @@ import { sleep } from '@portkey/utils';
 import { getAelfInstance } from '@portkey/utils/aelf';
 import { getTxResult } from 'utils/aelfUtils';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
+import { LoginStrType } from '@portkey/store/store-ca/guardians/utils';
 // import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 
 enum SwitchFail {
@@ -71,8 +71,8 @@ export default function GuardiansView() {
               {
                 caHash: walletInfo?.AELF?.caHash,
                 guardianType: {
-                  type: currentGuardian?.guardiansType,
-                  guardianType: currentGuardian?.loginGuardianType,
+                  type: currentGuardian?.guardianType,
+                  guardianType: currentGuardian?.guardianAccount,
                 },
               },
             ],
@@ -93,17 +93,16 @@ export default function GuardiansView() {
       } else {
         dispatch(
           setLoginAccountAction({
-            loginGuardianType: opGuardian?.loginGuardianType as string,
-            accountLoginType: opGuardian?.guardiansType as LoginType,
+            guardianAccount: opGuardian?.guardianAccount as string,
+            loginType: opGuardian?.guardianType as LoginType,
           }),
         );
         setLoading(true);
         const result = await sendVerificationCode({
-          loginGuardianType: opGuardian?.loginGuardianType as string,
-          guardiansType: opGuardian?.guardiansType as LoginType,
-          verificationType: VerificationType.addGuardian,
+          guardianAccount: opGuardian?.guardianAccount as string,
+          type: LoginStrType[opGuardian?.guardianType as LoginType],
           baseUrl: opGuardian?.verifier?.url || '',
-          managerUniqueId: walletInfo.managerInfo?.managerUniqueId as string,
+          verifierName: '',
         });
         setLoading(false);
         if (result.verifierSessionId) {
@@ -111,8 +110,8 @@ export default function GuardiansView() {
             setCurrentGuardianAction({
               isLoginAccount: opGuardian?.isLoginAccount,
               verifier: opGuardian?.verifier,
-              loginGuardianType: opGuardian?.loginGuardianType as string,
-              guardiansType: opGuardian?.guardiansType as LoginType,
+              guardianAccount: opGuardian?.guardianAccount as string,
+              guardianType: opGuardian?.guardianType as LoginType,
               sessionId: result.verifierSessionId,
               key: opGuardian?.key as string,
               isInitStatus: true,
@@ -156,7 +155,7 @@ export default function GuardiansView() {
             address: currentChain?.caContractAddress as string,
             chainType: currentNetwork.walletType,
             paramsOption: {
-              loginGuardianType: opGuardian?.loginGuardianType,
+              loginGuardianAccount: opGuardian?.guardianAccount,
             },
           });
           setSwitchFail(SwitchFail.openFail);
@@ -184,7 +183,7 @@ export default function GuardiansView() {
       currentChain?.caContractAddress,
       currentChain?.endPoint,
       currentNetwork.walletType,
-      opGuardian?.loginGuardianType,
+      opGuardian?.guardianAccount,
       userGuardiansList,
       verifyHandler,
     ],
@@ -212,7 +211,7 @@ export default function GuardiansView() {
         <div className="input-content">
           <div className="input-item">
             <p className="label">{t('Guardian Type')}</p>
-            <p className="control">{opGuardian?.loginGuardianType}</p>
+            <p className="control">{opGuardian?.guardianAccount}</p>
           </div>
           <div className="input-item">
             <div className="label">{t('Verifier')}</div>
@@ -243,7 +242,7 @@ export default function GuardiansView() {
       </div>
       <CommonModal className="verify-confirm-modal" closable={false} open={tipOpen} onCancel={() => setTipOpen(false)}>
         <p className="modal-content">{`${opGuardian?.verifier?.name ?? ''} will send a verification code to ${
-          opGuardian?.loginGuardianType
+          opGuardian?.guardianAccount
         } to verify your email address.`}</p>
         <div className="btn-wrapper">
           <Button onClick={() => setTipOpen(false)}>{t('Cancel')}</Button>

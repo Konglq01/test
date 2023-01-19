@@ -1,54 +1,52 @@
-import { LoginType } from '@portkey/types/types-ca/wallet';
+import { TLoginStrType } from '@portkey/types/types-ca/wallet';
 import { VerificationType } from '@portkey/types/verifier';
 import { request } from '..';
+import { IContext } from '../types';
 
-interface CreateWalletInfoParams {
+interface RegisterDIDWalletParams extends IContext {
   baseUrl: string;
-  type: LoginType;
-  loginGuardianType: string; //account
-  managerUniqueId: string;
+  type: TLoginStrType;
+  loginGuardianAccount: string; //account
   managerAddress: string;
   deviceString: string;
-  verificationType: VerificationType;
+  verifierId: string;
+  verificationDoc: string;
+  signature: string;
   chainId: string;
-  guardianCount?: number;
 }
 
-export const createWalletInfo = async ({
-  baseUrl,
-  type,
-  loginGuardianType,
-  managerUniqueId,
-  managerAddress,
-  verificationType,
-  deviceString,
-  chainId,
-  guardianCount,
-}: CreateWalletInfoParams) => {
-  let tmpFetch;
-  let params = {
-    type,
-    loginGuardianType,
-    managerUniqueId,
-    managerAddress,
-    deviceString,
-    chainId,
-  };
-  switch (verificationType) {
-    case VerificationType.register:
-      tmpFetch = request.wallet.registerWallet;
-      break;
-    case VerificationType.communityRecovery:
-      tmpFetch = request.wallet.recoveryWallet;
-      Object.assign(params, {
-        guardianCount,
-      });
-      break;
-    default:
-      throw Error('Unable to find the corresponding api');
-  }
-  return tmpFetch({
+export const registerDIDWallet = async (params: RegisterDIDWalletParams) => {
+  const _params: any = { ...params };
+  const baseUrl = _params.baseUrl;
+  delete _params.baseUrl;
+  return request.wallet.requestRegister({
     baseURL: baseUrl,
+    params: _params,
+  });
+};
+
+interface GuardiansApprovedType {
+  type: TLoginStrType;
+  value: string;
+  verifierId: string;
+  verificationDoc: string;
+  signature: string;
+}
+interface RecoveryDIDWalletParams extends IContext {
+  baseURL: string;
+  loginGuardianAccount: string;
+  managerAddress: string;
+  deviceString: string;
+  chainId: string;
+  guardiansApproved: GuardiansApprovedType[];
+}
+
+export const recoveryDIDWallet = async (params: RecoveryDIDWalletParams) => {
+  const _params: any = { ...params };
+  const baseURL = _params.baseURL;
+  delete _params.baseURL;
+  return request.wallet.recoveryWallet({
+    baseURL,
     params,
   });
 };
@@ -118,7 +116,7 @@ export const setWalletName = ({ nickname, baseURL = '' }: { baseURL?: string; ni
 
 interface FetchCreateWalletParams {
   verificationType?: VerificationType;
-  type: LoginType; //0: Email，1：Phone
+  type: TLoginStrType;
   loginGuardianType: string;
   managerUniqueId: string;
   baseUrl: string;
