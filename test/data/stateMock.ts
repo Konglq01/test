@@ -1,4 +1,4 @@
-const stateMock = {
+export const stateMock = {
   tokenBalance: {
     balances: {
       RpcUrl1: {

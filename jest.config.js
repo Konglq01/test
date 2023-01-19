@@ -5,6 +5,8 @@ module.exports = {
   testEnvironment: 'jsdom',
   coverageDirectory: 'coverage',
   testMatch: ['<rootDir>/test/**/*.test.tsx', '<rootDir>/packages/hooks/**/*.test.tsx'],
+  collectCoverageFrom: ['**/packages/hooks/**/*.{ts,tsx}', '!**/node_modules/**'],
+
   // projects: [
   //   {
   //     displayName: 'hooks',

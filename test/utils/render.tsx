@@ -4,11 +4,12 @@ import type { RenderOptions } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import type { Store } from 'redux';
+import { AnyAction } from '@reduxjs/toolkit';
 
 /**
  * render components with provider wrapper
  */
-export function renderWithProvider(ui: React.ReactElement, store: Store, renderOptions?: RenderOptions) {
+export function renderWithProvider(ui: React.ReactElement, store: Store<any, AnyAction>, renderOptions?: RenderOptions) {
   function Wrapper({ children }: PropsWithChildren<{}>): JSX.Element {
     return <Provider store={store}>{children}</Provider>;
   }
@@ -19,7 +20,7 @@ export function renderWithProvider(ui: React.ReactElement, store: Store, renderO
 /**
  * render hook with provider wrapper
  */
-export function renderHookWithProvider(fn: Function, store: Store, initialProps?: RenderOptions) {
+export function renderHookWithProvider(fn: Function, store: Store<any, AnyAction>, initialProps?: RenderOptions) {
   function Wrapper({ children }: PropsWithChildren<{}>): JSX.Element {
     return <Provider store={store}>{children}</Provider>;
   }
