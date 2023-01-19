@@ -11,7 +11,7 @@ const useGuardiansList = () => {
   const currentChain = useCurrentChain();
 
   const fetch = useCallback(
-    async (paramsOption: { loginGuardianType?: string; caHash?: string }) => {
+    async (paramsOption: { loginGuardianAccount?: string; caHash?: string }) => {
       try {
         if (!currentChain?.endPoint) throw 'Could not find chain information';
         const res = await getHolderInfo({
