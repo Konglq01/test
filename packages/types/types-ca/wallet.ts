@@ -4,7 +4,7 @@ import { VerificationType } from '../verifier';
 
 export type ManagerInfo = {
   managerUniqueId: string;
-  loginGuardianType: string;
+  loginAccount: string;
   type: LoginType;
   verificationType: VerificationType;
 };

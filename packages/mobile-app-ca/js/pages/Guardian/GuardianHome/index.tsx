@@ -11,7 +11,7 @@ import { useGuardiansInfo } from 'hooks/store';
 import GuardianAccountItem from '../components/GuardianAccountItem';
 import Touchable from 'components/Touchable';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
-import { useGetHolderInfo } from 'hooks/guardian';
+import { useGetGuardiansInfoWriteStore } from 'hooks/guardian';
 import useEffectOnce from 'hooks/useEffectOnce';
 import myEvents from 'utils/deviceEvent';
 import CommonToast from 'components/CommonToast';
@@ -27,17 +27,17 @@ export default function GuardianHome() {
 
   const { caHash } = useCurrentWalletInfo();
 
-  const getGuardiansList = useGetHolderInfo();
+  const getGuardiansInfoWriteStore = useGetGuardiansInfoWriteStore();
   const refreshGuardiansList = useCallback(async () => {
     try {
-      await getGuardiansList({
+      await getGuardiansInfoWriteStore({
         caHash,
       });
     } catch (error) {
       // TODO: remove Toast
       CommonToast.failError(error);
     }
-  }, [caHash, getGuardiansList]);
+  }, [caHash, getGuardiansInfoWriteStore]);
 
   useEffectOnce(() => {
     refreshGuardiansList();

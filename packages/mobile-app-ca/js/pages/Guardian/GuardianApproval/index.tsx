@@ -36,7 +36,7 @@ export interface EditGuardianParamsType {
 }
 
 type RouterParams = {
-  loginGuardianType?: string;
+  loginAccount?: string;
   userGuardiansList?: UserGuardianItem[];
   approvalType?: ApprovalType;
   guardianItem?: UserGuardianItem;
@@ -46,7 +46,7 @@ type RouterParams = {
 
 export default function GuardianApproval() {
   const {
-    loginGuardianType,
+    loginAccount,
     userGuardiansList: paramUserGuardiansList,
     approvalType = ApprovalType.register,
     guardianItem,
@@ -132,13 +132,13 @@ export default function GuardianApproval() {
     navigationService.navigate('SetPin', {
       managerInfo: {
         verificationType: VerificationType.communityRecovery,
-        loginGuardianType,
+        loginAccount,
         type: LoginType.email,
         managerUniqueId,
       } as ManagerInfo,
       guardianCount,
     });
-  }, [guardianCount, loginGuardianType, managerUniqueId]);
+  }, [guardianCount, loginAccount, managerUniqueId]);
 
   const onAddGuardian = useCallback(async () => {
     if (!managerAddress || !caHash || !editGuardianParams || !guardianItem || !guardiansStatus || !userGuardiansList)

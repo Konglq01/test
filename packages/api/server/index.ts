@@ -25,7 +25,7 @@ class ServiceInit {
   send = (base: BaseConfig, config?: RequestConfig) => {
     const { method = 'POST', url, baseURL, ...fetchConfig } = getRequestConfig(base, config) || {};
     const _baseURL = baseURL ?? '';
-    const _url = typeof base === 'string' ? base : base.target;
+    const _url = url || (typeof base === 'string' ? base : base.target);
 
     const URL = spliceUrl(_baseURL, _url);
     return customFetch(URL, {
