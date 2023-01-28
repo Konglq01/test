@@ -1,7 +1,5 @@
-import { PartialOption } from '@portkey/types/common';
 import {
   CaHolderManagerDto,
-  GetCaHolderManagerChangeRecordDto,
   GetCaHolderManagerInfoDto,
   GetCaHolderTokenBalanceDto,
   GetCaHolderTransactionAddressDto,
@@ -13,6 +11,12 @@ import {
   GetUserNftProtocolInfoDto,
   LoginGuardianTypeDto,
 } from './__generated__/resolversTypes';
+
+type GenerateType<T> = {
+  [K in keyof T]: T[K];
+};
+
+type PartialOption<T, K extends keyof T> = GenerateType<Partial<Pick<T, K>> & Omit<T, K>>;
 
 interface GraphqlRequestCommonType {
   skipCount: any;
