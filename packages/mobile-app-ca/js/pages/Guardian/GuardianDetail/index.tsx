@@ -132,8 +132,8 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
       // if (loginIndex === -1) {}
       Loading.show();
       try {
-        const holderInfo = await getGuardiansInfo({ loginAccount: guardian.guardianAccount });
-        if (holderInfo.guardians) {
+        const guardiansInfo = await getGuardiansInfo({ loginAccount: guardian.guardianAccount });
+        if (guardiansInfo.guardianAccounts) {
           Loading.hide();
           ActionSheet.alert({
             title2: t(`This account address is already a login account and cannot be used`),
