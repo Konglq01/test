@@ -1,4 +1,4 @@
-import { request } from '@portkey/api';
+import { request } from '@portkey/api/api-did';
 
 export const getChainList = ({ baseUrl }: { baseUrl: string }) => {
   try {

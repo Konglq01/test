@@ -14,7 +14,7 @@ import background from '../img/background.png';
 import Svg from 'components/Svg';
 import { BGStyles, FontStyles } from 'assets/theme/styles';
 import { isIos, screenHeight, screenWidth } from '@portkey/utils/mobile/device';
-import { useGetGuardiansList, useGetVerifierServers } from 'hooks/guardian';
+import { useGetGuardiansInfo, useGetVerifierServers } from 'hooks/guardian';
 import { handleError } from '@portkey/utils';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { useAppDispatch } from 'store/hooks';
@@ -31,7 +31,7 @@ function SignupEmail() {
   const [loading] = useState<boolean>();
   const [email, setEmail] = useState<string>();
   const [errorMessage, setErrorMessage] = useState<string>();
-  const getGuardiansList = useGetGuardiansList();
+  const getGuardiansInfo = useGetGuardiansInfo();
   const getVerifierServers = useGetVerifierServers();
   const chainInfo = useCurrentChain('AELF');
   const dispatch = useAppDispatch();
@@ -44,20 +44,20 @@ function SignupEmail() {
       if (!chainInfo) await dispatch(getChainListAsync());
       await getVerifierServers();
       try {
-        const holderInfo = await getGuardiansList({ loginGuardianType: email });
-        if (holderInfo.guardians) {
+        const guardiansInfo = await getGuardiansInfo({ loginAccount: email });
+        if (guardiansInfo.guardianAccounts) {
           Loading.hide();
           return setErrorMessage(EmailError.alreadyRegistered);
         }
       } catch (error) {
         console.debug(error, '====error');
       }
-      navigationService.navigate('SelectVerifier', { loginGuardianType: email });
+      navigationService.navigate('SelectVerifier', { loginAccount: email });
     } catch (error) {
       setErrorMessage(handleError(error));
     }
     Loading.hide();
-  }, [chainInfo, dispatch, email, getGuardiansList, getVerifierServers]);
+  }, [chainInfo, dispatch, email, getGuardiansInfo, getVerifierServers]);
   useEffectOnce(() => {
     const listener = myEvents.clearSignupInput.addListener(() => {
       setEmail('');

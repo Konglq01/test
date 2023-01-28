@@ -11,18 +11,18 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import CommonModal from 'components/CommonModal';
 import { useAppDispatch, useGuardiansInfo, useLoading } from 'store/Provider/hooks';
 import { EmailReg } from '@portkey/utils/reg';
-import { sendVerificationCode } from '@portkey/api/apiUtils/verification';
-import { VerificationType } from '@portkey/types/verifier';
+import { sendVerificationCode } from '@portkey/api/api-did/apiUtils/verification';
 import { LoginType } from '@portkey/types/types-ca/wallet';
 import CustomSelect from 'pages/components/CustomSelect';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
-import './index.less';
 import useGuardianList from 'hooks/useGuardianList';
 import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import { useTranslation } from 'react-i18next';
+import { LoginStrType } from '@portkey/store/store-ca/guardians/utils';
+import './index.less';
 
 const guardianTypeList = [{ label: 'Email', value: LoginType.email }];
 
@@ -76,8 +76,8 @@ export default function AddGuardian() {
 
   useEffect(() => {
     if (state === 'back' && opGuardian) {
-      setGuardianType(opGuardian.guardiansType);
-      setEmailVal(opGuardian.loginGuardianType);
+      setGuardianType(opGuardian.guardianType);
+      setEmailVal(opGuardian.guardianAccount);
       setVerifierVal(opGuardian.verifier?.name);
     }
   }, [state, opGuardian]);
@@ -116,27 +116,26 @@ export default function AddGuardian() {
     try {
       dispatch(
         setLoginAccountAction({
-          loginGuardianType: emailVal as string,
-          accountLoginType: guardianType as LoginType,
+          guardianAccount: emailVal as string,
+          loginType: guardianType as LoginType,
         }),
       );
       setLoading(true);
       dispatch(resetUserGuardianStatus());
       await userGuardianList({ caHash: walletInfo.caHash });
       const result = await sendVerificationCode({
-        loginGuardianType: emailVal as string,
-        guardiansType: guardianType as LoginType,
-        verificationType: VerificationType.addGuardian,
+        guardianAccount: emailVal as string,
+        type: LoginStrType[guardianType as LoginType],
         baseUrl: selectVerifierItem?.url || '',
-        managerUniqueId: walletInfo.managerInfo?.managerUniqueId as string,
+        verifierName: '',
       });
       setLoading(false);
       if (result.verifierSessionId) {
         const newGuardian: UserGuardianItem = {
           isLoginAccount: false,
           verifier: selectVerifierItem,
-          loginGuardianType: emailVal as string,
-          guardiansType: guardianType as LoginType,
+          guardianAccount: emailVal as string,
+          guardianType: guardianType as LoginType,
           sessionId: result.verifierSessionId,
           key: `${emailVal}&${selectVerifierItem?.name}`,
           isInitStatus: true,
@@ -151,17 +150,7 @@ export default function AddGuardian() {
       const _error = verifyErrorHandler(error);
       message.error(_error);
     }
-  }, [
-    dispatch,
-    emailVal,
-    guardianType,
-    navigate,
-    selectVerifierItem,
-    setLoading,
-    userGuardianList,
-    walletInfo.caHash,
-    walletInfo.managerInfo?.managerUniqueId,
-  ]);
+  }, [dispatch, emailVal, guardianType, navigate, selectVerifierItem, setLoading, userGuardianList, walletInfo.caHash]);
 
   return (
     <div className="add-guardians-page">

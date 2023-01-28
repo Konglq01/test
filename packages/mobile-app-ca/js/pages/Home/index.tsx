@@ -13,10 +13,10 @@ import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { getWallet } from 'utils/redux';
 import { useCredentials } from 'hooks/store';
 import { getAelfInstance } from '@portkey/utils/aelf';
-import { useGetHolderInfo } from 'hooks/guardian';
+import { useGetGuardiansInfoWriteStore } from 'hooks/guardian';
 export default function HomeScreen() {
   const wallet = useCurrentWalletInfo();
-  const getHolderInfo = useGetHolderInfo();
+  const getGuardiansInfoWriteStore = useGetGuardiansInfoWriteStore();
   const { pin } = useCredentials() || {};
   const chainInfo = useCurrentChain('AELF');
   return (
@@ -53,7 +53,7 @@ export default function HomeScreen() {
           onPress={async () => {
             if (!chainInfo || !pin) return;
             console.log(chainInfo, '==chainInfo.caContractAddress');
-            getHolderInfo({ caHash: wallet.AELF?.caHash as any });
+            getGuardiansInfoWriteStore({ caHash: wallet.AELF?.caHash as any });
             const account = getWallet(pin);
             // const contract = await getELFContract({
             //   contractAddress: chainInfo.caContractAddress,

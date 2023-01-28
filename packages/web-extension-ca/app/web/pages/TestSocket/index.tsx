@@ -5,7 +5,7 @@ import { SocketUrl } from '@portkey/constants/constants-ca/socket';
 import { randomId } from '@portkey/utils';
 import AElf from 'aelf-sdk';
 import { Button, Divider } from 'antd';
-import { request } from '@portkey/api';
+import { request } from '@portkey/api/api-did';
 
 const wallet = AElf.wallet.createNewWallet();
 const clientId = wallet.address;

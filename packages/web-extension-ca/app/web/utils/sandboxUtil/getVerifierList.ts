@@ -20,7 +20,7 @@ export const getVerifierList = async ({
 
   if (resMessage.code === SandboxErrorCode.error) throw resMessage;
   const res = resMessage.message?.verifierServers;
-  console.log(res, 'getVerifierList===');
+  console.log(res, 'getVerifierList===GetHolderInfo');
   return {
     code: resMessage.code,
     result: {

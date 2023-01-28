@@ -26,7 +26,7 @@ import { setLoginAccount } from 'utils/guardian';
 type FetchType = Record<string, API_REQ_FUNCTION>;
 
 type RouterParams = {
-  loginGuardianType?: string;
+  guardianAccount?: string;
   guardianItem?: UserGuardianItem;
   verifierSessionId?: string;
   managerUniqueId?: string;
@@ -35,7 +35,7 @@ type RouterParams = {
   guardianKey?: string;
 };
 
-function TipText({ loginGuardianType, isRegister }: { loginGuardianType?: string; isRegister?: boolean }) {
+function TipText({ guardianAccount, isRegister }: { guardianAccount?: string; isRegister?: boolean }) {
   const [first, last] = useMemo(() => {
     if (!isRegister)
       return [
@@ -47,7 +47,7 @@ function TipText({ loginGuardianType, isRegister }: { loginGuardianType?: string
   return (
     <TextM style={[FontStyles.font3, GStyles.marginTop(16), GStyles.marginBottom(50)]}>
       {first}
-      <Text style={FontStyles.font4}>{loginGuardianType}</Text>
+      <Text style={FontStyles.font4}>{guardianAccount}</Text>
       {last}
     </TextM>
   );
@@ -55,7 +55,7 @@ function TipText({ loginGuardianType, isRegister }: { loginGuardianType?: string
 
 export default function VerifierDetails() {
   const {
-    loginGuardianType,
+    guardianAccount,
     guardianItem,
     verifierSessionId,
     managerUniqueId,
@@ -63,6 +63,7 @@ export default function VerifierDetails() {
     verificationType,
     guardianKey,
   } = useRouterParams<RouterParams>();
+
   const countdown = useRef<VerifierCountdownInterface>();
   useEffectOnce(() => {
     if (!startResend) countdown.current?.resetTime(60);
@@ -104,7 +105,7 @@ export default function VerifierDetails() {
 
   const onFinish = useCallback(
     async (code: string) => {
-      if (!stateSessionId || !loginGuardianType || !code) return;
+      if (!stateSessionId || !guardianAccount || !code) return;
       try {
         Loading.show();
         let fetch: FetchType = request.register;
@@ -122,7 +123,7 @@ export default function VerifierDetails() {
           data: {
             type: 0,
             code,
-            loginGuardianType,
+            guardianAccount,
             verifierSessionId: stateSessionId,
           },
         });
@@ -169,7 +170,7 @@ export default function VerifierDetails() {
             navigationService.navigate('SetPin', {
               managerInfo: {
                 verificationType: VerificationType.register,
-                loginGuardianType,
+                guardianAccount,
                 type: LoginType.email,
                 managerUniqueId,
               },
@@ -184,7 +185,7 @@ export default function VerifierDetails() {
     },
     [
       guardianItem,
-      loginGuardianType,
+      guardianAccount,
       managerUniqueId,
       setGuardianStatus,
       onSetLoginAccount,
@@ -207,7 +208,7 @@ export default function VerifierDetails() {
         baseURL: guardianItem?.verifier?.url,
         data: {
           type: 0,
-          loginGuardianType,
+          guardianAccount,
           managerUniqueId,
         },
       });
@@ -225,13 +226,13 @@ export default function VerifierDetails() {
       CommonToast.failError(error, 'Verify Fail');
     }
     Loading.hide();
-  }, [guardianItem?.verifier?.url, loginGuardianType, managerUniqueId, setGuardianStatus, verificationType]);
+  }, [guardianItem?.verifier?.url, guardianAccount, managerUniqueId, setGuardianStatus, verificationType]);
   return (
     <PageContainer type="leftBack" titleDom containerStyles={styles.containerStyles}>
       {guardianItem ? <GuardianAccountItem guardianItem={guardianItem} isButtonHide /> : null}
       <TipText
         isRegister={!verificationType || (verificationType as VerificationType) === VerificationType.register}
-        loginGuardianType={loginGuardianType}
+        guardianAccount={guardianAccount}
       />
       <DigitInput ref={digitInput} onFinish={onFinish} maxLength={DIGIT_CODE.length} />
       <VerifierCountdown style={GStyles.marginTop(24)} onResend={resendCode} ref={countdown} />

@@ -1,7 +1,7 @@
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { usePreventHardwareBack } from 'hooks/useHardwareBack';
 import useLocationState from 'hooks/useLocationState';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import { useEffectOnce } from 'react-use';
 import { useAppDispatch } from 'store/Provider/hooks';
 import { resetLoginInfoAction } from 'store/reducers/loginCache/actions';

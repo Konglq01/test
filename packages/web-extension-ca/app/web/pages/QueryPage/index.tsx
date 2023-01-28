@@ -4,6 +4,7 @@
  */
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { useCurrentWalletInfo, useFetchWalletCAAddress } from '@portkey/hooks/hooks-ca/wallet';
+import { LoginStrType } from '@portkey/store/store-ca/guardians/utils';
 import { setCAInfo } from '@portkey/store/store-ca/wallet/actions';
 import { PinErrorMessage } from '@portkey/utils/wallet/types';
 import { message } from 'antd';
@@ -30,7 +31,7 @@ export default function QueryPage() {
       if (!currentWalletInfo.managerInfo) throw 'Missing managerInfo';
       const walletResult = await fetchWalletResult({
         baseUrl: currentNetwork.apiUrl,
-        type: currentWalletInfo.managerInfo.type,
+        type: LoginStrType[currentWalletInfo.managerInfo.type],
         verificationType: currentWalletInfo.managerInfo.verificationType,
         loginGuardianType: currentWalletInfo.managerInfo.loginGuardianType,
         managerUniqueId: currentWalletInfo.managerInfo.managerUniqueId,

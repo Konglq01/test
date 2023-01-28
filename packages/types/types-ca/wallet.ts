@@ -4,7 +4,7 @@ import { VerificationType } from '../verifier';
 
 export type ManagerInfo = {
   managerUniqueId: string;
-  loginGuardianType: string;
+  loginAccount: string;
   type: LoginType;
   verificationType: VerificationType;
 };
@@ -13,6 +13,8 @@ export enum LoginType {
   email,
   phone,
 }
+
+export type TLoginStrType = 'Email' | 'PhoneNumber';
 
 export interface CAInfo {
   caAddress: string;

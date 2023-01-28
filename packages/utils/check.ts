@@ -10,3 +10,8 @@ export function checkEmail(email?: string) {
   if (!email) return EmailError.noEmail;
   if (!isValidEmail(email)) return EmailError.invalidEmail;
 }
+
+export function checkHolderError(message?: string) {
+  if (message?.includes('Not found ca_hash')) return EmailError.noAccount;
+  return message;
+}

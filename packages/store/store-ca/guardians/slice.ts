@@ -1,8 +1,10 @@
+import { GuardianAccount } from '@portkey/types/guardian';
+import { LoginType } from '@portkey/types/types-ca/wallet';
 import { VerifierItem, VerifyStatus } from '@portkey/types/verifier';
 import { createSlice } from '@reduxjs/toolkit';
 import moment from 'moment';
 import {
-  resetVerifierState,
+  resetGuardiansState,
   setUserGuardianItemStatus,
   setCurrentGuardianAction,
   setVerifierListAction,
@@ -13,7 +15,7 @@ import {
   setPreGuardianAction,
   setOpGuardianAction,
 } from './actions';
-import { GuardiansState } from './type';
+import { GuardiansState, UserGuardianStatus } from './type';
 import { GUARDIAN_TYPE_TYPE } from './utils';
 
 const initialState: GuardiansState = {};
@@ -23,7 +25,7 @@ export const guardiansSlice = createSlice({
   reducers: {},
   extraReducers: builder => {
     builder
-      .addCase(resetVerifierState, state => {
+      .addCase(resetGuardiansState, state => {
         return { ...initialState, verifierMap: state.verifierMap };
       })
       .addCase(setVerifierListAction, (state, action) => {
@@ -38,32 +40,35 @@ export const guardiansSlice = createSlice({
         state.verifierMap = map;
       })
       .addCase(setGuardiansAction, (state, action) => {
+        console.log(action, 'action===GetHolderInfo');
         const { verifierMap } = state;
         if (!action.payload) {
           state.userGuardiansList = [];
           state.userGuardianStatus = {};
           return;
         }
-        const { loginGuardianTypeIndexes, guardians } = action.payload;
-        const _guardians: (typeof guardians[number] & { isLoginAccount?: boolean })[] = [...guardians];
-        loginGuardianTypeIndexes.forEach(item => {
-          _guardians[item].isLoginAccount = true;
+        const { loginGuardianAccountIndexes, guardianAccounts } = action.payload;
+        const _guardianAccounts: (GuardianAccount & { isLoginAccount?: boolean })[] = [...guardianAccounts];
+        loginGuardianAccountIndexes.forEach(item => {
+          _guardianAccounts[item].isLoginAccount = true;
         });
 
         const userStatus = state.userGuardianStatus ?? {};
-        const guardiansList = _guardians.map(guardian => {
-          const loginGuardianType = guardian.guardianType.guardianType;
-          const verifier = verifierMap?.[guardian.verifier.name];
-          const guardiansType =
-            typeof guardian.guardianType.type === 'string'
-              ? GUARDIAN_TYPE_TYPE[guardian.guardianType.type]
-              : guardian.guardianType.type;
-          const _guardian = {
-            key: `${loginGuardianType}&${verifier?.name}`,
-            isLoginAccount: guardian.isLoginAccount,
+        const guardiansList = _guardianAccounts.map(_guardianAccount => {
+          const guardianAccount = _guardianAccount.value;
+          const verifier = verifierMap?.[_guardianAccount.guardian.verifier.id];
+          const guardianType: LoginType = (
+            typeof _guardianAccount.guardian.type === 'string'
+              ? GUARDIAN_TYPE_TYPE[_guardianAccount.guardian.type]
+              : _guardianAccount.guardian.type
+          ) as any;
+
+          const _guardian: UserGuardianStatus = {
+            key: `${guardianAccount}&${verifier?.name}`,
+            isLoginAccount: _guardianAccount.isLoginAccount,
             verifier: verifier,
-            loginGuardianType,
-            guardiansType,
+            guardianAccount,
+            guardianType,
           };
 
           userStatus[_guardian.key] = { ..._guardian, status: userStatus?.[_guardian.key]?.status };
