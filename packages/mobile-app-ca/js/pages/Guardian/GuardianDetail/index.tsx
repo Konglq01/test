@@ -12,7 +12,7 @@ import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import CommonSwitch from 'components/CommonSwitch';
 import ActionSheet from 'components/ActionSheet';
 import { useGuardiansInfo } from 'hooks/store';
-import { useGetGuardiansList } from 'hooks/guardian';
+import { useGetGuardiansInfo } from 'hooks/guardian';
 import Loading from 'components/Loading';
 import { randomId } from '@portkey/utils';
 import { request } from 'api';
@@ -24,7 +24,6 @@ import myEvents from 'utils/deviceEvent';
 import { VerifierImage } from '../components/VerifierImage';
 import { cancelLoginAccount } from 'utils/guardian';
 import { useGetCurrentCAContract } from 'hooks/contract';
-
 interface GuardianDetailProps {
   route?: any;
 }
@@ -32,11 +31,10 @@ interface GuardianDetailProps {
 const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
   const { t } = useLanguage();
   const { params } = route;
-  const getGuardiansList = useGetGuardiansList();
+  const getGuardiansInfo = useGetGuardiansInfo();
   const { userGuardiansList } = useGuardiansInfo();
   const { caHash, address: managerAddress } = useCurrentWalletInfo();
   const getCurrentCAContract = useGetCurrentCAContract();
-
   const guardian = useMemo<UserGuardianItem | undefined>(
     () => (params?.guardian ? JSON.parse(params.guardian) : undefined),
     [params],
@@ -134,7 +132,7 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
       // if (loginIndex === -1) {}
       Loading.show();
       try {
-        const holderInfo = await getGuardiansList({ loginGuardianType: guardian.loginGuardianType });
+        const holderInfo = await getGuardiansInfo({ loginGuardianType: guardian.loginGuardianType });
         if (holderInfo.guardians) {
           Loading.hide();
           ActionSheet.alert({
@@ -166,7 +164,7 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
         ],
       });
     },
-    [getGuardiansList, guardian, onCancelLoginAccount, setLoginAccount, t, userGuardiansList],
+    [getGuardiansInfo, guardian, onCancelLoginAccount, setLoginAccount, t, userGuardiansList],
   );
 
   return (

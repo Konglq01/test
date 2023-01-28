@@ -1,6 +1,6 @@
 import { GUARDIAN_TYPE_TYPE } from '@portkey/store/store-ca/guardians/utils';
 import { resetWallet } from '@portkey/store/store-ca/wallet/actions';
-import { LoginType } from '@portkey/types/types-ca/wallet';
+import { GuardiansInfo } from '@portkey/types/guardian';
 import { VerifierItem } from '@portkey/types/verifier';
 import ActionSheet from 'components/ActionSheet';
 import { AppDispatch } from 'store';
@@ -28,16 +28,15 @@ export function queryFailAlert(dispatch: AppDispatch, isRecovery?: boolean, isRe
     ],
   });
 }
-export function handleUserGuardiansList(holderInfo: any, verifierServers: VerifierItem[]) {
+export function handleUserGuardiansList(holderInfo: GuardiansInfo, verifierServers: VerifierItem[]) {
   const { loginGuardianAccountIndexes, guardianAccounts } = holderInfo;
-  return guardianAccounts.map((item: any, index: number) => {
+  return guardianAccounts.map((item, index: number) => {
     const { value, guardian } = item;
 
     return {
       ...item,
-      loginGuardianType: value,
-      // TODO: guardiansType
-      guardiansType: typeof guardian.type === 'string' ? (GUARDIAN_TYPE_TYPE as any)[guardian.type] : guardian.type,
+      guardianAccount: value,
+      guardianType: typeof guardian.type === 'string' ? (GUARDIAN_TYPE_TYPE as any)[guardian.type] : guardian.type,
       key: `${value}&${guardian.verifier.id}`,
       verifier: verifierServers.find(verifierItem => verifierItem.id === guardian.verifier.id),
       isLoginAccount: loginGuardianAccountIndexes.includes(index),

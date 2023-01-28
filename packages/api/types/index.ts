@@ -1,6 +1,9 @@
 import { CustomFetchConfig } from '@portkey/utils/fetch';
 
-export type RequestConfig = CustomFetchConfig & { baseURL: string; url?: string };
+export interface RequestConfig extends CustomFetchConfig {
+  baseURL: string;
+  url?: string;
+}
 
 export type UrlObj = { [key: string]: RequestConfig };
 

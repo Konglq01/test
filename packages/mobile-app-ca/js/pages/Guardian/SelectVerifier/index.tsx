@@ -32,10 +32,10 @@ export default function SelectVerifier() {
 
   const [selectedVerifier, setSelectedVerifier] = useState(verifierList[0]);
 
-  const { loginGuardianType } = useRouterParams<{ loginGuardianType?: string }>();
+  const { loginAccount } = useRouterParams<{ loginAccount?: string }>();
   const onConfirm = useCallback(async () => {
     ActionSheet.alert({
-      title2: `${selectedVerifier.name} will send a verification code to ${loginGuardianType} to verify your email address.`,
+      title2: `${selectedVerifier.name} will send a verification code to ${loginAccount} to verify your email address.`,
       buttons: [
         {
           title: t('Cancel'),
@@ -52,21 +52,21 @@ export default function SelectVerifier() {
                 baseURL: selectedVerifier.url,
                 data: {
                   type: 0,
-                  loginGuardianType,
+                  loginAccount,
                   managerUniqueId,
                 },
               });
 
               if (req.verifierSessionId) {
                 navigationService.navigate('VerifierDetails', {
-                  loginGuardianType,
+                  loginAccount,
                   verifierSessionId: req.verifierSessionId,
                   managerUniqueId,
                   guardianItem: {
                     isLoginAccount: true,
                     verifier: selectedVerifier,
-                    loginGuardianType,
-                    guardiansType: LoginType.email,
+                    loginAccount,
+                    guardianType: LoginType.email,
                   },
                 });
               } else {
@@ -80,7 +80,7 @@ export default function SelectVerifier() {
         },
       ],
     });
-  }, [loginGuardianType, selectedVerifier, t]);
+  }, [loginAccount, selectedVerifier, t]);
   return (
     <PageContainer
       containerStyles={styles.containerStyles}

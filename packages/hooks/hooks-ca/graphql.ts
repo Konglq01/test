@@ -22,7 +22,8 @@ export function useIntervalQueryCAInfoByAddress(network: NetworkType, address?: 
             [address + network]: {
               managerInfo: {
                 managerUniqueId: loginGuardianTypeInfo[0].id,
-                loginGuardianType: loginGuardianTypeInfo[0].loginGuardianType,
+                // TODO type
+                // loginAccount: loginGuardianTypeInfo[0].loginAccount,
                 //TODO: dynamic type
                 type: LoginType.email,
                 verificationType: VerificationType.addManager,

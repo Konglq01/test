@@ -83,7 +83,7 @@ function GuardianItemButton({
         baseURL: guardianItem.verifier?.url,
         data: {
           type: 0,
-          loginGuardianType: guardianItem.loginGuardianType,
+          guardianAccount: guardianItem.guardianAccount,
           managerUniqueId,
         },
       });
@@ -99,7 +99,7 @@ function GuardianItemButton({
           guardianItem,
           verifierSessionId: req.verifierSessionId,
           managerUniqueId,
-          loginGuardianType: guardianItem.loginGuardianType,
+          guardianAccount: guardianItem.guardianAccount,
           verificationType: _verificationType,
           guardianKey: guardianItem.key,
         });
@@ -126,7 +126,7 @@ function GuardianItemButton({
     navigationService.push('VerifierDetails', {
       guardianItem,
       verifierSessionId,
-      loginGuardianType: guardianItem.loginGuardianType,
+      guardianAccount: guardianItem.guardianAccount,
       managerUniqueId,
       startResend: true,
       verificationType: _verificationType,
@@ -199,10 +199,10 @@ export default function GuardianAccountItem({
         </View>
       )}
       <View style={[GStyles.flexRow, GStyles.itemCenter, GStyles.flex1]}>
-        <Svg icon={LoginGuardianTypeIcon[guardianItem.guardiansType as LoginType] as any} size={pTd(32)} />
+        <Svg icon={LoginGuardianTypeIcon[guardianItem.guardianType as LoginType] as any} size={pTd(32)} />
         <VerifierImage size={pTd(32)} uri={guardianItem.verifier?.imageUrl} style={styles.iconStyle} />
         <TextM numberOfLines={1} style={[styles.nameStyle, GStyles.flex1]}>
-          {guardianItem.loginGuardianType}
+          {guardianItem.guardianAccount}
         </TextM>
       </View>
       {!isButtonHide && (
