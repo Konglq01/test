@@ -69,14 +69,14 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
       const req = await request.verification.sendCode({
         baseURL: guardian.verifier?.url,
         data: {
-          type: guardian.guardiansType,
-          loginGuardianType: guardian.loginGuardianType,
+          type: guardian.guardianType,
+          guardianAccount: guardian.guardianAccount,
           managerUniqueId,
         },
       });
       if (req.verifierSessionId) {
         navigationService.navigate('VerifierDetails', {
-          loginGuardianType: guardian.loginGuardianType,
+          guardianAccount: guardian.guardianAccount,
           verifierSessionId: req.verifierSessionId,
           managerUniqueId,
           verificationType: VerificationType.setLoginAccount,
@@ -94,15 +94,15 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
   const onLoginAccountChange = useCallback(
     async (value: boolean) => {
       if (guardian === undefined || userGuardiansList === undefined) return;
-      const email = guardian.loginGuardianType;
+      const email = guardian.guardianAccount;
 
       if (!value) {
         const loginIndex = userGuardiansList.findIndex(
           item =>
             item.isLoginAccount &&
             !(
-              item.guardiansType === guardian.guardiansType &&
-              item.loginGuardianType === guardian.loginGuardianType &&
+              item.guardianType === guardian.guardianType &&
+              item.guardianAccount === guardian.guardianAccount &&
               item.verifier?.url === guardian.verifier?.url
             ),
         );
@@ -125,14 +125,14 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
       // const loginIndex = userGuardiansList.findIndex(
       //   item =>
       //     item.isLoginAccount &&
-      //     item.guardiansType === guardian.guardiansType &&
-      //     item.loginGuardianType === guardian.loginGuardianType &&
+      //     item.guardianType === guardian.guardianType &&
+      //     item.guardianAccount === guardian.guardianAccount &&
       //     item.verifier?.url !== guardian.verifier?.url,
       // );
       // if (loginIndex === -1) {}
       Loading.show();
       try {
-        const holderInfo = await getGuardiansInfo({ loginGuardianType: guardian.loginGuardianType });
+        const holderInfo = await getGuardiansInfo({ loginAccount: guardian.guardianAccount });
         if (holderInfo.guardians) {
           Loading.hide();
           ActionSheet.alert({
@@ -176,7 +176,7 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
       <View style={pageStyles.contentWrap}>
         <View style={pageStyles.guardianInfoWrap}>
           <View style={pageStyles.guardianTypeWrap}>
-            <TextM>{guardian?.loginGuardianType || ''}</TextM>
+            <TextM>{guardian?.guardianAccount || ''}</TextM>
           </View>
           <View style={pageStyles.verifierInfoWrap}>
             <VerifierImage style={GStyles.marginRight(8)} size={pTd(30)} uri={guardian?.verifier?.imageUrl} />

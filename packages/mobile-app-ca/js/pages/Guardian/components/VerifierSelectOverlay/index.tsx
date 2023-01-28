@@ -8,7 +8,6 @@ import Svg from 'components/Svg';
 import { TextL, TextXL } from 'components/CommonText';
 import { pTd } from 'utils/unit';
 import { useLanguage } from 'i18n/hooks';
-import { defaultColors } from 'assets/theme';
 import OverlayBody from 'components/OverlayModal/OverlayBody';
 import { VerifierImage } from '../VerifierImage';
 

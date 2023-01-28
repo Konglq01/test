@@ -54,8 +54,8 @@ const GuardianEdit: React.FC = () => {
 
   useEffect(() => {
     if (editGuardian) {
-      setSelectedType(LOGIN_TYPE_LIST.find(item => item.value === editGuardian?.guardiansType));
-      setEmail(editGuardian?.loginGuardianType);
+      setSelectedType(LOGIN_TYPE_LIST.find(item => item.value === editGuardian?.guardianType));
+      setEmail(editGuardian?.guardianAccount);
       setSelectedVerifier(verifierList.find(item => item.name === editGuardian?.verifier?.name));
     }
   }, [editGuardian, verifierList]);
@@ -81,8 +81,8 @@ const GuardianEdit: React.FC = () => {
     if (
       userGuardiansList?.findIndex(
         guardian =>
-          guardian.guardiansType === selectedType?.value &&
-          guardian.loginGuardianType === email &&
+          guardian.guardianType === selectedType?.value &&
+          guardian.guardianAccount === email &&
           guardian.verifier?.url === selectedVerifier?.url,
       ) !== -1
     ) {
@@ -125,21 +125,21 @@ const GuardianEdit: React.FC = () => {
                 baseURL: selectedVerifier.url,
                 data: {
                   type: selectedType.value,
-                  loginGuardianType: email,
+                  guardianAccount: email,
                   managerUniqueId,
                 },
               });
               if (req.verifierSessionId) {
                 navigationService.navigate('VerifierDetails', {
-                  loginGuardianType: email,
+                  guardianAccount: email,
                   verifierSessionId: req.verifierSessionId,
                   managerUniqueId,
                   verificationType: VerificationType.addGuardian,
                   guardianItem: {
                     isLoginAccount: false,
                     verifier: selectedVerifier,
-                    loginGuardianType: email,
-                    guardiansType: LoginType.email,
+                    guardianAccount: email,
+                    guardianType: LoginType.email,
                   },
                 });
               } else {
