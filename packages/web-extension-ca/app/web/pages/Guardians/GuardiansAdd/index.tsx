@@ -127,7 +127,7 @@ export default function AddGuardian() {
         guardianAccount: emailVal as string,
         type: LoginStrType[guardianType as LoginType],
         baseUrl: selectVerifierItem?.url || '',
-        verifierName: '',
+        id: selectVerifierItem?.id || '',
       });
       setLoading(false);
       if (result.verifierSessionId) {

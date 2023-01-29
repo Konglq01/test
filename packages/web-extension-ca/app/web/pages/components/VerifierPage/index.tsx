@@ -63,7 +63,8 @@ export default function VerifierPage({
 
           const res = await checkVerificationCode({
             baseUrl: currentNetwork.apiUrl,
-            verifierSessionId: currentGuardian?.sessionId,
+            guardianAccount: loginAccount.guardianAccount,
+            verifierSessionId: currentGuardian.sessionId,
             verificationCode: code,
             endPoint: currentGuardian.verifier?.url || '',
           });
@@ -97,7 +98,7 @@ export default function VerifierPage({
       guardianAccount: currentGuardian.guardianAccount,
       type: LoginStrType[guardianType],
       baseUrl: currentGuardian?.verifier?.url || '',
-      verifierName: '',
+      id: currentGuardian.verifier?.id || '',
     });
     setLoading(false);
     if (res.verifierSessionId) {

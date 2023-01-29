@@ -51,8 +51,7 @@ export default function SelectVerifier() {
         guardianAccount: loginAccount.guardianAccount,
         type: LoginStrType[loginAccount.loginType],
         baseUrl: selectItem?.url || '',
-        // TODO
-        verifierName: selectItem.name,
+        id: selectItem.id,
       });
       setLoading(false);
       if (result.verifierSessionId) {

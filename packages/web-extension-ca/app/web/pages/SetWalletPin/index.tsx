@@ -147,7 +147,7 @@ export default function SetWalletPin() {
 
         const managerInfo = {
           managerUniqueId: requestId,
-          loginGuardianType: loginAccount?.guardianAccount,
+          loginAccount: loginAccount?.guardianAccount,
           type: loginAccount.loginType,
           verificationType: state === 'login' ? VerificationType.communityRecovery : VerificationType.register,
         };

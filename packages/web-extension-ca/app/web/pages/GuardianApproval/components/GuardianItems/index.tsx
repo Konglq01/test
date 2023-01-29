@@ -40,7 +40,7 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
           guardianAccount: item?.guardianAccount,
           type: LoginStrType[item.guardianType],
           baseUrl: item?.verifier?.url || '',
-          verifierName: item?.verifier?.name || '',
+          id: item?.verifier?.id || '',
         });
         setLoading(false);
         if (result.verifierSessionId) {
@@ -78,7 +78,7 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
           guardianAccount: item?.guardianAccount,
           type: LoginStrType[loginAccount.loginType],
           baseUrl: item?.verifier?.url || '',
-          verifierName: item.verifier?.name || '',
+          id: item.verifier?.id || '',
         });
         setLoading(false);
         if (result.verifierSessionId) {

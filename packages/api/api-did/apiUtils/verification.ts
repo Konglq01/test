@@ -1,13 +1,11 @@
-import { LoginType, TLoginStrType } from '@portkey/types/types-ca/wallet';
-import { VerificationType } from '@portkey/types/verifier';
+import { TLoginStrType } from '@portkey/types/types-ca/wallet';
 import { request } from '..';
 
 interface SendVerificationCodeParams {
   baseUrl: string;
   type: TLoginStrType;
   guardianAccount: string;
-  // TODO
-  verifierName: string;
+  id: string;
 }
 export function sendVerificationCode(params: SendVerificationCodeParams): Promise<any> {
   return request.verify.sendVerificationRequest({
@@ -15,7 +13,7 @@ export function sendVerificationCode(params: SendVerificationCodeParams): Promis
     params: {
       type: params.type,
       guardianAccount: params.guardianAccount,
-      verifierName: params.verifierName,
+      id: params.id,
     },
   });
 }
@@ -23,6 +21,7 @@ export function sendVerificationCode(params: SendVerificationCodeParams): Promis
 interface CheckVerificationCodeProps {
   baseUrl: string;
   endPoint: string;
+  guardianAccount: string;
   verifierSessionId: string;
   verificationCode: string;
 }
@@ -35,6 +34,7 @@ interface ErrorBack {
 export async function checkVerificationCode({
   baseUrl,
   endPoint,
+  guardianAccount,
   verificationCode,
   verifierSessionId,
 }: CheckVerificationCodeProps): Promise<{
@@ -48,16 +48,7 @@ export async function checkVerificationCode({
       endPoint,
       verificationCode,
       verifierSessionId,
+      guardianAccount,
     },
   });
-}
-
-export const getAccountVerifierList = async () => {
-  return;
-};
-
-interface loginGuardianTypeCheckParams {
-  type: LoginType;
-  loginGuardianType: string;
-  apiUrl?: string;
 }

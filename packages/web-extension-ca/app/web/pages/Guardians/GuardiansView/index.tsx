@@ -102,7 +102,7 @@ export default function GuardiansView() {
           guardianAccount: opGuardian?.guardianAccount as string,
           type: LoginStrType[opGuardian?.guardianType as LoginType],
           baseUrl: opGuardian?.verifier?.url || '',
-          verifierName: '',
+          id: opGuardian?.verifier?.id || '',
         });
         setLoading(false);
         if (result.verifierSessionId) {

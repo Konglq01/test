@@ -33,7 +33,8 @@ export default function QueryPage() {
         baseUrl: currentNetwork.apiUrl,
         type: LoginStrType[currentWalletInfo.managerInfo.type],
         verificationType: currentWalletInfo.managerInfo.verificationType,
-        loginGuardianType: currentWalletInfo.managerInfo.loginGuardianType,
+        // TODO
+        loginGuardianType: currentWalletInfo.managerInfo.loginAccount,
         managerUniqueId: currentWalletInfo.managerInfo.managerUniqueId,
       });
       if (walletResult.status !== 'pass') {
