@@ -1,0 +1,11 @@
+query caHolderTokenBalanceInfo($dto: GetCAHolderTokenBalanceDto){
+    caHolderTokenBalanceInfo(dto: $dto){
+        chainId
+        caAddress
+        tokenInfo{
+            symbol
+            decimals
+        }
+        balance
+    }
+}
