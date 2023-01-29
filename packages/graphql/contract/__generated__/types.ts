@@ -10,7 +10,7 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
-  Long: any;
+  Long: number;
 };
 
 export type CaHolderManagerChangeRecordDto = {
