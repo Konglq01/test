@@ -209,7 +209,7 @@ const getCAHolderByManager = async (network: NetworkType, params: GetCAHolderByM
     if (guardianResult.data.loginGuardianTypeInfo) {
       result.caHolderManagerInfo[0].loginGuardianTypeInfo = guardianResult.data.loginGuardianTypeInfo;
     } else {
-      result.caHolderManagerInfo[0].loginGuardianTypeInfo = []
+      result.caHolderManagerInfo[0].loginGuardianTypeInfo = [];
     }
   }
 

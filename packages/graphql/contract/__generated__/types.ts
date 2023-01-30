@@ -261,56 +261,45 @@ export type Query = {
   userNFTProtocolInfo?: Maybe<Array<Maybe<UserNftProtocolInfoDto>>>;
 };
 
-
 export type QueryCaHolderManagerChangeRecordInfoArgs = {
   dto?: InputMaybe<GetCaHolderManagerChangeRecordDto>;
 };
-
 
 export type QueryCaHolderManagerInfoArgs = {
   dto?: InputMaybe<GetCaHolderManagerInfoDto>;
 };
 
-
 export type QueryCaHolderTokenBalanceInfoArgs = {
   dto?: InputMaybe<GetCaHolderTokenBalanceDto>;
 };
-
 
 export type QueryCaHolderTransactionArgs = {
   dto?: InputMaybe<GetCaHolderTransactionDto>;
 };
 
-
 export type QueryCaHolderTransactionAddressInfoArgs = {
   dto?: InputMaybe<GetCaHolderTransactionAddressDto>;
 };
-
 
 export type QueryLoginGuardianTypeChangeRecordInfoArgs = {
   dto?: InputMaybe<GetLoginGuardianTypeChangeRecordDto>;
 };
 
-
 export type QueryLoginGuardianTypeInfoArgs = {
   dto?: InputMaybe<GetLoginGuardianTypeInfoDto>;
 };
-
 
 export type QueryNftProtocolInfoArgs = {
   dto?: InputMaybe<GetNftProtocolInfoDto>;
 };
 
-
 export type QueryTokenInfoArgs = {
   dto?: InputMaybe<GetTokenInfoDto>;
 };
 
-
 export type QueryUserNftInfoArgs = {
   dto?: InputMaybe<GetUserNftInfoDto>;
 };
-
 
 export type QueryUserNftProtocolInfoArgs = {
   dto?: InputMaybe<GetUserNftProtocolInfoDto>;
@@ -352,7 +341,7 @@ export enum TransactionStatus {
   NodeValidationFailed = 'NODE_VALIDATION_FAILED',
   NotExisted = 'NOT_EXISTED',
   Pending = 'PENDING',
-  PendingValidation = 'PENDING_VALIDATION'
+  PendingValidation = 'PENDING_VALIDATION',
 }
 
 export type TransferInfo = {

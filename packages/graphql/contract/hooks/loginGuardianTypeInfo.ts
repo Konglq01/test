@@ -7,22 +7,31 @@ export type LoginGuardianTypeInfoQueryVariables = Types.Exact<{
   dto?: Types.InputMaybe<Types.GetLoginGuardianTypeInfoDto>;
 }>;
 
-
-export type LoginGuardianTypeInfoQuery = { __typename?: 'Query', loginGuardianTypeInfo?: Array<{ __typename?: 'LoginGuardianTypeDto', id?: string | null, chainId?: string | null, caHash?: string | null, caAddress?: string | null, loginGuardianType?: string | null, type: number } | null> | null };
-
+export type LoginGuardianTypeInfoQuery = {
+  __typename?: 'Query';
+  loginGuardianTypeInfo?: Array<{
+    __typename?: 'LoginGuardianTypeDto';
+    id?: string | null;
+    chainId?: string | null;
+    caHash?: string | null;
+    caAddress?: string | null;
+    loginGuardianType?: string | null;
+    type: number;
+  } | null> | null;
+};
 
 export const LoginGuardianTypeInfoDocument = gql`
-    query loginGuardianTypeInfo($dto: GetLoginGuardianTypeInfoDto) {
-  loginGuardianTypeInfo(dto: $dto) {
-    id
-    chainId
-    caHash
-    caAddress
-    loginGuardianType
-    type
+  query loginGuardianTypeInfo($dto: GetLoginGuardianTypeInfoDto) {
+    loginGuardianTypeInfo(dto: $dto) {
+      id
+      chainId
+      caHash
+      caAddress
+      loginGuardianType
+      type
+    }
   }
-}
-    `;
+`;
 
 /**
  * __useLoginGuardianTypeInfoQuery__
@@ -40,14 +49,27 @@ export const LoginGuardianTypeInfoDocument = gql`
  *   },
  * });
  */
-export function useLoginGuardianTypeInfoQuery(baseOptions?: Apollo.QueryHookOptions<LoginGuardianTypeInfoQuery, LoginGuardianTypeInfoQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<LoginGuardianTypeInfoQuery, LoginGuardianTypeInfoQueryVariables>(LoginGuardianTypeInfoDocument, options);
-      }
-export function useLoginGuardianTypeInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<LoginGuardianTypeInfoQuery, LoginGuardianTypeInfoQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<LoginGuardianTypeInfoQuery, LoginGuardianTypeInfoQueryVariables>(LoginGuardianTypeInfoDocument, options);
-        }
+export function useLoginGuardianTypeInfoQuery(
+  baseOptions?: Apollo.QueryHookOptions<LoginGuardianTypeInfoQuery, LoginGuardianTypeInfoQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<LoginGuardianTypeInfoQuery, LoginGuardianTypeInfoQueryVariables>(
+    LoginGuardianTypeInfoDocument,
+    options,
+  );
+}
+export function useLoginGuardianTypeInfoLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<LoginGuardianTypeInfoQuery, LoginGuardianTypeInfoQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<LoginGuardianTypeInfoQuery, LoginGuardianTypeInfoQueryVariables>(
+    LoginGuardianTypeInfoDocument,
+    options,
+  );
+}
 export type LoginGuardianTypeInfoQueryHookResult = ReturnType<typeof useLoginGuardianTypeInfoQuery>;
 export type LoginGuardianTypeInfoLazyQueryHookResult = ReturnType<typeof useLoginGuardianTypeInfoLazyQuery>;
-export type LoginGuardianTypeInfoQueryResult = Apollo.QueryResult<LoginGuardianTypeInfoQuery, LoginGuardianTypeInfoQueryVariables>;
+export type LoginGuardianTypeInfoQueryResult = Apollo.QueryResult<
+  LoginGuardianTypeInfoQuery,
+  LoginGuardianTypeInfoQueryVariables
+>;
