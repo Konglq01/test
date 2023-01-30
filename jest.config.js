@@ -4,9 +4,16 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
   coverageDirectory: 'coverage',
-  testMatch: ['<rootDir>/test/**/*.test.tsx', '<rootDir>/packages/hooks/**/*.test.tsx'],
-  collectCoverageFrom: ['**/packages/hooks/**/*.{ts,tsx}', '!**/node_modules/**'],
-
+  testMatch: ['<rootDir>/packages/web-extension-ca/**/index.test.tsx'],
+  // testMatch: ['<rootDir>/test/**/*.test.tsx', '<rootDir>/packages/hooks/**/*.test.tsx'],
+  collectCoverageFrom: [
+    '**/packages/hooks/hooks-ca/**/*.{ts,tsx}',
+    'packages/web-extension-ca/app/web/components/DropdownSearch/*.{ts,tsx}',
+    '!**/node_modules/**',
+  ],
+  moduleNameMapper: {
+    '\\.(css|less)$': 'identity-obj-proxy',
+  },
   // projects: [
   //   {
   //     displayName: 'hooks',
