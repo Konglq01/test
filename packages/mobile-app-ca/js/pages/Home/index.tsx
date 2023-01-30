@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Button, Text } from '@rneui/base';
 import { ScrollView } from 'react-native-gesture-handler';
 import navigationService from '../../utils/navigationService';
