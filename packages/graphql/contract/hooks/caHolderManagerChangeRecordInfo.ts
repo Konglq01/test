@@ -23,6 +23,9 @@ export const CaHolderManagerChangeRecordInfoDocument = gql`
 }
     `;
 
+    
+    
+
 /**
  * __useCaHolderManagerChangeRecordInfoQuery__
  *
