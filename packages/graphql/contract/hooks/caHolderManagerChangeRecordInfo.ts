@@ -15,7 +15,7 @@ export type CaHolderManagerChangeRecordInfoQuery = {
     caHash?: string | null;
     manager?: string | null;
     changeType?: string | null;
-    blockHeight?: string | null;
+    blockHeight: number;
   } | null> | null;
 };
 

@@ -28,15 +28,15 @@ import {
   CaHolderTransactionAddressInfoQueryVariables,
 } from './hooks/caHolderTransactionAddressInfo';
 import {
-  LoginGuardianTypeChangeRecordInfoDocument,
-  LoginGuardianTypeChangeRecordInfoQuery,
-  LoginGuardianTypeChangeRecordInfoQueryVariables,
-} from './hooks/loginGuardianTypeChangeRecordInfo';
+  LoginGuardianAccountChangeRecordInfoDocument,
+  LoginGuardianAccountChangeRecordInfoQuery,
+  LoginGuardianAccountChangeRecordInfoQueryVariables,
+} from './hooks/loginGuardianAccountChangeRecordInfo';
 import {
-  LoginGuardianTypeInfoDocument,
-  LoginGuardianTypeInfoQuery,
-  LoginGuardianTypeInfoQueryVariables,
-} from './hooks/loginGuardianTypeInfo';
+  LoginGuardianAccountInfoDocument,
+  LoginGuardianAccountInfoQuery,
+  LoginGuardianAccountInfoQueryVariables,
+} from './hooks/loginGuardianAccountInfo';
 import { NftProtocolInfoDocument, NftProtocolInfoQuery, NftProtocolInfoQueryVariables } from './hooks/nftProtocolInfo';
 import { TokenInfoDocument, TokenInfoQuery, TokenInfoQueryVariables } from './hooks/tokenInfo';
 import { UserNftInfoDocument, UserNftInfoQuery, UserNftInfoQueryVariables } from './hooks/userNFTInfo';
@@ -107,25 +107,25 @@ const getCaHolderTransactionAddress = async (
 };
 
 // LoginGuardianTypeChangeRecord
-const getLoginGuardianTypeChangeRecord = async (
+const getLoginGuardianAccountChangeRecord = async (
   network: NetworkType,
-  params: LoginGuardianTypeChangeRecordInfoQueryVariables,
+  params: LoginGuardianAccountChangeRecordInfoQueryVariables,
 ) => {
   const apolloClient = getApolloClient(network);
 
-  const result = await apolloClient.query<LoginGuardianTypeChangeRecordInfoQuery>({
-    query: LoginGuardianTypeChangeRecordInfoDocument,
+  const result = await apolloClient.query<LoginGuardianAccountChangeRecordInfoQuery>({
+    query: LoginGuardianAccountChangeRecordInfoDocument,
     variables: params,
   });
   return result;
 };
 
 // LoginGuardianType
-const getLoginGuardianType = async (network: NetworkType, params: LoginGuardianTypeInfoQueryVariables) => {
+const getLoginGuardianAccount = async (network: NetworkType, params: LoginGuardianAccountInfoQueryVariables) => {
   const apolloClient = getApolloClient(network);
 
-  const result = await apolloClient.query<LoginGuardianTypeInfoQuery>({
-    query: LoginGuardianTypeInfoDocument,
+  const result = await apolloClient.query<LoginGuardianAccountInfoQuery>({
+    query: LoginGuardianAccountInfoDocument,
     variables: params,
   });
   return result;
@@ -190,13 +190,13 @@ const getCAHolderByManager = async (network: NetworkType, params: GetCAHolderByM
     caHolderManagerInfo: CaHolderWithGuardian[];
   } = {
     caHolderManagerInfo: caResult.data.caHolderManagerInfo
-      ? caResult.data.caHolderManagerInfo.map(item => ({ ...item, loginGuardianTypeInfo: [] }))
+      ? caResult.data.caHolderManagerInfo.map(item => ({ ...item, loginGuardianAccountInfo: [] }))
       : [],
   };
 
   if (result.caHolderManagerInfo.length > 0) {
     const caHash = result.caHolderManagerInfo[0].caHash;
-    const guardianResult = await getLoginGuardianType(network, {
+    const guardianResult = await getLoginGuardianAccount(network, {
       dto: {
         chainId: params.chainId,
         caHash,
@@ -206,10 +206,11 @@ const getCAHolderByManager = async (network: NetworkType, params: GetCAHolderByM
     });
 
     if (guardianResult.error) throw guardianResult.error;
-    if (guardianResult.data.loginGuardianTypeInfo) {
-      result.caHolderManagerInfo[0].loginGuardianTypeInfo = guardianResult.data.loginGuardianTypeInfo;
+
+    if (guardianResult.data.loginGuardianAccountInfo) {
+      result.caHolderManagerInfo[0].loginGuardianAccountInfo = guardianResult.data.loginGuardianAccountInfo;
     } else {
-      result.caHolderManagerInfo[0].loginGuardianTypeInfo = [];
+      result.caHolderManagerInfo[0].loginGuardianAccountInfo = [];
     }
   }
 
@@ -221,12 +222,12 @@ export {
   getNFTProtocolInfo,
   getCAHolderTransaction,
   getCAHolderManagerInfo,
-  getLoginGuardianType,
+  getLoginGuardianAccount,
   getCAHolderByManager,
   getCaHolderTokenBalance,
   getCaHolderTransactionAddress,
   getCaHolderManagerChangeRecord,
-  getLoginGuardianTypeChangeRecord,
+  getLoginGuardianAccountChangeRecord,
   getUserNftInfo,
   getUserNftProtocolInfo,
 };

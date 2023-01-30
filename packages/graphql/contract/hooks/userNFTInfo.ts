@@ -14,7 +14,7 @@ export type UserNftInfoQuery = {
     id?: string | null;
     chainId?: string | null;
     caAddress?: string | null;
-    quantity: number;
+    balance: number;
     nftInfo?: {
       __typename?: 'NFTItemInfoDto';
       id?: string | null;
@@ -42,7 +42,7 @@ export const UserNftInfoDocument = gql`
       id
       chainId
       caAddress
-      quantity
+      balance
       nftInfo {
         id
         protocolName
