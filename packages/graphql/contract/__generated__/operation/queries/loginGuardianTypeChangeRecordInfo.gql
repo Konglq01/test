@@ -1,0 +1,10 @@
+query loginGuardianTypeChangeRecordInfo($dto: GetLoginGuardianTypeChangeRecordDto){
+    loginGuardianTypeChangeRecordInfo(dto: $dto){
+        id
+        caHash
+        caAddress
+        changeType
+        loginGuardianType
+        blockHeight
+    }
+}

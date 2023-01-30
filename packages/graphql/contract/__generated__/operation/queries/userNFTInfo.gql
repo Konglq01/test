@@ -1,0 +1,25 @@
+query userNFTInfo($dto: GetUserNFTInfoDto){
+    userNFTInfo(dto: $dto){
+        id
+        chainId
+        caAddress
+        quantity
+        nftInfo{
+            id
+            protocolName
+            symbol
+            tokenId
+            owner
+            minter
+            quantity
+            alias
+            baseUri
+            uri
+            creator
+            nftType
+            totalQuantity
+            tokenHash
+            imageUrl
+        }
+    }
+}

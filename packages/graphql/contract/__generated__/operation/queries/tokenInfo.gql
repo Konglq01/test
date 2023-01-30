@@ -1,0 +1,17 @@
+query tokenInfo($dto: GetTokenInfoDto){
+    tokenInfo(dto: $dto){
+        id
+        chainId
+        blockHash
+        blockHeight
+        previousBlockHash
+        symbol
+        tokenContractAddress
+        decimals
+        totalSupply
+        tokenName
+        issuer
+        isBurnable
+        issueChainId
+    }
+}
