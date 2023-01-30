@@ -5,7 +5,6 @@ import BackHeader from 'components/BackHeader';
 import CustomSvg from 'components/CustomSvg';
 import { AddressItem } from '@portkey/types/types-ca/contact';
 import { useCopyToClipboard } from 'react-use';
-import { uniqueId } from 'lodash';
 import './index.less';
 import { useCallback } from 'react';
 
@@ -56,8 +55,8 @@ export default function ViewContact() {
           {t('Edit')}
         </Button>
         <div className="contact-item-addresses">
-          {addresses.map((ads: AddressItem) => (
-            <div className="flex-between address-item" key={uniqueId()}>
+          {addresses.map((ads: AddressItem, index: number) => (
+            <div className="flex-between address-item" key={index}>
               <div>
                 <div className="address">{`ELF_${ads?.address}_${ads?.chainId}`}</div>
                 <div className="chain">{`${ads?.chainType} ${ads?.chainId}`}</div>
