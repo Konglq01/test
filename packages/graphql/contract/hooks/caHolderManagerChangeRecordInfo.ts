@@ -7,24 +7,29 @@ export type CaHolderManagerChangeRecordInfoQueryVariables = Types.Exact<{
   dto?: Types.InputMaybe<Types.GetCaHolderManagerChangeRecordDto>;
 }>;
 
-
-export type CaHolderManagerChangeRecordInfoQuery = { __typename?: 'Query', caHolderManagerChangeRecordInfo?: Array<{ __typename?: 'CAHolderManagerChangeRecordDto', caAddress?: string | null, caHash?: string | null, manager?: string | null, changeType?: string | null, blockHeight?: string | null } | null> | null };
-
+export type CaHolderManagerChangeRecordInfoQuery = {
+  __typename?: 'Query';
+  caHolderManagerChangeRecordInfo?: Array<{
+    __typename?: 'CAHolderManagerChangeRecordDto';
+    caAddress?: string | null;
+    caHash?: string | null;
+    manager?: string | null;
+    changeType?: string | null;
+    blockHeight?: string | null;
+  } | null> | null;
+};
 
 export const CaHolderManagerChangeRecordInfoDocument = gql`
-    query caHolderManagerChangeRecordInfo($dto: GetCAHolderManagerChangeRecordDto) {
-  caHolderManagerChangeRecordInfo(dto: $dto) {
-    caAddress
-    caHash
-    manager
-    changeType
-    blockHeight
+  query caHolderManagerChangeRecordInfo($dto: GetCAHolderManagerChangeRecordDto) {
+    caHolderManagerChangeRecordInfo(dto: $dto) {
+      caAddress
+      caHash
+      manager
+      changeType
+      blockHeight
+    }
   }
-}
-    `;
-
-    
-    
+`;
 
 /**
  * __useCaHolderManagerChangeRecordInfoQuery__
@@ -42,14 +47,35 @@ export const CaHolderManagerChangeRecordInfoDocument = gql`
  *   },
  * });
  */
-export function useCaHolderManagerChangeRecordInfoQuery(baseOptions?: Apollo.QueryHookOptions<CaHolderManagerChangeRecordInfoQuery, CaHolderManagerChangeRecordInfoQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<CaHolderManagerChangeRecordInfoQuery, CaHolderManagerChangeRecordInfoQueryVariables>(CaHolderManagerChangeRecordInfoDocument, options);
-      }
-export function useCaHolderManagerChangeRecordInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CaHolderManagerChangeRecordInfoQuery, CaHolderManagerChangeRecordInfoQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<CaHolderManagerChangeRecordInfoQuery, CaHolderManagerChangeRecordInfoQueryVariables>(CaHolderManagerChangeRecordInfoDocument, options);
-        }
+export function useCaHolderManagerChangeRecordInfoQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    CaHolderManagerChangeRecordInfoQuery,
+    CaHolderManagerChangeRecordInfoQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<CaHolderManagerChangeRecordInfoQuery, CaHolderManagerChangeRecordInfoQueryVariables>(
+    CaHolderManagerChangeRecordInfoDocument,
+    options,
+  );
+}
+export function useCaHolderManagerChangeRecordInfoLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    CaHolderManagerChangeRecordInfoQuery,
+    CaHolderManagerChangeRecordInfoQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<CaHolderManagerChangeRecordInfoQuery, CaHolderManagerChangeRecordInfoQueryVariables>(
+    CaHolderManagerChangeRecordInfoDocument,
+    options,
+  );
+}
 export type CaHolderManagerChangeRecordInfoQueryHookResult = ReturnType<typeof useCaHolderManagerChangeRecordInfoQuery>;
-export type CaHolderManagerChangeRecordInfoLazyQueryHookResult = ReturnType<typeof useCaHolderManagerChangeRecordInfoLazyQuery>;
-export type CaHolderManagerChangeRecordInfoQueryResult = Apollo.QueryResult<CaHolderManagerChangeRecordInfoQuery, CaHolderManagerChangeRecordInfoQueryVariables>;
+export type CaHolderManagerChangeRecordInfoLazyQueryHookResult = ReturnType<
+  typeof useCaHolderManagerChangeRecordInfoLazyQuery
+>;
+export type CaHolderManagerChangeRecordInfoQueryResult = Apollo.QueryResult<
+  CaHolderManagerChangeRecordInfoQuery,
+  CaHolderManagerChangeRecordInfoQueryVariables
+>;
