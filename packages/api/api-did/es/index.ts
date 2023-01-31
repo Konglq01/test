@@ -3,7 +3,7 @@ import { ESBaseConfig } from './type';
 const Method = 'GET';
 const BaseESUrl = `/api/app/Es/`;
 
-const KeyList = ['getUserTokenList'] as const;
+const KeyList = ['getUserTokenList', 'getChainsInfo'] as const;
 
 const ApiObject: Record<typeof KeyList[number], ESBaseConfig> = {
   getUserTokenList: {
@@ -15,6 +15,12 @@ const ApiObject: Record<typeof KeyList[number], ESBaseConfig> = {
         fort: 'token.symbol.keyword',
         sortType: 0,
       },
+    },
+  },
+  getChainsInfo: {
+    target: `${BaseESUrl}chainsinfoindex`,
+    config: {
+      method: Method,
     },
   },
 };

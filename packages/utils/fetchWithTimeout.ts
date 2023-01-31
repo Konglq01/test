@@ -1,4 +1,4 @@
-import { memoize } from 'lodash';
+import memoize from 'lodash/memoize';
 import { SECOND } from '@portkey/constants';
 // How to use
 // const fetchWithTimeout = getFetchWithTimeout();

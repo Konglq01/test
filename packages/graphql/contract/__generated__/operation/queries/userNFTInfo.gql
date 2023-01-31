@@ -3,7 +3,7 @@ query userNFTInfo($dto: GetUserNFTInfoDto){
         id
         chainId
         caAddress
-        quantity
+        balance
         nftInfo{
             id
             protocolName
