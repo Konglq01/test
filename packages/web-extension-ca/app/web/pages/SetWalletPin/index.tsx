@@ -12,7 +12,7 @@ import { createWallet, setCAInfo, setManagerInfo } from '@portkey/store/store-ca
 import useLocationState from 'hooks/useLocationState';
 import { useTranslation } from 'react-i18next';
 import { recoveryDIDWallet, registerDIDWallet } from '@portkey/api/api-did/apiUtils/wallet';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
+import { useCurrentApiUrl, useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { VerificationType } from '@portkey/types/verifier';
 import { isWalletError } from '@portkey/store/wallet/utils';
 import { useHardwareBack } from 'hooks/useHardwareBack';
@@ -21,6 +21,7 @@ import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 import AElf from 'aelf-sdk';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 import './index.less';
+import { randomId } from '@portkey/utils';
 
 export default function SetWalletPin() {
   const [form] = Form.useForm();
@@ -35,6 +36,7 @@ export default function SetWalletPin() {
   const { setLoading } = useLoading();
   const { walletInfo } = useCurrentWallet();
   const [returnOpen, setReturnOpen] = useState<boolean>();
+  const baseUrl = useCurrentApiUrl();
   const { scanWalletInfo, scanCaWalletInfo, loginAccount, registerVerifier } = useLoginInfo();
   const fetchWalletResult = useFetchWalletCAAddress();
 
@@ -45,9 +47,9 @@ export default function SetWalletPin() {
       console.log(loginAccount, 'requestRegisterDIDWallet==');
       if (!loginAccount?.guardianAccount || !LoginStrType[loginAccount.loginType])
         throw 'Missing account!!! Please login/register again';
-      // const baseUrl
+      const requestId = randomId();
       if (!registerVerifier) throw 'Missing Verifier Server';
-      return await registerDIDWallet({
+      const result = await registerDIDWallet({
         baseUrl: currentNetwork.apiUrl,
         type: LoginStrType[loginAccount.loginType],
         loginGuardianAccount: loginAccount.guardianAccount,
@@ -59,9 +61,13 @@ export default function SetWalletPin() {
         signature: registerVerifier.signature,
         context: {
           clientId: managerAddress,
-          requestId: managerAddress,
+          requestId: requestId,
         },
       });
+      return {
+        requestId,
+        sessionId: result.sessionId,
+      };
     },
     [currentNetwork.apiUrl, loginAccount, registerVerifier],
   );
@@ -82,8 +88,8 @@ export default function SetWalletPin() {
         throw 'Missing account!!! Please login/register again';
       if (!registerVerifier) throw 'Missing Verifier Server';
       const guardiansApproved = getGuardiansApproved();
-      // userGuardianStatus
-      return await recoveryDIDWallet({
+      const requestId = randomId();
+      const result = await recoveryDIDWallet({
         baseURL: currentNetwork.apiUrl,
         loginGuardianAccount: loginAccount.guardianAccount,
         managerAddress,
@@ -92,9 +98,14 @@ export default function SetWalletPin() {
         guardiansApproved,
         context: {
           clientId: managerAddress,
-          requestId: managerAddress,
+          requestId,
         },
       });
+
+      return {
+        requestId,
+        sessionId: result.sessionId,
+      };
     },
     [currentNetwork.apiUrl, loginAccount, registerVerifier, getGuardiansApproved],
   );
@@ -136,18 +147,20 @@ export default function SetWalletPin() {
         console.log(pin, walletInfo.address, 'onCreate==');
 
         // Step 9
-        let sessionId = '';
+        let sessionInfo = {
+          requestId: walletInfo.address,
+          sessionId: '',
+        };
 
         if (state === 'register') {
-          const sessionIdInfo = await requestRegisterDIDWallet({ managerAddress: _walletInfo.address });
-          sessionId = sessionIdInfo.sessionId;
+          sessionInfo = await requestRegisterDIDWallet({ managerAddress: _walletInfo.address });
         } else {
-          const sessionIdInfo = await requestRecoveryDIDWallet({ managerAddress: _walletInfo.address });
-          sessionId = sessionIdInfo.sessionId;
+          sessionInfo = await requestRecoveryDIDWallet({ managerAddress: _walletInfo.address });
         }
 
         const managerInfo = {
-          managerUniqueId: sessionId,
+          managerUniqueId: sessionInfo.sessionId,
+          requestId: sessionInfo.requestId,
           loginAccount: loginAccount?.guardianAccount,
           type: loginAccount.loginType,
           verificationType: state === 'login' ? VerificationType.communityRecovery : VerificationType.register,
@@ -173,12 +186,14 @@ export default function SetWalletPin() {
         await setPinAction(pin);
 
         // TODO Step 14 Only get Main Chain caAddress
+
+        // Socket
         const walletResult = await fetchWalletResult({
-          baseUrl: currentNetwork.apiUrl,
+          baseUrl,
           type: LoginStrType[loginAccount?.loginType],
           verificationType: state === 'login' ? VerificationType.communityRecovery : VerificationType.register,
           loginGuardianType: loginAccount.guardianAccount,
-          managerUniqueId: sessionId,
+          managerUniqueId: sessionInfo.sessionId,
         });
 
         if (walletResult.status !== 'pass') {
@@ -215,7 +230,7 @@ export default function SetWalletPin() {
       state,
       walletInfo,
       loginAccount,
-      currentNetwork.apiUrl,
+      baseUrl,
       setLoading,
       createByScan,
       dispatch,

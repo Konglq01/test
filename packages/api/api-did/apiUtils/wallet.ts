@@ -60,53 +60,20 @@ export const recoveryDIDWallet = async (
 };
 
 interface RequestCreateWalletParams {
-  type: string;
   baseUrl: string;
-  loginGuardianType: string;
-  managerAddress: string;
-  deviceString: string;
-  chainId: string;
-  verifierName: string;
-  verificationDoc: string;
-  signature: string;
-  verificationType: VerificationType;
+  requestId: string;
+  clientId: string;
 }
 
-export const requestCreateWallet = async ({
-  baseUrl,
-  type,
-  loginGuardianType,
-  managerAddress,
-  verificationType,
-  deviceString,
-  chainId,
-  verifierName,
-  verificationDoc,
-  signature,
-}: RequestCreateWalletParams) => {
-  let tmpFetch;
+export const requestCreateWallet = async ({ baseUrl, requestId, clientId }: RequestCreateWalletParams) => {
   let params = {
-    type,
-    loginGuardianType,
-    managerAddress,
-    deviceString,
-    chainId,
-    verifierName,
-    verificationDoc,
-    signature,
+    context: {
+      requestId,
+      clientId,
+    },
   };
-  switch (verificationType) {
-    case VerificationType.register:
-      tmpFetch = request.wallet.requestRegister;
-      break;
-    case VerificationType.communityRecovery:
-      tmpFetch = request.wallet.recoveryWallet;
 
-      break;
-    default:
-      throw Error('Unable to find the corresponding api');
-  }
-  return tmpFetch({
+  return request.wallet.getResponse({
     baseURL: baseUrl,
     params,
   });
