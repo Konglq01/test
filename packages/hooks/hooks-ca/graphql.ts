@@ -16,8 +16,9 @@ export function useIntervalQueryCAInfoByAddress(network: NetworkType, address?: 
           chainId: DefaultChainId,
           manager: address,
         });
+        if (caHolderManagerInfo.length === 0) return;
         const { caAddress, caHash, loginGuardianTypeInfo } = caHolderManagerInfo[0];
-        if (caAddress && caHash)
+        if (caAddress && caHash && loginGuardianTypeInfo.length > 0 && loginGuardianTypeInfo[0])
           setInfo({
             [address + network]: {
               managerInfo: {

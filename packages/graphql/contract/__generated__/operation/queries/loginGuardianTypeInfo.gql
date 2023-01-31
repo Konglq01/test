@@ -1,0 +1,10 @@
+query loginGuardianTypeInfo($dto: GetLoginGuardianTypeInfoDto){
+    loginGuardianTypeInfo(dto: $dto){
+        id
+        chainId
+        caHash
+        caAddress
+        loginGuardianType
+        type
+    }
+}
