@@ -87,7 +87,7 @@ export const getChainListAsync = createAsyncThunk(
     const baseUrl = NetworkList.find(item => item.networkType === _networkType)?.apiUrl;
     if (!baseUrl) throw Error('Unable to obtain the corresponding network');
     const response = await getChainList({ baseUrl });
-    if (!response) throw Error('No data');
-    dispatch(setChainListAction({ chainList: response, networkType: _networkType }));
+    if (!response?.items) throw Error('No data');
+    dispatch(setChainListAction({ chainList: response.items, networkType: _networkType }));
   },
 );
