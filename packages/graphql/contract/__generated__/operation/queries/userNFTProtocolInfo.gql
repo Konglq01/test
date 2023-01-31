@@ -1,0 +1,22 @@
+query userNFTProtocolInfo($dto: GetUserNFTProtocolInfoDto){
+    userNFTProtocolInfo(dto: $dto){
+        id
+        chainId
+        caAddress
+        tokenIds
+        nftProtocolInfo{
+            id
+            symbol
+            creator
+            nftType
+            protocolName
+            baseUri
+            isTokenIdReuse
+            supply
+            totalSupply
+            issueChainId
+            isBurnable
+            imageUrl
+        }
+    }
+}

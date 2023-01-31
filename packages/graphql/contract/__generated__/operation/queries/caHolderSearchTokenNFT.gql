@@ -1,0 +1,29 @@
+query caHolderSearchTokenNFT($dto: GetCAHolderSearchTokenNFTDto){
+    caHolderSearchTokenNFT(dto: $dto){
+        chainId
+        caAddress
+        balance
+        tokenInfo{
+            symbol
+            tokenContractAddress
+            decimals
+            totalSupply
+            tokenName
+            issuer
+            isBurnable
+            issueChainId
+        }
+        nftInfo{
+            protocolName
+            symbol
+            tokenId
+            nftContractAddress
+            owner
+            minter
+            quantity
+            alias
+            baseUri
+            uri
+        }
+    }
+}

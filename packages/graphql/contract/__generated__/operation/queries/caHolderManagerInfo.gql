@@ -1,0 +1,12 @@
+query caHolderManagerInfo($dto: GetCAHolderManagerInfoDto){
+    caHolderManagerInfo(dto: $dto){
+        id
+        chainId
+        caHash
+        caAddress
+        managers{
+            manager
+            deviceString
+        }
+    }
+}

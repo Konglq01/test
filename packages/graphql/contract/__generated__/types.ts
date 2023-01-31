@@ -10,12 +10,18 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
-  Long: any;
+  Long: number;
 };
+
+export enum BlockFilterType {
+  Block = 'BLOCK',
+  LogEvent = 'LOG_EVENT',
+  Transaction = 'TRANSACTION',
+}
 
 export type CaHolderManagerChangeRecordDto = {
   __typename?: 'CAHolderManagerChangeRecordDto';
-  blockHeight?: Maybe<Scalars['String']>;
+  blockHeight: Scalars['Long'];
   caAddress?: Maybe<Scalars['String']>;
   caHash?: Maybe<Scalars['String']>;
   changeType?: Maybe<Scalars['String']>;
@@ -29,6 +35,15 @@ export type CaHolderManagerDto = {
   chainId?: Maybe<Scalars['String']>;
   id?: Maybe<Scalars['String']>;
   managers?: Maybe<Array<Maybe<ManagerInfo>>>;
+};
+
+export type CaHolderSearchTokenNftDto = {
+  __typename?: 'CAHolderSearchTokenNFTDto';
+  balance: Scalars['Long'];
+  caAddress?: Maybe<Scalars['String']>;
+  chainId?: Maybe<Scalars['String']>;
+  nftInfo?: Maybe<NftSearchInfoDto>;
+  tokenInfo?: Maybe<TokenSearchInfoDto>;
 };
 
 export type CaHolderTokenBalanceDto = {
@@ -67,14 +82,13 @@ export type CaHolderTransactionDto = {
 };
 
 export type GetCaHolderManagerChangeRecordDto = {
-  caHash?: InputMaybe<Scalars['String']>;
   chainId?: InputMaybe<Scalars['String']>;
   endBlockHeight: Scalars['Long'];
   startBlockHeight: Scalars['Long'];
 };
 
 export type GetCaHolderManagerInfoDto = {
-  caAddress?: InputMaybe<Scalars['String']>;
+  caAddresses?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
   caHash?: InputMaybe<Scalars['String']>;
   chainId?: InputMaybe<Scalars['String']>;
   manager?: InputMaybe<Scalars['String']>;
@@ -82,8 +96,16 @@ export type GetCaHolderManagerInfoDto = {
   skipCount: Scalars['Int'];
 };
 
-export type GetCaHolderTokenBalanceDto = {
+export type GetCaHolderSearchTokenNftDto = {
   caAddress?: InputMaybe<Scalars['String']>;
+  chainId?: InputMaybe<Scalars['String']>;
+  maxResultCount: Scalars['Int'];
+  searchWord?: InputMaybe<Scalars['String']>;
+  skipCount: Scalars['Int'];
+};
+
+export type GetCaHolderTokenBalanceDto = {
+  caAddresses?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
   chainId?: InputMaybe<Scalars['String']>;
   maxResultCount: Scalars['Int'];
   skipCount: Scalars['Int'];
@@ -98,8 +120,8 @@ export type GetCaHolderTransactionAddressDto = {
 };
 
 export type GetCaHolderTransactionDto = {
-  address?: InputMaybe<Scalars['String']>;
   blockHash?: InputMaybe<Scalars['String']>;
+  caAddresses?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
   chainId?: InputMaybe<Scalars['String']>;
   maxResultCount: Scalars['Int'];
   methodNames?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
@@ -108,18 +130,17 @@ export type GetCaHolderTransactionDto = {
   transactionId?: InputMaybe<Scalars['String']>;
 };
 
-export type GetLoginGuardianTypeChangeRecordDto = {
-  caHash?: InputMaybe<Scalars['String']>;
+export type GetLoginGuardianAccountChangeRecordDto = {
   chainId?: InputMaybe<Scalars['String']>;
   endBlockHeight: Scalars['Long'];
   startBlockHeight: Scalars['Long'];
 };
 
-export type GetLoginGuardianTypeInfoDto = {
+export type GetLoginGuardianAccountInfoDto = {
   caAddress?: InputMaybe<Scalars['String']>;
   caHash?: InputMaybe<Scalars['String']>;
   chainId?: InputMaybe<Scalars['String']>;
-  loginGuardianType?: InputMaybe<Scalars['String']>;
+  loginGuardianAccount?: InputMaybe<Scalars['String']>;
   maxResultCount: Scalars['Int'];
   skipCount: Scalars['Int'];
 };
@@ -131,6 +152,11 @@ export type GetNftProtocolInfoDto = {
   symbol?: InputMaybe<Scalars['String']>;
 };
 
+export type GetSyncStateDto = {
+  chainId?: InputMaybe<Scalars['String']>;
+  filterType: BlockFilterType;
+};
+
 export type GetTokenInfoDto = {
   chainId?: InputMaybe<Scalars['String']>;
   maxResultCount: Scalars['Int'];
@@ -139,40 +165,54 @@ export type GetTokenInfoDto = {
 };
 
 export type GetUserNftInfoDto = {
-  caAddress?: InputMaybe<Scalars['String']>;
+  caAddresses?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
   chainId?: InputMaybe<Scalars['String']>;
   maxResultCount: Scalars['Int'];
   skipCount: Scalars['Int'];
   symbol?: InputMaybe<Scalars['String']>;
-  tokenId: Scalars['Long'];
+  tokenId?: Scalars['Long'];
 };
 
 export type GetUserNftProtocolInfoDto = {
-  caAddress?: InputMaybe<Scalars['String']>;
+  caAddresses?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
   chainId?: InputMaybe<Scalars['String']>;
   maxResultCount: Scalars['Int'];
   skipCount: Scalars['Int'];
   symbol?: InputMaybe<Scalars['String']>;
 };
 
-export type LoginGuardianTypeChangeRecordDto = {
-  __typename?: 'LoginGuardianTypeChangeRecordDto';
+export type GuardianAccountDto = {
+  __typename?: 'GuardianAccountDto';
+  guardian?: Maybe<GuardianDto>;
+  value?: Maybe<Scalars['String']>;
+};
+
+export type GuardianDto = {
+  __typename?: 'GuardianDto';
+  type: Scalars['Int'];
+  verifier?: Maybe<Scalars['String']>;
+};
+
+export type LoginGuardianAccountChangeRecordDto = {
+  __typename?: 'LoginGuardianAccountChangeRecordDto';
   blockHeight: Scalars['Long'];
   caAddress?: Maybe<Scalars['String']>;
   caHash?: Maybe<Scalars['String']>;
+  chainId?: Maybe<Scalars['String']>;
   changeType?: Maybe<Scalars['String']>;
   id?: Maybe<Scalars['String']>;
-  loginGuardianType?: Maybe<Scalars['String']>;
+  loginGuardianAccount?: Maybe<GuardianAccountDto>;
+  manager?: Maybe<Scalars['String']>;
 };
 
-export type LoginGuardianTypeDto = {
-  __typename?: 'LoginGuardianTypeDto';
+export type LoginGuardianAccountDto = {
+  __typename?: 'LoginGuardianAccountDto';
   caAddress?: Maybe<Scalars['String']>;
   caHash?: Maybe<Scalars['String']>;
   chainId?: Maybe<Scalars['String']>;
   id?: Maybe<Scalars['String']>;
-  loginGuardianType?: Maybe<Scalars['String']>;
-  type: Scalars['Int'];
+  loginGuardianAccount?: Maybe<GuardianAccountDto>;
+  manager?: Maybe<Scalars['String']>;
 };
 
 export type ManagerInfo = {
@@ -246,74 +286,92 @@ export type NftProtocolInfoDto = {
   uri?: Maybe<Scalars['String']>;
 };
 
+export type NftSearchInfoDto = {
+  __typename?: 'NFTSearchInfoDto';
+  alias?: Maybe<Scalars['String']>;
+  baseUri?: Maybe<Scalars['String']>;
+  minter?: Maybe<Scalars['String']>;
+  nftContractAddress?: Maybe<Scalars['String']>;
+  owner?: Maybe<Scalars['String']>;
+  protocolName?: Maybe<Scalars['String']>;
+  quantity: Scalars['Long'];
+  symbol?: Maybe<Scalars['String']>;
+  tokenId: Scalars['Long'];
+  uri?: Maybe<Scalars['String']>;
+};
+
 export type Query = {
   __typename?: 'Query';
   caHolderManagerChangeRecordInfo?: Maybe<Array<Maybe<CaHolderManagerChangeRecordDto>>>;
   caHolderManagerInfo?: Maybe<Array<Maybe<CaHolderManagerDto>>>;
+  caHolderSearchTokenNFT?: Maybe<Array<Maybe<CaHolderSearchTokenNftDto>>>;
   caHolderTokenBalanceInfo?: Maybe<Array<Maybe<CaHolderTokenBalanceDto>>>;
   caHolderTransaction?: Maybe<Array<Maybe<CaHolderTransactionDto>>>;
   caHolderTransactionAddressInfo?: Maybe<Array<Maybe<CaHolderTransactionAddressDto>>>;
-  loginGuardianTypeChangeRecordInfo?: Maybe<Array<Maybe<LoginGuardianTypeChangeRecordDto>>>;
-  loginGuardianTypeInfo?: Maybe<Array<Maybe<LoginGuardianTypeDto>>>;
+  loginGuardianAccountChangeRecordInfo?: Maybe<Array<Maybe<LoginGuardianAccountChangeRecordDto>>>;
+  loginGuardianAccountInfo?: Maybe<Array<Maybe<LoginGuardianAccountDto>>>;
   nftProtocolInfo?: Maybe<Array<Maybe<NftProtocolInfoDto>>>;
+  syncState?: Maybe<SyncStateDto>;
   tokenInfo?: Maybe<Array<Maybe<TokenInfoDto>>>;
   userNFTInfo?: Maybe<Array<Maybe<UserNftInfoDto>>>;
   userNFTProtocolInfo?: Maybe<Array<Maybe<UserNftProtocolInfoDto>>>;
 };
 
-
 export type QueryCaHolderManagerChangeRecordInfoArgs = {
   dto?: InputMaybe<GetCaHolderManagerChangeRecordDto>;
 };
-
 
 export type QueryCaHolderManagerInfoArgs = {
   dto?: InputMaybe<GetCaHolderManagerInfoDto>;
 };
 
+export type QueryCaHolderSearchTokenNftArgs = {
+  dto?: InputMaybe<GetCaHolderSearchTokenNftDto>;
+};
 
 export type QueryCaHolderTokenBalanceInfoArgs = {
   dto?: InputMaybe<GetCaHolderTokenBalanceDto>;
 };
 
-
 export type QueryCaHolderTransactionArgs = {
   dto?: InputMaybe<GetCaHolderTransactionDto>;
 };
-
 
 export type QueryCaHolderTransactionAddressInfoArgs = {
   dto?: InputMaybe<GetCaHolderTransactionAddressDto>;
 };
 
-
-export type QueryLoginGuardianTypeChangeRecordInfoArgs = {
-  dto?: InputMaybe<GetLoginGuardianTypeChangeRecordDto>;
+export type QueryLoginGuardianAccountChangeRecordInfoArgs = {
+  dto?: InputMaybe<GetLoginGuardianAccountChangeRecordDto>;
 };
 
-
-export type QueryLoginGuardianTypeInfoArgs = {
-  dto?: InputMaybe<GetLoginGuardianTypeInfoDto>;
+export type QueryLoginGuardianAccountInfoArgs = {
+  dto?: InputMaybe<GetLoginGuardianAccountInfoDto>;
 };
-
 
 export type QueryNftProtocolInfoArgs = {
   dto?: InputMaybe<GetNftProtocolInfoDto>;
 };
 
+export type QuerySyncStateArgs = {
+  dto?: InputMaybe<GetSyncStateDto>;
+};
 
 export type QueryTokenInfoArgs = {
   dto?: InputMaybe<GetTokenInfoDto>;
 };
 
-
 export type QueryUserNftInfoArgs = {
   dto?: InputMaybe<GetUserNftInfoDto>;
 };
 
-
 export type QueryUserNftProtocolInfoArgs = {
   dto?: InputMaybe<GetUserNftProtocolInfoDto>;
+};
+
+export type SyncStateDto = {
+  __typename?: 'SyncStateDto';
+  confirmedBlockHeight: Scalars['Long'];
 };
 
 export type TokenInfo = {
@@ -339,6 +397,18 @@ export type TokenInfoDto = {
   totalSupply: Scalars['Long'];
 };
 
+export type TokenSearchInfoDto = {
+  __typename?: 'TokenSearchInfoDto';
+  decimals: Scalars['Int'];
+  isBurnable: Scalars['Boolean'];
+  issueChainId: Scalars['Int'];
+  issuer?: Maybe<Scalars['String']>;
+  symbol?: Maybe<Scalars['String']>;
+  tokenContractAddress?: Maybe<Scalars['String']>;
+  tokenName?: Maybe<Scalars['String']>;
+  totalSupply: Scalars['Long'];
+};
+
 export type TransactionFee = {
   __typename?: 'TransactionFee';
   amount: Scalars['Long'];
@@ -352,7 +422,7 @@ export enum TransactionStatus {
   NodeValidationFailed = 'NODE_VALIDATION_FAILED',
   NotExisted = 'NOT_EXISTED',
   Pending = 'PENDING',
-  PendingValidation = 'PENDING_VALIDATION'
+  PendingValidation = 'PENDING_VALIDATION',
 }
 
 export type TransferInfo = {
@@ -366,11 +436,11 @@ export type TransferInfo = {
 
 export type UserNftInfoDto = {
   __typename?: 'UserNFTInfoDto';
+  balance: Scalars['Long'];
   caAddress?: Maybe<Scalars['String']>;
   chainId?: Maybe<Scalars['String']>;
   id?: Maybe<Scalars['String']>;
   nftInfo?: Maybe<NftItemInfoDto>;
-  quantity: Scalars['Long'];
 };
 
 export type UserNftProtocolInfoDto = {
