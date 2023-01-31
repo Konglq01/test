@@ -17,13 +17,11 @@ export const getHolderInfo = async ({
   };
 }) => {
   const resMessage = await SandboxEventService.dispatchAndReceive(SandboxEventTypes.callViewMethod, {
-    rpcUrl: 'http://192.168.67.35:8000',
+    rpcUrl,
     chainType,
-    address: '2RHf2fxsnEaM3wb6N1yGqPupNZbcCY98LgWbGSFWmWzgEs5Sjo',
+    address,
     methodName: 'GetHolderInfo',
-    paramsOption: {
-      caHash: 'f603f5cf3d88dea80b4495ac9a78275be32e038e06535a6785c766dc9c9d55c8',
-    },
+    paramsOption,
   });
 
   console.log(resMessage, 'resMessage===GetHolderInfo');

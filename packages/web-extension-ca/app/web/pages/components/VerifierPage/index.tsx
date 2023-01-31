@@ -14,8 +14,8 @@ import { setUserGuardianSessionIdAction } from '@portkey/store/store-ca/guardian
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
 import { LoginType } from '@portkey/types/types-ca/wallet';
 import { useEffectOnce } from 'react-use';
-import { LoginStrType } from '@portkey/store/store-ca/guardians/utils';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
+import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
+import { useCurrentApiUrl, useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 
 const MAX_TIMER = 60;
 
@@ -47,6 +47,7 @@ export default function VerifierPage({
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetworkInfo();
+  const baseUrl = useCurrentApiUrl();
 
   useEffectOnce(() => {
     isInitStatus && setTimer(MAX_TIMER);
@@ -58,15 +59,17 @@ export default function VerifierPage({
         console.log(code);
         if (code && code.length === 6) {
           if (!loginAccount?.guardianAccount) throw 'Missing account!!!';
-          if (!currentGuardian?.sessionId) throw 'Missing verifierSessionId!!!';
+          if (!guardianType && guardianType !== 0) return message.error('Missing guardiansType');
+          if (!currentGuardian?.verifierInfo) throw 'Missing verifierInfo!!!';
           setLoading(true);
 
           const res = await checkVerificationCode({
             baseUrl: currentNetwork.apiUrl,
             guardianAccount: loginAccount.guardianAccount,
-            verifierSessionId: currentGuardian.sessionId,
+            verifierSessionId: currentGuardian.verifierInfo.sessionId,
             verificationCode: code,
-            endPoint: currentGuardian.verifier?.url || '',
+            endPoint: currentGuardian.verifierInfo.endPoint,
+            type: LoginStrType[guardianType],
           });
 
           setLoading(false);
@@ -87,7 +90,7 @@ export default function VerifierPage({
         message.error(_error);
       }
     },
-    [loginAccount, currentGuardian, setLoading, currentNetwork.apiUrl, onSuccess, t],
+    [loginAccount, guardianType, currentGuardian, setLoading, currentNetwork.apiUrl, onSuccess, t],
   );
 
   const resendCode = useCallback(async () => {
@@ -97,8 +100,8 @@ export default function VerifierPage({
     const res = await sendVerificationCode({
       guardianAccount: currentGuardian.guardianAccount,
       type: LoginStrType[guardianType],
-      baseUrl: currentGuardian?.verifier?.url || '',
-      id: currentGuardian.verifier?.id || '',
+      baseUrl,
+      verifierId: currentGuardian.verifier?.id || '',
     });
     setLoading(false);
     if (res.verifierSessionId) {
@@ -106,11 +109,14 @@ export default function VerifierPage({
       dispatch(
         setUserGuardianSessionIdAction({
           key: currentGuardian?.key ?? `${currentGuardian?.guardianAccount}&${currentGuardian?.verifier?.name}`,
-          sessionId: res.verifierSessionId,
+          verifierInfo: {
+            sessionId: res.verifierSessionId,
+            endPoint: res.endPoint,
+          },
         }),
       );
     }
-  }, [currentGuardian, dispatch, guardianType, setLoading]);
+  }, [baseUrl, currentGuardian, guardianType, dispatch, setLoading]);
 
   useEffect(() => {
     if (timer !== MAX_TIMER) return;

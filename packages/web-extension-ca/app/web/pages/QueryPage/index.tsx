@@ -4,7 +4,7 @@
  */
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { useCurrentWalletInfo, useFetchWalletCAAddress } from '@portkey/hooks/hooks-ca/wallet';
-import { LoginStrType } from '@portkey/store/store-ca/guardians/utils';
+import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 import { setCAInfo } from '@portkey/store/store-ca/wallet/actions';
 import { PinErrorMessage } from '@portkey/utils/wallet/types';
 import { message } from 'antd';

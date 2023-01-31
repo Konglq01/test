@@ -12,10 +12,11 @@ class SignalrDid extends Signalr {
     callback: (data: SinOutput) => void,
   ) {
     this.listen('Sin', (data: SinOutput) => {
-      if (data.requestId === requestId) {
-        this.Ack(clientId, requestId);
-        callback(data);
-      }
+      console.log(data, 'onSinAndAck====');
+      // if (data.requestId === requestId) {
+      //   this.Ack(clientId, requestId);
+      //   callback(data);
+      // }
     });
   }
 }

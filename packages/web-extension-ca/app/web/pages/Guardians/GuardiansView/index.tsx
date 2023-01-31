@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { handleGuardian } from 'utils/sandboxUtil/handleGuardian';
 import './index.less';
 import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
+import { useCurrentApiUrl, useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
 import { LoginType } from '@portkey/types/types-ca/wallet';
@@ -26,8 +26,7 @@ import { sleep } from '@portkey/utils';
 import { getAelfInstance } from '@portkey/utils/aelf';
 import { getTxResult } from 'utils/aelfUtils';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
-import { LoginStrType } from '@portkey/store/store-ca/guardians/utils';
-// import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
+import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 
 enum SwitchFail {
   default = 0,
@@ -48,6 +47,8 @@ export default function GuardiansView() {
   const { walletInfo } = useCurrentWallet();
   const { passwordSeed } = useUserInfo();
   const editable = useMemo(() => Object.keys(userGuardiansList ?? {}).length > 1, [userGuardiansList]);
+
+  const baseUrl = useCurrentApiUrl();
 
   const verifyHandler = useCallback(async () => {
     try {
@@ -101,8 +102,8 @@ export default function GuardiansView() {
         const result = await sendVerificationCode({
           guardianAccount: opGuardian?.guardianAccount as string,
           type: LoginStrType[opGuardian?.guardianType as LoginType],
-          baseUrl: opGuardian?.verifier?.url || '',
-          id: opGuardian?.verifier?.id || '',
+          baseUrl,
+          verifierId: opGuardian?.verifier?.id || '',
         });
         setLoading(false);
         if (result.verifierSessionId) {
@@ -112,7 +113,10 @@ export default function GuardiansView() {
               verifier: opGuardian?.verifier,
               guardianAccount: opGuardian?.guardianAccount as string,
               guardianType: opGuardian?.guardianType as LoginType,
-              sessionId: result.verifierSessionId,
+              verifierInfo: {
+                sessionId: result.verifierSessionId,
+                endPoint: result.endPoint,
+              },
               key: opGuardian?.key as string,
               isInitStatus: true,
             }),
@@ -128,7 +132,8 @@ export default function GuardiansView() {
   }, [
     currentChain,
     currentGuardian,
-    currentNetwork.walletType,
+    baseUrl,
+    currentNetwork,
     dispatch,
     navigate,
     opGuardian,

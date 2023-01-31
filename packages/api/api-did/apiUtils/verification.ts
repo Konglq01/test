@@ -5,20 +5,24 @@ interface SendVerificationCodeParams {
   baseUrl: string;
   type: TLoginStrType;
   guardianAccount: string;
-  id: string;
+  verifierId: string;
 }
-export function sendVerificationCode(params: SendVerificationCodeParams): Promise<any> {
+export function sendVerificationCode(params: SendVerificationCodeParams): Promise<{
+  endPoint: string;
+  verifierSessionId: string;
+}> {
   return request.verify.sendVerificationRequest({
     baseURL: params.baseUrl,
     params: {
       type: params.type,
       guardianAccount: params.guardianAccount,
-      id: params.id,
+      verifierId: params.verifierId,
     },
   });
 }
 
 interface CheckVerificationCodeProps {
+  type: TLoginStrType;
   baseUrl: string;
   endPoint: string;
   guardianAccount: string;
@@ -32,6 +36,7 @@ interface ErrorBack {
 }
 
 export async function checkVerificationCode({
+  type,
   baseUrl,
   endPoint,
   guardianAccount,
@@ -46,9 +51,10 @@ export async function checkVerificationCode({
     baseURL: baseUrl,
     params: {
       endPoint,
-      verificationCode,
       verifierSessionId,
+      verificationCode,
       guardianAccount,
+      type,
     },
   });
 }
