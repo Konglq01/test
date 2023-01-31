@@ -7,21 +7,29 @@ export type CaHolderTransactionAddressInfoQueryVariables = Types.Exact<{
   dto?: Types.InputMaybe<Types.GetCaHolderTransactionAddressDto>;
 }>;
 
-
-export type CaHolderTransactionAddressInfoQuery = { __typename?: 'Query', caHolderTransactionAddressInfo?: Array<{ __typename?: 'CAHolderTransactionAddressDto', chainId?: string | null, caAddress?: string | null, address?: string | null, addressChainId?: string | null, transactionTime: number } | null> | null };
-
+export type CaHolderTransactionAddressInfoQuery = {
+  __typename?: 'Query';
+  caHolderTransactionAddressInfo?: Array<{
+    __typename?: 'CAHolderTransactionAddressDto';
+    chainId?: string | null;
+    caAddress?: string | null;
+    address?: string | null;
+    addressChainId?: string | null;
+    transactionTime: number;
+  } | null> | null;
+};
 
 export const CaHolderTransactionAddressInfoDocument = gql`
-    query caHolderTransactionAddressInfo($dto: GetCAHolderTransactionAddressDto) {
-  caHolderTransactionAddressInfo(dto: $dto) {
-    chainId
-    caAddress
-    address
-    addressChainId
-    transactionTime
+  query caHolderTransactionAddressInfo($dto: GetCAHolderTransactionAddressDto) {
+    caHolderTransactionAddressInfo(dto: $dto) {
+      chainId
+      caAddress
+      address
+      addressChainId
+      transactionTime
+    }
   }
-}
-    `;
+`;
 
 /**
  * __useCaHolderTransactionAddressInfoQuery__
@@ -39,14 +47,35 @@ export const CaHolderTransactionAddressInfoDocument = gql`
  *   },
  * });
  */
-export function useCaHolderTransactionAddressInfoQuery(baseOptions?: Apollo.QueryHookOptions<CaHolderTransactionAddressInfoQuery, CaHolderTransactionAddressInfoQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<CaHolderTransactionAddressInfoQuery, CaHolderTransactionAddressInfoQueryVariables>(CaHolderTransactionAddressInfoDocument, options);
-      }
-export function useCaHolderTransactionAddressInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CaHolderTransactionAddressInfoQuery, CaHolderTransactionAddressInfoQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<CaHolderTransactionAddressInfoQuery, CaHolderTransactionAddressInfoQueryVariables>(CaHolderTransactionAddressInfoDocument, options);
-        }
+export function useCaHolderTransactionAddressInfoQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    CaHolderTransactionAddressInfoQuery,
+    CaHolderTransactionAddressInfoQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<CaHolderTransactionAddressInfoQuery, CaHolderTransactionAddressInfoQueryVariables>(
+    CaHolderTransactionAddressInfoDocument,
+    options,
+  );
+}
+export function useCaHolderTransactionAddressInfoLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    CaHolderTransactionAddressInfoQuery,
+    CaHolderTransactionAddressInfoQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<CaHolderTransactionAddressInfoQuery, CaHolderTransactionAddressInfoQueryVariables>(
+    CaHolderTransactionAddressInfoDocument,
+    options,
+  );
+}
 export type CaHolderTransactionAddressInfoQueryHookResult = ReturnType<typeof useCaHolderTransactionAddressInfoQuery>;
-export type CaHolderTransactionAddressInfoLazyQueryHookResult = ReturnType<typeof useCaHolderTransactionAddressInfoLazyQuery>;
-export type CaHolderTransactionAddressInfoQueryResult = Apollo.QueryResult<CaHolderTransactionAddressInfoQuery, CaHolderTransactionAddressInfoQueryVariables>;
+export type CaHolderTransactionAddressInfoLazyQueryHookResult = ReturnType<
+  typeof useCaHolderTransactionAddressInfoLazyQuery
+>;
+export type CaHolderTransactionAddressInfoQueryResult = Apollo.QueryResult<
+  CaHolderTransactionAddressInfoQuery,
+  CaHolderTransactionAddressInfoQueryVariables
+>;

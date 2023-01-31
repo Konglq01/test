@@ -7,37 +7,62 @@ export type UserNftInfoQueryVariables = Types.Exact<{
   dto?: Types.InputMaybe<Types.GetUserNftInfoDto>;
 }>;
 
-
-export type UserNftInfoQuery = { __typename?: 'Query', userNFTInfo?: Array<{ __typename?: 'UserNFTInfoDto', id?: string | null, chainId?: string | null, caAddress?: string | null, quantity: number, nftInfo?: { __typename?: 'NFTItemInfoDto', id?: string | null, protocolName?: string | null, symbol?: string | null, tokenId: number, owner?: string | null, minter?: string | null, quantity: number, alias?: string | null, baseUri?: string | null, uri?: string | null, creator?: string | null, nftType?: string | null, totalQuantity: number, tokenHash?: string | null, imageUrl?: string | null } | null } | null> | null };
-
+export type UserNftInfoQuery = {
+  __typename?: 'Query';
+  userNFTInfo?: Array<{
+    __typename?: 'UserNFTInfoDto';
+    id?: string | null;
+    chainId?: string | null;
+    caAddress?: string | null;
+    balance: number;
+    nftInfo?: {
+      __typename?: 'NFTItemInfoDto';
+      id?: string | null;
+      protocolName?: string | null;
+      symbol?: string | null;
+      tokenId: number;
+      owner?: string | null;
+      minter?: string | null;
+      quantity: number;
+      alias?: string | null;
+      baseUri?: string | null;
+      uri?: string | null;
+      creator?: string | null;
+      nftType?: string | null;
+      totalQuantity: number;
+      tokenHash?: string | null;
+      imageUrl?: string | null;
+    } | null;
+  } | null> | null;
+};
 
 export const UserNftInfoDocument = gql`
-    query userNFTInfo($dto: GetUserNFTInfoDto) {
-  userNFTInfo(dto: $dto) {
-    id
-    chainId
-    caAddress
-    quantity
-    nftInfo {
+  query userNFTInfo($dto: GetUserNFTInfoDto) {
+    userNFTInfo(dto: $dto) {
       id
-      protocolName
-      symbol
-      tokenId
-      owner
-      minter
-      quantity
-      alias
-      baseUri
-      uri
-      creator
-      nftType
-      totalQuantity
-      tokenHash
-      imageUrl
+      chainId
+      caAddress
+      balance
+      nftInfo {
+        id
+        protocolName
+        symbol
+        tokenId
+        owner
+        minter
+        quantity
+        alias
+        baseUri
+        uri
+        creator
+        nftType
+        totalQuantity
+        tokenHash
+        imageUrl
+      }
     }
   }
-}
-    `;
+`;
 
 /**
  * __useUserNftInfoQuery__
@@ -55,14 +80,18 @@ export const UserNftInfoDocument = gql`
  *   },
  * });
  */
-export function useUserNftInfoQuery(baseOptions?: Apollo.QueryHookOptions<UserNftInfoQuery, UserNftInfoQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<UserNftInfoQuery, UserNftInfoQueryVariables>(UserNftInfoDocument, options);
-      }
-export function useUserNftInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UserNftInfoQuery, UserNftInfoQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<UserNftInfoQuery, UserNftInfoQueryVariables>(UserNftInfoDocument, options);
-        }
+export function useUserNftInfoQuery(
+  baseOptions?: Apollo.QueryHookOptions<UserNftInfoQuery, UserNftInfoQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<UserNftInfoQuery, UserNftInfoQueryVariables>(UserNftInfoDocument, options);
+}
+export function useUserNftInfoLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<UserNftInfoQuery, UserNftInfoQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<UserNftInfoQuery, UserNftInfoQueryVariables>(UserNftInfoDocument, options);
+}
 export type UserNftInfoQueryHookResult = ReturnType<typeof useUserNftInfoQuery>;
 export type UserNftInfoLazyQueryHookResult = ReturnType<typeof useUserNftInfoLazyQuery>;
 export type UserNftInfoQueryResult = Apollo.QueryResult<UserNftInfoQuery, UserNftInfoQueryVariables>;
