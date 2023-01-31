@@ -1,7 +1,8 @@
 import { sendVerificationCode } from '@portkey/api/api-did/apiUtils/verification';
+import { useCurrentApiUrl } from '@portkey/hooks/hooks-ca/network';
 import { setCurrentGuardianAction, setUserGuardianItemStatus } from '@portkey/store/store-ca/guardians/actions';
 import { UserGuardianItem, UserGuardianStatus } from '@portkey/store/store-ca/guardians/type';
-import { LoginStrType } from '@portkey/store/store-ca/guardians/utils';
+import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 import { VerifyStatus } from '@portkey/types/verifier';
 import { Button, message } from 'antd';
 import clsx from 'clsx';
@@ -25,6 +26,7 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
   const { state } = useLocation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const baseUrl = useCurrentApiUrl();
 
   const guardianSendCode = useCallback(
     async (item: UserGuardianItem) => {
@@ -39,12 +41,21 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
         const result = await sendVerificationCode({
           guardianAccount: item?.guardianAccount,
           type: LoginStrType[item.guardianType],
-          baseUrl: item?.verifier?.url || '',
-          verifierName: item?.verifier?.name || '',
+          baseUrl,
+          verifierId: item?.verifier?.id || '',
         });
         setLoading(false);
         if (result.verifierSessionId) {
-          dispatch(setCurrentGuardianAction({ ...item, sessionId: result.verifierSessionId, isInitStatus: true }));
+          dispatch(
+            setCurrentGuardianAction({
+              ...item,
+              verifierInfo: {
+                sessionId: result.verifierSessionId,
+                endPoint: result.endPoint,
+              },
+              isInitStatus: true,
+            }),
+          );
           dispatch(
             setUserGuardianItemStatus({
               key: item.key,
@@ -59,7 +70,7 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
         message.error(error?.Error?.Message || error.message?.Message || error?.message);
       }
     },
-    [state, dispatch, navigate, setLoading],
+    [setLoading, dispatch, baseUrl, navigate, state],
   );
 
   const SendCode = useCallback(
@@ -77,12 +88,21 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
         const result = await sendVerificationCode({
           guardianAccount: item?.guardianAccount,
           type: LoginStrType[loginAccount.loginType],
-          baseUrl: item?.verifier?.url || '',
-          verifierName: item.verifier?.name || '',
+          baseUrl,
+          verifierId: item.verifier?.id || '',
         });
         setLoading(false);
         if (result.verifierSessionId) {
-          dispatch(setCurrentGuardianAction({ ...item, sessionId: result.verifierSessionId, isInitStatus: true }));
+          dispatch(
+            setCurrentGuardianAction({
+              ...item,
+              verifierInfo: {
+                sessionId: result.verifierSessionId,
+                endPoint: result.endPoint,
+              },
+              isInitStatus: true,
+            }),
+          );
           dispatch(
             setUserGuardianItemStatus({
               key: item.key,
@@ -97,7 +117,7 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
         message.error(error?.error?.message ?? error?.type ?? 'Something error');
       }
     },
-    [state, loginAccount, setLoading, guardianSendCode, dispatch, navigate],
+    [state, loginAccount, baseUrl, setLoading, guardianSendCode, dispatch, navigate],
   );
 
   const verifyingHandler = useCallback(

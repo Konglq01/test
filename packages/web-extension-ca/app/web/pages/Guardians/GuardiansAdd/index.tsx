@@ -21,7 +21,8 @@ import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import { useTranslation } from 'react-i18next';
-import { LoginStrType } from '@portkey/store/store-ca/guardians/utils';
+import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
+import { useCurrentApiUrl } from '@portkey/hooks/hooks-ca/network';
 import './index.less';
 
 const guardianTypeList = [{ label: 'Email', value: LoginType.email }];
@@ -46,6 +47,7 @@ export default function AddGuardian() {
   const { setLoading } = useLoading();
   const { walletInfo } = useCurrentWallet();
   const userGuardianList = useGuardianList();
+  const baseUrl = useCurrentApiUrl();
 
   const disabled = useMemo(() => !emailVal || exist || !!inputErr, [emailVal, exist, inputErr]);
 
@@ -126,8 +128,8 @@ export default function AddGuardian() {
       const result = await sendVerificationCode({
         guardianAccount: emailVal as string,
         type: LoginStrType[guardianType as LoginType],
-        baseUrl: selectVerifierItem?.url || '',
-        verifierName: '',
+        baseUrl,
+        verifierId: selectVerifierItem?.id || '',
       });
       setLoading(false);
       if (result.verifierSessionId) {
@@ -136,7 +138,10 @@ export default function AddGuardian() {
           verifier: selectVerifierItem,
           guardianAccount: emailVal as string,
           guardianType: guardianType as LoginType,
-          sessionId: result.verifierSessionId,
+          verifierInfo: {
+            sessionId: result.verifierSessionId,
+            endPoint: result.endPoint,
+          },
           key: `${emailVal}&${selectVerifierItem?.name}`,
           isInitStatus: true,
         };
@@ -150,7 +155,17 @@ export default function AddGuardian() {
       const _error = verifyErrorHandler(error);
       message.error(_error);
     }
-  }, [dispatch, emailVal, guardianType, navigate, selectVerifierItem, setLoading, userGuardianList, walletInfo.caHash]);
+  }, [
+    baseUrl,
+    dispatch,
+    emailVal,
+    guardianType,
+    navigate,
+    selectVerifierItem,
+    setLoading,
+    userGuardianList,
+    walletInfo.caHash,
+  ]);
 
   return (
     <div className="add-guardians-page">

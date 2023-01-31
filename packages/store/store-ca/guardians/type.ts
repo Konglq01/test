@@ -3,20 +3,26 @@ import { VerifierItem, VerifyStatus } from '@portkey/types/verifier';
 
 type VerifyName = string;
 type UserGuardianItemKey = string;
-
-export interface UserGuardianItem {
+export interface BaseGuardianItem {
   isLoginAccount: boolean | undefined;
   verifier?: VerifierItem;
   guardianAccount: string;
   guardianType: LoginType;
   key: string; // `${loginGuardianType}&${verifier?.name}`,
-  sessionId?: string;
+}
+
+export interface IVerifierInfo {
+  sessionId: string;
+  endPoint: string;
+}
+
+export interface UserGuardianItem extends BaseGuardianItem {
+  verifierInfo?: IVerifierInfo;
   isInitStatus?: boolean;
 }
 
 export interface UserGuardianStatus extends UserGuardianItem {
   status?: VerifyStatus;
-  sessionId?: string;
   signature?: string;
   verificationDoc?: string;
 }

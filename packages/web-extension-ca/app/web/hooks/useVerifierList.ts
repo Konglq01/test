@@ -3,7 +3,6 @@ import { useAppDispatch } from 'store/Provider/hooks';
 import { setVerifierListAction } from '@portkey/store/store-ca/guardians/actions';
 import { getVerifierList } from 'utils/sandboxUtil/getVerifierList';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
-import { message } from 'antd';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 
 const useVerifierList = () => {
@@ -21,11 +20,7 @@ const useVerifierList = () => {
     })
       .then((res) => {
         console.log(res, 'getVerifierList===');
-        const verifierList = res.result.verifierList?.map((item: any) => ({
-          ...item,
-          url: item.endPoints[0],
-        }));
-        dispatch(setVerifierListAction(verifierList));
+        res.result.verifierList && dispatch(setVerifierListAction(res.result.verifierList));
       })
       .catch((err) => {
         console.error(err, 'useVerifierList===error');

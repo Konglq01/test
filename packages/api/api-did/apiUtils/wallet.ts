@@ -15,7 +15,11 @@ interface RegisterDIDWalletParams extends IContext {
   chainId: string;
 }
 
-export const registerDIDWallet = async (params: RegisterDIDWalletParams) => {
+export const registerDIDWallet = async (
+  params: RegisterDIDWalletParams,
+): Promise<{
+  sessionId: string;
+}> => {
   const _params: any = { ...params };
   const baseUrl = _params.baseUrl;
   delete _params.baseUrl;
@@ -41,7 +45,11 @@ interface RecoveryDIDWalletParams extends IContext {
   guardiansApproved: GuardiansApprovedType[];
 }
 
-export const recoveryDIDWallet = async (params: RecoveryDIDWalletParams) => {
+export const recoveryDIDWallet = async (
+  params: RecoveryDIDWalletParams,
+): Promise<{
+  sessionId: string;
+}> => {
   const _params: any = { ...params };
   const baseURL = _params.baseURL;
   delete _params.baseURL;

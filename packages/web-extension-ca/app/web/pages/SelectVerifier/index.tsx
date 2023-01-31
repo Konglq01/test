@@ -11,7 +11,8 @@ import { sendVerificationCode } from '@portkey/api/api-did/apiUtils/verification
 import CommonSelect from 'components/CommonSelect1';
 import { useTranslation } from 'react-i18next';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
-import { LoginStrType } from '@portkey/store/store-ca/guardians/utils';
+import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
+import { useCurrentApiUrl } from '@portkey/hooks/hooks-ca/network';
 
 export default function SelectVerifier() {
   const { verifierMap } = useGuardiansInfo();
@@ -21,6 +22,8 @@ export default function SelectVerifier() {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const { setLoading } = useLoading();
+
+  const baseUrl = useCurrentApiUrl();
 
   const handleChange = useCallback((value: string) => {
     setSelectVal(value);
@@ -50,9 +53,8 @@ export default function SelectVerifier() {
       const result = await sendVerificationCode({
         guardianAccount: loginAccount.guardianAccount,
         type: LoginStrType[loginAccount.loginType],
-        baseUrl: selectItem?.url || '',
-        // TODO
-        verifierName: selectItem.name,
+        baseUrl: baseUrl,
+        verifierId: selectItem.id,
       });
       setLoading(false);
       if (result.verifierSessionId) {
@@ -63,7 +65,10 @@ export default function SelectVerifier() {
             verifier: selectItem,
             guardianAccount: loginAccount.guardianAccount,
             guardianType: loginAccount.loginType,
-            sessionId: result.verifierSessionId,
+            verifierInfo: {
+              sessionId: result.verifierSessionId,
+              endPoint: result.endPoint,
+            },
             key: _key,
           }),
         );
@@ -75,7 +80,7 @@ export default function SelectVerifier() {
       const _error = verifyErrorHandler(error);
       message.error(_error);
     }
-  }, [dispatch, loginAccount, navigate, selectItem, setLoading]);
+  }, [baseUrl, dispatch, loginAccount, navigate, selectItem, setLoading]);
 
   return (
     <div className="common-page select-verifier-wrapper">

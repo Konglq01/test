@@ -2,7 +2,7 @@ import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { VerifierItem, VerifyStatus } from '@portkey/types/verifier';
 import { GuardiansInfo } from '@portkey/types/guardian';
 
-import { UserGuardianItem, UserGuardianStatus } from './type';
+import { IVerifierInfo, UserGuardianItem, UserGuardianStatus } from './type';
 
 export const resetGuardiansState = createAction('verifier/resetGuardiansState');
 
@@ -38,7 +38,7 @@ export const setUserGuardianStatus = createAction<{ [x: string]: UserGuardianSta
 );
 export const resetUserGuardianStatus = createAction('verifier/resetUserGuardianStatus');
 
-export const setUserGuardianSessionIdAction = createAction<{ key: string; sessionId: string }>(
+export const setUserGuardianSessionIdAction = createAction<{ key: string; verifierInfo: IVerifierInfo }>(
   'verifier/setUserGuardianSessionId',
 );
 export const setOpGuardianAction = createAction<UserGuardianItem | undefined>('verifier/setOpGuardian');
