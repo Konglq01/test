@@ -16,28 +16,17 @@ import { sleep } from '@portkey/utils';
 import { ApprovalType, VerificationType, VerifyStatus } from '@portkey/types/verifier';
 import { BGStyles, FontStyles } from 'assets/theme/styles';
 import { isIOS } from '@rneui/base';
-import { API_REQ_FUNCTION } from 'api/types';
-import { EditGuardianParamsType } from '../../GuardianApproval';
 import { LoginGuardianTypeIcon } from 'constants/misc';
 import { LoginType } from '@portkey/types/types-ca/wallet';
 import { VerifierImage } from '../VerifierImage';
-
-export type GuardiansStatusItem = {
-  status: VerifyStatus;
-  verifierSessionId: string;
-  editGuardianParams?: EditGuardianParamsType;
-};
-
-export type GuardiansStatus = {
-  [key: string]: GuardiansStatusItem;
-};
+import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
+import { GuardiansStatus, GuardiansStatusItem } from 'pages/Guardian/types';
 
 interface GuardianAccountItemProps {
   guardianItem: UserGuardianItem;
   isButtonHide?: boolean;
   renderBtn?: (item: UserGuardianItem) => JSX.Element;
   isBorderHide?: boolean;
-  managerUniqueId?: string;
   guardiansStatus?: GuardiansStatus;
   setGuardianStatus?: (key: string, status: GuardiansStatusItem) => void;
   isExpired?: boolean;
@@ -47,7 +36,6 @@ interface GuardianAccountItemProps {
 
 function GuardianItemButton({
   guardianItem,
-  managerUniqueId,
   guardiansStatus,
   setGuardianStatus,
   isExpired,
@@ -58,7 +46,25 @@ function GuardianItemButton({
 }) {
   const itemStatus = useMemo(() => guardiansStatus?.[guardianItem.key], [guardianItem.key, guardiansStatus]);
 
-  const { status, verifierSessionId } = itemStatus || {};
+  const { status, verifierResult } = itemStatus || {};
+
+  const verifierInfo = useMemo(() => {
+    let _verificationType = VerificationType.communityRecovery;
+    if (
+      approvalType === ApprovalType.addGuardian ||
+      approvalType === ApprovalType.deleteGuardian ||
+      approvalType === ApprovalType.editGuardian
+    ) {
+      _verificationType = VerificationType.editGuardianApproval;
+    }
+    return {
+      guardianItem,
+      guardianAccount: guardianItem.guardianAccount,
+      type: guardianItem.guardianType,
+      verificationType: _verificationType,
+    };
+  }, [approvalType, guardianItem]);
+
   const onSetGuardianStatus = useCallback(
     (guardianStatus: GuardiansStatusItem) => {
       setGuardianStatus?.(guardianItem.key, guardianStatus);
@@ -68,40 +74,23 @@ function GuardianItemButton({
   const onSendCode = useCallback(async () => {
     Loading.show();
     try {
-      let fetch: Record<string, API_REQ_FUNCTION> = request.recovery;
-      let _verificationType = VerificationType.communityRecovery;
-      if (
-        approvalType === ApprovalType.addGuardian ||
-        approvalType === ApprovalType.deleteGuardian ||
-        approvalType === ApprovalType.editGuardian
-      ) {
-        _verificationType = VerificationType.editGuardianApproval;
-        fetch = request.verification;
-      }
-
-      const req = await fetch.sendCode({
-        baseURL: guardianItem.verifier?.url,
+      const req = await request.verify.sendCode({
         data: {
-          type: 0,
-          guardianAccount: guardianItem.guardianAccount,
-          managerUniqueId,
+          type: LoginStrType[verifierInfo.type],
+          guardianAccount: verifierInfo.guardianAccount,
+          verifierId: verifierInfo.guardianItem.verifier?.id,
         },
       });
       if (req.verifierSessionId) {
         Loading.hide();
         await sleep(200);
         onSetGuardianStatus({
-          verifierSessionId: req.verifierSessionId,
+          verifierResult: req,
           status: VerifyStatus.Verifying,
         });
-
         navigationService.push('VerifierDetails', {
-          guardianItem,
-          verifierSessionId: req.verifierSessionId,
-          managerUniqueId,
-          guardianAccount: guardianItem.guardianAccount,
-          verificationType: _verificationType,
-          guardianKey: guardianItem.key,
+          ...verifierInfo,
+          verifierResult: req,
         });
       } else {
         throw new Error('send fail');
@@ -112,27 +101,14 @@ function GuardianItemButton({
       CommonToast.failError(error);
     }
     Loading.hide();
-  }, [approvalType, guardianItem, managerUniqueId, onSetGuardianStatus]);
+  }, [onSetGuardianStatus, verifierInfo]);
   const onVerifier = useCallback(() => {
-    let _verificationType = VerificationType.communityRecovery;
-    if (
-      approvalType === ApprovalType.addGuardian ||
-      approvalType === ApprovalType.deleteGuardian ||
-      approvalType === ApprovalType.editGuardian
-    ) {
-      _verificationType = VerificationType.editGuardianApproval;
-    }
-
     navigationService.push('VerifierDetails', {
-      guardianItem,
-      verifierSessionId,
-      guardianAccount: guardianItem.guardianAccount,
-      managerUniqueId,
+      ...verifierInfo,
+      verifierResult,
       startResend: true,
-      verificationType: _verificationType,
-      guardianKey: guardianItem.key,
     });
-  }, [approvalType, guardianItem, managerUniqueId, verifierSessionId]);
+  }, [verifierInfo, verifierResult]);
   const buttonProps: CommonButtonProps = useMemo(() => {
     if (isExpired && status !== VerifyStatus.Verified) {
       return {
@@ -176,12 +152,11 @@ function GuardianItemButton({
   );
 }
 
-export default function GuardianAccountItem({
+export default function GuardianItem({
   guardianItem,
   isButtonHide,
   renderBtn,
   isBorderHide = false,
-  managerUniqueId,
   guardiansStatus,
   setGuardianStatus,
   isExpired,
@@ -211,7 +186,6 @@ export default function GuardianAccountItem({
           isExpired={isExpired}
           guardianItem={guardianItem}
           guardiansStatus={guardiansStatus}
-          managerUniqueId={managerUniqueId}
           setGuardianStatus={setGuardianStatus}
           approvalType={approvalType}
         />

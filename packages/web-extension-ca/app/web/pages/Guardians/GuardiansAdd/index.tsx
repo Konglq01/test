@@ -21,7 +21,7 @@ import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import { useTranslation } from 'react-i18next';
-import { LoginStrType } from '@portkey/store/store-ca/guardians/utils';
+import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 import './index.less';
 
 const guardianTypeList = [{ label: 'Email', value: LoginType.email }];
@@ -126,8 +126,7 @@ export default function AddGuardian() {
       const result = await sendVerificationCode({
         guardianAccount: emailVal as string,
         type: LoginStrType[guardianType as LoginType],
-        baseUrl: selectVerifierItem?.url || '',
-        verifierName: '',
+        verifierId: selectVerifierItem?.id || '',
       });
       setLoading(false);
       if (result.verifierSessionId) {
@@ -136,7 +135,10 @@ export default function AddGuardian() {
           verifier: selectVerifierItem,
           guardianAccount: emailVal as string,
           guardianType: guardianType as LoginType,
-          sessionId: result.verifierSessionId,
+          verifierInfo: {
+            sessionId: result.verifierSessionId,
+            endPoint: result.endPoint,
+          },
           key: `${emailVal}&${selectVerifierItem?.name}`,
           isInitStatus: true,
         };

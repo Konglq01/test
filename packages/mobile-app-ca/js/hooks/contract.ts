@@ -24,22 +24,11 @@ export function useGetCurrentCAViewContract(chainId: ChainId = 'AELF') {
     if (caContract) return caContract;
     if (!chainInfo) throw Error('Could not find chain information');
     const contract = await getELFContract({
-      contractAddress: '2RHf2fxsnEaM3wb6N1yGqPupNZbcCY98LgWbGSFWmWzgEs5Sjo',
+      contractAddress: chainInfo.caContractAddress,
       rpcUrl: chainInfo.endPoint,
       account: getDefaultWallet(),
     });
-    console.log(
-      contract,
-      {
-        contractAddress: '2WHXRoLRjbUTDQsuqR5CntygVfnDb125qdJkudev4kVNbLhTdG',
-        rpcUrl: chainInfo.endPoint,
-        account: getDefaultWallet(),
-      },
-      '=====contract',
-    );
-
     dispatch(setViewContract({ [chainInfo.caContractAddress]: contract as ContractBasic }));
-    console.log(contract, '====contract');
 
     return contract as ContractBasic;
   }, [caContract, chainInfo, dispatch]);

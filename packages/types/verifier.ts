@@ -9,10 +9,8 @@ export interface VerifierItem {
   id: string; // aelf.Hash
   name: string;
   imageUrl: string;
-  // TODO Is the URL necessary
-  url: string;
   endPoints: string[];
-  verifierAddress: string[];
+  verifierAddresses: string[];
 }
 
 // 0: register, 1: community recovery, 2: Add Guardian 3: Set LoginAccount 4: addManager

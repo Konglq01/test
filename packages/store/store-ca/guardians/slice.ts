@@ -16,7 +16,7 @@ import {
   setOpGuardianAction,
 } from './actions';
 import { GuardiansState, UserGuardianStatus } from './type';
-import { GUARDIAN_TYPE_TYPE } from './utils';
+import { GUARDIAN_TYPE_TYPE } from '@portkey/constants/constants-ca/guardian';
 
 const initialState: GuardiansState = {};
 export const guardiansSlice = createSlice({
@@ -35,8 +35,9 @@ export const guardiansSlice = createSlice({
         }
         const map: GuardiansState['verifierMap'] = {};
         action.payload.forEach((item: VerifierItem) => {
-          map[item.name] = item;
+          map[item.id] = item;
         });
+        console.log(map, 'verifierMap==');
         state.verifierMap = map;
       })
       .addCase(setGuardiansAction, (state, action) => {
@@ -70,6 +71,7 @@ export const guardiansSlice = createSlice({
             guardianAccount,
             guardianType,
           };
+          console.log(verifier, _guardianAccounts, verifierMap, 'verifier===');
 
           userStatus[_guardian.key] = { ..._guardian, status: userStatus?.[_guardian.key]?.status };
           return _guardian;
@@ -127,10 +129,10 @@ export const guardiansSlice = createSlice({
         state.userGuardianStatus = {};
       })
       .addCase(setUserGuardianSessionIdAction, (state, action) => {
-        const { key, sessionId } = action.payload;
+        const { key, verifierInfo } = action.payload;
         if (!state.userGuardianStatus?.[key]) throw Error("Can't find this item");
-        state.userGuardianStatus[key]['sessionId'] = sessionId;
-        if (state.currentGuardian?.key === key) state.currentGuardian['sessionId'] = sessionId;
+        state.userGuardianStatus[key]['verifierInfo'] = verifierInfo;
+        if (state.currentGuardian?.key === key) state.currentGuardian['verifierInfo'] = verifierInfo;
       });
   },
 });

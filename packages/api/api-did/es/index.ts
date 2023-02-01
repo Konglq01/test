@@ -3,7 +3,7 @@ import { ESBaseConfig } from './type';
 const Method = 'GET';
 const BaseESUrl = `/api/app/Es/`;
 
-const KeyList = ['getUserTokenList'] as const;
+const KeyList = ['getUserTokenList', 'getChainsInfo', 'getRegisterResult', 'getRecoverResult'] as const;
 
 const ApiObject: Record<typeof KeyList[number], ESBaseConfig> = {
   getUserTokenList: {
@@ -16,6 +16,18 @@ const ApiObject: Record<typeof KeyList[number], ESBaseConfig> = {
         sortType: 0,
       },
     },
+  },
+  getChainsInfo: {
+    target: `${BaseESUrl}chainsinfoindex`,
+    config: { method: Method },
+  },
+  getRegisterResult: {
+    target: `${BaseESUrl}accountregisterindex`,
+    config: { method: Method },
+  },
+  getRecoverResult: {
+    target: `${BaseESUrl}accountrecoverindex`,
+    config: { method: Method },
   },
 };
 

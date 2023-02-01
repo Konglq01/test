@@ -26,8 +26,7 @@ import { sleep } from '@portkey/utils';
 import { getAelfInstance } from '@portkey/utils/aelf';
 import { getTxResult } from 'utils/aelfUtils';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
-import { LoginStrType } from '@portkey/store/store-ca/guardians/utils';
-// import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
+import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 
 enum SwitchFail {
   default = 0,
@@ -101,8 +100,7 @@ export default function GuardiansView() {
         const result = await sendVerificationCode({
           guardianAccount: opGuardian?.guardianAccount as string,
           type: LoginStrType[opGuardian?.guardianType as LoginType],
-          baseUrl: opGuardian?.verifier?.url || '',
-          verifierName: '',
+          verifierId: opGuardian?.verifier?.id || '',
         });
         setLoading(false);
         if (result.verifierSessionId) {
@@ -112,7 +110,10 @@ export default function GuardiansView() {
               verifier: opGuardian?.verifier,
               guardianAccount: opGuardian?.guardianAccount as string,
               guardianType: opGuardian?.guardianType as LoginType,
-              sessionId: result.verifierSessionId,
+              verifierInfo: {
+                sessionId: result.verifierSessionId,
+                endPoint: result.endPoint,
+              },
               key: opGuardian?.key as string,
               isInitStatus: true,
             }),
@@ -128,7 +129,7 @@ export default function GuardiansView() {
   }, [
     currentChain,
     currentGuardian,
-    currentNetwork.walletType,
+    currentNetwork,
     dispatch,
     navigate,
     opGuardian,

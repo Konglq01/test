@@ -1,8 +1,11 @@
-import { GUARDIAN_TYPE_TYPE } from '@portkey/store/store-ca/guardians/utils';
+import { GUARDIAN_TYPE_TYPE, LoginStrType } from '@portkey/constants/constants-ca/guardian';
+import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import { resetWallet } from '@portkey/store/store-ca/wallet/actions';
 import { GuardiansInfo } from '@portkey/types/guardian';
+import { LoginType } from '@portkey/types/types-ca/wallet';
 import { VerifierItem } from '@portkey/types/verifier';
 import ActionSheet from 'components/ActionSheet';
+import { GuardiansStatus } from 'pages/Guardian/types';
 import { AppDispatch } from 'store';
 import { resetUser } from 'store/user/actions';
 import navigationService from './navigationService';
@@ -40,6 +43,19 @@ export function handleUserGuardiansList(holderInfo: GuardiansInfo, verifierServe
       key: `${value}&${guardian.verifier.id}`,
       verifier: verifierServers.find(verifierItem => verifierItem.id === guardian.verifier.id),
       isLoginAccount: loginGuardianAccountIndexes.includes(index),
+    };
+  });
+}
+
+export function handleGuardiansApproved(guardiansStatus: GuardiansStatus, userGuardiansList: UserGuardianItem[]) {
+  return Object.keys(guardiansStatus).map(key => {
+    const status = guardiansStatus?.[key];
+    const guardian = userGuardiansList?.find(item => item.key === key);
+    return {
+      ...status?.verifierInfo,
+      value: guardian?.guardianAccount,
+      guardianType: guardian?.guardianType,
+      type: LoginStrType[guardian?.guardianType as LoginType],
     };
   });
 }

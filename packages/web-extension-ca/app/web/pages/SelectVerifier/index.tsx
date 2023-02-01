@@ -11,7 +11,7 @@ import { sendVerificationCode } from '@portkey/api/api-did/apiUtils/verification
 import CommonSelect from 'components/CommonSelect1';
 import { useTranslation } from 'react-i18next';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
-import { LoginStrType } from '@portkey/store/store-ca/guardians/utils';
+import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 
 export default function SelectVerifier() {
   const { verifierMap } = useGuardiansInfo();
@@ -29,7 +29,7 @@ export default function SelectVerifier() {
   const selectOptions = useMemo(
     () =>
       Object.values(verifierMap ?? {})?.map((item) => ({
-        value: item.name,
+        value: item.id,
         iconUrl: item.imageUrl ?? '',
         label: item.name,
       })),
@@ -50,9 +50,7 @@ export default function SelectVerifier() {
       const result = await sendVerificationCode({
         guardianAccount: loginAccount.guardianAccount,
         type: LoginStrType[loginAccount.loginType],
-        baseUrl: selectItem?.url || '',
-        // TODO
-        verifierName: selectItem.name,
+        verifierId: selectItem.id,
       });
       setLoading(false);
       if (result.verifierSessionId) {
@@ -63,7 +61,10 @@ export default function SelectVerifier() {
             verifier: selectItem,
             guardianAccount: loginAccount.guardianAccount,
             guardianType: loginAccount.loginType,
-            sessionId: result.verifierSessionId,
+            verifierInfo: {
+              sessionId: result.verifierSessionId,
+              endPoint: result.endPoint,
+            },
             key: _key,
           }),
         );

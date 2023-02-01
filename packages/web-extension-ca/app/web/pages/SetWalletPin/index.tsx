@@ -12,22 +12,21 @@ import { createWallet, setCAInfo, setManagerInfo } from '@portkey/store/store-ca
 import useLocationState from 'hooks/useLocationState';
 import { useTranslation } from 'react-i18next';
 import { recoveryDIDWallet, registerDIDWallet } from '@portkey/api/api-did/apiUtils/wallet';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { VerificationType } from '@portkey/types/verifier';
 import { isWalletError } from '@portkey/store/wallet/utils';
 import { useHardwareBack } from 'hooks/useHardwareBack';
 import CommonModal from 'components/CommonModal';
-import { LoginStrType } from '@portkey/store/store-ca/guardians/utils';
-import { randomId } from '@portkey/utils';
+import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 import AElf from 'aelf-sdk';
+import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 import './index.less';
+import { randomId } from '@portkey/utils';
 
 export default function SetWalletPin() {
   const [form] = Form.useForm();
   const { t } = useTranslation();
   const { state, pathname } = useLocationState<'login' | 'register' | 'scan'>();
   // const { state } = useLocation();
-  const currentNetwork = useCurrentNetworkInfo();
 
   console.log(state, 'state====');
   const navigate = useNavigate();
@@ -42,29 +41,33 @@ export default function SetWalletPin() {
   console.log(walletInfo, 'walletInfo===');
   const requestRegisterDIDWallet = useCallback(
     async ({ managerAddress }: { managerAddress: string }) => {
+      console.log(loginAccount, registerVerifier, 'requestRegisterDIDWallet==');
       if (!loginAccount?.guardianAccount || !LoginStrType[loginAccount.loginType])
         throw 'Missing account!!! Please login/register again';
-      // const baseUrl
-      if (!registerVerifier) throw 'Missing Verifier Server';
       const requestId = randomId();
-      await registerDIDWallet({
-        baseUrl: currentNetwork.apiUrl,
+      if (!registerVerifier) throw 'Missing Verifier Server';
+      const result = await registerDIDWallet({
         type: LoginStrType[loginAccount.loginType],
         loginGuardianAccount: loginAccount.guardianAccount,
         managerAddress,
         deviceString: Date.now().toString(), //navigator.userAgent,
-        chainId: 'AELF',
+        chainId: DefaultChainId,
         verifierId: registerVerifier.verifierId,
-        verificationDoc: registerVerifier.verificationDoc,
+        // TODO
+        verificationDoc: (registerVerifier as any).verifierDoc,
+        // verificationDoc: (registerVerifier as any).verificationDoc,
         signature: registerVerifier.signature,
         context: {
           clientId: managerAddress,
-          requestId,
+          requestId: requestId,
         },
       });
-      return requestId;
+      return {
+        requestId,
+        sessionId: result.sessionId,
+      };
     },
-    [currentNetwork.apiUrl, loginAccount, registerVerifier],
+    [loginAccount, registerVerifier],
   );
 
   const getGuardiansApproved = useCallback(() => {
@@ -81,25 +84,26 @@ export default function SetWalletPin() {
     async ({ managerAddress }: { managerAddress: string }) => {
       if (!loginAccount?.guardianAccount || !LoginStrType[loginAccount.loginType])
         throw 'Missing account!!! Please login/register again';
-      if (!registerVerifier) throw 'Missing Verifier Server';
-      const requestId = randomId();
       const guardiansApproved = getGuardiansApproved();
-      // userGuardianStatus
-      await recoveryDIDWallet({
-        baseURL: currentNetwork.apiUrl,
+      const requestId = randomId();
+      const result = await recoveryDIDWallet({
         loginGuardianAccount: loginAccount.guardianAccount,
         managerAddress,
         deviceString: Date.now().toString(), //navigator.userAgent,
-        chainId: 'AELF',
+        chainId: DefaultChainId,
         guardiansApproved,
         context: {
           clientId: managerAddress,
           requestId,
         },
       });
-      return requestId;
+
+      return {
+        requestId,
+        sessionId: result.sessionId,
+      };
     },
-    [currentNetwork.apiUrl, loginAccount, registerVerifier, getGuardiansApproved],
+    [loginAccount, getGuardiansApproved],
   );
 
   const createByScan = useCallback(
@@ -129,25 +133,31 @@ export default function SetWalletPin() {
     async (values: any) => {
       try {
         const { pin } = values;
+        console.log(state, 'state===');
+
         if (state === 'scan') return createByScan(pin);
-        console.log(pin, walletInfo, loginAccount, 'onCreate==');
-        if (!loginAccount?.guardianAccount || LoginStrType[loginAccount.loginType])
+        if (!loginAccount?.guardianAccount || !LoginStrType[loginAccount.loginType])
           return message.error('Missing account!!! Please login/register again');
         setLoading(true);
         const _walletInfo = walletInfo.address ? walletInfo : AElf.wallet.createNewWallet();
         console.log(pin, walletInfo.address, 'onCreate==');
+
         // Step 9
-        let requestId = '';
+        let sessionInfo = {
+          requestId: walletInfo.address,
+          sessionId: '',
+        };
 
         if (state === 'register') {
-          requestId = await requestRegisterDIDWallet({ managerAddress: _walletInfo.address });
+          sessionInfo = await requestRegisterDIDWallet({ managerAddress: _walletInfo.address });
         } else {
-          requestId = await requestRecoveryDIDWallet({ managerAddress: _walletInfo.address });
+          sessionInfo = await requestRecoveryDIDWallet({ managerAddress: _walletInfo.address });
         }
 
         const managerInfo = {
-          managerUniqueId: requestId,
-          loginGuardianType: loginAccount?.guardianAccount,
+          managerUniqueId: sessionInfo.sessionId,
+          requestId: sessionInfo.requestId,
+          loginAccount: loginAccount?.guardianAccount,
           type: loginAccount.loginType,
           verificationType: state === 'login' ? VerificationType.communityRecovery : VerificationType.register,
         };
@@ -172,12 +182,13 @@ export default function SetWalletPin() {
         await setPinAction(pin);
 
         // TODO Step 14 Only get Main Chain caAddress
+
+        // Socket
         const walletResult = await fetchWalletResult({
-          baseUrl: currentNetwork.apiUrl,
           type: LoginStrType[loginAccount?.loginType],
           verificationType: state === 'login' ? VerificationType.communityRecovery : VerificationType.register,
           loginGuardianType: loginAccount.guardianAccount,
-          managerUniqueId: requestId,
+          managerUniqueId: sessionInfo.sessionId,
         });
 
         if (walletResult.status !== 'pass') {
@@ -201,10 +212,12 @@ export default function SetWalletPin() {
           registerStatus: 'Registered',
         });
         navigate('/register/success', { state });
-      } catch (error) {
+      } catch (error: any) {
         setLoading(false);
         console.log(error, 'onCreate');
         const walletError = isWalletError(error);
+        if (walletError) return message.error(walletError);
+        if (error?.message || error?.error?.message) return message.error(error?.message || error?.error?.message);
         const errorString = typeof error === 'string' ? error : 'Something error';
         message.error(walletError || errorString);
       }
@@ -214,7 +227,6 @@ export default function SetWalletPin() {
       state,
       walletInfo,
       loginAccount,
-      currentNetwork.apiUrl,
       setLoading,
       createByScan,
       dispatch,
@@ -246,13 +258,13 @@ export default function SetWalletPin() {
 
   const leftCallBack = useCallback(() => setReturnOpen(true), []);
 
-  useHardwareBack(() => {
-    if (state === 'register') {
-      leftCallBack();
-      return;
-    }
-    backHandler();
-  });
+  // useHardwareBack(() => {
+  //   if (state === 'register') {
+  //     leftCallBack();
+  //     return;
+  //   }
+  //   backHandler();
+  // });
 
   return (
     <div className="common-page set-pin-wrapper" id="set-pin-wrapper">

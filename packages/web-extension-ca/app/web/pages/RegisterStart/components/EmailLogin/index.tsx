@@ -46,7 +46,7 @@ export default function EmailLogin() {
       await emailInputInstance?.current?.validateEmail(val, 'login');
       loginHandler(val);
       dispatch(resetGuardiansState());
-      await fetchUserVerifier({ loginGuardianType: val });
+      await fetchUserVerifier({ loginGuardianAccount: val });
       setLoading(false);
 
       navigate('/login/guardian-approval');

@@ -8,33 +8,33 @@ import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import useRouterParams from '@portkey/hooks/useRouterParams';
 import { ApprovalType, VerificationType, VerifyStatus } from '@portkey/types/verifier';
-import GuardianAccountItem, { GuardiansStatusItem } from '../components/GuardianAccountItem';
+import GuardianItem from '../components/GuardianItem';
 import { FontStyles } from 'assets/theme/styles';
 import { request } from 'api';
 import Loading from 'components/Loading';
 import navigationService from 'utils/navigationService';
 import CommonToast from 'components/CommonToast';
 import useEffectOnce from 'hooks/useEffectOnce';
-import { LoginType } from '@portkey/types/types-ca/wallet';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import myEvents from 'utils/deviceEvent';
 import { API_REQ_FUNCTION } from 'api/types';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { useGetCurrentCAContract } from 'hooks/contract';
 import { setLoginAccount } from 'utils/guardian';
+import { LoginType } from '@portkey/types/types-ca/wallet';
+import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
+import { GuardiansStatusItem } from '../types';
 
 type FetchType = Record<string, API_REQ_FUNCTION>;
 
 type RouterParams = {
   guardianAccount?: string;
   guardianItem?: UserGuardianItem;
-  verifierSessionId?: string;
-  managerUniqueId?: string;
+  verifierResult?: { verifierSessionId: string; endPoint: string };
   startResend?: boolean;
   verificationType?: VerificationType;
-  guardianKey?: string;
+  type?: LoginType;
 };
-
 function TipText({ guardianAccount, isRegister }: { guardianAccount?: string; isRegister?: boolean }) {
   const [first, last] = useMemo(() => {
     if (!isRegister)
@@ -54,30 +54,24 @@ function TipText({ guardianAccount, isRegister }: { guardianAccount?: string; is
 }
 
 export default function VerifierDetails() {
-  const {
-    guardianAccount,
-    guardianItem,
-    verifierSessionId,
-    managerUniqueId,
-    startResend,
-    verificationType,
-    guardianKey,
-  } = useRouterParams<RouterParams>();
+  const { guardianAccount, guardianItem, verifierResult, startResend, verificationType, type } =
+    useRouterParams<RouterParams>();
+  console.log(guardianAccount, type, '====guardianAccount');
 
   const countdown = useRef<VerifierCountdownInterface>();
   useEffectOnce(() => {
     if (!startResend) countdown.current?.resetTime(60);
   });
-  const [stateSessionId, setStateSessionId] = useState<string>(verifierSessionId || '');
+  const [stateVerifierResult, setStateVerifierResult] = useState<RouterParams['verifierResult']>(verifierResult);
   const digitInput = useRef<DigitInputInterface>();
   const setGuardianStatus = useCallback(
     (status: GuardiansStatusItem) => {
       myEvents.setGuardianStatus.emit({
-        key: guardianKey,
+        key: guardianItem?.key,
         status,
       });
     },
-    [guardianKey],
+    [guardianItem?.key],
   );
 
   const { caHash, address: managerAddress } = useCurrentWalletInfo();
@@ -105,50 +99,38 @@ export default function VerifierDetails() {
 
   const onFinish = useCallback(
     async (code: string) => {
-      if (!stateSessionId || !guardianAccount || !code) return;
+      if (!stateVerifierResult || !guardianAccount || !code) return;
       try {
         Loading.show();
-        let fetch: FetchType = request.register;
-        if (verificationType === VerificationType.communityRecovery) fetch = request.recovery;
-        if (
-          verificationType === VerificationType.addGuardian ||
-          verificationType === VerificationType.editGuardianApproval ||
-          verificationType === VerificationType.setLoginAccount
-        ) {
-          fetch = request.verification;
-        }
-
-        const rst = await fetch.verifyCode({
-          baseURL: guardianItem?.verifier?.url,
+        const rst = await request.verify.verifyCode({
           data: {
-            type: 0,
-            code,
+            type: LoginStrType[type as LoginType],
+            verificationCode: code,
             guardianAccount,
-            verifierSessionId: stateSessionId,
+            ...stateVerifierResult,
+            verifierId: guardianItem?.verifier?.id,
           },
         });
+        console.log(rst, '===rst');
+
         CommonToast.success('Verified Successfully');
 
         switch (verificationType) {
           case VerificationType.communityRecovery:
+          case VerificationType.editGuardianApproval:
             setGuardianStatus({
-              verifierSessionId: stateSessionId,
+              verifierResult: stateVerifierResult,
               status: VerifyStatus.Verified,
+              verifierInfo: {
+                ...rst,
+                verifierId: guardianItem?.verifier?.id,
+              },
+              editGuardianParams: {
+                signature: rst.signature,
+                verifierDoc: rst.verifierDoc,
+              },
             });
             navigationService.goBack();
-            break;
-          case VerificationType.editGuardianApproval:
-            if (rst.signature && rst.verifierDoc) {
-              setGuardianStatus({
-                verifierSessionId: stateSessionId,
-                status: VerifyStatus.Verified,
-                editGuardianParams: {
-                  signature: rst.signature,
-                  verifierDoc: rst.verifierDoc,
-                },
-              });
-              navigationService.goBack();
-            }
             break;
           case VerificationType.addGuardian:
             if (rst.signature && rst.verifierDoc) {
@@ -159,7 +141,6 @@ export default function VerifierDetails() {
                   signature: rst.signature,
                   verifierDoc: rst.verifierDoc,
                 },
-                managerUniqueId,
               });
             }
             break;
@@ -170,9 +151,12 @@ export default function VerifierDetails() {
             navigationService.navigate('SetPin', {
               managerInfo: {
                 verificationType: VerificationType.register,
-                guardianAccount,
-                type: LoginType.email,
-                managerUniqueId,
+                loginAccount: guardianAccount,
+                type,
+              },
+              verifierInfo: {
+                ...rst,
+                verifierId: guardianItem?.verifier?.id,
               },
             });
             break;
@@ -183,39 +167,22 @@ export default function VerifierDetails() {
       }
       Loading.hide();
     },
-    [
-      guardianItem,
-      guardianAccount,
-      managerUniqueId,
-      setGuardianStatus,
-      onSetLoginAccount,
-      stateSessionId,
-      verificationType,
-    ],
+    [stateVerifierResult, guardianAccount, type, verificationType, setGuardianStatus, onSetLoginAccount, guardianItem],
   );
   const resendCode = useCallback(async () => {
     Loading.show();
     try {
-      let fetch: FetchType = request.register;
-      if (verificationType === VerificationType.communityRecovery) fetch = request.recovery;
-      if (
-        verificationType === VerificationType.addGuardian ||
-        verificationType === VerificationType.editGuardianApproval ||
-        verificationType === VerificationType.setLoginAccount
-      )
-        fetch = request.verification;
-      const req = await fetch.sendCode({
-        baseURL: guardianItem?.verifier?.url,
+      const req = await request.verify.sendCode({
         data: {
-          type: 0,
+          type: LoginStrType[type as LoginType],
           guardianAccount,
-          managerUniqueId,
+          verifierId: guardianItem?.verifier?.id,
         },
       });
       if (req.verifierSessionId) {
-        setStateSessionId(req.verifierSessionId);
+        setStateVerifierResult(req);
         setGuardianStatus({
-          verifierSessionId: req.verifierSessionId,
+          verifierResult: req,
           status: VerifyStatus.Verifying,
         });
         countdown.current?.resetTime(60);
@@ -226,10 +193,10 @@ export default function VerifierDetails() {
       CommonToast.failError(error, 'Verify Fail');
     }
     Loading.hide();
-  }, [guardianItem?.verifier?.url, guardianAccount, managerUniqueId, setGuardianStatus, verificationType]);
+  }, [guardianAccount, guardianItem?.verifier?.id, setGuardianStatus, type]);
   return (
     <PageContainer type="leftBack" titleDom containerStyles={styles.containerStyles}>
-      {guardianItem ? <GuardianAccountItem guardianItem={guardianItem} isButtonHide /> : null}
+      {guardianItem ? <GuardianItem guardianItem={guardianItem} isButtonHide /> : null}
       <TipText
         isRegister={!verificationType || (verificationType as VerificationType) === VerificationType.register}
         guardianAccount={guardianAccount}

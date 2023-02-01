@@ -15,7 +15,6 @@ import Loading from 'components/Loading';
 import useBiometricsReady from 'hooks/useBiometrics';
 import { usePreventHardwareBack } from '@portkey/hooks/mobile';
 import { intervalGetResult, onResultFail, TimerResult } from 'utils/wallet';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { setCAInfo } from '@portkey/store/store-ca/wallet/actions';
 import { CAInfo } from '@portkey/types/types-ca/wallet';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network';
@@ -25,7 +24,6 @@ import PinContainer from 'components/PinContainer';
 let appState: AppStateStatus, verifyTime: number;
 export default function SecurityLock() {
   const { biometrics } = useUser();
-  const { apiUrl } = useCurrentNetworkInfo();
   const biometricsReady = useBiometricsReady();
   const [caInfo, setStateCAInfo] = useState<CAInfo>();
   usePreventHardwareBack();
@@ -40,10 +38,9 @@ export default function SecurityLock() {
   useEffect(() => {
     if (isSyncCAInfo) {
       setTimeout(() => {
-        if (managerInfo && apiUrl) {
+        if (managerInfo) {
           timer.current?.remove();
           timer.current = intervalGetResult({
-            apiUrl,
             managerInfo: managerInfo,
             onPass: setStateCAInfo,
             onFail: message =>
@@ -58,7 +55,7 @@ export default function SecurityLock() {
       }, 100);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSyncCAInfo, apiUrl]);
+  }, [isSyncCAInfo]);
   const handleRouter = useCallback(
     (pinInput: string) => {
       Loading.hide();
@@ -83,7 +80,6 @@ export default function SecurityLock() {
         timer.current?.remove();
         Loading.show();
         timer.current = intervalGetResult({
-          apiUrl,
           managerInfo: managerInfo,
           onPass: (info: CAInfo) => {
             dispatch(
@@ -111,7 +107,7 @@ export default function SecurityLock() {
       }
       handleRouter(pwd);
     },
-    [apiUrl, caInfo, dispatch, handleRouter, isSyncCAInfo, managerInfo],
+    [caInfo, dispatch, handleRouter, isSyncCAInfo, managerInfo],
   );
   const verifyBiometrics = useCallback(async () => {
     if (!biometrics || (verifyTime && verifyTime + 1000 > new Date().getTime())) return;

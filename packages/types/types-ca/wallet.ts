@@ -7,6 +7,7 @@ export type ManagerInfo = {
   loginAccount: string;
   type: LoginType;
   verificationType: VerificationType;
+  requestId?: string;
 };
 
 export enum LoginType {

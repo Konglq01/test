@@ -4,7 +4,7 @@ import { request } from '..';
 import { IContext } from '../types';
 
 interface RegisterDIDWalletParams extends IContext {
-  baseUrl: string;
+  baseUrl?: string;
   type: TLoginStrType;
   loginGuardianAccount: string; //account
   managerAddress: string;
@@ -15,7 +15,11 @@ interface RegisterDIDWalletParams extends IContext {
   chainId: string;
 }
 
-export const registerDIDWallet = async (params: RegisterDIDWalletParams) => {
+export const registerDIDWallet = async (
+  params: RegisterDIDWalletParams,
+): Promise<{
+  sessionId: string;
+}> => {
   const _params: any = { ...params };
   const baseUrl = _params.baseUrl;
   delete _params.baseUrl;
@@ -33,7 +37,7 @@ interface GuardiansApprovedType {
   signature: string;
 }
 interface RecoveryDIDWalletParams extends IContext {
-  baseURL: string;
+  baseURL?: string;
   loginGuardianAccount: string;
   managerAddress: string;
   deviceString: string;
@@ -41,7 +45,11 @@ interface RecoveryDIDWalletParams extends IContext {
   guardiansApproved: GuardiansApprovedType[];
 }
 
-export const recoveryDIDWallet = async (params: RecoveryDIDWalletParams) => {
+export const recoveryDIDWallet = async (
+  params: RecoveryDIDWalletParams,
+): Promise<{
+  sessionId: string;
+}> => {
   const _params: any = { ...params };
   const baseURL = _params.baseURL;
   delete _params.baseURL;
@@ -52,53 +60,20 @@ export const recoveryDIDWallet = async (params: RecoveryDIDWalletParams) => {
 };
 
 interface RequestCreateWalletParams {
-  type: string;
-  baseUrl: string;
-  loginGuardianType: string;
-  managerAddress: string;
-  deviceString: string;
-  chainId: string;
-  verifierName: string;
-  verificationDoc: string;
-  signature: string;
-  verificationType: VerificationType;
+  baseUrl?: string;
+  requestId: string;
+  clientId: string;
 }
 
-export const requestCreateWallet = async ({
-  baseUrl,
-  type,
-  loginGuardianType,
-  managerAddress,
-  verificationType,
-  deviceString,
-  chainId,
-  verifierName,
-  verificationDoc,
-  signature,
-}: RequestCreateWalletParams) => {
-  let tmpFetch;
+export const requestCreateWallet = async ({ baseUrl, requestId, clientId }: RequestCreateWalletParams) => {
   let params = {
-    type,
-    loginGuardianType,
-    managerAddress,
-    deviceString,
-    chainId,
-    verifierName,
-    verificationDoc,
-    signature,
+    context: {
+      requestId,
+      clientId,
+    },
   };
-  switch (verificationType) {
-    case VerificationType.register:
-      tmpFetch = request.wallet.requestRegister;
-      break;
-    case VerificationType.communityRecovery:
-      tmpFetch = request.wallet.recoveryWallet;
 
-      break;
-    default:
-      throw Error('Unable to find the corresponding api');
-  }
-  return tmpFetch({
+  return request.wallet.getResponse({
     baseURL: baseUrl,
     params,
   });
@@ -119,7 +94,7 @@ interface FetchCreateWalletParams {
   type: TLoginStrType;
   loginGuardianType: string;
   managerUniqueId: string;
-  baseUrl: string;
+  baseUrl?: string;
 }
 
 export const fetchCreateWalletResult = async ({

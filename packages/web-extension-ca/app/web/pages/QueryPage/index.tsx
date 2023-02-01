@@ -4,7 +4,7 @@
  */
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { useCurrentWalletInfo, useFetchWalletCAAddress } from '@portkey/hooks/hooks-ca/wallet';
-import { LoginStrType } from '@portkey/store/store-ca/guardians/utils';
+import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 import { setCAInfo } from '@portkey/store/store-ca/wallet/actions';
 import { PinErrorMessage } from '@portkey/utils/wallet/types';
 import { message } from 'antd';
@@ -30,10 +30,10 @@ export default function QueryPage() {
     async (pwd: string) => {
       if (!currentWalletInfo.managerInfo) throw 'Missing managerInfo';
       const walletResult = await fetchWalletResult({
-        baseUrl: currentNetwork.apiUrl,
         type: LoginStrType[currentWalletInfo.managerInfo.type],
         verificationType: currentWalletInfo.managerInfo.verificationType,
-        loginGuardianType: currentWalletInfo.managerInfo.loginGuardianType,
+        // TODO
+        loginGuardianType: currentWalletInfo.managerInfo.loginAccount,
         managerUniqueId: currentWalletInfo.managerInfo.managerUniqueId,
       });
       if (walletResult.status !== 'pass') {
@@ -63,7 +63,7 @@ export default function QueryPage() {
         navigate('/register/success');
       }
     },
-    [currentWalletInfo, currentNetwork, dispatch, navigate, setLoading, fetchWalletResult],
+    [currentWalletInfo, dispatch, navigate, setLoading, fetchWalletResult],
   );
 
   useEffectOnce(() => {

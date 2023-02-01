@@ -7,9 +7,9 @@ import AElf from 'aelf-sdk';
 import { Button, Divider } from 'antd';
 import { request } from '@portkey/api/api-did';
 
-const wallet = AElf.wallet.createNewWallet();
-const clientId = wallet.address;
-let requestId = randomId();
+// const wallet = AElf.wallet.createNewWallet();
+const clientId = '2b5MrMC6TeikE2akJJgKbyMj2dzz9EQQfRaJDs41tCNdyXwA2j';
+const requestId = '76cf96e9d59a4dbca9c0cb5233c653da';
 
 Socket.doOpen({
   url: SocketUrl,
@@ -19,7 +19,7 @@ Socket.doOpen({
 Socket.onSinAndAck(
   {
     clientId,
-    requestId,
+    requestId: requestId,
   },
   (data) => {
     console.log(data, 'Socket ===Sin');
@@ -31,18 +31,16 @@ export default function TestSocket() {
     <div>
       <Button
         onClick={async () => {
-          requestId = randomId();
           const result = await request.wallet.hubPing({
-            baseURL: 'http://192.168.10.163:5588',
             method: 'post',
             params: {
               context: {
                 clientId,
-                requestId,
+                requestId: clientId,
               },
             },
           });
-          console.log(result, requestId, clientId, 'result===');
+          console.log(result, clientId, 'result===');
         }}>
         hubPing
       </Button>
@@ -73,16 +71,28 @@ export default function TestSocket() {
         onClick={async () => {
           try {
             const result = await request.wallet.getResponse({
-              baseURL: 'http://192.168.10.163:5588',
               method: 'post',
               params: {
                 context: {
                   clientId,
-                  requestId,
+                  requestId: clientId,
                 },
               },
             });
-            console.log(result, requestId, clientId, 'result===');
+            console.log(result, clientId, 'result===');
+          } catch (error) {
+            console.log('Socket = getResponse = error', error);
+          }
+        }}>
+        getResponse
+      </Button>
+      <Button
+        onClick={async () => {
+          try {
+            const result = await request.wallet.setWalletName({
+              baseURL: '',
+            });
+            console.log(result, clientId, 'result===');
           } catch (error) {
             console.log('Socket = getResponse = error', error);
           }
