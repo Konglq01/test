@@ -15,15 +15,15 @@ import { pTd } from 'utils/unit';
 import fonts from 'assets/theme/fonts';
 import navigationService from 'utils/navigationService';
 import useRouterParams from '@portkey/hooks/useRouterParams';
-import { request } from 'api';
 import CommonToast from 'components/CommonToast';
 import Loading from 'components/Loading';
-import { randomId } from '@portkey/utils';
-import { useVerifierList } from '@portkey/hooks/hooks-ca/network';
+import { useCurrentNetworkInfo, useVerifierList } from '@portkey/hooks/hooks-ca/network';
 import VerifierOverlay from '../components/VerifierOverlay';
 import { VerifierImage } from '../components/VerifierImage';
 import { LoginType } from '@portkey/types/types-ca/wallet';
 import myEvents from 'utils/deviceEvent';
+import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
+import { request } from 'api';
 
 const ScrollViewProps = { disabled: true };
 export default function SelectVerifier() {
@@ -31,9 +31,50 @@ export default function SelectVerifier() {
   const verifierList = useVerifierList();
 
   const [selectedVerifier, setSelectedVerifier] = useState(verifierList[0]);
+  const { apiUrl } = useCurrentNetworkInfo();
 
   const { loginAccount } = useRouterParams<{ loginAccount?: string }>();
   const onConfirm = useCallback(async () => {
+    const confirm = async () => {
+      try {
+        Loading.show();
+        console.log(
+          {
+            type: LoginStrType[LoginType.email],
+            guardianAccount: loginAccount,
+            verifierId: selectedVerifier.id,
+          },
+          '=====verifierInfo',
+        );
+        const verifierResult = await request.verify.sendCode({
+          baseURL: apiUrl,
+          data: {
+            type: LoginStrType[LoginType.email],
+            guardianAccount: loginAccount,
+            verifierId: selectedVerifier.id,
+          },
+        });
+
+        if (verifierResult.verifierSessionId) {
+          navigationService.navigate('VerifierDetails', {
+            guardianAccount: loginAccount,
+            verifierResult,
+            type: LoginType.email,
+            guardianItem: {
+              isLoginAccount: true,
+              verifier: selectedVerifier,
+              loginAccount,
+              guardianType: LoginType.email,
+            },
+          });
+        } else {
+          throw new Error('send fail');
+        }
+      } catch (error) {
+        CommonToast.failError(error);
+      }
+      Loading.hide();
+    };
     ActionSheet.alert({
       title2: `${selectedVerifier.name} will send a verification code to ${loginAccount} to verify your email address.`,
       buttons: [
@@ -44,43 +85,11 @@ export default function SelectVerifier() {
         },
         {
           title: t('Confirm'),
-          onPress: async () => {
-            try {
-              const managerUniqueId = randomId();
-              Loading.show();
-              const req = await request.register.sendCode({
-                baseURL: selectedVerifier.url,
-                data: {
-                  type: 0,
-                  loginAccount,
-                  managerUniqueId,
-                },
-              });
-
-              if (req.verifierSessionId) {
-                navigationService.navigate('VerifierDetails', {
-                  loginAccount,
-                  verifierSessionId: req.verifierSessionId,
-                  managerUniqueId,
-                  guardianItem: {
-                    isLoginAccount: true,
-                    verifier: selectedVerifier,
-                    loginAccount,
-                    guardianType: LoginType.email,
-                  },
-                });
-              } else {
-                throw new Error('send fail');
-              }
-            } catch (error) {
-              CommonToast.failError(error);
-            }
-            Loading.hide();
-          },
+          onPress: confirm,
         },
       ],
     });
-  }, [loginAccount, selectedVerifier, t]);
+  }, [selectedVerifier, loginAccount, t, apiUrl]);
   return (
     <PageContainer
       containerStyles={styles.containerStyles}

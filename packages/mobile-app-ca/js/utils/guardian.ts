@@ -1,6 +1,5 @@
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
-import { GuardiansStatus } from 'pages/Guardian/components/GuardianAccountItem';
-import { EditGuardianParamsType } from 'pages/Guardian/GuardianApproval';
+import { EditGuardianParamsType, GuardiansStatus } from 'pages/Guardian/types';
 import { ContractBasic } from './contract';
 
 export async function deleteGuardian(
