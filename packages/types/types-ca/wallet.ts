@@ -31,3 +31,36 @@ export interface CAWalletInfoType extends WalletInfoType {
     [key in NetworkType]: CAInfoType;
   };
 }
+
+export type RegisterStatus = 'pass' | 'pending' | 'fail' | null;
+
+export interface CreateWalletResult {
+  caAddress: string;
+  caHash: string;
+  message: null | string;
+  status: RegisterStatus;
+}
+
+export interface RegisterBody {
+  caAddress: string;
+  caHash: string;
+  registerMessage: null | string;
+  registerStatus: RegisterStatus;
+}
+
+export interface RecoverBody {
+  caAddress: string;
+  caHash: string;
+  recoverMessage: null | string;
+  recoverStatus: RegisterStatus;
+}
+
+export interface CaAccountRegisterResult {
+  requestId: string;
+  body: RegisterBody;
+}
+
+export interface CaAccountRecoverResult {
+  requestId: string;
+  body: RecoverBody;
+}

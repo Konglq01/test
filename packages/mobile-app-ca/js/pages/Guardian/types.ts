@@ -19,7 +19,7 @@ export type EditGuardianParamsType = {
 
 export type GuardiansStatusItem = {
   status: VerifyStatus;
-  requestCodeResult: { verifierSessionId: string; endPoint: string };
+  requestCodeResult: { verifierSessionId: string };
   editGuardianParams?: EditGuardianParamsType;
   verifierInfo?: VerifierInfo;
 };

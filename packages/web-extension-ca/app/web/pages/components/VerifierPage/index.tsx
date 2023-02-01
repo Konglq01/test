@@ -64,8 +64,7 @@ export default function VerifierPage({
             guardianAccount: loginAccount.guardianAccount,
             verifierSessionId: currentGuardian.verifierInfo.sessionId,
             verificationCode: code,
-            endPoint: currentGuardian.verifierInfo.endPoint,
-            type: LoginStrType[guardianType],
+            verifierId: currentGuardian.verifier?.id || '',
           });
 
           setLoading(false);
