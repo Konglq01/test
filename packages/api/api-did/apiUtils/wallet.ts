@@ -20,12 +20,11 @@ export const registerDIDWallet = async (
 ): Promise<{
   sessionId: string;
 }> => {
-  const _params: any = { ...params };
-  const baseUrl = _params.baseUrl;
-  delete _params.baseUrl;
+  const baseUrl = params.baseUrl;
+  delete params.baseUrl;
   return request.wallet.requestRegister({
     baseURL: baseUrl,
-    params: _params,
+    params,
   });
 };
 
@@ -50,9 +49,8 @@ export const recoveryDIDWallet = async (
 ): Promise<{
   sessionId: string;
 }> => {
-  const _params: any = { ...params };
-  const baseURL = _params.baseURL;
-  delete _params.baseURL;
+  const baseURL = params.baseURL;
+  delete params.baseURL;
   return request.wallet.recoveryWallet({
     baseURL,
     params,
@@ -73,7 +71,7 @@ export const requestCreateWallet = async ({ baseUrl, requestId, clientId }: Requ
     },
   };
 
-  return request.wallet.getResponse({
+  return request.wallet.getCreateResponse({
     baseURL: baseUrl,
     params,
   });

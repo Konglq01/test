@@ -22,9 +22,8 @@ export function sendVerificationCode(params: SendVerificationCodeParams): Promis
 }
 
 interface CheckVerificationCodeProps {
-  type: TLoginStrType;
   baseUrl?: string;
-  endPoint: string;
+  verifierId: string;
   guardianAccount: string;
   verifierSessionId: string;
   verificationCode: string;
@@ -36,9 +35,8 @@ interface ErrorBack {
 }
 
 export async function checkVerificationCode({
-  type,
   baseUrl,
-  endPoint,
+  verifierId,
   guardianAccount,
   verificationCode,
   verifierSessionId,
@@ -50,11 +48,10 @@ export async function checkVerificationCode({
   return await request.verify.checkVerificationCode({
     baseURL: baseUrl,
     params: {
-      endPoint,
+      verifierId,
       verifierSessionId,
       verificationCode,
       guardianAccount,
-      type,
     },
   });
 }

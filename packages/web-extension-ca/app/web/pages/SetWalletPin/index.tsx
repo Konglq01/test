@@ -6,7 +6,8 @@ import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useAppDispatch, useGuardiansInfo, useLoading, useLoginInfo } from 'store/Provider/hooks';
 import { setPinAction } from 'utils/lib/serviceWorkerAction';
-import { useCurrentWallet, useFetchWalletCAAddress } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { useFetchWalletCAAddress } from '@portkey/hooks/hooks-ca/wallet-result';
 import { setLocalStorage } from 'utils/storage/chromeStorage';
 import { createWallet, setCAInfo, setManagerInfo } from '@portkey/store/store-ca/wallet/actions';
 import useLocationState from 'hooks/useLocationState';
@@ -19,8 +20,8 @@ import CommonModal from 'components/CommonModal';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 import AElf from 'aelf-sdk';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network';
-import './index.less';
 import { randomId } from '@portkey/utils';
+import './index.less';
 
 export default function SetWalletPin() {
   const [form] = Form.useForm();
@@ -35,7 +36,7 @@ export default function SetWalletPin() {
   const { walletInfo } = useCurrentWallet();
   const [returnOpen, setReturnOpen] = useState<boolean>();
   const { scanWalletInfo, scanCaWalletInfo, loginAccount, registerVerifier } = useLoginInfo();
-  const fetchWalletResult = useFetchWalletCAAddress();
+  const getWalletCAAddressResult = useFetchWalletCAAddress();
 
   const { userGuardianStatus } = useGuardiansInfo();
   console.log(walletInfo, 'walletInfo===');
@@ -53,9 +54,7 @@ export default function SetWalletPin() {
         deviceString: Date.now().toString(), //navigator.userAgent,
         chainId: DefaultChainId,
         verifierId: registerVerifier.verifierId,
-        // TODO
-        verificationDoc: (registerVerifier as any).verifierDoc,
-        // verificationDoc: (registerVerifier as any).verificationDoc,
+        verificationDoc: registerVerifier.verificationDoc,
         signature: registerVerifier.signature,
         context: {
           clientId: managerAddress,
@@ -184,13 +183,11 @@ export default function SetWalletPin() {
         // TODO Step 14 Only get Main Chain caAddress
 
         // Socket
-        const walletResult = await fetchWalletResult({
-          type: LoginStrType[loginAccount?.loginType],
-          verificationType: state === 'login' ? VerificationType.communityRecovery : VerificationType.register,
-          loginGuardianType: loginAccount.guardianAccount,
-          managerUniqueId: sessionInfo.sessionId,
+        const walletResult = await getWalletCAAddressResult({
+          requestId: sessionInfo.requestId,
+          clientId: sessionInfo.sessionId,
+          type: state === 'login' ? VerificationType.communityRecovery : VerificationType.register,
         });
-
         if (walletResult.status !== 'pass') {
           await setLocalStorage({
             registerStatus: null,
@@ -224,13 +221,13 @@ export default function SetWalletPin() {
       setLoading(false);
     },
     [
-      state,
-      walletInfo,
-      loginAccount,
       setLoading,
+      state,
       createByScan,
+      loginAccount,
+      walletInfo,
       dispatch,
-      fetchWalletResult,
+      getWalletCAAddressResult,
       navigate,
       requestRegisterDIDWallet,
       requestRecoveryDIDWallet,
