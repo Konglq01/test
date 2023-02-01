@@ -185,8 +185,9 @@ export default function SetWalletPin() {
         // Socket
         const walletResult = await getWalletCAAddressResult({
           requestId: sessionInfo.requestId,
-          clientId: sessionInfo.sessionId,
-          type: state === 'login' ? VerificationType.communityRecovery : VerificationType.register,
+          clientId: _walletInfo.address,
+          verificationType: state === 'login' ? VerificationType.communityRecovery : VerificationType.register,
+          managerUniqueId: sessionInfo.sessionId,
         });
         if (walletResult.status !== 'pass') {
           await setLocalStorage({

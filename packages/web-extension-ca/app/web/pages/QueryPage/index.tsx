@@ -30,7 +30,8 @@ export default function QueryPage() {
       const walletResult = await fetchWalletResult({
         clientId: currentWalletInfo.address,
         requestId: currentWalletInfo.managerInfo.requestId || '',
-        type: currentWalletInfo.managerInfo.verificationType,
+        verificationType: currentWalletInfo.managerInfo.verificationType,
+        managerUniqueId: currentWalletInfo.managerInfo.managerUniqueId,
       });
       if (walletResult.status !== 'pass') {
         const errorString = walletResult?.message || walletResult.status;

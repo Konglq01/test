@@ -38,7 +38,7 @@ export interface CreateWalletResult {
   caAddress: string;
   caHash: string;
   message: null | string;
-  status: Omit<RegisterStatus, 'pending'>;
+  status: RegisterStatus;
 }
 
 export interface RegisterBody {

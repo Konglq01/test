@@ -58,23 +58,24 @@ export const recoveryDIDWallet = async (
 };
 
 interface RequestCreateWalletParams {
-  baseUrl?: string;
-  requestId: string;
-  clientId: string;
+  baseURL?: string;
+  verificationType: VerificationType;
+  managerUniqueId: string;
 }
 
-export const requestCreateWallet = async ({ baseUrl, requestId, clientId }: RequestCreateWalletParams) => {
-  let params = {
-    context: {
-      requestId,
-      clientId,
-    },
-  };
-
-  return request.wallet.getCreateResponse({
-    baseURL: baseUrl,
-    params,
+export const requestCreateWallet = async ({
+  baseURL,
+  verificationType,
+  managerUniqueId,
+}: RequestCreateWalletParams) => {
+  let fetch = request.es.getRegisterResult;
+  if (verificationType !== VerificationType.register) fetch = request.es.getRecoverResult;
+  const req = await fetch({
+    baseURL,
+    params: { filter: `id:${managerUniqueId}` },
   });
+  const result = req.items[0];
+  return result;
 };
 
 // TODO

@@ -3,7 +3,7 @@ import { useCurrentApiUrl } from '@portkey/hooks/hooks-ca/network';
 import { CreateWalletResult, RegisterStatus } from '@portkey/types/types-ca/wallet';
 import { requestCreateWallet } from '@portkey/api/api-did/apiUtils/wallet';
 import { sleep } from '@portkey/utils';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { VerificationType } from '@portkey/types/verifier';
 
 const getCreateResultBySocket = ({
@@ -30,10 +30,6 @@ const getCreateResultBySocket = ({
         },
         data => {
           console.log('onCaAccountRegister', data);
-          if (data.body.registerStatus !== 'pass') {
-            reject(data.body.registerMessage);
-            return;
-          }
           resolve({
             ...data.body,
             status: data.body.registerStatus,
@@ -48,11 +44,6 @@ const getCreateResultBySocket = ({
           requestId: requestId,
         },
         data => {
-          console.log('onCaAccountRecover', data);
-          if (data.body.recoverStatus !== 'pass') {
-            reject(data.body.recoverMessage);
-            return;
-          }
           resolve({
             ...data.body,
             status: data.body.recoverStatus,
@@ -65,53 +56,54 @@ const getCreateResultBySocket = ({
 };
 
 interface FetchCreateWalletParams {
-  requestId: string;
-  clientId: string;
-  baseUrl?: string;
+  baseURL?: string;
+  verificationType: VerificationType;
+  managerUniqueId: string;
 }
 
 export const getWalletCAAddressByApi = async (params: FetchCreateWalletParams): Promise<CreateWalletResult> => {
-  const res = await requestCreateWallet(params);
-  let statusField;
-  if ('registerStatus' in res.body) {
-    statusField = 'register';
-  } else if ('recoveryStatus') {
-    statusField = 'recovery';
-  } else {
-    throw 'Get walletInfo error';
-  }
-  if (res[`${statusField}Status`] === 'pending') {
+  const result = await requestCreateWallet(params);
+  if (result.recoveryStatus === 'pending' || result.registerStatus === 'pending') {
     await sleep(1000);
     return getWalletCAAddressByApi(params);
   } else {
     return {
-      ...res,
-      status: res[`${statusField}Status`],
-      message: res[`${statusField}Message`],
+      ...result,
+      status: result.recoveryStatus || result.registerStatus,
+      message: result.registerMessage,
     };
   }
 };
 
-interface FetchWalletCAAddressParams extends FetchCreateWalletParams {
-  type: VerificationType;
+interface GetSocketResultParams {
+  clientId: string;
+  requestId: string;
+  verificationType: VerificationType;
 }
 
 export const useFetchWalletCAAddress = () => {
   const apiUrl = useCurrentApiUrl();
-  const fetch = useCallback(async (params: FetchWalletCAAddressParams): Promise<CreateWalletResult> => {
-    return await Promise.race([
-      getCreateResultBySocket({
-        type: params.type,
-        apiUrl,
-        clientId: params.clientId,
-        requestId: params.requestId,
-      }),
-      // getWalletCAAddressByApi({
-      //   clientId: params.clientId,
-      //   requestId: params.requestId,
-      // }),
-    ]);
-  }, []);
+
+  const fetch = useCallback(
+    async (params: GetSocketResultParams & FetchCreateWalletParams): Promise<CreateWalletResult> => {
+      return new Promise(resolve => {
+        getCreateResultBySocket({
+          type: params.verificationType,
+          apiUrl,
+          clientId: params.clientId,
+          requestId: params.requestId,
+        }).then(resolve);
+
+        requestCreateWallet({
+          verificationType: params.verificationType,
+          managerUniqueId: params.managerUniqueId,
+        }).then(resolve);
+      });
+    },
+    [],
+  );
 
   return fetch;
 };
+
+Promise.allSettled;
