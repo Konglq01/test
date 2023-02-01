@@ -19,7 +19,6 @@ import { isIOS } from '@rneui/base';
 import { LoginGuardianTypeIcon } from 'constants/misc';
 import { LoginType } from '@portkey/types/types-ca/wallet';
 import { VerifierImage } from '../VerifierImage';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 import { GuardiansStatus, GuardiansStatusItem } from 'pages/Guardian/types';
 
@@ -75,12 +74,10 @@ function GuardianItemButton({
     },
     [guardianItem.key, setGuardianStatus],
   );
-  const { apiUrl } = useCurrentNetworkInfo();
   const onSendCode = useCallback(async () => {
     Loading.show();
     try {
       const req = await request.verify.sendCode({
-        baseURL: apiUrl,
         data: {
           type: LoginStrType[verifierInfo.type],
           guardianAccount: verifierInfo.guardianAccount,
@@ -107,7 +104,7 @@ function GuardianItemButton({
       CommonToast.failError(error);
     }
     Loading.hide();
-  }, [apiUrl, onSetGuardianStatus, verifierInfo]);
+  }, [onSetGuardianStatus, verifierInfo]);
   const onVerifier = useCallback(() => {
     navigationService.push('VerifierDetails', {
       ...verifierInfo,

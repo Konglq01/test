@@ -11,16 +11,26 @@ export function spliceUrl(baseUrl: string, extendArg: string = '') {
   return extendArg ? _baserUrl + '/' + _url : _baserUrl;
 }
 
-export function getRequestConfig(base: BaseConfig, config?: RequestConfig) {
+export function getRequestConfig(base: BaseConfig, config?: RequestConfig, defaultConfig?: RequestConfig) {
+  console.log(defaultConfig, '====defaultConfig');
+
   if (typeof base === 'string') {
+    if (defaultConfig) {
+      return {
+        ...defaultConfig,
+        ...config,
+        params: { ...defaultConfig.params, ...config?.params },
+      };
+    }
     return config;
   } else {
     const { config: baseConfig } = base || {};
     const { params } = config || {};
     return {
+      ...defaultConfig,
       ...baseConfig,
       ...config,
-      params: Object.assign({}, baseConfig.params, params),
+      params: { ...defaultConfig?.params, ...baseConfig.params, ...params },
     };
   }
 }

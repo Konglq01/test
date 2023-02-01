@@ -1,7 +1,6 @@
 import { customFetch } from '@portkey/utils/fetch';
 import { BaseConfig, RequestConfig, UrlObj } from '../types';
 import { getRequestConfig, spliceUrl } from '../utils';
-import serverConfig from './config';
 
 class ServiceInit {
   [x: string]: any;
@@ -10,6 +9,7 @@ class ServiceInit {
    * @param  {string} name
    * @param  {UrlObj} urlObj
    */
+  protected defaultConfig?: RequestConfig;
 
   parseRouter = (name: string, urlObj: UrlObj) => {
     const obj: any = (this[name] = {});
@@ -24,16 +24,23 @@ class ServiceInit {
    */
 
   send = (base: BaseConfig, config?: RequestConfig) => {
-    const { method = 'POST', url, baseURL, ...fetchConfig } = getRequestConfig(base, config) || {};
-    const _baseURL = baseURL || serverConfig.config.baseURL || '';
+    const { method = 'POST', url, baseURL, ...fetchConfig } = getRequestConfig(base, config, this.defaultConfig) || {};
     const _url = url || (typeof base === 'string' ? base : base.target);
-
-    const URL = spliceUrl(_baseURL, _url);
+    const URL = spliceUrl(baseURL || '', _url);
     return customFetch(URL, {
       ...fetchConfig,
       method,
     });
   };
+
+  setDefaultConfig(defaultConfig: RequestConfig) {
+    this.defaultConfig = defaultConfig;
+  }
+
+  set(key: keyof RequestConfig, value: any) {
+    if (!this.defaultConfig) this.defaultConfig = {};
+    this.defaultConfig[key] = value;
+  }
 }
 
 const myServer = new ServiceInit();

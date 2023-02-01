@@ -3,12 +3,9 @@ import { useWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { changeNetworkType } from '@portkey/store/store-ca/wallet/actions';
 import { ParamListBase, RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from 'navigation';
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { useAppDispatch } from 'store/hooks';
 import navigationService from 'utils/navigationService';
-import { request, RequestType } from 'api';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { service } from 'api/utils';
 
 export function useChangeNetwork(route: RouteProp<ParamListBase>) {
   const dispatch = useAppDispatch();
@@ -26,12 +23,4 @@ export function useChangeNetwork(route: RouteProp<ParamListBase>) {
     },
     [dispatch, route.name, walletInfo],
   );
-}
-
-export function useCurrentRequest(): RequestType {
-  const { apiUrl } = useCurrentNetworkInfo();
-  return useMemo(() => {
-    if (service.defaults.baseURL !== apiUrl) service.defaults.baseURL = apiUrl;
-    return request;
-  }, [apiUrl]);
 }

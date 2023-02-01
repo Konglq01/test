@@ -12,12 +12,10 @@ export type TimerResult = {
   remove: () => void;
 };
 export function intervalGetResult({
-  apiUrl,
   managerInfo,
   onPass,
   onFail,
 }: {
-  apiUrl: string;
   managerInfo: ManagerInfo;
   onPass?: (caInfo: CAInfo) => void;
   onFail?: (message: string) => void;
@@ -27,7 +25,6 @@ export function intervalGetResult({
   const timer = setTimeoutInterval(async () => {
     try {
       const req = await fetch({
-        baseURL: apiUrl,
         params: { filter: `id:${managerInfo.managerUniqueId}` },
       });
       const result = req.items[0];

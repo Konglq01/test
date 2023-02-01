@@ -13,7 +13,6 @@ import useBiometricsReady from './useBiometrics';
 import navigationService from 'utils/navigationService';
 import { intervalGetResult, onResultFail, TimerResult } from 'utils/wallet';
 import CommonToast from 'components/CommonToast';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import useEffectOnce from './useEffectOnce';
 import { setCredentials } from 'store/user/actions';
 import { DigitInputInterface } from 'components/DigitInput';
@@ -24,7 +23,6 @@ export function useOnManagerAddressAndQueryResult() {
   const dispatch = useAppDispatch();
   const biometricsReady = useBiometricsReady();
   const timer = useRef<TimerResult>();
-  const { apiUrl } = useCurrentNetworkInfo();
   useEffectOnce(() => {
     return () => {
       timer.current?.remove();
@@ -78,7 +76,6 @@ export function useOnManagerAddressAndQueryResult() {
         console.log(data, '====data');
 
         const req = await fetch({
-          baseURL: apiUrl,
           data,
         });
         console.log(req, '=====req');
@@ -108,7 +105,6 @@ export function useOnManagerAddressAndQueryResult() {
           navigationService.navigate('SetBiometrics', { pin: confirmPin });
         } else {
           timer.current = intervalGetResult({
-            apiUrl,
             managerInfo: _managerInfo,
             onPass: (caInfo: CAInfo) => {
               if (isRecovery) CommonToast.success('Wallet Recovered Successfully!');
@@ -131,6 +127,6 @@ export function useOnManagerAddressAndQueryResult() {
         pinRef?.current?.reset();
       }
     },
-    [apiUrl, biometricsReady, dispatch],
+    [biometricsReady, dispatch],
   );
 }

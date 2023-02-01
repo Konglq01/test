@@ -17,7 +17,7 @@ import navigationService from 'utils/navigationService';
 import useRouterParams from '@portkey/hooks/useRouterParams';
 import CommonToast from 'components/CommonToast';
 import Loading from 'components/Loading';
-import { useCurrentNetworkInfo, useVerifierList } from '@portkey/hooks/hooks-ca/network';
+import { useVerifierList } from '@portkey/hooks/hooks-ca/network';
 import VerifierOverlay from '../components/VerifierOverlay';
 import { VerifierImage } from '../components/VerifierImage';
 import { LoginType } from '@portkey/types/types-ca/wallet';
@@ -31,7 +31,6 @@ export default function SelectVerifier() {
   const verifierList = useVerifierList();
 
   const [selectedVerifier, setSelectedVerifier] = useState(verifierList[0]);
-  const { apiUrl } = useCurrentNetworkInfo();
 
   const { loginAccount } = useRouterParams<{ loginAccount?: string }>();
   const onConfirm = useCallback(async () => {
@@ -47,7 +46,6 @@ export default function SelectVerifier() {
           '=====verifierInfo',
         );
         const verifierResult = await request.verify.sendCode({
-          baseURL: apiUrl,
           data: {
             type: LoginStrType[LoginType.email],
             guardianAccount: loginAccount,
@@ -89,7 +87,7 @@ export default function SelectVerifier() {
         },
       ],
     });
-  }, [selectedVerifier, loginAccount, t, apiUrl]);
+  }, [selectedVerifier, loginAccount, t]);
   return (
     <PageContainer
       containerStyles={styles.containerStyles}

@@ -21,7 +21,6 @@ import { API_REQ_FUNCTION } from 'api/types';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { useGetCurrentCAContract } from 'hooks/contract';
 import { setLoginAccount } from 'utils/guardian';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { LoginType } from '@portkey/types/types-ca/wallet';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 import { GuardiansStatusItem } from '../types';
@@ -78,7 +77,6 @@ export default function VerifierDetails() {
 
   const { caHash, address: managerAddress } = useCurrentWalletInfo();
   const getCurrentCAContract = useGetCurrentCAContract();
-  const { apiUrl } = useCurrentNetworkInfo();
 
   const onSetLoginAccount = useCallback(async () => {
     if (!managerAddress || !caHash || !guardianItem) return;
@@ -117,7 +115,6 @@ export default function VerifierDetails() {
         );
 
         const rst = await request.verify.verifyCode({
-          baseURL: apiUrl,
           data: {
             type: LoginStrType[type as LoginType],
             verificationCode: code,
@@ -195,7 +192,6 @@ export default function VerifierDetails() {
     [
       stateVerifierResult,
       guardianAccount,
-      apiUrl,
       type,
       verificationType,
       setGuardianStatus,
@@ -208,7 +204,6 @@ export default function VerifierDetails() {
     Loading.show();
     try {
       const req = await request.verify.sendCode({
-        baseURL: apiUrl,
         data: {
           type: LoginStrType[type as LoginType],
           guardianAccount,
@@ -229,7 +224,7 @@ export default function VerifierDetails() {
       CommonToast.failError(error, 'Verify Fail');
     }
     Loading.hide();
-  }, [apiUrl, guardianAccount, guardianItem?.verifier?.id, setGuardianStatus, type]);
+  }, [guardianAccount, guardianItem?.verifier?.id, setGuardianStatus, type]);
   return (
     <PageContainer type="leftBack" titleDom containerStyles={styles.containerStyles}>
       {guardianItem ? <GuardianItem guardianItem={guardianItem} isButtonHide /> : null}
