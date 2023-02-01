@@ -190,12 +190,15 @@ export default function SetWalletPin() {
           verificationType: state === 'login' ? VerificationType.communityRecovery : VerificationType.register,
           managerUniqueId: sessionInfo.sessionId,
         });
+        walletResult.Socket.stop();
         if (walletResult.status !== 'pass') {
           await setLocalStorage({
             registerStatus: null,
           });
           throw walletResult?.message || walletResult.status;
         }
+
+        console.log(walletResult, 'walletResult===');
 
         dispatch(
           setCAInfo({
@@ -204,7 +207,7 @@ export default function SetWalletPin() {
               caHash: walletResult.caHash,
             },
             pin,
-            chainId: 'AELF',
+            chainId: DefaultChainId,
           }),
         );
         await setLocalStorage({

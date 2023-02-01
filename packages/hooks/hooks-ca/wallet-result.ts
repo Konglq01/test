@@ -18,6 +18,7 @@ const getCreateResultBySocket = ({
   type: VerificationType;
 }): Promise<CreateWalletResult> => {
   return new Promise((resolve, reject) => {
+    console.log('getCreateResultBySocket');
     Socket.doOpen({
       url: `${apiUrl}/ca`,
       clientId: clientId,
@@ -85,19 +86,21 @@ export const useFetchWalletCAAddress = () => {
   const apiUrl = useCurrentApiUrl();
 
   const fetch = useCallback(
-    async (params: GetSocketResultParams & FetchCreateWalletParams): Promise<CreateWalletResult> => {
+    async (
+      params: GetSocketResultParams & FetchCreateWalletParams,
+    ): Promise<CreateWalletResult & { Socket: typeof Socket }> => {
       return new Promise(resolve => {
         getCreateResultBySocket({
           type: params.verificationType,
           apiUrl,
           clientId: params.clientId,
           requestId: params.requestId,
-        }).then(resolve);
+        }).then(result => resolve({ ...result, Socket }));
 
-        requestCreateWallet({
+        getWalletCAAddressByApi({
           verificationType: params.verificationType,
           managerUniqueId: params.managerUniqueId,
-        }).then(resolve);
+        }).then(result => resolve({ ...result, Socket }));
       });
     },
     [],
@@ -105,5 +108,3 @@ export const useFetchWalletCAAddress = () => {
 
   return fetch;
 };
-
-Promise.allSettled;
