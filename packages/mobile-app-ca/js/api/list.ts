@@ -26,20 +26,6 @@ const VerifyApiList = {
   recoveryRequest: '/api/app/account/recovery/request',
 };
 
-const RecoveryApiList = {
-  managerAddress: '/api/app/account/recovery/managerAddress',
-  result: '/api/app/account/recovery/query',
-  sendCode: '/api/app/account/recovery/sendVerificationRequest',
-  verifyCode: '/api/app/account/recovery/verifyCode',
-};
-
-const RegisterApiList = {
-  managerAddress: '/api/app/account/register/managerAddress',
-  result: '/api/app/account/register/query',
-  sendCode: '/api/app/account/register/sendVerificationRequest',
-  verifyCode: '/api/app/account/register/verifyCode',
-};
-
 const VerificationApiList = {
   sendCode: '/api/app/account/verification/sendVerificationRequest',
   verifyCode: '/api/app/account/verification/verifyCode',
@@ -50,8 +36,6 @@ const VerificationApiList = {
  * @description object.key // The type of this object key comes from from @type {UrlObj}
  */
 export const EXPAND_APIS = {
-  register: RegisterApiList,
-  recovery: RecoveryApiList,
   verification: VerificationApiList,
   verify: VerifyApiList,
 };

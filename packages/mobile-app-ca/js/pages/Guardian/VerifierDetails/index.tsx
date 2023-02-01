@@ -28,12 +28,10 @@ import { GuardiansStatusItem } from '../types';
 type FetchType = Record<string, API_REQ_FUNCTION>;
 
 type RouterParams = {
-  guardianAccount?: string;
   guardianItem?: UserGuardianItem;
-  requestCodeResult?: { verifierSessionId: string; endPoint: string };
+  requestCodeResult?: { verifierSessionId: string };
   startResend?: boolean;
   verificationType?: VerificationType;
-  type?: LoginType;
 };
 function TipText({ guardianAccount, isRegister }: { guardianAccount?: string; isRegister?: boolean }) {
   const [first, last] = useMemo(() => {
@@ -55,14 +53,11 @@ function TipText({ guardianAccount, isRegister }: { guardianAccount?: string; is
 
 export default function VerifierDetails() {
   const {
-    guardianAccount,
     guardianItem,
     requestCodeResult: paramsRequestCodeResult,
     startResend,
     verificationType,
-    type,
   } = useRouterParams<RouterParams>();
-  console.log(guardianAccount, type, '====guardianAccount');
 
   const countdown = useRef<VerifierCountdownInterface>();
   useEffectOnce(() => {
@@ -104,14 +99,14 @@ export default function VerifierDetails() {
 
   const onFinish = useCallback(
     async (code: string) => {
-      if (!requestCodeResult || !guardianAccount || !code) return;
+      if (!requestCodeResult || !guardianItem || !code) return;
       try {
         Loading.show();
         const rst = await request.verify.verifyCode({
           data: {
-            type: LoginStrType[type as LoginType],
+            type: LoginStrType[guardianItem?.guardianType as LoginType],
             verificationCode: code,
-            guardianAccount,
+            guardianAccount: guardianItem.guardianAccount,
             ...requestCodeResult,
             verifierId: guardianItem?.verifier?.id,
           },
@@ -152,8 +147,8 @@ export default function VerifierDetails() {
             navigationService.navigate('SetPin', {
               managerInfo: {
                 verificationType: VerificationType.register,
-                loginAccount: guardianAccount,
-                type,
+                loginAccount: guardianItem.guardianAccount,
+                type: guardianItem?.guardianType,
               },
               verifierInfo: {
                 ...rst,
@@ -168,15 +163,15 @@ export default function VerifierDetails() {
       }
       Loading.hide();
     },
-    [requestCodeResult, guardianAccount, type, verificationType, setGuardianStatus, onSetLoginAccount, guardianItem],
+    [requestCodeResult, verificationType, setGuardianStatus, onSetLoginAccount, guardianItem],
   );
   const resendCode = useCallback(async () => {
     Loading.show();
     try {
       const req = await request.verify.sendCode({
         data: {
-          type: LoginStrType[type as LoginType],
-          guardianAccount,
+          type: LoginStrType[guardianItem?.guardianType as LoginType],
+          guardianAccount: guardianItem?.guardianAccount,
           verifierId: guardianItem?.verifier?.id,
         },
       });
@@ -194,13 +189,13 @@ export default function VerifierDetails() {
       CommonToast.failError(error, 'Verify Fail');
     }
     Loading.hide();
-  }, [guardianAccount, guardianItem?.verifier?.id, setGuardianStatus, type]);
+  }, [guardianItem?.guardianAccount, guardianItem?.guardianType, guardianItem?.verifier?.id, setGuardianStatus]);
   return (
     <PageContainer type="leftBack" titleDom containerStyles={styles.containerStyles}>
       {guardianItem ? <GuardianItem guardianItem={guardianItem} isButtonHide /> : null}
       <TipText
         isRegister={!verificationType || (verificationType as VerificationType) === VerificationType.register}
-        guardianAccount={guardianAccount}
+        guardianAccount={guardianItem?.guardianAccount}
       />
       <DigitInput ref={digitInput} onFinish={onFinish} maxLength={DIGIT_CODE.length} />
       <VerifierCountdown style={GStyles.marginTop(24)} onResend={resendCode} ref={countdown} />

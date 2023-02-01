@@ -55,13 +55,11 @@ export default function SelectVerifier() {
 
         if (requestCodeResult.verifierSessionId) {
           navigationService.navigate('VerifierDetails', {
-            guardianAccount: loginAccount,
             requestCodeResult,
-            type: LoginType.email,
             guardianItem: {
               isLoginAccount: true,
               verifier: selectedVerifier,
-              loginAccount,
+              guardianAccount: loginAccount,
               guardianType: LoginType.email,
             },
           });
