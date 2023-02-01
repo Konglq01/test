@@ -40,6 +40,7 @@ export default function SetWalletPin() {
 
   const { userGuardianStatus } = useGuardiansInfo();
   console.log(walletInfo, 'walletInfo===');
+
   const requestRegisterDIDWallet = useCallback(
     async ({ managerAddress }: { managerAddress: string }) => {
       console.log(loginAccount, registerVerifier, 'requestRegisterDIDWallet==');
