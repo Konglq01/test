@@ -45,10 +45,12 @@ const getCreateResultBySocket = ({
           requestId: requestId,
         },
         data => {
+          console.log('onCaAccountRecover', data);
+
           resolve({
             ...data.body,
-            status: data.body.recoverStatus,
-            message: data.body.recoverMessage,
+            status: data.body.recoveryStatus,
+            message: data.body.recoveryMessage,
           });
         },
       );
@@ -64,14 +66,15 @@ interface FetchCreateWalletParams {
 
 export const getWalletCAAddressByApi = async (params: FetchCreateWalletParams): Promise<CreateWalletResult> => {
   const result = await requestCreateWallet(params);
-  if (result.recoveryStatus === 'pending' || result.registerStatus === 'pending') {
-    await sleep(1000);
+  console.log(result, 'result===getWalletCAAddressByApi');
+  if (!result || result.recoveryStatus === 'pending' || result.registerStatus === 'pending') {
+    await sleep(2000);
     return getWalletCAAddressByApi(params);
   } else {
     return {
       ...result,
       status: result.recoveryStatus || result.registerStatus,
-      message: result.registerMessage,
+      message: result.recoveryMessage || result.registerMessage,
     };
   }
 };
