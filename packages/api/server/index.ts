@@ -1,6 +1,7 @@
 import { customFetch } from '@portkey/utils/fetch';
 import { BaseConfig, RequestConfig, UrlObj } from '../types';
 import { getRequestConfig, spliceUrl } from '../utils';
+import serverConfig from './config';
 
 class ServiceInit {
   [x: string]: any;
@@ -24,7 +25,7 @@ class ServiceInit {
 
   send = (base: BaseConfig, config?: RequestConfig) => {
     const { method = 'POST', url, baseURL, ...fetchConfig } = getRequestConfig(base, config) || {};
-    const _baseURL = baseURL ?? '';
+    const _baseURL = baseURL || serverConfig.config.baseURL || '';
     const _url = url || (typeof base === 'string' ? base : base.target);
 
     const URL = spliceUrl(_baseURL, _url);

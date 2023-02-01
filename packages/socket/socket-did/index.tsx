@@ -11,8 +11,34 @@ class SignalrDid extends Signalr {
     { clientId, requestId }: { clientId: string; requestId: string },
     callback: (data: SinOutput) => void,
   ) {
-    this.listen('Sin', (data: SinOutput) => {
-      console.log(data, 'onSinAndAck====');
+    this.listen('caAccountRegister', (data: SinOutput) => {
+      console.log(data, 'caAccountRegister====');
+      // if (data.requestId === requestId) {
+      //   this.Ack(clientId, requestId);
+      //   callback(data);
+      // }
+    });
+  }
+
+  public onCaAccountRegister(
+    { clientId, requestId }: { clientId: string; requestId: string },
+    callback: (data: SinOutput) => void,
+  ) {
+    this.listen('caAccountRegister', (data: SinOutput) => {
+      console.log(data, 'caAccountRegister====');
+      // if (data.requestId === requestId) {
+      //   this.Ack(clientId, requestId);
+      //   callback(data);
+      // }
+    });
+  }
+
+  public onCaAccountRecover(
+    { clientId, requestId }: { clientId: string; requestId: string },
+    callback: (data: SinOutput) => void,
+  ) {
+    this.listen('caAccountRecover', (data: SinOutput) => {
+      console.log(data, 'caAccountRecover====');
       // if (data.requestId === requestId) {
       //   this.Ack(clientId, requestId);
       //   callback(data);

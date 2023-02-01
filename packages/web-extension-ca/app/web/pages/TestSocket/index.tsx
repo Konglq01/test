@@ -8,8 +8,8 @@ import { Button, Divider } from 'antd';
 import { request } from '@portkey/api/api-did';
 
 // const wallet = AElf.wallet.createNewWallet();
-const clientId = 'XSQZXDxnPZzX7ybFnXAsSkU83q1krPrbNmnv6TQoPRWQ7fYpu';
-// let requestId = randomId();
+const clientId = '2b5MrMC6TeikE2akJJgKbyMj2dzz9EQQfRaJDs41tCNdyXwA2j';
+const requestId = '76cf96e9d59a4dbca9c0cb5233c653da';
 
 Socket.doOpen({
   url: SocketUrl,
@@ -19,7 +19,7 @@ Socket.doOpen({
 Socket.onSinAndAck(
   {
     clientId,
-    requestId: clientId,
+    requestId: requestId,
   },
   (data) => {
     console.log(data, 'Socket ===Sin');
@@ -32,7 +32,6 @@ export default function TestSocket() {
       <Button
         onClick={async () => {
           const result = await request.wallet.hubPing({
-            baseURL: 'http://192.168.10.163:5588',
             method: 'post',
             params: {
               context: {
@@ -72,7 +71,6 @@ export default function TestSocket() {
         onClick={async () => {
           try {
             const result = await request.wallet.getResponse({
-              baseURL: 'http://192.168.10.163:5588',
               method: 'post',
               params: {
                 context: {
@@ -80,6 +78,19 @@ export default function TestSocket() {
                   requestId: clientId,
                 },
               },
+            });
+            console.log(result, clientId, 'result===');
+          } catch (error) {
+            console.log('Socket = getResponse = error', error);
+          }
+        }}>
+        getResponse
+      </Button>
+      <Button
+        onClick={async () => {
+          try {
+            const result = await request.wallet.setWalletName({
+              baseURL: '',
             });
             console.log(result, clientId, 'result===');
           } catch (error) {

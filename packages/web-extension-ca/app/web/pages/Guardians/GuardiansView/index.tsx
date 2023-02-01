@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { handleGuardian } from 'utils/sandboxUtil/handleGuardian';
 import './index.less';
 import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
-import { useCurrentApiUrl, useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
+import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
 import { LoginType } from '@portkey/types/types-ca/wallet';
@@ -47,8 +47,6 @@ export default function GuardiansView() {
   const { walletInfo } = useCurrentWallet();
   const { passwordSeed } = useUserInfo();
   const editable = useMemo(() => Object.keys(userGuardiansList ?? {}).length > 1, [userGuardiansList]);
-
-  const baseUrl = useCurrentApiUrl();
 
   const verifyHandler = useCallback(async () => {
     try {
@@ -102,7 +100,6 @@ export default function GuardiansView() {
         const result = await sendVerificationCode({
           guardianAccount: opGuardian?.guardianAccount as string,
           type: LoginStrType[opGuardian?.guardianType as LoginType],
-          baseUrl,
           verifierId: opGuardian?.verifier?.id || '',
         });
         setLoading(false);
@@ -132,7 +129,6 @@ export default function GuardiansView() {
   }, [
     currentChain,
     currentGuardian,
-    baseUrl,
     currentNetwork,
     dispatch,
     navigate,

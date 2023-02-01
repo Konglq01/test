@@ -12,7 +12,6 @@ import CommonSelect from 'components/CommonSelect1';
 import { useTranslation } from 'react-i18next';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
-import { useCurrentApiUrl } from '@portkey/hooks/hooks-ca/network';
 
 export default function SelectVerifier() {
   const { verifierMap } = useGuardiansInfo();
@@ -23,8 +22,6 @@ export default function SelectVerifier() {
   const { t } = useTranslation();
   const { setLoading } = useLoading();
 
-  const baseUrl = useCurrentApiUrl();
-
   const handleChange = useCallback((value: string) => {
     setSelectVal(value);
   }, []);
@@ -32,7 +29,7 @@ export default function SelectVerifier() {
   const selectOptions = useMemo(
     () =>
       Object.values(verifierMap ?? {})?.map((item) => ({
-        value: item.name,
+        value: item.id,
         iconUrl: item.imageUrl ?? '',
         label: item.name,
       })),
@@ -53,7 +50,6 @@ export default function SelectVerifier() {
       const result = await sendVerificationCode({
         guardianAccount: loginAccount.guardianAccount,
         type: LoginStrType[loginAccount.loginType],
-        baseUrl: baseUrl,
         verifierId: selectItem.id,
       });
       setLoading(false);
@@ -80,7 +76,7 @@ export default function SelectVerifier() {
       const _error = verifyErrorHandler(error);
       message.error(_error);
     }
-  }, [baseUrl, dispatch, loginAccount, navigate, selectItem, setLoading]);
+  }, [dispatch, loginAccount, navigate, selectItem, setLoading]);
 
   return (
     <div className="common-page select-verifier-wrapper">
