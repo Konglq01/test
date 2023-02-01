@@ -15,9 +15,20 @@ import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { useOnManagerAddressAndQueryResult } from 'hooks/login';
 import myEvents from 'utils/deviceEvent';
 import { AElfWallet } from '@portkey/types/aelf';
-import { VerificationType } from '@portkey/types/verifier';
+import { VerificationType, VerifierInfo } from '@portkey/types/verifier';
 import useBiometricsReady from 'hooks/useBiometrics';
 import PinContainer from 'components/PinContainer';
+import { GuardiansApproved } from 'pages/Guardian/types';
+
+type RouterParams = {
+  oldPin?: string;
+  pin?: string;
+  managerInfo?: ManagerInfo;
+  caInfo?: CAInfoType;
+  walletInfo?: AElfWallet;
+  verifierInfo?: VerifierInfo;
+  guardiansApproved?: GuardiansApproved;
+};
 
 export default function ConfirmPin() {
   const { walletInfo } = useCurrentWallet();
@@ -25,17 +36,13 @@ export default function ConfirmPin() {
     pin,
     oldPin,
     managerInfo,
-    guardianCount,
     caInfo,
     walletInfo: paramsWalletInfo,
-  } = useRouterParams<{
-    oldPin?: string;
-    pin?: string;
-    managerInfo?: ManagerInfo;
-    guardianCount?: number;
-    caInfo?: CAInfoType;
-    walletInfo?: AElfWallet;
-  }>();
+    verifierInfo,
+    guardiansApproved,
+  } = useRouterParams<RouterParams>();
+  console.log(verifierInfo, managerInfo, guardiansApproved, '====verifierInfo');
+
   const biometricsReady = useBiometricsReady();
 
   const [errorMessage, setErrorMessage] = useState<string>();
@@ -73,8 +80,9 @@ export default function ConfirmPin() {
           managerInfo: managerInfo as ManagerInfo,
           confirmPin,
           walletInfo,
-          guardianCount,
           pinRef,
+          verifierInfo,
+          guardiansApproved,
         });
       }
     },
@@ -82,10 +90,11 @@ export default function ConfirmPin() {
       biometricsReady,
       caInfo,
       dispatch,
-      guardianCount,
+      guardiansApproved,
       managerInfo,
       onManagerAddressAndQueryResult,
       paramsWalletInfo,
+      verifierInfo,
       walletInfo,
     ],
   );

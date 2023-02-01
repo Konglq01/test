@@ -1,4 +1,3 @@
-import { request } from 'api';
 import { CAInfo, ManagerInfo } from '@portkey/types/types-ca/wallet';
 import { VerificationType } from '@portkey/types/verifier';
 import { clearTimeoutInterval, setTimeoutInterval } from '@portkey/utils/interval';
@@ -7,38 +6,37 @@ import CommonToast from 'components/CommonToast';
 import { queryFailAlert } from './login';
 import { AppDispatch } from 'store';
 import { ContractBasic } from './contract';
+import { request } from '@portkey/api/api-did';
 
 export type TimerResult = {
   remove: () => void;
 };
 export function intervalGetResult({
-  apiUrl,
   managerInfo,
   onPass,
   onFail,
 }: {
-  apiUrl: string;
   managerInfo: ManagerInfo;
   onPass?: (caInfo: CAInfo) => void;
   onFail?: (message: string) => void;
 }) {
-  let fetch = request.register;
-  if (managerInfo.verificationType !== VerificationType.register) fetch = request.recovery;
+  let fetch = request.es.getRegisterResult;
+  if (managerInfo.verificationType !== VerificationType.register) fetch = request.es.getRecoverResult;
   const timer = setTimeoutInterval(async () => {
     try {
-      const req = await fetch.result({
-        baseURL: apiUrl,
-        data: managerInfo,
+      const req = await fetch({
+        params: { filter: `id:${managerInfo.managerUniqueId}` },
       });
-      switch (req.recoveryStatus || req.registerStatus) {
+      const result = req.items[0];
+      switch (result.recoveryStatus || result.registerStatus) {
         case 'pass': {
           clearTimeoutInterval(timer);
-          onPass?.(req);
+          onPass?.(result);
           break;
         }
         case 'fail': {
           clearTimeoutInterval(timer);
-          onFail?.(req.recoveryMessage || req.registerMessage);
+          onFail?.(result.recoveryMessage || result.registerMessage);
           break;
         }
         default:

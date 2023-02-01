@@ -8,7 +8,7 @@ import PageContainer from 'components/PageContainer';
 import { pageStyles } from './style';
 import { useLanguage } from 'i18n/hooks';
 import { useGuardiansInfo } from 'hooks/store';
-import GuardianAccountItem from '../components/GuardianAccountItem';
+import GuardianItem from '../components/GuardianItem';
 import Touchable from 'components/Touchable';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { useGetGuardiansInfoWriteStore } from 'hooks/guardian';
@@ -79,7 +79,7 @@ export default function GuardianHome() {
             onPress={() => {
               navigationService.navigate('GuardianDetail', { guardian: JSON.stringify(guardian) });
             }}>
-            <GuardianAccountItem
+            <GuardianItem
               guardianItem={guardian}
               isButtonHide
               renderBtn={renderGuardianBtn}

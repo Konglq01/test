@@ -5,7 +5,6 @@ const axiosInstance = axios.create({
   baseURL: '/',
   timeout: 20000,
 });
-
 axiosInstance.defaults.headers.common['x-csrf-token'] = 'AUTH_TOKEN';
 
 axiosInstance.interceptors.request.use(
@@ -23,7 +22,10 @@ axiosInstance.interceptors.response.use(
     return res;
   },
   error => {
-    return Promise.reject(error?.response?.data?.error || error);
+    console.log(error, '======error');
+    const _error = { ...(error?.response?.data?.error || error) };
+    if (_error.details) _error.message = _error.details;
+    return Promise.reject(_error);
   },
 );
 

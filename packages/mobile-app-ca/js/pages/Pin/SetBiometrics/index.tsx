@@ -16,7 +16,6 @@ import { usePreventHardwareBack } from '@portkey/hooks/mobile';
 import biometric from 'assets/image/pngs/biometric.png';
 import { pTd } from 'utils/unit';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { intervalGetResult, onResultFail, TimerResult } from 'utils/wallet';
 import { CAInfo } from '@portkey/types/types-ca/wallet';
 import Loading from 'components/Loading';
@@ -33,7 +32,6 @@ export default function SetBiometrics() {
   const { pin, caInfo: paramsCAInfo } = useRouterParams<{ pin?: string; caInfo?: CAInfo }>();
   const [errorMessage, setErrorMessage] = useState<string>();
   const { address, managerInfo, caHash } = useCurrentWalletInfo();
-  const { apiUrl } = useCurrentNetworkInfo();
   const [caInfo, setStateCAInfo] = useState<CAInfo | undefined>(paramsCAInfo);
 
   const isSyncCAInfo = useMemo(() => address && managerInfo && !caHash, [address, caHash, managerInfo]);
@@ -41,9 +39,8 @@ export default function SetBiometrics() {
   useEffect(() => {
     if (isSyncCAInfo) {
       setTimeout(() => {
-        if (managerInfo && apiUrl)
+        if (managerInfo)
           timer.current = intervalGetResult({
-            apiUrl,
             managerInfo,
             onPass: setStateCAInfo,
             onFail: message =>
@@ -75,7 +72,6 @@ export default function SetBiometrics() {
       timer.current?.remove();
       Loading.show();
       timer.current = intervalGetResult({
-        apiUrl,
         managerInfo,
         onPass: (info: CAInfo) => {
           dispatch(
@@ -92,7 +88,7 @@ export default function SetBiometrics() {
           onResultFail(dispatch, message, managerInfo?.verificationType === VerificationType.communityRecovery, true),
       });
     }
-  }, [apiUrl, caInfo, dispatch, isSyncCAInfo, managerInfo, pin]);
+  }, [caInfo, dispatch, isSyncCAInfo, managerInfo, pin]);
   const openBiometrics = useCallback(async () => {
     if (!pin) return;
     try {
