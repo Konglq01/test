@@ -4,7 +4,12 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
   coverageDirectory: 'coverage',
-  testMatch: ['<rootDir>/packages/web-extension-ca/**/index.test.tsx'],
+  testMatch: [
+    '<rootDir>/packages/hooks/**/*.test.{ts,tsx}',
+    '<rootDir>/packages/utils/**/*.test.{ts,tsx}',
+    '<rootDir>/packages/store/**/*.test.{ts,tsx}',
+    '<rootDir>/packages/web-extension-ca/**/*.test.tsx',
+  ],
   // testMatch: ['<rootDir>/test/**/*.test.tsx', '<rootDir>/packages/hooks/**/*.test.tsx'],
   collectCoverageFrom: [
     '**/packages/hooks/hooks-ca/**/*.{ts,tsx}',

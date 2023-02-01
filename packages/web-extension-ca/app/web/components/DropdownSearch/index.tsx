@@ -1,6 +1,6 @@
 import { Dropdown, DropdownProps, Input, InputProps } from 'antd';
 import clsx from 'clsx';
-import CustomSvg from 'components/CustomSvg';
+import CustomSvg from '../../components/CustomSvg';
 import './index.less';
 
 interface DropdownSearchProps extends DropdownProps {
