@@ -45,7 +45,7 @@ export default function SelectVerifier() {
           },
           '=====verifierInfo',
         );
-        const verifierResult = await request.verify.sendCode({
+        const requestCodeResult = await request.verify.sendCode({
           data: {
             type: LoginStrType[LoginType.email],
             guardianAccount: loginAccount,
@@ -53,10 +53,10 @@ export default function SelectVerifier() {
           },
         });
 
-        if (verifierResult.verifierSessionId) {
+        if (requestCodeResult.verifierSessionId) {
           navigationService.navigate('VerifierDetails', {
             guardianAccount: loginAccount,
-            verifierResult,
+            requestCodeResult,
             type: LoginType.email,
             guardianItem: {
               isLoginAccount: true,
