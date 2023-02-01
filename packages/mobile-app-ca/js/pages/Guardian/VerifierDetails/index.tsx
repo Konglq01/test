@@ -62,7 +62,7 @@ export default function VerifierDetails() {
   useEffectOnce(() => {
     if (!startResend) countdown.current?.resetTime(60);
   });
-  const [stateVerifierResult, setStateSessionId] = useState<RouterParams['verifierResult']>(verifierResult);
+  const [stateVerifierResult, setStateVerifierResult] = useState<RouterParams['verifierResult']>(verifierResult);
   const digitInput = useRef<DigitInputInterface>();
   const setGuardianStatus = useCallback(
     (status: GuardiansStatusItem) => {
@@ -102,17 +102,6 @@ export default function VerifierDetails() {
       if (!stateVerifierResult || !guardianAccount || !code) return;
       try {
         Loading.show();
-        console.log(
-          {
-            type: LoginStrType[type as LoginType],
-            verificationCode: code,
-            guardianAccount,
-            ...stateVerifierResult,
-            verifierId: guardianItem?.verifier?.id,
-          },
-          '====',
-        );
-
         const rst = await request.verify.verifyCode({
           data: {
             type: LoginStrType[type as LoginType],
@@ -128,6 +117,7 @@ export default function VerifierDetails() {
 
         switch (verificationType) {
           case VerificationType.communityRecovery:
+          case VerificationType.editGuardianApproval:
             setGuardianStatus({
               verifierResult: stateVerifierResult,
               status: VerifyStatus.Verified,
@@ -135,21 +125,12 @@ export default function VerifierDetails() {
                 ...rst,
                 verifierId: guardianItem?.verifier?.id,
               },
+              editGuardianParams: {
+                signature: rst.signature,
+                verifierDoc: rst.verifierDoc,
+              },
             });
             navigationService.goBack();
-            break;
-          case VerificationType.editGuardianApproval:
-            if (rst.signature && rst.verifierDoc) {
-              setGuardianStatus({
-                verifierResult: stateVerifierResult,
-                status: VerifyStatus.Verified,
-                editGuardianParams: {
-                  signature: rst.signature,
-                  verifierDoc: rst.verifierDoc,
-                },
-              });
-              navigationService.goBack();
-            }
             break;
           case VerificationType.addGuardian:
             if (rst.signature && rst.verifierDoc) {
@@ -199,7 +180,7 @@ export default function VerifierDetails() {
         },
       });
       if (req.verifierSessionId) {
-        setStateSessionId(req);
+        setStateVerifierResult(req);
         setGuardianStatus({
           verifierResult: req,
           status: VerifyStatus.Verifying,
