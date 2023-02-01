@@ -1,5 +1,4 @@
 import { sendVerificationCode } from '@portkey/api/api-did/apiUtils/verification';
-import { useCurrentApiUrl } from '@portkey/hooks/hooks-ca/network';
 import { setCurrentGuardianAction, setUserGuardianItemStatus } from '@portkey/store/store-ca/guardians/actions';
 import { UserGuardianItem, UserGuardianStatus } from '@portkey/store/store-ca/guardians/type';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
@@ -26,7 +25,6 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
   const { state } = useLocation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const baseUrl = useCurrentApiUrl();
 
   const guardianSendCode = useCallback(
     async (item: UserGuardianItem) => {
@@ -41,7 +39,6 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
         const result = await sendVerificationCode({
           guardianAccount: item?.guardianAccount,
           type: LoginStrType[item.guardianType],
-          baseUrl,
           verifierId: item?.verifier?.id || '',
         });
         setLoading(false);
@@ -70,11 +67,13 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
         message.error(error?.Error?.Message || error.message?.Message || error?.message);
       }
     },
-    [setLoading, dispatch, baseUrl, navigate, state],
+    [setLoading, dispatch, navigate, state],
   );
 
   const SendCode = useCallback(
     async (item: UserGuardianItem) => {
+      console.log(item, 'guardianSendCode===');
+
       try {
         if (state && state.indexOf('guardians') !== -1) {
           guardianSendCode(item);
@@ -88,7 +87,6 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
         const result = await sendVerificationCode({
           guardianAccount: item?.guardianAccount,
           type: LoginStrType[loginAccount.loginType],
-          baseUrl,
           verifierId: item.verifier?.id || '',
         });
         setLoading(false);
@@ -117,7 +115,7 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
         message.error(error?.error?.message ?? error?.type ?? 'Something error');
       }
     },
-    [state, loginAccount, baseUrl, setLoading, guardianSendCode, dispatch, navigate],
+    [state, loginAccount, setLoading, guardianSendCode, dispatch, navigate],
   );
 
   const verifyingHandler = useCallback(

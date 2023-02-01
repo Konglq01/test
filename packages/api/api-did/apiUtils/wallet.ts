@@ -4,7 +4,7 @@ import { request } from '..';
 import { IContext } from '../types';
 
 interface RegisterDIDWalletParams extends IContext {
-  baseUrl: string;
+  baseUrl?: string;
   type: TLoginStrType;
   loginGuardianAccount: string; //account
   managerAddress: string;
@@ -37,7 +37,7 @@ interface GuardiansApprovedType {
   signature: string;
 }
 interface RecoveryDIDWalletParams extends IContext {
-  baseURL: string;
+  baseURL?: string;
   loginGuardianAccount: string;
   managerAddress: string;
   deviceString: string;
@@ -60,7 +60,7 @@ export const recoveryDIDWallet = async (
 };
 
 interface RequestCreateWalletParams {
-  baseUrl: string;
+  baseUrl?: string;
   requestId: string;
   clientId: string;
 }
@@ -94,7 +94,7 @@ interface FetchCreateWalletParams {
   type: TLoginStrType;
   loginGuardianType: string;
   managerUniqueId: string;
-  baseUrl: string;
+  baseUrl?: string;
 }
 
 export const fetchCreateWalletResult = async ({

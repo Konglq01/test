@@ -30,7 +30,6 @@ export default function QueryPage() {
     async (pwd: string) => {
       if (!currentWalletInfo.managerInfo) throw 'Missing managerInfo';
       const walletResult = await fetchWalletResult({
-        baseUrl: currentNetwork.apiUrl,
         type: LoginStrType[currentWalletInfo.managerInfo.type],
         verificationType: currentWalletInfo.managerInfo.verificationType,
         // TODO
@@ -64,7 +63,7 @@ export default function QueryPage() {
         navigate('/register/success');
       }
     },
-    [currentWalletInfo, currentNetwork, dispatch, navigate, setLoading, fetchWalletResult],
+    [currentWalletInfo, dispatch, navigate, setLoading, fetchWalletResult],
   );
 
   useEffectOnce(() => {

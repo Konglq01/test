@@ -1,7 +1,7 @@
 import { CustomFetchConfig } from '@portkey/utils/fetch';
 
 export interface RequestConfig extends CustomFetchConfig {
-  baseURL: string;
+  baseURL?: string;
   url?: string;
 }
 

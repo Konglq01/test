@@ -35,8 +35,9 @@ export const guardiansSlice = createSlice({
         }
         const map: GuardiansState['verifierMap'] = {};
         action.payload.forEach((item: VerifierItem) => {
-          map[item.name] = item;
+          map[item.id] = item;
         });
+        console.log(map, 'verifierMap==');
         state.verifierMap = map;
       })
       .addCase(setGuardiansAction, (state, action) => {
@@ -70,6 +71,7 @@ export const guardiansSlice = createSlice({
             guardianAccount,
             guardianType,
           };
+          console.log(verifier, _guardianAccounts, verifierMap, 'verifier===');
 
           userStatus[_guardian.key] = { ..._guardian, status: userStatus?.[_guardian.key]?.status };
           return _guardian;

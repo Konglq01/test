@@ -15,4 +15,4 @@ export type ESBaseConfig = BaseConfig & {
   config: ESConfig;
 };
 
-export type ES_API_REQ_FUNCTION = (config: RequestConfig & ESConfig) => Promise<{ type: 'timeout' } | any>;
+export type ES_API_REQ_FUNCTION = (config?: RequestConfig & ESConfig) => Promise<{ type: 'timeout' } | any>;
