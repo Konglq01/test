@@ -30,7 +30,7 @@ type FetchType = Record<string, API_REQ_FUNCTION>;
 type RouterParams = {
   guardianAccount?: string;
   guardianItem?: UserGuardianItem;
-  verifierResult?: { verifierSessionId: string; endPoint: string };
+  requestCodeResult?: { verifierSessionId: string; endPoint: string };
   startResend?: boolean;
   verificationType?: VerificationType;
   type?: LoginType;
@@ -54,16 +54,25 @@ function TipText({ guardianAccount, isRegister }: { guardianAccount?: string; is
 }
 
 export default function VerifierDetails() {
-  const { guardianAccount, guardianItem, verifierResult, startResend, verificationType, type } =
-    useRouterParams<RouterParams>();
+  const {
+    guardianAccount,
+    guardianItem,
+    requestCodeResult: paramsRequestCodeResult,
+    startResend,
+    verificationType,
+    type,
+  } = useRouterParams<RouterParams>();
   console.log(guardianAccount, type, '====guardianAccount');
 
   const countdown = useRef<VerifierCountdownInterface>();
   useEffectOnce(() => {
     if (!startResend) countdown.current?.resetTime(60);
   });
-  const [stateVerifierResult, setStateVerifierResult] = useState<RouterParams['verifierResult']>(verifierResult);
+  const [requestCodeResult, setRequestCodeResult] =
+    useState<RouterParams['requestCodeResult']>(paramsRequestCodeResult);
   const digitInput = useRef<DigitInputInterface>();
+  const { caHash, address: managerAddress } = useCurrentWalletInfo();
+  const getCurrentCAContract = useGetCurrentCAContract();
   const setGuardianStatus = useCallback(
     (status: GuardiansStatusItem) => {
       myEvents.setGuardianStatus.emit({
@@ -73,10 +82,6 @@ export default function VerifierDetails() {
     },
     [guardianItem?.key],
   );
-
-  const { caHash, address: managerAddress } = useCurrentWalletInfo();
-  const getCurrentCAContract = useGetCurrentCAContract();
-
   const onSetLoginAccount = useCallback(async () => {
     if (!managerAddress || !caHash || !guardianItem) return;
 
@@ -99,7 +104,7 @@ export default function VerifierDetails() {
 
   const onFinish = useCallback(
     async (code: string) => {
-      if (!stateVerifierResult || !guardianAccount || !code) return;
+      if (!requestCodeResult || !guardianAccount || !code) return;
       try {
         Loading.show();
         const rst = await request.verify.verifyCode({
@@ -107,19 +112,15 @@ export default function VerifierDetails() {
             type: LoginStrType[type as LoginType],
             verificationCode: code,
             guardianAccount,
-            ...stateVerifierResult,
+            ...requestCodeResult,
             verifierId: guardianItem?.verifier?.id,
           },
         });
-        console.log(rst, '===rst');
-
-        CommonToast.success('Verified Successfully');
-
         switch (verificationType) {
           case VerificationType.communityRecovery:
           case VerificationType.editGuardianApproval:
             setGuardianStatus({
-              verifierResult: stateVerifierResult,
+              requestCodeResult: requestCodeResult,
               status: VerifyStatus.Verified,
               verifierInfo: {
                 ...rst,
@@ -167,7 +168,7 @@ export default function VerifierDetails() {
       }
       Loading.hide();
     },
-    [stateVerifierResult, guardianAccount, type, verificationType, setGuardianStatus, onSetLoginAccount, guardianItem],
+    [requestCodeResult, guardianAccount, type, verificationType, setGuardianStatus, onSetLoginAccount, guardianItem],
   );
   const resendCode = useCallback(async () => {
     Loading.show();
@@ -180,9 +181,9 @@ export default function VerifierDetails() {
         },
       });
       if (req.verifierSessionId) {
-        setStateVerifierResult(req);
+        setRequestCodeResult(req);
         setGuardianStatus({
-          verifierResult: req,
+          requestCodeResult: req,
           status: VerifyStatus.Verifying,
         });
         countdown.current?.resetTime(60);
