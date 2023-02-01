@@ -15,7 +15,6 @@ import { verifyErrorHandler } from 'utils/tryErrorHandler';
 import { LoginType } from '@portkey/types/types-ca/wallet';
 import { useEffectOnce } from 'react-use';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
-import { useCurrentApiUrl, useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 
 const MAX_TIMER = 60;
 
@@ -46,8 +45,6 @@ export default function VerifierPage({
   const timerRef = useRef<NodeJS.Timer>();
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const currentNetwork = useCurrentNetworkInfo();
-  const baseUrl = useCurrentApiUrl();
 
   useEffectOnce(() => {
     isInitStatus && setTimer(MAX_TIMER);
@@ -64,7 +61,6 @@ export default function VerifierPage({
           setLoading(true);
 
           const res = await checkVerificationCode({
-            baseUrl: currentNetwork.apiUrl,
             guardianAccount: loginAccount.guardianAccount,
             verifierSessionId: currentGuardian.verifierInfo.sessionId,
             verificationCode: code,
@@ -90,7 +86,7 @@ export default function VerifierPage({
         message.error(_error);
       }
     },
-    [loginAccount, guardianType, currentGuardian, setLoading, currentNetwork.apiUrl, onSuccess, t],
+    [loginAccount, guardianType, currentGuardian, setLoading, onSuccess, t],
   );
 
   const resendCode = useCallback(async () => {
@@ -100,7 +96,6 @@ export default function VerifierPage({
     const res = await sendVerificationCode({
       guardianAccount: currentGuardian.guardianAccount,
       type: LoginStrType[guardianType],
-      baseUrl,
       verifierId: currentGuardian.verifier?.id || '',
     });
     setLoading(false);
@@ -116,7 +111,7 @@ export default function VerifierPage({
         }),
       );
     }
-  }, [baseUrl, currentGuardian, guardianType, dispatch, setLoading]);
+  }, [currentGuardian, guardianType, dispatch, setLoading]);
 
   useEffect(() => {
     if (timer !== MAX_TIMER) return;

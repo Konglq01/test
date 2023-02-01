@@ -2,7 +2,7 @@ import { TLoginStrType } from '@portkey/types/types-ca/wallet';
 import { request } from '..';
 
 interface SendVerificationCodeParams {
-  baseUrl: string;
+  baseUrl?: string;
   type: TLoginStrType;
   guardianAccount: string;
   verifierId: string;
@@ -23,7 +23,7 @@ export function sendVerificationCode(params: SendVerificationCodeParams): Promis
 
 interface CheckVerificationCodeProps {
   type: TLoginStrType;
-  baseUrl: string;
+  baseUrl?: string;
   endPoint: string;
   guardianAccount: string;
   verifierSessionId: string;

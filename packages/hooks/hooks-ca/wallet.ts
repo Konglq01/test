@@ -47,7 +47,7 @@ interface FetchCreateWalletParams {
   type: TLoginStrType; //0: Email，1：Phone
   loginGuardianType: string;
   managerUniqueId: string;
-  baseUrl: string;
+  baseUrl?: string;
 }
 
 type RegisterStatus = 'pass' | 'pending' | 'fail' | null;

@@ -22,7 +22,6 @@ import BaseVerifierIcon from 'components/BaseVerifierIcon';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import { useTranslation } from 'react-i18next';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
-import { useCurrentApiUrl } from '@portkey/hooks/hooks-ca/network';
 import './index.less';
 
 const guardianTypeList = [{ label: 'Email', value: LoginType.email }];
@@ -47,7 +46,6 @@ export default function AddGuardian() {
   const { setLoading } = useLoading();
   const { walletInfo } = useCurrentWallet();
   const userGuardianList = useGuardianList();
-  const baseUrl = useCurrentApiUrl();
 
   const disabled = useMemo(() => !emailVal || exist || !!inputErr, [emailVal, exist, inputErr]);
 
@@ -128,7 +126,6 @@ export default function AddGuardian() {
       const result = await sendVerificationCode({
         guardianAccount: emailVal as string,
         type: LoginStrType[guardianType as LoginType],
-        baseUrl,
         verifierId: selectVerifierItem?.id || '',
       });
       setLoading(false);
@@ -155,17 +152,7 @@ export default function AddGuardian() {
       const _error = verifyErrorHandler(error);
       message.error(_error);
     }
-  }, [
-    baseUrl,
-    dispatch,
-    emailVal,
-    guardianType,
-    navigate,
-    selectVerifierItem,
-    setLoading,
-    userGuardianList,
-    walletInfo.caHash,
-  ]);
+  }, [dispatch, emailVal, guardianType, navigate, selectVerifierItem, setLoading, userGuardianList, walletInfo.caHash]);
 
   return (
     <div className="add-guardians-page">
