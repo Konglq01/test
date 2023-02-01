@@ -92,7 +92,7 @@ export default function SelectVerifier() {
           {Object.values(verifierMap ?? {})
             .slice(0, 3)
             ?.map((item) => (
-              <li key={item.name} className="popular-item" onClick={() => handleChange(item.name)}>
+              <li key={item.name} className="popular-item" onClick={() => handleChange(item.id)}>
                 <BaseVerifierIcon src={item.imageUrl} rootClassName="popular-item-image" />
                 <p className="popular-item-name">{item.name}</p>
               </li>

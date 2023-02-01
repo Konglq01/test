@@ -1,5 +1,5 @@
 import Signalr from '..';
-import { SinOutput } from './types';
+import { CaAccountRecoverResult, CaAccountRegisterResult } from '@portkey/types/types-ca/wallet';
 import { listenList } from '@portkey/constants/constants-ca/socket';
 
 class SignalrDid extends Signalr {
@@ -7,42 +7,31 @@ class SignalrDid extends Signalr {
     this.invoke('Ack', clientId, requestId);
   }
 
-  public onSinAndAck(
-    { clientId, requestId }: { clientId: string; requestId: string },
-    callback: (data: SinOutput) => void,
-  ) {
-    this.listen('caAccountRegister', (data: SinOutput) => {
-      console.log(data, 'caAccountRegister====');
-      // if (data.requestId === requestId) {
-      //   this.Ack(clientId, requestId);
-      //   callback(data);
-      // }
-    });
-  }
-
   public onCaAccountRegister(
     { clientId, requestId }: { clientId: string; requestId: string },
-    callback: (data: SinOutput) => void,
+    callback: (data: CaAccountRegisterResult) => void,
   ) {
-    this.listen('caAccountRegister', (data: SinOutput) => {
-      console.log(data, 'caAccountRegister====');
-      // if (data.requestId === requestId) {
-      //   this.Ack(clientId, requestId);
-      //   callback(data);
-      // }
+    this.listen('caAccountRegister', (data: CaAccountRegisterResult) => {
+      if (data.requestId === requestId) {
+        if (data.body.registerStatus !== 'pending') {
+          this.Ack(clientId, requestId);
+        }
+        callback(data);
+      }
     });
   }
 
   public onCaAccountRecover(
     { clientId, requestId }: { clientId: string; requestId: string },
-    callback: (data: SinOutput) => void,
+    callback: (data: CaAccountRecoverResult) => void,
   ) {
-    this.listen('caAccountRecover', (data: SinOutput) => {
-      console.log(data, 'caAccountRecover====');
-      // if (data.requestId === requestId) {
-      //   this.Ack(clientId, requestId);
-      //   callback(data);
-      // }
+    this.listen('caAccountRecover', (data: CaAccountRecoverResult) => {
+      if (data.requestId === requestId) {
+        if (data.body.recoverStatus !== 'pending') {
+          this.Ack(clientId, requestId);
+        }
+        callback(data);
+      }
     });
   }
 }
