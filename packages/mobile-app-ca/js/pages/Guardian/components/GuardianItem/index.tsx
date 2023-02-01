@@ -46,7 +46,7 @@ function GuardianItemButton({
 }) {
   const itemStatus = useMemo(() => guardiansStatus?.[guardianItem.key], [guardianItem.key, guardiansStatus]);
 
-  const { status, verifierResult } = itemStatus || {};
+  const { status, requestCodeResult } = itemStatus || {};
 
   const verifierInfo = useMemo(() => {
     let _verificationType = VerificationType.communityRecovery;
@@ -85,12 +85,12 @@ function GuardianItemButton({
         Loading.hide();
         await sleep(200);
         onSetGuardianStatus({
-          verifierResult: req,
+          requestCodeResult: req,
           status: VerifyStatus.Verifying,
         });
         navigationService.push('VerifierDetails', {
           ...verifierInfo,
-          verifierResult: req,
+          requestCodeResult: req,
         });
       } else {
         throw new Error('send fail');
@@ -105,10 +105,10 @@ function GuardianItemButton({
   const onVerifier = useCallback(() => {
     navigationService.push('VerifierDetails', {
       ...verifierInfo,
-      verifierResult,
+      requestCodeResult,
       startResend: true,
     });
-  }, [verifierInfo, verifierResult]);
+  }, [verifierInfo, requestCodeResult]);
   const buttonProps: CommonButtonProps = useMemo(() => {
     if (isExpired && status !== VerifyStatus.Verified) {
       return {
