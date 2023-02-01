@@ -191,27 +191,25 @@ export default class ServiceWorkerInstantiate {
           ServiceWorkerInstantiate.getWalletState(sendResponse);
           break;
         default:
-          sendResponse({
-            ...errorHandler(700001, `Portkey does not contain this method (${message.type})`),
-          });
+          sendResponse(errorHandler(700001, `Portkey does not contain this method (${message.type})`));
           break;
       }
       // } else if (pageState.chain.currentChain.chainType === 'aelf') {
       //   this.aelfMethodController.dispenseMessage(message, sendResponse);
       //   return;
     } else {
-      sendResponse({
-        ...errorHandler(
+      sendResponse(
+        errorHandler(
           700001,
           'Not Support',
           // `The current network is ${pageState.chain.currentChain.chainType}, which cannot match this method (${message.type})`,
         ),
-      });
+      );
     }
   }
 
   async openRecaptchaPage(sendResponse: SendResponseFun, message: any) {
-    if (!message.externalLink) return sendResponse({ ...errorHandler(400001, 'Missing param externalLink') });
+    if (!message.externalLink) return sendResponse(errorHandler(400001, 'Missing param externalLink'));
     const result = await notificationService.openPrompt({
       method: PromptRouteTypes.EXPAND_FULL_SCREEN,
       externalLink: message.externalLink,
@@ -260,11 +258,9 @@ export default class ServiceWorkerInstantiate {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async getAddress(sendResponse: SendResponseFun, _message: any) {
     try {
-      sendResponse({
-        ...errorHandler(700001),
-      });
+      sendResponse(errorHandler(700001));
     } catch (error) {
-      sendResponse({ ...errorHandler(500001, error) });
+      sendResponse(errorHandler(500001, error));
     }
   }
 
@@ -273,12 +269,10 @@ export default class ServiceWorkerInstantiate {
    */
   async connectWallet(sendResponse: SendResponseFun, message: any) {
     try {
-      sendResponse({ ...errorHandler(700001, '') });
+      sendResponse(errorHandler(700001, ''));
     } catch (error) {
       console.log(error, 'connectWallet==');
-      return sendResponse({
-        ...errorHandler(500001, error),
-      });
+      return sendResponse(errorHandler(500001, error));
     }
   }
 
@@ -304,9 +298,7 @@ export default class ServiceWorkerInstantiate {
       });
     } catch (error) {
       console.log(error, 'notificationServiceClose');
-      sendResponse({
-        ...errorHandler(500001, error),
-      });
+      sendResponse(errorHandler(500001, error));
     }
   }
 
@@ -324,13 +316,9 @@ export default class ServiceWorkerInstantiate {
 
   static async getWalletState(sendResponse: SendResponseFun) {
     try {
-      sendResponse({
-        ...errorHandler(0),
-      });
+      sendResponse(errorHandler(0));
     } catch (error) {
-      sendResponse({
-        ...errorHandler(200004, error),
-      });
+      sendResponse(errorHandler(200004, error));
     }
   }
 
@@ -367,33 +355,40 @@ export default class ServiceWorkerInstantiate {
       setLocalStorage({
         [storage.lastMessageTime]: moment().add(pageState.lockTime, 'm').format(),
       });
-      lastTime && timeLock && ServiceWorkerInstantiate.lockWallet(sendResponse);
+      console.log(
+        timeLock,
+        lastTime,
+        pageState.lockTime,
+        moment().format(),
+        moment().add(pageState.lockTime, 'm').format(),
+        'timeLock==',
+      );
+      lastTime && timeLock && ServiceWorkerInstantiate.lockWallet(sendResponse, 'timingLock');
       // MV2 -> MV3 setTimeout -> alarms.create
-      // apis.alarms.create('timingLock', {
-      //   delayInMinutes: pageState.lockTime ?? AutoLockDataType.OneHour,
-      // });
-      // apis.alarms.onAlarm.addListener((alarm) => {
-      //   if (alarm.name !== 'timingLock') return;
-      //   apis.alarms.clear(alarm.name);
-      //   if (pageState.lockTime === AutoLockDataType.Never) return;
-      //   ServiceWorkerInstantiate.lockWallet(sendResponse);
-      // });
-    }
-  }
-
-  static lockWallet(sendResponse?: SendResponseFun) {
-    try {
-      seed = null;
-      SWEventController.lockStateChanged(true, sendResponse);
-    } catch (e) {
-      sendResponse?.({
-        ...errorHandler(500001, e),
+      apis.alarms.create('timingLock', {
+        delayInMinutes: pageState.lockTime ?? AutoLockDataType.OneHour,
+      });
+      apis.alarms.onAlarm.addListener((alarm) => {
+        if (alarm.name !== 'timingLock') return;
+        apis.alarms.clear(alarm.name);
+        if (pageState.lockTime === AutoLockDataType.Never) return;
+        ServiceWorkerInstantiate.lockWallet(sendResponse, 'timingLock');
       });
     }
   }
 
+  static lockWallet(sendResponse?: SendResponseFun, message?: any) {
+    try {
+      console.log('lockWallet', message);
+      seed = null;
+      SWEventController.lockStateChanged(true, sendResponse);
+    } catch (e) {
+      sendResponse?.(errorHandler(500001, e));
+    }
+  }
+
   static unlockWallet(sendResponse: SendResponseFun, _seed: string | null) {
-    if (!_seed) return sendResponse({ ...errorHandler(500001, 'unlockWallet error') });
+    if (!_seed) return sendResponse(errorHandler(500001, 'unlockWallet error'));
     SWEventController.lockStateChanged(false, sendResponse);
   }
 

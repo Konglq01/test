@@ -1,14 +1,9 @@
 import { PIN_SIZE } from '@portkey/constants/misc';
-import { TextL } from 'components/CommonText';
 import PageContainer from 'components/PageContainer';
-import DigitInput, { DigitInputInterface } from 'components/DigitInput';
+import { DigitInputInterface } from 'components/DigitInput';
 import useRouterParams from '@portkey/hooks/useRouterParams';
 import React, { useCallback, useRef, useState } from 'react';
 import navigationService from 'utils/navigationService';
-import { StyleSheet, View } from 'react-native';
-import { windowHeight } from '@portkey/utils/mobile/device';
-import { pTd } from 'utils/unit';
-import GStyles from 'assets/theme/GStyles';
 import { useAppDispatch } from 'store/hooks';
 import { changePin, createWallet } from '@portkey/store/store-ca/wallet/actions';
 import CommonToast from 'components/CommonToast';
@@ -20,8 +15,20 @@ import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { useOnManagerAddressAndQueryResult } from 'hooks/login';
 import myEvents from 'utils/deviceEvent';
 import { AElfWallet } from '@portkey/types/aelf';
-import { VerificationType } from '@portkey/types/verifier';
+import { VerificationType, VerifierInfo } from '@portkey/types/verifier';
 import useBiometricsReady from 'hooks/useBiometrics';
+import PinContainer from 'components/PinContainer';
+import { GuardiansApproved } from 'pages/Guardian/types';
+
+type RouterParams = {
+  oldPin?: string;
+  pin?: string;
+  managerInfo?: ManagerInfo;
+  caInfo?: CAInfoType;
+  walletInfo?: AElfWallet;
+  verifierInfo?: VerifierInfo;
+  guardiansApproved?: GuardiansApproved;
+};
 
 export default function ConfirmPin() {
   const { walletInfo } = useCurrentWallet();
@@ -29,17 +36,13 @@ export default function ConfirmPin() {
     pin,
     oldPin,
     managerInfo,
-    guardianCount,
     caInfo,
     walletInfo: paramsWalletInfo,
-  } = useRouterParams<{
-    oldPin?: string;
-    pin?: string;
-    managerInfo?: ManagerInfo;
-    guardianCount?: number;
-    caInfo?: CAInfoType;
-    walletInfo?: AElfWallet;
-  }>();
+    verifierInfo,
+    guardiansApproved,
+  } = useRouterParams<RouterParams>();
+  console.log(verifierInfo, managerInfo, guardiansApproved, '====verifierInfo');
+
   const biometricsReady = useBiometricsReady();
 
   const [errorMessage, setErrorMessage] = useState<string>();
@@ -77,7 +80,9 @@ export default function ConfirmPin() {
           managerInfo: managerInfo as ManagerInfo,
           confirmPin,
           walletInfo,
-          guardianCount,
+          pinRef,
+          verifierInfo,
+          guardiansApproved,
         });
       }
     },
@@ -85,10 +90,11 @@ export default function ConfirmPin() {
       biometricsReady,
       caInfo,
       dispatch,
-      guardianCount,
+      guardiansApproved,
       managerInfo,
       onManagerAddressAndQueryResult,
       paramsWalletInfo,
+      verifierInfo,
       walletInfo,
     ],
   );
@@ -101,7 +107,7 @@ export default function ConfirmPin() {
       }
 
       if (confirmPin !== pin) {
-        pinRef.current?.resetPin();
+        pinRef.current?.reset();
         return setErrorMessage('Pins do not match');
       }
 
@@ -119,28 +125,7 @@ export default function ConfirmPin() {
         myEvents.clearSetPin.emit('clearSetPin');
         navigationService.goBack();
       }}>
-      <View style={styles.container}>
-        <TextL style={GStyles.textAlignCenter}>Confirm Pin</TextL>
-        <DigitInput
-          type="pin"
-          ref={pinRef}
-          secureTextEntry
-          style={styles.pinStyle}
-          onChangeText={onChangeText}
-          errorMessage={errorMessage}
-        />
-      </View>
+      <PinContainer ref={pinRef} title="Confirm Pin" errorMessage={errorMessage} onChangeText={onChangeText} />
     </PageContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    width: pTd(230),
-    alignSelf: 'center',
-    marginTop: windowHeight * 0.3,
-  },
-  pinStyle: {
-    marginTop: 24,
-  },
-});

@@ -1,5 +1,5 @@
 import { DEFAULT_METHOD } from 'api/list';
-import { BaseConfig, UrlObj, requestConfig } from 'api/types';
+import { BaseConfig, UrlObj, RequestConfig } from 'api/types';
 import { spliceUrl, service, getRequestConfig } from 'api/utils';
 import { NETWORK_CONFIG } from 'api/wallet';
 
@@ -24,7 +24,7 @@ myServer.prototype.parseRouter = function (name: string, urlObj: UrlObj) {
  * @param  {object} config
  * @return {Promise<any>}
  */
-myServer.prototype.send = function (base: BaseConfig, config: requestConfig) {
+myServer.prototype.send = function (base: BaseConfig, config: RequestConfig) {
   const {
     method = DEFAULT_METHOD,
     query = '',

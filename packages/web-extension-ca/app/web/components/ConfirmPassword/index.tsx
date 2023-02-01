@@ -59,6 +59,7 @@ export default function ConfirmPassword({
             label?.password
           ) : (
             <>
+              {/* eslint-disable-next-line no-inline-styles/no-inline-styles */}
               <span style={{ marginRight: 8 }}>{t('Pin (Must be at least 8 characters)')}</span>
             </>
           )
@@ -68,15 +69,15 @@ export default function ConfirmPassword({
         validateTrigger="onBlur"
         help={createValidate.errorMsg || (isPasswordLengthTipShow ? t('Must be at least 8 characters') : undefined)}
         rules={[
-          { required: true, message: t('Please enter Pin!') },
+          { required: true, message: t('Please enter Pin') },
           () => ({
             validator(_, value) {
               if (!value) {
                 setCreateValidate({
                   validateStatus: 'error',
-                  errorMsg: t('Please enter Pin!'),
+                  errorMsg: t('Please enter Pin'),
                 });
-                return Promise.reject(t('Please enter Pin!'));
+                return Promise.reject(t('Please enter Pin'));
               }
               if (value.length < 8) {
                 setCreateValidate({
@@ -111,7 +112,7 @@ export default function ConfirmPassword({
         name="confirmPassword"
         validateTrigger="onBlur"
         rules={[
-          { required: true, message: t('Please enter Pin!') },
+          { required: true, message: t('Please enter Pin') },
           () => ({
             validator(_, value) {
               if (!value || password === value) {

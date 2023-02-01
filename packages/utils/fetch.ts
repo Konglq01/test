@@ -78,6 +78,7 @@ export const customFetch: CustomFetchFun = (url, _config) => {
             reject('timeout');
           } else {
             const _result = result as Response;
+            console.log(result, 'customFetch===');
             _result
               .text()
               .then((text: string) => {

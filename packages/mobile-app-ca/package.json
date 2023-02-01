@@ -3,6 +3,8 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
+    "prebuild:apk": "yarn workspace @portkey/constants run handle-network",
+    "prebuild:ipa": "yarn workspace @portkey/constants run handle-network",
     "android": "react-native run-android",
     "ios": "react-native run-ios --simulator='iPhone 13 Pro'",
     "ios14": "react-native run-ios --simulator='iPhone 14 Pro'",
@@ -10,7 +12,6 @@
     "start": "react-native start",
     "test": "jest",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "prepare": "husky install",
     "android-clean": "cd android && ./gradlew clean && cd ..",
     "ios-clean": "rm -rf ios/Pods && rm -rf ios/build",
     "pod-install": "cd ios && pod install && cd ..",
@@ -34,7 +35,7 @@
       "@rneui/themed/**",
       "base-64",
       "buffer",
-      "teaset",
+      "rn-teaset",
       "@shopify/flash-list"
     ]
   },
@@ -111,13 +112,14 @@
     "react-native-webview": "^11.23.0",
     "react-native-largelist": "3.1.0-rc.2",
     "react-native-spring-scrollview": "3.0.2",
+    "react-native-spinkit": "1.5.1",
     "react-redux": "^8.0.2",
     "redux-flipper": "^2.0.2",
     "redux-persist": "^6.0.0",
     "rn-nodeify": "^10.3.0",
     "seamless-immutable": "^7.1.4",
     "stream": "^0.0.2",
-    "teaset": "git+https://github.com/mason-hz/teaset",
+    "rn-teaset": "^0.1.1",
     "uuid": "^8.3.2",
     "web3-utils": "^1.8.0"
   },

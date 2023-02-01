@@ -13,8 +13,6 @@ import { NetworkType } from '@portkey/types';
 import CommonSelect from 'components/CommonSelect1';
 import { useChangeNetwork } from 'hooks/useChangeNetwork';
 import i18n from 'i18n';
-import { Button, message } from 'antd';
-import { clearLocalStorage } from 'utils/storage/chromeStorage';
 
 export default function RegisterStart() {
   const { type } = useParams();
@@ -64,7 +62,6 @@ export default function RegisterStart() {
                   value={currentNetwork.networkType}
                   items={selectItems}
                   onChange={networkChange}
-                  style={{ width: 366 }}
                   showArrow={false}
                   getPopupContainer={(triggerNode) => triggerNode.parentElement}
                 />
@@ -73,15 +70,6 @@ export default function RegisterStart() {
           )}
         </div>
       </div>
-      <Button
-        style={{ width: 500 }}
-        onClick={async () => {
-          await clearLocalStorage();
-          message.success('clear');
-          location.reload();
-        }}>
-        ClearStorage
-      </Button>
     </div>
   );
 }

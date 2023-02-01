@@ -1,12 +1,12 @@
 import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
-import { resetVerifierState } from '@portkey/store/store-ca/guardians/actions';
+import { resetGuardiansState } from '@portkey/store/store-ca/guardians/actions';
 import { Button, message } from 'antd';
 import EmailInput, { EmailInputInstance } from 'pages/RegisterStart/components/EmailInput';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useAppDispatch, useLoading, useLoginInfo } from 'store/Provider/hooks';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import useAccountVerifierList from 'hooks/useGuardianList';
+import useGuardianList from 'hooks/useGuardianList';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { LoginType } from '@portkey/types/types-ca/wallet';
 import './index.less';
@@ -16,7 +16,7 @@ export default function EmailLogin() {
   const { setLoading } = useLoading();
   const [error, setError] = useState<string>();
   const account = useMemo(
-    () => (loginAccount?.createType === 'login' ? loginAccount.loginGuardianType : undefined),
+    () => (loginAccount?.createType === 'login' ? loginAccount.guardianAccount : undefined),
     [loginAccount],
   );
   const [val, setVal] = useState<string | undefined>(account);
@@ -25,13 +25,13 @@ export default function EmailLogin() {
   const navigate = useNavigate();
   const currentNetwork = useCurrentNetworkInfo();
   const currentChain = useCurrentChain();
-  const fetchUserVerifier = useAccountVerifierList();
+  const fetchUserVerifier = useGuardianList();
   const loginHandler = useCallback(
-    (loginGuardianType: string) => {
+    (guardianAccount: string) => {
       dispatch(
         setLoginAccountAction({
-          loginGuardianType: loginGuardianType,
-          accountLoginType: LoginType.email,
+          guardianAccount,
+          loginType: LoginType.email,
           createType: 'login',
         }),
       );
@@ -45,8 +45,8 @@ export default function EmailLogin() {
       setLoading(true);
       await emailInputInstance?.current?.validateEmail(val, 'login');
       loginHandler(val);
-      dispatch(resetVerifierState());
-      await fetchUserVerifier(val);
+      dispatch(resetGuardiansState());
+      await fetchUserVerifier({ loginGuardianAccount: val });
       setLoading(false);
 
       navigate('/login/guardian-approval');
@@ -55,7 +55,7 @@ export default function EmailLogin() {
       console.error(error, 'error====onLogin');
       typeof error === 'string' ? setError(error) : message.error(error);
     }
-  }, [dispatch, fetchUserVerifier, loginHandler, navigate, setLoading, val]);
+  }, [val, dispatch, fetchUserVerifier, loginHandler, navigate, setLoading]);
 
   return (
     <div className="email-login-wrapper">

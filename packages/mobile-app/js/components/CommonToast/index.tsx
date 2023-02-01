@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
-import Toast from 'teaset/components/Toast/Toast';
-import Overlay from 'teaset/components/Overlay/Overlay';
+import Toast from 'rn-teaset/components/Toast/Toast';
+import Overlay from 'rn-teaset/components/Overlay/Overlay';
 import { StyleSheet, View } from 'react-native';
 import { defaultColors } from 'assets/theme';
 import Svg from 'components/Svg';

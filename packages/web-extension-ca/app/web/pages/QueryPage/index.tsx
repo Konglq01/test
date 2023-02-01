@@ -2,8 +2,7 @@
  * @file
  * Query registration and login data
  */
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { useCurrentWalletInfo, useFetchWalletCAAddress } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { setCAInfo } from '@portkey/store/store-ca/wallet/actions';
 import { PinErrorMessage } from '@portkey/utils/wallet/types';
 import { message } from 'antd';
@@ -16,23 +15,22 @@ import { useNavigate } from 'react-router';
 import { useEffectOnce } from 'react-use';
 import { useAppDispatch, useLoading } from 'store/Provider/hooks';
 import { setLocalStorage } from 'utils/storage/chromeStorage';
+import { useFetchWalletCAAddress } from '@portkey/hooks/hooks-ca/wallet-result';
 
 export default function QueryPage() {
   const { setLoading } = useLoading();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const fetchWalletResult = useFetchWalletCAAddress();
-  const currentNetwork = useCurrentNetworkInfo();
   const currentWalletInfo = useCurrentWalletInfo();
 
   const fetchCreateWalletResult = useCallback(
     async (pwd: string) => {
       if (!currentWalletInfo.managerInfo) throw 'Missing managerInfo';
       const walletResult = await fetchWalletResult({
-        baseUrl: currentNetwork.apiUrl,
-        type: currentWalletInfo.managerInfo.type,
+        clientId: currentWalletInfo.address,
+        requestId: currentWalletInfo.managerInfo.requestId || '',
         verificationType: currentWalletInfo.managerInfo.verificationType,
-        loginGuardianType: currentWalletInfo.managerInfo.loginGuardianType,
         managerUniqueId: currentWalletInfo.managerInfo.managerUniqueId,
       });
       if (walletResult.status !== 'pass') {
@@ -62,11 +60,11 @@ export default function QueryPage() {
         navigate('/register/success');
       }
     },
-    [currentWalletInfo, currentNetwork, dispatch, navigate, setLoading, fetchWalletResult],
+    [currentWalletInfo, dispatch, navigate, setLoading, fetchWalletResult],
   );
 
   useEffectOnce(() => {
-    setLoading(1);
+    setLoading(0.5);
     InternalMessage.payload(InternalMessageTypes.GET_SEED)
       .send()
       .then((res) => {
@@ -78,7 +76,7 @@ export default function QueryPage() {
   const onUnLockHandler = useCallback(
     async (pwd: string) => {
       // get CA address
-      setLoading(1);
+      setLoading(0.5);
       await fetchCreateWalletResult(pwd);
     },
     [fetchCreateWalletResult, setLoading],

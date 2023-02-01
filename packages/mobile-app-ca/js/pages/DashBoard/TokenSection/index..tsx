@@ -18,7 +18,7 @@ const mockData = {
     {
       chainId: 'AELF',
       token: {
-        id: Math.random(),
+        id: 1,
         chainId: 'AELF',
         symbol: 'ELF',
         address: 'xxxxxx',
@@ -29,7 +29,7 @@ const mockData = {
     {
       chainId: 'AELF',
       token: {
-        id: Math.random(),
+        id: 2,
         chainId: 'AELF',
         symbol: 'ELF',
         address: 'xxxxxx',
@@ -40,7 +40,7 @@ const mockData = {
     {
       chainId: 'AELF',
       token: {
-        id: Math.random(),
+        id: 3,
         chainId: 'AELF',
         symbol: 'ELF',
         address: 'xxxxxx',
@@ -103,7 +103,7 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
         refreshing={refreshing}
         data={accountTokenList || []}
         renderItem={renderItem}
-        keyExtractor={(item: TokenItemShowType) => item?.id || ''}
+        keyExtractor={(item: any) => item?.token?.id}
         onRefresh={() => {
           setRefreshing(true);
           getAccountBalance?.();

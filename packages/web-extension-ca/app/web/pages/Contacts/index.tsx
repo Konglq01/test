@@ -94,7 +94,7 @@ export default function Contacts() {
         />
         <Input
           className="search-input"
-          prefix={<CustomSvg type="SearchBlur" style={{ width: 17, height: 18 }} />}
+          prefix={<CustomSvg type="SearchBlur" className="search-svg" />}
           placeholder="Name or Address"
           onChange={searchContacts}
         />
@@ -107,14 +107,14 @@ export default function Contacts() {
             <div className="flex-column no-contact">
               <p className="title">{t('No Contacts')}</p>
               <p className="desc">{t("Contacts you've added will appear here")}</p>
-              <CustomSvg type="AddressBook" style={{ width: 56, height: 64 }} />
+              <CustomSvg type="AddressBook" className="no-contact-svg" />
               <Button
                 className="flex-row-center add-button"
                 type="text"
                 onClick={() => {
                   navigate('/setting/contacts/add', { state: initContactItem });
                 }}>
-                <CustomSvg type="Plus" style={{ width: 12, height: 12 }} /> {t('Add New Contact')}
+                <CustomSvg type="Plus" className="plug-svg" /> {t('Add New Contact')}
               </Button>
             </div>
           )

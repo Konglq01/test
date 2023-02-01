@@ -24,6 +24,7 @@ export default function Receive() {
   const rightElement = useMemo(() => {
     return (
       <div>
+        {/* eslint-disable-next-line no-inline-styles/no-inline-styles */}
         <CustomSvg onClick={() => navigate(-1)} type="Close2" style={{ width: 18, height: 18, cursor: 'pointer' }} />
       </div>
     );
@@ -46,6 +47,7 @@ export default function Receive() {
         <QRCode
           // imageSettings={}
           value={JSON.stringify({ address: receiveAddress, token: { symbol, chainId }, network: currentNetwork })}
+          // eslint-disable-next-line no-inline-styles/no-inline-styles
           style={{ width: 140, height: 140 }}
         />
         <div className="receive-address">

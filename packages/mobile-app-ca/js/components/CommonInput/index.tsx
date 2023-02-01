@@ -4,6 +4,7 @@ import Svg from 'components/Svg';
 import { generalStyles, searchStyle, bgWhiteStyles } from './style';
 import { pTd } from 'utils/unit';
 import { useLanguage } from 'i18n/hooks';
+import { defaultColors } from 'assets/theme';
 
 type CommonInputProps = InputProps & { type?: 'search' | 'general'; theme?: 'white-bg' | 'gray-bg' };
 
@@ -25,6 +26,7 @@ const CommonInput = forwardRef((props: CommonInputProps, forwardedRef: any) => {
   if (type === 'search')
     return (
       <Input
+        selectionColor={defaultColors.primaryColor}
         containerStyle={[searchStyle.containerStyle, containerStyle]}
         inputContainerStyle={[searchStyle.inputContainerStyle, inputContainerStyle]}
         inputStyle={[searchStyle.inputStyle, inputStyle]}
@@ -46,6 +48,7 @@ const CommonInput = forwardRef((props: CommonInputProps, forwardedRef: any) => {
         theme === 'white-bg' && bgWhiteStyles.inputContainerStyle,
         inputContainerStyle,
       ]}
+      selectionColor={defaultColors.primaryColor}
       inputStyle={[generalStyles.inputStyle, inputStyle]}
       labelStyle={[generalStyles.labelStyle, labelStyle]}
       rightIconContainerStyle={[generalStyles.rightIconContainerStyle, rightIconContainerStyle]}

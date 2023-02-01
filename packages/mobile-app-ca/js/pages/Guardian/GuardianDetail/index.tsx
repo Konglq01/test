@@ -12,7 +12,7 @@ import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import CommonSwitch from 'components/CommonSwitch';
 import ActionSheet from 'components/ActionSheet';
 import { useGuardiansInfo } from 'hooks/store';
-import { useGetGuardiansList } from 'hooks/guardian';
+import { useGetGuardiansInfo } from 'hooks/guardian';
 import Loading from 'components/Loading';
 import { randomId } from '@portkey/utils';
 import { request } from 'api';
@@ -23,8 +23,7 @@ import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import myEvents from 'utils/deviceEvent';
 import { VerifierImage } from '../components/VerifierImage';
 import { cancelLoginAccount } from 'utils/guardian';
-import { useCurrentCAContract } from 'hooks/contract';
-
+import { useGetCurrentCAContract } from 'hooks/contract';
 interface GuardianDetailProps {
   route?: any;
 }
@@ -32,21 +31,21 @@ interface GuardianDetailProps {
 const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
   const { t } = useLanguage();
   const { params } = route;
-  const getGuardiansList = useGetGuardiansList();
+  const getGuardiansInfo = useGetGuardiansInfo();
   const { userGuardiansList } = useGuardiansInfo();
   const { caHash, address: managerAddress } = useCurrentWalletInfo();
-  const caContract = useCurrentCAContract();
-
+  const getCurrentCAContract = useGetCurrentCAContract();
   const guardian = useMemo<UserGuardianItem | undefined>(
     () => (params?.guardian ? JSON.parse(params.guardian) : undefined),
     [params],
   );
 
   const onCancelLoginAccount = useCallback(async () => {
-    if (!caContract || !managerAddress || !caHash || !guardian) return;
+    if (!managerAddress || !caHash || !guardian) return;
 
     Loading.show();
     try {
+      const caContract = await getCurrentCAContract();
       const req = await cancelLoginAccount(caContract, managerAddress, caHash, guardian);
       if (req && !req.error) {
         myEvents.refreshGuardiansList.emit();
@@ -60,7 +59,7 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
       CommonToast.failError(error);
     }
     Loading.hide();
-  }, [caContract, caHash, guardian, managerAddress]);
+  }, [caHash, getCurrentCAContract, guardian, managerAddress]);
 
   const setLoginAccount = useCallback(async () => {
     if (!guardian) return;
@@ -97,7 +96,7 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
       if (guardian === undefined || userGuardiansList === undefined) return;
       const email = guardian.loginGuardianType;
 
-      if (value === false) {
+      if (!value) {
         const loginIndex = userGuardiansList.findIndex(
           item =>
             item.isLoginAccount &&
@@ -123,39 +122,36 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
         return;
       }
 
-      if (value) {
-        const loginIndex = userGuardiansList.findIndex(
-          item =>
-            item.isLoginAccount &&
-            item.guardiansType === guardian.guardiansType &&
-            item.loginGuardianType === guardian.loginGuardianType &&
-            item.verifier?.url !== guardian.verifier?.url,
-        );
-        if (loginIndex === -1) {
-          Loading.show();
-          try {
-            const holderInfo = await getGuardiansList({ loginGuardianType: guardian.loginGuardianType });
-            if (holderInfo.guardians) {
-              Loading.hide();
-              ActionSheet.alert({
-                title2: t(`This account address is already a login account of other wallets and cannot be used`),
-                buttons: [
-                  {
-                    title: t('Close'),
-                  },
-                ],
-              });
-              return;
-            }
-          } catch (error) {
-            console.debug(error, '====error');
-          }
+      // const loginIndex = userGuardiansList.findIndex(
+      //   item =>
+      //     item.isLoginAccount &&
+      //     item.guardiansType === guardian.guardiansType &&
+      //     item.loginGuardianType === guardian.loginGuardianType &&
+      //     item.verifier?.url !== guardian.verifier?.url,
+      // );
+      // if (loginIndex === -1) {}
+      Loading.show();
+      try {
+        const holderInfo = await getGuardiansInfo({ loginGuardianType: guardian.loginGuardianType });
+        if (holderInfo.guardians) {
           Loading.hide();
+          ActionSheet.alert({
+            title2: t(`This account address is already a login account and cannot be used`),
+            buttons: [
+              {
+                title: t('Close'),
+              },
+            ],
+          });
+          return;
         }
+      } catch (error) {
+        console.debug(error, '====error');
       }
+      Loading.hide();
 
       ActionSheet.alert({
-        title2: `Portkey will send a verification code to ${email} to verify your email address.`,
+        title2: `${guardian.verifier?.name} will send a verification code to ${email} to verify your email address.`,
         buttons: [
           {
             title: t('Cancel'),
@@ -163,14 +159,12 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
           },
           {
             title: t('Confirm'),
-            onPress: () => {
-              setLoginAccount();
-            },
+            onPress: setLoginAccount,
           },
         ],
       });
     },
-    [getGuardiansList, guardian, onCancelLoginAccount, setLoginAccount, t, userGuardiansList],
+    [getGuardiansInfo, guardian, onCancelLoginAccount, setLoginAccount, t, userGuardiansList],
   );
 
   return (

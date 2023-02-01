@@ -16,7 +16,7 @@ export default function CustomSelect({ items = [], className, ...props }: Custom
         <Option key={op.value} {...op}>
           <div className="custom-select-option">
             <div className="option-selected-icon-area">
-              <CustomSvg type="Correct" style={{ width: 16, height: 16 }} />
+              <CustomSvg type="Correct" />
             </div>
             <div className="option-label">{op.children}</div>
           </div>

@@ -7,7 +7,7 @@ import { StyleSheet, View, TextInput, TouchableHighlight, StyleProp, ViewStyle }
 import { screenWidth } from '@portkey/utils/mobile/device';
 import { isValidPositiveInteger } from '@portkey/utils/reg';
 
-type DigitInputProps = {
+export type DigitInputProps = {
   maxLength?: number;
   inputItemStyle?: StyleProp<ViewStyle>;
   iconStyle?: StyleProp<ViewStyle>;
@@ -17,7 +17,7 @@ type DigitInputProps = {
 } & InputProps;
 
 export type DigitInputInterface = {
-  resetPin: () => void;
+  reset: () => void;
 };
 
 function InputItem({
@@ -79,8 +79,8 @@ const DigitInput = forwardRef(
       }
       return inputItem;
     }, [iconStyle, inputItemStyle, maxLength, secureTextEntry, styleProps.inputItem, text, type]);
-    const resetPin = useCallback(() => setText(''), []);
-    useImperativeHandle(forwardedRef, () => ({ resetPin }), [resetPin]);
+    const reset = useCallback(() => setText(''), []);
+    useImperativeHandle(forwardedRef, () => ({ reset }), [reset]);
 
     return (
       <TouchableHighlight onPress={() => input.current?.focus()} activeOpacity={1} underlayColor="transparent">

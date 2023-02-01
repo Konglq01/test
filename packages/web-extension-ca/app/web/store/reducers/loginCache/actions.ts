@@ -1,8 +1,9 @@
 import { CAInfoType } from '@portkey/types/types-ca/wallet';
+import { VerifierInfo } from '@portkey/types/verifier';
 import { createAction } from '@reduxjs/toolkit';
-import { loginInfo } from './type';
+import { LoginInfo } from './type';
 
-export const setLoginAccountAction = createAction<Omit<loginInfo, 'managerUniqueId'>>('login/setLoginAccount');
+export const setLoginAccountAction = createAction<Omit<LoginInfo, 'managerUniqueId'>>('login/setLoginAccount');
 export const setWalletInfoAction = createAction<{
   walletInfo: any;
   caWalletInfo: CAInfoType;
@@ -10,4 +11,4 @@ export const setWalletInfoAction = createAction<{
 
 export const resetLoginInfoAction = createAction('login/resetLoginInfo');
 
-export const setGuardianCountAction = createAction<number>('login/setGuardianCount');
+export const setRegisterVerifierAction = createAction<VerifierInfo>('login/setRegisterVerifier');

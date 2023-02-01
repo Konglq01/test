@@ -3,6 +3,7 @@
 /** select */
 .common-select1 {
   margin-bottom: 32px;
+  width: 100%;
   &.@{app-prefix}-select-single:not(.@{app-prefix}-select-customize-input) .@{app-prefix}-select-selector {
     height: 48px;
     padding: 0 16px;
@@ -27,6 +28,11 @@
     display: inline-block;
     background: url('../../assets/svgIcon/Down.svg') center no-repeat;
     background-size: 16px;
+  }
+  &.@{app-prefix}-select-open {
+    .@{app-prefix}-select-selector::after {
+      transform: rotate(180deg);
+    }
   }
 }
 .label-item {

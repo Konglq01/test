@@ -19,6 +19,13 @@ export const DEFAULT_METHOD = 'POST';
 
 export const BASE_APIS = {};
 
+const VerifyApiList = {
+  sendCode: '/api/app/account/sendVerificationRequest',
+  verifyCode: '/api/app/account/verifyCode',
+  registerRequest: '/api/app/account/register/request',
+  recoveryRequest: '/api/app/account/recovery/request',
+};
+
 const RecoveryApiList = {
   managerAddress: '/api/app/account/recovery/managerAddress',
   result: '/api/app/account/recovery/query',
@@ -42,7 +49,12 @@ const VerificationApiList = {
  * api request extension configuration directory
  * @description object.key // The type of this object key comes from from @type {UrlObj}
  */
-export const EXPAND_APIS = { register: RegisterApiList, recovery: RecoveryApiList, verification: VerificationApiList };
+export const EXPAND_APIS = {
+  register: RegisterApiList,
+  recovery: RecoveryApiList,
+  verification: VerificationApiList,
+  verify: VerifyApiList,
+};
 
 export type BASE_REQ_TYPES = {
   [x in keyof typeof BASE_APIS]: API_REQ_FUNCTION;

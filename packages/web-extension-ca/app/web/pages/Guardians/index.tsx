@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import CustomSvg from 'components/CustomSvg';
 import { useTranslation } from 'react-i18next';
 import useGuardianList from 'hooks/useGuardianList';
@@ -6,9 +6,8 @@ import SettingHeader from 'pages/components/SettingHeader';
 import { useNavigate } from 'react-router';
 import { useAppDispatch, useGuardiansInfo } from 'store/Provider/hooks';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
-import { setCurrentGuardianAction } from '@portkey/store/store-ca/guardians/actions';
+import { setCurrentGuardianAction, setOpGuardianAction } from '@portkey/store/store-ca/guardians/actions';
 import VerifierPair from 'components/VerifierPair';
-import useVerifierList from 'hooks/useVerifierList';
 import './index.less';
 import { Button } from 'antd';
 
@@ -20,9 +19,14 @@ export default function Guardians() {
   const { walletInfo } = useCurrentWallet();
   const getGuardianList = useGuardianList();
 
-  useVerifierList();
+  const formatGuardianList = useMemo(() => {
+    const temp = [...(userGuardiansList || [])];
+    temp.reverse();
+    return temp;
+  }, [userGuardiansList]);
+
   useEffect(() => {
-    getGuardianList(walletInfo.managerInfo?.loginGuardianType as string);
+    getGuardianList({ caHash: walletInfo.caHash });
   }, [getGuardianList, walletInfo]);
 
   return (
@@ -43,19 +47,20 @@ export default function Guardians() {
       </div>
       <div className="guardians-content">
         <ul>
-          {userGuardiansList?.map((item, key) => (
+          {formatGuardianList.map((item, key) => (
             <li
               key={key}
               onClick={() => {
                 dispatch(setCurrentGuardianAction({ ...item, isLoginAccount: !!item.isLoginAccount }));
+                dispatch(setOpGuardianAction({ ...item, isLoginAccount: !!item.isLoginAccount }));
                 navigate('/setting/guardians/view');
               }}>
               <div className="flex-between-center guardian">
                 <div>
                   {item.isLoginAccount && <div className="login-icon">{t('Login Account')}</div>}
                   <div className="flex-between-center">
-                    <VerifierPair guardiansType={item.guardiansType} verifierSrc={item.verifier?.imageUrl} />
-                    <span className="account-text">{item.loginGuardianType}</span>
+                    <VerifierPair guardianType={item.guardianType} verifierSrc={item.verifier?.imageUrl} />
+                    <span className="account-text">{item.guardianAccount}</span>
                   </div>
                 </div>
                 <div>

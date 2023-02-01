@@ -24,6 +24,7 @@ import Transaction from 'pages/Transaction';
 import NFT from 'pages/NFT';
 import Unlock from 'pages/Unlock';
 import QueryPage from 'pages/QueryPage';
+import TestSocket from 'pages/TestSocket';
 
 // TODO delete unnecessary pages
 export const PageRouter = () =>
@@ -147,6 +148,10 @@ export const PageRouter = () =>
     {
       path: 'query-page',
       element: <QueryPage />,
+    },
+    {
+      path: '/test/socket',
+      element: <TestSocket />,
     },
     {
       path: '*',
