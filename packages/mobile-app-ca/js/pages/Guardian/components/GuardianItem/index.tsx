@@ -48,7 +48,7 @@ function GuardianItemButton({
 
   const { status, requestCodeResult } = itemStatus || {};
 
-  const verifierInfo = useMemo(() => {
+  const guardianInfo = useMemo(() => {
     let _verificationType = VerificationType.communityRecovery;
     if (
       approvalType === ApprovalType.addGuardian ||
@@ -59,8 +59,6 @@ function GuardianItemButton({
     }
     return {
       guardianItem,
-      guardianAccount: guardianItem.guardianAccount,
-      type: guardianItem.guardianType,
       verificationType: _verificationType,
     };
   }, [approvalType, guardianItem]);
@@ -76,9 +74,9 @@ function GuardianItemButton({
     try {
       const req = await request.verify.sendCode({
         data: {
-          type: LoginStrType[verifierInfo.type],
-          guardianAccount: verifierInfo.guardianAccount,
-          verifierId: verifierInfo.guardianItem.verifier?.id,
+          type: LoginStrType[guardianInfo.guardianItem.guardianType],
+          guardianAccount: guardianInfo.guardianItem.guardianAccount,
+          verifierId: guardianInfo.guardianItem.verifier?.id,
         },
       });
       if (req.verifierSessionId) {
@@ -89,7 +87,7 @@ function GuardianItemButton({
           status: VerifyStatus.Verifying,
         });
         navigationService.push('VerifierDetails', {
-          ...verifierInfo,
+          ...guardianInfo,
           requestCodeResult: req,
         });
       } else {
@@ -101,14 +99,14 @@ function GuardianItemButton({
       CommonToast.failError(error);
     }
     Loading.hide();
-  }, [onSetGuardianStatus, verifierInfo]);
+  }, [onSetGuardianStatus, guardianInfo]);
   const onVerifier = useCallback(() => {
     navigationService.push('VerifierDetails', {
-      ...verifierInfo,
+      ...guardianInfo,
       requestCodeResult,
       startResend: true,
     });
-  }, [verifierInfo, requestCodeResult]);
+  }, [guardianInfo, requestCodeResult]);
   const buttonProps: CommonButtonProps = useMemo(() => {
     if (isExpired && status !== VerifyStatus.Verified) {
       return {
