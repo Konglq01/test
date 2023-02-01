@@ -31,7 +31,6 @@ type RouterParams = {
   guardianAccount?: string;
   guardianItem?: UserGuardianItem;
   verifierResult?: { verifierSessionId: string; endPoint: string };
-  managerUniqueId?: string;
   startResend?: boolean;
   verificationType?: VerificationType;
   type?: LoginType;
@@ -55,7 +54,7 @@ function TipText({ guardianAccount, isRegister }: { guardianAccount?: string; is
 }
 
 export default function VerifierDetails() {
-  const { guardianAccount, guardianItem, verifierResult, managerUniqueId, startResend, verificationType, type } =
+  const { guardianAccount, guardianItem, verifierResult, startResend, verificationType, type } =
     useRouterParams<RouterParams>();
   console.log(guardianAccount, type, '====guardianAccount');
 
@@ -161,7 +160,6 @@ export default function VerifierDetails() {
                   signature: rst.signature,
                   verifierDoc: rst.verifierDoc,
                 },
-                managerUniqueId,
               });
             }
             break;
@@ -174,7 +172,6 @@ export default function VerifierDetails() {
                 verificationType: VerificationType.register,
                 loginAccount: guardianAccount,
                 type,
-                managerUniqueId,
               },
               verifierInfo: {
                 ...rst,
@@ -189,16 +186,7 @@ export default function VerifierDetails() {
       }
       Loading.hide();
     },
-    [
-      stateVerifierResult,
-      guardianAccount,
-      type,
-      verificationType,
-      setGuardianStatus,
-      onSetLoginAccount,
-      managerUniqueId,
-      guardianItem,
-    ],
+    [stateVerifierResult, guardianAccount, type, verificationType, setGuardianStatus, onSetLoginAccount, guardianItem],
   );
   const resendCode = useCallback(async () => {
     Loading.show();

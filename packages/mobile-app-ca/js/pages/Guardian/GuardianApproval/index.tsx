@@ -14,7 +14,6 @@ import { getApprovalCount } from '@portkey/utils/guardian';
 import { ApprovalType, VerificationType, VerifyStatus } from '@portkey/types/verifier';
 import GuardianItem from '../components/GuardianItem';
 import useEffectOnce from 'hooks/useEffectOnce';
-import { randomId } from '@portkey/utils';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import navigationService from 'utils/navigationService';
 import { LoginType, ManagerInfo } from '@portkey/types/types-ca/wallet';
@@ -38,7 +37,6 @@ type RouterParams = {
   approvalType?: ApprovalType;
   guardianItem?: UserGuardianItem;
   editGuardianParams?: EditGuardianParamsType;
-  managerUniqueId?: string;
 };
 export default function GuardianApproval() {
   const {
@@ -47,7 +45,6 @@ export default function GuardianApproval() {
     approvalType = ApprovalType.register,
     guardianItem,
     editGuardianParams,
-    managerUniqueId: paramManagerUniqueId,
   } = useRouterParams<RouterParams>();
   const dispatch = useAppDispatch();
 
@@ -65,7 +62,6 @@ export default function GuardianApproval() {
   const { caHash, address: managerAddress } = useCurrentWalletInfo();
   const getCurrentCAContract = useGetCurrentCAContract();
 
-  const [managerUniqueId, setManagerUniqueId] = useState<string>();
   const [guardiansStatus, setApproved] = useState<GuardiansStatus>();
   const [isExpired, setIsExpired] = useState<boolean>();
   console.log(guardiansStatus, '==guardiansStatus');
@@ -103,7 +99,6 @@ export default function GuardianApproval() {
     [setGuardianStatus],
   );
   useEffectOnce(() => {
-    setManagerUniqueId(paramManagerUniqueId || randomId());
     const listener = myEvents.setGuardianStatus.addListener(onSetGuardianStatus);
     const expiredTimer = setInterval(() => {
       if (guardianExpiredTime.current && new Date().getTime() > guardianExpiredTime.current) setIsExpired(true);
@@ -131,14 +126,13 @@ export default function GuardianApproval() {
         verificationType: VerificationType.communityRecovery,
         loginAccount,
         type: LoginType.email,
-        managerUniqueId,
       } as ManagerInfo,
       guardiansApproved: handleGuardiansApproved(
         guardiansStatus as GuardiansStatus,
         userGuardiansList as UserGuardianItem[],
       ),
     });
-  }, [guardiansStatus, loginAccount, managerUniqueId, userGuardiansList]);
+  }, [guardiansStatus, loginAccount, userGuardiansList]);
 
   const onAddGuardian = useCallback(async () => {
     if (!managerAddress || !caHash || !editGuardianParams || !guardianItem || !guardiansStatus || !userGuardiansList)
@@ -305,7 +299,6 @@ export default function GuardianApproval() {
                     key={item.key}
                     guardianItem={item}
                     setGuardianStatus={setGuardianStatus}
-                    managerUniqueId={managerUniqueId as string}
                     guardiansStatus={guardiansStatus}
                     isExpired={isExpired}
                     isSuccess={isSuccess}

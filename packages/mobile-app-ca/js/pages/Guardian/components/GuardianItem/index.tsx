@@ -27,7 +27,6 @@ interface GuardianAccountItemProps {
   isButtonHide?: boolean;
   renderBtn?: (item: UserGuardianItem) => JSX.Element;
   isBorderHide?: boolean;
-  managerUniqueId?: string;
   guardiansStatus?: GuardiansStatus;
   setGuardianStatus?: (key: string, status: GuardiansStatusItem) => void;
   isExpired?: boolean;
@@ -37,7 +36,6 @@ interface GuardianAccountItemProps {
 
 function GuardianItemButton({
   guardianItem,
-  managerUniqueId,
   guardiansStatus,
   setGuardianStatus,
   isExpired,
@@ -61,12 +59,11 @@ function GuardianItemButton({
     }
     return {
       guardianItem,
-      managerUniqueId,
       guardianAccount: guardianItem.guardianAccount,
       type: guardianItem.guardianType,
       verificationType: _verificationType,
     };
-  }, [approvalType, guardianItem, managerUniqueId]);
+  }, [approvalType, guardianItem]);
 
   const onSetGuardianStatus = useCallback(
     (guardianStatus: GuardiansStatusItem) => {
@@ -160,7 +157,6 @@ export default function GuardianItem({
   isButtonHide,
   renderBtn,
   isBorderHide = false,
-  managerUniqueId,
   guardiansStatus,
   setGuardianStatus,
   isExpired,
@@ -190,7 +186,6 @@ export default function GuardianItem({
           isExpired={isExpired}
           guardianItem={guardianItem}
           guardiansStatus={guardiansStatus}
-          managerUniqueId={managerUniqueId}
           setGuardianStatus={setGuardianStatus}
           approvalType={approvalType}
         />
