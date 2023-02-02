@@ -82,12 +82,11 @@ export default function VerifierDetails() {
 
     try {
       const caContract = await getCurrentCAContract();
-
       const req = await setLoginAccount(caContract, managerAddress, caHash, guardianItem);
       if (req && !req.error) {
         myEvents.refreshGuardiansList.emit();
         navigationService.navigate('GuardianDetail', {
-          guardian: JSON.stringify({ ...guardianItem, isLoginAccount: true }),
+          guardian: { ...guardianItem, isLoginAccount: true },
         });
       } else {
         CommonToast.fail(req?.error.message);
@@ -111,15 +110,12 @@ export default function VerifierDetails() {
             verifierId: guardianItem?.verifier?.id,
           },
         });
-        console.log(rst, '===rst');
-
         CommonToast.success('Verified Successfully');
 
         const verifierInfo: VerifierInfo = {
           ...rst,
           verifierId: guardianItem?.verifier?.id,
         };
-
         switch (verificationType) {
           case VerificationType.communityRecovery:
           case VerificationType.editGuardianApproval:

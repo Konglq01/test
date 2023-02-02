@@ -1,7 +1,7 @@
 import GStyles from 'assets/theme/GStyles';
 import CommonButton from 'components/CommonButton';
 import { TextM } from 'components/CommonText';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
 import { View } from 'react-native';
 import { pTd } from 'utils/unit';
 import navigationService from 'utils/navigationService';
@@ -18,27 +18,26 @@ import { request } from 'api';
 import CommonToast from 'components/CommonToast';
 import { VerificationType } from '@portkey/types/verifier';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
-
 import myEvents from 'utils/deviceEvent';
 import { VerifierImage } from '../components/VerifierImage';
 import { cancelLoginAccount } from 'utils/guardian';
 import { useGetCurrentCAContract } from 'hooks/contract';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
-interface GuardianDetailProps {
-  route?: any;
-}
+import { RouteProp, useRoute } from '@react-navigation/native';
 
-const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
+type RouterParams = {
+  guardian?: UserGuardianItem;
+};
+
+export default function GuardianDetail() {
+  const {
+    params: { guardian },
+  } = useRoute<RouteProp<{ params: RouterParams }>>();
   const { t } = useLanguage();
-  const { params } = route;
   const getGuardiansInfo = useGetGuardiansInfo();
   const { userGuardiansList } = useGuardiansInfo();
   const { caHash, address: managerAddress } = useCurrentWalletInfo();
   const getCurrentCAContract = useGetCurrentCAContract();
-  const guardian = useMemo<UserGuardianItem | undefined>(
-    () => (params?.guardian ? JSON.parse(params.guardian) : undefined),
-    [params],
-  );
 
   const onCancelLoginAccount = useCallback(async () => {
     if (!managerAddress || !caHash || !guardian) return;
@@ -49,7 +48,7 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
       if (req && !req.error) {
         myEvents.refreshGuardiansList.emit();
         navigationService.navigate('GuardianDetail', {
-          guardian: JSON.stringify({ ...guardian, isLoginAccount: false }),
+          guardian: { ...guardian, isLoginAccount: false },
         });
       } else {
         CommonToast.fail(req?.error.message);
@@ -206,6 +205,4 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
       )}
     </PageContainer>
   );
-};
-
-export default GuardianDetail;
+}
