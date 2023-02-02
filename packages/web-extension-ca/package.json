@@ -17,7 +17,7 @@
     "@portkey/types": "^0.0.1",
     "@portkey/utils": "^0.0.1",
     "@reduxjs/toolkit": "^1.8.5",
-    "aelf-sdk": "^3.2.41",
+    "aelf-sdk": "^3.2.44",
     "aelf-sdk-cross-chain": "^1.0.14",
     "antd": "^4.23.2",
     "antd-mobile": "^5.26.0",
