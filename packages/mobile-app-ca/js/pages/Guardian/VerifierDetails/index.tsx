@@ -17,15 +17,12 @@ import CommonToast from 'components/CommonToast';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import myEvents from 'utils/deviceEvent';
-import { API_REQ_FUNCTION } from 'api/types';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { useGetCurrentCAContract } from 'hooks/contract';
 import { setLoginAccount } from 'utils/guardian';
 import { LoginType } from '@portkey/types/types-ca/wallet';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 import { GuardiansStatusItem } from '../types';
-
-type FetchType = Record<string, API_REQ_FUNCTION>;
 
 type RouterParams = {
   guardianItem?: UserGuardianItem;
@@ -134,9 +131,7 @@ export default function VerifierDetails() {
             if (verifierInfo.signature && verifierInfo.verificationDoc) {
               navigationService.navigate('GuardianApproval', {
                 approvalType: ApprovalType.addGuardian,
-                guardianItem: {
-                  ...guardianItem,
-                },
+                guardianItem,
                 verifierInfo,
               });
             }
@@ -149,7 +144,7 @@ export default function VerifierDetails() {
               managerInfo: {
                 verificationType: VerificationType.register,
                 loginAccount: guardianItem.guardianAccount,
-                type: guardianItem?.guardianType,
+                type: guardianItem.guardianType,
               },
               verifierInfo,
             });
@@ -180,12 +175,11 @@ export default function VerifierDetails() {
           status: VerifyStatus.Verifying,
         });
         countdown.current?.resetTime(60);
-        digitInput.current?.reset();
       }
     } catch (error) {
-      digitInput.current?.reset();
       CommonToast.failError(error, 'Verify Fail');
     }
+    digitInput.current?.reset();
     Loading.hide();
   }, [guardianItem?.guardianAccount, guardianItem?.guardianType, guardianItem?.verifier?.id, setGuardianStatus]);
   return (

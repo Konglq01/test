@@ -8,10 +8,10 @@ import { AppDispatch } from 'store';
 import { ContractBasic } from './contract';
 import { request } from '@portkey/api/api-did';
 import myServer from '@portkey/api/server';
-import { listenList } from '@portkey/constants/constants-ca/socket';
 import Signalr from '@portkey/socket';
+import { listenList } from '@portkey/constants/constants-ca/socket';
 
-class DidSignalr extends Signalr {
+class SignalrDid extends Signalr {
   public Ack(clientId: string, requestId: string) {
     this.invoke('Ack', clientId, requestId);
   }
@@ -36,7 +36,7 @@ class DidSignalr extends Signalr {
   ) {
     return this.listen('caAccountRecover', (data: CaAccountRecoverResult) => {
       if (data.requestId === requestId) {
-        if (data.body.recoverStatus !== 'pending') {
+        if (data.body.recoveryStatus !== 'pending') {
           this.Ack(clientId, requestId);
         }
         callback(data);
@@ -48,45 +48,53 @@ class DidSignalr extends Signalr {
 export type TimerResult = {
   remove: () => void;
 };
-export function intervalGetResult({
-  managerInfo,
-  onPass,
-  onFail,
-}: {
+
+export type IntervalGetResultParams = {
   managerInfo: ManagerInfo;
   onPass?: (caInfo: CAInfo) => void;
   onFail?: (message: string) => void;
-}) {
-  const socket = new DidSignalr({
-    listenList,
-  }) as Signalr<typeof listenList> & DidSignalr;
+};
 
-  let timer = '';
-  let mark = false;
-  const listenerList: { remove: () => void }[] = [];
+export function intervalGetResult({ managerInfo, onPass, onFail }: IntervalGetResultParams) {
+  let timer = '',
+    mark = false;
+  const listenerList: TimerResult[] = [];
+  const socket = new SignalrDid({
+    listenList,
+  });
+  const remove = () => {
+    try {
+      timer && clearTimeoutInterval(timer);
+      listenerList.forEach(listen => listen.remove());
+      socket.stop();
+    } catch (error) {
+      console.debug(error);
+    }
+  };
   const sendResult = (result: any) => {
     if (mark) return;
     switch (result.recoveryStatus || result.registerStatus) {
       case 'pass': {
         onPass?.(result);
+        remove();
+        mark = true;
         break;
       }
       case 'fail': {
         onFail?.(result.recoveryMessage || result.registerMessage);
+        remove();
+        mark = true;
         break;
       }
       default:
         break;
     }
-    // timer && clearTimeoutInterval(timer);
-    listenerList.forEach(listen => listen.remove());
-    mark = true;
   };
   const clientId = managerInfo.requestId || '';
   const requestId = managerInfo.requestId || '';
   socket.doOpen({
     url: `${myServer.defaultConfig.baseURL}/ca`,
-    clientId: managerInfo.requestId || '',
+    clientId,
   });
   let fetch: any;
   if (managerInfo.verificationType !== VerificationType.register) {
@@ -111,15 +119,10 @@ export function intervalGetResult({
       });
       sendResult(req.items[0]);
     } catch (error) {
-      console.log(error, '=====error');
+      console.debug(error, '=====error');
     }
   }, 3000);
-  return {
-    remove: () => {
-      timer && clearTimeoutInterval(timer);
-      listenerList.forEach(listen => listen.remove());
-    },
-  };
+  return { remove };
 }
 
 export function onResultFail(dispatch: AppDispatch, message: string, isRecovery?: boolean, isReset?: boolean) {

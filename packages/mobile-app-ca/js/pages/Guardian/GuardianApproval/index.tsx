@@ -34,7 +34,7 @@ import { handleGuardiansApproved } from 'utils/login';
 type RouterParams = {
   loginAccount?: string;
   userGuardiansList?: UserGuardianItem[];
-  approvalType?: ApprovalType;
+  approvalType: ApprovalType;
   guardianItem?: UserGuardianItem;
   verifierInfo?: VerifierInfo;
 };

@@ -11,7 +11,7 @@ class SignalrDid extends Signalr {
     { clientId, requestId }: { clientId: string; requestId: string },
     callback: (data: CaAccountRegisterResult) => void,
   ) {
-    this.listen('caAccountRegister', (data: CaAccountRegisterResult) => {
+    return this.listen('caAccountRegister', (data: CaAccountRegisterResult) => {
       if (data.requestId === requestId) {
         if (data.body.registerStatus !== 'pending') {
           this.Ack(clientId, requestId);
@@ -25,7 +25,7 @@ class SignalrDid extends Signalr {
     { clientId, requestId }: { clientId: string; requestId: string },
     callback: (data: CaAccountRecoverResult) => void,
   ) {
-    this.listen('caAccountRecover', (data: CaAccountRecoverResult) => {
+    return this.listen('caAccountRecover', (data: CaAccountRecoverResult) => {
       if (data.requestId === requestId) {
         if (data.body.recoveryStatus !== 'pending') {
           this.Ack(clientId, requestId);

@@ -11,7 +11,7 @@ import { useCallback, useRef } from 'react';
 import { useAppDispatch } from 'store/hooks';
 import useBiometricsReady from './useBiometrics';
 import navigationService from 'utils/navigationService';
-import { intervalGetResult, onResultFail, TimerResult } from 'utils/wallet';
+import { onResultFail, TimerResult, IntervalGetResultParams, intervalGetResult } from 'utils/wallet';
 import CommonToast from 'components/CommonToast';
 import useEffectOnce from './useEffectOnce';
 import { setCredentials } from 'store/user/actions';
@@ -28,6 +28,7 @@ export function useOnManagerAddressAndQueryResult() {
       timer.current?.remove();
     };
   });
+  const onIntervalGetResult = useIntervalGetResult();
   return useCallback(
     async ({
       managerInfo,
@@ -104,7 +105,7 @@ export function useOnManagerAddressAndQueryResult() {
           Loading.hide();
           navigationService.navigate('SetBiometrics', { pin: confirmPin });
         } else {
-          timer.current = intervalGetResult({
+          timer.current = onIntervalGetResult({
             managerInfo: _managerInfo,
             onPass: (caInfo: CAInfo) => {
               if (isRecovery) CommonToast.success('Wallet Recovered Successfully!');
@@ -127,6 +128,10 @@ export function useOnManagerAddressAndQueryResult() {
         pinRef?.current?.reset();
       }
     },
-    [biometricsReady, dispatch],
+    [biometricsReady, dispatch, onIntervalGetResult],
   );
+}
+
+export function useIntervalGetResult() {
+  return useCallback((params: IntervalGetResultParams) => intervalGetResult(params), []);
 }
