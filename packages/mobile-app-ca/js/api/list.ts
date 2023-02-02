@@ -26,17 +26,11 @@ const VerifyApiList = {
   recoveryRequest: '/api/app/account/recovery/request',
 };
 
-const VerificationApiList = {
-  sendCode: '/api/app/account/verification/sendVerificationRequest',
-  verifyCode: '/api/app/account/verification/verifyCode',
-};
-
 /**
  * api request extension configuration directory
  * @description object.key // The type of this object key comes from from @type {UrlObj}
  */
 export const EXPAND_APIS = {
-  verification: VerificationApiList,
   verify: VerifyApiList,
 };
 
