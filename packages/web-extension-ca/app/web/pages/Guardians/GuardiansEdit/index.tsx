@@ -27,7 +27,8 @@ export default function GuardiansEdit() {
   const { verifierMap } = useGuardiansInfo();
   const [removeOpen, setRemoveOpen] = useState<boolean>();
   const [removeClose, setRemoveClose] = useState<boolean>(false);
-  const [selectVal, setSelectVal] = useState<string>(opGuardian?.verifier?.name as string);
+  const [selectVal, setSelectVal] = useState<string>(opGuardian?.verifier?.id as string);
+  const [selectName, setSelectName] = useState<string>(opGuardian?.verifier?.name as string);
   const [exist, setExist] = useState<boolean>(false);
   const { walletInfo } = useCurrentWallet();
   const userGuardianList = useGuardianList();
@@ -37,7 +38,7 @@ export default function GuardiansEdit() {
   const selectOptions = useMemo(
     () =>
       Object.values(verifierMap ?? {})?.map((item: VerifierItem) => ({
-        value: item.name,
+        value: item.id,
         children: (
           <div className="flex verifier-option">
             <BaseVerifierIcon width={32} height={32} src={item.imageUrl} />
@@ -48,22 +49,26 @@ export default function GuardiansEdit() {
     [verifierMap],
   );
 
-  const disabled = useMemo(() => exist || selectVal === preGuardian?.verifier?.name, [exist, selectVal, preGuardian]);
+  const disabled = useMemo(() => exist || selectVal === preGuardian?.verifier?.id, [exist, selectVal, preGuardian]);
 
   const targetVerifier = useCallback(
-    () => Object.values(verifierMap ?? {})?.filter((item: VerifierItem) => item.name === selectVal),
+    () => Object.values(verifierMap ?? {})?.filter((item: VerifierItem) => item.id === selectVal),
     [selectVal, verifierMap],
   );
 
-  const handleChange = useCallback((value: string) => {
-    setExist(false);
-    setSelectVal(value);
-  }, []);
+  const handleChange = useCallback(
+    (value: string) => {
+      setExist(false);
+      setSelectVal(value);
+      setSelectName(verifierMap?.[value]?.name || '');
+    },
+    [verifierMap],
+  );
 
   const guardiansChangeHandler = useCallback(async () => {
     const flag: boolean =
       Object.values(userGuardiansList ?? {})?.some((item) => {
-        return item.key === `${currentGuardian?.guardianAccount}&${selectVal}`;
+        return item.key === `${currentGuardian?.guardianAccount}&${selectName}`;
       }) ?? false;
     setExist(flag);
     if (flag) return;
@@ -79,7 +84,7 @@ export default function GuardiansEdit() {
       await userGuardianList({ caHash: walletInfo.caHash });
       dispatch(
         setOpGuardianAction({
-          key: `${currentGuardian?.guardianAccount}&${selectVal}`,
+          key: `${currentGuardian?.guardianAccount}&${selectName}`,
           verifier: targetVerifier()?.[0],
           isLoginAccount: opGuardian?.isLoginAccount,
           guardianAccount: opGuardian?.guardianAccount as string,
@@ -98,7 +103,7 @@ export default function GuardiansEdit() {
     dispatch,
     navigate,
     opGuardian,
-    selectVal,
+    selectName,
     setLoading,
     targetVerifier,
     userGuardianList,
