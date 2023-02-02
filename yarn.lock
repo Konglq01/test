@@ -7046,6 +7046,28 @@ aelf-sdk@^3.2.41:
     scryptsy "^2.1.0"
     xmlhttprequest "^1.8.0"
 
+aelf-sdk@^3.2.44:
+  version "3.2.44"
+  resolved "https://registry.yarnpkg.com/aelf-sdk/-/aelf-sdk-3.2.44.tgz#7f97d330711cf41c1ca4271f921a99130fcd1ea9"
+  integrity sha512-R/MD0z98LDv1GitTqhOWMmQTm7YLg9KsqOVjr3l0NWkq1KxgPGBfd2wlvg/jhhPgCsYJ91mQbAxkJU7kQRmHPA==
+  dependencies:
+    "@aelfqueen/protobufjs" "^6.8.9"
+    "@babel/runtime" "^7.4.5"
+    assert "^2.0.0"
+    bignumber.js "^9.0.0"
+    bip39 "^3.0.2"
+    browserify-cipher "^1.0.1"
+    bs58 "^4.0.1"
+    buffer "^5.2.1"
+    crypto-js "^3.1.9-1"
+    elliptic "^6.4.1"
+    hdkey "^1.1.1"
+    js-sha256 "^0.9.0"
+    query-string "5.1.1"
+    randombytes "^2.1.0"
+    scryptsy "^2.1.0"
+    xmlhttprequest "^1.8.0"
+
 aes-js@^3.1.2:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/aes-js/-/aes-js-3.1.2.tgz#db9aabde85d5caabbfc0d4f2a4446960f627146a"
