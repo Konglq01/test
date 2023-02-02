@@ -21,6 +21,7 @@ import { LoginType } from '@portkey/types/types-ca/wallet';
 import { VerifierImage } from '../VerifierImage';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 import { GuardiansStatus, GuardiansStatusItem } from 'pages/Guardian/types';
+import { DefaultChainId } from '@portkey/constants/constants-ca/network-test2';
 
 interface GuardianAccountItemProps {
   guardianItem: UserGuardianItem;
@@ -77,6 +78,7 @@ function GuardianItemButton({
           type: LoginStrType[guardianInfo.guardianItem.guardianType],
           guardianAccount: guardianInfo.guardianItem.guardianAccount,
           verifierId: guardianInfo.guardianItem.verifier?.id,
+          chainId: DefaultChainId,
         },
       });
       if (req.verifierSessionId) {

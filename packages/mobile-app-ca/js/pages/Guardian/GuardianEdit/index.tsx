@@ -31,6 +31,7 @@ import { useAppDispatch } from 'store/hooks';
 import { setPreGuardianAction } from '@portkey/store/store-ca/guardians/actions';
 import { VerifierImage } from '../components/VerifierImage';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
+import { DefaultChainId } from '@portkey/constants/constants-ca/network-test2';
 
 type RouterParams = {
   guardian?: UserGuardianItem;
@@ -125,6 +126,7 @@ const GuardianEdit: React.FC = () => {
                   type: LoginStrType[selectedType.value],
                   guardianAccount: email,
                   verifierId: selectedVerifier.id,
+                  chainId: DefaultChainId,
                 },
               });
               if (req.verifierSessionId) {

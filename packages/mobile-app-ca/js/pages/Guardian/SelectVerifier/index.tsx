@@ -24,6 +24,7 @@ import { LoginType } from '@portkey/types/types-ca/wallet';
 import myEvents from 'utils/deviceEvent';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 import { request } from 'api';
+import { DefaultChainId } from '@portkey/constants/constants-ca/network-test2';
 
 const ScrollViewProps = { disabled: true };
 export default function SelectVerifier() {
@@ -42,6 +43,7 @@ export default function SelectVerifier() {
             type: LoginStrType[LoginType.email],
             guardianAccount: loginAccount,
             verifierId: selectedVerifier.id,
+            chainId: DefaultChainId,
           },
         });
 

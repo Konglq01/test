@@ -23,6 +23,7 @@ import { setLoginAccount } from 'utils/guardian';
 import { LoginType } from '@portkey/types/types-ca/wallet';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 import { GuardiansStatusItem } from '../types';
+import { DefaultChainId } from '@portkey/constants/constants-ca/network-test2';
 
 type RouterParams = {
   guardianItem?: UserGuardianItem;
@@ -105,6 +106,7 @@ export default function VerifierDetails() {
             guardianAccount: guardianItem.guardianAccount,
             ...requestCodeResult,
             verifierId: guardianItem?.verifier?.id,
+            chainId: DefaultChainId,
           },
         });
         CommonToast.success('Verified Successfully');
@@ -162,6 +164,7 @@ export default function VerifierDetails() {
           type: LoginStrType[guardianItem?.guardianType as LoginType],
           guardianAccount: guardianItem?.guardianAccount,
           verifierId: guardianItem?.verifier?.id,
+          chainId: DefaultChainId,
         },
       });
       if (req.verifierSessionId) {

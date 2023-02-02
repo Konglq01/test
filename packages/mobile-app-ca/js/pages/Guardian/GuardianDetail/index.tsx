@@ -24,6 +24,7 @@ import { cancelLoginAccount } from 'utils/guardian';
 import { useGetCurrentCAContract } from 'hooks/contract';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 import { RouteProp, useRoute } from '@react-navigation/native';
+import { DefaultChainId } from '@portkey/constants/constants-ca/network-test2';
 
 type RouterParams = {
   guardian?: UserGuardianItem;
@@ -68,6 +69,7 @@ export default function GuardianDetail() {
           type: LoginStrType[guardian.guardianType],
           guardianAccount: guardian.guardianAccount,
           verifierId: guardian.verifier?.id,
+          chainId: DefaultChainId,
         },
       });
       if (req.verifierSessionId) {
