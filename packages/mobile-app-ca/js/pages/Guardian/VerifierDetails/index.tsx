@@ -7,7 +7,7 @@ import DigitInput, { DigitInputInterface } from 'components/DigitInput';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import useRouterParams from '@portkey/hooks/useRouterParams';
-import { ApprovalType, VerificationType, VerifyStatus } from '@portkey/types/verifier';
+import { ApprovalType, VerificationType, VerifierInfo, VerifyStatus } from '@portkey/types/verifier';
 import GuardianItem from '../components/GuardianItem';
 import { FontStyles } from 'assets/theme/styles';
 import { request } from 'api';
@@ -111,32 +111,33 @@ export default function VerifierDetails() {
             verifierId: guardianItem?.verifier?.id,
           },
         });
+        console.log(rst, '===rst');
+
+        CommonToast.success('Verified Successfully');
+
+        const verifierInfo: VerifierInfo = {
+          ...rst,
+          verifierId: guardianItem?.verifier?.id,
+        };
+
         switch (verificationType) {
           case VerificationType.communityRecovery:
           case VerificationType.editGuardianApproval:
             setGuardianStatus({
               requestCodeResult: requestCodeResult,
               status: VerifyStatus.Verified,
-              verifierInfo: {
-                ...rst,
-                verifierId: guardianItem?.verifier?.id,
-              },
-              editGuardianParams: {
-                signature: rst.signature,
-                verifierDoc: rst.verifierDoc,
-              },
+              verifierInfo,
             });
             navigationService.goBack();
             break;
           case VerificationType.addGuardian:
-            if (rst.signature && rst.verifierDoc) {
+            if (verifierInfo.signature && verifierInfo.verificationDoc) {
               navigationService.navigate('GuardianApproval', {
                 approvalType: ApprovalType.addGuardian,
-                guardianItem,
-                editGuardianParams: {
-                  signature: rst.signature,
-                  verifierDoc: rst.verifierDoc,
+                guardianItem: {
+                  ...guardianItem,
                 },
+                verifierInfo,
               });
             }
             break;
@@ -150,10 +151,7 @@ export default function VerifierDetails() {
                 loginAccount: guardianItem.guardianAccount,
                 type: guardianItem?.guardianType,
               },
-              verifierInfo: {
-                ...rst,
-                verifierId: guardianItem?.verifier?.id,
-              },
+              verifierInfo,
             });
             break;
         }

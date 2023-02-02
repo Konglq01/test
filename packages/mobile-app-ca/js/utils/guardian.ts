@@ -1,6 +1,24 @@
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
-import { EditGuardianParamsType, GuardiansStatus } from 'pages/Guardian/types';
+import { VerifierInfo } from '@portkey/types/verifier';
+import { GuardiansStatus } from 'pages/Guardian/types';
 import { ContractBasic } from './contract';
+
+const getGuardiansApproved = (userGuardiansList: UserGuardianItem[], guardiansStatus: GuardiansStatus) => {
+  return userGuardiansList
+    .map(guardian => {
+      if (!guardiansStatus[guardian.key] || !guardiansStatus[guardian.key].verifierInfo) return null;
+      return {
+        value: guardian.guardianAccount,
+        type: guardian.guardianType,
+        verificationInfo: {
+          id: guardian.verifier?.id,
+          signature: Object.values(Buffer.from(guardiansStatus[guardian.key].verifierInfo?.signature as any, 'hex')),
+          verificationDoc: guardiansStatus[guardian.key].verifierInfo?.verificationDoc,
+        },
+      };
+    })
+    .filter(item => item !== null);
+};
 
 export async function deleteGuardian(
   contract: ContractBasic,
@@ -18,22 +36,7 @@ export async function deleteGuardian(
     },
   };
 
-  const guardiansApproved = userGuardiansList
-    .map(guardian => {
-      if (!guardiansStatus[guardian.key] || !guardiansStatus[guardian.key].editGuardianParams) return null;
-      return {
-        value: guardian.guardianAccount,
-        type: guardian.guardianType,
-        verificationInfo: {
-          id: guardian.verifier?.id,
-          signature: Object.values(
-            Buffer.from(guardiansStatus[guardian.key].editGuardianParams?.signature as any, 'hex'),
-          ),
-          verificationDoc: guardiansStatus[guardian.key].editGuardianParams?.verifierDoc,
-        },
-      };
-    })
-    .filter(item => item !== null);
+  const guardiansApproved = getGuardiansApproved(userGuardiansList, guardiansStatus);
   // TODO: remove console&req in this page
   console.log('RemoveGuardian', {
     caHash,
@@ -54,7 +57,7 @@ export async function addGuardian(
   contract: ContractBasic,
   address: string,
   caHash: string,
-  editGuardianParams: EditGuardianParamsType,
+  verifierInfo: VerifierInfo,
   guardianItem: UserGuardianItem,
   userGuardiansList: UserGuardianItem[],
   guardiansStatus: GuardiansStatus,
@@ -64,27 +67,12 @@ export async function addGuardian(
     type: guardianItem.guardianType,
     verificationInfo: {
       id: guardianItem.verifier?.id,
-      signature: Object.values(Buffer.from(editGuardianParams.signature as any, 'hex')),
-      verificationDoc: editGuardianParams.verifierDoc,
+      signature: Object.values(Buffer.from(verifierInfo.signature as any, 'hex')),
+      verificationDoc: verifierInfo.verificationDoc,
     },
   };
 
-  const guardiansApproved = userGuardiansList
-    .map(guardian => {
-      if (!guardiansStatus[guardian.key] || !guardiansStatus[guardian.key].editGuardianParams) return null;
-      return {
-        value: guardian.guardianAccount,
-        type: guardian.guardianType,
-        verificationInfo: {
-          id: guardian.verifier?.id,
-          signature: Object.values(
-            Buffer.from(guardiansStatus[guardian.key].editGuardianParams?.signature as any, 'hex'),
-          ),
-          verificationDoc: guardiansStatus[guardian.key].editGuardianParams?.verifierDoc,
-        },
-      };
-    })
-    .filter(item => item !== null);
+  const guardiansApproved = getGuardiansApproved(userGuardiansList, guardiansStatus);
 
   console.log('AddGuardian', {
     caHash,
@@ -124,22 +112,7 @@ export async function editGuardian(
     },
   };
 
-  const guardiansApproved = userGuardiansList
-    .map(guardian => {
-      if (!guardiansStatus[guardian.key] || !guardiansStatus[guardian.key].editGuardianParams) return null;
-      return {
-        value: guardian.guardianAccount,
-        type: guardian.guardianType,
-        verificationInfo: {
-          id: guardian.verifier?.id,
-          signature: Object.values(
-            Buffer.from(guardiansStatus[guardian.key].editGuardianParams?.signature as any, 'hex'),
-          ),
-          verificationDoc: guardiansStatus[guardian.key].editGuardianParams?.verifierDoc,
-        },
-      };
-    })
-    .filter(item => item !== null);
+  const guardiansApproved = getGuardiansApproved(userGuardiansList, guardiansStatus);
 
   console.log('UpdateGuardian', {
     caHash,

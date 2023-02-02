@@ -23,7 +23,6 @@ import { ErrorType } from 'types/common';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import { FontStyles } from 'assets/theme/styles';
 import { request } from 'api';
-import { randomId } from '@portkey/utils';
 import Loading from 'components/Loading';
 import CommonToast from 'components/CommonToast';
 import useRouterParams from '@portkey/hooks/useRouterParams';
@@ -31,6 +30,7 @@ import { LoginType } from '@portkey/types/types-ca/wallet';
 import { useAppDispatch } from 'store/hooks';
 import { setPreGuardianAction } from '@portkey/store/store-ca/guardians/actions';
 import { VerifierImage } from '../components/VerifierImage';
+import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 
 type RouterParams = {
   guardian?: UserGuardianItem;
@@ -83,7 +83,7 @@ const GuardianEdit: React.FC = () => {
         guardian =>
           guardian.guardianType === selectedType?.value &&
           guardian.guardianAccount === email &&
-          guardian.verifier?.url === selectedVerifier?.url,
+          guardian.verifier?.id === selectedVerifier?.id,
       ) !== -1
     ) {
       return { ...INIT_HAS_ERROR, errorMsg: t('This guardian already exists') };
@@ -119,28 +119,26 @@ const GuardianEdit: React.FC = () => {
           title: t('Confirm'),
           onPress: async () => {
             try {
-              const managerUniqueId = randomId();
               Loading.show();
-              const req = await request.verification.sendCode({
-                baseURL: selectedVerifier.url,
+              const req = await request.verify.sendCode({
                 data: {
-                  type: selectedType.value,
+                  type: LoginStrType[selectedType.value],
                   guardianAccount: email,
-                  managerUniqueId,
+                  verifierId: selectedVerifier.id,
                 },
               });
               if (req.verifierSessionId) {
                 navigationService.navigate('VerifierDetails', {
-                  guardianAccount: email,
-                  verifierSessionId: req.verifierSessionId,
-                  managerUniqueId,
-                  verificationType: VerificationType.addGuardian,
                   guardianItem: {
                     isLoginAccount: false,
                     verifier: selectedVerifier,
                     guardianAccount: email,
                     guardianType: LoginType.email,
                   },
+                  requestCodeResult: {
+                    verifierSessionId: req.verifierSessionId,
+                  },
+                  verificationType: VerificationType.addGuardian,
                 });
               } else {
                 throw new Error('send fail');
@@ -211,7 +209,7 @@ const GuardianEdit: React.FC = () => {
   );
 
   const isApprovalDisable = useMemo(
-    () => selectedVerifier?.url === editGuardian?.verifier?.url,
+    () => selectedVerifier?.id === editGuardian?.verifier?.id,
     [editGuardian, selectedVerifier],
   );
 
@@ -263,7 +261,7 @@ const GuardianEdit: React.FC = () => {
         <ListItem
           onPress={() => {
             VerifierSelectOverlay.showList({
-              url: selectedVerifier?.url,
+              id: selectedVerifier?.id,
               labelAttrName: 'name',
               list: verifierList,
               callBack: onSelectedVerifier,

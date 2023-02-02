@@ -14,7 +14,6 @@ import ActionSheet from 'components/ActionSheet';
 import { useGuardiansInfo } from 'hooks/store';
 import { useGetGuardiansInfo } from 'hooks/guardian';
 import Loading from 'components/Loading';
-import { randomId } from '@portkey/utils';
 import { request } from 'api';
 import CommonToast from 'components/CommonToast';
 import { VerificationType } from '@portkey/types/verifier';
@@ -24,6 +23,7 @@ import myEvents from 'utils/deviceEvent';
 import { VerifierImage } from '../components/VerifierImage';
 import { cancelLoginAccount } from 'utils/guardian';
 import { useGetCurrentCAContract } from 'hooks/contract';
+import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 interface GuardianDetailProps {
   route?: any;
 }
@@ -42,7 +42,6 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
 
   const onCancelLoginAccount = useCallback(async () => {
     if (!managerAddress || !caHash || !guardian) return;
-
     Loading.show();
     try {
       const caContract = await getCurrentCAContract();
@@ -64,23 +63,21 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
   const setLoginAccount = useCallback(async () => {
     if (!guardian) return;
     try {
-      const managerUniqueId = randomId();
       Loading.show();
-      const req = await request.verification.sendCode({
-        baseURL: guardian.verifier?.url,
+      const req = await request.verify.sendCode({
         data: {
-          type: guardian.guardianType,
+          type: LoginStrType[guardian.guardianType],
           guardianAccount: guardian.guardianAccount,
-          managerUniqueId,
+          verifierId: guardian.verifier?.id,
         },
       });
       if (req.verifierSessionId) {
         navigationService.navigate('VerifierDetails', {
-          guardianAccount: guardian.guardianAccount,
-          verifierSessionId: req.verifierSessionId,
-          managerUniqueId,
-          verificationType: VerificationType.setLoginAccount,
           guardianItem: guardian,
+          requestCodeResult: {
+            verifierSessionId: req.verifierSessionId,
+          },
+          verificationType: VerificationType.setLoginAccount,
         });
       } else {
         console.log('send fail');
@@ -94,7 +91,6 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
   const onLoginAccountChange = useCallback(
     async (value: boolean) => {
       if (guardian === undefined || userGuardiansList === undefined) return;
-      const email = guardian.guardianAccount;
 
       if (!value) {
         const loginIndex = userGuardiansList.findIndex(
@@ -103,7 +99,7 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
             !(
               item.guardianType === guardian.guardianType &&
               item.guardianAccount === guardian.guardianAccount &&
-              item.verifier?.url === guardian.verifier?.url
+              item.verifier?.id === guardian.verifier?.id
             ),
         );
         if (loginIndex === -1) {
@@ -117,41 +113,41 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
           });
           return;
         }
-
         onCancelLoginAccount();
         return;
       }
 
-      // const loginIndex = userGuardiansList.findIndex(
-      //   item =>
-      //     item.isLoginAccount &&
-      //     item.guardianType === guardian.guardianType &&
-      //     item.guardianAccount === guardian.guardianAccount &&
-      //     item.verifier?.url !== guardian.verifier?.url,
-      // );
-      // if (loginIndex === -1) {}
-      Loading.show();
-      try {
-        const guardiansInfo = await getGuardiansInfo({ loginAccount: guardian.guardianAccount });
-        if (guardiansInfo.guardianAccounts) {
-          Loading.hide();
-          ActionSheet.alert({
-            title2: t(`This account address is already a login account and cannot be used`),
-            buttons: [
-              {
-                title: t('Close'),
-              },
-            ],
-          });
-          return;
+      const loginIndex = userGuardiansList.findIndex(
+        item =>
+          item.isLoginAccount &&
+          item.guardianType === guardian.guardianType &&
+          item.guardianAccount === guardian.guardianAccount &&
+          item.verifier?.id !== guardian.verifier?.id,
+      );
+      if (loginIndex === -1) {
+        Loading.show();
+        try {
+          const guardiansInfo = await getGuardiansInfo({ loginAccount: guardian.guardianAccount });
+          if (guardiansInfo.guardianAccounts) {
+            Loading.hide();
+            ActionSheet.alert({
+              title2: t(`This account address is already a login account and cannot be used`),
+              buttons: [
+                {
+                  title: t('Close'),
+                },
+              ],
+            });
+            return;
+          }
+        } catch (error) {
+          console.debug(error, '====error');
         }
-      } catch (error) {
-        console.debug(error, '====error');
+        Loading.hide();
       }
-      Loading.hide();
 
       ActionSheet.alert({
-        title2: `${guardian.verifier?.name} will send a verification code to ${email} to verify your email address.`,
+        title2: `${guardian.verifier?.name} will send a verification code to ${guardian.guardianAccount} to verify your email address.`,
         buttons: [
           {
             title: t('Cancel'),
@@ -193,7 +189,7 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
         </View>
 
         <TextM style={pageStyles.tips}>
-          {t('The master account will be able to log in and control all your assets')}
+          {t('The login account will be able to log in and control all your assets')}
         </TextM>
       </View>
       {userGuardiansList && userGuardiansList.length > 1 && (

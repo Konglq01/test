@@ -15,12 +15,12 @@ type ValueType = string | number;
 type DefaultValueType = string;
 
 type ItemTypeBase<T extends ValueType = DefaultValueType> = {
-  url: T;
+  id: T;
   [key: string]: any;
 };
 
 type SelectListProps<ItemType extends ItemTypeBase<ItemValueType>, ItemValueType extends ValueType> = {
-  url?: ItemValueType;
+  id?: ItemValueType;
   list: Array<ItemType>;
   callBack: (item: ItemType) => void;
   labelAttrName?: string;
@@ -29,8 +29,8 @@ type SelectListProps<ItemType extends ItemTypeBase<ItemValueType>, ItemValueType
 const SelectList = <ItemType extends ItemTypeBase<ItemValueType>, ItemValueType extends ValueType>({
   list,
   callBack,
-  url,
-  labelAttrName = 'url',
+  id,
+  labelAttrName = 'id',
 }: SelectListProps<ItemType, ItemValueType>) => {
   const { t } = useLanguage();
 
@@ -41,7 +41,7 @@ const SelectList = <ItemType extends ItemTypeBase<ItemValueType>, ItemValueType 
         {list.map(item => {
           return (
             <Touchable
-              key={item.url}
+              key={item.id}
               onPress={() => {
                 OverlayModal.hide();
                 callBack(item);
@@ -51,7 +51,7 @@ const SelectList = <ItemType extends ItemTypeBase<ItemValueType>, ItemValueType 
 
                 <View style={styles.itemContent}>
                   <TextL>{item[labelAttrName]}</TextL>
-                  {url !== undefined && url === item.url && (
+                  {id !== undefined && id === item.id && (
                     <Svg iconStyle={styles.itemIcon} icon="selected" size={pTd(24)} />
                   )}
                 </View>
