@@ -14,7 +14,7 @@ module.exports = {
   collectCoverageFrom: [
     '**/packages/hooks/hooks-ca/**/*.{ts,tsx}',
     'packages/web-extension-ca/app/web/components/DropdownSearch/*.{ts,tsx}',
-    '**/packages/store/**/*.{ts,tsx}',
+    '**/packages/store/store-ca/guardians/*.{ts,tsx}',
     '**/packages/utils/wallet/*.ts',
     '!**/node_modules/**',
   ],
