@@ -1,11 +1,10 @@
 import { defaultColors } from 'assets/theme';
 import Svg from 'components/Svg';
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { pTd } from 'utils/unit';
 import navigationService from 'utils/navigationService';
 import PageContainer from 'components/PageContainer';
-import { pageStyles } from './style';
 import { useLanguage } from 'i18n/hooks';
 import { useGuardiansInfo } from 'hooks/store';
 import GuardianItem from '../components/GuardianItem';
@@ -14,7 +13,7 @@ import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { useGetGuardiansInfoWriteStore } from 'hooks/guardian';
 import useEffectOnce from 'hooks/useEffectOnce';
 import myEvents from 'utils/deviceEvent';
-import CommonToast from 'components/CommonToast';
+import GStyles from 'assets/theme/GStyles';
 
 export default function GuardianHome() {
   const { t } = useLanguage();
@@ -26,7 +25,6 @@ export default function GuardianHome() {
   }, [userGuardiansList]);
 
   const { caHash } = useCurrentWalletInfo();
-
   const getGuardiansInfoWriteStore = useGetGuardiansInfoWriteStore();
   const refreshGuardiansList = useCallback(async () => {
     try {
@@ -34,8 +32,7 @@ export default function GuardianHome() {
         caHash,
       });
     } catch (error) {
-      // TODO: remove Toast
-      CommonToast.failError(error);
+      console.log(error);
     }
   }, [caHash, getGuardiansInfoWriteStore]);
 
@@ -45,7 +42,6 @@ export default function GuardianHome() {
 
   useEffect(() => {
     const listener = myEvents.refreshGuardiansList.addListener(() => {
-      console.log('listener:refreshGuardiansList----');
       refreshGuardiansList();
     });
     return () => {
@@ -91,3 +87,11 @@ export default function GuardianHome() {
     </PageContainer>
   );
 }
+
+const pageStyles = StyleSheet.create({
+  pageWrap: {
+    flex: 1,
+    backgroundColor: defaultColors.bg1,
+    ...GStyles.paddingArg(24, 20),
+  },
+});

@@ -61,7 +61,7 @@ export default function VerifierPage({
           setLoading(true);
 
           const res = await checkVerificationCode({
-            guardianAccount: loginAccount.guardianAccount,
+            guardianAccount: currentGuardian.guardianAccount,
             verifierSessionId: currentGuardian.verifierInfo.sessionId,
             verificationCode: code,
             verifierId: currentGuardian.verifier?.id || '',
