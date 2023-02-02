@@ -13,6 +13,8 @@ import { getTxResult } from 'utils/aelfUtils';
 import { sleep } from '@portkey/utils';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { clearLocalStorage } from 'utils/storage/chromeStorage';
+import { contractErrorHandler } from 'utils/tryErrorHandler';
+import useLogOut from 'hooks/useLogout';
 
 interface ExitWalletProps {
   open: boolean;
@@ -27,6 +29,7 @@ export default function ExitWallet({ open, onCancel }: ExitWalletProps) {
   const currentChain = useCurrentChain();
   const { setLoading } = useLoading();
   const currentNetwork = useCurrentNetworkInfo();
+  const logout = useLogOut();
 
   const onConfirm = useCallback(async () => {
     try {
@@ -55,17 +58,18 @@ export default function ExitWallet({ open, onCancel }: ExitWalletProps) {
       await sleep(1000);
       const aelfInstance = getAelfInstance(currentChain.endPoint);
       await getTxResult(aelfInstance, TransactionId);
+      logout();
       clearLocalStorage();
       setLoading(false);
     } catch (error: any) {
       setLoading(false);
-      message.error(error);
+      message.error(contractErrorHandler(error));
       console.log('---exist wallet error', error);
     }
   }, [
-    currentChain?.caContractAddress,
-    currentChain?.endPoint,
+    currentChain,
     currentNetwork.walletType,
+    logout,
     passwordSeed,
     setLoading,
     wallet.address,
