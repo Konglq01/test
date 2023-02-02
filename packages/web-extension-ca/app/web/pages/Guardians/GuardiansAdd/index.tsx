@@ -23,6 +23,7 @@ import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import { useTranslation } from 'react-i18next';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 import './index.less';
+import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 
 const guardianTypeList = [{ label: 'Email', value: LoginType.email }];
 
@@ -133,6 +134,7 @@ export default function AddGuardian() {
         guardianAccount: emailVal as string,
         type: LoginStrType[guardianType as LoginType],
         verifierId: selectVerifierItem?.id || '',
+        chainId: DefaultChainId,
       });
       setLoading(false);
       if (result.verifierSessionId) {

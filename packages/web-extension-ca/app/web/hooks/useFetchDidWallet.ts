@@ -1,4 +1,4 @@
-import { DefaultChainId } from '@portkey/constants/constants-ca/network-test2';
+import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { useFetchWalletCAAddress } from '@portkey/hooks/hooks-ca/wallet-result';
@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router';
 import { useAppDispatch } from 'store/Provider/hooks';
 import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
 import { setLocalStorage } from 'utils/storage/chromeStorage';
+import { contractErrorHandler } from 'utils/tryErrorHandler';
 
 export default function useFetchDidWallet() {
   const fetchWalletResult = useFetchWalletCAAddress();
@@ -85,9 +86,9 @@ export default function useFetchDidWallet() {
             registerStatus: 'Registered',
           });
           const path = VerificationType.register === verificationType ? 'register' : 'login';
-          navigate(`/${path}/success`);
+          navigate(`/success-page/${path}`);
         } catch (error: any) {
-          throw error?.Error?.Message || error.message?.Message || error?.message || error;
+          throw contractErrorHandler(error) || error;
         }
       }
     },

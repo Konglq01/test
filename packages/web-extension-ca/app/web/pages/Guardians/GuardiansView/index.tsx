@@ -28,6 +28,8 @@ import { getTxResult } from 'utils/aelfUtils';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
+import { DefaultChainId } from '@portkey/constants/constants-ca/network';
+import { contractErrorHandler } from 'utils/tryErrorHandler';
 
 enum SwitchFail {
   default = 0,
@@ -107,6 +109,7 @@ export default function GuardiansView() {
           guardianAccount: opGuardian?.guardianAccount as string,
           type: LoginStrType[opGuardian?.guardianType as LoginType],
           verifierId: opGuardian?.verifier?.id || '',
+          chainId: DefaultChainId,
         });
         setLoading(false);
         if (result.verifierSessionId) {
@@ -129,7 +132,7 @@ export default function GuardiansView() {
       }
     } catch (error: any) {
       setLoading(false);
-      message.error(error?.Error?.Message || error.message?.Message || error?.message || error?.type);
+      message.error(contractErrorHandler(error) || error?.type);
       console.log('---setLoginAccount-error', error);
     }
   }, [
@@ -168,7 +171,7 @@ export default function GuardiansView() {
           if (error?.Error?.Details && error?.Error?.Details?.indexOf('Not found ca_hash')) {
             setTipOpen(true);
           } else {
-            message.error(error?.Error?.Message || error.message?.Message || error?.message);
+            message.error(contractErrorHandler(error));
             throw error;
           }
         }

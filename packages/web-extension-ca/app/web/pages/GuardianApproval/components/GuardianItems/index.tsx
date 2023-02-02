@@ -12,6 +12,8 @@ import { useLocation, useNavigate } from 'react-router';
 import { useAppDispatch, useLoading } from 'store/Provider/hooks';
 import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
 import { LoginInfo } from 'store/reducers/loginCache/type';
+import { DefaultChainId } from '@portkey/constants/constants-ca/network';
+import { contractErrorHandler } from 'utils/tryErrorHandler';
 
 interface GuardianItemProps {
   disabled?: boolean;
@@ -40,6 +42,7 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
           guardianAccount: item?.guardianAccount,
           type: LoginStrType[item.guardianType],
           verifierId: item?.verifier?.id || '',
+          chainId: DefaultChainId,
         });
         setLoading(false);
         if (result.verifierSessionId) {
@@ -64,7 +67,7 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
       } catch (error: any) {
         console.log('---guardian-sendCode-error', error);
         setLoading(false);
-        message.error(error?.Error?.Message || error.message?.Message || error?.message);
+        message.error(contractErrorHandler(error));
       }
     },
     [setLoading, dispatch, navigate, state],
@@ -88,6 +91,7 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
           guardianAccount: item?.guardianAccount,
           type: LoginStrType[loginAccount.loginType],
           verifierId: item.verifier?.id || '',
+          chainId: DefaultChainId,
         });
         setLoading(false);
         if (result.verifierSessionId) {

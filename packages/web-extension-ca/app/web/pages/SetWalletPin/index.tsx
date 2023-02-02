@@ -2,12 +2,11 @@ import { Button, Form, message } from 'antd';
 import { FormItem } from 'components/BaseAntd';
 import ConfirmPassword from 'components/ConfirmPassword';
 import PortKeyTitle from 'pages/components/PortKeyTitle';
-import { useCallback, useMemo, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router';
+import { useCallback, useState } from 'react';
+import { useNavigate, useParams } from 'react-router';
 import { useAppDispatch, useGuardiansInfo, useLoading, useLoginInfo } from 'store/Provider/hooks';
 import { setPinAction } from 'utils/lib/serviceWorkerAction';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
-import { useFetchWalletCAAddress } from '@portkey/hooks/hooks-ca/wallet-result';
 import { setLocalStorage } from 'utils/storage/chromeStorage';
 import { createWallet, setManagerInfo } from '@portkey/store/store-ca/wallet/actions';
 import { useTranslation } from 'react-i18next';
@@ -27,9 +26,7 @@ export default function SetWalletPin() {
   const [form] = Form.useForm();
   const { t } = useTranslation();
 
-  const { pathname } = useLocation();
-  const state = useMemo(() => pathname.split('/')[1], [pathname]);
-
+  const { type: state } = useParams<{ type: 'login' | 'scan' | 'register' }>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { setLoading } = useLoading();
@@ -39,7 +36,7 @@ export default function SetWalletPin() {
   const getWalletCAAddressResult = useFetchDidWallet();
 
   const { userGuardianStatus } = useGuardiansInfo();
-  console.log(walletInfo, 'walletInfo===');
+  console.log(walletInfo, state, scanWalletInfo, scanCaWalletInfo, 'walletInfo===caWallet');
 
   const requestRegisterDIDWallet = useCallback(
     async ({ managerAddress }: { managerAddress: string }) => {
@@ -110,8 +107,9 @@ export default function SetWalletPin() {
     async (pin: string) => {
       const scanWallet = scanWalletInfo;
       if (!scanWallet?.address || !scanCaWalletInfo) {
-        navigate(-1);
-        throw 'Wallet information is wrong, please go back to scan the code and try again';
+        navigate('/register/start/scan');
+        message.error('Wallet information is wrong, please go back to scan the code and try again');
+        return;
       }
       dispatch(
         createWallet({
@@ -124,7 +122,7 @@ export default function SetWalletPin() {
         registerStatus: 'Registered',
       });
       await setPinAction(pin);
-      navigate(`/${state}/success`);
+      navigate(`/success-page/${state}`);
     },
     [dispatch, navigate, scanCaWalletInfo, scanWalletInfo, state],
   );
@@ -228,6 +226,9 @@ export default function SetWalletPin() {
         break;
       case 'login':
         navigate('/login/guardian-approval');
+        break;
+      case 'scan':
+        navigate('/register/start/scan');
         break;
       default:
         navigate(-1);

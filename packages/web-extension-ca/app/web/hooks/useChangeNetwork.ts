@@ -22,7 +22,7 @@ export function useChangeNetwork() {
         if (!isPrompt) {
           navigate('/');
         } else {
-          navigate('/login/success');
+          navigate('/success-page/login');
         }
       } else {
         if (!isPrompt) {

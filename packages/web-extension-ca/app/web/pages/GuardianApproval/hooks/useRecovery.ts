@@ -16,6 +16,7 @@ import { resetLoginInfoAction } from 'store/reducers/loginCache/actions';
 import { GuardianMth } from 'types/guardians';
 import { getTxResult } from 'utils/aelfUtils';
 import { handleGuardian } from 'utils/sandboxUtil/handleGuardian';
+import { contractErrorHandler } from 'utils/tryErrorHandler';
 import getPrivateKeyAndMnemonic from 'utils/Wallet/getPrivateKeyAndMnemonic';
 import { formatAddGuardianValue } from '../utils/formatAddGuardianValue';
 import { formatDelGuardianValue } from '../utils/formatDelGuardianValue';
@@ -91,7 +92,8 @@ export const useRecovery = () => {
     } catch (error: any) {
       setLoading(false);
       console.log('---op-guardian-error', error);
-      message.error(error?.Error?.Message || error.message?.Message || error?.message);
+      const _error = contractErrorHandler(error) || 'Something error';
+      message.error(_error);
     }
   }, [
     currentChain,

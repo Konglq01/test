@@ -6,6 +6,7 @@ interface SendVerificationCodeParams {
   type: TLoginStrType;
   guardianAccount: string;
   verifierId: string;
+  chainId: string | number;
 }
 export function sendVerificationCode(params: SendVerificationCodeParams): Promise<{
   endPoint: string;
@@ -17,6 +18,7 @@ export function sendVerificationCode(params: SendVerificationCodeParams): Promis
       type: params.type,
       guardianAccount: params.guardianAccount,
       verifierId: params.verifierId,
+      chainId: params.chainId,
     },
   });
 }
@@ -24,6 +26,7 @@ export function sendVerificationCode(params: SendVerificationCodeParams): Promis
 interface CheckVerificationCodeProps {
   baseUrl?: string;
   verifierId: string;
+  chainId: string | number;
   guardianAccount: string;
   verifierSessionId: string;
   verificationCode: string;
@@ -36,6 +39,7 @@ interface ErrorBack {
 
 export async function checkVerificationCode({
   baseUrl,
+  chainId,
   verifierId,
   guardianAccount,
   verificationCode,
@@ -52,6 +56,7 @@ export async function checkVerificationCode({
       verifierSessionId,
       verificationCode,
       guardianAccount,
+      chainId,
     },
   });
 }

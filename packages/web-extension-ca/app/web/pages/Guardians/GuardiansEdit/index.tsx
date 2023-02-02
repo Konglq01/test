@@ -19,6 +19,7 @@ import { LoginType } from '@portkey/types/types-ca/wallet';
 import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
 import { VerifierItem } from '@portkey/types/verifier';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
+import { contractErrorHandler } from 'utils/tryErrorHandler';
 
 export default function GuardiansEdit() {
   const { t } = useTranslation();
@@ -96,7 +97,7 @@ export default function GuardiansEdit() {
     } catch (error: any) {
       setLoading(false);
       console.log('---edit-guardian-error', error);
-      message.error(error?.Error?.Message || error.message?.Message || error?.message);
+      message.error(contractErrorHandler(error));
     }
   }, [
     currentGuardian,
