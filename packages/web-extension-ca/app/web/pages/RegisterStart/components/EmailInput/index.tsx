@@ -8,6 +8,7 @@ import { NetworkItem } from '@portkey/types/types-ca/network';
 import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
 import { ChainItemType } from '@portkey/store/store-ca/wallet/type';
 import { checkEmail, EmailError } from '@portkey/utils/check';
+import { contractErrorHandler } from 'utils/tryErrorHandler';
 interface EmailInputProps {
   currentNetwork: NetworkItem;
   currentChain?: ChainItemType;
@@ -51,7 +52,7 @@ const EmailInput = forwardRef(
           } else if (error?.Error?.Message === 'Invalid signature') {
             isHasAccount = false;
           } else {
-            throw error?.Error?.Message || error.message?.Message || error?.message;
+            throw contractErrorHandler(error);
           }
         }
 

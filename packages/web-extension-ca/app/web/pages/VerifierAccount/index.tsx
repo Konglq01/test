@@ -27,6 +27,7 @@ import { setRegisterVerifierAction } from 'store/reducers/loginCache/actions';
 import { sleep } from '@portkey/utils';
 import { getAelfInstance } from '@portkey/utils/aelf';
 import { getTxResult } from 'utils/aelfUtils';
+import { contractErrorHandler } from 'utils/tryErrorHandler';
 
 export default function VerifierAccount() {
   const { loginAccount } = useLoginInfo();
@@ -93,7 +94,7 @@ export default function VerifierAccount() {
           navigate('/setting/guardians/view');
         } catch (error: any) {
           setLoading(false);
-          message.error(error?.Error?.Message || error.message?.Message || error?.message);
+          message.error(contractErrorHandler(error));
           console.log('---set login account error', error);
         }
       } else {
@@ -127,7 +128,7 @@ export default function VerifierAccount() {
     async (res: VerifierInfo) => {
       if (state === 'register') {
         dispatch(setRegisterVerifierAction(res));
-        navigate('/register/set-pin', { state: 'register' });
+        navigate('/login/set-pin/register');
       } else if (state == 'login') {
         if (!currentGuardian) return;
         dispatch(

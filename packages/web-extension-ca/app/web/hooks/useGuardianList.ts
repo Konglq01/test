@@ -4,6 +4,7 @@ import { setGuardiansAction } from '@portkey/store/store-ca/guardians/actions';
 import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+import { contractErrorHandler } from 'utils/tryErrorHandler';
 
 const useGuardiansList = () => {
   const dispatch = useAppDispatch();
@@ -22,7 +23,7 @@ const useGuardiansList = () => {
         });
         dispatch(setGuardiansAction(res.result.guardiansInfo));
       } catch (error: any) {
-        throw error?.Error?.Message || error.message?.Message || error?.message;
+        throw contractErrorHandler(error);
       }
     },
     [currentChain, currentNetwork, dispatch],

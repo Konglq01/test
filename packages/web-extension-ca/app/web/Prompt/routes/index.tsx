@@ -54,19 +54,11 @@ export const PageRouter = () =>
       element: <VerifierAccount />,
     },
     {
-      path: '/register/set-pin',
+      path: '/login/set-pin/:type',
       element: <SetWalletPin />,
     },
     {
-      path: '/login/set-pin',
-      element: <SetWalletPin />,
-    },
-    {
-      path: '/scan/set-pin',
-      element: <SetWalletPin />,
-    },
-    {
-      path: '/register/success',
+      path: '/success-page/:type',
       element: <SuccessPage />,
     },
     {

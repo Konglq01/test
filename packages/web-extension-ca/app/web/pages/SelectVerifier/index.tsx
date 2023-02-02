@@ -12,6 +12,7 @@ import CommonSelect from 'components/CommonSelect1';
 import { useTranslation } from 'react-i18next';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
+import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 
 export default function SelectVerifier() {
   const { verifierMap } = useGuardiansInfo();
@@ -51,6 +52,7 @@ export default function SelectVerifier() {
         guardianAccount: loginAccount.guardianAccount,
         type: LoginStrType[loginAccount.loginType],
         verifierId: selectItem.id,
+        chainId: DefaultChainId,
       });
       setLoading(false);
       if (result.verifierSessionId) {

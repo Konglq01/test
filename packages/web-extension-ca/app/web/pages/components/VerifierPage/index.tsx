@@ -15,6 +15,7 @@ import { verifyErrorHandler } from 'utils/tryErrorHandler';
 import { LoginType } from '@portkey/types/types-ca/wallet';
 import { useEffectOnce } from 'react-use';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
+import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 
 const MAX_TIMER = 60;
 
@@ -31,13 +32,7 @@ interface VerifierPageProps {
   onSuccess?: (res: { verificationDoc: string; signature: string; verifierId: string }) => void;
 }
 
-export default function VerifierPage({
-  loginAccount,
-  currentGuardian,
-  guardianType,
-  isInitStatus,
-  onSuccess,
-}: VerifierPageProps) {
+export default function VerifierPage({ currentGuardian, guardianType, isInitStatus, onSuccess }: VerifierPageProps) {
   const { setLoading } = useLoading();
   const [timer, setTimer] = useState<number>(0);
   const { isPrompt } = useCommonState();
@@ -55,7 +50,6 @@ export default function VerifierPage({
       try {
         console.log(code);
         if (code && code.length === 6) {
-          if (!loginAccount?.guardianAccount) throw 'Missing account!!!';
           if (!guardianType && guardianType !== 0) return message.error('Missing guardiansType');
           if (!currentGuardian?.verifierInfo) throw 'Missing verifierInfo!!!';
           setLoading(true);
@@ -65,6 +59,7 @@ export default function VerifierPage({
             verifierSessionId: currentGuardian.verifierInfo.sessionId,
             verificationCode: code,
             verifierId: currentGuardian.verifier?.id || '',
+            chainId: DefaultChainId,
           });
 
           setLoading(false);
@@ -85,7 +80,7 @@ export default function VerifierPage({
         message.error(_error);
       }
     },
-    [loginAccount, guardianType, currentGuardian, setLoading, onSuccess, t],
+    [guardianType, currentGuardian, setLoading, onSuccess, t],
   );
 
   const resendCode = useCallback(async () => {
@@ -96,6 +91,7 @@ export default function VerifierPage({
       guardianAccount: currentGuardian.guardianAccount,
       type: LoginStrType[guardianType],
       verifierId: currentGuardian.verifier?.id || '',
+      chainId: DefaultChainId,
     });
     setLoading(false);
     if (res.verifierSessionId) {
