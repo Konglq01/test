@@ -38,6 +38,7 @@ export default function AddGuardian() {
   const { verifierMap, userGuardiansList, opGuardian } = useGuardiansInfo();
   const [guardianType, setGuardianType] = useState<LoginType>();
   const [verifierVal, setVerifierVal] = useState<string>();
+  const [verifierName, setVerifierName] = useState<string>();
   const [emailVal, setEmailVal] = useState<string>();
   const [inputErr, setInputErr] = useState<string>();
   const [visible, setVisible] = useState<boolean>(false);
@@ -54,7 +55,7 @@ export default function AddGuardian() {
   const verifierOptions = useMemo(
     () =>
       Object.values(verifierMap ?? {})?.map((item) => ({
-        value: item.name,
+        value: item.id,
         children: (
           <div className="flex select-option">
             <BaseVerifierIcon width={32} height={32} src={item.imageUrl} />
@@ -78,7 +79,8 @@ export default function AddGuardian() {
     if (state === 'back' && opGuardian) {
       setGuardianType(opGuardian.guardianType);
       setEmailVal(opGuardian.guardianAccount);
-      setVerifierVal(opGuardian.verifier?.name);
+      setVerifierVal(opGuardian.verifier?.id);
+      setVerifierName(opGuardian.verifier?.name);
     }
   }, [state, opGuardian]);
 
@@ -87,10 +89,14 @@ export default function AddGuardian() {
     setGuardianType(value);
   }, []);
 
-  const verifierChange = useCallback((value: string) => {
-    setVerifierVal(value);
-    setExist(false);
-  }, []);
+  const verifierChange = useCallback(
+    (value: string) => {
+      setVerifierVal(value);
+      setVerifierName(verifierMap?.[value]?.name);
+      setExist(false);
+    },
+    [verifierMap],
+  );
 
   const handleInputChange = useCallback((v: string) => {
     setInputErr('');
@@ -106,11 +112,11 @@ export default function AddGuardian() {
     if (!selectVerifierItem) return message.error('Can not get the current verifier message');
     const isExist: boolean =
       Object.values(userGuardiansList ?? {})?.some((item) => {
-        return item.key === `${emailVal}&${verifierVal}`;
+        return item.key === `${emailVal}&${verifierName}`;
       }) ?? false;
     setExist(isExist);
     !isExist && setVisible(true);
-  }, [emailVal, selectVerifierItem, userGuardiansList, verifierVal]);
+  }, [emailVal, selectVerifierItem, userGuardiansList, verifierName]);
 
   const handleVerify = useCallback(async () => {
     try {
@@ -211,7 +217,7 @@ export default function AddGuardian() {
         closable={false}
         open={visible}
         onCancel={() => setVisible(false)}>
-        <p className="modal-content">{`${verifierVal} will send a verification code to ${emailVal} to verify your email address.`}</p>
+        <p className="modal-content">{`${verifierName} will send a verification code to ${emailVal} to verify your email address.`}</p>
         <div className="btn-wrapper">
           <Button onClick={() => setVisible(false)}>{'Cancel'}</Button>
           <Button type="primary" onClick={handleVerify}>

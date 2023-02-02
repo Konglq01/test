@@ -15,33 +15,27 @@ export const formatEditGuardianValue = ({
   preGuardian?: UserGuardianItem;
 }) => {
   const guardianToUpdatePre: GuardianItem = {
-    guardianType: {
-      type: preGuardian?.guardianType as LoginType,
-      guardianType: preGuardian?.guardianAccount as string,
-    },
-    verifier: {
-      name: preGuardian?.verifier?.name as string,
+    value: preGuardian?.guardianAccount as string,
+    type: preGuardian?.guardianType as LoginType,
+    verificationInfo: {
+      id: preGuardian?.verifier?.id as string,
     },
   };
   const guardianToUpdateNew: GuardianItem = {
-    guardianType: {
-      type: opGuardian?.guardianType as LoginType,
-      guardianType: opGuardian?.guardianAccount as string,
-    },
-    verifier: {
-      name: opGuardian?.verifier?.name as string,
+    value: opGuardian?.guardianAccount as string,
+    type: opGuardian?.guardianType as LoginType,
+    verificationInfo: {
+      id: opGuardian?.verifier?.id as string,
     },
   };
   const guardiansApproved: GuardianItem[] = [];
   Object.values(userGuardianStatus ?? {})?.forEach((item: UserGuardianStatus) => {
     if (item.signature) {
       guardiansApproved.push({
-        guardianType: {
-          type: item.guardianType,
-          guardianType: item.guardianAccount,
-        },
-        verifier: {
-          name: item.verifier?.name as string,
+        value: item.guardianAccount,
+        type: item.guardianType,
+        verificationInfo: {
+          id: item.verifier?.id as string,
           signature: Object.values(Buffer.from(item.signature as any, 'hex')),
           verificationDoc: item.verificationDoc as string,
         },

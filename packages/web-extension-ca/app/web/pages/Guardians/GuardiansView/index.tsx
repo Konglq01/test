@@ -27,6 +27,7 @@ import { getAelfInstance } from '@portkey/utils/aelf';
 import { getTxResult } from 'utils/aelfUtils';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
+import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 
 enum SwitchFail {
   default = 0,
@@ -69,9 +70,14 @@ export default function GuardiansView() {
             params: [
               {
                 caHash: walletInfo?.AELF?.caHash,
-                guardianType: {
-                  type: currentGuardian?.guardianType,
-                  guardianType: currentGuardian?.guardianAccount,
+                guardianAccount: {
+                  guardian: {
+                    type: currentGuardian?.guardianType,
+                    verifier: {
+                      id: currentGuardian?.verifier?.id,
+                    },
+                  },
+                  value: currentGuardian?.guardianAccount,
                 },
               },
             ],
@@ -141,15 +147,13 @@ export default function GuardiansView() {
   const handleSwitch = useCallback(
     async (status: boolean) => {
       if (status) {
-        // TODO: this logic will be added
-        // const isLogin = Object.values(userGuardiansList ?? {}).some(
-        //   (item: UserGuardianItem) =>
-        //     item.isLoginAccount && item.loginGuardianType === currentGuardian?.loginGuardianType,
-        // );
-        // if (isLogin) {
-        //   setTipOpen(true);
-        //   return;
-        // }
+        const isLogin = Object.values(userGuardiansList ?? {}).some(
+          (item: UserGuardianItem) => item.isLoginAccount && item.guardianAccount === currentGuardian?.guardianAccount,
+        );
+        if (isLogin) {
+          setTipOpen(true);
+          return;
+        }
         try {
           await getHolderInfo({
             rpcUrl: currentChain?.endPoint as string,
@@ -181,8 +185,8 @@ export default function GuardiansView() {
       }
     },
     [
-      currentChain?.caContractAddress,
-      currentChain?.endPoint,
+      currentChain,
+      currentGuardian?.guardianAccount,
       currentNetwork.walletType,
       opGuardian?.guardianAccount,
       userGuardiansList,
