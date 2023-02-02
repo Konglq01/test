@@ -38,6 +38,7 @@ export async function deleteGuardian(
 
   const guardiansApproved = getGuardiansApproved(userGuardiansList, guardiansStatus);
   // TODO: remove console&req in this page
+  // TODO: remove async await
   console.log('RemoveGuardian', {
     caHash,
     guardianToRemove,
@@ -199,8 +200,8 @@ export async function cancelLoginAccount(
   return req;
 }
 
-export async function removeManager(contract: ContractBasic, address: string, caHash: string) {
-  return await contract?.callSendMethod('RemoveManager', address, {
+export function removeManager(contract: ContractBasic, address: string, caHash: string) {
+  return contract?.callSendMethod('RemoveManager', address, {
     caHash,
     manager: {
       managerAddress: address,

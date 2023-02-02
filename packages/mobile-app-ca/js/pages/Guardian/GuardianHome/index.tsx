@@ -77,7 +77,7 @@ export default function GuardianHome() {
           <Touchable
             key={idx}
             onPress={() => {
-              navigationService.navigate('GuardianDetail', { guardian: JSON.stringify(guardian) });
+              navigationService.navigate('GuardianDetail', { guardian });
             }}>
             <GuardianItem
               guardianItem={guardian}
