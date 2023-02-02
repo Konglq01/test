@@ -57,7 +57,7 @@ export default function ScanCard() {
           caWalletInfo: caWallet,
         }),
       );
-      navigate('/register/set-pin', { state: 'scan' });
+      navigate('/scan/set-pin', { state: 'scan' });
     }
   }, [caWallet, dispatch, navigate, newWallet]);
 
