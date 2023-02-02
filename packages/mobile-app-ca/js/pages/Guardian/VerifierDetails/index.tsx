@@ -7,7 +7,7 @@ import DigitInput, { DigitInputInterface } from 'components/DigitInput';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import useRouterParams from '@portkey/hooks/useRouterParams';
-import { ApprovalType, VerificationType, VerifyStatus } from '@portkey/types/verifier';
+import { ApprovalType, VerificationType, VerifierInfo, VerifyStatus } from '@portkey/types/verifier';
 import GuardianItem from '../components/GuardianItem';
 import { FontStyles } from 'assets/theme/styles';
 import { request } from 'api';
@@ -17,15 +17,12 @@ import CommonToast from 'components/CommonToast';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import myEvents from 'utils/deviceEvent';
-import { API_REQ_FUNCTION } from 'api/types';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { useGetCurrentCAContract } from 'hooks/contract';
 import { setLoginAccount } from 'utils/guardian';
 import { LoginType } from '@portkey/types/types-ca/wallet';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 import { GuardiansStatusItem } from '../types';
-
-type FetchType = Record<string, API_REQ_FUNCTION>;
 
 type RouterParams = {
   guardianItem?: UserGuardianItem;
@@ -82,12 +79,11 @@ export default function VerifierDetails() {
 
     try {
       const caContract = await getCurrentCAContract();
-
       const req = await setLoginAccount(caContract, managerAddress, caHash, guardianItem);
       if (req && !req.error) {
         myEvents.refreshGuardiansList.emit();
         navigationService.navigate('GuardianDetail', {
-          guardian: JSON.stringify({ ...guardianItem, isLoginAccount: true }),
+          guardian: { ...guardianItem, isLoginAccount: true },
         });
       } else {
         CommonToast.fail(req?.error.message);
@@ -111,32 +107,28 @@ export default function VerifierDetails() {
             verifierId: guardianItem?.verifier?.id,
           },
         });
+        CommonToast.success('Verified Successfully');
+
+        const verifierInfo: VerifierInfo = {
+          ...rst,
+          verifierId: guardianItem?.verifier?.id,
+        };
         switch (verificationType) {
           case VerificationType.communityRecovery:
           case VerificationType.editGuardianApproval:
             setGuardianStatus({
               requestCodeResult: requestCodeResult,
               status: VerifyStatus.Verified,
-              verifierInfo: {
-                ...rst,
-                verifierId: guardianItem?.verifier?.id,
-              },
-              editGuardianParams: {
-                signature: rst.signature,
-                verifierDoc: rst.verifierDoc,
-              },
+              verifierInfo,
             });
             navigationService.goBack();
             break;
           case VerificationType.addGuardian:
-            if (rst.signature && rst.verifierDoc) {
+            if (verifierInfo.signature && verifierInfo.verificationDoc) {
               navigationService.navigate('GuardianApproval', {
                 approvalType: ApprovalType.addGuardian,
                 guardianItem,
-                editGuardianParams: {
-                  signature: rst.signature,
-                  verifierDoc: rst.verifierDoc,
-                },
+                verifierInfo,
               });
             }
             break;
@@ -148,12 +140,9 @@ export default function VerifierDetails() {
               managerInfo: {
                 verificationType: VerificationType.register,
                 loginAccount: guardianItem.guardianAccount,
-                type: guardianItem?.guardianType,
+                type: guardianItem.guardianType,
               },
-              verifierInfo: {
-                ...rst,
-                verifierId: guardianItem?.verifier?.id,
-              },
+              verifierInfo,
             });
             break;
         }
@@ -182,12 +171,11 @@ export default function VerifierDetails() {
           status: VerifyStatus.Verifying,
         });
         countdown.current?.resetTime(60);
-        digitInput.current?.reset();
       }
     } catch (error) {
-      digitInput.current?.reset();
       CommonToast.failError(error, 'Verify Fail');
     }
+    digitInput.current?.reset();
     Loading.hide();
   }, [guardianItem?.guardianAccount, guardianItem?.guardianType, guardianItem?.verifier?.id, setGuardianStatus]);
   return (

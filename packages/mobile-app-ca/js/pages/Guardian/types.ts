@@ -12,15 +12,9 @@ export type GuardianApproved = {
 
 export type GuardiansApproved = GuardianApproved[];
 
-export type EditGuardianParamsType = {
-  signature: string;
-  verifierDoc: string;
-};
-
 export type GuardiansStatusItem = {
   status: VerifyStatus;
   requestCodeResult: { verifierSessionId: string };
-  editGuardianParams?: EditGuardianParamsType;
   verifierInfo?: VerifierInfo;
 };
 

@@ -4253,6 +4253,17 @@
   resolved "https://registry.yarnpkg.com/@micro-zoe/micro-app/-/micro-app-0.8.10.tgz#33fc5e821289521d8339cb35aa47a20786e01aea"
   integrity sha512-Zb1G5UrOAEHhiAlanzHJiBlRFHMd4+C/Q5jkwTM991R7blb1F6uGY47pmcunzHns48Kj6k9v2+CLsozGyhQmyw==
 
+"@microsoft/signalr@7.0.2":
+  version "7.0.2"
+  resolved "https://registry.npmjs.org/@microsoft/signalr/-/signalr-7.0.2.tgz#00cd9444de903602ddbea1f9f629995a1fda31ae"
+  integrity sha512-U+o33K2m6nnMojZzBrjrApKgYfiQ0A0t4I2F5oFJObgfzRSDS9v0YoYgkmva5nbPftUp3YcR5XmH0S/1+BZT6Q==
+  dependencies:
+    abort-controller "^3.0.0"
+    eventsource "^2.0.2"
+    fetch-cookie "^2.0.3"
+    node-fetch "^2.6.7"
+    ws "^7.4.5"
+
 "@microsoft/signalr@~6.0.1":
   version "6.0.13"
   resolved "https://registry.npmjs.org/@microsoft/signalr/-/signalr-6.0.13.tgz#0c901745bc1f0614fc99754748cb318f1c0182e7"
@@ -7017,6 +7028,28 @@ aelf-sdk@^3.2.41:
   version "3.2.41"
   resolved "https://registry.npmmirror.com/aelf-sdk/-/aelf-sdk-3.2.41.tgz#6e2df4cd57e884a7c06b1cc1fa73634e7306e3cd"
   integrity sha512-1Iq/wTNRUMYMgptzxNgWVFq9MJAYBkX/Q+XU+emZIpx8gqAE+fN3ph1FnWEMjnzkg47HAKwXmXYYmc95kWMAAw==
+  dependencies:
+    "@aelfqueen/protobufjs" "^6.8.9"
+    "@babel/runtime" "^7.4.5"
+    assert "^2.0.0"
+    bignumber.js "^9.0.0"
+    bip39 "^3.0.2"
+    browserify-cipher "^1.0.1"
+    bs58 "^4.0.1"
+    buffer "^5.2.1"
+    crypto-js "^3.1.9-1"
+    elliptic "^6.4.1"
+    hdkey "^1.1.1"
+    js-sha256 "^0.9.0"
+    query-string "5.1.1"
+    randombytes "^2.1.0"
+    scryptsy "^2.1.0"
+    xmlhttprequest "^1.8.0"
+
+aelf-sdk@^3.2.44:
+  version "3.2.44"
+  resolved "https://registry.yarnpkg.com/aelf-sdk/-/aelf-sdk-3.2.44.tgz#7f97d330711cf41c1ca4271f921a99130fcd1ea9"
+  integrity sha512-R/MD0z98LDv1GitTqhOWMmQTm7YLg9KsqOVjr3l0NWkq1KxgPGBfd2wlvg/jhhPgCsYJ91mQbAxkJU7kQRmHPA==
   dependencies:
     "@aelfqueen/protobufjs" "^6.8.9"
     "@babel/runtime" "^7.4.5"
@@ -13209,6 +13242,11 @@ eventsource@^1.0.7:
   resolved "https://registry.npmjs.org/eventsource/-/eventsource-1.1.2.tgz#bc75ae1c60209e7cb1541231980460343eaea7c2"
   integrity sha512-xAH3zWhgO2/3KIniEKYPr8plNSzlGINOUqYj0m0u7AB81iRw8b/3E73W6AuU+6klLbaSFmZnaETQ2lXPfAydrA==
 
+eventsource@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.npmjs.org/eventsource/-/eventsource-2.0.2.tgz#76dfcc02930fb2ff339520b6d290da573a9e8508"
+  integrity sha512-IzUmBGPR3+oUG9dUeXynyNmf91/3zUSJg1lCktzKw47OXuhco54U3r9B7O4XX+Rb1Itm9OZ2b0RkTs10bICOxA==
+
 evp_bytestokey@^1.0.0, evp_bytestokey@^1.0.3:
   version "1.0.3"
   resolved "https://registry.npmmirror.com/evp_bytestokey/-/evp_bytestokey-1.0.3.tgz#7fcbdb198dc71959432efe13842684e0525acb02"
@@ -13808,6 +13846,14 @@ fetch-cookie@^0.11.0:
   integrity sha512-BQm7iZLFhMWFy5CZ/162sAGjBfdNWb7a8LEqqnzsHFhxT/X/SVj/z2t2nu3aJvjlbQkrAlTUApplPRjWyH4mhA==
   dependencies:
     tough-cookie "^2.3.3 || ^3.0.1 || ^4.0.0"
+
+fetch-cookie@^2.0.3:
+  version "2.1.0"
+  resolved "https://registry.npmjs.org/fetch-cookie/-/fetch-cookie-2.1.0.tgz#6e127909912f9e527533b045aab555c06b33801b"
+  integrity sha512-39+cZRbWfbibmj22R2Jy6dmTbAWC+oqun1f1FzQaNurkPDUP4C38jpeZbiXCR88RKRVDp8UcDrbFXkNhN+NjYg==
+  dependencies:
+    set-cookie-parser "^2.4.8"
+    tough-cookie "^4.0.0"
 
 fetch-retry@^4.1.1:
   version "4.1.1"
@@ -23538,6 +23584,11 @@ set-blocking@^2.0.0, set-blocking@~2.0.0:
   version "2.0.0"
   resolved "https://registry.npmmirror.com/set-blocking/-/set-blocking-2.0.0.tgz#045f9782d011ae9a6803ddd382b24392b3d890f7"
   integrity sha512-KiKBS8AnWGEyLzofFfmvKwpdPzqiy16LvQfK3yv/fVH7Bj13/wl3JSR1J+rfgRE9q7xUJK4qvgS8raSOeLUehw==
+
+set-cookie-parser@^2.4.8:
+  version "2.5.1"
+  resolved "https://registry.npmjs.org/set-cookie-parser/-/set-cookie-parser-2.5.1.tgz#ddd3e9a566b0e8e0862aca974a6ac0e01349430b"
+  integrity sha512-1jeBGaKNGdEq4FgIrORu/N570dwoPYio8lSoYLWmX7sQ//0JY08Xh9o5pBcgmHQ/MbsYp/aZnOe1s1lIsbLprQ==
 
 set-harmonic-interval@^1.0.1:
   version "1.0.1"

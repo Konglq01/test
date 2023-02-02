@@ -108,6 +108,7 @@ function GuardianItemButton({
     });
   }, [guardianInfo, requestCodeResult]);
   const buttonProps: CommonButtonProps = useMemo(() => {
+    // expired
     if (isExpired && status !== VerifyStatus.Verified) {
       return {
         disabled: true,

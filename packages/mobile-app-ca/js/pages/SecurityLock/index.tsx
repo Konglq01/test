@@ -14,13 +14,14 @@ import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import Loading from 'components/Loading';
 import useBiometricsReady from 'hooks/useBiometrics';
 import { usePreventHardwareBack } from '@portkey/hooks/mobile';
-import { intervalGetResult, onResultFail, TimerResult } from 'utils/wallet';
+import { onResultFail, TimerResult } from 'utils/wallet';
 import { setCAInfo } from '@portkey/store/store-ca/wallet/actions';
 import { CAInfo } from '@portkey/types/types-ca/wallet';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 import { VerificationType } from '@portkey/types/verifier';
 import useEffectOnce from 'hooks/useEffectOnce';
 import PinContainer from 'components/PinContainer';
+import { useIntervalGetResult } from 'hooks/login';
 let appState: AppStateStatus, verifyTime: number;
 export default function SecurityLock() {
   const { biometrics } = useUser();
@@ -35,12 +36,14 @@ export default function SecurityLock() {
   const dispatch = useAppDispatch();
   const isSyncCAInfo = useMemo(() => address && managerInfo && !caHash, [address, caHash, managerInfo]);
   const navigation = useNavigation();
+  const onIntervalGetResult = useIntervalGetResult();
+
   useEffect(() => {
     if (isSyncCAInfo) {
       setTimeout(() => {
         if (managerInfo) {
           timer.current?.remove();
-          timer.current = intervalGetResult({
+          timer.current = onIntervalGetResult({
             managerInfo: managerInfo,
             onPass: setStateCAInfo,
             onFail: message =>
@@ -79,7 +82,7 @@ export default function SecurityLock() {
       if (isSyncCAInfo && !caInfo) {
         timer.current?.remove();
         Loading.show();
-        timer.current = intervalGetResult({
+        timer.current = onIntervalGetResult({
           managerInfo: managerInfo,
           onPass: (info: CAInfo) => {
             dispatch(
@@ -107,7 +110,7 @@ export default function SecurityLock() {
       }
       handleRouter(pwd);
     },
-    [caInfo, dispatch, handleRouter, isSyncCAInfo, managerInfo],
+    [caInfo, dispatch, handleRouter, isSyncCAInfo, managerInfo, onIntervalGetResult],
   );
   const verifyBiometrics = useCallback(async () => {
     if (!biometrics || (verifyTime && verifyTime + 1000 > new Date().getTime())) return;

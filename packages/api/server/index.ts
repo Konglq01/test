@@ -9,7 +9,11 @@ class ServiceInit {
    * @param  {string} name
    * @param  {UrlObj} urlObj
    */
-  protected defaultConfig?: RequestConfig;
+  public defaultConfig: RequestConfig;
+
+  constructor() {
+    this.defaultConfig = {};
+  }
 
   parseRouter = (name: string, urlObj: UrlObj) => {
     const obj: any = (this[name] = {});
@@ -38,7 +42,6 @@ class ServiceInit {
   }
 
   set(key: keyof RequestConfig, value: any) {
-    if (!this.defaultConfig) this.defaultConfig = {};
     this.defaultConfig[key] = value;
   }
 }

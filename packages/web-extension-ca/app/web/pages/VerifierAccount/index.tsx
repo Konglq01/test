@@ -65,9 +65,14 @@ export default function VerifierAccount() {
               params: [
                 {
                   caHash: walletInfo?.AELF?.caHash,
-                  guardianType: {
-                    type: currentGuardian?.guardianType,
-                    guardianType: currentGuardian?.guardianAccount,
+                  guardianAccount: {
+                    guardian: {
+                      type: currentGuardian?.guardianType,
+                      verifier: {
+                        id: currentGuardian?.verifier?.id,
+                      },
+                    },
+                    value: currentGuardian?.guardianAccount,
                   },
                 },
               ],

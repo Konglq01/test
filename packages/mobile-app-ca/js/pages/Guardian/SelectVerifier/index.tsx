@@ -37,14 +37,6 @@ export default function SelectVerifier() {
     const confirm = async () => {
       try {
         Loading.show();
-        console.log(
-          {
-            type: LoginStrType[LoginType.email],
-            guardianAccount: loginAccount,
-            verifierId: selectedVerifier.id,
-          },
-          '=====verifierInfo',
-        );
         const requestCodeResult = await request.verify.sendCode({
           data: {
             type: LoginStrType[LoginType.email],
