@@ -70,6 +70,14 @@ export const PageRouter = () =>
       element: <SuccessPage />,
     },
     {
+      path: '/login/success',
+      element: <SuccessPage />,
+    },
+    {
+      path: '/scan/success',
+      element: <SuccessPage />,
+    },
+    {
       path: '/login/guardian-approval',
       element: <GuardianApproval />,
     },

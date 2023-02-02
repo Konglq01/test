@@ -9,8 +9,7 @@ import { setPinAction } from 'utils/lib/serviceWorkerAction';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { useFetchWalletCAAddress } from '@portkey/hooks/hooks-ca/wallet-result';
 import { setLocalStorage } from 'utils/storage/chromeStorage';
-import { createWallet, resetWallet, setCAInfo, setManagerInfo } from '@portkey/store/store-ca/wallet/actions';
-import useLocationState from 'hooks/useLocationState';
+import { createWallet, setManagerInfo } from '@portkey/store/store-ca/wallet/actions';
 import { useTranslation } from 'react-i18next';
 import { recoveryDIDWallet, registerDIDWallet } from '@portkey/api/api-did/apiUtils/wallet';
 import { VerificationType } from '@portkey/types/verifier';
@@ -22,23 +21,22 @@ import AElf from 'aelf-sdk';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 import { randomId } from '@portkey/utils';
 import './index.less';
+import useFetchDidWallet from 'hooks/useFetchDidWallet';
 
 export default function SetWalletPin() {
   const [form] = Form.useForm();
   const { t } = useTranslation();
 
   const { pathname } = useLocation();
-  // const { state } = useLocation();
   const state = useMemo(() => pathname.split('/')[1], [pathname]);
 
-  console.log(state, 'state====');
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { setLoading } = useLoading();
   const { walletInfo } = useCurrentWallet();
   const [returnOpen, setReturnOpen] = useState<boolean>();
   const { scanWalletInfo, scanCaWalletInfo, loginAccount, registerVerifier } = useLoginInfo();
-  const getWalletCAAddressResult = useFetchWalletCAAddress();
+  const getWalletCAAddressResult = useFetchDidWallet();
 
   const { userGuardianStatus } = useGuardiansInfo();
   console.log(walletInfo, 'walletInfo===');
@@ -126,7 +124,7 @@ export default function SetWalletPin() {
         registerStatus: 'Registered',
       });
       await setPinAction(pin);
-      navigate('/register/success', { state });
+      navigate(`/${state}/success`);
     },
     [dispatch, navigate, scanCaWalletInfo, scanWalletInfo, state],
   );
@@ -186,38 +184,14 @@ export default function SetWalletPin() {
         // TODO Step 14 Only get Main Chain caAddress
 
         // Socket
-        const walletResult = await getWalletCAAddressResult({
+        await getWalletCAAddressResult({
           requestId: sessionInfo.requestId,
           clientId: _walletInfo.address,
           verificationType: state === 'login' ? VerificationType.communityRecovery : VerificationType.register,
           managerUniqueId: sessionInfo.sessionId,
+          pwd: pin,
+          managerAddress: _walletInfo.address,
         });
-        console.log(walletResult, 'walletResult===');
-        // walletResult.Socket.stop();
-        if (walletResult.status !== 'pass') {
-          await setLocalStorage({
-            registerStatus: null,
-          });
-          dispatch(resetWallet());
-          throw walletResult?.message || walletResult.status;
-        }
-
-        console.log(walletResult, 'walletResult===');
-
-        dispatch(
-          setCAInfo({
-            caInfo: {
-              caAddress: walletResult.caAddress,
-              caHash: walletResult.caHash,
-            },
-            pin,
-            chainId: DefaultChainId,
-          }),
-        );
-        await setLocalStorage({
-          registerStatus: 'Registered',
-        });
-        navigate('/register/success', { state });
       } catch (error: any) {
         setLoading(false);
         console.log(error, 'onCreate==error');
@@ -237,7 +211,6 @@ export default function SetWalletPin() {
       walletInfo,
       dispatch,
       getWalletCAAddressResult,
-      navigate,
       requestRegisterDIDWallet,
       requestRecoveryDIDWallet,
     ],

@@ -55,13 +55,12 @@ export default function VerifierPage({
       try {
         console.log(code);
         if (code && code.length === 6) {
-          if (!loginAccount?.guardianAccount) throw 'Missing account!!!';
           if (!guardianType && guardianType !== 0) return message.error('Missing guardiansType');
           if (!currentGuardian?.verifierInfo) throw 'Missing verifierInfo!!!';
           setLoading(true);
 
           const res = await checkVerificationCode({
-            guardianAccount: loginAccount.guardianAccount,
+            guardianAccount: currentGuardian.guardianAccount,
             verifierSessionId: currentGuardian.verifierInfo.sessionId,
             verificationCode: code,
             verifierId: currentGuardian.verifier?.id || '',
@@ -85,7 +84,7 @@ export default function VerifierPage({
         message.error(_error);
       }
     },
-    [loginAccount, guardianType, currentGuardian, setLoading, onSuccess, t],
+    [guardianType, currentGuardian, setLoading, onSuccess, t],
   );
 
   const resendCode = useCallback(async () => {

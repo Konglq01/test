@@ -22,7 +22,7 @@ export function useChangeNetwork() {
         if (!isPrompt) {
           navigate('/');
         } else {
-          navigate('/register/success', { state: 'login' });
+          navigate('/login/success');
         }
       } else {
         if (!isPrompt) {

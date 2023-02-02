@@ -24,7 +24,7 @@ const getCreateResultBySocket = ({
       clientId: clientId,
     });
     if (type === VerificationType.register) {
-      Socket.onCaAccountRegister(
+      const { remove } = Socket.onCaAccountRegister(
         {
           clientId,
           requestId: requestId,
@@ -36,10 +36,11 @@ const getCreateResultBySocket = ({
             status: data.body.registerStatus,
             message: data.body.registerMessage,
           });
+          remove();
         },
       );
     } else {
-      Socket.onCaAccountRecover(
+      const { remove } = Socket.onCaAccountRecover(
         {
           clientId,
           requestId: requestId,
@@ -52,6 +53,8 @@ const getCreateResultBySocket = ({
             status: data.body.recoveryStatus,
             message: data.body.recoveryMessage,
           });
+
+          remove();
         },
       );
     }
