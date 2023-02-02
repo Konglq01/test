@@ -3,7 +3,7 @@ import { defaultColors } from 'assets/theme';
 import { pTd } from 'utils/unit';
 import GStyles from 'assets/theme/GStyles';
 
-const { font3, bg1, bg4, error, border6 } = defaultColors;
+const { font3, bg1, bg4, border6 } = defaultColors;
 
 export const pageStyles = StyleSheet.create({
   pageWrap: {
@@ -45,24 +45,5 @@ export const pageStyles = StyleSheet.create({
   tips: {
     color: font3,
     lineHeight: pTd(20),
-  },
-
-  buttonWrap: {},
-  titleLabel: {
-    color: font3,
-    lineHeight: pTd(20),
-  },
-
-  typeOverlayTitleLabel: {
-    marginTop: pTd(16),
-    marginBottom: pTd(8),
-    textAlign: 'center',
-  },
-
-  titleTextStyle: {
-    fontSize: pTd(14),
-  },
-  errorTips: {
-    color: error,
   },
 });

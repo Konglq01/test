@@ -50,7 +50,6 @@ export async function deleteGuardian(
     guardiansApproved: guardiansApproved,
   });
   console.log('RemoveGuardian: req', req);
-
   return req;
 }
 
