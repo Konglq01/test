@@ -51,8 +51,8 @@ export interface RegisterBody {
 export interface RecoverBody {
   caAddress: string;
   caHash: string;
-  recoverMessage: null | string;
-  recoverStatus: RegisterStatus;
+  recoveryMessage: null | string;
+  recoveryStatus: RegisterStatus;
 }
 
 export interface CaAccountRegisterResult {

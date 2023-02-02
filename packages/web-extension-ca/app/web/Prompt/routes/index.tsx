@@ -58,6 +58,14 @@ export const PageRouter = () =>
       element: <SetWalletPin />,
     },
     {
+      path: '/login/set-pin',
+      element: <SetWalletPin />,
+    },
+    {
+      path: '/scan/set-pin',
+      element: <SetWalletPin />,
+    },
+    {
       path: '/register/success',
       element: <SuccessPage />,
     },

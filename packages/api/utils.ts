@@ -19,6 +19,7 @@ export function getRequestConfig(base: BaseConfig, config?: RequestConfig, defau
       return {
         ...defaultConfig,
         ...config,
+        baseURL: config?.baseURL === undefined ? defaultConfig.baseURL : config?.baseURL,
         params: { ...defaultConfig.params, ...config?.params },
       };
     }
@@ -30,6 +31,7 @@ export function getRequestConfig(base: BaseConfig, config?: RequestConfig, defau
       ...defaultConfig,
       ...baseConfig,
       ...config,
+      baseURL: config?.baseURL === undefined ? defaultConfig?.baseURL : config?.baseURL,
       params: { ...defaultConfig?.params, ...baseConfig.params, ...params },
     };
   }
