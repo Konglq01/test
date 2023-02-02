@@ -1,6 +1,6 @@
 export default {
   requestRegister: '/api/app/account/register/request',
-  recoveryWallet: '/api/app/account/register/recovery',
+  recoveryWallet: '/api/app/account/recovery/request',
   // TODO Test api
   hubPing: '/api/app/account/hub/ping',
   getCreateResponse: 'api/app/account/hub/response',

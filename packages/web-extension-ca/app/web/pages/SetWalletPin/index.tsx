@@ -2,14 +2,14 @@ import { Button, Form, message } from 'antd';
 import { FormItem } from 'components/BaseAntd';
 import ConfirmPassword from 'components/ConfirmPassword';
 import PortKeyTitle from 'pages/components/PortKeyTitle';
-import { useCallback, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useCallback, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router';
 import { useAppDispatch, useGuardiansInfo, useLoading, useLoginInfo } from 'store/Provider/hooks';
 import { setPinAction } from 'utils/lib/serviceWorkerAction';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { useFetchWalletCAAddress } from '@portkey/hooks/hooks-ca/wallet-result';
 import { setLocalStorage } from 'utils/storage/chromeStorage';
-import { createWallet, setCAInfo, setManagerInfo } from '@portkey/store/store-ca/wallet/actions';
+import { createWallet, resetWallet, setCAInfo, setManagerInfo } from '@portkey/store/store-ca/wallet/actions';
 import useLocationState from 'hooks/useLocationState';
 import { useTranslation } from 'react-i18next';
 import { recoveryDIDWallet, registerDIDWallet } from '@portkey/api/api-did/apiUtils/wallet';
@@ -26,8 +26,10 @@ import './index.less';
 export default function SetWalletPin() {
   const [form] = Form.useForm();
   const { t } = useTranslation();
-  const { state, pathname } = useLocationState<'login' | 'register' | 'scan'>();
+
+  const { pathname } = useLocation();
   // const { state } = useLocation();
+  const state = useMemo(() => pathname.split('/')[1], [pathname]);
 
   console.log(state, 'state====');
   const navigate = useNavigate();
@@ -190,12 +192,17 @@ export default function SetWalletPin() {
           verificationType: state === 'login' ? VerificationType.communityRecovery : VerificationType.register,
           managerUniqueId: sessionInfo.sessionId,
         });
+        console.log(walletResult, 'walletResult===');
+        // walletResult.Socket.stop();
         if (walletResult.status !== 'pass') {
           await setLocalStorage({
             registerStatus: null,
           });
+          dispatch(resetWallet());
           throw walletResult?.message || walletResult.status;
         }
+
+        console.log(walletResult, 'walletResult===');
 
         dispatch(
           setCAInfo({
@@ -204,7 +211,7 @@ export default function SetWalletPin() {
               caHash: walletResult.caHash,
             },
             pin,
-            chainId: 'AELF',
+            chainId: DefaultChainId,
           }),
         );
         await setLocalStorage({
@@ -213,7 +220,7 @@ export default function SetWalletPin() {
         navigate('/register/success', { state });
       } catch (error: any) {
         setLoading(false);
-        console.log(error, 'onCreate');
+        console.log(error, 'onCreate==error');
         const walletError = isWalletError(error);
         if (walletError) return message.error(walletError);
         if (error?.message || error?.error?.message) return message.error(error?.message || error?.error?.message);
@@ -250,20 +257,22 @@ export default function SetWalletPin() {
         navigate('/login/guardian-approval');
         break;
       default:
-        if (pathname.startsWith('/register')) return navigate('/register/select-verifier');
         navigate(-1);
     }
-  }, [navigate, pathname, state]);
+  }, [navigate, state]);
 
-  const leftCallBack = useCallback(() => setReturnOpen(true), []);
+  const leftCallBack = useCallback(() => {
+    if (state === 'register') return setReturnOpen(true);
+    backHandler();
+  }, [backHandler, state]);
 
-  // useHardwareBack(() => {
-  //   if (state === 'register') {
-  //     leftCallBack();
-  //     return;
-  //   }
-  //   backHandler();
-  // });
+  useHardwareBack(() => {
+    if (state === 'register') {
+      leftCallBack();
+      return;
+    }
+    backHandler();
+  });
 
   return (
     <div className="common-page set-pin-wrapper" id="set-pin-wrapper">

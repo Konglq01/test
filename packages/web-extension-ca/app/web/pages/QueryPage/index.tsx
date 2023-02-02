@@ -26,38 +26,44 @@ export default function QueryPage() {
 
   const fetchCreateWalletResult = useCallback(
     async (pwd: string) => {
-      if (!currentWalletInfo.managerInfo) throw 'Missing managerInfo';
-      const walletResult = await fetchWalletResult({
-        clientId: currentWalletInfo.address,
-        requestId: currentWalletInfo.managerInfo.requestId || '',
-        verificationType: currentWalletInfo.managerInfo.verificationType,
-        managerUniqueId: currentWalletInfo.managerInfo.managerUniqueId,
-      });
-      if (walletResult.status !== 'pass') {
-        const errorString = walletResult?.message || walletResult.status;
-        message.error((errorString as string) || 'Something error');
-        await setLocalStorage({
-          registerStatus: null,
+      try {
+        if (!currentWalletInfo.managerInfo) throw 'Missing managerInfo';
+        const walletResult = await fetchWalletResult({
+          clientId: currentWalletInfo.address,
+          requestId: currentWalletInfo.managerInfo.requestId || '',
+          verificationType: currentWalletInfo.managerInfo.verificationType,
+          managerUniqueId: currentWalletInfo.managerInfo.managerUniqueId,
         });
-        setLoading(false);
-        throw 'error';
-      } else {
-        if (!pwd) return message.error(PinErrorMessage.invalidPin);
-        dispatch(
-          setCAInfo({
-            caInfo: {
-              caAddress: walletResult.caAddress,
-              caHash: walletResult.caHash,
-            },
-            pin: pwd,
-            chainId: 'AELF',
-          }),
-        );
-        setLoading(false);
-        await setLocalStorage({
-          registerStatus: 'Registered',
-        });
-        navigate('/register/success');
+        console.log(walletResult, 'walletResult===');
+        walletResult.Socket.stop();
+        if (walletResult.status !== 'pass') {
+          const errorString = walletResult?.message || walletResult.status;
+          message.error((errorString as string) || 'Something error');
+          await setLocalStorage({
+            registerStatus: null,
+          });
+          setLoading(false);
+          throw 'error';
+        } else {
+          if (!pwd) return message.error(PinErrorMessage.invalidPin);
+          dispatch(
+            setCAInfo({
+              caInfo: {
+                caAddress: walletResult.caAddress,
+                caHash: walletResult.caHash,
+              },
+              pin: pwd,
+              chainId: 'AELF',
+            }),
+          );
+          setLoading(false);
+          await setLocalStorage({
+            registerStatus: 'Registered',
+          });
+          navigate('/register/success');
+        }
+      } catch (error) {
+        console.log(error, 'fetch error===');
       }
     },
     [currentWalletInfo, dispatch, navigate, setLoading, fetchWalletResult],

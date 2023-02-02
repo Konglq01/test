@@ -50,7 +50,7 @@ export default function GuardianApproval() {
     if (state && state.indexOf('guardians') !== -1) {
       handleGuardianRecovery();
     } else {
-      navigate('/register/set-pin', { state: 'login' });
+      navigate('/login/set-pin', { state: 'login' });
     }
   }, [handleGuardianRecovery, navigate, state]);
 

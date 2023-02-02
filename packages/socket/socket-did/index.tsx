@@ -27,7 +27,7 @@ class SignalrDid extends Signalr {
   ) {
     this.listen('caAccountRecover', (data: CaAccountRecoverResult) => {
       if (data.requestId === requestId) {
-        if (data.body.recoverStatus !== 'pending') {
+        if (data.body.recoveryStatus !== 'pending') {
           this.Ack(clientId, requestId);
         }
         callback(data);
