@@ -12,7 +12,6 @@ export const getELFChainBalance = async (tokenContract: any, symbol: string, own
 
 export const getELFContractAddress = async (rpcUrl: string, GenesisContractAddress: string, name: string) => {
   const zeroContract = await getELFContract(rpcUrl, GenesisContractAddress);
-  console.log(zeroContract, 'zeroContract');
   return await zeroContract.GetContractAddressByName.call(AElf.utils.sha256(name));
 };
 

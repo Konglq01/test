@@ -1,0 +1,34 @@
+query caHolderTransaction($dto: GetCAHolderTransactionDto){
+    caHolderTransaction(dto: $dto){
+        id
+        chainId
+        blockHash
+        blockHeight
+        previousBlockHash
+        transactionId
+        methodName
+        tokenInfo{
+            symbol
+            decimals
+        }
+        nftInfo{
+            url
+            alias
+            nftId
+        }
+        status
+        timestamp
+        transferInfo{
+            fromAddress
+            toAddress
+            amount
+            fromChainId
+            toChainId
+        }
+        fromAddress
+        transactionFees{
+            symbol
+            amount
+        }
+    }
+}

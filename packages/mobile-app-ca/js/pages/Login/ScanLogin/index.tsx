@@ -14,37 +14,29 @@ import useRouterParams from '@portkey/hooks/useRouterParams';
 import { LoginQRData } from '@portkey/types/types-ca/qrcode';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import CommonToast from 'components/CommonToast';
-import { useCurrentCAContract } from 'hooks/contract';
+import { useGetCurrentCAContract } from 'hooks/contract';
+import { addManager } from 'utils/wallet';
 const ScrollViewProps = { disabled: true };
 export default function ScanLogin() {
   const { data } = useRouterParams<{ data?: LoginQRData }>();
-  const { address } = data || {};
+  const { address: managerAddress } = data || {};
 
-  const { caHash, address: managerAddress } = useCurrentWalletInfo();
+  const { caHash, address } = useCurrentWalletInfo();
   const [loading, setLoading] = useState<boolean>();
-  const caContract = useCurrentCAContract();
+  const getCurrentCAContract = useGetCurrentCAContract();
   const onLogin = useCallback(async () => {
     if (!caHash || loading) return;
     try {
-      if (!caContract) throw Error('contract init error');
+      const contract = await getCurrentCAContract();
       setLoading(true);
-      const req = await caContract.callSendMethod('AddManager', managerAddress, {
-        caHash,
-        manager: {
-          managerAddress: address,
-          deviceString: new Date().getTime(),
-        },
-      });
-      if (req && !req.error) {
-        navigationService.navigate('Tab');
-      } else {
-        CommonToast.fail(req?.error.message);
-      }
+      const req = await addManager({ contract, caHash, address, managerAddress });
+      if (req?.error) throw req?.error;
+      navigationService.navigate('Tab');
     } catch (error) {
       CommonToast.failError(error);
     }
     setLoading(false);
-  }, [caHash, loading, caContract, managerAddress, address]);
+  }, [caHash, loading, getCurrentCAContract, address, managerAddress]);
   return (
     <PageContainer
       scrollViewProps={ScrollViewProps}

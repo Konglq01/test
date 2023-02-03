@@ -1,11 +1,10 @@
 import axios from 'axios';
-import { BaseConfig, requestConfig } from './types';
+import { BaseConfig, RequestConfig } from './types';
 
 const axiosInstance = axios.create({
   baseURL: '/',
   timeout: 20000,
 });
-
 axiosInstance.defaults.headers.common['x-csrf-token'] = 'AUTH_TOKEN';
 
 axiosInstance.interceptors.request.use(
@@ -23,7 +22,10 @@ axiosInstance.interceptors.response.use(
     return res;
   },
   error => {
-    return Promise.reject(error?.response?.data?.error || error);
+    console.log(error, '======error');
+    const _error = { ...(error?.response?.data?.error || error) };
+    if (_error.details) _error.message = _error.details;
+    return Promise.reject(_error);
   },
 );
 
@@ -33,7 +35,7 @@ export function spliceUrl(baseUrl: string, extendArg?: string) {
   return extendArg ? baseUrl + '/' + extendArg : baseUrl;
 }
 
-export function getRequestConfig(base: BaseConfig, config?: requestConfig) {
+export function getRequestConfig(base: BaseConfig, config?: RequestConfig) {
   if (typeof base === 'string') {
     return config;
   } else {

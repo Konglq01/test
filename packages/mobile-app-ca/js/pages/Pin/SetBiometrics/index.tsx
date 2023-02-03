@@ -15,17 +15,16 @@ import { setBiometrics } from 'store/user/actions';
 import { usePreventHardwareBack } from '@portkey/hooks/mobile';
 import biometric from 'assets/image/pngs/biometric.png';
 import { pTd } from 'utils/unit';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { intervalGetResult, onResultFail, TimerResult } from 'utils/wallet';
+import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import { onResultFail, TimerResult } from 'utils/wallet';
 import { CAInfo } from '@portkey/types/types-ca/wallet';
 import Loading from 'components/Loading';
 import { setCAInfo } from '@portkey/store/store-ca/wallet/actions';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 import { handleError } from '@portkey/utils';
 import { VerificationType } from '@portkey/types/verifier';
-import useEffectOnce from 'hooks/useEffectOnce';
 import CommonToast from 'components/CommonToast';
+import { useIntervalGetResult } from 'hooks/login';
 const ScrollViewProps = { disabled: true };
 export default function SetBiometrics() {
   usePreventHardwareBack();
@@ -33,27 +32,24 @@ export default function SetBiometrics() {
   const timer = useRef<TimerResult>();
   const { pin, caInfo: paramsCAInfo } = useRouterParams<{ pin?: string; caInfo?: CAInfo }>();
   const [errorMessage, setErrorMessage] = useState<string>();
-  const { walletInfo } = useCurrentWallet();
-  const { apiUrl } = useCurrentNetworkInfo();
+  const { address, managerInfo, caHash } = useCurrentWalletInfo();
   const [caInfo, setStateCAInfo] = useState<CAInfo | undefined>(paramsCAInfo);
 
-  const isSyncCAInfo = useMemo(
-    () => walletInfo.address && walletInfo.managerInfo && !walletInfo.AELF?.caAddress,
-    [walletInfo.AELF?.caAddress, walletInfo.address, walletInfo.managerInfo],
-  );
+  const isSyncCAInfo = useMemo(() => address && managerInfo && !caHash, [address, caHash, managerInfo]);
+  const onIntervalGetResult = useIntervalGetResult();
+
   useEffect(() => {
     if (isSyncCAInfo) {
       setTimeout(() => {
-        if (walletInfo.managerInfo && apiUrl)
-          timer.current = intervalGetResult({
-            apiUrl,
-            managerInfo: walletInfo.managerInfo,
+        if (managerInfo)
+          timer.current = onIntervalGetResult({
+            managerInfo,
             onPass: setStateCAInfo,
             onFail: message =>
               onResultFail(
                 dispatch,
                 message,
-                walletInfo.managerInfo?.verificationType === VerificationType.communityRecovery,
+                managerInfo?.verificationType === VerificationType.communityRecovery,
                 true,
               ),
           });
@@ -74,12 +70,11 @@ export default function SetBiometrics() {
       );
       return navigationService.reset('Tab');
     }
-    if (walletInfo.managerInfo) {
+    if (managerInfo) {
       timer.current?.remove();
       Loading.show();
-      timer.current = intervalGetResult({
-        apiUrl,
-        managerInfo: walletInfo.managerInfo,
+      timer.current = onIntervalGetResult({
+        managerInfo,
         onPass: (info: CAInfo) => {
           dispatch(
             setCAInfo({
@@ -92,15 +87,10 @@ export default function SetBiometrics() {
           navigationService.reset('Tab');
         },
         onFail: message =>
-          onResultFail(
-            dispatch,
-            message,
-            walletInfo.managerInfo?.verificationType === VerificationType.communityRecovery,
-            true,
-          ),
+          onResultFail(dispatch, message, managerInfo?.verificationType === VerificationType.communityRecovery, true),
       });
     }
-  }, [apiUrl, caInfo, dispatch, isSyncCAInfo, pin, walletInfo.managerInfo]);
+  }, [caInfo, dispatch, isSyncCAInfo, managerInfo, onIntervalGetResult, pin]);
   const openBiometrics = useCallback(async () => {
     if (!pin) return;
     try {
@@ -116,16 +106,9 @@ export default function SetBiometrics() {
       dispatch(setBiometrics(false));
       await getResult();
     } catch (error) {
-      console.log(error, 'onSkip');
-
       CommonToast.failError(error);
     }
   }, [dispatch, getResult]);
-  useEffectOnce(() => {
-    setTimeout(() => {
-      openBiometrics();
-    }, 100);
-  });
   return (
     <PageContainer scrollViewProps={ScrollViewProps} leftDom titleDom containerStyles={styles.containerStyles}>
       <Touchable style={GStyles.itemCenter} onPress={openBiometrics}>

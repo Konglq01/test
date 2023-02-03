@@ -1,11 +1,9 @@
-import { checkVerificationCode, sendVerificationCode } from '@portkey/api/apiUtils/verification';
-import { sleep } from '@portkey/utils';
+import { checkVerificationCode, sendVerificationCode } from '@portkey/api/api-did/apiUtils/verification';
 import { Button, message } from 'antd';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAppDispatch, useCommonState, useLoading } from 'store/Provider/hooks';
 import { PasscodeInput } from 'antd-mobile';
-import { loginInfo } from 'store/reducers/loginCache/type';
-import { VerificationType } from '@portkey/types/verifier';
+import { LoginInfo } from 'store/reducers/loginCache/type';
 import { DIGIT_CODE } from '@portkey/constants/misc';
 import clsx from 'clsx';
 import VerifierPair from 'components/VerifierPair';
@@ -15,8 +13,9 @@ import { useTranslation } from 'react-i18next';
 import { setUserGuardianSessionIdAction } from '@portkey/store/store-ca/guardians/actions';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
 import { LoginType } from '@portkey/types/types-ca/wallet';
-import { useLocation } from 'react-router';
 import { useEffectOnce } from 'react-use';
+import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
+import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 
 const MAX_TIMER = 60;
 
@@ -26,29 +25,21 @@ enum VerificationError {
 }
 
 interface VerifierPageProps {
-  loginAccount?: loginInfo;
+  loginAccount?: LoginInfo;
   currentGuardian?: UserGuardianItem;
-  guardiansType?: LoginType;
-  verificationType: VerificationType;
+  guardianType?: LoginType;
   isInitStatus?: boolean;
-  onSuccess?: (res: any) => void;
+  onSuccess?: (res: { verificationDoc: string; signature: string; verifierId: string }) => void;
 }
 
-export default function VerifierPage({
-  loginAccount,
-  currentGuardian,
-  guardiansType,
-  verificationType,
-  isInitStatus,
-  onSuccess,
-}: VerifierPageProps) {
+export default function VerifierPage({ currentGuardian, guardianType, isInitStatus, onSuccess }: VerifierPageProps) {
   const { setLoading } = useLoading();
-  const [timer, setTimer] = useState<number | undefined>();
+  const [timer, setTimer] = useState<number>(0);
   const { isPrompt } = useCommonState();
   const [pinVal, setPinVal] = useState<string>();
+  const timerRef = useRef<NodeJS.Timer>();
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const { state } = useLocation();
 
   useEffectOnce(() => {
     isInitStatus && setTimer(MAX_TIMER);
@@ -59,28 +50,21 @@ export default function VerifierPage({
       try {
         console.log(code);
         if (code && code.length === 6) {
-          if (
-            !loginAccount?.loginGuardianType ||
-            (!loginAccount.accountLoginType && loginAccount.accountLoginType !== 0)
-          )
-            throw 'Missing account!!!';
-          if (!currentGuardian?.sessionId) throw 'Missing verifierSessionId!!!';
+          if (!guardianType && guardianType !== 0) return message.error('Missing guardiansType');
+          if (!currentGuardian?.verifierInfo) throw 'Missing verifierInfo!!!';
           setLoading(true);
 
           const res = await checkVerificationCode({
-            code,
-            baseUrl: currentGuardian?.verifier?.url || '',
-            verificationType,
-            type: loginAccount.accountLoginType,
-            loginGuardianType: currentGuardian?.loginGuardianType,
-            verifierSessionId: currentGuardian?.sessionId,
+            guardianAccount: currentGuardian.guardianAccount,
+            verifierSessionId: currentGuardian.verifierInfo.sessionId,
+            verificationCode: code,
+            verifierId: currentGuardian.verifier?.id || '',
+            chainId: DefaultChainId,
           });
+
           setLoading(false);
-          if (state && state.indexOf('guardians') !== -1) {
-            if (Object.keys(res).length) return onSuccess?.(res);
-          } else {
-            if (!Object.keys(res).length) return onSuccess?.(res);
-          }
+          if (res.signature) return onSuccess?.({ ...res, verifierId: currentGuardian.verifier?.id || '' });
+
           if (res?.error?.message) {
             message.error(t(res.error.message));
           } else {
@@ -96,59 +80,61 @@ export default function VerifierPage({
         message.error(_error);
       }
     },
-    [loginAccount, currentGuardian, setLoading, verificationType, state, onSuccess, t],
+    [guardianType, currentGuardian, setLoading, onSuccess, t],
   );
 
   const resendCode = useCallback(async () => {
-    if (!currentGuardian?.loginGuardianType) return message.error('Missing loginGuardianType');
-    console.log(guardiansType, 'guardiansType===');
-    if (!guardiansType && guardiansType !== 0) return message.error('Missing guardiansType');
+    if (!currentGuardian?.guardianAccount) return message.error('Missing loginGuardianType');
+    if (!guardianType && guardianType !== 0) return message.error('Missing guardiansType');
     setLoading(true);
     const res = await sendVerificationCode({
-      loginGuardianType: currentGuardian.loginGuardianType,
-      guardiansType,
-      verificationType,
-      baseUrl: currentGuardian?.verifier?.url || '',
-      managerUniqueId: loginAccount?.managerUniqueId ?? '',
+      guardianAccount: currentGuardian.guardianAccount,
+      type: LoginStrType[guardianType],
+      verifierId: currentGuardian.verifier?.id || '',
+      chainId: DefaultChainId,
     });
     setLoading(false);
     if (res.verifierSessionId) {
       setTimer(MAX_TIMER);
       dispatch(
         setUserGuardianSessionIdAction({
-          key: currentGuardian?.key ?? `${currentGuardian?.loginGuardianType}&${currentGuardian?.verifier?.name}`,
-          sessionId: res.verifierSessionId,
+          key: currentGuardian?.key ?? `${currentGuardian?.guardianAccount}&${currentGuardian?.verifier?.name}`,
+          verifierInfo: {
+            sessionId: res.verifierSessionId,
+            endPoint: res.endPoint,
+          },
         }),
       );
     }
-  }, [currentGuardian, dispatch, guardiansType, loginAccount, setLoading, verificationType]);
-
-  const timerUtil = useCallback(async () => {
-    if (!timer) return setTimer(undefined);
-    await sleep(1000);
-    setTimer((v) => (v ? --v : v));
-    timerUtil();
-  }, [timer]);
+  }, [currentGuardian, guardianType, dispatch, setLoading]);
 
   useEffect(() => {
     if (timer !== MAX_TIMER) return;
-    timerUtil();
-  }, [timer, timerUtil]);
+    timerRef.current && clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setTimer((t) => {
+        const newTime = t - 1;
+        if (newTime <= 0) {
+          timerRef.current && clearInterval(timerRef.current);
+          timerRef.current = undefined;
+          return 0;
+        }
+        return newTime;
+      });
+    }, 1000);
+  }, [timer]);
 
   return (
     <div className={clsx('verifier-page-wrapper', isPrompt || 'popup-page')}>
-      <div className="login-icon">{t('Login Account')}</div>
+      {currentGuardian?.isLoginAccount && <div className="login-icon">{t('Login Account')}</div>}
       <div className="flex-row-center login-account-wrapper">
-        <VerifierPair
-          guardiansType={currentGuardian?.guardiansType}
-          verifierSrc={currentGuardian?.verifier?.imageUrl}
-        />
-        <span className="login-account">{currentGuardian?.loginGuardianType || ''}</span>
+        <VerifierPair guardianType={currentGuardian?.guardianType} verifierSrc={currentGuardian?.verifier?.imageUrl} />
+        <span className="login-account">{currentGuardian?.guardianAccount || ''}</span>
       </div>
       <div className="send-tip">
         {isPrompt || 'Please contact your guardians, and enter '}
         {t('sendCodeTip1', { codeCount: DIGIT_CODE.length })}&nbsp;
-        <span className="account">{currentGuardian?.loginGuardianType}</span>
+        <span className="account">{currentGuardian?.guardianAccount}</span>
         <br />
         {t('sendCodeTip2', { minute: DIGIT_CODE.expiration })}
       </div>

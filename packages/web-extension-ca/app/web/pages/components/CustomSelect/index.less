@@ -1,6 +1,7 @@
 @import '../../../assets/theme/color.less';
 
 .custom-select {
+  width: 100%;
   &.@{app-prefix}-select-focused:not(.@{app-prefix}-select-disabled).@{app-prefix}-select:not(.@{app-prefix}-select-customize-input)
     .@{app-prefix}-select-selector {
     border-color: @border-3 !important;
@@ -40,6 +41,10 @@
 
   .option-selected-icon-area {
     display: none;
+    .correct-icon {
+      width: 16px;
+      height: 16px;
+    }
   }
   .option-label {
     flex: 1;

@@ -14,12 +14,12 @@ export const pageStyles = StyleSheet.create({
     ...GStyles.paddingArg(24, 20, 18),
     minHeight: windowHeight - pTd(100),
   },
+  contentWrap: {
+    flex: 1,
+  },
   titleLabel: {
     color: font3,
     lineHeight: pTd(20),
-  },
-  contentWrap: {
-    flex: 1,
   },
   titleTextStyle: {
     fontSize: pTd(14),

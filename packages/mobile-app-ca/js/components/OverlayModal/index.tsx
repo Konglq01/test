@@ -1,12 +1,17 @@
 'use strict';
 import React, { ReactNode } from 'react';
-import Overlay from 'teaset/components/Overlay/Overlay';
+import Overlay from 'rn-teaset/components/Overlay/Overlay';
 import { StyleProp, StyleSheet, ViewStyle } from 'react-native';
 import { bottomBarHeight, screenHeight, screenWidth, statusBarHeight } from '@portkey/utils/mobile/device';
 import { defaultColors } from 'assets/theme';
 import GStyles from 'assets/theme/GStyles';
 import { pTd } from 'utils/unit';
-let elements: any[] = [];
+
+export type OverlayInterface = {
+  close?: () => void;
+};
+
+let elements: OverlayInterface[] = [];
 const customBounds = {
   x: 0,
   y: screenHeight,
@@ -41,7 +46,7 @@ export default class OverlayModal extends React.Component {
       <Overlay.PopView
         modal={false}
         type="custom"
-        ref={(v: any) => elements.push(v)}
+        ref={(v: OverlayInterface) => elements.push(v)}
         style={style}
         overlayOpacity={0.3}
         containerStyle={containerStyle}
@@ -52,30 +57,16 @@ export default class OverlayModal extends React.Component {
     );
     Overlay.show(overlayView);
   }
-  static showDrawer(component: ReactNode, overlayProps = {}) {
-    const overlayView = (
-      <Overlay.PullView
-        side="left"
-        ref={(v: any) => elements.push(v)}
-        style={styles.bgStyle}
-        overlayOpacity={0.3}
-        containerStyle={styles.containerStyle}
-        {...overlayProps}>
-        {component}
-      </Overlay.PullView>
-    );
-    Overlay.show(overlayView);
-  }
 
   static hide() {
-    elements = elements.filter(item => item); //Discard invalid data
-    const key = elements.pop();
-    key && key.close && key.close();
+    elements = elements.filter(item => item); // Discard invalid data
+    const topItem = elements.pop();
+    topItem?.close?.();
   }
 
   static destroy() {
     elements.forEach(item => {
-      item && item.close && item.close();
+      item?.close?.();
     });
     elements = [];
   }

@@ -34,7 +34,6 @@ export default function CommonSelect1({ items, className, ...props }: CommonSele
       className={clsx('common-select1', className)}
       showArrow={false}
       getPopupContainer={(triggerNode) => triggerNode.parentElement}
-      style={{ width: '100%' }}
       options={selectOptions}
       {...props}
     />

@@ -2,83 +2,59 @@
  * @file
  * Query registration and login data
  */
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { useCurrentWalletInfo, useFetchWalletCAAddress } from '@portkey/hooks/hooks-ca/wallet';
-import { setCAInfo } from '@portkey/store/store-ca/wallet/actions';
+import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { message } from 'antd';
 import InternalMessage from 'messages/InternalMessage';
 import InternalMessageTypes from 'messages/InternalMessageTypes';
 import LockPage from 'pages/components/LockPage';
 import RegisterHeader from 'pages/components/RegisterHeader';
-import { useCallback, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useCallback } from 'react';
 import { useEffectOnce } from 'react-use';
-import { useAppDispatch, useLoading } from 'store/Provider/hooks';
-import { setLocalStorage } from 'utils/storage/chromeStorage';
+import { useLoading } from 'store/Provider/hooks';
+import useFetchDidWallet from 'hooks/useFetchDidWallet';
 
 export default function QueryPage() {
   const { setLoading } = useLoading();
-  const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-  const fetchWalletResult = useFetchWalletCAAddress();
-  const currentNetwork = useCurrentNetworkInfo();
+  const fetchWalletResult = useFetchDidWallet();
   const currentWalletInfo = useCurrentWalletInfo();
-  const [password, setPassword] = useState<string>();
 
-  const fetchCreateWalletResult = useCallback(async () => {
-    if (!currentWalletInfo.managerInfo) throw 'Missing managerInfo';
-    const walletResult = await fetchWalletResult({
-      baseUrl: currentNetwork.apiUrl,
-      type: currentWalletInfo.managerInfo.type,
-      verificationType: currentWalletInfo.managerInfo.verificationType,
-      loginGuardianType: currentWalletInfo.managerInfo.loginGuardianType,
-      managerUniqueId: currentWalletInfo.managerInfo.managerUniqueId,
-    });
-    if (walletResult.status !== 'pass') {
-      const errorString = walletResult?.message || walletResult.status;
-      message.error((errorString as string) || 'Something error');
-      await setLocalStorage({
-        registerStatus: null,
-      });
+  const fetchCreateWalletResult = useCallback(
+    async (pwd: string) => {
+      try {
+        if (!currentWalletInfo.managerInfo) throw 'Missing managerInfo';
+        await fetchWalletResult({
+          pwd,
+          clientId: currentWalletInfo.address,
+          requestId: currentWalletInfo.managerInfo.requestId || '',
+          verificationType: currentWalletInfo.managerInfo.verificationType,
+          managerUniqueId: currentWalletInfo.managerInfo.managerUniqueId,
+          managerAddress: currentWalletInfo.address,
+        });
+      } catch (error: any) {
+        setLoading(false);
+        console.log(error, 'fetch error===');
+        message.error(error);
+      }
       setLoading(false);
-      throw 'error';
-    } else {
-      if (!password) return;
-      dispatch(
-        setCAInfo({
-          caInfo: {
-            caAddress: walletResult.caAddress,
-            caHash: walletResult.caHash,
-          },
-          pin: password,
-          chainId: 'AELF',
-        }),
-      );
-      setLoading(false);
-      await setLocalStorage({
-        registerStatus: 'Registered',
-      });
-      navigate('/register/success');
-    }
-  }, [currentWalletInfo, currentNetwork, password, dispatch, navigate, setLoading, fetchWalletResult]);
+    },
+    [currentWalletInfo, setLoading, fetchWalletResult],
+  );
 
   useEffectOnce(() => {
-    setLoading(1);
+    setLoading(0.5);
     InternalMessage.payload(InternalMessageTypes.GET_SEED)
       .send()
       .then((res) => {
         if (!res?.data?.privateKey) return setLoading(false);
-        setPassword(res.data.privateKey);
-        fetchCreateWalletResult();
+        fetchCreateWalletResult(res.data.privateKey);
       });
   });
 
   const onUnLockHandler = useCallback(
     async (pwd: string) => {
       // get CA address
-      setLoading(1);
-      setPassword(pwd);
-      await fetchCreateWalletResult();
+      setLoading(0.5);
+      await fetchCreateWalletResult(pwd);
     },
     [fetchCreateWalletResult, setLoading],
   );

@@ -1,63 +1,152 @@
-import { request } from 'api';
-import { CAInfo, ManagerInfo } from '@portkey/types/types-ca/wallet';
+import { CaAccountRecoverResult, CaAccountRegisterResult, CAInfo, ManagerInfo } from '@portkey/types/types-ca/wallet';
 import { VerificationType } from '@portkey/types/verifier';
-import { clearTimeoutInterval, setTimeoutInterval } from './Interval';
+import { clearTimeoutInterval, setTimeoutInterval } from '@portkey/utils/interval';
 import Loading from 'components/Loading';
 import CommonToast from 'components/CommonToast';
 import { queryFailAlert } from './login';
 import { AppDispatch } from 'store';
+import { ContractBasic } from './contract';
+import { request } from '@portkey/api/api-did';
+import myServer from '@portkey/api/server';
+import Signalr from '@portkey/socket';
+import { listenList } from '@portkey/constants/constants-ca/socket';
+
+class SignalrDid extends Signalr {
+  public Ack(clientId: string, requestId: string) {
+    this.invoke('Ack', clientId, requestId);
+  }
+
+  public onCaAccountRegister(
+    { clientId, requestId }: { clientId: string; requestId: string },
+    callback: (data: CaAccountRegisterResult) => void,
+  ) {
+    return this.listen('caAccountRegister', (data: CaAccountRegisterResult) => {
+      if (data.requestId === requestId) {
+        if (data.body.registerStatus !== 'pending') {
+          this.Ack(clientId, requestId);
+        }
+        callback(data);
+      }
+    });
+  }
+
+  public onCaAccountRecover(
+    { clientId, requestId }: { clientId: string; requestId: string },
+    callback: (data: CaAccountRecoverResult) => void,
+  ) {
+    return this.listen('caAccountRecover', (data: CaAccountRecoverResult) => {
+      if (data.requestId === requestId) {
+        if (data.body.recoveryStatus !== 'pending') {
+          this.Ack(clientId, requestId);
+        }
+        callback(data);
+      }
+    });
+  }
+}
 
 export type TimerResult = {
   remove: () => void;
 };
-export function intervalGetResult({
-  apiUrl,
-  managerInfo,
-  onPass,
-  onFail,
-}: {
-  apiUrl: string;
+
+export type IntervalGetResultParams = {
   managerInfo: ManagerInfo;
   onPass?: (caInfo: CAInfo) => void;
   onFail?: (message: string) => void;
-}) {
-  let fetch = request.register;
-  if (managerInfo.verificationType !== VerificationType.register) fetch = request.recovery;
-  const timer = setTimeoutInterval(async () => {
-    try {
-      const req = await fetch.result({
-        baseURL: apiUrl,
-        data: managerInfo,
-      });
-      console.log(req, '====req');
+};
 
-      switch (req.recoveryStatus || req.registerStatus) {
-        case 'pass': {
-          clearTimeoutInterval(timer);
-          onPass?.(req);
-          break;
-        }
-        case 'fail': {
-          clearTimeoutInterval(timer);
-          onFail?.(req.recoveryMessage || req.registerMessage);
-          break;
-        }
-        default:
-          break;
-      }
+export function intervalGetResult({ managerInfo, onPass, onFail }: IntervalGetResultParams) {
+  let timer = '',
+    mark = false;
+  const listenerList: TimerResult[] = [];
+  const socket = new SignalrDid({
+    listenList,
+  });
+  const remove = () => {
+    try {
+      timer && clearTimeoutInterval(timer);
+      listenerList.forEach(listen => listen.remove());
+      socket.stop();
     } catch (error) {
-      console.log(error, '=====error');
+      console.debug(error);
+    }
+  };
+  const sendResult = (result: any) => {
+    if (mark) return;
+    switch (result.recoveryStatus || result.registerStatus) {
+      case 'pass': {
+        onPass?.(result);
+        remove();
+        mark = true;
+        break;
+      }
+      case 'fail': {
+        onFail?.(result.recoveryMessage || result.registerMessage);
+        remove();
+        mark = true;
+        break;
+      }
+      default:
+        break;
+    }
+  };
+  const clientId = managerInfo.requestId || '';
+  const requestId = managerInfo.requestId || '';
+  socket.doOpen({
+    url: `${myServer.defaultConfig.baseURL}/ca`,
+    clientId,
+  });
+  let fetch: any;
+  if (managerInfo.verificationType !== VerificationType.register) {
+    fetch = request.es.getRecoverResult;
+    listenerList.push(
+      socket.onCaAccountRecover({ clientId, requestId }, data => {
+        sendResult(data.body);
+      }),
+    );
+  } else {
+    fetch = request.es.getRegisterResult;
+    listenerList.push(
+      socket.onCaAccountRegister({ clientId, requestId }, data => {
+        sendResult(data.body);
+      }),
+    );
+  }
+  timer = setTimeoutInterval(async () => {
+    try {
+      const req = await fetch({
+        params: { filter: `id:${managerInfo.managerUniqueId}` },
+      });
+      sendResult(req.items[0]);
+    } catch (error) {
+      console.debug(error, '=====error');
     }
   }, 3000);
-  console.log(timer, '====timer');
-
-  return {
-    remove: () => clearTimeoutInterval(timer),
-  };
+  return { remove };
 }
 
 export function onResultFail(dispatch: AppDispatch, message: string, isRecovery?: boolean, isReset?: boolean) {
   Loading.hide();
   CommonToast.fail(message);
   queryFailAlert(dispatch, isRecovery, isReset);
+}
+
+export async function addManager({
+  contract,
+  address,
+  caHash,
+  managerAddress,
+}: {
+  contract: ContractBasic;
+  address: string;
+  caHash: string;
+  managerAddress?: string;
+}) {
+  return contract.callSendMethod('AddManager', address, {
+    caHash,
+    manager: {
+      managerAddress,
+      deviceString: new Date().getTime(),
+    },
+  });
 }

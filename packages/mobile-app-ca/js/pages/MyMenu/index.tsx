@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import PageContainer from 'components/PageContainer';
 import { useLanguage } from 'i18n/hooks';
 import navigationService from 'utils/navigationService';
@@ -11,11 +11,13 @@ import MenuItem from './components/MenuItem';
 import { RootStackName } from 'navigation';
 import { IconName } from 'components/Svg';
 
-const MenuList: Array<{
+interface MenuItem {
   name: RootStackName;
   label: string;
   icon: IconName;
-}> = [
+}
+
+const MenuList: Array<MenuItem> = [
   {
     name: 'WalletHome',
     label: 'Wallet',

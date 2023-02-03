@@ -13,8 +13,8 @@ import navigationService from 'utils/navigationService';
 import background from '../img/background.png';
 import Svg from 'components/Svg';
 import { BGStyles, FontStyles } from 'assets/theme/styles';
-import { screenHeight, screenWidth } from '@portkey/utils/mobile/device';
-import { useGetHolderInfo, useGetVerifierServers } from 'hooks/guardian';
+import { isIos, screenHeight, screenWidth } from '@portkey/utils/mobile/device';
+import { useGetGuardiansInfo, useGetVerifierServers } from 'hooks/guardian';
 import { handleError } from '@portkey/utils';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { useAppDispatch } from 'store/hooks';
@@ -31,33 +31,33 @@ function SignupEmail() {
   const [loading] = useState<boolean>();
   const [email, setEmail] = useState<string>();
   const [errorMessage, setErrorMessage] = useState<string>();
-  const getHolderInfo = useGetHolderInfo();
+  const getGuardiansInfo = useGetGuardiansInfo();
   const getVerifierServers = useGetVerifierServers();
   const chainInfo = useCurrentChain('AELF');
   const dispatch = useAppDispatch();
   const onSignup = useCallback(async () => {
-    setErrorMessage(undefined);
     const message = checkEmail(email);
-    if (message) return setErrorMessage(message);
+    setErrorMessage(message);
+    if (message) return;
     Loading.show();
     try {
       if (!chainInfo) await dispatch(getChainListAsync());
       await getVerifierServers();
       try {
-        const holderInfo = await getHolderInfo({ loginGuardianType: email });
-        if (holderInfo.guardians) {
+        const guardiansInfo = await getGuardiansInfo({ loginAccount: email });
+        if (guardiansInfo.guardianAccounts) {
           Loading.hide();
           return setErrorMessage(EmailError.alreadyRegistered);
         }
       } catch (error) {
         console.debug(error, '====error');
       }
-      navigationService.navigate('SelectVerifier', { loginGuardianType: email });
+      navigationService.navigate('SelectVerifier', { loginAccount: email });
     } catch (error) {
       setErrorMessage(handleError(error));
     }
     Loading.hide();
-  }, [chainInfo, dispatch, email, getHolderInfo, getVerifierServers]);
+  }, [chainInfo, dispatch, email, getGuardiansInfo, getVerifierServers]);
   useEffectOnce(() => {
     const listener = myEvents.clearSignupInput.addListener(() => {
       setEmail('');
@@ -70,15 +70,16 @@ function SignupEmail() {
   return (
     <View style={[BGStyles.bg1, styles.card]}>
       <CommonInput
+        value={email}
         label="Email"
         type="general"
-        value={email}
-        placeholder={t('Enter Email')}
         maxLength={30}
-        containerStyle={styles.inputContainerStyle}
+        autoCorrect={false}
         onChangeText={setEmail}
         errorMessage={errorMessage}
         keyboardType="email-address"
+        placeholder={t('Enter Email')}
+        containerStyle={styles.inputContainerStyle}
       />
       <CommonButton style={GStyles.marginTop(15)} disabled={!email} type="primary" loading={loading} onPress={onSignup}>
         {t('Sign up')}
@@ -93,13 +94,14 @@ export default function SignupPortkey() {
   return (
     <ImageBackground style={styles.backgroundContainer} resizeMode="cover" source={background}>
       <PageContainer
-        type="leftBack"
         titleDom
+        type="leftBack"
         themeType="blue"
+        pageSafeBottomPadding={!isIos}
         style={BGStyles.transparent}
-        containerStyles={styles.containerStyles}
         safeAreaColor={safeAreaColor}
         scrollViewProps={scrollViewProps}
+        containerStyles={styles.containerStyles}
         leftCallback={() => {
           myEvents.clearLoginInput.emit();
           navigationService.goBack();

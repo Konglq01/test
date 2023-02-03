@@ -7,16 +7,16 @@ import { useAppDispatch, useLoginInfo, useGuardiansInfo, useLoading } from 'stor
 import PortKeyTitle from 'pages/components/PortKeyTitle';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
 import './index.less';
-import { sendVerificationCode } from '@portkey/api/apiUtils/verification';
-import { VerificationType } from '@portkey/types/verifier';
+import { sendVerificationCode } from '@portkey/api/api-did/apiUtils/verification';
 import CommonSelect from 'components/CommonSelect1';
 import { useTranslation } from 'react-i18next';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
+import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
+import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 
 export default function SelectVerifier() {
   const { verifierMap } = useGuardiansInfo();
   const { loginAccount } = useLoginInfo();
-  const [selectVal, setSelectVal] = useState<string>('portkey');
   const [open, setOpen] = useState<boolean>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -27,46 +27,46 @@ export default function SelectVerifier() {
     setSelectVal(value);
   }, []);
 
-  const selectItem = useMemo(() => verifierMap?.[selectVal], [selectVal, verifierMap]);
-
   const selectOptions = useMemo(
     () =>
       Object.values(verifierMap ?? {})?.map((item) => ({
-        value: item.name,
+        value: item.id,
         iconUrl: item.imageUrl ?? '',
         label: item.name,
       })),
     [verifierMap],
   );
 
+  const [selectVal, setSelectVal] = useState<string>(selectOptions?.[0]?.value);
+
+  const selectItem = useMemo(() => verifierMap?.[selectVal], [selectVal, verifierMap]);
+
   const verifyHandler = useCallback(async () => {
     try {
-      if (
-        !loginAccount ||
-        (!loginAccount.accountLoginType && loginAccount.accountLoginType !== 0) ||
-        !loginAccount.loginGuardianType
-      )
+      if (!loginAccount || !LoginStrType[loginAccount.loginType] || !loginAccount.guardianAccount)
         return message.error('User registration information is invalid, please fill in the registration method again');
       if (!selectItem) return message.error('Can not get verification');
 
       setLoading(true);
       const result = await sendVerificationCode({
-        loginGuardianType: loginAccount.loginGuardianType,
-        guardiansType: loginAccount?.accountLoginType,
-        verificationType: VerificationType.register,
-        baseUrl: selectItem?.url || '',
-        managerUniqueId: loginAccount.managerUniqueId,
+        guardianAccount: loginAccount.guardianAccount,
+        type: LoginStrType[loginAccount.loginType],
+        verifierId: selectItem.id,
+        chainId: DefaultChainId,
       });
       setLoading(false);
       if (result.verifierSessionId) {
-        const _key = `${loginAccount.loginGuardianType}&${selectItem.name}`;
+        const _key = `${loginAccount.guardianAccount}&${selectItem.name}`;
         dispatch(
           setCurrentGuardianAction({
             isLoginAccount: true,
             verifier: selectItem,
-            loginGuardianType: loginAccount.loginGuardianType,
-            guardiansType: loginAccount.accountLoginType,
-            sessionId: result.verifierSessionId,
+            guardianAccount: loginAccount.guardianAccount,
+            guardianType: loginAccount.loginType,
+            verifierInfo: {
+              sessionId: result.verifierSessionId,
+              endPoint: result.endPoint,
+            },
             key: _key,
           }),
         );
@@ -91,12 +91,14 @@ export default function SelectVerifier() {
         <CommonSelect className="verifier-select" value={selectVal} onChange={handleChange} items={selectOptions} />
         <p className="popular-title">{t('Popular')}</p>
         <ul className="popular-content">
-          {Object.values(verifierMap ?? {})?.map((item) => (
-            <li key={item.name} className="popular-item" onClick={() => handleChange(item.name)}>
-              <BaseVerifierIcon src={item.imageUrl} rootClassName="popular-item-image" />
-              <p className="popular-item-name">{item.name}</p>
-            </li>
-          ))}
+          {Object.values(verifierMap ?? {})
+            .slice(0, 3)
+            ?.map((item) => (
+              <li key={item.name} className="popular-item" onClick={() => handleChange(item.id)}>
+                <BaseVerifierIcon src={item.imageUrl} rootClassName="popular-item-image" />
+                <p className="popular-item-name">{item.name}</p>
+              </li>
+            ))}
         </ul>
         <Button className="confirm-btn" type="primary" onClick={() => setOpen(true)}>
           {t('Confirm')}
@@ -110,8 +112,8 @@ export default function SelectVerifier() {
           open={open}
           width={320}
           onCancel={() => setOpen(false)}>
-          <p className="modal-content">{`${t('Portkey will send a verification code to')} ${
-            loginAccount.loginGuardianType
+          <p className="modal-content">{`${t('verificationCodeTip', { verifier: selectItem?.name })} ${
+            loginAccount.guardianAccount
           } ${t('to verify your email address.')}`}</p>
           <div className="btn-wrapper">
             <Button onClick={() => setOpen(false)}>{t('Cancel')}</Button>

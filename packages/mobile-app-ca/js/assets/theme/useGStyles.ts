@@ -9,7 +9,6 @@ export const useGStyles = makeStyles(theme => {
       flex: 1,
       backgroundColor: theme.colors.bg1,
       ...gSTyles.paddingArg(0, pTd(16)),
-      paddingBottom: !isIOS ? 20 : undefined,
     },
     pwTip: {
       marginTop: 3,

@@ -1,8 +1,6 @@
 import React, { useEffect } from 'react';
-import 'react-native-gesture-handler';
-import 'react-native-get-random-values';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { StatusBar, StatusBarProps, useColorScheme } from 'react-native';
+import { StatusBar, StatusBarProps } from 'react-native';
 import { ThemeProvider } from '@rneui/themed';
 import NavigationRoot from './js/navigation';
 import { useMemo } from 'react';
@@ -16,11 +14,12 @@ import { initLanguage } from 'i18n';
 import * as SplashScreen from 'expo-splash-screen';
 import secureStore from '@portkey/utils/mobile/secureStore';
 import Config from 'react-native-config';
-import TopView from 'teaset/components/Overlay/TopView';
+import TopView from 'rn-teaset/components/Overlay/TopView';
 import AppListener from 'components/AppListener/index';
 import InterfaceProvider from 'contexts/useInterface';
 import GlobalStyleHandler from 'components/GlobalStyleHandler';
 import { lockScreenOrientation } from 'utils/screenOrientation';
+import Updater from 'components/Updater';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -31,16 +30,14 @@ secureStore.init(Config.PORT_KEY_CODE || 'EXAMPLE_PORT_KEY_CODE');
 const persistor = persistStore(store);
 
 const App = () => {
-  const isDarkMode = useColorScheme() === 'dark';
-
   const statusBarProps = useMemo(() => {
-    const barProps: StatusBarProps = { barStyle: isDarkMode ? 'light-content' : 'dark-content' };
+    const barProps: StatusBarProps = { barStyle: 'light-content' };
     if (!isIos) {
       barProps.translucent = true;
       barProps.backgroundColor = 'transparent';
     }
     return barProps;
-  }, [isDarkMode]);
+  }, []);
   useEffect(() => {
     // Lock the screen orientation Right-side up portrait only.
     lockScreenOrientation();
@@ -56,6 +53,7 @@ const App = () => {
                   <SafeAreaProvider>
                     <StatusBar {...statusBarProps} />
                     <NavigationRoot />
+                    <Updater />
                   </SafeAreaProvider>
                 </TopView>
               </InterfaceProvider>

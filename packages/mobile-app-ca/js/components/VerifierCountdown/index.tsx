@@ -6,6 +6,8 @@ import useEffectOnce from 'hooks/useEffectOnce';
 import React, { useCallback, useRef, useState, forwardRef, useImperativeHandle } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { ViewStyleType } from 'types/styles';
+import { clearBackgroundInterval, setBackgroundInterval } from 'utils/backgroundTimer';
+
 export type VerifierCountdownInterface = {
   resetTime: (t: number) => void;
 };
@@ -18,12 +20,12 @@ const VerifierCountdown = forwardRef(({ style, onResend }: VerifierCountdownProp
   const [time, setTime] = useState<number>(0);
   const timer = useRef<NodeJS.Timer>();
   const startTimer = useCallback(() => {
-    timer.current && clearInterval(timer.current);
-    timer.current = setInterval(() => {
+    timer.current && clearBackgroundInterval(timer.current);
+    timer.current = setBackgroundInterval(() => {
       setTime(t => {
         const newTime = t - 1;
         if (newTime <= 0) {
-          timer.current && clearInterval(timer.current);
+          timer.current && clearBackgroundInterval(timer.current);
           timer.current = undefined;
           return 0;
         }
@@ -34,7 +36,7 @@ const VerifierCountdown = forwardRef(({ style, onResend }: VerifierCountdownProp
   useEffectOnce(() => {
     startTimer();
     return () => {
-      timer.current && clearInterval(timer.current);
+      timer.current && clearBackgroundInterval(timer.current);
     };
   });
   const resetTime = useCallback(
