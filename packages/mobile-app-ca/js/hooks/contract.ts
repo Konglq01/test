@@ -29,7 +29,6 @@ export function useGetCurrentCAViewContract(chainId: ChainId = 'AELF') {
       account: getDefaultWallet(),
     });
     dispatch(setViewContract({ [chainInfo.caContractAddress]: contract as ContractBasic }));
-    console.log(contract, '====contract');
 
     return contract as ContractBasic;
   }, [caContract, chainInfo, dispatch]);

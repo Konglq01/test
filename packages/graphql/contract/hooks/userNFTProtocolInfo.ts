@@ -7,34 +7,56 @@ export type UserNftProtocolInfoQueryVariables = Types.Exact<{
   dto?: Types.InputMaybe<Types.GetUserNftProtocolInfoDto>;
 }>;
 
-
-export type UserNftProtocolInfoQuery = { __typename?: 'Query', userNFTProtocolInfo?: Array<{ __typename?: 'UserNFTProtocolInfoDto', id?: string | null, chainId?: string | null, caAddress?: string | null, tokenIds?: Array<number> | null, nftProtocolInfo?: { __typename?: 'NFTProtocolDto', id?: string | null, symbol?: string | null, creator?: string | null, nftType?: string | null, protocolName?: string | null, baseUri?: string | null, isTokenIdReuse: boolean, supply: number, totalSupply: number, issueChainId: number, isBurnable: boolean, imageUrl?: string | null } | null } | null> | null };
-
+export type UserNftProtocolInfoQuery = {
+  __typename?: 'Query';
+  userNFTProtocolInfo?: Array<{
+    __typename?: 'UserNFTProtocolInfoDto';
+    id?: string | null;
+    chainId?: string | null;
+    caAddress?: string | null;
+    tokenIds?: Array<number> | null;
+    nftProtocolInfo?: {
+      __typename?: 'NFTProtocolDto';
+      id?: string | null;
+      symbol?: string | null;
+      creator?: string | null;
+      nftType?: string | null;
+      protocolName?: string | null;
+      baseUri?: string | null;
+      isTokenIdReuse: boolean;
+      supply: number;
+      totalSupply: number;
+      issueChainId: number;
+      isBurnable: boolean;
+      imageUrl?: string | null;
+    } | null;
+  } | null> | null;
+};
 
 export const UserNftProtocolInfoDocument = gql`
-    query userNFTProtocolInfo($dto: GetUserNFTProtocolInfoDto) {
-  userNFTProtocolInfo(dto: $dto) {
-    id
-    chainId
-    caAddress
-    tokenIds
-    nftProtocolInfo {
+  query userNFTProtocolInfo($dto: GetUserNFTProtocolInfoDto) {
+    userNFTProtocolInfo(dto: $dto) {
       id
-      symbol
-      creator
-      nftType
-      protocolName
-      baseUri
-      isTokenIdReuse
-      supply
-      totalSupply
-      issueChainId
-      isBurnable
-      imageUrl
+      chainId
+      caAddress
+      tokenIds
+      nftProtocolInfo {
+        id
+        symbol
+        creator
+        nftType
+        protocolName
+        baseUri
+        isTokenIdReuse
+        supply
+        totalSupply
+        issueChainId
+        isBurnable
+        imageUrl
+      }
     }
   }
-}
-    `;
+`;
 
 /**
  * __useUserNftProtocolInfoQuery__
@@ -52,14 +74,27 @@ export const UserNftProtocolInfoDocument = gql`
  *   },
  * });
  */
-export function useUserNftProtocolInfoQuery(baseOptions?: Apollo.QueryHookOptions<UserNftProtocolInfoQuery, UserNftProtocolInfoQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<UserNftProtocolInfoQuery, UserNftProtocolInfoQueryVariables>(UserNftProtocolInfoDocument, options);
-      }
-export function useUserNftProtocolInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UserNftProtocolInfoQuery, UserNftProtocolInfoQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<UserNftProtocolInfoQuery, UserNftProtocolInfoQueryVariables>(UserNftProtocolInfoDocument, options);
-        }
+export function useUserNftProtocolInfoQuery(
+  baseOptions?: Apollo.QueryHookOptions<UserNftProtocolInfoQuery, UserNftProtocolInfoQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<UserNftProtocolInfoQuery, UserNftProtocolInfoQueryVariables>(
+    UserNftProtocolInfoDocument,
+    options,
+  );
+}
+export function useUserNftProtocolInfoLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<UserNftProtocolInfoQuery, UserNftProtocolInfoQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<UserNftProtocolInfoQuery, UserNftProtocolInfoQueryVariables>(
+    UserNftProtocolInfoDocument,
+    options,
+  );
+}
 export type UserNftProtocolInfoQueryHookResult = ReturnType<typeof useUserNftProtocolInfoQuery>;
 export type UserNftProtocolInfoLazyQueryHookResult = ReturnType<typeof useUserNftProtocolInfoLazyQuery>;
-export type UserNftProtocolInfoQueryResult = Apollo.QueryResult<UserNftProtocolInfoQuery, UserNftProtocolInfoQueryVariables>;
+export type UserNftProtocolInfoQueryResult = Apollo.QueryResult<
+  UserNftProtocolInfoQuery,
+  UserNftProtocolInfoQueryVariables
+>;

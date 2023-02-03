@@ -8,3 +8,7 @@ export const verifyErrorHandler = (error: any) => {
   _error = error?.message || error?.error?.message || 'Something error';
   return _error;
 };
+
+export const contractErrorHandler = (error: any) => {
+  return error?.Error?.Message || error.message?.Message || error?.message || error?.Error;
+};

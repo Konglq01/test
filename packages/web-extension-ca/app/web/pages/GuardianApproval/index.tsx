@@ -1,6 +1,6 @@
 import { Button } from 'antd';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useAppDispatch, useLoginInfo, useGuardiansInfo, useCommonState } from 'store/Provider/hooks';
+import { useLoginInfo, useGuardiansInfo, useCommonState } from 'store/Provider/hooks';
 import { VerifyStatus } from '@portkey/types/verifier';
 import { useNavigate, useLocation } from 'react-router';
 import { UserGuardianStatus } from '@portkey/store/store-ca/guardians/type';
@@ -10,8 +10,6 @@ import PortKeyTitle from 'pages/components/PortKeyTitle';
 import clsx from 'clsx';
 import CommonTooltip from 'components/CommonTooltip';
 import SettingHeader from 'pages/components/SettingHeader';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
-import { setGuardianCountAction } from 'store/reducers/loginCache/actions';
 import { useTranslation } from 'react-i18next';
 import GuardianItems from './components/GuardianItems';
 import { useRecovery } from './hooks/useRecovery';
@@ -22,9 +20,7 @@ export default function GuardianApproval() {
   const [isExpired, setIsExpired] = useState<boolean>(false);
   const navigate = useNavigate();
   const { state } = useLocation();
-  const dispatch = useAppDispatch();
   const { isPrompt } = useCommonState();
-  const { walletInfo } = useCurrentWallet();
   const { t } = useTranslation();
 
   const userVerifiedList = useMemo(() => {
@@ -37,6 +33,8 @@ export default function GuardianApproval() {
     }
     return filterVerifiedList;
   }, [opGuardian, preGuardian, state, userGuardianStatus]);
+
+  console.log(userVerifiedList, userGuardianStatus, 'userGuardianStatus==');
   const approvalLength = useMemo(() => {
     return getApprovalCount(userVerifiedList.length);
   }, [userVerifiedList.length]);
@@ -52,10 +50,9 @@ export default function GuardianApproval() {
     if (state && state.indexOf('guardians') !== -1) {
       handleGuardianRecovery();
     } else {
-      dispatch(setGuardianCountAction(alreadyApprovalLength));
-      navigate('/register/set-pin', { state: 'login' });
+      navigate('/login/set-pin/login');
     }
-  }, [alreadyApprovalLength, dispatch, handleGuardianRecovery, navigate, state]);
+  }, [handleGuardianRecovery, navigate, state]);
 
   useEffect(() => {
     if (!guardianExpiredTime) return setIsExpired(false);
@@ -108,7 +105,6 @@ export default function GuardianApproval() {
               isExpired={isExpired}
               item={item}
               loginAccount={loginAccount}
-              managerUniqueId={(walletInfo.managerInfo?.managerUniqueId || loginAccount?.managerUniqueId) as string}
             />
           ))}
         </ul>

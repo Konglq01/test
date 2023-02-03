@@ -1,0 +1,16 @@
+query loginGuardianAccountInfo($dto: GetLoginGuardianAccountInfoDto){
+    loginGuardianAccountInfo(dto: $dto){
+        id
+        chainId
+        caHash
+        caAddress
+        manager
+        loginGuardianAccount{
+            guardian{
+                type
+                verifier
+            }
+            value
+        }
+    }
+}

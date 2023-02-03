@@ -7,10 +7,10 @@ import AElf from 'aelf-sdk';
 import { useEffectOnce } from 'react-use';
 import { LoginQRData } from '@portkey/types/types-ca/qrcode';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
-import './index.less';
 import { useAppDispatch } from 'store/Provider/hooks';
 import { useIntervalQueryCAInfoByAddress } from '@portkey/hooks/hooks-ca/graphql';
 import { setWalletInfoAction } from 'store/reducers/loginCache/actions';
+import './index.less';
 
 export default function ScanCard() {
   const navigate = useNavigate();
@@ -18,7 +18,6 @@ export default function ScanCard() {
   const [newWallet, setNewWallet] = useState<WalletInfoType>();
   const { walletInfo, currentNetwork } = useCurrentWallet();
   const caWallet = useIntervalQueryCAInfoByAddress(currentNetwork, newWallet?.address);
-  console.log(caWallet, newWallet?.address, 'caWallet====');
   const generateKeystore = useCallback(() => {
     try {
       const wallet = walletInfo?.address ? walletInfo : AElf.wallet.createNewWallet();
@@ -57,7 +56,7 @@ export default function ScanCard() {
           caWalletInfo: caWallet,
         }),
       );
-      navigate('/register/set-pin', { state: 'scan' });
+      navigate('/login/set-pin/scan');
     }
   }, [caWallet, dispatch, navigate, newWallet]);
 

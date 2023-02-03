@@ -4,8 +4,8 @@ export enum GuardianMth {
   addGuardian = 'addGuardian',
   UpdateGuardian = 'UpdateGuardian',
   RemoveGuardian = 'RemoveGuardian',
-  SetGuardianTypeForLogin = 'SetGuardianTypeForLogin',
-  UnsetGuardianTypeForLogin = 'UnsetGuardianTypeForLogin',
+  SetGuardianTypeForLogin = 'SetGuardianAccountForLogin',
+  UnsetGuardianTypeForLogin = 'UnsetGuardianAccountForLogin',
 }
 
 export interface GuardianType {
@@ -19,9 +19,16 @@ export interface VerifierType {
   verificationDoc?: string;
 }
 
+export interface verificationInfo {
+  id: string;
+  signature?: number[];
+  verificationDoc?: string;
+}
+
 export interface GuardianItem {
-  guardianType: GuardianType;
-  verifier: VerifierType;
+  value: string;
+  type: LoginType;
+  verificationInfo: verificationInfo;
 }
 
 export interface GuardianAddType {

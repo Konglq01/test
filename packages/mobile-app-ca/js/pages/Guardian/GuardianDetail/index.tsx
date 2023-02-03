@@ -1,7 +1,7 @@
 import GStyles from 'assets/theme/GStyles';
 import CommonButton from 'components/CommonButton';
 import { TextM } from 'components/CommonText';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
 import { View } from 'react-native';
 import { pTd } from 'utils/unit';
 import navigationService from 'utils/navigationService';
@@ -12,39 +12,36 @@ import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import CommonSwitch from 'components/CommonSwitch';
 import ActionSheet from 'components/ActionSheet';
 import { useGuardiansInfo } from 'hooks/store';
-import { useGetGuardiansList } from 'hooks/guardian';
+import { useGetGuardiansInfo } from 'hooks/guardian';
 import Loading from 'components/Loading';
-import { randomId } from '@portkey/utils';
 import { request } from 'api';
 import CommonToast from 'components/CommonToast';
 import { VerificationType } from '@portkey/types/verifier';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
-
 import myEvents from 'utils/deviceEvent';
 import { VerifierImage } from '../components/VerifierImage';
 import { cancelLoginAccount } from 'utils/guardian';
 import { useGetCurrentCAContract } from 'hooks/contract';
+import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
+import { RouteProp, useRoute } from '@react-navigation/native';
+import { DefaultChainId } from '@portkey/constants/constants-ca/network-test2';
 
-interface GuardianDetailProps {
-  route?: any;
-}
+type RouterParams = {
+  guardian?: UserGuardianItem;
+};
 
-const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
+export default function GuardianDetail() {
+  const {
+    params: { guardian },
+  } = useRoute<RouteProp<{ params: RouterParams }>>();
   const { t } = useLanguage();
-  const { params } = route;
-  const getGuardiansList = useGetGuardiansList();
+  const getGuardiansInfo = useGetGuardiansInfo();
   const { userGuardiansList } = useGuardiansInfo();
   const { caHash, address: managerAddress } = useCurrentWalletInfo();
   const getCurrentCAContract = useGetCurrentCAContract();
 
-  const guardian = useMemo<UserGuardianItem | undefined>(
-    () => (params?.guardian ? JSON.parse(params.guardian) : undefined),
-    [params],
-  );
-
   const onCancelLoginAccount = useCallback(async () => {
     if (!managerAddress || !caHash || !guardian) return;
-
     Loading.show();
     try {
       const caContract = await getCurrentCAContract();
@@ -52,7 +49,7 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
       if (req && !req.error) {
         myEvents.refreshGuardiansList.emit();
         navigationService.navigate('GuardianDetail', {
-          guardian: JSON.stringify({ ...guardian, isLoginAccount: false }),
+          guardian: { ...guardian, isLoginAccount: false },
         });
       } else {
         CommonToast.fail(req?.error.message);
@@ -66,23 +63,22 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
   const setLoginAccount = useCallback(async () => {
     if (!guardian) return;
     try {
-      const managerUniqueId = randomId();
       Loading.show();
-      const req = await request.verification.sendCode({
-        baseURL: guardian.verifier?.url,
+      const req = await request.verify.sendCode({
         data: {
-          type: guardian.guardiansType,
-          loginGuardianType: guardian.loginGuardianType,
-          managerUniqueId,
+          type: LoginStrType[guardian.guardianType],
+          guardianAccount: guardian.guardianAccount,
+          verifierId: guardian.verifier?.id,
+          chainId: DefaultChainId,
         },
       });
       if (req.verifierSessionId) {
         navigationService.navigate('VerifierDetails', {
-          loginGuardianType: guardian.loginGuardianType,
-          verifierSessionId: req.verifierSessionId,
-          managerUniqueId,
-          verificationType: VerificationType.setLoginAccount,
           guardianItem: guardian,
+          requestCodeResult: {
+            verifierSessionId: req.verifierSessionId,
+          },
+          verificationType: VerificationType.setLoginAccount,
         });
       } else {
         console.log('send fail');
@@ -96,16 +92,15 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
   const onLoginAccountChange = useCallback(
     async (value: boolean) => {
       if (guardian === undefined || userGuardiansList === undefined) return;
-      const email = guardian.loginGuardianType;
 
       if (!value) {
         const loginIndex = userGuardiansList.findIndex(
           item =>
             item.isLoginAccount &&
             !(
-              item.guardiansType === guardian.guardiansType &&
-              item.loginGuardianType === guardian.loginGuardianType &&
-              item.verifier?.url === guardian.verifier?.url
+              item.guardianType === guardian.guardianType &&
+              item.guardianAccount === guardian.guardianAccount &&
+              item.verifier?.id === guardian.verifier?.id
             ),
         );
         if (loginIndex === -1) {
@@ -119,41 +114,41 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
           });
           return;
         }
-
         onCancelLoginAccount();
         return;
       }
 
-      // const loginIndex = userGuardiansList.findIndex(
-      //   item =>
-      //     item.isLoginAccount &&
-      //     item.guardiansType === guardian.guardiansType &&
-      //     item.loginGuardianType === guardian.loginGuardianType &&
-      //     item.verifier?.url !== guardian.verifier?.url,
-      // );
-      // if (loginIndex === -1) {}
-      Loading.show();
-      try {
-        const holderInfo = await getGuardiansList({ loginGuardianType: guardian.loginGuardianType });
-        if (holderInfo.guardians) {
-          Loading.hide();
-          ActionSheet.alert({
-            title2: t(`This account address is already a login account and cannot be used`),
-            buttons: [
-              {
-                title: t('Close'),
-              },
-            ],
-          });
-          return;
+      const loginIndex = userGuardiansList.findIndex(
+        item =>
+          item.isLoginAccount &&
+          item.guardianType === guardian.guardianType &&
+          item.guardianAccount === guardian.guardianAccount &&
+          item.verifier?.id !== guardian.verifier?.id,
+      );
+      if (loginIndex === -1) {
+        Loading.show();
+        try {
+          const guardiansInfo = await getGuardiansInfo({ loginAccount: guardian.guardianAccount });
+          if (guardiansInfo.guardianAccounts) {
+            Loading.hide();
+            ActionSheet.alert({
+              title2: t(`This account address is already a login account and cannot be used`),
+              buttons: [
+                {
+                  title: t('Close'),
+                },
+              ],
+            });
+            return;
+          }
+        } catch (error) {
+          console.debug(error, '====error');
         }
-      } catch (error) {
-        console.debug(error, '====error');
+        Loading.hide();
       }
-      Loading.hide();
 
       ActionSheet.alert({
-        title2: `${guardian.verifier?.name} will send a verification code to ${email} to verify your email address.`,
+        title2: `${guardian.verifier?.name} will send a verification code to ${guardian.guardianAccount} to verify your email address.`,
         buttons: [
           {
             title: t('Cancel'),
@@ -166,7 +161,7 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
         ],
       });
     },
-    [getGuardiansList, guardian, onCancelLoginAccount, setLoginAccount, t, userGuardiansList],
+    [getGuardiansInfo, guardian, onCancelLoginAccount, setLoginAccount, t, userGuardiansList],
   );
 
   return (
@@ -178,7 +173,7 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
       <View style={pageStyles.contentWrap}>
         <View style={pageStyles.guardianInfoWrap}>
           <View style={pageStyles.guardianTypeWrap}>
-            <TextM>{guardian?.loginGuardianType || ''}</TextM>
+            <TextM>{guardian?.guardianAccount || ''}</TextM>
           </View>
           <View style={pageStyles.verifierInfoWrap}>
             <VerifierImage style={GStyles.marginRight(8)} size={pTd(30)} uri={guardian?.verifier?.imageUrl} />
@@ -195,7 +190,7 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
         </View>
 
         <TextM style={pageStyles.tips}>
-          {t('The master account will be able to log in and control all your assets')}
+          {t('The login account will be able to log in and control all your assets')}
         </TextM>
       </View>
       {userGuardiansList && userGuardiansList.length > 1 && (
@@ -212,6 +207,4 @@ const GuardianDetail: React.FC<GuardianDetailProps> = ({ route }) => {
       )}
     </PageContainer>
   );
-};
-
-export default GuardianDetail;
+}

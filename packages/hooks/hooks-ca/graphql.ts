@@ -3,7 +3,7 @@ import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 import { contractQueries } from '@portkey/graphql/index';
 import { NetworkType } from '@portkey/types';
 import { useState, useMemo } from 'react';
-import { CAInfoType, LoginType, ManagerInfo } from '@portkey/types/types-ca/wallet';
+import { CAInfoType, ManagerInfo } from '@portkey/types/types-ca/wallet';
 import { VerificationType } from '@portkey/types/verifier';
 export function useIntervalQueryCAInfoByAddress(network: NetworkType, address?: string) {
   const [info, setInfo] = useState<{ [address: string]: CAInfoType }>();
@@ -16,16 +16,17 @@ export function useIntervalQueryCAInfoByAddress(network: NetworkType, address?: 
           chainId: DefaultChainId,
           manager: address,
         });
+        console.log(caHolderManagerInfo, '====caHolderManagerInfo');
+
         if (caHolderManagerInfo.length === 0) return;
-        const { caAddress, caHash, loginGuardianTypeInfo } = caHolderManagerInfo[0];
-        if (caAddress && caHash && loginGuardianTypeInfo.length > 0 && loginGuardianTypeInfo[0])
+        const { caAddress, caHash, loginGuardianAccountInfo } = caHolderManagerInfo[0];
+        if (caAddress && caHash && loginGuardianAccountInfo.length > 0 && loginGuardianAccountInfo[0])
           setInfo({
             [address + network]: {
               managerInfo: {
-                managerUniqueId: loginGuardianTypeInfo[0].id,
-                loginGuardianType: loginGuardianTypeInfo[0].loginGuardianType,
-                //TODO: dynamic type
-                type: LoginType.email,
+                managerUniqueId: loginGuardianAccountInfo[0].id,
+                loginAccount: loginGuardianAccountInfo[0].loginGuardianAccount?.value,
+                type: loginGuardianAccountInfo[0].loginGuardianAccount?.guardian?.type,
                 verificationType: VerificationType.addManager,
               } as ManagerInfo,
               [DefaultChainId]: { caAddress, caHash },

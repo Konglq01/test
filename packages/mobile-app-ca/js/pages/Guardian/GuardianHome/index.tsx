@@ -1,20 +1,19 @@
 import { defaultColors } from 'assets/theme';
 import Svg from 'components/Svg';
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { pTd } from 'utils/unit';
 import navigationService from 'utils/navigationService';
 import PageContainer from 'components/PageContainer';
-import { pageStyles } from './style';
 import { useLanguage } from 'i18n/hooks';
 import { useGuardiansInfo } from 'hooks/store';
-import GuardianAccountItem from '../components/GuardianAccountItem';
+import GuardianItem from '../components/GuardianItem';
 import Touchable from 'components/Touchable';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
-import { useGetHolderInfo } from 'hooks/guardian';
+import { useGetGuardiansInfoWriteStore } from 'hooks/guardian';
 import useEffectOnce from 'hooks/useEffectOnce';
 import myEvents from 'utils/deviceEvent';
-import CommonToast from 'components/CommonToast';
+import GStyles from 'assets/theme/GStyles';
 
 export default function GuardianHome() {
   const { t } = useLanguage();
@@ -26,18 +25,16 @@ export default function GuardianHome() {
   }, [userGuardiansList]);
 
   const { caHash } = useCurrentWalletInfo();
-
-  const getGuardiansList = useGetHolderInfo();
+  const getGuardiansInfoWriteStore = useGetGuardiansInfoWriteStore();
   const refreshGuardiansList = useCallback(async () => {
     try {
-      await getGuardiansList({
+      await getGuardiansInfoWriteStore({
         caHash,
       });
     } catch (error) {
-      // TODO: remove Toast
-      CommonToast.failError(error);
+      console.log(error);
     }
-  }, [caHash, getGuardiansList]);
+  }, [caHash, getGuardiansInfoWriteStore]);
 
   useEffectOnce(() => {
     refreshGuardiansList();
@@ -45,7 +42,6 @@ export default function GuardianHome() {
 
   useEffect(() => {
     const listener = myEvents.refreshGuardiansList.addListener(() => {
-      console.log('listener:refreshGuardiansList----');
       refreshGuardiansList();
     });
     return () => {
@@ -77,9 +73,9 @@ export default function GuardianHome() {
           <Touchable
             key={idx}
             onPress={() => {
-              navigationService.navigate('GuardianDetail', { guardian: JSON.stringify(guardian) });
+              navigationService.navigate('GuardianDetail', { guardian });
             }}>
-            <GuardianAccountItem
+            <GuardianItem
               guardianItem={guardian}
               isButtonHide
               renderBtn={renderGuardianBtn}
@@ -91,3 +87,11 @@ export default function GuardianHome() {
     </PageContainer>
   );
 }
+
+const pageStyles = StyleSheet.create({
+  pageWrap: {
+    flex: 1,
+    backgroundColor: defaultColors.bg1,
+    ...GStyles.paddingArg(24, 20),
+  },
+});

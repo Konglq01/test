@@ -16,8 +16,7 @@ import { usePreventHardwareBack } from '@portkey/hooks/mobile';
 import biometric from 'assets/image/pngs/biometric.png';
 import { pTd } from 'utils/unit';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { intervalGetResult, onResultFail, TimerResult } from 'utils/wallet';
+import { onResultFail, TimerResult } from 'utils/wallet';
 import { CAInfo } from '@portkey/types/types-ca/wallet';
 import Loading from 'components/Loading';
 import { setCAInfo } from '@portkey/store/store-ca/wallet/actions';
@@ -25,6 +24,7 @@ import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 import { handleError } from '@portkey/utils';
 import { VerificationType } from '@portkey/types/verifier';
 import CommonToast from 'components/CommonToast';
+import { useIntervalGetResult } from 'hooks/login';
 const ScrollViewProps = { disabled: true };
 export default function SetBiometrics() {
   usePreventHardwareBack();
@@ -33,17 +33,16 @@ export default function SetBiometrics() {
   const { pin, caInfo: paramsCAInfo } = useRouterParams<{ pin?: string; caInfo?: CAInfo }>();
   const [errorMessage, setErrorMessage] = useState<string>();
   const { address, managerInfo, caHash } = useCurrentWalletInfo();
-  const { apiUrl } = useCurrentNetworkInfo();
   const [caInfo, setStateCAInfo] = useState<CAInfo | undefined>(paramsCAInfo);
 
   const isSyncCAInfo = useMemo(() => address && managerInfo && !caHash, [address, caHash, managerInfo]);
+  const onIntervalGetResult = useIntervalGetResult();
 
   useEffect(() => {
     if (isSyncCAInfo) {
       setTimeout(() => {
-        if (managerInfo && apiUrl)
-          timer.current = intervalGetResult({
-            apiUrl,
+        if (managerInfo)
+          timer.current = onIntervalGetResult({
             managerInfo,
             onPass: setStateCAInfo,
             onFail: message =>
@@ -74,8 +73,7 @@ export default function SetBiometrics() {
     if (managerInfo) {
       timer.current?.remove();
       Loading.show();
-      timer.current = intervalGetResult({
-        apiUrl,
+      timer.current = onIntervalGetResult({
         managerInfo,
         onPass: (info: CAInfo) => {
           dispatch(
@@ -92,7 +90,7 @@ export default function SetBiometrics() {
           onResultFail(dispatch, message, managerInfo?.verificationType === VerificationType.communityRecovery, true),
       });
     }
-  }, [apiUrl, caInfo, dispatch, isSyncCAInfo, managerInfo, pin]);
+  }, [caInfo, dispatch, isSyncCAInfo, managerInfo, onIntervalGetResult, pin]);
   const openBiometrics = useCallback(async () => {
     if (!pin) return;
     try {
