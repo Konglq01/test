@@ -18,9 +18,9 @@ export function useCurrentNetworkBalances() {
   const balances = useAllBalances();
   const currentNetwork = useCurrentNetwork();
   return useMemo(() => {
-    if (!currentNetwork.rpcUrl) return;
+    if (!currentNetwork?.rpcUrl) return;
     return balances?.[currentNetwork.rpcUrl];
-  }, [balances, currentNetwork.rpcUrl]);
+  }, [balances, currentNetwork?.rpcUrl]);
 }
 
 export function useAccountListNativeBalances() {
@@ -33,7 +33,7 @@ export function useAccountListNativeBalances() {
     const obj: { [key: Account]: string } = {};
     accountList?.forEach(account => {
       const symbol = nativeCurrency.symbol;
-      obj[account.address] = currentNetworkBalances?.[account.address]?.[symbol];
+      obj[account.address] = currentNetworkBalances[account.address]?.[symbol];
     });
     return obj;
   }, [nativeCurrency, currentNetworkBalances, accountList]);

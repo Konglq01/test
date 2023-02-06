@@ -1,5 +1,6 @@
 import { ChainType, NetworkType } from '@portkey/types';
 import { CAWalletInfoType } from '@portkey/types/types-ca/wallet';
+import { AccountType } from '@portkey/types/wallet';
 import { PinErrorMessage } from '@portkey/utils/wallet/types';
 
 export type WalletType = ChainType;
@@ -30,4 +31,5 @@ export interface WalletState {
   walletInfo?: CAWalletInfoType;
   chainList: ChainItemType[];
   chainInfo?: { [key in NetworkType]?: ChainItemType[] };
+  accountList?: AccountType[];
 }
