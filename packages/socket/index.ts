@@ -31,6 +31,9 @@ export default class Signalr<ListenList = any> {
     signalr.onclose(err => {
       console.log('onclose', err);
     });
+    signalr.on('caAccountRegister', (...args) => {
+      console.log('caAccountRegister===', args);
+    });
     if (this.signalr) await this.destroy();
     await signalr.start();
     await signalr.invoke('Connect', clientId);

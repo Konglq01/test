@@ -1,8 +1,10 @@
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
-import { GuardiansInfo, VerifierItem, VerifyStatus } from '@portkey/types/verifier';
-import { UserGuardianItem, UserGuardianStatus } from './type';
+import { VerifierItem, VerifyStatus } from '@portkey/types/verifier';
+import { GuardiansInfo } from '@portkey/types/guardian';
 
-export const resetVerifierState = createAction('verifier/resetVerifierState');
+import { IVerifierInfo, UserGuardianItem, UserGuardianStatus } from './type';
+
+export const resetGuardiansState = createAction('verifier/resetGuardiansState');
 
 // TODO Will delete
 /** @deprecated */
@@ -23,18 +25,20 @@ export const setVerifierListAction = createAction<VerifierItem[] | null>('verifi
 export const setGuardiansAction = createAction<GuardiansInfo | null>('verifier/setGuardians');
 
 export const setCurrentGuardianAction = createAction<UserGuardianItem>('verifier/setCurrentGuardian');
+
 export const setUserGuardianItemStatus = createAction<{
   key: string;
   status: VerifyStatus;
   signature?: string;
   verificationDoc?: string;
 }>('verifier/setUserGuardianItemStatus');
+
 export const setUserGuardianStatus = createAction<{ [x: string]: UserGuardianStatus }>(
   'verifier/setUserGuardianStatus',
 );
 export const resetUserGuardianStatus = createAction('verifier/resetUserGuardianStatus');
 
-export const setUserGuardianSessionIdAction = createAction<{ key: string; sessionId: string }>(
+export const setUserGuardianSessionIdAction = createAction<{ key: string; verifierInfo: IVerifierInfo }>(
   'verifier/setUserGuardianSessionId',
 );
 export const setOpGuardianAction = createAction<UserGuardianItem | undefined>('verifier/setOpGuardian');

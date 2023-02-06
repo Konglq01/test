@@ -19,9 +19,6 @@ import SecurityLock from 'pages/SecurityLock';
 import DashBoard from 'pages/DashBoard/index';
 import Receive from 'pages/Receive';
 import NFTDetail from 'pages/NFT/NFTDetail';
-import { useLanguage } from 'i18n/hooks';
-import useEffectOnce from 'hooks/useEffectOnce';
-import { useChainListFetch } from '@portkey/hooks/hooks-ca/chainList';
 
 const Stack = createStackNavigator();
 export const stackNav = [
@@ -55,12 +52,6 @@ export type RootStackName = typeof stackNav[number]['name'];
 export type RootNavigationProp = StackNavigationProp<RootStackParamList>;
 
 export default function NavigationRoot() {
-  // FIXME: delete language
-  const { changeLanguage } = useLanguage();
-  useEffectOnce(() => {
-    changeLanguage('en');
-  });
-  useChainListFetch();
   return (
     <NavigationContainer ref={navigationService.setTopLevelNavigator}>
       <Stack.Navigator

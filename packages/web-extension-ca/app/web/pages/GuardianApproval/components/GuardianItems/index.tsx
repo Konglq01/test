@@ -1,7 +1,8 @@
-import { sendVerificationCode } from '@portkey/api/apiUtils/verification';
+import { sendVerificationCode } from '@portkey/api/api-did/apiUtils/verification';
 import { setCurrentGuardianAction, setUserGuardianItemStatus } from '@portkey/store/store-ca/guardians/actions';
 import { UserGuardianItem, UserGuardianStatus } from '@portkey/store/store-ca/guardians/type';
-import { VerificationType, VerifyStatus } from '@portkey/types/verifier';
+import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
+import { VerifyStatus } from '@portkey/types/verifier';
 import { Button, message } from 'antd';
 import clsx from 'clsx';
 import VerifierPair from 'components/VerifierPair';
@@ -11,15 +12,16 @@ import { useLocation, useNavigate } from 'react-router';
 import { useAppDispatch, useLoading } from 'store/Provider/hooks';
 import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
 import { LoginInfo } from 'store/reducers/loginCache/type';
+import { DefaultChainId } from '@portkey/constants/constants-ca/network';
+import { contractErrorHandler } from 'utils/tryErrorHandler';
 
 interface GuardianItemProps {
   disabled?: boolean;
   isExpired?: boolean;
   item: UserGuardianStatus;
   loginAccount?: LoginInfo;
-  managerUniqueId: string;
 }
-export default function GuardianItems({ disabled, item, isExpired, loginAccount, managerUniqueId }: GuardianItemProps) {
+export default function GuardianItems({ disabled, item, isExpired, loginAccount }: GuardianItemProps) {
   const { t } = useTranslation();
   const { setLoading } = useLoading();
   const { state } = useLocation();
@@ -32,20 +34,28 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount,
         setLoading(true);
         dispatch(
           setLoginAccountAction({
-            loginGuardianType: item.loginGuardianType,
-            accountLoginType: item.guardiansType,
+            guardianAccount: item.guardianAccount,
+            loginType: item.guardianType,
           }),
         );
         const result = await sendVerificationCode({
-          loginGuardianType: item?.loginGuardianType,
-          guardiansType: item.guardiansType,
-          verificationType: VerificationType.addGuardian,
-          baseUrl: item?.verifier?.url || '',
-          managerUniqueId,
+          guardianAccount: item?.guardianAccount,
+          type: LoginStrType[item.guardianType],
+          verifierId: item?.verifier?.id || '',
+          chainId: DefaultChainId,
         });
         setLoading(false);
         if (result.verifierSessionId) {
-          dispatch(setCurrentGuardianAction({ ...item, sessionId: result.verifierSessionId, isInitStatus: true }));
+          dispatch(
+            setCurrentGuardianAction({
+              ...item,
+              verifierInfo: {
+                sessionId: result.verifierSessionId,
+                endPoint: result.endPoint,
+              },
+              isInitStatus: true,
+            }),
+          );
           dispatch(
             setUserGuardianItemStatus({
               key: item.key,
@@ -57,38 +67,44 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount,
       } catch (error: any) {
         console.log('---guardian-sendCode-error', error);
         setLoading(false);
-        message.error(error?.Error?.Message || error.message?.Message || error?.message);
+        message.error(contractErrorHandler(error));
       }
     },
-    [state, managerUniqueId, dispatch, navigate, setLoading],
+    [setLoading, dispatch, navigate, state],
   );
 
   const SendCode = useCallback(
     async (item: UserGuardianItem) => {
+      console.log(item, 'guardianSendCode===');
+
       try {
         if (state && state.indexOf('guardians') !== -1) {
           guardianSendCode(item);
           return;
         }
-        if (
-          !loginAccount ||
-          (!loginAccount.accountLoginType && loginAccount.accountLoginType !== 0) ||
-          !loginAccount.loginGuardianType
-        )
+        if (!loginAccount || !LoginStrType[loginAccount.loginType] || !loginAccount.guardianAccount)
           return message.error(
             'User registration information is invalid, please fill in the registration method again',
           );
         setLoading(true);
         const result = await sendVerificationCode({
-          loginGuardianType: item?.loginGuardianType,
-          guardiansType: loginAccount?.accountLoginType,
-          verificationType: VerificationType.communityRecovery,
-          baseUrl: item?.verifier?.url || '',
-          managerUniqueId: loginAccount.managerUniqueId,
+          guardianAccount: item?.guardianAccount,
+          type: LoginStrType[loginAccount.loginType],
+          verifierId: item.verifier?.id || '',
+          chainId: DefaultChainId,
         });
         setLoading(false);
         if (result.verifierSessionId) {
-          dispatch(setCurrentGuardianAction({ ...item, sessionId: result.verifierSessionId, isInitStatus: true }));
+          dispatch(
+            setCurrentGuardianAction({
+              ...item,
+              verifierInfo: {
+                sessionId: result.verifierSessionId,
+                endPoint: result.endPoint,
+              },
+              isInitStatus: true,
+            }),
+          );
           dispatch(
             setUserGuardianItemStatus({
               key: item.key,
@@ -120,8 +136,8 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount,
     <li className={clsx('flex-between-center verifier-item', disabled && 'verifier-item-disabled')}>
       {item.isLoginAccount && <div className="login-icon">{t('Login Account')}</div>}
       <div className="flex-between-center">
-        <VerifierPair guardiansType={item.guardiansType} verifierSrc={item.verifier?.imageUrl} />
-        <span className="account-text">{item.loginGuardianType}</span>
+        <VerifierPair guardianType={item.guardianType} verifierSrc={item.verifier?.imageUrl} />
+        <span className="account-text">{item.guardianAccount}</span>
       </div>
       {isExpired && item.status !== VerifyStatus.Verified ? (
         <Button className="expired" type="text" disabled>

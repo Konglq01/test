@@ -5,44 +5,52 @@ import { SocketUrl } from '@portkey/constants/constants-ca/socket';
 import { randomId } from '@portkey/utils';
 import AElf from 'aelf-sdk';
 import { Button, Divider } from 'antd';
-import { request } from '@portkey/api';
+import { request } from '@portkey/api/api-did';
 
-const wallet = AElf.wallet.createNewWallet();
-const clientId = wallet.address;
-let requestId = randomId();
+// const wallet = AElf.wallet.createNewWallet();
+const clientId = 'aelf1';
+const requestId = 'aelf2';
 
-Socket.doOpen({
-  url: SocketUrl,
-  clientId: clientId,
-});
+// Socket.doOpen({
+//   url: SocketUrl,
+//   clientId: clientId,
+// });
 
-Socket.onSinAndAck(
-  {
-    clientId,
-    requestId,
-  },
-  (data) => {
-    console.log(data, 'Socket ===Sin');
-  },
-);
+// Socket.onCaAccountRegister(
+//   {
+//     clientId,
+//     requestId: requestId,
+//   },
+//   (data) => {
+//     console.log(data, 'Socket ===Sin');
+//   },
+// );
+
+// Socket.onCaAccountRecover(
+//   {
+//     clientId,
+//     requestId: requestId,
+//   },
+//   (data) => {
+//     console.log(data, 'Socket ===Sin');
+//   },
+// );
 
 export default function TestSocket() {
   return (
     <div>
       <Button
         onClick={async () => {
-          requestId = randomId();
           const result = await request.wallet.hubPing({
-            baseURL: 'http://192.168.10.163:5588',
             method: 'post',
             params: {
               context: {
                 clientId,
-                requestId,
+                requestId: clientId,
               },
             },
           });
-          console.log(result, requestId, clientId, 'result===');
+          console.log(result, clientId, 'result===');
         }}>
         hubPing
       </Button>
@@ -72,23 +80,17 @@ export default function TestSocket() {
       <Button
         onClick={async () => {
           try {
-            const result = await request.wallet.getResponse({
-              baseURL: 'http://192.168.10.163:5588',
-              method: 'post',
-              params: {
-                context: {
-                  clientId,
-                  requestId,
-                },
-              },
-            });
-            console.log(result, requestId, clientId, 'result===');
+            // const result = await request.wallet.getResponse({
+            //   method: 'post',
+            // });
+            // console.log(result, clientId, 'result===');
           } catch (error) {
             console.log('Socket = getResponse = error', error);
           }
         }}>
         getResponse
       </Button>
+
       <Divider />
     </div>
   );

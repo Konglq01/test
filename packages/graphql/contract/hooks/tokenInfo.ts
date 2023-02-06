@@ -7,29 +7,45 @@ export type TokenInfoQueryVariables = Types.Exact<{
   dto?: Types.InputMaybe<Types.GetTokenInfoDto>;
 }>;
 
-
-export type TokenInfoQuery = { __typename?: 'Query', tokenInfo?: Array<{ __typename?: 'TokenInfoDto', id?: string | null, chainId?: string | null, blockHash?: string | null, blockHeight: number, previousBlockHash?: string | null, symbol?: string | null, tokenContractAddress?: string | null, decimals: number, totalSupply: number, tokenName?: string | null, issuer?: string | null, isBurnable: boolean, issueChainId: number } | null> | null };
-
+export type TokenInfoQuery = {
+  __typename?: 'Query';
+  tokenInfo?: Array<{
+    __typename?: 'TokenInfoDto';
+    id?: string | null;
+    chainId?: string | null;
+    blockHash?: string | null;
+    blockHeight: number;
+    previousBlockHash?: string | null;
+    symbol?: string | null;
+    tokenContractAddress?: string | null;
+    decimals: number;
+    totalSupply: number;
+    tokenName?: string | null;
+    issuer?: string | null;
+    isBurnable: boolean;
+    issueChainId: number;
+  } | null> | null;
+};
 
 export const TokenInfoDocument = gql`
-    query tokenInfo($dto: GetTokenInfoDto) {
-  tokenInfo(dto: $dto) {
-    id
-    chainId
-    blockHash
-    blockHeight
-    previousBlockHash
-    symbol
-    tokenContractAddress
-    decimals
-    totalSupply
-    tokenName
-    issuer
-    isBurnable
-    issueChainId
+  query tokenInfo($dto: GetTokenInfoDto) {
+    tokenInfo(dto: $dto) {
+      id
+      chainId
+      blockHash
+      blockHeight
+      previousBlockHash
+      symbol
+      tokenContractAddress
+      decimals
+      totalSupply
+      tokenName
+      issuer
+      isBurnable
+      issueChainId
+    }
   }
-}
-    `;
+`;
 
 /**
  * __useTokenInfoQuery__
@@ -48,13 +64,15 @@ export const TokenInfoDocument = gql`
  * });
  */
 export function useTokenInfoQuery(baseOptions?: Apollo.QueryHookOptions<TokenInfoQuery, TokenInfoQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<TokenInfoQuery, TokenInfoQueryVariables>(TokenInfoDocument, options);
-      }
-export function useTokenInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<TokenInfoQuery, TokenInfoQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<TokenInfoQuery, TokenInfoQueryVariables>(TokenInfoDocument, options);
-        }
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<TokenInfoQuery, TokenInfoQueryVariables>(TokenInfoDocument, options);
+}
+export function useTokenInfoLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<TokenInfoQuery, TokenInfoQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<TokenInfoQuery, TokenInfoQueryVariables>(TokenInfoDocument, options);
+}
 export type TokenInfoQueryHookResult = ReturnType<typeof useTokenInfoQuery>;
 export type TokenInfoLazyQueryHookResult = ReturnType<typeof useTokenInfoLazyQuery>;
 export type TokenInfoQueryResult = Apollo.QueryResult<TokenInfoQuery, TokenInfoQueryVariables>;

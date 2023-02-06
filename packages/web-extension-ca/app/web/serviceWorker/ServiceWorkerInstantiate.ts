@@ -1,10 +1,5 @@
 import { LocalStream } from 'extension-streams';
-import {
-  clearLocalStorage,
-  getAllStorageLocalData,
-  getLocalStorage,
-  setLocalStorage,
-} from 'utils/storage/chromeStorage';
+import { getAllStorageLocalData, getLocalStorage } from 'utils/storage/chromeStorage';
 import storage from 'utils/storage/storage';
 import { AutoLockDataKey, AutoLockDataType, DefaultLock } from 'constants/lock';
 import SWEventController from 'controllers/SWEventController';
@@ -25,7 +20,6 @@ import InternalMessage from 'messages/InternalMessage';
 import { CreatePromptType, SendResponseFun } from 'types';
 import errorHandler from 'utils/errorHandler';
 import { apis } from 'utils/BrowserApis';
-import moment from 'moment';
 
 const notificationService = new NotificationService();
 // Get default data in redux
@@ -350,20 +344,20 @@ export default class ServiceWorkerInstantiate {
       return;
     }
     if (seed) {
-      const lastTime = await getLocalStorage('lastMessageTime');
-      const timeLock = moment().isSameOrAfter(lastTime);
-      setLocalStorage({
-        [storage.lastMessageTime]: moment().add(pageState.lockTime, 'm').format(),
-      });
-      console.log(
-        timeLock,
-        lastTime,
-        pageState.lockTime,
-        moment().format(),
-        moment().add(pageState.lockTime, 'm').format(),
-        'timeLock==',
-      );
-      lastTime && timeLock && ServiceWorkerInstantiate.lockWallet(sendResponse, 'timingLock');
+      // const lastTime = await getLocalStorage('lastMessageTime');
+      // const timeLock = moment().isSameOrAfter(lastTime);
+      // setLocalStorage({
+      //   [storage.lastMessageTime]: moment().add(pageState.lockTime, 'm').format(),
+      // });
+      // console.log(
+      //   timeLock,
+      //   lastTime,
+      //   pageState.lockTime,
+      //   moment().format(),
+      //   moment().add(pageState.lockTime, 'm').format(),
+      //   'timeLock==',
+      // );
+      // lastTime && timeLock && ServiceWorkerInstantiate.lockWallet(sendResponse, 'timingLock');
       // MV2 -> MV3 setTimeout -> alarms.create
       apis.alarms.create('timingLock', {
         delayInMinutes: pageState.lockTime ?? AutoLockDataType.OneHour,

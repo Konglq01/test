@@ -16,28 +16,19 @@ import { sleep } from '@portkey/utils';
 import { ApprovalType, VerificationType, VerifyStatus } from '@portkey/types/verifier';
 import { BGStyles, FontStyles } from 'assets/theme/styles';
 import { isIOS } from '@rneui/base';
-import { API_REQ_FUNCTION } from 'api/types';
-import { EditGuardianParamsType } from '../../GuardianApproval';
 import { LoginGuardianTypeIcon } from 'constants/misc';
 import { LoginType } from '@portkey/types/types-ca/wallet';
 import { VerifierImage } from '../VerifierImage';
-
-export type GuardiansStatusItem = {
-  status: VerifyStatus;
-  verifierSessionId: string;
-  editGuardianParams?: EditGuardianParamsType;
-};
-
-export type GuardiansStatus = {
-  [key: string]: GuardiansStatusItem;
-};
+import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
+import { GuardiansStatus, GuardiansStatusItem } from 'pages/Guardian/types';
+import { DefaultChainId } from '@portkey/constants/constants-ca/network-test2';
+import useDebounceCallback from 'hooks/useDebounceCallback';
 
 interface GuardianAccountItemProps {
   guardianItem: UserGuardianItem;
   isButtonHide?: boolean;
   renderBtn?: (item: UserGuardianItem) => JSX.Element;
   isBorderHide?: boolean;
-  managerUniqueId?: string;
   guardiansStatus?: GuardiansStatus;
   setGuardianStatus?: (key: string, status: GuardiansStatusItem) => void;
   isExpired?: boolean;
@@ -47,7 +38,6 @@ interface GuardianAccountItemProps {
 
 function GuardianItemButton({
   guardianItem,
-  managerUniqueId,
   guardiansStatus,
   setGuardianStatus,
   isExpired,
@@ -58,50 +48,50 @@ function GuardianItemButton({
 }) {
   const itemStatus = useMemo(() => guardiansStatus?.[guardianItem.key], [guardianItem.key, guardiansStatus]);
 
-  const { status, verifierSessionId } = itemStatus || {};
+  const { status, requestCodeResult } = itemStatus || {};
+
+  const guardianInfo = useMemo(() => {
+    let _verificationType = VerificationType.communityRecovery;
+    if (
+      approvalType === ApprovalType.addGuardian ||
+      approvalType === ApprovalType.deleteGuardian ||
+      approvalType === ApprovalType.editGuardian
+    ) {
+      _verificationType = VerificationType.editGuardianApproval;
+    }
+    return {
+      guardianItem,
+      verificationType: _verificationType,
+    };
+  }, [approvalType, guardianItem]);
+
   const onSetGuardianStatus = useCallback(
     (guardianStatus: GuardiansStatusItem) => {
       setGuardianStatus?.(guardianItem.key, guardianStatus);
     },
     [guardianItem.key, setGuardianStatus],
   );
-  const onSendCode = useCallback(async () => {
+  const onSendCode = useDebounceCallback(async () => {
     Loading.show();
     try {
-      let fetch: Record<string, API_REQ_FUNCTION> = request.recovery;
-      let _verificationType = VerificationType.communityRecovery;
-      if (
-        approvalType === ApprovalType.addGuardian ||
-        approvalType === ApprovalType.deleteGuardian ||
-        approvalType === ApprovalType.editGuardian
-      ) {
-        _verificationType = VerificationType.editGuardianApproval;
-        fetch = request.verification;
-      }
-
-      const req = await fetch.sendCode({
-        baseURL: guardianItem.verifier?.url,
+      const req = await request.verify.sendCode({
         data: {
-          type: 0,
-          loginGuardianType: guardianItem.loginGuardianType,
-          managerUniqueId,
+          type: LoginStrType[guardianInfo.guardianItem.guardianType],
+          guardianAccount: guardianInfo.guardianItem.guardianAccount,
+          verifierId: guardianInfo.guardianItem.verifier?.id,
+          chainId: DefaultChainId,
         },
       });
       if (req.verifierSessionId) {
         Loading.hide();
         await sleep(200);
         onSetGuardianStatus({
-          verifierSessionId: req.verifierSessionId,
+          requestCodeResult: req,
           status: VerifyStatus.Verifying,
         });
-
         navigationService.push('VerifierDetails', {
-          guardianItem,
-          verifierSessionId: req.verifierSessionId,
-          managerUniqueId,
-          loginGuardianType: guardianItem.loginGuardianType,
-          verificationType: _verificationType,
-          guardianKey: guardianItem.key,
+          ...guardianInfo,
+          requestCodeResult: req,
         });
       } else {
         throw new Error('send fail');
@@ -112,28 +102,16 @@ function GuardianItemButton({
       CommonToast.failError(error);
     }
     Loading.hide();
-  }, [approvalType, guardianItem, managerUniqueId, onSetGuardianStatus]);
-  const onVerifier = useCallback(() => {
-    let _verificationType = VerificationType.communityRecovery;
-    if (
-      approvalType === ApprovalType.addGuardian ||
-      approvalType === ApprovalType.deleteGuardian ||
-      approvalType === ApprovalType.editGuardian
-    ) {
-      _verificationType = VerificationType.editGuardianApproval;
-    }
-
+  }, [onSetGuardianStatus, guardianInfo]);
+  const onVerifier = useDebounceCallback(() => {
     navigationService.push('VerifierDetails', {
-      guardianItem,
-      verifierSessionId,
-      loginGuardianType: guardianItem.loginGuardianType,
-      managerUniqueId,
+      ...guardianInfo,
+      requestCodeResult,
       startResend: true,
-      verificationType: _verificationType,
-      guardianKey: guardianItem.key,
     });
-  }, [approvalType, guardianItem, managerUniqueId, verifierSessionId]);
+  }, [guardianInfo, requestCodeResult]);
   const buttonProps: CommonButtonProps = useMemo(() => {
+    // expired
     if (isExpired && status !== VerifyStatus.Verified) {
       return {
         disabled: true,
@@ -176,12 +154,11 @@ function GuardianItemButton({
   );
 }
 
-export default function GuardianAccountItem({
+export default function GuardianItem({
   guardianItem,
   isButtonHide,
   renderBtn,
   isBorderHide = false,
-  managerUniqueId,
   guardiansStatus,
   setGuardianStatus,
   isExpired,
@@ -199,10 +176,10 @@ export default function GuardianAccountItem({
         </View>
       )}
       <View style={[GStyles.flexRow, GStyles.itemCenter, GStyles.flex1]}>
-        <Svg icon={LoginGuardianTypeIcon[guardianItem.guardiansType as LoginType] as any} size={pTd(32)} />
+        <Svg icon={LoginGuardianTypeIcon[guardianItem.guardianType as LoginType] as any} size={pTd(32)} />
         <VerifierImage size={pTd(32)} uri={guardianItem.verifier?.imageUrl} style={styles.iconStyle} />
         <TextM numberOfLines={1} style={[styles.nameStyle, GStyles.flex1]}>
-          {guardianItem.loginGuardianType}
+          {guardianItem.guardianAccount}
         </TextM>
       </View>
       {!isButtonHide && (
@@ -211,7 +188,6 @@ export default function GuardianAccountItem({
           isExpired={isExpired}
           guardianItem={guardianItem}
           guardiansStatus={guardiansStatus}
-          managerUniqueId={managerUniqueId}
           setGuardianStatus={setGuardianStatus}
           approvalType={approvalType}
         />

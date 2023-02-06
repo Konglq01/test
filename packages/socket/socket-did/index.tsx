@@ -1,5 +1,5 @@
 import Signalr from '..';
-import { SinOutput } from './types';
+import { CaAccountRecoverResult, CaAccountRegisterResult } from '@portkey/types/types-ca/wallet';
 import { listenList } from '@portkey/constants/constants-ca/socket';
 
 class SignalrDid extends Signalr {
@@ -7,13 +7,29 @@ class SignalrDid extends Signalr {
     this.invoke('Ack', clientId, requestId);
   }
 
-  public onSinAndAck(
+  public onCaAccountRegister(
     { clientId, requestId }: { clientId: string; requestId: string },
-    callback: (data: SinOutput) => void,
+    callback: (data: CaAccountRegisterResult) => void,
   ) {
-    this.listen('Sin', (data: SinOutput) => {
+    return this.listen('caAccountRegister', (data: CaAccountRegisterResult) => {
       if (data.requestId === requestId) {
-        this.Ack(clientId, requestId);
+        if (data.body.registerStatus !== 'pending') {
+          this.Ack(clientId, requestId);
+        }
+        callback(data);
+      }
+    });
+  }
+
+  public onCaAccountRecover(
+    { clientId, requestId }: { clientId: string; requestId: string },
+    callback: (data: CaAccountRecoverResult) => void,
+  ) {
+    return this.listen('caAccountRecover', (data: CaAccountRecoverResult) => {
+      if (data.requestId === requestId) {
+        if (data.body.recoveryStatus !== 'pending') {
+          this.Ack(clientId, requestId);
+        }
         callback(data);
       }
     });

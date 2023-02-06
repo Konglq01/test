@@ -2,67 +2,42 @@
  * @file
  * Query registration and login data
  */
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { useCurrentWalletInfo, useFetchWalletCAAddress } from '@portkey/hooks/hooks-ca/wallet';
-import { setCAInfo } from '@portkey/store/store-ca/wallet/actions';
-import { PinErrorMessage } from '@portkey/utils/wallet/types';
+import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { message } from 'antd';
 import InternalMessage from 'messages/InternalMessage';
 import InternalMessageTypes from 'messages/InternalMessageTypes';
 import LockPage from 'pages/components/LockPage';
 import RegisterHeader from 'pages/components/RegisterHeader';
 import { useCallback } from 'react';
-import { useNavigate } from 'react-router';
 import { useEffectOnce } from 'react-use';
-import { useAppDispatch, useLoading } from 'store/Provider/hooks';
-import { setLocalStorage } from 'utils/storage/chromeStorage';
+import { useLoading } from 'store/Provider/hooks';
+import useFetchDidWallet from 'hooks/useFetchDidWallet';
 
 export default function QueryPage() {
   const { setLoading } = useLoading();
-  const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-  const fetchWalletResult = useFetchWalletCAAddress();
-  const currentNetwork = useCurrentNetworkInfo();
+  const fetchWalletResult = useFetchDidWallet();
   const currentWalletInfo = useCurrentWalletInfo();
 
   const fetchCreateWalletResult = useCallback(
     async (pwd: string) => {
-      if (!currentWalletInfo.managerInfo) throw 'Missing managerInfo';
-      const walletResult = await fetchWalletResult({
-        baseUrl: currentNetwork.apiUrl,
-        type: currentWalletInfo.managerInfo.type,
-        verificationType: currentWalletInfo.managerInfo.verificationType,
-        loginGuardianType: currentWalletInfo.managerInfo.loginGuardianType,
-        managerUniqueId: currentWalletInfo.managerInfo.managerUniqueId,
-      });
-      if (walletResult.status !== 'pass') {
-        const errorString = walletResult?.message || walletResult.status;
-        message.error((errorString as string) || 'Something error');
-        await setLocalStorage({
-          registerStatus: null,
+      try {
+        if (!currentWalletInfo.managerInfo) throw 'Missing managerInfo';
+        await fetchWalletResult({
+          pwd,
+          clientId: currentWalletInfo.address,
+          requestId: currentWalletInfo.managerInfo.requestId || '',
+          verificationType: currentWalletInfo.managerInfo.verificationType,
+          managerUniqueId: currentWalletInfo.managerInfo.managerUniqueId,
+          managerAddress: currentWalletInfo.address,
         });
+      } catch (error: any) {
         setLoading(false);
-        throw 'error';
-      } else {
-        if (!pwd) return message.error(PinErrorMessage.invalidPin);
-        dispatch(
-          setCAInfo({
-            caInfo: {
-              caAddress: walletResult.caAddress,
-              caHash: walletResult.caHash,
-            },
-            pin: pwd,
-            chainId: 'AELF',
-          }),
-        );
-        setLoading(false);
-        await setLocalStorage({
-          registerStatus: 'Registered',
-        });
-        navigate('/register/success');
+        console.log(error, 'fetch error===');
+        message.error(error);
       }
+      setLoading(false);
     },
-    [currentWalletInfo, currentNetwork, dispatch, navigate, setLoading, fetchWalletResult],
+    [currentWalletInfo, setLoading, fetchWalletResult],
   );
 
   useEffectOnce(() => {

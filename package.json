@@ -39,5 +39,5 @@
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": "eslint --cache --fix"
   },
-  "version": "1.22.19"
+  "version": "1.0.0"
 }

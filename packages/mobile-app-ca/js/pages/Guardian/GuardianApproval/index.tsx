@@ -11,10 +11,9 @@ import { BorderStyles, FontStyles } from 'assets/theme/styles';
 import Svg from 'components/Svg';
 import { pTd } from 'utils/unit';
 import { getApprovalCount } from '@portkey/utils/guardian';
-import { ApprovalType, VerificationType, VerifyStatus } from '@portkey/types/verifier';
-import GuardianAccountItem, { GuardiansStatus, GuardiansStatusItem } from '../components/GuardianAccountItem';
+import { ApprovalType, VerificationType, VerifierInfo, VerifyStatus } from '@portkey/types/verifier';
+import GuardianItem from '../components/GuardianItem';
 import useEffectOnce from 'hooks/useEffectOnce';
-import { randomId } from '@portkey/utils';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import navigationService from 'utils/navigationService';
 import { LoginType, ManagerInfo } from '@portkey/types/types-ca/wallet';
@@ -29,29 +28,23 @@ import { useAppDispatch } from 'store/hooks';
 import { setPreGuardianAction } from '@portkey/store/store-ca/guardians/actions';
 import { addGuardian, deleteGuardian, editGuardian } from 'utils/guardian';
 import { useGetCurrentCAContract } from 'hooks/contract';
-
-export interface EditGuardianParamsType {
-  signature: string;
-  verifierDoc: string;
-}
+import { GuardiansStatus, GuardiansStatusItem } from '../types';
+import { handleGuardiansApproved } from 'utils/login';
 
 type RouterParams = {
-  loginGuardianType?: string;
+  loginAccount?: string;
   userGuardiansList?: UserGuardianItem[];
-  approvalType?: ApprovalType;
+  approvalType: ApprovalType;
   guardianItem?: UserGuardianItem;
-  editGuardianParams?: EditGuardianParamsType;
-  managerUniqueId?: string;
+  verifierInfo?: VerifierInfo;
 };
-
 export default function GuardianApproval() {
   const {
-    loginGuardianType,
+    loginAccount,
     userGuardiansList: paramUserGuardiansList,
     approvalType = ApprovalType.register,
     guardianItem,
-    editGuardianParams,
-    managerUniqueId: paramManagerUniqueId,
+    verifierInfo,
   } = useRouterParams<RouterParams>();
   const dispatch = useAppDispatch();
 
@@ -69,9 +62,9 @@ export default function GuardianApproval() {
   const { caHash, address: managerAddress } = useCurrentWalletInfo();
   const getCurrentCAContract = useGetCurrentCAContract();
 
-  const [managerUniqueId, setManagerUniqueId] = useState<string>();
   const [guardiansStatus, setApproved] = useState<GuardiansStatus>();
   const [isExpired, setIsExpired] = useState<boolean>();
+  console.log(guardiansStatus, '==guardiansStatus');
 
   const guardianExpiredTime = useRef<number>();
   const approvedList = useMemo(() => {
@@ -106,7 +99,6 @@ export default function GuardianApproval() {
     [setGuardianStatus],
   );
   useEffectOnce(() => {
-    setManagerUniqueId(paramManagerUniqueId || randomId());
     const listener = myEvents.setGuardianStatus.addListener(onSetGuardianStatus);
     const expiredTimer = setInterval(() => {
       if (guardianExpiredTime.current && new Date().getTime() > guardianExpiredTime.current) setIsExpired(true);
@@ -118,13 +110,10 @@ export default function GuardianApproval() {
   });
 
   const onBack = useCallback(() => {
-    switch (approvalType) {
-      case ApprovalType.addGuardian:
-        navigationService.navigate('GuardianEdit');
-        break;
-      default:
-        navigationService.goBack();
-        break;
+    if (approvalType === ApprovalType.addGuardian) {
+      navigationService.navigate('GuardianEdit');
+    } else {
+      navigationService.goBack();
     }
   }, [approvalType]);
 
@@ -132,18 +121,18 @@ export default function GuardianApproval() {
     navigationService.navigate('SetPin', {
       managerInfo: {
         verificationType: VerificationType.communityRecovery,
-        loginGuardianType,
+        loginAccount,
         type: LoginType.email,
-        managerUniqueId,
       } as ManagerInfo,
-      guardianCount,
+      guardiansApproved: handleGuardiansApproved(
+        guardiansStatus as GuardiansStatus,
+        userGuardiansList as UserGuardianItem[],
+      ),
     });
-  }, [guardianCount, loginGuardianType, managerUniqueId]);
+  }, [guardiansStatus, loginAccount, userGuardiansList]);
 
   const onAddGuardian = useCallback(async () => {
-    if (!managerAddress || !caHash || !editGuardianParams || !guardianItem || !guardiansStatus || !userGuardiansList)
-      return;
-
+    if (!managerAddress || !caHash || !verifierInfo || !guardianItem || !guardiansStatus || !userGuardiansList) return;
     Loading.show();
     try {
       const caContract = await getCurrentCAContract();
@@ -151,7 +140,7 @@ export default function GuardianApproval() {
         caContract,
         managerAddress,
         caHash,
-        editGuardianParams,
+        verifierInfo,
         guardianItem,
         userGuardiansList,
         guardiansStatus,
@@ -167,19 +156,10 @@ export default function GuardianApproval() {
       CommonToast.failError(error);
     }
     Loading.hide();
-  }, [
-    caHash,
-    editGuardianParams,
-    getCurrentCAContract,
-    guardianItem,
-    guardiansStatus,
-    managerAddress,
-    userGuardiansList,
-  ]);
+  }, [caHash, getCurrentCAContract, guardianItem, guardiansStatus, managerAddress, userGuardiansList, verifierInfo]);
 
   const onDeleteGuardian = useCallback(async () => {
     if (!managerAddress || !caHash || !guardianItem || !userGuardiansList || !guardiansStatus) return;
-
     Loading.show();
     try {
       const caContract = await getCurrentCAContract();
@@ -191,7 +171,6 @@ export default function GuardianApproval() {
         userGuardiansList,
         guardiansStatus,
       );
-
       if (req && !req.error) {
         myEvents.refreshGuardiansList.emit();
         navigationService.navigate('GuardianHome');
@@ -201,15 +180,11 @@ export default function GuardianApproval() {
     } catch (error) {
       CommonToast.failError(error);
     }
-
     Loading.hide();
   }, [caHash, getCurrentCAContract, guardianItem, guardiansStatus, managerAddress, userGuardiansList]);
 
   const onEditGuardian = useCallback(async () => {
-    if (!managerAddress || !caHash || !preGuardian || !guardianItem || !userGuardiansList || !guardiansStatus) {
-      return;
-    }
-
+    if (!managerAddress || !caHash || !preGuardian || !guardianItem || !userGuardiansList || !guardiansStatus) return;
     Loading.show();
     try {
       const caContract = await getCurrentCAContract();
@@ -232,7 +207,6 @@ export default function GuardianApproval() {
     } catch (error) {
       CommonToast.failError(error);
     }
-
     Loading.hide();
   }, [
     caHash,
@@ -301,11 +275,10 @@ export default function GuardianApproval() {
             <ScrollView>
               {userGuardiansList?.map(item => {
                 return (
-                  <GuardianAccountItem
+                  <GuardianItem
                     key={item.key}
                     guardianItem={item}
                     setGuardianStatus={setGuardianStatus}
-                    managerUniqueId={managerUniqueId as string}
                     guardiansStatus={guardiansStatus}
                     isExpired={isExpired}
                     isSuccess={isSuccess}

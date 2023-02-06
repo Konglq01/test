@@ -7,23 +7,30 @@ export type CaHolderTokenBalanceInfoQueryVariables = Types.Exact<{
   dto?: Types.InputMaybe<Types.GetCaHolderTokenBalanceDto>;
 }>;
 
-
-export type CaHolderTokenBalanceInfoQuery = { __typename?: 'Query', caHolderTokenBalanceInfo?: Array<{ __typename?: 'CAHolderTokenBalanceDto', chainId?: string | null, caAddress?: string | null, balance: number, tokenInfo?: { __typename?: 'TokenInfo', symbol?: string | null, decimals: number } | null } | null> | null };
-
+export type CaHolderTokenBalanceInfoQuery = {
+  __typename?: 'Query';
+  caHolderTokenBalanceInfo?: Array<{
+    __typename?: 'CAHolderTokenBalanceDto';
+    chainId?: string | null;
+    caAddress?: string | null;
+    balance: number;
+    tokenInfo?: { __typename?: 'TokenInfo'; symbol?: string | null; decimals: number } | null;
+  } | null> | null;
+};
 
 export const CaHolderTokenBalanceInfoDocument = gql`
-    query caHolderTokenBalanceInfo($dto: GetCAHolderTokenBalanceDto) {
-  caHolderTokenBalanceInfo(dto: $dto) {
-    chainId
-    caAddress
-    tokenInfo {
-      symbol
-      decimals
+  query caHolderTokenBalanceInfo($dto: GetCAHolderTokenBalanceDto) {
+    caHolderTokenBalanceInfo(dto: $dto) {
+      chainId
+      caAddress
+      tokenInfo {
+        symbol
+        decimals
+      }
+      balance
     }
-    balance
   }
-}
-    `;
+`;
 
 /**
  * __useCaHolderTokenBalanceInfoQuery__
@@ -41,14 +48,27 @@ export const CaHolderTokenBalanceInfoDocument = gql`
  *   },
  * });
  */
-export function useCaHolderTokenBalanceInfoQuery(baseOptions?: Apollo.QueryHookOptions<CaHolderTokenBalanceInfoQuery, CaHolderTokenBalanceInfoQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<CaHolderTokenBalanceInfoQuery, CaHolderTokenBalanceInfoQueryVariables>(CaHolderTokenBalanceInfoDocument, options);
-      }
-export function useCaHolderTokenBalanceInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CaHolderTokenBalanceInfoQuery, CaHolderTokenBalanceInfoQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<CaHolderTokenBalanceInfoQuery, CaHolderTokenBalanceInfoQueryVariables>(CaHolderTokenBalanceInfoDocument, options);
-        }
+export function useCaHolderTokenBalanceInfoQuery(
+  baseOptions?: Apollo.QueryHookOptions<CaHolderTokenBalanceInfoQuery, CaHolderTokenBalanceInfoQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<CaHolderTokenBalanceInfoQuery, CaHolderTokenBalanceInfoQueryVariables>(
+    CaHolderTokenBalanceInfoDocument,
+    options,
+  );
+}
+export function useCaHolderTokenBalanceInfoLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<CaHolderTokenBalanceInfoQuery, CaHolderTokenBalanceInfoQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<CaHolderTokenBalanceInfoQuery, CaHolderTokenBalanceInfoQueryVariables>(
+    CaHolderTokenBalanceInfoDocument,
+    options,
+  );
+}
 export type CaHolderTokenBalanceInfoQueryHookResult = ReturnType<typeof useCaHolderTokenBalanceInfoQuery>;
 export type CaHolderTokenBalanceInfoLazyQueryHookResult = ReturnType<typeof useCaHolderTokenBalanceInfoLazyQuery>;
-export type CaHolderTokenBalanceInfoQueryResult = Apollo.QueryResult<CaHolderTokenBalanceInfoQuery, CaHolderTokenBalanceInfoQueryVariables>;
+export type CaHolderTokenBalanceInfoQueryResult = Apollo.QueryResult<
+  CaHolderTokenBalanceInfoQuery,
+  CaHolderTokenBalanceInfoQueryVariables
+>;

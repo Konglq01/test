@@ -15,24 +15,20 @@ export const formatAddGuardianValue = ({
   Object.values(userGuardianStatus ?? {})?.forEach((item: UserGuardianStatus) => {
     if (item.key === opGuardian?.key) {
       guardianToAdd = {
-        guardianType: {
-          type: item.guardiansType,
-          guardianType: item.loginGuardianType,
-        },
-        verifier: {
-          name: item.verifier?.name as string,
+        value: item.guardianAccount,
+        type: item.guardianType,
+        verificationInfo: {
+          id: item.verifier?.id as string,
           signature: Object.values(Buffer.from(item.signature as any, 'hex')),
           verificationDoc: item.verificationDoc || '',
         },
       };
     } else if (item.signature) {
       guardiansApproved.push({
-        guardianType: {
-          type: item.guardiansType,
-          guardianType: item.loginGuardianType,
-        },
-        verifier: {
-          name: item.verifier?.name as string,
+        type: item.guardianType,
+        value: item.guardianAccount,
+        verificationInfo: {
+          id: item.verifier?.id as string,
           signature: Object.values(Buffer.from(item.signature as any, 'hex')),
           verificationDoc: item.verificationDoc as string,
         },

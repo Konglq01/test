@@ -12,7 +12,7 @@ export const getHolderInfo = async ({
   address: string;
   chainType: ChainType;
   paramsOption: {
-    loginGuardianType?: string;
+    loginGuardianAccount?: string;
     caHash?: string;
   };
 }) => {
@@ -23,6 +23,8 @@ export const getHolderInfo = async ({
     methodName: 'GetHolderInfo',
     paramsOption,
   });
+
+  console.log(resMessage, 'resMessage===GetHolderInfo');
 
   if (resMessage.code === SandboxErrorCode.error) throw resMessage.message;
   return {

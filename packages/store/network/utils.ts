@@ -13,8 +13,6 @@ type CheckRpcUrlParam = {
 };
 
 export const getElfChainStatus = async (rpcUrl: string) => {
-  console.log(rpcUrl, '===rpcUrl');
-
   const aelf = new AElf(new AElf.providers.HttpProvider(formatRpcUrl(rpcUrl)));
   try {
     return await aelf.chain.getChainStatus();

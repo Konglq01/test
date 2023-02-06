@@ -16,6 +16,11 @@ export function useCurrentNetworkInfo() {
   );
 }
 
+export function useCurrentApiUrl() {
+  const currentNetwork = useCurrentNetworkInfo();
+  return useMemo(() => currentNetwork.apiUrl, [currentNetwork.apiUrl]);
+}
+
 export function useVerifierList() {
   const { verifierMap } = useAppCASelector(state => state.guardians);
   return useMemo(() => (verifierMap ? Object.values(verifierMap) : []), [verifierMap]);

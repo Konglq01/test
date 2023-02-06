@@ -1,7 +1,1 @@
-export interface SinOutput {
-  requestId: string;
-  body: {
-    data: any;
-    signature: any;
-  };
-}
+export type RegisterStatus = 'pass' | 'pending' | 'fail' | null;

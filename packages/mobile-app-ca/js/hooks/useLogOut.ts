@@ -8,7 +8,7 @@ import { resetNetwork } from '@portkey/store/network/actions';
 import { resetWallet } from '@portkey/store/store-ca/wallet/actions';
 import { resetUser } from 'store/user/actions';
 import { resetToken } from '@portkey/store/token/slice';
-import { resetVerifierState } from '@portkey/store/store-ca/guardians/actions';
+import { resetGuardiansState } from '@portkey/store/store-ca/guardians/actions';
 
 export default function useLogOut() {
   const dispatch = useAppDispatch();
@@ -19,7 +19,7 @@ export default function useLogOut() {
       dispatch(resetToken());
       dispatch(resetSettings());
       dispatch(resetNetwork());
-      dispatch(resetVerifierState());
+      dispatch(resetGuardiansState());
       navigationService.reset('Referral');
     } catch (error) {
       console.log(error, '====error');

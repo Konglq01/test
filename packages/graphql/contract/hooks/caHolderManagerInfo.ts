@@ -7,24 +7,36 @@ export type CaHolderManagerInfoQueryVariables = Types.Exact<{
   dto?: Types.InputMaybe<Types.GetCaHolderManagerInfoDto>;
 }>;
 
-
-export type CaHolderManagerInfoQuery = { __typename?: 'Query', caHolderManagerInfo?: Array<{ __typename?: 'CAHolderManagerDto', id?: string | null, chainId?: string | null, caHash?: string | null, caAddress?: string | null, managers?: Array<{ __typename?: 'ManagerInfo', manager?: string | null, deviceString?: string | null } | null> | null } | null> | null };
-
+export type CaHolderManagerInfoQuery = {
+  __typename?: 'Query';
+  caHolderManagerInfo?: Array<{
+    __typename?: 'CAHolderManagerDto';
+    id?: string | null;
+    chainId?: string | null;
+    caHash?: string | null;
+    caAddress?: string | null;
+    managers?: Array<{
+      __typename?: 'ManagerInfo';
+      manager?: string | null;
+      deviceString?: string | null;
+    } | null> | null;
+  } | null> | null;
+};
 
 export const CaHolderManagerInfoDocument = gql`
-    query caHolderManagerInfo($dto: GetCAHolderManagerInfoDto) {
-  caHolderManagerInfo(dto: $dto) {
-    id
-    chainId
-    caHash
-    caAddress
-    managers {
-      manager
-      deviceString
+  query caHolderManagerInfo($dto: GetCAHolderManagerInfoDto) {
+    caHolderManagerInfo(dto: $dto) {
+      id
+      chainId
+      caHash
+      caAddress
+      managers {
+        manager
+        deviceString
+      }
     }
   }
-}
-    `;
+`;
 
 /**
  * __useCaHolderManagerInfoQuery__
@@ -42,14 +54,27 @@ export const CaHolderManagerInfoDocument = gql`
  *   },
  * });
  */
-export function useCaHolderManagerInfoQuery(baseOptions?: Apollo.QueryHookOptions<CaHolderManagerInfoQuery, CaHolderManagerInfoQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<CaHolderManagerInfoQuery, CaHolderManagerInfoQueryVariables>(CaHolderManagerInfoDocument, options);
-      }
-export function useCaHolderManagerInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CaHolderManagerInfoQuery, CaHolderManagerInfoQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<CaHolderManagerInfoQuery, CaHolderManagerInfoQueryVariables>(CaHolderManagerInfoDocument, options);
-        }
+export function useCaHolderManagerInfoQuery(
+  baseOptions?: Apollo.QueryHookOptions<CaHolderManagerInfoQuery, CaHolderManagerInfoQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<CaHolderManagerInfoQuery, CaHolderManagerInfoQueryVariables>(
+    CaHolderManagerInfoDocument,
+    options,
+  );
+}
+export function useCaHolderManagerInfoLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<CaHolderManagerInfoQuery, CaHolderManagerInfoQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<CaHolderManagerInfoQuery, CaHolderManagerInfoQueryVariables>(
+    CaHolderManagerInfoDocument,
+    options,
+  );
+}
 export type CaHolderManagerInfoQueryHookResult = ReturnType<typeof useCaHolderManagerInfoQuery>;
 export type CaHolderManagerInfoLazyQueryHookResult = ReturnType<typeof useCaHolderManagerInfoLazyQuery>;
-export type CaHolderManagerInfoQueryResult = Apollo.QueryResult<CaHolderManagerInfoQuery, CaHolderManagerInfoQueryVariables>;
+export type CaHolderManagerInfoQueryResult = Apollo.QueryResult<
+  CaHolderManagerInfoQuery,
+  CaHolderManagerInfoQueryVariables
+>;
