@@ -11,7 +11,7 @@ import { setLocalStorage } from 'utils/storage/chromeStorage';
 import { createWallet, setManagerInfo } from '@portkey/store/store-ca/wallet/actions';
 import { useTranslation } from 'react-i18next';
 import { recoveryDIDWallet, registerDIDWallet } from '@portkey/api/api-did/apiUtils/wallet';
-import { VerificationType } from '@portkey/types/verifier';
+import { VerificationType, VerifyStatus } from '@portkey/types/verifier';
 import { isWalletError } from '@portkey/store/wallet/utils';
 import { useHardwareBack } from 'hooks/useHardwareBack';
 import CommonModal from 'components/CommonModal';
@@ -68,13 +68,15 @@ export default function SetWalletPin() {
   );
 
   const getGuardiansApproved = useCallback(() => {
-    return Object.values(userGuardianStatus ?? {}).map((guardian) => ({
-      type: LoginStrType[guardian.guardianType],
-      value: guardian.guardianAccount,
-      verifierId: guardian.verifier?.id || '',
-      verificationDoc: guardian.verificationDoc || '',
-      signature: guardian.signature || '',
-    }));
+    return Object.values(userGuardianStatus ?? {})
+      .filter((guardian) => guardian.status === VerifyStatus.Verified)
+      .map((guardian) => ({
+        type: LoginStrType[guardian.guardianType],
+        value: guardian.guardianAccount,
+        verifierId: guardian.verifier?.id || '',
+        verificationDoc: guardian.verificationDoc || '',
+        signature: guardian.signature || '',
+      }));
   }, [userGuardianStatus]);
 
   const requestRecoveryDIDWallet = useCallback(
@@ -287,11 +289,9 @@ export default function SetWalletPin() {
         closable={false}
         open={returnOpen}
         className="set-pin-modal"
-        title={' Confirm return'}
+        title={t('Leave this page?')}
         getContainer={'#set-pin-wrapper'}>
-        <p className="modal-content">
-          After returning, you will need to re-select the operator and re-do the code verification.
-        </p>
+        <p className="modal-content">{t('returnTip')}</p>
         <div className="btn-wrapper">
           <Button onClick={() => setReturnOpen(false)}>No</Button>
           <Button type="primary" onClick={backHandler}>

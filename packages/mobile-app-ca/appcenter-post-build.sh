@@ -94,8 +94,8 @@ if [ "$AGENT_JOBSTATUS" == "Succeeded" ]; then
         # https://open.feishu.cn/open-apis/bot/v2/hook/f2d3fffd-c630-4e59-86e3-e7053a64e4b2
 
         curl -X POST -H "Content-Type: application/json" \
-         -d '{"msg_type":"text","content":{"text":"DID:IOS端最新包（id:'$APPCENTER_BUILD_ID'） 已build成功并推送至TestFlight，您可发送apple账号（邮箱）给@魏子轩申请进入内部测试组，然后在TestFlight查看下载最新版本的DID应用"}}' \
-        https://open.feishu.cn/open-apis/bot/v2/hook/18cb4392-dd86-49d2-805b-4a793856e219
+         -d '{"msg_type":"text","content":{"text":"DID:IOS端最新包（id:'$APPCENTER_BUILD_ID'） 已更新至TestFlight，您可发送apple账号（邮箱）给@魏子轩申请进入内部测试组，然后在TestFlight查看下载最新版本的DID应用"}}' \
+        https://open.feishu.cn/open-apis/bot/v2/hook/f2d3fffd-c630-4e59-86e3-e7053a64e4b2
 
     else
         echo "Current branch is $APPCENTER_BRANCH"

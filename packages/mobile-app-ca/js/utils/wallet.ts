@@ -115,7 +115,7 @@ export function intervalGetResult({ managerInfo, onPass, onFail }: IntervalGetRe
   timer = setTimeoutInterval(async () => {
     try {
       const req = await fetch({
-        params: { filter: `id:${managerInfo.managerUniqueId}` },
+        params: { filter: `_id:${managerInfo.managerUniqueId}` },
       });
       sendResult(req.items[0]);
     } catch (error) {
