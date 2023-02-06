@@ -21,6 +21,7 @@ import { handleWalletInfo } from '@portkey/utils/wallet';
 import { LoginQRData } from '@portkey/types/types-ca/qrcode';
 import phone from 'assets/image/pngs/phone.png';
 import QRCode from 'react-native-qrcode-svg';
+import { useIsFocused } from '@react-navigation/native';
 
 export default function LoginQRCode({ setLoginType }: { setLoginType: (type: LoginType) => void }) {
   const { walletInfo, currentNetwork } = useCurrentWallet();
@@ -28,7 +29,9 @@ export default function LoginQRCode({ setLoginType }: { setLoginType: (type: Log
   const dispatch = useAppDispatch();
   const { pin } = useCredentials() || {};
   const caInfo = useIntervalQueryCAInfoByAddress(currentNetwork, newWallet?.address);
+  const isFocused = useIsFocused();
   useEffect(() => {
+    if (!isFocused) return;
     if (caInfo) {
       if (pin) {
         try {
@@ -45,7 +48,8 @@ export default function LoginQRCode({ setLoginType }: { setLoginType: (type: Log
         });
       }
     }
-  }, [caInfo, dispatch, newWallet, pin, walletInfo]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [caInfo, dispatch, isFocused, newWallet, walletInfo]);
   const generateKeystore = useCallback(() => {
     try {
       const wallet = walletInfo?.address ? walletInfo : AElf.wallet.createNewWallet();

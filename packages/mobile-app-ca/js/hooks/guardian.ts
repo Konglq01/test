@@ -5,6 +5,7 @@ import { setGuardiansAction, setVerifierListAction } from '@portkey/store/store-
 import { LoginInfo } from 'types/wallet';
 import { checkHolderError } from '@portkey/utils/check';
 import { VerifierItem } from '@portkey/types/verifier';
+import { ChainItemType } from '@portkey/store/store-ca/wallet/type';
 
 export const useGetHolderInfo = () => {
   const getCurrentCAViewContract = useGetCurrentCAViewContract();
@@ -48,18 +49,21 @@ export const useGetGuardiansInfoWriteStore = () => {
 export const useGetVerifierServers = () => {
   const dispatch = useAppDispatch();
   const getCurrentCAViewContract = useGetCurrentCAViewContract();
-  return useCallback(async () => {
-    const caContract = await getCurrentCAViewContract();
-    const res = await caContract?.callViewMethod('GetVerifierServers', '');
-    if (res && !res.error) {
-      const verifierList: VerifierItem[] = res.verifierServers.map((item: VerifierItem) => ({
-        ...item,
-        url: item.endPoints[0],
-      }));
-      dispatch(setVerifierListAction(verifierList));
-      return verifierList;
-    } else {
-      throw res?.error || { message: 'Could not find VerifierServers' };
-    }
-  }, [dispatch, getCurrentCAViewContract]);
+  return useCallback(
+    async (chainInfo?: ChainItemType) => {
+      const caContract = await getCurrentCAViewContract(chainInfo);
+      const res = await caContract?.callViewMethod('GetVerifierServers', '');
+      if (res && !res.error) {
+        const verifierList: VerifierItem[] = res.verifierServers.map((item: VerifierItem) => ({
+          ...item,
+          url: item.endPoints[0],
+        }));
+        dispatch(setVerifierListAction(verifierList));
+        return verifierList;
+      } else {
+        throw res?.error || { message: 'Could not find VerifierServers' };
+      }
+    },
+    [dispatch, getCurrentCAViewContract],
+  );
 };
