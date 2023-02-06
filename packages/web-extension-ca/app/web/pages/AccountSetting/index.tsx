@@ -25,8 +25,14 @@ export default function AccountSetting() {
           setPinOpen(true);
         },
       },
+      {
+        label: t('Devices'),
+        click: () => {
+          navigate('/setting/account-setting/device');
+        },
+      },
     ],
-    [t],
+    [navigate, t],
   );
 
   return (
@@ -34,6 +40,9 @@ export default function AccountSetting() {
       <div className="account-setting-title">
         <BackHeader
           title={t('Account Setting')}
+          leftCallBack={() => {
+            navigate('/setting');
+          }}
           rightElement={
             <CustomSvg
               type="Close2"

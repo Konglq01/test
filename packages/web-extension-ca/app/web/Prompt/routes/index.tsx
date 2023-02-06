@@ -25,6 +25,7 @@ import NFT from 'pages/NFT';
 import Unlock from 'pages/Unlock';
 import QueryPage from 'pages/QueryPage';
 import TestSocket from 'pages/TestSocket';
+import Device from 'pages/AccountSetting/device';
 
 // TODO delete unnecessary pages
 export const PageRouter = () =>
@@ -140,6 +141,10 @@ export const PageRouter = () =>
     {
       path: '/setting/account-setting',
       element: <AccountSetting />,
+    },
+    {
+      path: '/setting/account-setting/device',
+      element: <Device />,
     },
     {
       path: '/unlock',

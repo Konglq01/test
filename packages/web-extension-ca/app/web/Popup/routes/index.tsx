@@ -18,6 +18,7 @@ import GuardiansView from 'pages/Guardians/GuardiansView';
 import VerifierAccount from 'pages/VerifierAccount';
 import GuardianApproval from 'pages/GuardianApproval';
 import Unlock from 'pages/Unlock';
+import Device from 'pages/AccountSetting/device';
 
 export const PageRouter = () =>
   useRoutes([
@@ -44,6 +45,10 @@ export const PageRouter = () =>
     {
       path: '/setting/account-setting',
       element: <AccountSetting />,
+    },
+    {
+      path: '/setting/account-setting/device',
+      element: <Device />,
     },
     {
       path: '/setting/guardians',
