@@ -6,20 +6,6 @@ import { IVerifierInfo, UserGuardianItem, UserGuardianStatus } from './type';
 
 export const resetGuardiansState = createAction('verifier/resetGuardiansState');
 
-// TODO Will delete
-/** @deprecated */
-export const fetchVerifierListAsync = createAsyncThunk('verifier/fetchVerifierListAsync', async () => {
-  // const response: any = await fetchVerifierList();
-  // return response;
-});
-
-// TODO Will delete
-/** @deprecated */
-export const fetchGuardianListAsync = createAsyncThunk('verifier/fetchGuardianListAsync', async () => {
-  // const response: GuardiansInfo = await fetchGuardiansList();
-  // return response;
-});
-
 export const setVerifierListAction = createAction<VerifierItem[] | null>('verifier/setVerifierList');
 
 export const setGuardiansAction = createAction<GuardiansInfo | null>('verifier/setGuardians');
