@@ -287,11 +287,9 @@ export default function SetWalletPin() {
         closable={false}
         open={returnOpen}
         className="set-pin-modal"
-        title={' Confirm return'}
+        title={t('Leave this page?')}
         getContainer={'#set-pin-wrapper'}>
-        <p className="modal-content">
-          After returning, you will need to re-select the operator and re-do the code verification.
-        </p>
+        <p className="modal-content">{t('returnTip')}</p>
         <div className="btn-wrapper">
           <Button onClick={() => setReturnOpen(false)}>No</Button>
           <Button type="primary" onClick={backHandler}>
