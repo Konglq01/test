@@ -50,7 +50,7 @@ export default function ExitWallet({ open, onCancel }: ExitWalletProps) {
           caHash: wallet?.caHash as string,
           manager: {
             managerAddress: wallet.address,
-            deviceString: new Date().getTime(),
+            deviceString: new Date().getTime().toString(),
           },
         },
       });
