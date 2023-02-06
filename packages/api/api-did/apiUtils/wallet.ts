@@ -72,7 +72,7 @@ export const requestCreateWallet = async ({
   if (verificationType !== VerificationType.register) fetch = request.es.getRecoverResult;
   const req = await fetch({
     baseURL,
-    params: { filter: `id:${managerUniqueId}` },
+    params: { filter: `_id:${managerUniqueId}` },
   });
   const result = req.items[0];
   return result;
