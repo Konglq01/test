@@ -139,6 +139,12 @@ export class AElfContractBasic {
         try {
           return await getTxResult(this.aelfInstance, TransactionId);
         } catch (error: any) {
+          if (typeof error === 'string')
+            return {
+              error: {
+                message: error,
+              },
+            };
           if (error.message) return { error };
           return {
             ...error,
