@@ -120,8 +120,7 @@ export const guardiansSlice = createSlice({
         state.userGuardianStatus[key]['status'] = status;
         state.userGuardianStatus[key]['signature'] = signature;
         state.userGuardianStatus[key]['verificationDoc'] = verificationDoc;
-        if (!state.guardianExpiredTime) {
-          // && status === VerifyStatus.Verifying
+        if (!state.guardianExpiredTime && status === VerifyStatus.Verified) {
           state.guardianExpiredTime = moment().add(1, 'h').subtract(2, 'minute').valueOf();
         }
       })
