@@ -5,12 +5,12 @@ import { NetworkType } from '@portkey/types';
 import { useState, useMemo } from 'react';
 import { CAInfoType, ManagerInfo } from '@portkey/types/types-ca/wallet';
 import { VerificationType } from '@portkey/types/verifier';
-import { useAppDispatch } from 'store/hooks';
+import { useAppCommonDispatch } from '..';
 import { useCurrentChain } from './chainList';
 import { getChainListAsync } from '@portkey/store/store-ca/wallet/actions';
 export function useIntervalQueryCAInfoByAddress(network: NetworkType, address?: string) {
   const [info, setInfo] = useState<{ [address: string]: CAInfoType }>();
-  const dispatch = useAppDispatch();
+  const dispatch = useAppCommonDispatch();
   const chainInfo = useCurrentChain('AELF');
   const caInfo = useMemo(() => (address && info ? info?.[address + network] : undefined), [info, address]);
   useInterval(
