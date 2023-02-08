@@ -48,7 +48,7 @@ function SignupEmail() {
       }
       await getVerifierServers(_chainInfo);
       try {
-        const guardiansInfo = await getGuardiansInfo({ loginAccount: email });
+        const guardiansInfo = await getGuardiansInfo({ loginAccount: email }, _chainInfo);
         if (guardiansInfo.guardianAccounts) {
           Loading.hide();
           return setErrorMessage(EmailError.alreadyRegistered);
