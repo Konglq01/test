@@ -409,5 +409,5 @@
   "Resend after": "Resend after {{timer}}s",
   "guardianApprovalTip": "You will need a certain number of guardians to confirm your action. The requirements differ depending on your guardian counts. ",
   "verificationCodeTip": "{{verifier}} will send a verification code to",
-  "returnTip": "After returning, you will need to re-select the operator and re-do the code verification."
+  "returnTip": "Are you sure you want to leave this page? All changes will not be saved."
 }
