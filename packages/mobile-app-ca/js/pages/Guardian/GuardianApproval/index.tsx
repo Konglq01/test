@@ -37,6 +37,7 @@ type RouterParams = {
   approvalType: ApprovalType;
   guardianItem?: UserGuardianItem;
   verifierInfo?: VerifierInfo;
+  verifiedTime?: number;
 };
 export default function GuardianApproval() {
   const {
@@ -45,6 +46,7 @@ export default function GuardianApproval() {
     approvalType = ApprovalType.register,
     guardianItem,
     verifierInfo,
+    verifiedTime,
   } = useRouterParams<RouterParams>();
   const dispatch = useAppDispatch();
 
@@ -103,6 +105,7 @@ export default function GuardianApproval() {
     const expiredTimer = setInterval(() => {
       if (guardianExpiredTime.current && new Date().getTime() > guardianExpiredTime.current) setIsExpired(true);
     }, 1000);
+    if (verifiedTime) guardianExpiredTime.current = verifiedTime + GUARDIAN_EXPIRED_TIME;
     return () => {
       listener.remove();
       expiredTimer && clearInterval(expiredTimer);
