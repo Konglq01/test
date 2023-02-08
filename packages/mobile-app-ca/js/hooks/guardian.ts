@@ -10,9 +10,9 @@ import { ChainItemType } from '@portkey/store/store-ca/wallet/type';
 export const useGetHolderInfo = () => {
   const getCurrentCAViewContract = useGetCurrentCAViewContract();
   return useCallback(
-    async (loginInfo: LoginInfo) => {
+    async (loginInfo: LoginInfo, chainInfo?: ChainItemType) => {
       if (!loginInfo) throw new Error('Could not find accountInfo');
-      const caContract = await getCurrentCAViewContract();
+      const caContract = await getCurrentCAViewContract(chainInfo);
       return caContract?.callViewMethod('GetHolderInfo', {
         caHash: loginInfo.caHash,
         loginGuardianAccount: loginInfo.loginAccount,
@@ -25,8 +25,8 @@ export const useGetHolderInfo = () => {
 export const useGetGuardiansInfo = () => {
   const getHolderInfo = useGetHolderInfo();
   return useCallback(
-    async (loginInfo: LoginInfo) => {
-      const res = await getHolderInfo(loginInfo);
+    async (loginInfo: LoginInfo, chainInfo?: ChainItemType) => {
+      const res = await getHolderInfo(loginInfo, chainInfo);
       if (res && !res.error) return res.guardiansInfo;
       throw new Error(checkHolderError(res.error?.message));
     },
@@ -38,8 +38,8 @@ export const useGetGuardiansInfoWriteStore = () => {
   const dispatch = useAppDispatch();
   const getGetGuardiansInfo = useGetGuardiansInfo();
   return useCallback(
-    async (loginInfo: LoginInfo) => {
-      const guardiansInfo = await getGetGuardiansInfo(loginInfo);
+    async (loginInfo: LoginInfo, chainInfo?: ChainItemType) => {
+      const guardiansInfo = await getGetGuardiansInfo(loginInfo, chainInfo);
       dispatch(setGuardiansAction(guardiansInfo));
       return guardiansInfo;
     },
