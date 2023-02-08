@@ -132,8 +132,8 @@ export default function GuardiansView() {
       }
     } catch (error: any) {
       setLoading(false);
-      message.error(contractErrorHandler(error) || error?.type);
-      console.log('---setLoginAccount-error', error);
+      message.error(contractErrorHandler(error?.error || error) || error?.type);
+      console.log('---setLoginAccount-error---', error);
     }
   }, [
     currentChain,
