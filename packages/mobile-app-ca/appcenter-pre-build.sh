@@ -7,3 +7,6 @@ set | egrep -e $ENV_WHITELIST | sed 's/^RN_//g' > .env
 printf "\n.env created with contents:\n\n"
 cat .env
 yarn run prebuild:apk
+
+# check the aelf-sdk version
+sh check-node_modules-hash.sh
