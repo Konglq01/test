@@ -1,4 +1,3 @@
-import { CONTACT_EVENT_TYPE } from '@portkey/constants/contact';
 import type { NetworkType } from '../index';
 export interface AddressItem {
   id: string;
@@ -12,18 +11,14 @@ export interface ContactItemType {
   index: string;
   name: string;
   addresses: AddressItem[];
+  modificationTime: number;
+  isDeleted: boolean;
 }
 
-export type FetchContractListApiType = Array<ContactItemType>;
-
-export interface ContactEventItem {
-  type: CONTACT_EVENT_TYPE;
-  contactId: ContactItemType['id'];
-  updateTime: number;
-  contact?: ContactItemType;
-}
-
-export type GetContactEventListApiType = Array<ContactEventItem>;
+export type GetContractListApiType = {
+  totalCount: number;
+  items: Array<ContactItemType>;
+};
 
 export interface RecentContactItemType extends ContactItemType {
   transferTime: String | number;

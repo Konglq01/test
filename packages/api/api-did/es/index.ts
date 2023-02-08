@@ -3,7 +3,13 @@ import { ESBaseConfig } from './type';
 const Method = 'GET';
 const BaseESUrl = `/api/app/Es/`;
 
-const KeyList = ['getUserTokenList', 'getChainsInfo', 'getRegisterResult', 'getRecoverResult'] as const;
+const KeyList = [
+  'getUserTokenList',
+  'getChainsInfo',
+  'getRegisterResult',
+  'getRecoverResult',
+  'getContactList',
+] as const;
 
 const ApiObject: Record<typeof KeyList[number], ESBaseConfig> = {
   getUserTokenList: {
@@ -12,7 +18,7 @@ const ApiObject: Record<typeof KeyList[number], ESBaseConfig> = {
       method: Method,
       params: {
         filter: '(token.symbol:ELF AND token.chainId:AELF) OR token.symbol:READ',
-        fort: 'token.symbol.keyword',
+        sort: 'token.symbol.keyword',
         sortType: 0,
       },
     },
@@ -28,6 +34,12 @@ const ApiObject: Record<typeof KeyList[number], ESBaseConfig> = {
   getRecoverResult: {
     target: `${BaseESUrl}accountrecoverindex`,
     config: { method: Method },
+  },
+  getContactList: {
+    target: `${BaseESUrl}contactindex`,
+    config: {
+      method: Method,
+    },
   },
 };
 

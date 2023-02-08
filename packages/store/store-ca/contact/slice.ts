@@ -21,7 +21,7 @@ export const contactSlice = createSlice({
   reducers: {},
   extraReducers: builder => {
     builder
-      // fetchContactList
+      // getContactList
       .addCase(fetchContractListAsync.fulfilled, (state, action) => {
         const { isInit, lastModified, contactIndexList, eventList } = action.payload;
         if (isInit && contactIndexList !== undefined) {
