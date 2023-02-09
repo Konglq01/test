@@ -1,4 +1,4 @@
-import { CONTACT_API_FETCH_SIZE } from '@portkey/constants/contact';
+import { CONTACT_API_FETCH_SIZE } from '@portkey/constants/constants-ca/contact';
 import {
   getContactList as getContactListEs,
   getContactEventList as getContactEventListEs,

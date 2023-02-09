@@ -11,7 +11,7 @@ import { useCallback, useRef } from 'react';
 import { useAppDispatch } from 'store/hooks';
 import useBiometricsReady from './useBiometrics';
 import navigationService from 'utils/navigationService';
-import { onResultFail, TimerResult, IntervalGetResultParams, intervalGetResult } from 'utils/wallet';
+import { onResultFail, TimerResult, IntervalGetResultParams, intervalGetResult, getDeviceType } from 'utils/wallet';
 import CommonToast from 'components/CommonToast';
 import useEffectOnce from './useEffectOnce';
 import { setCredentials } from 'store/user/actions';
@@ -53,7 +53,7 @@ export function useOnManagerAddressAndQueryResult() {
         let data: any = {
           loginGuardianAccount: managerInfo.loginAccount,
           managerAddress: tmpWalletInfo.address,
-          deviceString: new Date().getTime().toString(),
+          deviceString: `${getDeviceType()},${Date.now()}`,
           context: {
             clientId: tmpWalletInfo.address,
             requestId: tmpWalletInfo.address,
