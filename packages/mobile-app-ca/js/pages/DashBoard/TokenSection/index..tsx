@@ -12,6 +12,7 @@ import TokenListItem from 'components/TokenListItem';
 import { useLanguage } from 'i18n/hooks';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { fetchTokenList } from '@portkey/store/store-ca/assets/api';
+import CommonToast from 'components/CommonToast';
 
 const mockData = {
   items: [
@@ -70,6 +71,8 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
   const { accountToken } = useAppCASelector(state => state.assets);
 
   const onNavigate = useCallback((tokenInfo: TokenItemShowType) => {
+    return CommonToast.text('Coming soon. Check back here for updates');
+
     navigationService.navigate('TokenDetail', { tokenInfo });
   }, []);
 
@@ -113,6 +116,8 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
           <TouchableOpacity
             style={styles.addWrap}
             onPress={() => {
+              return CommonToast.text('Coming soon. Check back here for updates');
+
               navigationService.navigate('ManageTokenList');
             }}>
             <Svg icon="add-token" size={20} />

@@ -6,6 +6,7 @@ import navigationService from 'utils/navigationService';
 import { StyleSheet } from 'react-native';
 import { defaultColors } from 'assets/theme';
 import { useLanguage } from 'i18n/hooks';
+import CommonToast from 'components/CommonToast';
 
 const list: ListItemProps[] = [
   {
@@ -13,7 +14,7 @@ const list: ListItemProps[] = [
     // TODO: remove disable
     // onPress: () => navigationService.navigate('CheckPin'),
     onPress: () => {
-      //
+      return CommonToast.text('Coming soon. Check back here for updates');
     },
   },
 ];
@@ -35,6 +36,7 @@ export default function AccountSettings() {
           title={t('Biometric Authentication')}
           // TODO: remove disable
           // onPress={() => navigationService.navigate('Biometric')}
+          onPress={() => CommonToast.text('Coming soon. Check back here for updates')}
         />
       )}
     </PageContainer>

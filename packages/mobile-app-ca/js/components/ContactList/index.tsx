@@ -20,6 +20,7 @@ import GStyles from 'assets/theme/GStyles';
 import { ViewStyleType } from 'types/styles';
 import { getAelfAddress } from '@portkey/utils/aelf';
 import { transContactsToIndexes } from '@portkey/store/store-ca/contact/utils';
+import CommonToast from 'components/CommonToast';
 
 interface ContactsListProps {
   isIndexBarShow?: boolean;
@@ -159,7 +160,8 @@ const ContactsList: React.FC<ContactsListProps> = ({
           type="solid"
           containerStyle={contactListStyles.addButtonWrap}
           buttonStyle={[contactListStyles.addButton]}
-          onPress={() => navigationService.navigate('ContactEdit')}>
+          onPress={() => CommonToast.text('Coming soon. Check back here for updates')}>
+          {/* onPress={() => navigationService.navigate('ContactEdit')}> */}
           <Svg icon="add1" size={pTd(16)} color={defaultColors.icon2} />
           <Text style={contactListStyles.addText}>{t('Add New Contacts')}</Text>
         </CommonButton>
