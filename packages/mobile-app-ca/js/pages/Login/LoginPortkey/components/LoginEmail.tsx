@@ -45,7 +45,7 @@ export default function LoginEmail({ setLoginType }: { setLoginType: (type: Logi
         if (Array.isArray(chainList.payload)) _chainInfo = chainList.payload[1];
       }
       const verifierServers = await getVerifierServers(_chainInfo);
-      const holderInfo = await getGuardiansInfoWriteStore({ loginAccount });
+      const holderInfo = await getGuardiansInfoWriteStore({ loginAccount }, _chainInfo);
       navigationService.navigate('GuardianApproval', {
         loginAccount,
         userGuardiansList: handleUserGuardiansList(holderInfo, verifierServers),

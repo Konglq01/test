@@ -5,7 +5,7 @@ import { NetworkType } from '@portkey/types';
 import { useState, useMemo } from 'react';
 import { CAInfoType, ManagerInfo } from '@portkey/types/types-ca/wallet';
 import { VerificationType } from '@portkey/types/verifier';
-import { useAppCommonDispatch } from '..';
+import { useAppCommonDispatch } from '../index';
 import { useCurrentChain } from './chainList';
 import { getChainListAsync } from '@portkey/store/store-ca/wallet/actions';
 export function useIntervalQueryCAInfoByAddress(network: NetworkType, address?: string) {
