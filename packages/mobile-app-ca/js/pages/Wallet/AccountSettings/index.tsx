@@ -10,7 +10,11 @@ import { useLanguage } from 'i18n/hooks';
 const list: ListItemProps[] = [
   {
     title: 'Change Pin',
-    onPress: () => navigationService.navigate('CheckPin'),
+    // TODO: remove disable
+    // onPress: () => navigationService.navigate('CheckPin'),
+    onPress: () => {
+      //
+    },
   },
 ];
 
@@ -29,7 +33,8 @@ export default function AccountSettings() {
         <ListItem
           style={styles.listStyle}
           title={t('Biometric Authentication')}
-          onPress={() => navigationService.navigate('Biometric')}
+          // TODO: remove disable
+          // onPress={() => navigationService.navigate('Biometric')}
         />
       )}
     </PageContainer>
