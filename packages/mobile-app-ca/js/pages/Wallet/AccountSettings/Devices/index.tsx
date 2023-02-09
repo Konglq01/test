@@ -1,41 +1,22 @@
 import PageContainer from 'components/PageContainer';
 import { useLanguage } from 'i18n/hooks';
-import React, { useCallback } from 'react';
+import React from 'react';
 import { pTd } from 'utils/unit';
 import { StyleSheet, View } from 'react-native';
 import GStyles from 'assets/theme/GStyles';
-import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { TextM, TextS, TextXL } from 'components/CommonText';
 import Touchable from 'components/Touchable';
 import { defaultColors } from 'assets/theme';
 import { FontStyles } from 'assets/theme/styles';
 import Svg, { IconName } from 'components/Svg';
-import { changeNetworkType } from '@portkey/store/store-ca/wallet/actions';
-import { NetworkItem } from '@portkey/types/types-ca/network';
-import { useNetworkList } from '@portkey/hooks/hooks-ca/network';
-import { DeviceType, DEVICE_TYPE_INFO } from '@portkey/constants/constants-ca/wallet';
-
-const deviceList = [
-  {
-    type: DeviceType.mac,
-    info: DEVICE_TYPE_INFO[DeviceType.mac],
-  },
-  {
-    type: DeviceType.windows,
-    info: DEVICE_TYPE_INFO[DeviceType.windows],
-  },
-  {
-    type: DeviceType.ios,
-    info: DEVICE_TYPE_INFO[DeviceType.ios],
-  },
-  {
-    type: DeviceType.android,
-    info: DEVICE_TYPE_INFO[DeviceType.android],
-  },
-];
+import { useCurrentWalletInfo, useDeviceList } from '@portkey/hooks/hooks-ca/wallet';
+import { formatTransferTime } from 'utils';
 
 const Devices: React.FC = () => {
   const { t } = useLanguage();
+  const deviceList = useDeviceList();
+  const walletInfo = useCurrentWalletInfo();
+  console.log('deviceList', deviceList);
 
   return (
     <PageContainer
@@ -48,11 +29,13 @@ const Devices: React.FC = () => {
         <Touchable key={idx}>
           <View style={styles.deviceItemWrap}>
             <View style={styles.deviceItemInfoWrap}>
-              <Svg icon={item.info.icon as IconName} size={pTd(16)} color={defaultColors.icon1} />
-              <TextXL style={GStyles.marginLeft(10)}>{item.info.name}</TextXL>
-              <TextS style={styles.currentWrap}>Current</TextS>
+              <Svg icon={item.deviceTypeInfo.icon as IconName} size={pTd(16)} color={defaultColors.icon1} />
+              <TextXL style={GStyles.marginLeft(10)}>{item.deviceTypeInfo.name}</TextXL>
+              {walletInfo.address === item.managerAddress && <TextS style={styles.currentWrap}>Current</TextS>}
             </View>
-            <TextM style={[GStyles.marginLeft(26), FontStyles.font7]}>Jul 6 at 5:20pm</TextM>
+            <TextM style={[GStyles.marginLeft(26), FontStyles.font7]}>
+              {item.loginTime ? formatTransferTime(item.loginTime) : ''}
+            </TextM>
           </View>
         </Touchable>
       ))}

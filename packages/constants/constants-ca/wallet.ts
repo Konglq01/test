@@ -1,11 +1,10 @@
-export enum DeviceType {
-  mac,
-  ios,
-  windows,
-  android,
-}
+import { DeviceType, DeviceTypeInfo } from '@portkey/types/types-ca/wallet';
 
-export const DEVICE_TYPE_INFO: Record<DeviceType, { name: string; icon: string }> = {
+export const DEVICE_TYPE_INFO: Record<DeviceType, DeviceTypeInfo> = {
+  [DeviceType.other]: {
+    name: 'Other',
+    icon: 'desk-mac',
+  },
   [DeviceType.mac]: {
     name: 'macOS',
     icon: 'desk-mac',

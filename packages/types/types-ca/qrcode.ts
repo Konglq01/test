@@ -1,4 +1,5 @@
 import { ChainType, NetworkType } from '..';
+import { DeviceType } from './wallet';
 
 export interface QRData {
   type: 'login' | 'send';
@@ -9,6 +10,7 @@ export interface QRData {
 
 export interface LoginQRData extends QRData {
   type: 'login';
+  deviceType: DeviceType;
 }
 
 export interface SendTokenQRData extends QRData {

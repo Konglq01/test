@@ -10,5 +10,8 @@
     "build": "tsc",
     "start": "tsc --watch",
     "handle-network": "cd ./scripts && node handleNetwork.js && cd .."
+  },
+  "dependencies": {
+    "@portkey/types": "0.0.1"
   }
 }

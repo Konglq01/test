@@ -64,3 +64,22 @@ export interface CaAccountRecoverResult {
   requestId: string;
   body: RecoverBody;
 }
+
+export enum DeviceType {
+  other,
+  mac,
+  ios,
+  windows,
+  android,
+}
+
+export interface DeviceTypeInfo {
+  name: string;
+  icon: string;
+}
+export interface DeviceItemType {
+  deviceType: DeviceType;
+  managerAddress?: string | null;
+  loginTime?: number;
+  deviceTypeInfo: DeviceTypeInfo;
+}
