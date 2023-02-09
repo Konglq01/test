@@ -1,4 +1,4 @@
-import { NetworkList } from '@portkey/constants/constants-ca/network';
+import { DefaultChainId, NetworkList } from '@portkey/constants/constants-ca/network';
 import { ChainId, NetworkType } from '@portkey/types';
 import { CAInfo, CAInfoType, ManagerInfo } from '@portkey/types/types-ca/wallet';
 import { WalletInfoType } from '@portkey/types/wallet';
@@ -87,7 +87,8 @@ export const getChainListAsync = createAsyncThunk(
     const baseUrl = NetworkList.find(item => item.networkType === _networkType)?.apiUrl;
     if (!baseUrl) throw Error('Unable to obtain the corresponding network');
     const response = await getChainList({ baseUrl });
-    if (!response) throw Error('No data');
-    dispatch(setChainListAction({ chainList: response, networkType: _networkType }));
+    if (!response?.items) throw Error('No data');
+    dispatch(setChainListAction({ chainList: response.items, networkType: _networkType }));
+    return [response.items, response.items.find((item: any) => item.chainId === DefaultChainId)];
   },
 );

@@ -66,12 +66,12 @@ export default function LockPage({ header, onUnLockHandler, ...props }: LockPage
           header
         ) : (
           <div className="lock-page-header">
-            <CustomSvg type="PortKey" style={{ width: 31, height: 32 }} />
+            <CustomSvg type="PortKey" />
           </div>
         )}
         <div className="lock-page-content">
           <div className="logo-wrapper">
-            <CustomSvg type="PortKey" style={{ width: 85, height: 88 }} />
+            <CustomSvg type="PortKey" />
             <h1>{t('Welcome back!')}</h1>
           </div>
           <Form

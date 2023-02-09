@@ -10,6 +10,7 @@ import { getDefaultWallet } from 'utils/aelfUtils';
 import AElf from 'aelf-sdk';
 import { useCredentials } from './store';
 import { ContractBasic } from 'utils/contract';
+import { ChainItemType } from '@portkey/store/store-ca/wallet/type';
 
 export function useGetCurrentCAViewContract(chainId: ChainId = 'AELF') {
   const chainInfo = useCurrentChain(chainId);
@@ -20,19 +21,22 @@ export function useGetCurrentCAViewContract(chainId: ChainId = 'AELF') {
     return viewContracts?.[chainInfo.caContractAddress];
   }, [chainInfo?.caContractAddress, viewContracts]);
 
-  return useCallback(async () => {
-    if (caContract) return caContract;
-    if (!chainInfo) throw Error('Could not find chain information');
-    const contract = await getELFContract({
-      contractAddress: chainInfo.caContractAddress,
-      rpcUrl: chainInfo.endPoint,
-      account: getDefaultWallet(),
-    });
-    dispatch(setViewContract({ [chainInfo.caContractAddress]: contract as ContractBasic }));
-    console.log(contract, '====contract');
+  return useCallback(
+    async (paramChainInfo?: ChainItemType) => {
+      if (caContract) return caContract;
+      const _chainInfo = paramChainInfo || chainInfo;
+      if (!_chainInfo) throw Error('Could not find chain information');
+      const contract = await getELFContract({
+        contractAddress: _chainInfo.caContractAddress,
+        rpcUrl: _chainInfo.endPoint,
+        account: getDefaultWallet(),
+      });
+      dispatch(setViewContract({ [_chainInfo.caContractAddress]: contract as ContractBasic }));
 
-    return contract as ContractBasic;
-  }, [caContract, chainInfo, dispatch]);
+      return contract as ContractBasic;
+    },
+    [caContract, chainInfo, dispatch],
+  );
 }
 
 export function useGetCurrentCAContract(chainId: ChainId = 'AELF') {

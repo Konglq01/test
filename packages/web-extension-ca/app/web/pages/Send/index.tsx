@@ -7,7 +7,7 @@ import CustomSvg from 'components/CustomSvg';
 import TitleWrapper from 'components/TitleWrapper';
 import { ReactElement, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { useDebounce } from 'react-use';
 import { useContact, useWalletInfo } from 'store/Provider/hooks';
 import AddressSelector from './components/AddressSelector';
@@ -66,7 +66,7 @@ export default function Send() {
     () => {
       const value = getAelfAddress(toAccount.address);
       const searchResult: ContactItemType[] = [];
-      contactIndexList.forEach(({ index, contacts }) => {
+      contactIndexList.forEach(({ contacts }) => {
         searchResult.push(
           ...contacts.filter(
             (contact) =>

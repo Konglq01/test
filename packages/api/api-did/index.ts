@@ -2,8 +2,10 @@ import walletApi from './wallet';
 import verificationApi from './verification';
 import contactApi from './contact';
 import chainApi from './chain';
-import myServer from './server';
-import { API_REQ_FUNCTION } from './types';
+import esApi from './es';
+import myServer from '../server';
+import { API_REQ_FUNCTION } from '../types';
+import { ES_API_REQ_FUNCTION } from './es/type';
 
 export const DEFAULT_METHOD = 'POST';
 
@@ -23,7 +25,12 @@ export const DEFAULT_METHOD = 'POST';
 
 export const BASE_APIS = {};
 
-export const EXPAND_APIS = { wallet: walletApi, verify: verificationApi, contact: contactApi, chain: chainApi };
+export const EXPAND_APIS = {
+  wallet: walletApi,
+  verify: verificationApi,
+  contact: contactApi,
+  chain: chainApi,
+};
 
 export type BASE_REQ_TYPES = {
   [x in keyof typeof BASE_APIS]: API_REQ_FUNCTION;
@@ -35,13 +42,20 @@ export type EXPAND_REQ_TYPES = {
   };
 };
 
-console.log(myServer, 'myServer===ServiceInit');
+export type ES_REQ_TYPES = Record<keyof typeof esApi, ES_API_REQ_FUNCTION>;
+
+myServer.parseRouter('es', esApi as any);
+
 myServer.parseRouter('base', BASE_APIS);
 
 Object.entries(EXPAND_APIS).forEach(([key, value]) => {
   myServer.parseRouter(key, value as any);
 });
 
-const request = myServer as unknown as BASE_REQ_TYPES & EXPAND_REQ_TYPES;
+export interface IRequest extends BASE_REQ_TYPES, EXPAND_REQ_TYPES {
+  es: ES_REQ_TYPES;
+}
+
+const request = myServer as unknown as IRequest;
 
 export { request };

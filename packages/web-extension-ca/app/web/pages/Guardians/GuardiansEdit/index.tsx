@@ -19,6 +19,7 @@ import { LoginType } from '@portkey/types/types-ca/wallet';
 import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
 import { VerifierItem } from '@portkey/types/verifier';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
+import { contractErrorHandler } from 'utils/tryErrorHandler';
 
 export default function GuardiansEdit() {
   const { t } = useTranslation();
@@ -27,7 +28,8 @@ export default function GuardiansEdit() {
   const { verifierMap } = useGuardiansInfo();
   const [removeOpen, setRemoveOpen] = useState<boolean>();
   const [removeClose, setRemoveClose] = useState<boolean>(false);
-  const [selectVal, setSelectVal] = useState<string>(opGuardian?.verifier?.name as string);
+  const [selectVal, setSelectVal] = useState<string>(opGuardian?.verifier?.id as string);
+  const [selectName, setSelectName] = useState<string>(opGuardian?.verifier?.name as string);
   const [exist, setExist] = useState<boolean>(false);
   const { walletInfo } = useCurrentWallet();
   const userGuardianList = useGuardianList();
@@ -37,7 +39,7 @@ export default function GuardiansEdit() {
   const selectOptions = useMemo(
     () =>
       Object.values(verifierMap ?? {})?.map((item: VerifierItem) => ({
-        value: item.name,
+        value: item.id,
         children: (
           <div className="flex verifier-option">
             <BaseVerifierIcon width={32} height={32} src={item.imageUrl} />
@@ -48,30 +50,34 @@ export default function GuardiansEdit() {
     [verifierMap],
   );
 
-  const disabled = useMemo(() => exist || selectVal === preGuardian?.verifier?.name, [exist, selectVal, preGuardian]);
+  const disabled = useMemo(() => exist || selectVal === preGuardian?.verifier?.id, [exist, selectVal, preGuardian]);
 
   const targetVerifier = useCallback(
-    () => Object.values(verifierMap ?? {})?.filter((item: VerifierItem) => item.name === selectVal),
+    () => Object.values(verifierMap ?? {})?.filter((item: VerifierItem) => item.id === selectVal),
     [selectVal, verifierMap],
   );
 
-  const handleChange = useCallback((value: string) => {
-    setExist(false);
-    setSelectVal(value);
-  }, []);
+  const handleChange = useCallback(
+    (value: string) => {
+      setExist(false);
+      setSelectVal(value);
+      setSelectName(verifierMap?.[value]?.name || '');
+    },
+    [verifierMap],
+  );
 
   const guardiansChangeHandler = useCallback(async () => {
     const flag: boolean =
       Object.values(userGuardiansList ?? {})?.some((item) => {
-        return item.key === `${currentGuardian?.loginGuardianType}&${selectVal}`;
+        return item.key === `${currentGuardian?.guardianAccount}&${selectName}`;
       }) ?? false;
     setExist(flag);
     if (flag) return;
     try {
       dispatch(
         setLoginAccountAction({
-          loginGuardianType: opGuardian?.loginGuardianType as string,
-          accountLoginType: opGuardian?.guardiansType as LoginType,
+          guardianAccount: opGuardian?.guardianAccount as string,
+          loginType: opGuardian?.guardianType as LoginType,
         }),
       );
       setLoading(true);
@@ -79,11 +85,11 @@ export default function GuardiansEdit() {
       await userGuardianList({ caHash: walletInfo.caHash });
       dispatch(
         setOpGuardianAction({
-          key: `${currentGuardian?.loginGuardianType}&${selectVal}`,
+          key: `${currentGuardian?.guardianAccount}&${selectName}`,
           verifier: targetVerifier()?.[0],
           isLoginAccount: opGuardian?.isLoginAccount,
-          loginGuardianType: opGuardian?.loginGuardianType as string,
-          guardiansType: opGuardian?.guardiansType as LoginType,
+          guardianAccount: opGuardian?.guardianAccount as string,
+          guardianType: opGuardian?.guardianType as LoginType,
         }),
       );
       setLoading(false);
@@ -91,14 +97,14 @@ export default function GuardiansEdit() {
     } catch (error: any) {
       setLoading(false);
       console.log('---edit-guardian-error', error);
-      message.error(error?.Error?.Message || error.message?.Message || error?.message);
+      message.error(contractErrorHandler(error));
     }
   }, [
     currentGuardian,
     dispatch,
     navigate,
     opGuardian,
-    selectVal,
+    selectName,
     setLoading,
     targetVerifier,
     userGuardianList,
@@ -117,8 +123,8 @@ export default function GuardiansEdit() {
   const removeHandler = useCallback(async () => {
     dispatch(
       setLoginAccountAction({
-        loginGuardianType: opGuardian?.loginGuardianType as string,
-        accountLoginType: opGuardian?.guardiansType as LoginType,
+        guardianAccount: opGuardian?.guardianAccount as string,
+        loginType: opGuardian?.guardianType as LoginType,
       }),
     );
     dispatch(resetUserGuardianStatus());
@@ -127,8 +133,8 @@ export default function GuardiansEdit() {
       setCurrentGuardianAction({
         isLoginAccount: opGuardian?.isLoginAccount,
         verifier: opGuardian?.verifier,
-        loginGuardianType: opGuardian?.loginGuardianType as string,
-        guardiansType: opGuardian?.guardiansType as LoginType,
+        guardianAccount: opGuardian?.guardianAccount as string,
+        guardianType: opGuardian?.guardianType as LoginType,
         key: opGuardian?.key as string,
       }),
     );
@@ -148,7 +154,7 @@ export default function GuardiansEdit() {
       </div>
       <div className="input-item">
         <p className="label">{t('Guardian Type')}</p>
-        <p className="control">{currentGuardian?.loginGuardianType}</p>
+        <p className="control">{currentGuardian?.guardianAccount}</p>
       </div>
       <div className="input-item">
         <p className="label">{t('Verifier')}</p>

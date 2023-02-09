@@ -4,14 +4,15 @@ import NFTSection from '../NFTSection/index.';
 import CommonTopTab from 'components/CommonTopTab';
 
 import { useLanguage } from 'i18n/hooks';
-
+import { useCurrentELFBalances } from '@portkey/hooks/hooks-ca/balances';
+import { TextTitle } from 'components/CommonText';
 type DashBoardTabProps = {
   getAccountBalance?: () => void;
 };
 
 const DashBoardTab: React.FC<DashBoardTabProps> = (props: DashBoardTabProps) => {
   const { t } = useLanguage();
-
+  const balance = useCurrentELFBalances(__DEV__);
   const tabList = useMemo(() => {
     return [
       {
@@ -24,8 +25,7 @@ const DashBoardTab: React.FC<DashBoardTabProps> = (props: DashBoardTabProps) => 
       },
     ];
   }, [props, t]);
-
+  if (__DEV__) return <TextTitle selectable>{balance}</TextTitle>;
   return <CommonTopTab hasTabBarBorderRadius tabList={tabList} />;
 };
-
 export default DashBoardTab;

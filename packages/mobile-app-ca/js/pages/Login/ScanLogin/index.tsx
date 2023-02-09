@@ -27,8 +27,8 @@ export default function ScanLogin() {
   const onLogin = useCallback(async () => {
     if (!caHash || loading) return;
     try {
-      const contract = await getCurrentCAContract();
       setLoading(true);
+      const contract = await getCurrentCAContract();
       const req = await addManager({ contract, caHash, address, managerAddress });
       if (req?.error) throw req?.error;
       navigationService.navigate('Tab');

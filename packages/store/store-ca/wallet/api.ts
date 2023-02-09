@@ -1,11 +1,8 @@
-import { request } from '@portkey/api';
+import { request } from '@portkey/api/api-did';
 
 export const getChainList = ({ baseUrl }: { baseUrl: string }) => {
   try {
-    return request.chain.getChains({
-      baseURL: baseUrl,
-      method: 'get',
-    });
+    return request.es.getChainsInfo({ baseURL: baseUrl });
   } catch (error: any) {
     if (error?.type) throw Error(error.type);
     if (error?.error?.message) throw Error(error.error.message);

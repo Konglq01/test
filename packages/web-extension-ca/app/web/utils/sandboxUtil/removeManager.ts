@@ -13,7 +13,7 @@ export const removeManager = async ({
   address: string;
   chainType: ChainType;
   privateKey: string;
-  paramsOption: { caHash: string; manager: { managerAddress: string; deviceString: number } };
+  paramsOption: { caHash: string; manager: { managerAddress: string; deviceString: string } };
 }) => {
   const resMessage = await SandboxEventService.dispatchAndReceive(SandboxEventTypes.callSendMethod, {
     rpcUrl: rpcUrl,

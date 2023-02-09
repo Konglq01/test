@@ -14,24 +14,20 @@ export const formatDelGuardianValue = ({
   preGuardian?: UserGuardianItem;
 }) => {
   const guardianToRemove: GuardianItem = {
-    guardianType: {
-      type: opGuardian?.guardiansType as LoginType,
-      guardianType: opGuardian?.loginGuardianType as string,
-    },
-    verifier: {
-      name: opGuardian?.verifier?.name as string,
+    type: opGuardian?.guardianType as LoginType,
+    value: opGuardian?.guardianAccount as string,
+    verificationInfo: {
+      id: opGuardian?.verifier?.id as string,
     },
   };
   const guardiansApproved: GuardianItem[] = [];
   Object.values(userGuardianStatus ?? {})?.forEach((item: UserGuardianStatus) => {
     if (item.signature) {
       guardiansApproved.push({
-        guardianType: {
-          type: item.guardiansType,
-          guardianType: item.loginGuardianType,
-        },
-        verifier: {
-          name: item.verifier?.name as string,
+        value: item.guardianAccount,
+        type: item.guardianType,
+        verificationInfo: {
+          id: item.verifier?.id as string,
           signature: Object.values(Buffer.from(item.signature as any, 'hex')),
           verificationDoc: item.verificationDoc as string,
         },

@@ -37,9 +37,9 @@ export function isValidNumber(n: string) {
   return P_N_REG.test(n);
 }
 
-const PASSWORD_REG = /^[a-zA-Z\d! ~@#_^*%/.+:;=\\|，'~{}[\]]{8,16}$/;
+const PASSWORD_REG = /^[a-zA-Z\d! ~@#_^*%/.+:;=\\|,'~{}\[\]]{8,16}$/;
 
-const WALLET_REG = /^[a-zA-Z\d! ~@#_^*%/.+:;=\\|，'~{}[\]]{1,30}$/;
+const WALLET_REG = /^[a-zA-Z\d! ~@#_^*%/.+:;=\\|,'~{}[\]]{1,30}$/;
 
 const CA_WALLET_REG = /^[a-zA-Z\d _]{1,16}$/;
 

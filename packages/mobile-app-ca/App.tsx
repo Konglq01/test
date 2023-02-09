@@ -19,6 +19,7 @@ import AppListener from 'components/AppListener/index';
 import InterfaceProvider from 'contexts/useInterface';
 import GlobalStyleHandler from 'components/GlobalStyleHandler';
 import { lockScreenOrientation } from 'utils/screenOrientation';
+import Updater from 'components/Updater';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -52,6 +53,7 @@ const App = () => {
                   <SafeAreaProvider>
                     <StatusBar {...statusBarProps} />
                     <NavigationRoot />
+                    <Updater />
                   </SafeAreaProvider>
                 </TopView>
               </InterfaceProvider>

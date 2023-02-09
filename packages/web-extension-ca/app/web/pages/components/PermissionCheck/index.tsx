@@ -37,6 +37,7 @@ export default function PermissionCheck({
     () =>
       location.pathname.includes('/login') ||
       location.pathname.includes('/register') ||
+      location.pathname.includes('/success-page') ||
       location.pathname === '/permission',
     [location.pathname],
   );
@@ -44,6 +45,7 @@ export default function PermissionCheck({
   const isRegisterPage = useMemo(
     () =>
       location.pathname.includes('/register') ||
+      location.pathname.includes('/success-page') ||
       ((location.pathname.includes('/query-page') || location.pathname.includes('/login')) && pageType === 'Popup'),
     [location.pathname, pageType],
   );

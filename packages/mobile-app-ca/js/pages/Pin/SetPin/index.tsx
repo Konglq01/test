@@ -6,10 +6,21 @@ import useRouterParams from '@portkey/hooks/useRouterParams';
 import ActionSheet from 'components/ActionSheet';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { CAInfoType, ManagerInfo } from '@portkey/types/types-ca/wallet';
-import { VerificationType } from '@portkey/types/verifier';
+import { VerificationType, VerifierInfo } from '@portkey/types/verifier';
 import myEvents from 'utils/deviceEvent';
 import { AElfWallet } from '@portkey/types/aelf';
 import PinContainer from 'components/PinContainer';
+import { GuardiansApproved } from 'pages/Guardian/types';
+
+type RouterParams = {
+  oldPin?: string;
+  managerInfo?: ManagerInfo;
+  caInfo?: CAInfoType;
+  walletInfo?: AElfWallet;
+  verifierInfo?: VerifierInfo;
+  guardiansApproved?: GuardiansApproved;
+};
+
 const scrollViewProps = {};
 const MessageMap: any = {
   [VerificationType.register]: 'Are you sure you want to leave this page? All changes will not be saved.',
@@ -23,13 +34,7 @@ const RouterMap: any = {
   [VerificationType.addManager]: 'LoginPortkey',
 };
 export default function SetPin() {
-  const { oldPin, managerInfo, guardianCount, caInfo, walletInfo } = useRouterParams<{
-    oldPin?: string;
-    managerInfo?: ManagerInfo;
-    guardianCount?: number;
-    caInfo?: CAInfoType;
-    walletInfo?: AElfWallet;
-  }>();
+  const { oldPin, managerInfo, caInfo, walletInfo, verifierInfo, guardiansApproved } = useRouterParams<RouterParams>();
   const digitInput = useRef<DigitInputInterface>();
   useEffectOnce(() => {
     const listener = myEvents.clearSetPin.addListener(() => digitInput.current?.reset());
@@ -69,7 +74,15 @@ export default function SetPin() {
         ref={digitInput}
         title={oldPin ? 'Please enter a new pin' : 'Enter pin to protect your device'}
         onFinish={pin => {
-          navigationService.navigate('ConfirmPin', { oldPin, pin, managerInfo, guardianCount, walletInfo, caInfo });
+          navigationService.navigate('ConfirmPin', {
+            oldPin,
+            pin,
+            managerInfo,
+            walletInfo,
+            caInfo,
+            verifierInfo,
+            guardiansApproved,
+          });
         }}
       />
     </PageContainer>

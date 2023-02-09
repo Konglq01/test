@@ -3,68 +3,67 @@ import { useAppDispatch } from 'store/hooks';
 import { useGetCurrentCAViewContract } from './contract';
 import { setGuardiansAction, setVerifierListAction } from '@portkey/store/store-ca/guardians/actions';
 import { LoginInfo } from 'types/wallet';
-import { EmailError } from '@portkey/utils/check';
+import { checkHolderError } from '@portkey/utils/check';
 import { VerifierItem } from '@portkey/types/verifier';
+import { ChainItemType } from '@portkey/store/store-ca/wallet/type';
 
-// TODO: adjust this hooks name
-export const useGetGuardiansList = () => {
+export const useGetHolderInfo = () => {
   const getCurrentCAViewContract = useGetCurrentCAViewContract();
-  const getGuardiansList = useCallback(
-    async (loginAccount: LoginInfo) => {
-      if (!loginAccount) throw new Error('Could not find accountInfo');
-      const caContract = await getCurrentCAViewContract();
-      const res = await caContract?.callViewMethod('GetHolderInfo', {
-        caHash: loginAccount.caHash,
-        loginGuardianType: loginAccount.loginGuardianType,
+  return useCallback(
+    async (loginInfo: LoginInfo, chainInfo?: ChainItemType) => {
+      if (!loginInfo) throw new Error('Could not find accountInfo');
+      const caContract = await getCurrentCAViewContract(chainInfo);
+      return caContract?.callViewMethod('GetHolderInfo', {
+        caHash: loginInfo.caHash,
+        loginGuardianAccount: loginInfo.loginAccount,
       });
-      console.log(res, '=====res');
-
-      if (!res?.error) {
-        return res.guardiansInfo;
-      } else {
-        if (res.error?.message && res.error.message.includes('Not found ca_hash'))
-          throw new Error(EmailError.noAccount);
-        throw res.error;
-      }
     },
     [getCurrentCAViewContract],
   );
-
-  return getGuardiansList;
 };
 
-export const useGetHolderInfo = () => {
+export const useGetGuardiansInfo = () => {
+  const getHolderInfo = useGetHolderInfo();
+  return useCallback(
+    async (loginInfo: LoginInfo, chainInfo?: ChainItemType) => {
+      const res = await getHolderInfo(loginInfo, chainInfo);
+      if (res && !res.error) return res.guardiansInfo;
+      throw new Error(checkHolderError(res.error?.message));
+    },
+    [getHolderInfo],
+  );
+};
+
+export const useGetGuardiansInfoWriteStore = () => {
   const dispatch = useAppDispatch();
-  const getGuardiansList = useGetGuardiansList();
-  const onGetGuardiansList = useCallback(
-    async (loginAccount: LoginInfo) => {
-      const guardiansInfo = await getGuardiansList(loginAccount);
+  const getGetGuardiansInfo = useGetGuardiansInfo();
+  return useCallback(
+    async (loginInfo: LoginInfo, chainInfo?: ChainItemType) => {
+      const guardiansInfo = await getGetGuardiansInfo(loginInfo, chainInfo);
       dispatch(setGuardiansAction(guardiansInfo));
       return guardiansInfo;
     },
-    [dispatch, getGuardiansList],
+    [dispatch, getGetGuardiansInfo],
   );
-
-  return onGetGuardiansList;
 };
 export const useGetVerifierServers = () => {
   const dispatch = useAppDispatch();
   const getCurrentCAViewContract = useGetCurrentCAViewContract();
-  const getGuardiansList = useCallback(async () => {
-    const caContract = await getCurrentCAViewContract();
-    const res = await caContract?.callViewMethod('GetVerifierServers', '');
-    if (res && !res.error) {
-      const verifierList: VerifierItem[] = res.verifierServers.map((item: any) => ({
-        name: item.name,
-        url: item.endPoints[0],
-        imageUrl: item.imageUrl,
-      }));
-      dispatch(setVerifierListAction(verifierList));
-      return verifierList;
-    } else {
-      throw res?.error || { message: 'Could not find VerifierServers' };
-    }
-  }, [dispatch, getCurrentCAViewContract]);
-
-  return getGuardiansList;
+  return useCallback(
+    async (chainInfo?: ChainItemType) => {
+      const caContract = await getCurrentCAViewContract(chainInfo);
+      const res = await caContract?.callViewMethod('GetVerifierServers', '');
+      if (res && !res.error) {
+        const verifierList: VerifierItem[] = res.verifierServers.map((item: VerifierItem) => ({
+          ...item,
+          url: item.endPoints[0],
+        }));
+        dispatch(setVerifierListAction(verifierList));
+        return verifierList;
+      } else {
+        throw res?.error || { message: 'Could not find VerifierServers' };
+      }
+    },
+    [dispatch, getCurrentCAViewContract],
+  );
 };
