@@ -39,3 +39,15 @@ export const checkPin = (pin: string) => {
   if (!AESEncryptPrivateKey) return false;
   return !!aes.decrypt(AESEncryptPrivateKey, pin);
 };
+
+export const getManagerAccount = (password: string): AElfWallet | undefined => {
+  const walletInfo = getWalletInfo();
+  if (!walletInfo) return;
+
+  // get privateKey
+  const privateKey = aes.decrypt(walletInfo.AESEncryptPrivateKey, password);
+  if (!privateKey) return;
+
+  if (!walletMap[walletInfo.address]) walletMap[walletInfo.address] = AElf.wallet.getWalletByPrivateKey(privateKey);
+  return walletMap[walletInfo.address];
+};

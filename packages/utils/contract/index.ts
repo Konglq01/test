@@ -1,0 +1,120 @@
+import { sleep } from '@portkey/utils';
+import { AElfInterface } from '@portkey/types/aelf';
+import {
+  encodedParams,
+  getContractMethods,
+  getTxResult,
+  handleContractError,
+  handleContractParams,
+  handleFunctionName,
+} from './utils';
+import { ChainType } from '@portkey/types';
+import { encodedTx } from '@portkey/utils/aelf';
+import { AElfCallSendMethod, AElfCallViewMethod, CallSendMethod, CallViewMethod, ContractProps } from './types';
+
+export class ContractBasic {
+  public address?: string;
+  public callContract: WB3ContractBasic | AElfContractBasic;
+  public chainType: ChainType;
+  public rpcUrl: string;
+  constructor(options: ContractProps) {
+    this.address = options.contractAddress;
+    this.rpcUrl = options.rpcUrl;
+    const isELF = true;
+    // TODO :ethereum
+    this.callContract = isELF ? new AElfContractBasic(options) : new WB3ContractBasic();
+    this.chainType = isELF ? 'aelf' : 'ethereum';
+  }
+
+  public callViewMethod: CallViewMethod = async (
+    functionName,
+    paramsOption,
+    callOptions = { defaultBlock: 'latest' },
+  ) => {
+    if (this.callContract instanceof AElfContractBasic)
+      return this.callContract.callViewMethod(functionName, paramsOption);
+  };
+
+  public callSendMethod: CallSendMethod = async (functionName, account, paramsOption, sendOptions) => {
+    if (this.callContract instanceof AElfContractBasic)
+      return this.callContract.callSendMethod(functionName, paramsOption, sendOptions);
+  };
+  public encodedTx: CallViewMethod = async (functionName, paramsOption) => {
+    if (this.callContract instanceof AElfContractBasic) return this.callContract.encodedTx(functionName, paramsOption);
+  };
+}
+
+export class WB3ContractBasic {}
+
+export class AElfContractBasic {
+  public aelfContract: any;
+  public address: string;
+  public aelfInstance?: AElfInterface;
+  constructor(options: ContractProps) {
+    const { aelfContract, contractAddress, aelfInstance } = options;
+    this.address = contractAddress;
+    this.aelfContract = aelfContract;
+    this.aelfInstance = aelfInstance;
+  }
+  public callViewMethod: AElfCallViewMethod = async (functionName, paramsOption) => {
+    const contract = this.aelfContract;
+    if (!contract) return { error: { code: 401, message: 'Contract init error1' } };
+    try {
+      const req = await contract[handleFunctionName(functionName)].call(paramsOption);
+      if (!req?.error && (req?.result || req?.result === null)) return req.result;
+      return req;
+    } catch (error) {
+      return handleContractError(error);
+    }
+  };
+
+  public callSendMethod: AElfCallSendMethod = async (functionName, paramsOption, sendOptions) => {
+    if (!this.aelfContract) return { error: { code: 401, message: 'Contract init error' } };
+    try {
+      const { onMethod = 'receipt' } = sendOptions || {};
+      const _functionName = handleFunctionName(functionName);
+      const _params = await handleContractParams({
+        instance: this.aelfInstance,
+        paramsOption,
+        functionName: _functionName,
+      });
+      console.log(_params, _functionName, '=====_params');
+
+      const req = await this.aelfContract[_functionName](_params);
+
+      const { TransactionId } = req.result || req;
+      if (req.error) return { error: handleContractError(undefined, req), transactionId: TransactionId };
+
+      // receipt
+      if (onMethod === 'receipt') {
+        await sleep(1000);
+        try {
+          return await getTxResult(this.aelfInstance, TransactionId);
+        } catch (error) {
+          return { error: handleContractError(error, req), transactionId: TransactionId };
+        }
+      }
+
+      // transactionHash
+      return { TransactionId };
+    } catch (error) {
+      return { error: handleContractError(error) };
+    }
+  };
+
+  public encodedTx: AElfCallViewMethod = async (functionName, paramsOption) => {
+    if (!this.aelfContract) return { error: { code: 401, message: 'Contract init error' } };
+    if (!this.aelfInstance) return { error: { code: 401, message: 'instance init error' } };
+    try {
+      const raw = await encodedTx({
+        instance: this.aelfInstance,
+        contract: this.aelfContract,
+        functionName,
+        paramsOption,
+      });
+      return raw;
+    } catch (error) {
+      return handleContractError(error);
+    }
+  };
+}

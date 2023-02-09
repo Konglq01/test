@@ -77,11 +77,11 @@ export const sleep = (time: number) => {
 };
 
 export function getExploreLink(
-  exploreUrl: string,
+  explorerUrl: string,
   data: string,
   type: 'transaction' | 'token' | 'address' | 'block' = 'address',
 ): string {
-  const prefix = exploreUrl[exploreUrl.length - 1] !== '/' ? exploreUrl + '/' : exploreUrl;
+  const prefix = explorerUrl[explorerUrl.length - 1] !== '/' ? explorerUrl + '/' : explorerUrl;
   switch (type) {
     case 'transaction': {
       return `${prefix}tx/${data}`;
