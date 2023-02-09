@@ -20,7 +20,7 @@ const getGuardiansApproved = (userGuardiansList: UserGuardianItem[], guardiansSt
     .filter(item => item !== null);
 };
 
-export async function deleteGuardian(
+export function deleteGuardian(
   contract: ContractBasic,
   address: string,
   caHash: string,
@@ -35,25 +35,15 @@ export async function deleteGuardian(
       id: guardianItem.verifier?.id,
     },
   };
-
   const guardiansApproved = getGuardiansApproved(userGuardiansList, guardiansStatus);
-  // TODO: remove console&req in this page
-  // TODO: remove async await
-  console.log('RemoveGuardian', {
+  return contract?.callSendMethod('RemoveGuardian', address, {
     caHash,
     guardianToRemove,
     guardiansApproved: guardiansApproved,
   });
-  const req = await contract?.callSendMethod('RemoveGuardian', address, {
-    caHash,
-    guardianToRemove,
-    guardiansApproved: guardiansApproved,
-  });
-  console.log('RemoveGuardian: req', req);
-  return req;
 }
 
-export async function addGuardian(
+export function addGuardian(
   contract: ContractBasic,
   address: string,
   caHash: string,
@@ -71,24 +61,15 @@ export async function addGuardian(
       verificationDoc: verifierInfo.verificationDoc,
     },
   };
-
   const guardiansApproved = getGuardiansApproved(userGuardiansList, guardiansStatus);
-
-  console.log('AddGuardian', {
+  return contract?.callSendMethod('AddGuardian', address, {
     caHash,
     guardianToAdd: guardianToAdd,
     guardiansApproved: guardiansApproved,
   });
-  const req = await contract?.callSendMethod('AddGuardian', address, {
-    caHash,
-    guardianToAdd: guardianToAdd,
-    guardiansApproved: guardiansApproved,
-  });
-  console.log('AddGuardian: req', req);
-  return req;
 }
 
-export async function editGuardian(
+export function editGuardian(
   contract: ContractBasic,
   address: string,
   caHash: string,
@@ -111,32 +92,22 @@ export async function editGuardian(
       id: guardianItem.verifier?.id,
     },
   };
-
   const guardiansApproved = getGuardiansApproved(userGuardiansList, guardiansStatus);
-
-  console.log('UpdateGuardian', {
+  return contract?.callSendMethod('UpdateGuardian', address, {
     caHash,
     guardianToUpdatePre,
     guardianToUpdateNew,
     guardiansApproved: guardiansApproved,
   });
-  const req = await contract?.callSendMethod('UpdateGuardian', address, {
-    caHash,
-    guardianToUpdatePre,
-    guardianToUpdateNew,
-    guardiansApproved: guardiansApproved,
-  });
-  console.log('UpdateGuardian: req', req);
-  return req;
 }
 
-export async function setLoginAccount(
+export function setLoginAccount(
   contract: ContractBasic,
   address: string,
   caHash: string,
   guardianItem: UserGuardianItem,
 ) {
-  console.log('SetGuardianAccountForLogin', {
+  return contract?.callSendMethod('SetGuardianAccountForLogin', address, {
     caHash,
     guardianAccount: {
       value: guardianItem.guardianAccount,
@@ -148,29 +119,15 @@ export async function setLoginAccount(
       },
     },
   });
-  const req = await contract?.callSendMethod('SetGuardianAccountForLogin', address, {
-    caHash,
-    guardianAccount: {
-      value: guardianItem.guardianAccount,
-      guardian: {
-        type: guardianItem.guardianType,
-        verifier: {
-          id: guardianItem.verifier?.id,
-        },
-      },
-    },
-  });
-  console.log('SetGuardianAccountForLogin: req', req);
-  return req;
 }
 
-export async function cancelLoginAccount(
+export function cancelLoginAccount(
   contract: ContractBasic,
   address: string,
   caHash: string,
   guardianItem: UserGuardianItem,
 ) {
-  console.log('UnsetGuardianAccountForLogin', {
+  return contract?.callSendMethod('UnsetGuardianAccountForLogin', address, {
     caHash,
     guardianAccount: {
       value: guardianItem.guardianAccount,
@@ -182,21 +139,6 @@ export async function cancelLoginAccount(
       },
     },
   });
-
-  const req = await contract?.callSendMethod('UnsetGuardianAccountForLogin', address, {
-    caHash,
-    guardianAccount: {
-      value: guardianItem.guardianAccount,
-      guardian: {
-        type: guardianItem.guardianType,
-        verifier: {
-          id: guardianItem.verifier?.id,
-        },
-      },
-    },
-  });
-  console.log('UnsetGuardianAccountForLogin: req', req);
-  return req;
 }
 
 export function removeManager(contract: ContractBasic, address: string, caHash: string) {
