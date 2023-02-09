@@ -1,23 +1,32 @@
 import { TokenBaseItemType } from '@portkey/types/types-ca/assets';
 import { unitConverter } from '@portkey/utils/converter';
+import { message } from 'antd';
 import CustomSvg from 'components/CustomSvg';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
+// import { useNavigate } from 'react-router';
 import { useWalletInfo } from 'store/Provider/hooks';
+import './index.less';
 
 export default function TokenList({ tokenList }: { tokenList: TokenBaseItemType[] }) {
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const { currentNetwork } = useWalletInfo();
   const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? currentNetwork : ''), [currentNetwork]);
 
-  const onNavigate = useCallback(
-    (tokenInfo: TokenBaseItemType) => {
-      navigate('/token-detail', { state: { tokenInfo } });
-    },
-    [navigate],
-  );
+  const onNavigate = useCallback((tokenInfo: TokenBaseItemType) => {
+    console.log(tokenInfo);
+
+    message.info('Coming soon. Check back here for updates');
+    return;
+    // navigate('/token-detail', { state: { tokenInfo } });
+  }, []);
+
+  const handleAddToken = useCallback(() => {
+    message.info('Coming soon. Check back here for updates');
+    // navigate('/add-token');
+    return;
+  }, []);
 
   return (
     <>
@@ -25,14 +34,14 @@ export default function TokenList({ tokenList }: { tokenList: TokenBaseItemType[
         {tokenList.map((item) => (
           <li className="token-list-item" key={item.token.symbol} onClick={() => onNavigate(item)}>
             {item.token.symbol === 'ELF' ? (
-              <CustomSvg className="token-logo" type="Aelf" style={{ width: 32, height: 32 }} />
+              <CustomSvg className="token-logo" type="Aelf" />
             ) : (
               <div className="token-logo custom-word-logo">{(item.token.symbol && item.token.symbol[0]) || ''}</div>
             )}
             <div className="info">
               <span>{item.token.symbol}</span>
               <span>
-                {item.chainId.toLowerCase() === 'main' ? 'MainChain' : 'SideChain'} {item.chainId} {isTestNet}
+                {item.chainId.toLowerCase() === 'aelf' ? 'MainChain' : 'SideChain'} {item.chainId} {isTestNet}
               </span>
             </div>
             <div className="amount">
@@ -43,8 +52,8 @@ export default function TokenList({ tokenList }: { tokenList: TokenBaseItemType[
         ))}
       </ul>
       <div>
-        <div className="add-token-enter-btn" style={{ textAlign: 'center' }} onClick={() => navigate('/add-token')}>
-          <CustomSvg type="PlusFilled" style={{ width: 20, height: 20 }} />
+        <div className="add-token-enter-btn" onClick={handleAddToken}>
+          <CustomSvg type="PlusFilled" className="plus-filled" />
           <span>{t('Add Tokens')}</span>
         </div>
       </div>
