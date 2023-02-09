@@ -8,89 +8,90 @@ import { pTd } from 'utils/unit';
 import NFTItem from './NFTItem';
 
 const mockData = {
-  items: [
-    {
-      chainId: 'AELF',
-      name: 'Mini Kove',
-      amount: '1000',
-      nftInfo: {
-        nftTokenId: '#1001',
-        tokenHash: 'xxxxx',
-        count: 50,
-        nftProtocolInfo: Array(50)
-          .fill('')
-          .map(ele => ({
-            symbol: 'Mini Kove' + Math.random(),
-            nftType: 'Type',
-            totalSupply: '1000',
-            baseUri: 'baseUri',
-          })),
-        // [
-        //   {
-        //     symbol: 'Mini Kove',
-        //     nftType: 'Type',
-        //     totalSupply: '1000',
-        //     baseUri: 'baseUri',
-        //   },
-        //   {
-        //     symbol: 'Mini Kove1',
-        //     nftType: 'Type',
-        //     totalSupply: '1000',
-        //     baseUri: 'baseUri',
-        //   },
-        //   {
-        //     symbol: 'Mini Kove2',
-        //     nftType: 'Type',
-        //     totalSupply: '1000',
-        //     baseUri: 'baseUri',
-        //   },
-        //   {
-        //     symbol: 'Mini Kove3',
-        //     nftType: 'Type',
-        //     totalSupply: '1000',
-        //     baseUri: 'baseUri',
-        //   },
-        // ],
-      },
-    },
-    {
-      chainId: 'tDVV',
-      name: 'Mini Kove1',
-      amount: '1000',
-      nftInfo: {
-        nftTokenId: '#1002',
-        tokenHash: 'xxxxx',
-        count: 100,
-        nftProtocolInfo: [
-          {
-            symbol: 'Mini Kove',
-            nftType: 'Type',
-            totalSupply: '1000',
-            baseUri: 'baseUri',
-          },
-          {
-            symbol: 'Mini Kove1',
-            nftType: 'Type',
-            totalSupply: '1000',
-            baseUri: 'baseUri',
-          },
-          {
-            symbol: 'Mini Kove3',
-            nftType: 'Type',
-            totalSupply: '1000',
-            baseUri: 'baseUri',
-          },
-          {
-            symbol: 'Mini Kove4',
-            nftType: 'Type',
-            totalSupply: '1000',
-            baseUri: 'baseUri',
-          },
-        ],
-      },
-    },
-  ],
-  totalCount: 3,
+  // items: [
+  //   {
+  //     chainId: 'AELF',
+  //     name: 'Mini Kove',
+  //     amount: '1000',
+  //     nftInfo: {
+  //       nftTokenId: '#1001',
+  //       tokenHash: 'xxxxx',
+  //       count: 50,
+  //       nftProtocolInfo: Array(50)
+  //         .fill('')
+  //         .map(ele => ({
+  //           symbol: 'Mini Kove' + Math.random(),
+  //           nftType: 'Type',
+  //           totalSupply: '1000',
+  //           baseUri: 'baseUri',
+  //         })),
+  //       // [
+  //       //   {
+  //       //     symbol: 'Mini Kove',
+  //       //     nftType: 'Type',
+  //       //     totalSupply: '1000',
+  //       //     baseUri: 'baseUri',
+  //       //   },
+  //       //   {
+  //       //     symbol: 'Mini Kove1',
+  //       //     nftType: 'Type',
+  //       //     totalSupply: '1000',
+  //       //     baseUri: 'baseUri',
+  //       //   },
+  //       //   {
+  //       //     symbol: 'Mini Kove2',
+  //       //     nftType: 'Type',
+  //       //     totalSupply: '1000',
+  //       //     baseUri: 'baseUri',
+  //       //   },
+  //       //   {
+  //       //     symbol: 'Mini Kove3',
+  //       //     nftType: 'Type',
+  //       //     totalSupply: '1000',
+  //       //     baseUri: 'baseUri',
+  //       //   },
+  //       // ],
+  //     },
+  //   },
+  //   {
+  //     chainId: 'tDVV',
+  //     name: 'Mini Kove1',
+  //     amount: '1000',
+  //     nftInfo: {
+  //       nftTokenId: '#1002',
+  //       tokenHash: 'xxxxx',
+  //       count: 100,
+  //       nftProtocolInfo: [
+  //         {
+  //           symbol: 'Mini Kove',
+  //           nftType: 'Type',
+  //           totalSupply: '1000',
+  //           baseUri: 'baseUri',
+  //         },
+  //         {
+  //           symbol: 'Mini Kove1',
+  //           nftType: 'Type',
+  //           totalSupply: '1000',
+  //           baseUri: 'baseUri',
+  //         },
+  //         {
+  //           symbol: 'Mini Kove3',
+  //           nftType: 'Type',
+  //           totalSupply: '1000',
+  //           baseUri: 'baseUri',
+  //         },
+  //         {
+  //           symbol: 'Mini Kove4',
+  //           nftType: 'Type',
+  //           totalSupply: '1000',
+  //           baseUri: 'baseUri',
+  //         },
+  //       ],
+  //     },
+  //   },
+  // ],
+  item: [],
+  totalCount: 0,
 };
 
 type NFTSectionPropsType = {
@@ -143,7 +144,7 @@ export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
 
   return (
     <View style={styles.wrap}>
-      <FlatList
+      {/* <FlatList
         refreshing={refreshing}
         data={NFTList || []}
         renderItem={renderItem}
@@ -156,7 +157,7 @@ export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
         onEndReached={() => {
           console.log('load more series');
         }}
-      />
+      /> */}
     </View>
   );
 }
