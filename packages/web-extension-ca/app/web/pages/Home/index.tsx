@@ -38,7 +38,7 @@ export default function Home() {
       <PortKeyHeader onUserClick={onUserClick} />
       <div className="portkey-home-body">
         <MyBalance />
-        {TestCode}
+        {/* {TestCode} */}
         {/* <SettingDrawer
           open={visible}
           onClose={() => setVisible(false)}
