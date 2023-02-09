@@ -3,7 +3,7 @@ import { createAsyncThunk, createAction } from '@reduxjs/toolkit';
 import { ContactItemType } from '@portkey/types/types-ca/contact';
 import { ContactState } from './slice';
 import { FetchContractListAsyncPayloadType } from './type';
-import { CONTACT_API_FETCH_SIZE, CONTACT_API_RETRY_LIMIT } from '@portkey/constants/contact';
+import { CONTACT_API_FETCH_SIZE, CONTACT_API_RETRY_LIMIT } from '@portkey/constants/constants-ca/contact';
 import { transContactsToIndexes } from './utils';
 import { WalletState } from '../wallet/type';
 import { NetworkList } from '@portkey/constants/constants-ca/network';
