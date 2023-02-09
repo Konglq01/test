@@ -1,4 +1,6 @@
 import type { NetworkType } from '../index';
+import { PartialOption } from '../common';
+
 export interface AddressItem {
   id: string;
   chainType: NetworkType;
@@ -12,8 +14,12 @@ export interface ContactItemType {
   name: string;
   addresses: AddressItem[];
   modificationTime: number;
-  isDeleted: boolean;
+  isDeleted?: boolean;
+  userId?: string;
 }
+
+export type EditContactItemApiType = PartialOption<ContactItemType, 'isDeleted' | 'modificationTime' | 'index'>;
+export type AddContactItemApiType = PartialOption<EditContactItemApiType, 'id'>;
 
 export type GetContractListApiType = {
   totalCount: number;

@@ -1,5 +1,5 @@
 import { getContactList, getContactEventList } from './api';
-import { createAsyncThunk } from '@reduxjs/toolkit';
+import { createAsyncThunk, createAction } from '@reduxjs/toolkit';
 import { ContactItemType } from '@portkey/types/types-ca/contact';
 import { ContactState } from './slice';
 import { FetchContractListAsyncPayloadType } from './type';
@@ -97,3 +97,9 @@ export const fetchContractListAsync = createAsyncThunk<FetchContractListAsyncPay
     };
   },
 );
+
+export const addContractAction = createAction<ContactItemType>('contact/addContract');
+
+export const editContractAction = createAction<ContactItemType>('contact/editContract');
+
+export const deleteContractAction = createAction<ContactItemType>('contact/deleteContract');

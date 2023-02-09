@@ -2,6 +2,7 @@ import { ESBaseConfig } from './type';
 
 const Method = 'GET';
 const BaseESUrl = `/api/app/Es/`;
+// TODO: adjust BaseESUrl to /api/app/Search/
 
 const KeyList = [
   'getUserTokenList',
@@ -37,9 +38,7 @@ const ApiObject: Record<typeof KeyList[number], ESBaseConfig> = {
   },
   getContactList: {
     target: `${BaseESUrl}contactindex`,
-    config: {
-      method: Method,
-    },
+    config: { method: Method },
   },
 };
 

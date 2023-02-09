@@ -1,11 +1,6 @@
-import {
-  ContactIndexType,
-  ContactItemType,
-  ContactMapType,
-  GetContractListApiType,
-} from '@portkey/types/types-ca/contact';
+import { ContactIndexType, ContactItemType, ContactMapType } from '@portkey/types/types-ca/contact';
 
-const charCodeOfA = 'A'.charCodeAt(0);
+const CHAR_CODE_A = 'A'.charCodeAt(0);
 
 export const transIndexesToContactMap = (contactIndexList: ContactIndexType[]) => {
   const contactMap: ContactMapType = {};
@@ -25,7 +20,7 @@ const OTHER_INDEX = 26;
 export const transContactsToIndexes = (contacts: ContactItemType[]) => {
   // A~Z & #
   const contactIndexList: ContactIndexType[] = new Array(27).fill('').map((_, i) => {
-    const index = i === OTHER_INDEX ? '#' : String.fromCharCode(charCodeOfA + i);
+    const index = i === OTHER_INDEX ? '#' : String.fromCharCode(CHAR_CODE_A + i);
     return {
       index,
       contacts: [],
@@ -36,7 +31,7 @@ export const transContactsToIndexes = (contacts: ContactItemType[]) => {
       contactIndexList[OTHER_INDEX].contacts.push(contact);
       return;
     }
-    const idx = contact.index.charCodeAt(0) - charCodeOfA;
+    const idx = contact.index.charCodeAt(0) - CHAR_CODE_A;
     contactIndexList[idx].contacts.push(contact);
   });
   return contactIndexList;
@@ -46,7 +41,6 @@ export const sortContactIndexList = (contactIndexList: ContactIndexType[]) => {
   contactIndexList.forEach(contactIndex => {
     contactIndex.contacts.sort((a, b) => a.name.localeCompare(b.name));
   });
-
   return contactIndexList;
 };
 
@@ -55,116 +49,43 @@ export const executeEventToContactIndexList = (
   eventList: ContactItemType[],
 ): ContactIndexType[] => {
   eventList.forEach(event => {
-    if (event.isDeleted) {
+    const { contactIndex, contactItemIndex } = findPathFromContactIndexList(contactIndexList, event);
+    if (!contactIndex) return;
+    if (event.isDeleted && contactItemIndex !== -1) {
       // Delete
-      for (let i = 0; i < contactIndexList.length; i++) {
-        const contactIndex = contactIndexList[i];
-        const contactIdx = contactIndex.contacts.findIndex(contact => contact.id === event.id);
-        if (contactIdx !== -1) {
-          contactIndex.contacts.splice(contactIdx, 1);
-          break;
-        }
-      }
+      contactIndex.contacts.splice(contactItemIndex, 1);
+    } else if (contactItemIndex === -1) {
+      // Add
+      contactIndex.contacts.push(event);
+    } else if (event.modificationTime > contactIndex.contacts[contactItemIndex].modificationTime) {
+      // Edit
+      contactIndex.contacts[contactItemIndex] = event;
     } else {
-      const contactIndex = contactIndexList.find(item => item.index === event.index);
-      if (contactIndex === undefined) return;
-      const contactIdx = contactIndex.contacts.findIndex(item => item.id === event.id);
-      if (contactIdx === -1) {
-        // Add
-        contactIndex.contacts.push(event);
-      } else {
-        contactIndex.contacts[contactIdx] = event;
-      }
+      console.log('expired event:', {
+        event,
+        contactIndex,
+        contactItemIndex,
+      });
     }
   });
 
   return contactIndexList;
 };
 
-// TODO: delete test data
-const randomChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_@$ ';
-
-const getRandomChar = () => {
-  return randomChars[Math.floor(Math.random() * randomChars.length)];
+export const findPathFromContactIndexList = (
+  contactIndexList: ContactIndexType[],
+  contactItem: ContactItemType,
+): { contactIndex?: ContactIndexType; contactItemIndex: number; contactItem?: ContactItemType } => {
+  let contactItemIndex = -1,
+    contactItemResult;
+  const contactIndex = contactIndexList.find(item => item.index === contactItem.index);
+  if (contactIndex !== undefined) {
+    contactItemIndex = contactIndex.contacts.findIndex(item => item.id === contactItem.id);
+    if (contactItemIndex !== -1) contactItemResult = contactIndex.contacts[contactItemIndex];
+  }
+  return {
+    contactIndex,
+    contactItemIndex,
+    contactItem: contactItemResult,
+  };
 };
-
-// export const getMockContact = (indexContactLength: number = 250): ContactItemType[] =>
-//   Array(27)
-//     .fill('')
-//     .map((_, i) => {
-//       const index = i === 26 ? '#' : String.fromCharCode(charCodeOfA + i);
-//       return Array(i === 1 ? 0 : indexContactLength)
-//         .fill('')
-//         .map((__, itemIdx) => ({
-//           id: `${index}${itemIdx}`,
-//           name: `${index}~${getRandomChar()}${getRandomChar()}${getRandomChar()}${getRandomChar()}`,
-//           index,
-//           isDeleted: false,
-//           modificationTime: Date.now() - 1000000,
-//           addresses: [
-//             {
-//               id: `${index}${itemIdx}_addr_1`,
-//               chainId: 'AELF',
-//               address: 'ArPnUb5FtxG2oXTaWX2DxNZowDEruJLs2TEkhRCzDdrRDfg8B',
-//               chainType: 'TESTNET' as any,
-//             },
-//             {
-//               id: `${index}${itemIdx}_addr_2`,
-//               chainId: 'AELF',
-//               address: 'ArPnUb5FtxG2oXTaWX2DxNZowDEruJLs2TEkhRCzDdrRDfg8B',
-//               chainType: 'TESTNET' as any,
-//             },
-//           ],
-//         }));
-//     })
-//     .reduce((pre, cv) => pre.concat(cv));
-
-// const _indexContactLength = 25;
-// const originData = getMockContact(_indexContactLength);
-// export const mockFetchContractList = (page: number, size: number): Promise<GetContractListApiType> => {
-//   console.log('mockFetchContractList', page, size);
-
-//   const offset = (page - 1) * size;
-//   const response: GetContractListApiType = originData.slice(offset, offset + size);
-
-//   return new Promise(resolve => {
-//     setTimeout(() => {
-//       resolve(response);
-//     }, 200);
-//   });
-// };
-
-// export const mockGetContactEventList = (startTime: number): Promise<GetContractListApiType> => {
-//   console.log('mockGetContactEventList, startTime=', startTime);
-//   const response: GetContractListApiType = [];
-
-//   // add
-//   const addId = 'A_' + Date.now();
-//   response.push({
-//     ...originData[0],
-//     name: 'A_Add_' + addId.slice(2, 6),
-//     id: addId,
-//     modificationTime: startTime - 10,
-//   });
-
-//   // update
-//   console.log('update contact:', JSON.stringify(originData[1]));
-//   response.push({
-//     ...originData[0],
-//     name: 'A_testUpdate',
-//     modificationTime: startTime - 10,
-//   });
-
-//   // delete
-//   console.log('delete contact:', JSON.stringify(originData[2]));
-//   response.push({
-//     ...originData[1],
-//     isDeleted: true,
-//   });
-
-//   return new Promise(resolve => {
-//     setTimeout(() => {
-//       resolve(response);
-//     }, 500);
-//   });
-// };

@@ -1,5 +1,6 @@
 import walletApi from './wallet';
 import verificationApi from './verification';
+import contactApi from './contact';
 import chainApi from './chain';
 import esApi from './es';
 import myServer from '../server';
@@ -27,6 +28,7 @@ export const BASE_APIS = {};
 export const EXPAND_APIS = {
   wallet: walletApi,
   verify: verificationApi,
+  contact: contactApi,
   chain: chainApi,
 };
 

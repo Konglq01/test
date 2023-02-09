@@ -3,14 +3,14 @@ import { TouchableWithoutFeedback, View } from 'react-native';
 import { pageStyles } from './style';
 import PageContainer from 'components/PageContainer';
 import { useLanguage } from 'i18n/hooks';
-import { AddressItem, ContactItemType } from '@portkey/types/types-ca/contact';
+import { AddressItem, ContactItemType, EditContactItemApiType } from '@portkey/types/types-ca/contact';
 import Input from 'components/CommonInput';
 import CommonButton from 'components/CommonButton';
 import { TextM } from 'components/CommonText';
 import Svg from 'components/Svg';
 import { pTd } from 'utils/unit';
 import navigationService from 'utils/navigationService';
-import { useAppSelector } from 'store/hooks';
+import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { ErrorType } from 'types/common';
 import { FontStyles } from 'assets/theme/styles';
 import Touchable from 'components/Touchable';
@@ -26,6 +26,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import CommonToast from 'components/CommonToast';
 import ActionSheet from 'components/ActionSheet';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { useAddContact, useDeleteContact, useEditContact } from 'hooks/contact';
 
 interface ContactEditProps {
   route?: any;
@@ -33,7 +34,7 @@ interface ContactEditProps {
 
 export type EditAddressType = AddressItem & { error: ErrorType };
 
-interface EditContactType extends ContactItemType {
+interface EditContactType extends EditContactItemApiType {
   error: ErrorType;
   addresses: EditAddressType[];
 }
@@ -48,7 +49,10 @@ const initEditContact: EditContactType = {
 
 const ContactEdit: React.FC<ContactEditProps> = ({ route }) => {
   const { t } = useLanguage();
-  // const appDispatch = useAppDispatch();
+  const addContactApi = useAddContact();
+  const editContactApi = useEditContact();
+  const deleteContactApi = useDeleteContact();
+
   const { contactIndexList } = useAppSelector(state => state.contact);
   const [editContact, setEditContact] = useState<EditContactType>(initEditContact);
 
@@ -69,7 +73,6 @@ const ContactEdit: React.FC<ContactEditProps> = ({ route }) => {
   const isEdit = useMemo(() => params?.contact !== undefined, [params?.contact]);
 
   const { chainList = [], currentNetwork } = useCurrentWallet();
-
   const chainMap = useMemo(() => {
     const _chainMap: { [k: string]: ChainItemType } = {};
     chainList.forEach(item => {
@@ -131,7 +134,6 @@ const ContactEdit: React.FC<ContactEditProps> = ({ route }) => {
 
   const onAddressChange = useCallback((value: string, idx: number) => {
     value = getAelfAddress(value.trim());
-
     setEditContact(preEditContact => {
       const _editContact = { ...preEditContact };
       const curAddress = _editContact.addresses[idx];
@@ -153,7 +155,7 @@ const ContactEdit: React.FC<ContactEditProps> = ({ route }) => {
     return false;
   }, [editContact]);
 
-  const onFinish = useCallback(() => {
+  const checkError = useCallback(() => {
     const _nameValue = editContact.name.trim();
 
     let isErrorExist = false;
@@ -202,24 +204,26 @@ const ContactEdit: React.FC<ContactEditProps> = ({ route }) => {
         };
       }
     });
+    if (isErrorExist) setEditContact(_editContact);
+    return isErrorExist;
+  }, [contactIndexList, editContact, t]);
 
-    if (isErrorExist) {
-      setEditContact(_editContact);
-      return;
-    }
-
+  const onFinish = useCallback(async () => {
+    const isErrorExist = checkError();
+    if (isErrorExist) return;
     try {
-      // TODO: add submit
-
       if (isEdit) {
+        await editContactApi(editContact);
         CommonToast.success(t('Saved Successful'), undefined, 'bottom');
       } else {
+        await addContactApi(editContact);
         CommonToast.success(t('Contact Added'), undefined, 'bottom');
       }
-
       navigationService.navigate('ContactsHome');
-    } catch (err) {}
-  }, [contactIndexList, editContact, isEdit, t]);
+    } catch (err) {
+      console.log(err);
+    }
+  }, [addContactApi, checkError, editContact, editContactApi, isEdit, t]);
 
   const onDelete = useCallback(() => {
     ActionSheet.alert({
@@ -232,14 +236,19 @@ const ContactEdit: React.FC<ContactEditProps> = ({ route }) => {
         },
         {
           title: t('Yes'),
-          onPress: () => {
-            CommonToast.success(t('Contact Deleted'), undefined, 'bottom');
-            navigationService.navigate('ContactsHome');
+          onPress: async () => {
+            try {
+              await deleteContactApi(editContact);
+              CommonToast.success(t('Contact Deleted'), undefined, 'bottom');
+              navigationService.navigate('ContactsHome');
+            } catch (error) {
+              console.log('onDelete:error', error);
+            }
           },
         },
       ],
     });
-  }, [t]);
+  }, [deleteContactApi, editContact, t]);
 
   const onChainChange = useCallback(
     (addressIdx: number, chainItem: ChainItemType) => {
