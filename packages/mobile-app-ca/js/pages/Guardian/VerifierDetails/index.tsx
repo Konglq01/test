@@ -131,6 +131,7 @@ export default function VerifierDetails() {
                 approvalType: ApprovalType.addGuardian,
                 guardianItem,
                 verifierInfo,
+                verifiedTime: Date.now(),
               });
             }
             break;

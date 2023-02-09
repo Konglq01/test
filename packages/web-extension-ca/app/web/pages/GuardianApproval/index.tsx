@@ -97,7 +97,7 @@ export default function GuardianApproval() {
             <span className="all-approval">{`/${approvalLength}`}</span>
           </div>
         </div>
-        <ul className="verifier-content">
+        <ul className={clsx('verifier-content', !isPrompt && 'popup-verifier-content')}>
           {userVerifiedList?.map((item) => (
             <GuardianItems
               key={item.key}
