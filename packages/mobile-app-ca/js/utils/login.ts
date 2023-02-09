@@ -48,14 +48,16 @@ export function handleUserGuardiansList(holderInfo: GuardiansInfo, verifierServe
 }
 
 export function handleGuardiansApproved(guardiansStatus: GuardiansStatus, userGuardiansList: UserGuardianItem[]) {
-  return Object.keys(guardiansStatus).map(key => {
-    const status = guardiansStatus?.[key];
-    const guardian = userGuardiansList?.find(item => item.key === key);
-    return {
-      ...status?.verifierInfo,
-      value: guardian?.guardianAccount,
-      guardianType: guardian?.guardianType,
-      type: LoginStrType[guardian?.guardianType as LoginType],
-    };
-  });
+  return Object.keys(guardiansStatus)
+    .map(key => {
+      const status = guardiansStatus?.[key];
+      const guardian = userGuardiansList?.find(item => item.key === key);
+      return {
+        ...status?.verifierInfo,
+        value: guardian?.guardianAccount,
+        guardianType: guardian?.guardianType,
+        type: LoginStrType[guardian?.guardianType as LoginType],
+      };
+    })
+    .filter(item => item.signature && item.verificationDoc);
 }

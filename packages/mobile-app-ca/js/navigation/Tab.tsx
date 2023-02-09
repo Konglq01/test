@@ -1,12 +1,12 @@
-import * as React from 'react';
+import React, { useEffect } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import HomeScreen from 'pages/Home';
 import DashBoard from 'pages/DashBoard';
 import Svg from 'components/Svg';
 import { defaultColors } from 'assets/theme';
-import { useNetworkInitialization } from '@portkey/hooks/network';
 import { useLanguage } from 'i18n/hooks';
 import MyMenu from 'pages/MyMenu';
+import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import useLogOut from 'hooks/useLogOut';
 
 const Tab = createBottomTabNavigator();
 
@@ -19,8 +19,12 @@ type tabMenuIcon = typeof tabMenuList[number]['icon'];
 
 export default function TabRoot() {
   const { t } = useLanguage();
-
-  useNetworkInitialization();
+  const { address } = useCurrentWalletInfo();
+  const logOut = useLogOut();
+  useEffect(() => {
+    if (!address) logOut();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [address]);
   return (
     <Tab.Navigator
       initialRouteName="Wallet"

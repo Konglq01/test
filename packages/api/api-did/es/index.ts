@@ -1,8 +1,7 @@
 import { ESBaseConfig } from './type';
 
 const Method = 'GET';
-const BaseESUrl = `/api/app/Es/`;
-// TODO: adjust BaseESUrl to /api/app/Search/
+const BaseESUrl = `/api/app/search/`;
 
 const KeyList = [
   'getUserTokenList',

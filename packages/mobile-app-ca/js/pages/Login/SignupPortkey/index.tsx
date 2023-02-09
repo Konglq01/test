@@ -41,10 +41,14 @@ function SignupEmail() {
     if (message) return;
     Loading.show();
     try {
-      if (!chainInfo) await dispatch(getChainListAsync());
-      await getVerifierServers();
+      let _chainInfo;
+      if (!chainInfo) {
+        const chainList = await dispatch(getChainListAsync());
+        if (Array.isArray(chainList.payload)) _chainInfo = chainList.payload[1];
+      }
+      await getVerifierServers(_chainInfo);
       try {
-        const guardiansInfo = await getGuardiansInfo({ loginAccount: email });
+        const guardiansInfo = await getGuardiansInfo({ loginAccount: email }, _chainInfo);
         if (guardiansInfo.guardianAccounts) {
           Loading.hide();
           return setErrorMessage(EmailError.alreadyRegistered);

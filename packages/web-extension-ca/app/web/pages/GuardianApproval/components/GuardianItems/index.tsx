@@ -13,7 +13,7 @@ import { useAppDispatch, useLoading } from 'store/Provider/hooks';
 import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
 import { LoginInfo } from 'store/reducers/loginCache/type';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network';
-import { contractErrorHandler } from 'utils/tryErrorHandler';
+import { verifyErrorHandler } from 'utils/tryErrorHandler';
 
 interface GuardianItemProps {
   disabled?: boolean;
@@ -67,7 +67,7 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
       } catch (error: any) {
         console.log('---guardian-sendCode-error', error);
         setLoading(false);
-        message.error(contractErrorHandler(error));
+        message.error(verifyErrorHandler(error));
       }
     },
     [setLoading, dispatch, navigate, state],
@@ -116,7 +116,8 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
       } catch (error: any) {
         console.log(error, 'error===');
         setLoading(false);
-        message.error(error?.error?.message ?? error?.type ?? 'Something error');
+        const _error = verifyErrorHandler(error);
+        message.error(_error);
       }
     },
     [state, loginAccount, setLoading, guardianSendCode, dispatch, navigate],
