@@ -17,7 +17,6 @@ import myServer from '@portkey/api/server';
 import Signalr from '@portkey/socket';
 import { listenList } from '@portkey/constants/constants-ca/socket';
 import { LoginQRData } from '@portkey/types/types-ca/qrcode';
-import { Platform } from 'react-native';
 
 class SignalrDid extends Signalr {
   public Ack(clientId: string, requestId: string) {
@@ -159,20 +158,4 @@ export async function addManager({
       deviceString: `${deviceType !== undefined ? deviceType + ',' : ''}${Date.now()}`,
     },
   });
-}
-
-export function getDeviceType() {
-  let deviceType: DeviceType;
-  switch (Platform.OS) {
-    case 'ios':
-      deviceType = DeviceType.ios;
-      break;
-    case 'android':
-      deviceType = DeviceType.android;
-      break;
-    default:
-      deviceType = DeviceType.other;
-      break;
-  }
-  return deviceType;
 }

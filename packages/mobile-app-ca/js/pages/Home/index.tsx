@@ -19,7 +19,8 @@ import { baseRequest } from 'api';
 import AElf from 'aelf-sdk';
 import { customFetch } from '@portkey/utils/fetch';
 import { useGetCurrentCAContract } from 'hooks/contract';
-import { addManager, getDeviceType } from 'utils/wallet';
+import { addManager } from 'utils/wallet';
+import { DEVICE_TYPE } from 'constants/common';
 export default function HomeScreen() {
   const wallet = useCurrentWalletInfo();
   const getVerifierServers = useGetVerifierServers();
@@ -148,7 +149,7 @@ export default function HomeScreen() {
                 caHash: wallet.caHash,
                 address: wallet.address,
                 managerAddress: tmpWalletInfo.address,
-                deviceType: getDeviceType(),
+                deviceType: DEVICE_TYPE,
               });
               console.log(req, '===req');
             } catch (error) {

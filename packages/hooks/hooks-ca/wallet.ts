@@ -19,6 +19,9 @@ import { useCurrentChain } from './chainList';
 import { useCaHolderManagerInfoQuery } from '@portkey/graphql/contract/hooks/caHolderManagerInfo';
 import { getApolloClient } from '@portkey/graphql/contract/apollo';
 import { DEVICE_TYPE_INFO } from '@portkey/constants/constants-ca/wallet';
+import { request } from '@portkey/api/api-did';
+import { useAppCommonDispatch } from '../index';
+import { setWalletNameAction } from '@portkey/store/store-ca/wallet/actions';
 
 export interface CurrentWalletType extends WalletInfoType, CAInfoType {
   caHash?: string;
@@ -69,7 +72,7 @@ export const useDeviceList = () => {
         maxResultCount: 100,
       },
     },
-    fetchPolicy: 'cache-first',
+    fetchPolicy: 'cache-and-network',
   });
 
   return useMemo<DeviceItemType[]>(() => {
@@ -108,4 +111,21 @@ export const useDeviceList = () => {
       })
       .reverse();
   }, [data, error]);
+};
+
+export const useSetWalletName = () => {
+  const dispatch = useAppCommonDispatch();
+  const networkInfo = useCurrentNetworkInfo();
+  return useCallback(
+    async (nickName: string) => {
+      await request.wallet.editWalletName({
+        baseURL: networkInfo.apiUrl,
+        params: {
+          nickName,
+        },
+      });
+      dispatch(setWalletNameAction(nickName));
+    },
+    [dispatch, networkInfo],
+  );
 };
