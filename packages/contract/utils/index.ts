@@ -1,12 +1,12 @@
 import { AElfInterface, AElfWallet } from '@portkey/types/aelf';
-import { ContractBasic } from './index';
-import { getAelfInstance } from '../aelf';
-import { sleep } from '../index';
+import { ContractBasic } from '../index';
 import AElf from 'aelf-sdk';
+import { getAelfInstance } from '@portkey/utils/aelf';
+import { sleep } from '@portkey/utils';
 
 const methodsMap: { [key: string]: any } = {};
 
-export async function getELFContract({
+export async function getContractBasic({
   contractAddress,
   aelfInstance,
   account,

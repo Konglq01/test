@@ -82,17 +82,21 @@ export const customFetch: CustomFetchFun = (url, _config) => {
           } else {
             const _result = result as Response;
             console.log(result, 'customFetch===');
-            _result
-              .text()
-              .then((text: string) => {
-                const res = formatResponse(text);
-                if (result.status !== 200 || !result.ok) {
-                  reject(res ? res : _result.statusText);
-                  return;
-                }
-                resolve(res);
-              })
-              .catch((err: any) => reject(err));
+            if (_result.status === 401) {
+              resolve({ message: 'unauthorized', status: 401 });
+            } else {
+              _result
+                .text()
+                .then((text: string) => {
+                  const res = formatResponse(text);
+                  if (result.status !== 200 || !result.ok) {
+                    reject(res ? res : _result.statusText);
+                    return;
+                  }
+                  resolve(res);
+                })
+                .catch((err: any) => reject(err));
+            }
           }
         } catch (e) {
           reject(e);

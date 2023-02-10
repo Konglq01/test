@@ -56,6 +56,7 @@ export default function VerifierDetails() {
     startResend,
     verificationType,
   } = useRouterParams<RouterParams>();
+  console.log(guardianItem, '=====guardianItem');
 
   const countdown = useRef<VerifierCountdownInterface>();
   useEffectOnce(() => {
@@ -87,7 +88,7 @@ export default function VerifierDetails() {
           guardian: { ...guardianItem, isLoginAccount: true },
         });
       } else {
-        CommonToast.fail(req?.error.message);
+        CommonToast.fail(req?.error?.message || '');
       }
     } catch (error) {
       CommonToast.failError(error);

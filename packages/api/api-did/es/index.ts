@@ -1,7 +1,7 @@
 import { ESBaseConfig } from './type';
 
 const Method = 'GET';
-const BaseESUrl = `/api/app/search/`;
+const BaseESUrl = `/api/app/ES/`;
 
 const KeyList = ['getUserTokenList', 'getChainsInfo', 'getRegisterResult', 'getRecoverResult'] as const;
 

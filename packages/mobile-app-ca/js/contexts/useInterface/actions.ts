@@ -1,7 +1,7 @@
 import { ChainId } from '@portkey/types';
 import { AElfChainMethods } from '@portkey/types/aelf';
 import { basicActions } from 'contexts/utils';
-import { ContractBasic } from 'utils/contract';
+import { ContractBasic } from '@portkey/contract';
 import { State } from './types';
 
 export enum InterfaceActions {

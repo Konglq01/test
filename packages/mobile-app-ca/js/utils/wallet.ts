@@ -5,9 +5,8 @@ import Loading from 'components/Loading';
 import CommonToast from 'components/CommonToast';
 import { queryFailAlert } from './login';
 import { AppDispatch } from 'store';
-import { ContractBasic } from './contract';
+import { ContractBasic } from '@portkey/contract';
 import { request } from '@portkey/api/api-did';
-import myServer from '@portkey/api/server';
 import Signalr from '@portkey/socket';
 import { listenList } from '@portkey/constants/constants-ca/socket';
 
@@ -93,7 +92,7 @@ export function intervalGetResult({ managerInfo, onPass, onFail }: IntervalGetRe
   const clientId = managerInfo.requestId || '';
   const requestId = managerInfo.requestId || '';
   socket.doOpen({
-    url: `${myServer.defaultConfig.baseURL}/ca`,
+    url: `${request.defaultConfig.baseURL}/ca`,
     clientId,
   });
   let fetch: any;

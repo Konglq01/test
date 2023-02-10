@@ -4,12 +4,12 @@ import { ChainId } from '@portkey/types';
 import aes from '@portkey/utils/aes';
 import { useInterface } from 'contexts/useInterface';
 import { setCAContract, setViewContract } from 'contexts/useInterface/actions';
-import { getELFContract } from 'contexts/utils';
+import { getContractBasic } from '@portkey/contract/utils';
 import { useCallback, useMemo } from 'react';
 import { getDefaultWallet } from 'utils/aelfUtils';
 import AElf from 'aelf-sdk';
-import { useCredentials } from './store';
-import { ContractBasic } from 'utils/contract';
+import { usePin } from './store';
+import { ContractBasic } from '@portkey/contract';
 import { ChainItemType } from '@portkey/store/store-ca/wallet/type';
 
 export function useGetCurrentCAViewContract(chainId: ChainId = 'AELF') {
@@ -26,7 +26,7 @@ export function useGetCurrentCAViewContract(chainId: ChainId = 'AELF') {
       if (caContract) return caContract;
       const _chainInfo = paramChainInfo || chainInfo;
       if (!_chainInfo) throw Error('Could not find chain information');
-      const contract = await getELFContract({
+      const contract = await getContractBasic({
         contractAddress: _chainInfo.caContractAddress,
         rpcUrl: _chainInfo.endPoint,
         account: getDefaultWallet(),
@@ -41,7 +41,7 @@ export function useGetCurrentCAViewContract(chainId: ChainId = 'AELF') {
 
 export function useGetCurrentCAContract(chainId: ChainId = 'AELF') {
   const chainInfo = useCurrentChain(chainId);
-  const { pin } = useCredentials() || {};
+  const pin = usePin();
   const { AESEncryptPrivateKey, address } = useCurrentWalletInfo();
   const [{ caContracts }, dispatch] = useInterface();
   const key = useMemo(() => address + '_' + chainInfo?.caContractAddress, [address, chainInfo?.caContractAddress]);
@@ -58,7 +58,7 @@ export function useGetCurrentCAContract(chainId: ChainId = 'AELF') {
     const privateKey = aes.decrypt(AESEncryptPrivateKey, pin);
     const wallet = AElf.wallet.getWalletByPrivateKey(privateKey);
 
-    const contract = await getELFContract({
+    const contract = await getContractBasic({
       contractAddress: chainInfo.caContractAddress,
       rpcUrl: chainInfo.endPoint,
       account: wallet,

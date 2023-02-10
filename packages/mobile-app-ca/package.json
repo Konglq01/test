@@ -45,6 +45,7 @@
     "@portkey/graphql": "^0.0.1",
     "@portkey/i18n": "^0.0.1",
     "@portkey/store": "^0.0.1",
+    "@portkey/contract": "^0.0.1",
     "@react-native-async-storage/async-storage": "^1.17.6",
     "@react-native-firebase/analytics": "^15.3.0",
     "@react-native-firebase/app": "^15.3.0",

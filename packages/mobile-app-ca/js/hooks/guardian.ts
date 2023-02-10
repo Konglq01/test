@@ -27,7 +27,7 @@ export const useGetGuardiansInfo = () => {
   return useCallback(
     async (loginInfo: LoginInfo, chainInfo?: ChainItemType) => {
       const res = await getHolderInfo(loginInfo, chainInfo);
-      if (res && !res.error) return res.guardiansInfo;
+      if (res && !res.error) return res.data.guardiansInfo;
       throw new Error(checkHolderError(res.error?.message));
     },
     [getHolderInfo],
@@ -54,7 +54,7 @@ export const useGetVerifierServers = () => {
       const caContract = await getCurrentCAViewContract(chainInfo);
       const res = await caContract?.callViewMethod('GetVerifierServers', '');
       if (res && !res.error) {
-        const verifierList: VerifierItem[] = res.verifierServers.map((item: VerifierItem) => ({
+        const verifierList: VerifierItem[] = res.data.verifierServers.map((item: VerifierItem) => ({
           ...item,
           url: item.endPoints[0],
         }));

@@ -10,23 +10,22 @@ import Loading from 'components/Loading';
 import { contractQueries } from '@portkey/graphql/index';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
-import { getManagerAccount, getWallet } from 'utils/redux';
-import { useCredentials } from 'hooks/store';
-import { getAelfInstance } from '@portkey/utils/aelf';
-import { useGetGuardiansInfoWriteStore, useGetVerifierServers } from 'hooks/guardian';
-import { getELFContract } from '@portkey/utils/contract/utils';
-import { baseRequest } from 'api';
+import { getManagerAccount } from 'utils/redux';
+import { usePin } from 'hooks/store';
+import { getContractBasic } from '@portkey/contract/utils';
 import AElf from 'aelf-sdk';
 import { customFetch } from '@portkey/utils/fetch';
 import { useGetCurrentCAContract } from 'hooks/contract';
 import { addManager } from 'utils/wallet';
+import { request } from '@portkey/api/api-did';
+import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 export default function HomeScreen() {
   const wallet = useCurrentWalletInfo();
-  const getVerifierServers = useGetVerifierServers();
   const getCurrentCAContract = useGetCurrentCAContract();
 
-  const { pin } = useCredentials() || {};
+  const pin = usePin();
   const chainInfo = useCurrentChain('AELF');
+  const { connectUrl } = useCurrentNetworkInfo();
   return (
     <SafeAreaBox>
       <ScrollView>
@@ -62,7 +61,7 @@ export default function HomeScreen() {
             if (!chainInfo || !pin) return;
             const account = getManagerAccount(pin);
             if (!account) return;
-            const contract = await getELFContract({
+            const contract = await getContractBasic({
               contractAddress: chainInfo.caContractAddress,
               rpcUrl: chainInfo.endPoint,
               account,
@@ -107,24 +106,17 @@ export default function HomeScreen() {
                   pubkey,
                   timestamp,
                   cahash: wallet.AELF?.caHash,
+                  connectUrl,
                 },
                 '====',
+                connectUrl + '/connect/token',
               );
 
-              const req = await customFetch('http://192.168.66.38:8080/connect/token', {
+              const req = await customFetch(connectUrl + '/connect/token', {
                 headers: {
                   'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 method: 'POST',
-                // params: {
-                //   grant_type: 'signature',
-                //   client_id: 'CAServer_App',
-                //   scope: 'CAServer',
-                //   signature,
-                //   pubkey,
-                //   timestamp,
-                //   cahash: wallet.AELF?.caHash,
-                // },
                 body: `grant_type=signature&client_id=CAServer_App&scope=CAServer&signature=${signature}&pubkey=${pubkey}&timestamp=${timestamp}&cahash=${wallet.AELF?.caHash}`,
               });
               console.log(req, '======req');
@@ -153,6 +145,28 @@ export default function HomeScreen() {
               console.log(req, '===req');
             } catch (error) {
               console.log(error, '====error');
+            }
+          }}
+        />
+        <Button
+          title="add contact"
+          onPress={async () => {
+            try {
+              if (!chainInfo || !pin || !wallet.AELF?.caHash) return;
+              const req = await request.contact.addContact({
+                params: {
+                  name: 'xxx',
+                  addresses: [
+                    {
+                      chainId: 'string',
+                      address: 'string',
+                    },
+                  ],
+                },
+              });
+              console.log(req, '====req');
+            } catch (error) {
+              console.log(error, '====error-1');
             }
           }}
         />

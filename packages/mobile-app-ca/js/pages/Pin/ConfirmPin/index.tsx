@@ -68,8 +68,8 @@ export default function ConfirmPin() {
   const onFinish = useCallback(
     async (confirmPin: string) => {
       if (managerInfo?.verificationType === VerificationType.addManager) {
-        dispatch(setCredentials({ pin: confirmPin }));
         dispatch(createWallet({ walletInfo: paramsWalletInfo, caInfo, pin: confirmPin }));
+        dispatch(setCredentials({ pin: confirmPin }));
         if (biometricsReady) {
           navigationService.navigate('SetBiometrics', { pin: confirmPin });
         } else {
