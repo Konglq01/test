@@ -1,4 +1,10 @@
-import { CaAccountRecoverResult, CaAccountRegisterResult, CAInfo, ManagerInfo } from '@portkey/types/types-ca/wallet';
+import {
+  CaAccountRecoverResult,
+  CaAccountRegisterResult,
+  CAInfo,
+  DeviceType,
+  ManagerInfo,
+} from '@portkey/types/types-ca/wallet';
 import { VerificationType } from '@portkey/types/verifier';
 import { clearTimeoutInterval, setTimeoutInterval } from '@portkey/utils/interval';
 import Loading from 'components/Loading';
@@ -9,6 +15,7 @@ import { ContractBasic } from '@portkey/contracts/utils/ContractBasic';
 import { request } from '@portkey/api/api-did';
 import Signalr from '@portkey/socket';
 import { listenList } from '@portkey/constants/constants-ca/socket';
+import { LoginQRData } from '@portkey/types/types-ca/qrcode';
 
 class SignalrDid extends Signalr {
   public Ack(clientId: string, requestId: string) {
@@ -135,17 +142,19 @@ export async function addManager({
   address,
   caHash,
   managerAddress,
+  deviceType,
 }: {
   contract: ContractBasic;
   address: string;
   caHash: string;
-  managerAddress?: string;
+  managerAddress?: LoginQRData['address'];
+  deviceType?: LoginQRData['deviceType'];
 }) {
   return contract.callSendMethod('AddManager', address, {
     caHash,
     manager: {
       managerAddress,
-      deviceString: new Date().getTime(),
+      deviceString: `${deviceType !== undefined ? deviceType + ',' : ''}${Date.now()}`,
     },
   });
 }

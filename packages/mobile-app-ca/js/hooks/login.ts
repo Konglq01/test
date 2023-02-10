@@ -18,6 +18,7 @@ import { setCredentials } from 'store/user/actions';
 import { DigitInputInterface } from 'components/DigitInput';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 import { GuardiansApproved } from 'pages/Guardian/types';
+import { DEVICE_TYPE } from 'constants/common';
 
 export function useOnManagerAddressAndQueryResult() {
   const dispatch = useAppDispatch();
@@ -53,7 +54,7 @@ export function useOnManagerAddressAndQueryResult() {
         let data: any = {
           loginGuardianAccount: managerInfo.loginAccount,
           managerAddress: tmpWalletInfo.address,
-          deviceString: new Date().getTime().toString(),
+          deviceString: `${DEVICE_TYPE},${Date.now()}`,
           context: {
             clientId: tmpWalletInfo.address,
             requestId: tmpWalletInfo.address,

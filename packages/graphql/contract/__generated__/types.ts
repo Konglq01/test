@@ -97,7 +97,7 @@ export type GetCaHolderManagerInfoDto = {
 };
 
 export type GetCaHolderSearchTokenNftDto = {
-  caAddress?: InputMaybe<Scalars['String']>;
+  caAddresses?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
   chainId?: InputMaybe<Scalars['String']>;
   maxResultCount: Scalars['Int'];
   searchWord?: InputMaybe<Scalars['String']>;
@@ -113,7 +113,7 @@ export type GetCaHolderTokenBalanceDto = {
 };
 
 export type GetCaHolderTransactionAddressDto = {
-  caAddress?: InputMaybe<Scalars['String']>;
+  caAddresses?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
   chainId?: InputMaybe<Scalars['String']>;
   maxResultCount: Scalars['Int'];
   skipCount: Scalars['Int'];

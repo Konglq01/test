@@ -19,6 +19,7 @@ import { useGetCurrentCAContract } from 'hooks/contract';
 import { addManager } from 'utils/wallet';
 import { request } from '@portkey/api/api-did';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
+import { DEVICE_TYPE } from 'constants/common';
 export default function HomeScreen() {
   const wallet = useCurrentWalletInfo();
   const getCurrentCAContract = useGetCurrentCAContract();
@@ -119,13 +120,13 @@ export default function HomeScreen() {
 
             try {
               const tmpWalletInfo = AElf.wallet.createNewWallet();
-
               const contract = await getCurrentCAContract();
               const req = await addManager({
                 contract,
                 caHash: wallet.caHash,
                 address: wallet.address,
                 managerAddress: tmpWalletInfo.address,
+                deviceType: DEVICE_TYPE,
               });
               console.log(req, '===req');
             } catch (error) {

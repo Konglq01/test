@@ -22,6 +22,7 @@ import { LoginQRData } from '@portkey/types/types-ca/qrcode';
 import phone from 'assets/image/pngs/phone.png';
 import QRCode from 'react-native-qrcode-svg';
 import { useIsFocused } from '@react-navigation/native';
+import { DEVICE_TYPE } from 'constants/common';
 
 export default function LoginQRCode({ setLoginType }: { setLoginType: (type: LoginType) => void }) {
   const { walletInfo, currentNetwork } = useCurrentWallet();
@@ -86,6 +87,7 @@ export default function LoginQRCode({ setLoginType }: { setLoginType: (type: Log
       type: 'login',
       address: newWallet.address,
       netWorkType: currentNetwork,
+      deviceType: DEVICE_TYPE,
     };
     return JSON.stringify(data);
   }, [currentNetwork, newWallet]);

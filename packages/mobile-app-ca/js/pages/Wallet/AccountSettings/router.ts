@@ -1,5 +1,6 @@
 import AccountSettings from '.';
 import Biometric from './Biometric';
+import Devices from './Devices';
 
 const stackNav = [
   {
@@ -9,6 +10,10 @@ const stackNav = [
   {
     name: 'Biometric',
     component: Biometric,
+  },
+  {
+    name: 'Devices',
+    component: Devices,
   },
 ] as const;
 
