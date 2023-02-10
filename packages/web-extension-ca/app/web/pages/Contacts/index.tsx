@@ -79,7 +79,7 @@ export default function Contacts() {
             <div className="flex-center header-right-close">
               <Button
                 onClick={() => {
-                  message.info('Coming soon. Check back here for updates');
+                  message.info('Coming soon. Check back here for updates', 1);
                   // navigate('/setting/contacts/add', { state: initContactItem });
                 }}>
                 {t('Add contact')}
@@ -113,7 +113,7 @@ export default function Contacts() {
                 className="flex-row-center add-button"
                 type="text"
                 onClick={() => {
-                  message.info('Coming soon. Check back here for updates');
+                  message.info('Coming soon. Check back here for updates', 1);
                   // navigate('/setting/contacts/add', { state: initContactItem });
                 }}>
                 <CustomSvg type="Plus" className="plug-svg" /> {t('Add New Contact')}
