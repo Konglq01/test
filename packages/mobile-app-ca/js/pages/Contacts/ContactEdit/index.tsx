@@ -27,10 +27,11 @@ import CommonToast from 'components/CommonToast';
 import ActionSheet from 'components/ActionSheet';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { useAddContact, useDeleteContact, useEditContact } from 'hooks/contact';
+import useRouterParams from '@portkey/hooks/useRouterParams';
 
-interface ContactEditProps {
-  route?: any;
-}
+type RouterParams = {
+  contact?: ContactItemType;
+};
 
 export type EditAddressType = AddressItem & { error: ErrorType };
 
@@ -47,7 +48,8 @@ const initEditContact: EditContactType = {
   addresses: [],
 };
 
-const ContactEdit: React.FC<ContactEditProps> = ({ route }) => {
+const ContactEdit: React.FC = () => {
+  const { contact } = useRouterParams<RouterParams>();
   const { t } = useLanguage();
   const addContactApi = useAddContact();
   const editContactApi = useEditContact();
@@ -56,21 +58,19 @@ const ContactEdit: React.FC<ContactEditProps> = ({ route }) => {
   const { contactIndexList } = useAppSelector(state => state.contact);
   const [editContact, setEditContact] = useState<EditContactType>(initEditContact);
 
-  const { params } = route;
   useEffect(() => {
-    if (!params?.contact) return;
-    const contact: ContactItemType = JSON.parse(params.contact);
+    if (!contact) return;
+    const _contact: ContactItemType = JSON.parse(JSON.stringify(contact));
     setEditContact({
-      ...contact,
+      ..._contact,
       error: { ...INIT_NONE_ERROR },
-      addresses: contact.addresses.map(item => ({
+      addresses: _contact.addresses.map(item => ({
         ...item,
         error: { ...INIT_NONE_ERROR },
       })),
     });
-  }, [params]);
-
-  const isEdit = useMemo(() => params?.contact !== undefined, [params?.contact]);
+  }, [contact]);
+  const isEdit = useMemo(() => contact !== undefined, [contact]);
 
   const { chainList = [], currentNetwork } = useCurrentWallet();
   const chainMap = useMemo(() => {
@@ -289,12 +289,12 @@ const ContactEdit: React.FC<ContactEditProps> = ({ route }) => {
                 editAddressItem={addressItem}
                 editAddressIdx={addressIdx}
                 onDelete={deleteAddress}
-                chainName={chainMap[addressItem.chainId]?.name || ''}
+                chainName={chainMap[addressItem.chainId]?.chainName || ''}
                 onChainPress={() =>
                   ChainOverlay.showList({
                     list: chainList,
                     value: addressItem.chainId,
-                    labelAttrName: 'name',
+                    labelAttrName: 'chainName',
                     callBack: item => {
                       onChainChange(addressIdx, item);
                     },

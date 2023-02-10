@@ -23,17 +23,15 @@ import { VerifierImage } from '../components/VerifierImage';
 import { cancelLoginAccount } from 'utils/guardian';
 import { useGetCurrentCAContract } from 'hooks/contract';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
-import { RouteProp, useRoute } from '@react-navigation/native';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network-test2';
+import useRouterParams from '@portkey/hooks/useRouterParams';
 
 type RouterParams = {
   guardian?: UserGuardianItem;
 };
 
 export default function GuardianDetail() {
-  const {
-    params: { guardian },
-  } = useRoute<RouteProp<{ params: RouterParams }>>();
+  const { guardian } = useRouterParams<RouterParams>();
   const { t } = useLanguage();
   const getGuardiansInfo = useGetGuardiansInfo();
   const { userGuardiansList } = useGuardiansInfo();
