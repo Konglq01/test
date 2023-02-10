@@ -16,6 +16,7 @@ export class DidService extends ServiceInit {
       this.defaultConfig.headers = { ...this.defaultConfig.headers, Authorization: authorization };
       return authorization;
     } catch (error) {
+      console.log(error, '====error-getConnectToken');
       return;
     }
   };

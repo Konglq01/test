@@ -20,6 +20,7 @@ import { addManager } from 'utils/wallet';
 import { request } from '@portkey/api/api-did';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { DEVICE_TYPE } from 'constants/common';
+import { useGetHolderInfo } from 'hooks/guardian';
 export default function HomeScreen() {
   const wallet = useCurrentWalletInfo();
   const getCurrentCAContract = useGetCurrentCAContract();
@@ -27,6 +28,7 @@ export default function HomeScreen() {
   const pin = usePin();
   const chainInfo = useCurrentChain('AELF');
   const { connectUrl } = useCurrentNetworkInfo();
+  const getHolderInfo = useGetHolderInfo();
   return (
     <SafeAreaBox>
       <ScrollView>
@@ -138,6 +140,12 @@ export default function HomeScreen() {
           title="add contact"
           onPress={async () => {
             try {
+              console.log(wallet, '====wallet');
+              const holderInfo = await getHolderInfo({
+                caHash: 'f8e66f2ba4a17dce896b444b1ce0ac83c063481cceef81fc5460a7a0674852f4',
+              });
+              console.log(holderInfo, '===holderInfo');
+
               if (!chainInfo || !pin || !wallet.AELF?.caHash) return;
               const req = await request.contact.addContact({
                 params: {

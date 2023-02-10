@@ -10,7 +10,7 @@ export type RefreshTokenConfig = {
   signature: string;
   pubkey: string;
   timestamp: number;
-  cahash: string;
+  ca_hash: string;
   connectUrl: string;
 };
 export const queryAuthorization = async (config: RefreshTokenConfig) => {
@@ -45,7 +45,7 @@ export function setRefreshTokenConfig({
   const message = Buffer.from(`${account.address}-${timestamp}`).toString('hex');
   const signature = AElf.wallet.sign(message, account.keyPair).toString('hex');
   const pubkey = (account.keyPair as any).getPublic('hex');
-  const cahash = caHash;
+  const ca_hash = caHash;
 
   request.setRefreshTokenConfig({
     grant_type: 'signature',
@@ -54,7 +54,7 @@ export function setRefreshTokenConfig({
     signature: signature,
     pubkey,
     timestamp,
-    cahash,
+    ca_hash,
     connectUrl,
   });
 }
