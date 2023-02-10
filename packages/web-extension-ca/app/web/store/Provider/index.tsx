@@ -15,13 +15,14 @@ import { BrowserTracing } from '@sentry/tracing';
 
 const bodyRootWrapper = document.body;
 Sentry.init({
-  dsn: 'https://f439a3f5052f4a578f87a09ac11a246d@o4504399844999168.ingest.sentry.io/4504647744421888',
+  dsn: process.env.SENTRY_DSN,
   integrations: [new BrowserTracing()],
-
   // Set tracesSampleRate to 1.0 to capture 100%
   // of transactions for performance monitoring.
   // We recommend adjusting this value in production
   tracesSampleRate: 1.0,
+  // release: 'v1.0.0',
+  // environment: process.env.NODE_ENV,
 });
 ConfigProvider.config({
   prefixCls,
