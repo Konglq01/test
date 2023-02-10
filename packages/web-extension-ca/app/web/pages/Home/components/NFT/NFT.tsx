@@ -10,7 +10,8 @@ import './index.less';
 export default function NFT() {
   const nav = useNavigate();
   const { currentNetwork } = useWalletInfo();
-  const [noData, SetNoData] = useState(false);
+  const [noData, SetNoData] = useState(true);
+  console.log(SetNoData);
   const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? currentNetwork : ''), [currentNetwork]);
   return (
     <div className="tab-nft">

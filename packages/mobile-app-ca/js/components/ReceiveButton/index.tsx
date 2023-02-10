@@ -8,6 +8,7 @@ import { useLanguage } from 'i18n/hooks';
 import TokenOverlay from 'components/TokenOverlay';
 import { TokenItemShowType } from '@portkey/types/types-ca/token';
 import { pTd } from 'utils/unit';
+import CommonToast from 'components/CommonToast';
 
 interface SendButtonType {
   themeType?: 'dashBoard' | 'innerPage';
@@ -23,6 +24,8 @@ export default function ReceiveButton(props: SendButtonType) {
     <View style={styles.buttonWrap}>
       <TouchableOpacity
         onPress={() => {
+          return CommonToast.text('Coming soon. Check back here for updates');
+
           if (themeType === 'innerPage') return navigationService.navigate('Receive');
 
           TokenOverlay.showTokenList({
