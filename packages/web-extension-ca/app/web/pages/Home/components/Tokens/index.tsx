@@ -17,13 +17,13 @@ export default function TokenList({ tokenList }: { tokenList: TokenBaseItemType[
   const onNavigate = useCallback((tokenInfo: TokenBaseItemType) => {
     console.log(tokenInfo);
 
-    message.info('Coming soon. Check back here for updates');
+    message.info('Coming soon. Check back here for updates', 1);
     return;
     // navigate('/token-detail', { state: { tokenInfo } });
   }, []);
 
   const handleAddToken = useCallback(() => {
-    message.info('Coming soon. Check back here for updates');
+    message.info('Coming soon. Check back here for updates', 1);
     // navigate('/add-token');
     return;
   }, []);

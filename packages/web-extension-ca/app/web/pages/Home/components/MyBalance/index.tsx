@@ -159,13 +159,13 @@ export default function MyBalance() {
           if (tokenList.length > 1) {
             // setNavTarget('send');
             // return setTokenOpen(true);
-            return message.info('Coming soon. Check back here for updates');
+            return message.info('Coming soon. Check back here for updates', 1);
           }
           navigate(`/send/${'ELF'}`);
         }}
         onReceive={() => {
           if (tokenList.length > 1) {
-            return message.info('Coming soon. Check back here for updates');
+            return message.info('Coming soon. Check back here for updates', 1);
             // setNavTarget('receive');
             // return setTokenOpen(true);
           }
