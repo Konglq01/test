@@ -11,9 +11,9 @@
     "start": "tsc --watch"
   },
   "dependencies": {
+    "@portkey/api": "^0.0.1",
     "@portkey/types": "^0.0.1",
     "@portkey/utils": "^0.0.1",
-    "@portkey/api": "^0.0.1",
     "aelf-sdk": "^3.2.40"
   }
 }

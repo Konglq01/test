@@ -87,6 +87,26 @@ type AElfCallSendMethod = (
   sendOptions?: SendOptions,
 ) => Promise<ErrorMsg> | Promise<any>;
 
+function handleError(error?: any, req?: any) {
+  if (typeof error === 'string') return { error: { message: error } };
+  if (error?.message) return { error };
+  if (error.Error) {
+    return {
+      error: {
+        message: error.Error.Details || error.Error.Message || error.Error || error.Status,
+        code: error.Error.Code,
+      },
+    };
+  }
+  return {
+    ...error,
+    error: {
+      code: req?.error?.message?.Code || req?.error,
+      message: req?.errorMessage?.message || req?.error?.message?.Message,
+    },
+  };
+}
+
 export class AElfContractBasic {
   public aelfContract: any;
   public address: string;
@@ -105,16 +125,8 @@ export class AElfContractBasic {
       const req = await contract[functionNameUpper].call(paramsOption);
       if (!req?.error && (req?.result || req?.result === null)) return req.result;
       return req;
-    } catch (e: any) {
-      if (e?.Error) {
-        return {
-          error: {
-            message: e.Error.Details || e.Error.Message,
-            code: e.Error.Code,
-          },
-        };
-      }
-      return { error: e };
+    } catch (error) {
+      return handleError(error);
     }
   };
 
@@ -124,35 +136,20 @@ export class AElfContractBasic {
       const { onMethod = 'receipt' } = sendOptions || {};
       const functionNameUpper = functionName.replace(functionName[0], functionName[0].toLocaleUpperCase());
       const req = await this.aelfContract[functionNameUpper](paramsOption);
-      if (req.error) {
-        return {
-          error: {
-            code: req.error.message?.Code || req.error,
-            message: req.errorMessage?.message || req.error.message?.Message,
-          },
-        };
-      }
+      if (req.error) return handleError(undefined, req);
 
       const { TransactionId } = req.result || req;
       if (onMethod === 'receipt') {
         await sleep(1000);
         try {
           return await getTxResult(this.aelfInstance, TransactionId);
-        } catch (error: any) {
-          if (error.message) return { error };
-          return {
-            ...error,
-            error: {
-              code: req?.error?.message?.Code || req?.error,
-              message: error.Error || req?.errorMessage?.message || req?.error?.message?.Message,
-            },
-          };
+        } catch (error) {
+          return handleError(error, req);
         }
       }
       return { TransactionId };
-    } catch (error: any) {
-      if (error.message) return { error };
-      return { error: { message: error.Error || error.Status } };
+    } catch (error) {
+      return handleError(error);
     }
   };
 

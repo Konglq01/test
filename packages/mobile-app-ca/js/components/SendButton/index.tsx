@@ -7,6 +7,7 @@ import { isSameTypeToken } from '@portkey/utils/token';
 import { View, TouchableOpacity } from 'react-native';
 import { TextM } from 'components/CommonText';
 import { useLanguage } from 'i18n/hooks';
+import CommonToast from 'components/CommonToast';
 
 import * as Sentry from '@sentry/react-native';
 
@@ -54,6 +55,7 @@ const SendButton = (props: SendButtonType) => {
     <View style={styles.buttonWrap}>
       <TouchableOpacity
         onPress={() => {
+          return CommonToast.text('Coming soon. Check back here for updates');
           // navigationService.navigate('SendHome', {
           //   tokenItem: {
           //     symbol: 'ELF',

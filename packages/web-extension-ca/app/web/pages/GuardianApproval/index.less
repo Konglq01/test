@@ -82,6 +82,13 @@
       }
     }
   }
+  .popup-verifier-content {
+    max-height: 320px;
+    overflow: auto;
+  }
+  .popup-verifier-content::-webkit-scrollbar{
+    display: none;
+  }
   .login-icon {
     position: absolute;
     top: 0;
@@ -151,12 +158,15 @@
     }
   }
   .btn-wrap {
+    position: fixed;
+    bottom: 0;
     margin-left: -24px;
     width: 100vw;
     border-top: 1px solid @border-2;
     padding: 16px;
+    background-color: @bg-11;
     button {
       height: 48px;
-    }
+    };
   }
 }

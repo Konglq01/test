@@ -8,6 +8,7 @@ import { NetworkItem } from '@portkey/types/types-ca/network';
 import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
 import { ChainItemType } from '@portkey/store/store-ca/wallet/type';
 import { checkEmail, EmailError } from '@portkey/utils/check';
+import { contractErrorHandler } from 'utils/tryErrorHandler';
 interface EmailInputProps {
   currentNetwork: NetworkItem;
   currentChain?: ChainItemType;
@@ -37,18 +38,21 @@ const EmailInput = forwardRef(
             address: currentChain.caContractAddress,
             chainType: currentNetwork.walletType,
             paramsOption: {
-              loginGuardianType: email as string,
+              loginGuardianAccount: email as string,
             },
           });
-          if (checkResult.result.guardiansInfo?.guardians?.length > 0) {
+          console.log(checkResult, 'checkResult===GetHolderInfo');
+          if (checkResult.result.guardiansInfo?.guardianAccounts?.length > 0) {
             isHasAccount = true;
           }
         } catch (error: any) {
           console.log(error, 'validateEmail===');
-          if (error?.Error?.Details && error?.Error?.Details?.indexOf('Not found ca_hash')) {
+          if (error?.Error?.Details && error?.Error?.Details?.indexOf('Not found')) {
+            isHasAccount = false;
+          } else if (error?.Error?.Message === 'Invalid signature') {
             isHasAccount = false;
           } else {
-            throw error?.Error?.Message || error.message?.Message || error?.message;
+            throw contractErrorHandler(error);
           }
         }
 

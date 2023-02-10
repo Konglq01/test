@@ -1,3 +1,4 @@
+/* eslint-disable no-inline-styles/no-inline-styles */
 import CustomSvg from 'components/CustomSvg';
 import './index.less';
 import { useTranslation } from 'react-i18next';
@@ -9,7 +10,7 @@ export interface BalanceCardProps {
   onReceive?: () => void;
 }
 
-export default function BalanceCard({ amount, onSend, onReceive }: BalanceCardProps) {
+export default function BalanceCard({ onSend, onReceive }: BalanceCardProps) {
   const { t } = useTranslation();
 
   return (

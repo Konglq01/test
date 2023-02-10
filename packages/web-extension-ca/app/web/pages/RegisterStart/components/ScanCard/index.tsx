@@ -7,19 +7,17 @@ import AElf from 'aelf-sdk';
 import { useEffectOnce } from 'react-use';
 import { LoginQRData } from '@portkey/types/types-ca/qrcode';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
-import './index.less';
-import { useAppDispatch, useLoading } from 'store/Provider/hooks';
+import { useAppDispatch } from 'store/Provider/hooks';
 import { useIntervalQueryCAInfoByAddress } from '@portkey/hooks/hooks-ca/graphql';
 import { setWalletInfoAction } from 'store/reducers/loginCache/actions';
+import './index.less';
 
 export default function ScanCard() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { setLoading } = useLoading();
   const [newWallet, setNewWallet] = useState<WalletInfoType>();
   const { walletInfo, currentNetwork } = useCurrentWallet();
   const caWallet = useIntervalQueryCAInfoByAddress(currentNetwork, newWallet?.address);
-  console.log(caWallet, newWallet?.address, 'caWallet====');
   const generateKeystore = useCallback(() => {
     try {
       const wallet = walletInfo?.address ? walletInfo : AElf.wallet.createNewWallet();
@@ -58,7 +56,7 @@ export default function ScanCard() {
           caWalletInfo: caWallet,
         }),
       );
-      navigate('/register/set-pin', { state: 'scan' });
+      navigate('/login/set-pin/scan');
     }
   }, [caWallet, dispatch, navigate, newWallet]);
 
@@ -70,6 +68,7 @@ export default function ScanCard() {
       </h2>
       <p>Please use the portkey Dapp to scan the QR code</p>
       <div className="login-content">
+        {/* eslint-disable-next-line no-inline-styles/no-inline-styles */}
         {qrData && <QRCode className="qrc" value={qrData} style={{ width: 170, height: 170 }} />}
       </div>
     </div>

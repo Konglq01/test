@@ -21,7 +21,7 @@ const serviceWorkerListener = ({ pageStateChange, checkRegisterStatus, checkTimi
     checkRegisterStatus();
     console.log('reason', reason);
     // if (reason === chrome.runtime.OnInstalledReason.UPDATE) {
-    //   SWEventController.onDisconnect({ ...errorHandler(600002) });
+    //   SWEventController.onDisconnect(errorHandler(600002) );
     // }
   });
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

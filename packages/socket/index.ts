@@ -25,14 +25,18 @@ export default class Signalr<ListenList = any> {
     this.listenList = listenList;
   }
 
-  doOpen = async ({ url }: { url: string }) => {
+  doOpen = async ({ url, clientId }: { url: string; clientId: string }) => {
     const signalr = new HubConnectionBuilder().withUrl(url).withAutomaticReconnect().build();
     this._listener(signalr);
     signalr.onclose(err => {
       console.log('onclose', err);
     });
+    signalr.on('caAccountRegister', (...args) => {
+      console.log('caAccountRegister===', args);
+    });
     if (this.signalr) await this.destroy();
     await signalr.start();
+    await signalr.invoke('Connect', clientId);
     this.connectionId = signalr.connectionId ?? '';
     this.signalr = signalr;
     this.url = url;

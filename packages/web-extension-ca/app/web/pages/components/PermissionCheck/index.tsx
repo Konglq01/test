@@ -37,6 +37,7 @@ export default function PermissionCheck({
     () =>
       location.pathname.includes('/login') ||
       location.pathname.includes('/register') ||
+      location.pathname.includes('/success-page') ||
       location.pathname === '/permission',
     [location.pathname],
   );
@@ -44,6 +45,7 @@ export default function PermissionCheck({
   const isRegisterPage = useMemo(
     () =>
       location.pathname.includes('/register') ||
+      location.pathname.includes('/success-page') ||
       ((location.pathname.includes('/query-page') || location.pathname.includes('/login')) && pageType === 'Popup'),
     [location.pathname, pageType],
   );
@@ -92,6 +94,7 @@ export default function PermissionCheck({
   }, [pageType, noCheckRegister, isRegisterPage, getPassword]);
 
   useEffect(() => {
+    if (location.pathname.includes('/test')) return;
     if (locked && !noCheckRegister && !isRegisterPage) return navigate('/unlock');
     checkRegisterHandler();
   }, [isRegisterPage, locked, noCheckRegister, navigate, getPassword, checkRegisterHandler]);

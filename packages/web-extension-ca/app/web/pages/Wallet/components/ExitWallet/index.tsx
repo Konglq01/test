@@ -12,9 +12,9 @@ import { getAelfInstance } from '@portkey/utils/aelf';
 import { getTxResult } from 'utils/aelfUtils';
 import { sleep } from '@portkey/utils';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import InternalMessage from 'messages/InternalMessage';
-import InternalMessageTypes, { PromptRouteTypes } from 'messages/InternalMessageTypes';
 import { clearLocalStorage } from 'utils/storage/chromeStorage';
+import { contractErrorHandler } from 'utils/tryErrorHandler';
+import useLogOut from 'hooks/useLogout';
 
 interface ExitWalletProps {
   open: boolean;
@@ -29,6 +29,7 @@ export default function ExitWallet({ open, onCancel }: ExitWalletProps) {
   const currentChain = useCurrentChain();
   const { setLoading } = useLoading();
   const currentNetwork = useCurrentNetworkInfo();
+  const logout = useLogOut();
 
   const onConfirm = useCallback(async () => {
     try {
@@ -49,7 +50,7 @@ export default function ExitWallet({ open, onCancel }: ExitWalletProps) {
           caHash: wallet?.caHash as string,
           manager: {
             managerAddress: wallet.address,
-            deviceString: new Date().getTime(),
+            deviceString: new Date().getTime().toString(),
           },
         },
       });
@@ -57,17 +58,19 @@ export default function ExitWallet({ open, onCancel }: ExitWalletProps) {
       await sleep(1000);
       const aelfInstance = getAelfInstance(currentChain.endPoint);
       await getTxResult(aelfInstance, TransactionId);
+      logout();
       clearLocalStorage();
       setLoading(false);
     } catch (error: any) {
       setLoading(false);
-      message.error(error);
+      const _error = contractErrorHandler(error) || 'Something error';
+      message.error(_error);
       console.log('---exist wallet error', error);
     }
   }, [
-    currentChain?.caContractAddress,
-    currentChain?.endPoint,
+    currentChain,
     currentNetwork.walletType,
+    logout,
     passwordSeed,
     setLoading,
     wallet.address,
@@ -93,7 +96,7 @@ export default function ExitWallet({ open, onCancel }: ExitWalletProps) {
         </div>
       }>
       <div className="text-center modal-content">
-        <div style={{ marginBottom: 12 }}>
+        <div className="tip-title">
           {t('Your current wallet and assets will be removed from this app permanently. This action cannot be undone.')}
         </div>
         <div>{t('You can ONLY recover this wallet with your guardians.')}</div>

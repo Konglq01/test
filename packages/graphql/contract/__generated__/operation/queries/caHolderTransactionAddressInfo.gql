@@ -1,0 +1,9 @@
+query caHolderTransactionAddressInfo($dto: GetCAHolderTransactionAddressDto){
+    caHolderTransactionAddressInfo(dto: $dto){
+        chainId
+        caAddress
+        address
+        addressChainId
+        transactionTime
+    }
+}

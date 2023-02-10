@@ -6,6 +6,7 @@ import CustomSvg from 'components/CustomSvg';
 import MenuItem from 'components/MenuItem';
 import SetPin from './components/SetPin';
 import './index.less';
+import { message } from 'antd';
 
 interface MenuItemInfo {
   label: string;
@@ -22,7 +23,8 @@ export default function AccountSetting() {
       {
         label: t('Change Pin'),
         click: () => {
-          setPinOpen(true);
+          message.info('Coming soon. Check back here for updates', 1);
+          // setPinOpen(true);
         },
       },
     ],

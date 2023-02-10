@@ -1,8 +1,21 @@
-import React from 'react';
+import { bottomBarHeight } from '@portkey/utils/mobile/device';
+import React, { useMemo } from 'react';
 import { SafeAreaView, SafeAreaViewProps } from 'react-native-safe-area-context';
 import styles from './styles';
 
-export type SafeAreaBoxProps = SafeAreaViewProps;
-export default function SafeAreaBox(props: SafeAreaBoxProps) {
-  return <SafeAreaView {...props} style={[styles.pageWrap, props.style]} />;
+export type SafeAreaBoxProps = SafeAreaViewProps & {
+  pageSafeBottomPadding?: boolean;
+};
+
+export default function SafeAreaBox({ pageSafeBottomPadding, style, ...props }: SafeAreaBoxProps) {
+  const isPageSafeBottomPadding = useMemo(() => {
+    const isBottomEdge = !props.edges || props.edges.includes('bottom');
+    return pageSafeBottomPadding || (!bottomBarHeight && isBottomEdge);
+  }, [pageSafeBottomPadding, props.edges]);
+  return (
+    <SafeAreaView
+      style={[styles.pageWrap, isPageSafeBottomPadding ? styles.pageSafeBottom : undefined, style]}
+      {...props}
+    />
+  );
 }

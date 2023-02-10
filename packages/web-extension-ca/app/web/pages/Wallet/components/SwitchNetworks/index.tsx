@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { NetworkType } from '@portkey/types';
@@ -43,13 +43,16 @@ export default function SwitchNetwork() {
     [],
   );
 
-  const handleChangeNet = (net: Network) => {
-    if (!net.disabled) {
-      // TODO: judge userInfo login status
-      setCurNet(net.key);
-      appDispatch(changeNetworkType(net.networkType));
-    }
-  };
+  const handleChangeNet = useCallback(
+    (net: Network) => {
+      if (!net.disabled) {
+        // TODO: judge userInfo login status
+        setCurNet(net.key);
+        appDispatch(changeNetworkType(net.networkType));
+      }
+    },
+    [appDispatch],
+  );
 
   return (
     <div className="flex-column switch-networks-drawer">
@@ -59,10 +62,10 @@ export default function SwitchNetwork() {
           className={clsx('network-item', net.disabled ? 'disabled' : '')}
           onClick={() => handleChangeNet(net)}>
           <div className="network-item-checked">
-            {curNet === net.key && <CustomSvg type="selected" style={{ width: 16, height: 16 }} />}
+            {curNet === net.key && <CustomSvg type="selected" className="selected-svg" />}
           </div>
           <div className="network-item-icon">
-            <CustomSvg type="Aelf" style={{ width: 32, height: 32 }} />
+            <CustomSvg type="Aelf" />
           </div>
           {t(net.name)}
         </div>

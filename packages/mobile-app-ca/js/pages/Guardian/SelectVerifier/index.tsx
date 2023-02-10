@@ -13,18 +13,18 @@ import { BorderStyles, FontStyles } from 'assets/theme/styles';
 import ListItem from 'components/ListItem';
 import { pTd } from 'utils/unit';
 import fonts from 'assets/theme/fonts';
-import { isIos } from '@portkey/utils/mobile/device';
 import navigationService from 'utils/navigationService';
 import useRouterParams from '@portkey/hooks/useRouterParams';
-import { request } from 'api';
 import CommonToast from 'components/CommonToast';
 import Loading from 'components/Loading';
-import { randomId } from '@portkey/utils';
 import { useVerifierList } from '@portkey/hooks/hooks-ca/network';
 import VerifierOverlay from '../components/VerifierOverlay';
 import { VerifierImage } from '../components/VerifierImage';
 import { LoginType } from '@portkey/types/types-ca/wallet';
 import myEvents from 'utils/deviceEvent';
+import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
+import { request } from 'api';
+import { DefaultChainId } from '@portkey/constants/constants-ca/network-test2';
 
 const ScrollViewProps = { disabled: true };
 export default function SelectVerifier() {
@@ -33,10 +33,40 @@ export default function SelectVerifier() {
 
   const [selectedVerifier, setSelectedVerifier] = useState(verifierList[0]);
 
-  const { loginGuardianType } = useRouterParams<{ loginGuardianType?: string }>();
+  const { loginAccount } = useRouterParams<{ loginAccount?: string }>();
   const onConfirm = useCallback(async () => {
+    const confirm = async () => {
+      try {
+        Loading.show();
+        const requestCodeResult = await request.verify.sendCode({
+          data: {
+            type: LoginStrType[LoginType.email],
+            guardianAccount: loginAccount,
+            verifierId: selectedVerifier.id,
+            chainId: DefaultChainId,
+          },
+        });
+
+        if (requestCodeResult.verifierSessionId) {
+          navigationService.navigate('VerifierDetails', {
+            requestCodeResult,
+            guardianItem: {
+              isLoginAccount: true,
+              verifier: selectedVerifier,
+              guardianAccount: loginAccount,
+              guardianType: LoginType.email,
+            },
+          });
+        } else {
+          throw new Error('send fail');
+        }
+      } catch (error) {
+        CommonToast.failError(error);
+      }
+      Loading.hide();
+    };
     ActionSheet.alert({
-      title2: `${selectedVerifier.name} will send a verification code to ${loginGuardianType} to verify your email address.`,
+      title2: `${selectedVerifier.name} will send a verification code to ${loginAccount} to verify your email address.`,
       buttons: [
         {
           title: t('Cancel'),
@@ -45,43 +75,11 @@ export default function SelectVerifier() {
         },
         {
           title: t('Confirm'),
-          onPress: async () => {
-            try {
-              const managerUniqueId = randomId();
-              Loading.show();
-              const req = await request.register.sendCode({
-                baseURL: selectedVerifier.url,
-                data: {
-                  type: 0,
-                  loginGuardianType,
-                  managerUniqueId,
-                },
-              });
-
-              if (req.verifierSessionId) {
-                navigationService.navigate('VerifierDetails', {
-                  loginGuardianType,
-                  verifierSessionId: req.verifierSessionId,
-                  managerUniqueId,
-                  guardianItem: {
-                    isLoginAccount: true,
-                    verifier: selectedVerifier,
-                    loginGuardianType,
-                    guardiansType: LoginType.email,
-                  },
-                });
-              } else {
-                throw new Error('send fail');
-              }
-            } catch (error) {
-              CommonToast.failError(error);
-            }
-            Loading.hide();
-          },
+          onPress: confirm,
         },
       ],
     });
-  }, [loginGuardianType, selectedVerifier, t]);
+  }, [selectedVerifier, loginAccount, t]);
   return (
     <PageContainer
       containerStyles={styles.containerStyles}
@@ -134,7 +132,7 @@ export default function SelectVerifier() {
 const styles = StyleSheet.create({
   containerStyles: {
     justifyContent: 'space-between',
-    paddingBottom: isIos ? 16 : 40,
+    paddingBottom: 16,
   },
   selectedItem: {
     borderWidth: 1,

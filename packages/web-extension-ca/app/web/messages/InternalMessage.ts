@@ -7,7 +7,7 @@ import type { SendResponseParams } from 'types';
 import { InternalMessageData } from 'types/SW';
 import errorHandler from 'utils/errorHandler';
 
-const timeoutPromise = (delay?: number): Promise<SendResponseParams> => {
+export const timeoutPromise = (delay?: number): Promise<SendResponseParams> => {
   return new Promise((_resolve) => {
     const ids = setTimeout(() => {
       clearTimeout(ids);
