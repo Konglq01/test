@@ -165,7 +165,7 @@ export function getDeviceType() {
   let deviceType: DeviceType;
   switch (Platform.OS) {
     case 'ios':
-      deviceType = DeviceType.mac;
+      deviceType = DeviceType.ios;
       break;
     case 'android':
       deviceType = DeviceType.android;
