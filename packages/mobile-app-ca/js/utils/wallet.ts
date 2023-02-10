@@ -1,4 +1,10 @@
-import { CaAccountRecoverResult, CaAccountRegisterResult, CAInfo, ManagerInfo } from '@portkey/types/types-ca/wallet';
+import {
+  CaAccountRecoverResult,
+  CaAccountRegisterResult,
+  CAInfo,
+  DeviceType,
+  ManagerInfo,
+} from '@portkey/types/types-ca/wallet';
 import { VerificationType } from '@portkey/types/verifier';
 import { clearTimeoutInterval, setTimeoutInterval } from '@portkey/utils/interval';
 import Loading from 'components/Loading';
@@ -10,6 +16,8 @@ import { request } from '@portkey/api/api-did';
 import myServer from '@portkey/api/server';
 import Signalr from '@portkey/socket';
 import { listenList } from '@portkey/constants/constants-ca/socket';
+import { LoginQRData } from '@portkey/types/types-ca/qrcode';
+import { Platform } from 'react-native';
 
 class SignalrDid extends Signalr {
   public Ack(clientId: string, requestId: string) {
@@ -136,17 +144,35 @@ export async function addManager({
   address,
   caHash,
   managerAddress,
+  deviceType,
 }: {
   contract: ContractBasic;
   address: string;
   caHash: string;
-  managerAddress?: string;
+  managerAddress?: LoginQRData['address'];
+  deviceType?: LoginQRData['deviceType'];
 }) {
   return contract.callSendMethod('AddManager', address, {
     caHash,
     manager: {
       managerAddress,
-      deviceString: new Date().getTime(),
+      deviceString: `${deviceType !== undefined ? deviceType + ',' : ''}${Date.now()}`,
     },
   });
+}
+
+export function getDeviceType() {
+  let deviceType: DeviceType;
+  switch (Platform.OS) {
+    case 'ios':
+      deviceType = DeviceType.ios;
+      break;
+    case 'android':
+      deviceType = DeviceType.android;
+      break;
+    default:
+      deviceType = DeviceType.other;
+      break;
+  }
+  return deviceType;
 }

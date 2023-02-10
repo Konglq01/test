@@ -18,7 +18,7 @@ export interface ChainItemType {
   chainId: string;
   name: string;
   endPoint: string;
-  exploreUrl: string;
+  explorerUrl: string;
   caContractAddress: string;
 }
 

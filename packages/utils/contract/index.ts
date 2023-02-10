@@ -1,54 +1,21 @@
 import { sleep } from '@portkey/utils';
 import { AElfInterface } from '@portkey/types/aelf';
-import { getTxResult } from './aelfUtils';
+import {
+  encodedParams,
+  getContractMethods,
+  getTxResult,
+  handleContractError,
+  handleContractParams,
+  handleFunctionName,
+} from './utils';
 import { ChainType } from '@portkey/types';
 import { encodedTx } from '@portkey/utils/aelf';
-type SendOptions = {
-  from?: string;
-  gasPrice?: string;
-  gas?: number;
-  value?: number | string;
-  nonce?: number;
-  onMethod: 'transactionHash' | 'receipt' | 'confirmation';
-};
+import { AElfCallSendMethod, AElfCallViewMethod, CallSendMethod, CallViewMethod, ContractProps } from './types';
 
-export interface ContractProps {
-  contractAddress: string;
-  aelfContract?: any;
-  aelfInstance?: AElfInterface;
-  rpcUrl: string;
-}
-
-interface ErrorMsg {
-  error: {
-    name?: string;
-    code: number;
-    message: string;
-  };
-}
-
-type CallViewMethod = (
-  functionName: string,
-  paramsOption?: any,
-  callOptions?: {
-    defaultBlock: number | string;
-    options?: any;
-    callback?: any;
-  },
-) => Promise<any | ErrorMsg>;
-
-type CallSendMethod = (
-  functionName: string,
-  account: string,
-  paramsOption?: any,
-  sendOptions?: SendOptions,
-) => Promise<ErrorMsg> | Promise<any>;
-
-export type ContractBasicErrorMsg = ErrorMsg;
 export class ContractBasic {
   public address?: string;
   public callContract: WB3ContractBasic | AElfContractBasic;
-  public contractType: ChainType;
+  public chainType: ChainType;
   public rpcUrl: string;
   constructor(options: ContractProps) {
     this.address = options.contractAddress;
@@ -56,7 +23,7 @@ export class ContractBasic {
     const isELF = true;
     // TODO :ethereum
     this.callContract = isELF ? new AElfContractBasic(options) : new WB3ContractBasic();
-    this.contractType = isELF ? 'aelf' : 'ethereum';
+    this.chainType = isELF ? 'aelf' : 'ethereum';
   }
 
   public callViewMethod: CallViewMethod = async (
@@ -79,34 +46,6 @@ export class ContractBasic {
 
 export class WB3ContractBasic {}
 
-type AElfCallViewMethod = (functionName: string, paramsOption?: any) => Promise<any | ErrorMsg>;
-
-type AElfCallSendMethod = (
-  functionName: string,
-  paramsOption?: any,
-  sendOptions?: SendOptions,
-) => Promise<ErrorMsg> | Promise<any>;
-
-function handleError(error?: any, req?: any) {
-  if (typeof error === 'string') return { error: { message: error } };
-  if (error?.message) return { error };
-  if (error.Error) {
-    return {
-      error: {
-        message: error.Error.Details || error.Error.Message || error.Error || error.Status,
-        code: error.Error.Code,
-      },
-    };
-  }
-  return {
-    ...error,
-    error: {
-      code: req?.error?.message?.Code || req?.error,
-      message: req?.errorMessage?.message || req?.error?.message?.Message,
-    },
-  };
-}
-
 export class AElfContractBasic {
   public aelfContract: any;
   public address: string;
@@ -121,12 +60,11 @@ export class AElfContractBasic {
     const contract = this.aelfContract;
     if (!contract) return { error: { code: 401, message: 'Contract init error1' } };
     try {
-      const functionNameUpper = functionName.replace(functionName[0], functionName[0].toLocaleUpperCase());
-      const req = await contract[functionNameUpper].call(paramsOption);
+      const req = await contract[handleFunctionName(functionName)].call(paramsOption);
       if (!req?.error && (req?.result || req?.result === null)) return req.result;
       return req;
     } catch (error) {
-      return handleError(error);
+      return handleContractError(error);
     }
   };
 
@@ -134,22 +72,33 @@ export class AElfContractBasic {
     if (!this.aelfContract) return { error: { code: 401, message: 'Contract init error' } };
     try {
       const { onMethod = 'receipt' } = sendOptions || {};
-      const functionNameUpper = functionName.replace(functionName[0], functionName[0].toLocaleUpperCase());
-      const req = await this.aelfContract[functionNameUpper](paramsOption);
-      if (req.error) return handleError(undefined, req);
+      const _functionName = handleFunctionName(functionName);
+      const _params = await handleContractParams({
+        instance: this.aelfInstance,
+        paramsOption,
+        functionName: _functionName,
+      });
+      console.log(_params, _functionName, '=====_params');
+
+      const req = await this.aelfContract[_functionName](_params);
 
       const { TransactionId } = req.result || req;
+      if (req.error) return { error: handleContractError(undefined, req), transactionId: TransactionId };
+
+      // receipt
       if (onMethod === 'receipt') {
         await sleep(1000);
         try {
           return await getTxResult(this.aelfInstance, TransactionId);
         } catch (error) {
-          return handleError(error, req);
+          return { error: handleContractError(error, req), transactionId: TransactionId };
         }
       }
+
+      // transactionHash
       return { TransactionId };
     } catch (error) {
-      return handleError(error);
+      return { error: handleContractError(error) };
     }
   };
 
@@ -164,8 +113,8 @@ export class AElfContractBasic {
         paramsOption,
       });
       return raw;
-    } catch (e) {
-      return { error: e };
+    } catch (error) {
+      return handleContractError(error);
     }
   };
 }

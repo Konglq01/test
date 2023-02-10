@@ -41,7 +41,7 @@ const GlobalStyleHandler: React.FC<GlobalStyleHandlerType> = ({ children }) => {
         break;
     }
     changeFonts(language as LanguageValue);
-    navigationService.reset('Tab');
+    // navigationService.reset('Tab');
   }, [language, prevLanguage]);
 
   useEffectOnce(() => {

@@ -1,4 +1,5 @@
 import { fetchChainListAsync } from '@portkey/store/network/actions';
+import { getChainListAsync } from '@portkey/store/store-ca/wallet/actions';
 import { ChainItemType } from '@portkey/types/chain';
 import { useEffect, useMemo, useCallback } from 'react';
 import { useAppCommonSelector, useAppCommonDispatch } from '.';
@@ -32,7 +33,7 @@ export function useNetworkInitialization() {
   const dispatch = useAppCommonDispatch();
   useEffect(() => {
     try {
-      dispatch(fetchChainListAsync());
+      dispatch(getChainListAsync());
     } catch (error) {
       console.log(error);
     }

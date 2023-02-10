@@ -19,7 +19,7 @@ import { addManager } from 'utils/wallet';
 const ScrollViewProps = { disabled: true };
 export default function ScanLogin() {
   const { data } = useRouterParams<{ data?: LoginQRData }>();
-  const { address: managerAddress } = data || {};
+  const { address: managerAddress, deviceType } = data || {};
 
   const { caHash, address } = useCurrentWalletInfo();
   const [loading, setLoading] = useState<boolean>();
@@ -27,16 +27,16 @@ export default function ScanLogin() {
   const onLogin = useCallback(async () => {
     if (!caHash || loading) return;
     try {
-      const contract = await getCurrentCAContract();
       setLoading(true);
-      const req = await addManager({ contract, caHash, address, managerAddress });
+      const contract = await getCurrentCAContract();
+      const req = await addManager({ contract, caHash, address, managerAddress, deviceType });
       if (req?.error) throw req?.error;
       navigationService.navigate('Tab');
     } catch (error) {
       CommonToast.failError(error);
     }
     setLoading(false);
-  }, [caHash, loading, getCurrentCAContract, address, managerAddress]);
+  }, [caHash, loading, getCurrentCAContract, address, managerAddress, deviceType]);
   return (
     <PageContainer
       scrollViewProps={ScrollViewProps}

@@ -36,11 +36,14 @@ const timeoutPromise = (delay?: number) => {
 
 const fetchFormat = (requestConfig: RequestInit & { url: string; params?: any }) => {
   const { url, signal, params = {}, method = 'GET', headers } = requestConfig;
-  let body: undefined | string = JSON.stringify(params);
+  let body: RequestInit['body'] = JSON.stringify(params);
   let uri = url;
-  if (method.toUpperCase() === 'GET' || method.toUpperCase() === 'DELETE') {
+  const _method = method.toUpperCase();
+  if (_method === 'GET' || _method === 'DELETE') {
     uri = Object.keys(params).length > 0 ? `${uri}?${stringify(params)}` : uri;
     body = undefined;
+  } else {
+    if (requestConfig.body) body = requestConfig.body;
   }
   delete requestConfig.params;
 
@@ -50,7 +53,7 @@ const fetchFormat = (requestConfig: RequestInit & { url: string; params?: any })
   });
   return fetch(uri, {
     ...requestConfig,
-    method: method.toUpperCase(),
+    method: _method,
     headers: myHeaders,
     signal,
     body,

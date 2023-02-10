@@ -22,6 +22,7 @@ import { VerifierImage } from '../VerifierImage';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 import { GuardiansStatus, GuardiansStatusItem } from 'pages/Guardian/types';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network-test2';
+import useDebounceCallback from 'hooks/useDebounceCallback';
 
 interface GuardianAccountItemProps {
   guardianItem: UserGuardianItem;
@@ -70,7 +71,7 @@ function GuardianItemButton({
     },
     [guardianItem.key, setGuardianStatus],
   );
-  const onSendCode = useCallback(async () => {
+  const onSendCode = useDebounceCallback(async () => {
     Loading.show();
     try {
       const req = await request.verify.sendCode({
@@ -102,7 +103,7 @@ function GuardianItemButton({
     }
     Loading.hide();
   }, [onSetGuardianStatus, guardianInfo]);
-  const onVerifier = useCallback(() => {
+  const onVerifier = useDebounceCallback(() => {
     navigationService.push('VerifierDetails', {
       ...guardianInfo,
       requestCodeResult,

@@ -39,9 +39,13 @@ export default function LoginEmail({ setLoginType }: { setLoginType: (type: Logi
     if (message) return;
     Loading.show();
     try {
-      if (!chainInfo) await dispatch(getChainListAsync());
-      const verifierServers = await getVerifierServers();
-      const holderInfo = await getGuardiansInfoWriteStore({ loginAccount });
+      let _chainInfo;
+      if (!chainInfo) {
+        const chainList = await dispatch(getChainListAsync());
+        if (Array.isArray(chainList.payload)) _chainInfo = chainList.payload[1];
+      }
+      const verifierServers = await getVerifierServers(_chainInfo);
+      const holderInfo = await getGuardiansInfoWriteStore({ loginAccount }, _chainInfo);
       navigationService.navigate('GuardianApproval', {
         loginAccount,
         userGuardiansList: handleUserGuardiansList(holderInfo, verifierServers),
@@ -50,7 +54,7 @@ export default function LoginEmail({ setLoginType }: { setLoginType: (type: Logi
       setErrorMessage(handleError(error));
     }
     Loading.hide();
-  }, [chainInfo, dispatch, loginAccount, getGuardiansInfoWriteStore, getVerifierServers]);
+  }, [loginAccount, chainInfo, getVerifierServers, getGuardiansInfoWriteStore, dispatch]);
 
   useEffectOnce(() => {
     const listener = myEvents.clearLoginInput.addListener(() => {

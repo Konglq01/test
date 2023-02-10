@@ -10,5 +10,5 @@ export const verifyErrorHandler = (error: any) => {
 };
 
 export const contractErrorHandler = (error: any) => {
-  return error?.Error?.Message || error.message?.Message || error?.message || error?.Error;
+  return error?.Error?.Message || error?.message?.Message || error?.message || error?.Error;
 };

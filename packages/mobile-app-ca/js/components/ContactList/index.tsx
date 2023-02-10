@@ -44,7 +44,7 @@ const ContactsList: React.FC<ContactsListProps> = ({
   const appDispatch = useAppDispatch();
   const { t } = useLanguage();
   useEffectOnce(() => {
-    appDispatch(fetchContractListAsync());
+    appDispatch(fetchContractListAsync(true));
   });
   const { contactIndexList, contactMap } = useAppSelector(state => state.contact);
 
