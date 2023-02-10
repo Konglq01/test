@@ -59,7 +59,6 @@ export const useDeviceList = () => {
   const networkInfo = useCurrentNetworkInfo();
   const walletInfo = useCurrentWalletInfo();
   const chainInfo = useCurrentChain();
-
   const { data, error } = useCaHolderManagerInfoQuery({
     client: getApolloClient(networkInfo.networkType),
     variables: {
@@ -72,38 +71,41 @@ export const useDeviceList = () => {
     },
     fetchPolicy: 'cache-first',
   });
+
   return useMemo<DeviceItemType[]>(() => {
     if (error || !data || !data.caHolderManagerInfo || data.caHolderManagerInfo.length < 1) return [];
 
     const caHolderManagerInfo = data.caHolderManagerInfo[0];
     const managers = caHolderManagerInfo?.managers || [];
-    return managers.map(item => {
-      const deviceStringArray = (item?.deviceString || '').split(',').map(item => Number(item));
-      let deviceType: DeviceType = 0,
-        loginTime = undefined;
-      const firstNum = deviceStringArray[0];
-      if (firstNum !== undefined && !isNaN(firstNum)) {
-        if (DeviceType[firstNum] !== undefined) {
-          deviceType = firstNum;
-        } else if (!isNaN(new Date(firstNum).getTime())) {
-          loginTime = firstNum;
+    return managers
+      .map(item => {
+        const deviceStringArray = (item?.deviceString || '').split(',').map(item => Number(item));
+        let deviceType: DeviceType = 0,
+          loginTime = undefined;
+        const firstNum = deviceStringArray[0];
+        if (firstNum !== undefined && !isNaN(firstNum)) {
+          if (DeviceType[firstNum] !== undefined) {
+            deviceType = firstNum;
+          } else if (!isNaN(new Date(firstNum).getTime())) {
+            loginTime = firstNum;
+          }
         }
-      }
-      const secondNum = deviceStringArray[1];
-      if (
-        loginTime === undefined &&
-        secondNum !== undefined &&
-        !isNaN(secondNum) &&
-        !isNaN(new Date(firstNum).getTime())
-      ) {
-        loginTime = secondNum;
-      }
-      return {
-        deviceType,
-        loginTime,
-        deviceTypeInfo: DEVICE_TYPE_INFO[deviceType],
-        managerAddress: item?.manager,
-      };
-    });
+        const secondNum = deviceStringArray[1];
+        if (
+          loginTime === undefined &&
+          secondNum !== undefined &&
+          !isNaN(secondNum) &&
+          !isNaN(new Date(firstNum).getTime())
+        ) {
+          loginTime = secondNum;
+        }
+        return {
+          deviceType,
+          loginTime,
+          deviceTypeInfo: DEVICE_TYPE_INFO[deviceType],
+          managerAddress: item?.manager,
+        };
+      })
+      .reverse();
   }, [data, error]);
 };

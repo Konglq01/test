@@ -24,9 +24,8 @@ const Devices: React.FC = () => {
       safeAreaColor={['blue', 'gray']}
       containerStyles={styles.pageWrap}
       scrollViewProps={{ disabled: false }}>
-      {/* TODO:  adjust key */}
-      {deviceList.map((item, idx) => (
-        <Touchable key={idx}>
+      {deviceList.map(item => (
+        <Touchable key={item.managerAddress}>
           <View style={styles.deviceItemWrap}>
             <View style={styles.deviceItemInfoWrap}>
               <Svg icon={item.deviceTypeInfo.icon as IconName} size={pTd(16)} color={defaultColors.icon1} />
