@@ -4,12 +4,12 @@ import { ChainId } from '@portkey/types';
 import aes from '@portkey/utils/aes';
 import { useInterface } from 'contexts/useInterface';
 import { setCAContract, setViewContract } from 'contexts/useInterface/actions';
-import { getContractBasic } from '@portkey/contract/utils';
+import { getContractBasic } from '@portkey/contracts/utils';
 import { useCallback, useMemo } from 'react';
 import { getDefaultWallet } from 'utils/aelfUtils';
 import AElf from 'aelf-sdk';
 import { usePin } from './store';
-import { ContractBasic } from '@portkey/contract';
+import { ContractBasic } from '@portkey/contracts/utils/ContractBasic';
 import { ChainItemType } from '@portkey/store/store-ca/wallet/type';
 
 export function useGetCurrentCAViewContract(chainId: ChainId = 'AELF') {

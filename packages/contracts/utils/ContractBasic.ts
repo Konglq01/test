@@ -1,9 +1,9 @@
 import { sleep } from '@portkey/utils';
 import { AElfInterface } from '@portkey/types/aelf';
-import { getTxResult, handleContractError, handleContractParams, handleFunctionName } from './utils';
+import { getTxResult, handleContractError, handleContractParams, handleFunctionName } from '.';
 import { ChainType } from '@portkey/types';
 import { encodedTx } from '@portkey/utils/aelf';
-import { AElfCallSendMethod, AElfCallViewMethod, CallSendMethod, CallViewMethod, ContractProps } from './types';
+import { AElfCallSendMethod, AElfCallViewMethod, CallSendMethod, CallViewMethod, ContractProps } from '../types';
 
 export class ContractBasic {
   public address?: string;
@@ -80,8 +80,6 @@ export class AElfContractBasic {
         paramsOption,
         functionName: _functionName,
       });
-      console.log(_params, _functionName, '=====_params');
-
       const req = await this.aelfContract[_functionName](_params);
 
       const { TransactionId } = req.result || req;

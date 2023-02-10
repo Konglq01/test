@@ -5,7 +5,7 @@ import Loading from 'components/Loading';
 import CommonToast from 'components/CommonToast';
 import { queryFailAlert } from './login';
 import { AppDispatch } from 'store';
-import { ContractBasic } from '@portkey/contract';
+import { ContractBasic } from '@portkey/contracts/utils/ContractBasic';
 import { request } from '@portkey/api/api-did';
 import Signalr from '@portkey/socket';
 import { listenList } from '@portkey/constants/constants-ca/socket';

@@ -12,7 +12,7 @@ import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { getManagerAccount } from 'utils/redux';
 import { usePin } from 'hooks/store';
-import { getContractBasic } from '@portkey/contract/utils';
+import { getContractBasic } from '@portkey/contracts/utils';
 import AElf from 'aelf-sdk';
 import { customFetch } from '@portkey/utils/fetch';
 import { useGetCurrentCAContract } from 'hooks/contract';
@@ -70,10 +70,10 @@ export default function HomeScreen() {
               caHash: wallet.AELF?.caHash,
               contractAddress: 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE',
               methodName: 'Transfer',
-              params: {
+              args: {
                 symbol: 'ELF',
                 to: '2PfWcs9yhY5xVcJPskxjtAHiKyNUbX7wyWv2NcwFJEg9iNfnPj',
-                amount: 1 * 10 ** 8,
+                // amount: 1 * 10 ** 8,
                 memo: 'transfer address1 to address2',
               },
             });
@@ -81,48 +81,33 @@ export default function HomeScreen() {
           }}
         />
         <Button
-          title="connect token"
+          title="ManagerForwardCall Transfer transactionHash"
           onPress={async () => {
             if (!chainInfo || !pin) return;
-            // const aa = await getVerifierServers();
-            // console.log(JSON.stringify(aa), '=====aa');
-
-            try {
-              const account = getManagerAccount(pin);
-              if (!account) return;
-              console.log(account, '=====account');
-              console.log(AElf.wallet, '====AElf.wallet');
-              const timestamp = new Date().getTime();
-              const message = Buffer.from(`${account.address}-${timestamp}`).toString('hex');
-
-              const signature = AElf.wallet.sign(message, account.keyPair).toString('hex');
-              const pubkey = account?.keyPair?.getPublic('hex');
-              console.log(
-                {
-                  grant_type: 'signature',
-                  client_id: 'CAServer_App',
-                  scope: 'CAServer',
-                  signature: signature,
-                  pubkey,
-                  timestamp,
-                  cahash: wallet.AELF?.caHash,
-                  connectUrl,
+            const account = getManagerAccount(pin);
+            if (!account) return;
+            const contract = await getContractBasic({
+              contractAddress: chainInfo.caContractAddress,
+              rpcUrl: chainInfo.endPoint,
+              account,
+            });
+            const req = await contract?.callSendMethod(
+              'ManagerForwardCall',
+              '',
+              {
+                caHash: wallet.AELF?.caHash,
+                contractAddress: 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE',
+                methodName: 'Transfer',
+                args: {
+                  symbol: 'ELF',
+                  to: '2PfWcs9yhY5xVcJPskxjtAHiKyNUbX7wyWv2NcwFJEg9iNfnPj',
+                  amount: 1 * 10 ** 8,
+                  memo: 'transfer address1 to address2',
                 },
-                '====',
-                connectUrl + '/connect/token',
-              );
-
-              const req = await customFetch(connectUrl + '/connect/token', {
-                headers: {
-                  'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                method: 'POST',
-                body: `grant_type=signature&client_id=CAServer_App&scope=CAServer&signature=${signature}&pubkey=${pubkey}&timestamp=${timestamp}&cahash=${wallet.AELF?.caHash}`,
-              });
-              console.log(req, '======req');
-            } catch (error) {
-              console.log(error, '====error');
-            }
+              },
+              { onMethod: 'transactionHash' },
+            );
+            console.log(req, '======req');
           }}
         />
         <Button

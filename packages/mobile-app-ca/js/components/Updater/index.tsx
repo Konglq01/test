@@ -18,7 +18,7 @@ export default function Updater() {
   const { apiUrl } = useCurrentNetworkInfo();
   const pin = usePin();
   const onLocking = useLocking();
-  // useRefreshTokenConfig(pin);
+  useRefreshTokenConfig(pin);
   useMemo(() => {
     request.set('baseURL', apiUrl);
     if (service.defaults.baseURL !== apiUrl) {
