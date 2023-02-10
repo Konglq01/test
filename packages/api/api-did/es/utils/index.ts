@@ -31,3 +31,23 @@ export const getContactEventList = (
     },
   });
 };
+
+export const getCaHolder = (
+  baseURL: string,
+  { caHash }: { caHash: string },
+): Promise<{
+  items: Array<{
+    userId: string;
+    caAddress: string;
+    caHash: string;
+    id: string;
+    nickName: string;
+  }>;
+}> => {
+  return request.es.getContactList({
+    baseURL,
+    params: {
+      filter: `caHash: ${caHash}`,
+    },
+  });
+};
