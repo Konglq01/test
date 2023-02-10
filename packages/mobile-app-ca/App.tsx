@@ -29,7 +29,7 @@ SplashScreen.preventAutoHideAsync();
 const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
 
 Sentry.init({
-  dsn: 'https://019a9dbb76c240b0b7419d18cb646158@o4504478184636416.ingest.sentry.io/4504494999994368',
+  dsn: Config.SENTRY_DNS,
   // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
   // We recommend adjusting this value in production.
   tracesSampleRate: 1.0,
