@@ -15,6 +15,7 @@ import { useWallet } from 'hooks/store';
 import useQrScanPermission from 'hooks/useQrScanPermission';
 import ActionSheet from 'components/ActionSheet';
 import { useLanguage } from 'i18n/hooks';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 interface CardProps {
   balanceShow?: string;
@@ -61,8 +62,12 @@ const Card: React.FC<CardProps> = () => {
         style={styles.accountName}
         onPress={() => {
           // AccountOverlay.showAccountInfo(currentAccount as AccountType);
+          // crashlytics().crash();
+          crashlytics().log('firebase error!');
+          crashlytics().recordError(new Error('firebase error!'));
+          crashlytics().crash();
         }}>
-        {walletName}
+        {walletName + 'xx'}
       </TextM>
       <View style={styles.buttonGroupWrap}>
         <SendButton themeType="dashBoard" />
