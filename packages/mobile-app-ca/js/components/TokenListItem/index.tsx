@@ -36,7 +36,8 @@ const TokenListItem: React.FC<TokenListItemType> = props => {
           </TextL>
           <TextS numberOfLines={1} style={[FontStyles.font7, itemStyle.chainInfo]}>
             {item?.chainId === 'AELF' ? 'MainChain ' : 'SideChain '} {item?.chainId}{' '}
-            {currentNetwork === 'MAIN' && 'Testnet'}
+            {/* {currentNetwork === 'MAIN' && 'Testnet'} */}
+            {'Testnet'}
           </TextS>
         </View>
 
