@@ -9,7 +9,7 @@ import NFT from 'pages/NFT';
 import Transaction from 'pages/Transaction';
 import My from 'pages/My';
 import Contacts from 'pages/Contacts';
-import Contact from 'pages/ContactDetail';
+import Contact from 'pages/Contacts/ContactDetail';
 import AccountSetting from 'pages/AccountSetting';
 import Guardians from 'pages/Guardians';
 import AddGuardian from 'pages/Guardians/GuardiansAdd';

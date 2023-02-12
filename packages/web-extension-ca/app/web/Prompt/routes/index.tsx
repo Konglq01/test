@@ -17,7 +17,7 @@ import Receive from 'pages/Receive';
 import AddGuardian from 'pages/Guardians/GuardiansAdd';
 import TokenDetail from 'pages/Token/Detail';
 import AccountSetting from 'pages/AccountSetting';
-import Contact from 'pages/ContactDetail';
+import Contact from 'pages/Contacts/ContactDetail';
 import My from 'pages/My';
 import Send from 'pages/Send';
 import Transaction from 'pages/Transaction';
