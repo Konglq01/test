@@ -25,9 +25,10 @@ const ContactDetail: React.FC = () => {
   const { contact } = useRouterParams<RouterParams>();
   const { t } = useLanguage();
   const { currentNetwork } = useWallet();
+
   const renderAddress = useCallback(
-    (addressItem: AddressItem) => (
-      <View key={addressItem.id} style={pageStyles.addressWrap}>
+    (addressItem: AddressItem, index: number) => (
+      <View key={index} style={pageStyles.addressWrap}>
         <View style={pageStyles.addressInfo}>
           <TextM style={pageStyles.addressLabel}>
             ELF_{addressItem.address}_{addressItem.chainId}
@@ -65,7 +66,7 @@ const ContactDetail: React.FC = () => {
 
       <ScrollView alwaysBounceVertical={true}>
         <TouchableWithoutFeedback>
-          <View>{contact?.addresses.map(addressItem => renderAddress(addressItem))}</View>
+          <View>{contact?.addresses.map((addressItem, addressIdx) => renderAddress(addressItem, addressIdx))}</View>
         </TouchableWithoutFeedback>
       </ScrollView>
 
