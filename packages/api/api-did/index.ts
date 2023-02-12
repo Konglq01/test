@@ -2,6 +2,7 @@ import walletApi from './wallet';
 import verificationApi from './verification';
 import contactApi from './contact';
 import chainApi from './chain';
+import tokenApi from './token';
 import esApi from './es';
 import myServer from '../server';
 import { API_REQ_FUNCTION } from '../types';
@@ -30,6 +31,7 @@ export const EXPAND_APIS = {
   verify: verificationApi,
   contact: contactApi,
   chain: chainApi,
+  token: tokenApi,
 };
 
 export type BASE_REQ_TYPES = {
