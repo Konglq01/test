@@ -1,5 +1,5 @@
-import React, { useCallback, useRef } from 'react';
-import { Text, View, TouchableOpacity } from 'react-native';
+import React, { useCallback, useMemo, useRef } from 'react';
+import { Text, View, TouchableOpacity, GestureResponderEvent } from 'react-native';
 
 import { styles as contactListStyles } from './style';
 import { ContactIndexType, ContactItemType } from '@portkey/types/types-ca/contact';
@@ -17,6 +17,16 @@ interface ContactsListProps {
   ListFooterComponent?: JSX.Element;
   renderContactItem: (item: ContactItemType) => JSX.Element;
   renderContactIndex: (contactIndex: ContactIndexType) => JSX.Element;
+}
+
+interface PageLocationType {
+  height: number;
+  pageX: number;
+  pageY: number;
+  indexHeight: number;
+}
+interface IndexInfoType extends PageLocationType {
+  currentIndex: number;
 }
 
 const ContactsList: React.FC<ContactsListProps> = ({
@@ -40,6 +50,62 @@ const ContactsList: React.FC<ContactsListProps> = ({
     [contactIndexList],
   );
 
+  const indexRef = useRef<View>(null);
+  const indexInfoRef = useRef<IndexInfoType>();
+
+  const setCurrentIndex = useCallback(
+    (nativePageY: number) => {
+      if (!indexInfoRef.current) return;
+      const { pageY, height, currentIndex, indexHeight } = indexInfoRef.current;
+      const nativeClientY = nativePageY - pageY;
+      if (nativeClientY < 0 || nativeClientY > height) return;
+      const nowIndex = Math.floor(nativeClientY / indexHeight);
+      if (currentIndex !== nowIndex) {
+        indexInfoRef.current.currentIndex = nowIndex;
+        onSectionSelect(nowIndex);
+      }
+    },
+    [onSectionSelect],
+  );
+  const panResponder = useMemo(
+    () => ({
+      onStartShouldSetResponder: () => true,
+      onMoveShouldSetResponder: () => true,
+      onResponderStart: async (evt: GestureResponderEvent) => {
+        if (indexInfoRef.current) {
+          indexInfoRef.current.currentIndex = 0;
+        } else {
+          const { height, pageX, pageY, indexHeight } = await new Promise<PageLocationType>((resolve, reject) => {
+            if (indexRef.current === null) {
+              reject('no indexRef');
+              return;
+            }
+            indexRef.current.measure((_x, _y, _width, _height, _pageX, _pageY) => {
+              resolve({
+                height: _height,
+                pageX: _pageX,
+                pageY: _pageY,
+                indexHeight: _height / 27,
+              });
+            });
+          });
+          indexInfoRef.current = {
+            height,
+            pageX,
+            pageY,
+            indexHeight,
+            currentIndex: 0,
+          };
+        }
+        setCurrentIndex(evt.nativeEvent.pageY);
+      },
+      onResponderMove: (evt: GestureResponderEvent) => {
+        setCurrentIndex(evt.nativeEvent.pageY);
+      },
+    }),
+    [setCurrentIndex],
+  );
+
   return (
     <View style={[contactListStyles.sectionListWrap, !isIndexBarShow && contactListStyles.sectionListWrapFull]}>
       <FlashList
@@ -60,14 +126,17 @@ const ContactsList: React.FC<ContactsListProps> = ({
       />
 
       {isIndexBarShow && (
-        <View style={contactListStyles.indexBarWrap}>
-          {contactIndexList.map((item, index) => (
-            <TouchableOpacity
-              key={item.index}
-              onPress={() => onSectionSelect(index)}
-              style={contactListStyles.indexItemWrap}>
+        <View ref={indexRef} style={contactListStyles.indexBarWrap} {...panResponder}>
+          {contactIndexList.map(item => (
+            // <TouchableOpacity
+            //   key={item.index}
+            //   onPressIn={() => onSectionSelect(index)}
+            //   style={contactListStyles.indexItemWrap}>
+            //   <Text style={[contactListStyles.indexItem, FontStyles.font3, fonts.mediumFont]}>{item.index}</Text>
+            // </TouchableOpacity>
+            <View key={item.index} style={contactListStyles.indexItemWrap}>
               <Text style={[contactListStyles.indexItem, FontStyles.font3, fonts.mediumFont]}>{item.index}</Text>
-            </TouchableOpacity>
+            </View>
           ))}
         </View>
       )}

@@ -21,7 +21,7 @@ export const styles = StyleSheet.create({
     top: pTd(42),
     height: pTd(432),
     width: pTd(10),
-    justifyContent: 'space-evenly',
+    justifyContent: 'space-between',
     alignItems: 'center',
     flexDirection: 'column',
   },
