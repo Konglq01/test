@@ -16,7 +16,7 @@ export const WalletError = Object.assign({}, BaseWalletError, PinErrorMessage);
 
 export interface ChainItemType {
   chainId: string;
-  name: string;
+  chainName: string;
   endPoint: string;
   explorerUrl: string;
   caContractAddress: string;
