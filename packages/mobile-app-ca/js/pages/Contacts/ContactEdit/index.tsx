@@ -222,13 +222,11 @@ const ContactEdit: React.FC = () => {
     Loading.show();
     try {
       if (isEdit) {
-        const req = await editContactApi(editContact);
-        console.log('editContact', req);
+        await editContactApi(editContact);
         refreshContactList();
         CommonToast.success(t('Saved Successful'), undefined, 'bottom');
       } else {
-        const req = await addContactApi(editContact);
-        console.log('addContact', req);
+        await addContactApi(editContact);
         refreshContactList();
         CommonToast.success(t('Contact Added'), undefined, 'bottom');
       }
@@ -253,8 +251,7 @@ const ContactEdit: React.FC = () => {
           onPress: async () => {
             Loading.show();
             try {
-              const req = await deleteContactApi(editContact);
-              console.log('deleteContact', req);
+              await deleteContactApi(editContact);
               CommonToast.success(t('Contact Deleted'), undefined, 'bottom');
               navigationService.navigate('ContactsHome');
               refreshContactList();

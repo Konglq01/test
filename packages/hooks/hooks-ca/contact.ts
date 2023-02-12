@@ -48,7 +48,7 @@ export const useDeleteContact = () => {
         baseURL: currentNetworkInfo.apiUrl,
         resourceUrl: `${contactItem.id}`,
       });
-      dispatch(deleteContractAction(response));
+      dispatch(deleteContractAction({ ...contactItem, isDeleted: true } as ContactItemType));
       return response;
     },
     [currentNetworkInfo.apiUrl, dispatch],

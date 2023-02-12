@@ -7,7 +7,7 @@ export const getContactList = (
   return request.es.getContactList({
     baseURL,
     params: {
-      // TODO: add userId filter
+      userId,
       filter: `modificationTime: [0 TO ${modificationTime}] AND isDeleted: false`,
       sort: 'modificationTime',
       sortType: 0,
@@ -24,7 +24,7 @@ export const getContactEventList = (
   return request.es.getContactList({
     baseURL,
     params: {
-      // TODO: add userId filter
+      userId,
       filter: `modificationTime: [${modificationTime} TO ${fetchTime}]`,
       sort: 'modificationTime',
       sortType: 0,
@@ -44,7 +44,7 @@ export const getCaHolder = (
     nickName: string;
   }>;
 }> => {
-  return request.es.getContactList({
+  return request.es.getCaHolder({
     baseURL,
     params: {
       filter: `caHash: ${caHash}`,
