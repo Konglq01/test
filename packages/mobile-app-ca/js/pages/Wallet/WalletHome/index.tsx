@@ -41,7 +41,7 @@ const WalletHome: React.FC<WalletHomeProps> = () => {
           console.log('logout success', req);
           logout();
         } else {
-          CommonToast.fail(req?.error.message);
+          CommonToast.fail(req?.error?.message || '');
         }
       } catch (error) {
         console.log(error, '=====error');

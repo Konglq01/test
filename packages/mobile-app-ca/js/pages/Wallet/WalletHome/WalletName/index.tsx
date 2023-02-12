@@ -48,8 +48,8 @@ const WalletName: React.FC = () => {
       await setWalletName(_nameValue);
       navigationService.goBack();
       CommonToast.success(t('Saved Successful'), undefined, 'bottom');
-    } catch (error) {
-      // TODO: should show error?
+    } catch (error: any) {
+      CommonToast.failError(error.error);
       console.log('setWalletName: error', error);
     }
     Loading.hide();

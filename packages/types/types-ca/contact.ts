@@ -2,8 +2,6 @@ import type { NetworkType } from '../index';
 import { PartialOption } from '../common';
 
 export interface AddressItem {
-  id: string;
-  chainType: NetworkType;
   chainId: string; // AELF tDVV tDVW
   address: string;
 }

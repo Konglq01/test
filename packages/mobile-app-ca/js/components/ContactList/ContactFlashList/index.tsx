@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef } from 'react';
-import { Text, View, TouchableOpacity, GestureResponderEvent } from 'react-native';
+import { Text, View, GestureResponderEvent } from 'react-native';
 
 import { styles as contactListStyles } from './style';
 import { ContactIndexType, ContactItemType } from '@portkey/types/types-ca/contact';

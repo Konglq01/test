@@ -10,7 +10,7 @@ import { TextM } from 'components/CommonText';
 import Svg from 'components/Svg';
 import { pTd } from 'utils/unit';
 import navigationService from 'utils/navigationService';
-import { useAppSelector } from 'store/hooks';
+import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { ErrorType } from 'types/common';
 import { FontStyles } from 'assets/theme/styles';
 import Touchable from 'components/Touchable';
@@ -26,8 +26,10 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import CommonToast from 'components/CommonToast';
 import ActionSheet from 'components/ActionSheet';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
-import { useAddContact, useDeleteContact, useEditContact } from 'hooks/contact';
+import { useAddContact, useDeleteContact, useEditContact } from '@portkey/hooks/hooks-ca/contact';
 import useRouterParams from '@portkey/hooks/useRouterParams';
+import { fetchContractListAsync } from '@portkey/store/store-ca/contact/actions';
+import Loading from 'components/Loading';
 
 type RouterParams = {
   contact?: ContactItemType;
@@ -50,6 +52,7 @@ const initEditContact: EditContactType = {
 
 const ContactEdit: React.FC = () => {
   const { contact } = useRouterParams<RouterParams>();
+  const appDispatch = useAppDispatch();
   const { t } = useLanguage();
   const addContactApi = useAddContact();
   const editContactApi = useEditContact();
@@ -73,6 +76,7 @@ const ContactEdit: React.FC = () => {
   const isEdit = useMemo(() => contact !== undefined, [contact]);
 
   const { chainList = [], currentNetwork } = useCurrentWallet();
+
   const chainMap = useMemo(() => {
     const _chainMap: { [k: string]: ChainItemType } = {};
     chainList.forEach(item => {
@@ -87,8 +91,6 @@ const ContactEdit: React.FC = () => {
       const _editContact = { ...preEditContact };
       _editContact.addresses = [
         {
-          id: '',
-          chainType: currentNetwork,
           chainId: chainList[0].chainId,
           address: '',
           error: { ...INIT_HAS_ERROR },
@@ -97,6 +99,12 @@ const ContactEdit: React.FC = () => {
       return _editContact;
     });
   }, [chainList, currentNetwork, isEdit]);
+
+  const refreshContactList = useCallback(() => {
+    setTimeout(() => {
+      appDispatch(fetchContractListAsync());
+    }, 3000);
+  }, [appDispatch]);
 
   // TODO: should check that Why init error as INIT_HAS_ERROR
   const onNameChange = useCallback((value: string) => {
@@ -211,19 +219,26 @@ const ContactEdit: React.FC = () => {
   const onFinish = useCallback(async () => {
     const isErrorExist = checkError();
     if (isErrorExist) return;
+    Loading.show();
     try {
       if (isEdit) {
-        await editContactApi(editContact);
+        const req = await editContactApi(editContact);
+        console.log('editContact', req);
+        refreshContactList();
         CommonToast.success(t('Saved Successful'), undefined, 'bottom');
       } else {
-        await addContactApi(editContact);
+        const req = await addContactApi(editContact);
+        console.log('addContact', req);
+        refreshContactList();
         CommonToast.success(t('Contact Added'), undefined, 'bottom');
       }
       navigationService.navigate('ContactsHome');
-    } catch (err) {
+    } catch (err: any) {
+      CommonToast.failError(err.error);
       console.log(err);
     }
-  }, [addContactApi, checkError, editContact, editContactApi, isEdit, t]);
+    Loading.hide();
+  }, [addContactApi, checkError, editContact, editContactApi, isEdit, refreshContactList, t]);
 
   const onDelete = useCallback(() => {
     ActionSheet.alert({
@@ -237,18 +252,23 @@ const ContactEdit: React.FC = () => {
         {
           title: t('Yes'),
           onPress: async () => {
+            Loading.show();
             try {
-              await deleteContactApi(editContact);
+              const req = await deleteContactApi(editContact);
+              console.log('deleteContact', req);
               CommonToast.success(t('Contact Deleted'), undefined, 'bottom');
               navigationService.navigate('ContactsHome');
-            } catch (error) {
+              refreshContactList();
+            } catch (error: any) {
               console.log('onDelete:error', error);
+              CommonToast.failError(error.error);
             }
+            Loading.hide();
           },
         },
       ],
     });
-  }, [deleteContactApi, editContact, t]);
+  }, [deleteContactApi, editContact, refreshContactList, t]);
 
   const onChainChange = useCallback(
     (addressIdx: number, chainItem: ChainItemType) => {
@@ -285,7 +305,7 @@ const ContactEdit: React.FC = () => {
           <View>
             {editContact.addresses.map((addressItem, addressIdx) => (
               <ContactAddress
-                key={addressItem.id || 'idx_' + addressIdx}
+                key={addressIdx}
                 editAddressItem={addressItem}
                 editAddressIdx={addressIdx}
                 onDelete={deleteAddress}

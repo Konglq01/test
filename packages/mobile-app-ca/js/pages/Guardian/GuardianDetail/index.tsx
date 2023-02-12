@@ -50,7 +50,7 @@ export default function GuardianDetail() {
           guardian: { ...guardian, isLoginAccount: false },
         });
       } else {
-        CommonToast.fail(req?.error.message);
+        CommonToast.fail(req?.error?.message || '');
       }
     } catch (error) {
       CommonToast.failError(error);
