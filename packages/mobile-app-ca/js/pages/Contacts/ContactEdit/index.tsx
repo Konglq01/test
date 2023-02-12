@@ -234,8 +234,7 @@ const ContactEdit: React.FC = () => {
       }
       navigationService.navigate('ContactsHome');
     } catch (err: any) {
-      CommonToast.failError(err.error);
-      console.log(err);
+      CommonToast.failError(err);
     }
     Loading.hide();
   }, [addContactApi, checkError, editContact, editContactApi, isEdit, refreshContactList, t]);
