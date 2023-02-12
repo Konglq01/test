@@ -71,6 +71,7 @@ export default function SetPin() {
       backTitle={oldPin ? 'Change Pin' : undefined}
       leftCallback={leftCallback}>
       <PinContainer
+        showHeader
         ref={digitInput}
         title={oldPin ? 'Please enter a new pin' : 'Enter pin to protect your device'}
         onFinish={pin => {

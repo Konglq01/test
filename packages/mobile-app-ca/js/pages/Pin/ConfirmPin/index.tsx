@@ -125,7 +125,13 @@ export default function ConfirmPin() {
         myEvents.clearSetPin.emit('clearSetPin');
         navigationService.goBack();
       }}>
-      <PinContainer ref={pinRef} title="Confirm Pin" errorMessage={errorMessage} onChangeText={onChangeText} />
+      <PinContainer
+        showHeader
+        ref={pinRef}
+        title="Confirm Pin"
+        errorMessage={errorMessage}
+        onChangeText={onChangeText}
+      />
     </PageContainer>
   );
 }
