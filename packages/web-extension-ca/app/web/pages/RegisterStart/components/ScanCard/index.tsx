@@ -11,6 +11,7 @@ import { useAppDispatch } from 'store/Provider/hooks';
 import { useIntervalQueryCAInfoByAddress } from '@portkey/hooks/hooks-ca/graphql';
 import { setWalletInfoAction } from 'store/reducers/loginCache/actions';
 import './index.less';
+import { DeviceType } from '@portkey/types/types-ca/wallet';
 
 export default function ScanCard() {
   const navigate = useNavigate();
@@ -43,6 +44,7 @@ export default function ScanCard() {
       address: newWallet.address,
       netWorkType: currentNetwork,
       chainType: 'aelf',
+      deviceType: DeviceType.mac,
     };
     return JSON.stringify(data);
   }, [currentNetwork, newWallet]);

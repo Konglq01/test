@@ -25,7 +25,8 @@ import NFT from 'pages/NFT';
 import Unlock from 'pages/Unlock';
 import QueryPage from 'pages/QueryPage';
 import TestSocket from 'pages/TestSocket';
-import Device from 'pages/AccountSetting/device';
+import Device from 'pages/AccountSetting/Devices';
+import SetPin from 'pages/AccountSetting/SetPin';
 
 // TODO delete unnecessary pages
 export const PageRouter = () =>
@@ -145,6 +146,10 @@ export const PageRouter = () =>
     {
       path: '/setting/account-setting/device',
       element: <Device />,
+    },
+    {
+      path: '/setting/account-setting/set-pin',
+      element: <SetPin />,
     },
     {
       path: '/unlock',

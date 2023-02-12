@@ -21,6 +21,7 @@ import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 import { randomId } from '@portkey/utils';
 import './index.less';
 import useFetchDidWallet from 'hooks/useFetchDidWallet';
+import { setPasswordSeed } from 'store/reducers/user/slice';
 
 export default function SetWalletPin() {
   const [form] = Form.useForm();
@@ -123,6 +124,7 @@ export default function SetWalletPin() {
       await setLocalStorage({
         registerStatus: 'Registered',
       });
+      dispatch(setPasswordSeed(pin));
       await setPinAction(pin);
       navigate(`/success-page/${state}`);
     },
