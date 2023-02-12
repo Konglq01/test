@@ -115,7 +115,7 @@ const ContactsList: React.FC<ContactsListProps> = ({
         key={item.id}
         contact={item}
         onPress={() => {
-          navigationService.navigate('ContactDetail', { contact: JSON.stringify(item) });
+          navigationService.navigate('ContactDetail', { contact: item });
         }}
       />
     );

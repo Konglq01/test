@@ -23,7 +23,7 @@ export const removeManager = async ({
     methodName: 'RemoveManager',
     paramsOption: [paramsOption],
   });
-  if (resMessage.code === SandboxErrorCode.error) throw resMessage.message;
+  if (resMessage.code === SandboxErrorCode.error) throw resMessage.error;
   const message = resMessage.message;
   return {
     code: resMessage.code,

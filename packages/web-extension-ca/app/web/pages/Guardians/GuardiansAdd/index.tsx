@@ -11,7 +11,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import CommonModal from 'components/CommonModal';
 import { useAppDispatch, useGuardiansInfo, useLoading } from 'store/Provider/hooks';
 import { EmailReg } from '@portkey/utils/reg';
-import { sendVerificationCode } from '@portkey/api/api-did/apiUtils/verification';
+import { sendVerificationCode } from '@portkey/api/api-did/utils/verification';
 import { LoginType } from '@portkey/types/types-ca/wallet';
 import CustomSelect from 'pages/components/CustomSelect';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';

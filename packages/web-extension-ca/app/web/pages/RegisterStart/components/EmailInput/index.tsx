@@ -47,7 +47,7 @@ const EmailInput = forwardRef(
           }
         } catch (error: any) {
           console.log(error, 'validateEmail===');
-          if (error?.Error?.Details && error?.Error?.Details?.indexOf('Not found')) {
+          if (error?.message?.indexOf('Not found')) {
             isHasAccount = false;
           } else if (error?.Error?.Message === 'Invalid signature') {
             isHasAccount = false;

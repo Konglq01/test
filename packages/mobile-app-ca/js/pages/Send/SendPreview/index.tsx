@@ -16,7 +16,7 @@ import useQrScanPermission from 'hooks/useQrScanPermission';
 // import CrossChainTransferModal from '../components/CrossChainTransferModal';
 import { ZERO } from '@portkey/constants/misc';
 import { useGetELFRateQuery } from '@portkey/store/rate/api';
-// import { ContractBasic } from 'utils/contract';
+// import { ContractBasic } from '@portkey/contracts/utils/ContractBasic';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { formatAddress2NoPrefix, formatStr2EllipsisStr } from 'utils';
 import { addRecentContact } from '@portkey/store/store-ca/recent/slice';

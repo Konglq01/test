@@ -1,15 +1,13 @@
 import { request } from '@portkey/api/api-did';
-import { apiTarget } from '@portkey/api/api-did/contact';
 import { CheckContactNameResponseType } from '@portkey/api/api-did/contact/type';
-import { customFetch } from '@portkey/utils/fetch';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { AddContactItemApiType, ContactItemType, EditContactItemApiType } from '@portkey/types/types-ca/contact';
 import { useCallback } from 'react';
-import { useAppDispatch } from 'store/hooks';
 import { addContractAction, deleteContractAction, editContractAction } from '@portkey/store/store-ca/contact/actions';
+import { useAppCommonDispatch } from '../index';
 
 export const useAddContact = () => {
-  const dispatch = useAppDispatch();
+  const dispatch = useAppCommonDispatch();
   const currentNetworkInfo = useCurrentNetworkInfo();
   return useCallback(
     async (contactItem: AddContactItemApiType): Promise<ContactItemType> => {
@@ -25,13 +23,14 @@ export const useAddContact = () => {
 };
 
 export const useEditContact = () => {
-  const dispatch = useAppDispatch();
+  const dispatch = useAppCommonDispatch();
   const currentNetworkInfo = useCurrentNetworkInfo();
   return useCallback(
     async (contactItem: EditContactItemApiType): Promise<ContactItemType> => {
-      const response = await customFetch(`${currentNetworkInfo.apiUrl}${apiTarget.editContact}/${contactItem.id}`, {
+      const response = await request.contact.editContact({
+        baseURL: currentNetworkInfo.apiUrl,
+        resourceUrl: `${contactItem.id}`,
         params: contactItem,
-        method: 'PUT',
       });
       dispatch(editContractAction(response));
       return response;
@@ -41,14 +40,15 @@ export const useEditContact = () => {
 };
 
 export const useDeleteContact = () => {
-  const dispatch = useAppDispatch();
+  const dispatch = useAppCommonDispatch();
   const currentNetworkInfo = useCurrentNetworkInfo();
   return useCallback(
     async (contactItem: EditContactItemApiType): Promise<ContactItemType> => {
-      const response = await customFetch(`${currentNetworkInfo.apiUrl}${apiTarget.editContact}/${contactItem.id}`, {
-        method: 'DELETE',
+      const response = await request.contact.deleteContact({
+        baseURL: currentNetworkInfo.apiUrl,
+        resourceUrl: `${contactItem.id}`,
       });
-      dispatch(deleteContractAction(response));
+      dispatch(deleteContractAction({ ...contactItem, isDeleted: true } as ContactItemType));
       return response;
     },
     [currentNetworkInfo.apiUrl, dispatch],

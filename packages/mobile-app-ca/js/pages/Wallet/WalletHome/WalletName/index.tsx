@@ -1,32 +1,28 @@
 import PageContainer from 'components/PageContainer';
 import { useLanguage } from 'i18n/hooks';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { pageStyles } from './style';
 import CommonButton from 'components/CommonButton';
 import CommonInput from 'components/CommonInput';
 import { ErrorType } from 'types/common';
-import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { updateWalletNameAsync } from '@portkey/store/store-ca/wallet/actions';
 import { INIT_HAS_ERROR } from 'constants/common';
 import { isValidCAWalletName } from '@portkey/utils/reg';
 import navigationService from 'utils/navigationService';
 import CommonToast from 'components/CommonToast';
+import { useSetWalletName, useWallet } from '@portkey/hooks/hooks-ca/wallet';
+import Loading from 'components/Loading';
 
 const WalletName: React.FC = () => {
   const { t } = useLanguage();
-  const appDispatch = useAppDispatch();
-  const { walletName } = useAppSelector(state => state.wallet);
-  const [nameValue, setNameValue] = useState<string>('');
+  const { walletName } = useWallet();
+  const [nameValue, setNameValue] = useState<string>(walletName);
   const [nameError, setNameError] = useState<ErrorType>(INIT_HAS_ERROR);
+  const setWalletName = useSetWalletName();
 
   const onNameChange = useCallback((value: string) => {
     setNameValue(value);
     setNameError({ ...INIT_HAS_ERROR });
   }, []);
-
-  useEffect(() => {
-    setNameValue(walletName);
-  }, [walletName]);
 
   const onSave = useCallback(async () => {
     const _nameValue = nameValue.trim();
@@ -42,13 +38,22 @@ const WalletName: React.FC = () => {
       setNameError({ ...INIT_HAS_ERROR, errorMsg: t('3-16 characters, only a-z, A-Z, 0-9 and "_" allowed') });
       return;
     }
-
-    const response = await appDispatch(updateWalletNameAsync(_nameValue));
-    if (response.meta.requestStatus === 'fulfilled') {
+    // if (_nameValue === walletName) {
+    //   CommonToast.success(t('Saved Successful'), undefined, 'bottom');
+    //   navigationService.goBack();
+    //   return;
+    // }
+    Loading.show();
+    try {
+      await setWalletName(_nameValue);
       navigationService.goBack();
       CommonToast.success(t('Saved Successful'), undefined, 'bottom');
+    } catch (error: any) {
+      CommonToast.failError(error.error);
+      console.log('setWalletName: error', error);
     }
-  }, [appDispatch, nameValue, t]);
+    Loading.hide();
+  }, [nameValue, setWalletName, t]);
 
   return (
     <PageContainer

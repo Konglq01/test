@@ -9,5 +9,10 @@
     "prebuild": "rm -rf dist",
     "build": "tsc",
     "start": "tsc --watch"
+  },
+  "dependencies": {
+    "@portkey/constants": "^0.0.1",
+    "@portkey/types": "^0.0.1",
+    "query-string": "^7.1.1"
   }
 }

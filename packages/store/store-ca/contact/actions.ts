@@ -45,6 +45,7 @@ export const fetchContractListAsync = createAsyncThunk<FetchContractListAsyncPay
             size: CONTACT_API_FETCH_SIZE,
             modificationTime,
           });
+          console.log('getContactList: response', response);
           response.items.forEach(item => (item.modificationTime = new Date(item.modificationTime).getTime()));
           contactList = contactList.concat(response.items);
           totalCount = response.totalCount;
@@ -80,6 +81,7 @@ export const fetchContractListAsync = createAsyncThunk<FetchContractListAsyncPay
           modificationTime: lastModified,
           fetchTime,
         });
+        console.log('getContactEventList: response', response);
         eventList = response.items;
         eventList.forEach(item => (item.modificationTime = new Date(item.modificationTime).getTime()));
       } catch (err) {

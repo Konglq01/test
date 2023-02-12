@@ -1,7 +1,7 @@
 import Socket from '@portkey/socket/socket-did';
 import { useCurrentApiUrl } from '@portkey/hooks/hooks-ca/network';
 import { CreateWalletResult, RegisterStatus } from '@portkey/types/types-ca/wallet';
-import { requestCreateWallet } from '@portkey/api/api-did/apiUtils/wallet';
+import { requestCreateWallet } from '@portkey/api/api-did/utils/wallet';
 import { sleep } from '@portkey/utils';
 import { useCallback, useState } from 'react';
 import { VerificationType } from '@portkey/types/verifier';

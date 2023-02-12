@@ -10,7 +10,7 @@ import { TextM } from 'components/CommonText';
 import Svg from 'components/Svg';
 import { pTd } from 'utils/unit';
 import navigationService from 'utils/navigationService';
-import { useAppSelector } from 'store/hooks';
+import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { ErrorType } from 'types/common';
 import { FontStyles } from 'assets/theme/styles';
 import Touchable from 'components/Touchable';
@@ -26,11 +26,14 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import CommonToast from 'components/CommonToast';
 import ActionSheet from 'components/ActionSheet';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
-import { useAddContact, useDeleteContact, useEditContact } from 'hooks/contact';
+import { useAddContact, useDeleteContact, useEditContact } from '@portkey/hooks/hooks-ca/contact';
+import useRouterParams from '@portkey/hooks/useRouterParams';
+import { fetchContractListAsync } from '@portkey/store/store-ca/contact/actions';
+import Loading from 'components/Loading';
 
-interface ContactEditProps {
-  route?: any;
-}
+type RouterParams = {
+  contact?: ContactItemType;
+};
 
 export type EditAddressType = AddressItem & { error: ErrorType };
 
@@ -47,7 +50,9 @@ const initEditContact: EditContactType = {
   addresses: [],
 };
 
-const ContactEdit: React.FC<ContactEditProps> = ({ route }) => {
+const ContactEdit: React.FC = () => {
+  const { contact } = useRouterParams<RouterParams>();
+  const appDispatch = useAppDispatch();
   const { t } = useLanguage();
   const addContactApi = useAddContact();
   const editContactApi = useEditContact();
@@ -56,23 +61,22 @@ const ContactEdit: React.FC<ContactEditProps> = ({ route }) => {
   const { contactIndexList } = useAppSelector(state => state.contact);
   const [editContact, setEditContact] = useState<EditContactType>(initEditContact);
 
-  const { params } = route;
   useEffect(() => {
-    if (!params?.contact) return;
-    const contact: ContactItemType = JSON.parse(params.contact);
+    if (!contact) return;
+    const _contact: ContactItemType = JSON.parse(JSON.stringify(contact));
     setEditContact({
-      ...contact,
+      ..._contact,
       error: { ...INIT_NONE_ERROR },
-      addresses: contact.addresses.map(item => ({
+      addresses: _contact.addresses.map(item => ({
         ...item,
         error: { ...INIT_NONE_ERROR },
       })),
     });
-  }, [params]);
-
-  const isEdit = useMemo(() => params?.contact !== undefined, [params?.contact]);
+  }, [contact]);
+  const isEdit = useMemo(() => contact !== undefined, [contact]);
 
   const { chainList = [], currentNetwork } = useCurrentWallet();
+
   const chainMap = useMemo(() => {
     const _chainMap: { [k: string]: ChainItemType } = {};
     chainList.forEach(item => {
@@ -87,8 +91,6 @@ const ContactEdit: React.FC<ContactEditProps> = ({ route }) => {
       const _editContact = { ...preEditContact };
       _editContact.addresses = [
         {
-          id: '',
-          chainType: currentNetwork,
           chainId: chainList[0].chainId,
           address: '',
           error: { ...INIT_HAS_ERROR },
@@ -97,6 +99,12 @@ const ContactEdit: React.FC<ContactEditProps> = ({ route }) => {
       return _editContact;
     });
   }, [chainList, currentNetwork, isEdit]);
+
+  const refreshContactList = useCallback(() => {
+    setTimeout(() => {
+      appDispatch(fetchContractListAsync());
+    }, 3000);
+  }, [appDispatch]);
 
   // TODO: should check that Why init error as INIT_HAS_ERROR
   const onNameChange = useCallback((value: string) => {
@@ -211,19 +219,23 @@ const ContactEdit: React.FC<ContactEditProps> = ({ route }) => {
   const onFinish = useCallback(async () => {
     const isErrorExist = checkError();
     if (isErrorExist) return;
+    Loading.show();
     try {
       if (isEdit) {
         await editContactApi(editContact);
+        refreshContactList();
         CommonToast.success(t('Saved Successful'), undefined, 'bottom');
       } else {
         await addContactApi(editContact);
+        refreshContactList();
         CommonToast.success(t('Contact Added'), undefined, 'bottom');
       }
       navigationService.navigate('ContactsHome');
-    } catch (err) {
-      console.log(err);
+    } catch (err: any) {
+      CommonToast.failError(err);
     }
-  }, [addContactApi, checkError, editContact, editContactApi, isEdit, t]);
+    Loading.hide();
+  }, [addContactApi, checkError, editContact, editContactApi, isEdit, refreshContactList, t]);
 
   const onDelete = useCallback(() => {
     ActionSheet.alert({
@@ -237,18 +249,22 @@ const ContactEdit: React.FC<ContactEditProps> = ({ route }) => {
         {
           title: t('Yes'),
           onPress: async () => {
+            Loading.show();
             try {
               await deleteContactApi(editContact);
               CommonToast.success(t('Contact Deleted'), undefined, 'bottom');
               navigationService.navigate('ContactsHome');
-            } catch (error) {
+              refreshContactList();
+            } catch (error: any) {
               console.log('onDelete:error', error);
+              CommonToast.failError(error.error);
             }
+            Loading.hide();
           },
         },
       ],
     });
-  }, [deleteContactApi, editContact, t]);
+  }, [deleteContactApi, editContact, refreshContactList, t]);
 
   const onChainChange = useCallback(
     (addressIdx: number, chainItem: ChainItemType) => {
@@ -285,16 +301,16 @@ const ContactEdit: React.FC<ContactEditProps> = ({ route }) => {
           <View>
             {editContact.addresses.map((addressItem, addressIdx) => (
               <ContactAddress
-                key={addressItem.id || 'idx_' + addressIdx}
+                key={addressIdx}
                 editAddressItem={addressItem}
                 editAddressIdx={addressIdx}
                 onDelete={deleteAddress}
-                chainName={chainMap[addressItem.chainId]?.name || ''}
+                chainName={chainMap[addressItem.chainId]?.chainName || ''}
                 onChainPress={() =>
                   ChainOverlay.showList({
                     list: chainList,
                     value: addressItem.chainId,
-                    labelAttrName: 'name',
+                    labelAttrName: 'chainName',
                     callBack: item => {
                       onChainChange(addressIdx, item);
                     },

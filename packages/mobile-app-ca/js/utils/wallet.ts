@@ -11,13 +11,11 @@ import Loading from 'components/Loading';
 import CommonToast from 'components/CommonToast';
 import { queryFailAlert } from './login';
 import { AppDispatch } from 'store';
-import { ContractBasic } from './contract';
+import { ContractBasic } from '@portkey/contracts/utils/ContractBasic';
 import { request } from '@portkey/api/api-did';
-import myServer from '@portkey/api/server';
 import Signalr from '@portkey/socket';
 import { listenList } from '@portkey/constants/constants-ca/socket';
 import { LoginQRData } from '@portkey/types/types-ca/qrcode';
-import { Platform } from 'react-native';
 
 class SignalrDid extends Signalr {
   public Ack(clientId: string, requestId: string) {
@@ -101,7 +99,7 @@ export function intervalGetResult({ managerInfo, onPass, onFail }: IntervalGetRe
   const clientId = managerInfo.requestId || '';
   const requestId = managerInfo.requestId || '';
   socket.doOpen({
-    url: `${myServer.defaultConfig.baseURL}/ca`,
+    url: `${request.defaultConfig.baseURL}/ca`,
     clientId,
   });
   let fetch: any;
@@ -159,20 +157,4 @@ export async function addManager({
       deviceString: `${deviceType !== undefined ? deviceType + ',' : ''}${Date.now()}`,
     },
   });
-}
-
-export function getDeviceType() {
-  let deviceType: DeviceType;
-  switch (Platform.OS) {
-    case 'ios':
-      deviceType = DeviceType.ios;
-      break;
-    case 'android':
-      deviceType = DeviceType.android;
-      break;
-    default:
-      deviceType = DeviceType.other;
-      break;
-  }
-  return deviceType;
 }

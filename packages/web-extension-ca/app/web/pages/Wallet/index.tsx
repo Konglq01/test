@@ -11,10 +11,10 @@ import AutoLock from './components/AutoLock';
 import SwitchNetworks from './components/SwitchNetworks';
 import AboutUs from './components/AboutUs';
 import ExitWallet from './components/ExitWallet';
-import { updateWalletNameAsync } from '@portkey/store/store-ca/wallet/actions';
-import { useWalletInfo, useAppDispatch } from 'store/Provider/hooks';
+import { useWalletInfo } from 'store/Provider/hooks';
 import svgsList from 'assets/svgs';
 import './index.less';
+import { useSetWalletName } from '@portkey/hooks/hooks-ca/wallet';
 
 export type WalletAvatar = keyof typeof svgsList;
 interface MenuItemInfo {
@@ -26,20 +26,23 @@ interface MenuItemInfo {
 export default function Wallet() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const appDispatch = useAppDispatch();
   const { walletName, walletAvatar } = useWalletInfo();
   const [curMenu, setCurMenu] = useState<MenuItemInfo | null>(null);
   const [exitVisible, setExitVisible] = useState<boolean>(false);
+  const setWalletName = useSetWalletName();
 
   const handleUpdateName = useCallback(
     async (name: string) => {
-      const res = await appDispatch(updateWalletNameAsync(name));
-      if (res.meta.requestStatus === 'fulfilled') {
+      try {
+        await setWalletName(name);
         setCurMenu(null);
         message.success(t('Saved Successful'));
+      } catch (error) {
+        // TODO: should show error?
+        console.log('setWalletName: error', error);
       }
     },
-    [appDispatch, t],
+    [setWalletName, t],
   );
 
   const MenuList: MenuItemInfo[] = useMemo(

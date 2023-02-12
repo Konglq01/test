@@ -11,13 +11,14 @@ import { useCallback, useRef } from 'react';
 import { useAppDispatch } from 'store/hooks';
 import useBiometricsReady from './useBiometrics';
 import navigationService from 'utils/navigationService';
-import { onResultFail, TimerResult, IntervalGetResultParams, intervalGetResult, getDeviceType } from 'utils/wallet';
+import { onResultFail, TimerResult, IntervalGetResultParams, intervalGetResult } from 'utils/wallet';
 import CommonToast from 'components/CommonToast';
 import useEffectOnce from './useEffectOnce';
 import { setCredentials } from 'store/user/actions';
 import { DigitInputInterface } from 'components/DigitInput';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 import { GuardiansApproved } from 'pages/Guardian/types';
+import { DEVICE_TYPE } from 'constants/common';
 
 export function useOnManagerAddressAndQueryResult() {
   const dispatch = useAppDispatch();
@@ -53,7 +54,7 @@ export function useOnManagerAddressAndQueryResult() {
         let data: any = {
           loginGuardianAccount: managerInfo.loginAccount,
           managerAddress: tmpWalletInfo.address,
-          deviceString: `${getDeviceType()},${Date.now()}`,
+          deviceString: `${DEVICE_TYPE},${Date.now()}`,
           context: {
             clientId: tmpWalletInfo.address,
             requestId: tmpWalletInfo.address,

@@ -153,7 +153,7 @@ export default function GuardianApproval() {
         myEvents.refreshGuardiansList.emit();
         navigationService.navigate('GuardianHome');
       } else {
-        CommonToast.fail(req?.error.message);
+        CommonToast.fail(req?.error?.message || '');
       }
     } catch (error) {
       CommonToast.failError(error);
@@ -178,7 +178,7 @@ export default function GuardianApproval() {
         myEvents.refreshGuardiansList.emit();
         navigationService.navigate('GuardianHome');
       } else {
-        CommonToast.fail(req?.error.message);
+        CommonToast.fail(req?.error?.message || '');
       }
     } catch (error) {
       CommonToast.failError(error);
@@ -205,7 +205,7 @@ export default function GuardianApproval() {
         myEvents.refreshGuardiansList.emit();
         navigationService.navigate('GuardianHome');
       } else {
-        CommonToast.fail(req?.error.message);
+        CommonToast.fail(req?.error?.message || '');
       }
     } catch (error) {
       CommonToast.failError(error);
