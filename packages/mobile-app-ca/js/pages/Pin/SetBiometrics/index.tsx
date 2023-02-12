@@ -25,6 +25,7 @@ import { handleError } from '@portkey/utils';
 import { VerificationType } from '@portkey/types/verifier';
 import CommonToast from 'components/CommonToast';
 import { useIntervalGetResult } from 'hooks/login';
+import useEffectOnce from 'hooks/useEffectOnce';
 const ScrollViewProps = { disabled: true };
 export default function SetBiometrics() {
   usePreventHardwareBack();
@@ -109,6 +110,11 @@ export default function SetBiometrics() {
       CommonToast.failError(error);
     }
   }, [dispatch, getResult]);
+  useEffectOnce(() => {
+    setTimeout(() => {
+      openBiometrics();
+    }, 100);
+  });
   return (
     <PageContainer scrollViewProps={ScrollViewProps} leftDom titleDom containerStyles={styles.containerStyles}>
       <Touchable style={GStyles.itemCenter} onPress={openBiometrics}>

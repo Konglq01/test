@@ -3,7 +3,6 @@ import { AppState, AppStateStatus } from 'react-native';
 import { useAppDispatch } from 'store/hooks';
 import { setCredentials } from 'store/user/actions';
 import { useUser } from 'hooks/store';
-import secureStore from '@portkey/utils/mobile/secureStore';
 import PageContainer from 'components/PageContainer';
 import { DigitInputInterface } from 'components/DigitInput';
 import { PIN_SIZE } from '@portkey/constants/misc';
@@ -22,6 +21,8 @@ import { VerificationType } from '@portkey/types/verifier';
 import useEffectOnce from 'hooks/useEffectOnce';
 import PinContainer from 'components/PinContainer';
 import { useIntervalGetResult } from 'hooks/login';
+import { getSecureStoreItem } from '@portkey/utils/mobile/biometric';
+import useDebounceCallback from 'hooks/useDebounceCallback';
 let appState: AppStateStatus, verifyTime: number;
 export default function SecurityLock() {
   const { biometrics } = useUser();
@@ -112,17 +113,21 @@ export default function SecurityLock() {
     },
     [caInfo, dispatch, handleRouter, isSyncCAInfo, managerInfo, onIntervalGetResult],
   );
-  const verifyBiometrics = useCallback(async () => {
-    if (!biometrics || (verifyTime && verifyTime + 1000 > new Date().getTime())) return;
-    try {
-      const securePassword = await secureStore.getItemAsync('Pin');
-      if (!securePassword) return;
-      handlePassword(securePassword);
-    } catch (error) {
-      console.log(error, '=====error');
-    }
-    verifyTime = new Date().getTime();
-  }, [biometrics, handlePassword]);
+  const verifyBiometrics = useDebounceCallback(
+    async () => {
+      if (!biometrics || (verifyTime && verifyTime + 1000 > new Date().getTime())) return;
+      try {
+        const securePassword = await getSecureStoreItem('Pin');
+        if (!securePassword) return;
+        handlePassword(securePassword);
+      } catch (error) {
+        console.log(error, '=====error');
+      }
+      verifyTime = new Date().getTime();
+    },
+    [biometrics, handlePassword],
+    1000,
+  );
   const handleAppStateChange = useCallback(
     (nextAppState: AppStateStatus) => {
       if (nextAppState === 'active' && appState !== 'active') {
