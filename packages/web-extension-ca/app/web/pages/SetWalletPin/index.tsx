@@ -10,7 +10,7 @@ import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { setLocalStorage } from 'utils/storage/chromeStorage';
 import { createWallet, setManagerInfo } from '@portkey/store/store-ca/wallet/actions';
 import { useTranslation } from 'react-i18next';
-import { recoveryDIDWallet, registerDIDWallet } from '@portkey/api/api-did/apiUtils/wallet';
+import { recoveryDIDWallet, registerDIDWallet } from '@portkey/api/api-did/utils/wallet';
 import { VerificationType, VerifyStatus } from '@portkey/types/verifier';
 import { isWalletError } from '@portkey/store/wallet/utils';
 import { useHardwareBack } from 'hooks/useHardwareBack';
