@@ -12,7 +12,7 @@ import {
 } from '@portkey/types/types-ca/wallet';
 import { WalletState } from '@portkey/store/store-ca/wallet/type';
 import { VerificationType } from '@portkey/types/verifier';
-import { fetchCreateWalletResult, requestCreateWallet } from '@portkey/api/api-did/apiUtils/wallet';
+import { fetchCreateWalletResult, requestCreateWallet } from '@portkey/api/api-did/utils/wallet';
 import { sleep } from '@portkey/utils';
 import { useCurrentNetworkInfo } from './network';
 import { useCurrentChain } from './chainList';

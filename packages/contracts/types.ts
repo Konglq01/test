@@ -21,6 +21,14 @@ export interface ErrorMsg {
   code?: number;
   message?: string;
 }
+export interface ViewResult {
+  data?: any;
+  error?: ErrorMsg;
+}
+
+export interface SendResult extends ViewResult {
+  transactionId?: string;
+}
 
 export type CallViewMethod = (
   functionName: string,
@@ -30,31 +38,21 @@ export type CallViewMethod = (
     options?: any;
     callback?: any;
   },
-) => Promise<any | ErrorMsg>;
+) => Promise<ViewResult>;
 
 export type CallSendMethod = (
   functionName: string,
   account: string,
   paramsOption?: any,
   sendOptions?: SendOptions,
-) => Promise<
-  {
-    error?: ErrorMsg;
-    transactionId?: string;
-  } & any
->;
+) => Promise<SendResult>;
 
 export type ContractBasicErrorMsg = ErrorMsg;
 
-export type AElfCallViewMethod = (functionName: string, paramsOption?: any) => Promise<any | ErrorMsg>;
+export type AElfCallViewMethod = (functionName: string, paramsOption?: any) => Promise<ViewResult>;
 
 export type AElfCallSendMethod = (
   functionName: string,
   paramsOption?: any,
   sendOptions?: SendOptions,
-) => Promise<
-  {
-    error?: ErrorMsg;
-    transactionId?: string;
-  } & any
->;
+) => Promise<SendResult>;

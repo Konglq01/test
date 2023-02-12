@@ -5,7 +5,7 @@ import CustomSvg from 'components/CustomSvg';
 import SettingHeader from 'pages/components/SettingHeader';
 import { useAppDispatch, useGuardiansInfo, useLoading, useUserInfo } from 'store/Provider/hooks';
 import { useState, useMemo, useCallback } from 'react';
-import { sendVerificationCode } from '@portkey/api/api-did/apiUtils/verification';
+import { sendVerificationCode } from '@portkey/api/api-did/utils/verification';
 import { useTranslation } from 'react-i18next';
 import { handleGuardian } from 'utils/sandboxUtil/handleGuardian';
 import './index.less';

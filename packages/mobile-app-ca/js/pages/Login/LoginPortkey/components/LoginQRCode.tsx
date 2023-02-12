@@ -14,7 +14,7 @@ import { TextL, TextM, TextXXXL } from 'components/CommonText';
 import { LoginType } from '..';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { WalletInfoType } from '@portkey/types/wallet';
-import { useCredentials } from 'hooks/store';
+import { usePin } from 'hooks/store';
 import { useIntervalQueryCAInfoByAddress } from '@portkey/hooks/hooks-ca/graphql';
 import CommonToast from 'components/CommonToast';
 import { handleWalletInfo } from '@portkey/utils/wallet';
@@ -28,7 +28,7 @@ export default function LoginQRCode({ setLoginType }: { setLoginType: (type: Log
   const { walletInfo, currentNetwork } = useCurrentWallet();
   const [newWallet, setNewWallet] = useState<WalletInfoType>();
   const dispatch = useAppDispatch();
-  const { pin } = useCredentials() || {};
+  const pin = usePin();
   const caInfo = useIntervalQueryCAInfoByAddress(currentNetwork, newWallet?.address);
   const isFocused = useIsFocused();
   useEffect(() => {

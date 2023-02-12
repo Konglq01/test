@@ -1,12 +1,12 @@
 import { AElfInterface, AElfWallet } from '@portkey/types/aelf';
-import { ContractBasic } from './index';
-import { getAelfInstance } from '../aelf';
-import { sleep } from '../index';
+import { ContractBasic } from './ContractBasic';
 import AElf from 'aelf-sdk';
+import { getAelfInstance } from '@portkey/utils/aelf';
+import { sleep } from '@portkey/utils';
 
 const methodsMap: { [key: string]: any } = {};
 
-export async function getELFContract({
+export async function getContractBasic({
   contractAddress,
   aelfInstance,
   account,
@@ -103,7 +103,6 @@ export const getServicesFromFileDescriptors = (descriptors: any) => {
 
 export const getFileDescriptorsSet = async (instance: any, contractAddress: string) => {
   const fds = await instance.chain.getContractFileDescriptorSet(contractAddress);
-  console.log(fds, '====fds');
   return getServicesFromFileDescriptors(fds);
 };
 
@@ -137,19 +136,19 @@ type HandleContractParamsParams = { paramsOption: any; functionName: string; ins
 
 export const handleContractParams = async ({ paramsOption, functionName, instance }: HandleContractParamsParams) => {
   if (functionName === 'ManagerForwardCall') {
-    const { contractAddress, methodName, params, caHash } = paramsOption || {};
-    if (!(contractAddress && methodName && params && caHash)) {
+    const { contractAddress, methodName, args, caHash } = paramsOption || {};
+    if (!(contractAddress && methodName && args && caHash)) {
       throw new Error('ManagerForwardCall parameter is missing');
     }
     const methods = await getContractMethods(instance, paramsOption.contractAddress);
     const inputType = methods[paramsOption.methodName];
     if (!inputType) throw new Error(`Contract ${contractAddress} does not exist ${methodName}`);
-    const args = await encodedParams(inputType, paramsOption.params);
+    const _args = await encodedParams(inputType, args);
     return {
       caHash,
       contractAddress,
       methodName,
-      args,
+      args: _args,
     };
   }
   return paramsOption;
