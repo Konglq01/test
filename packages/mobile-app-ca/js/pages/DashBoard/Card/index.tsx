@@ -67,7 +67,7 @@ const Card: React.FC<CardProps> = () => {
           crashlytics().recordError(new Error('firebase error!'));
           crashlytics().crash();
         }}>
-        {walletName + 'xx'}
+        {walletName}
       </TextM>
       <View style={styles.buttonGroupWrap}>
         <SendButton themeType="dashBoard" />
