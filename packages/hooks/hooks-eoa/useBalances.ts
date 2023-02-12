@@ -3,8 +3,8 @@ import BigNumber from 'bignumber.js';
 import useInterval from '../useInterval';
 import { useAppEOASelector } from '.';
 import AElf from 'aelf-sdk';
-import { getELFChainBalance } from '@portkey/contracts';
 import { TokenItemType } from '@portkey/types/types-eoa/token';
+import { getELFChainBalance } from '@portkey/utils/balance';
 
 const bigNAN = new BigNumber('');
 

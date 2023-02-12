@@ -4,7 +4,7 @@ import contactApi from './contact';
 import chainApi from './chain';
 import tokenApi from './token';
 import esApi from './es';
-import myServer from '../server';
+import myServer, { DidService } from './server';
 import { API_REQ_FUNCTION } from '../types';
 import { ES_API_REQ_FUNCTION } from './es/type';
 
@@ -58,6 +58,6 @@ export interface IRequest extends BASE_REQ_TYPES, EXPAND_REQ_TYPES {
   es: ES_REQ_TYPES;
 }
 
-const request = myServer as unknown as IRequest;
+const request = myServer as unknown as IRequest & DidService;
 
 export { request };

@@ -283,7 +283,7 @@ type CAHolderTransactionAddressDto {
 
 input GetCAHolderTransactionAddressDto {
   chainId: String
-  caAddress: String
+  caAddresses: [String]
   skipCount: Int!
   maxResultCount: Int!
 }
@@ -353,7 +353,7 @@ type NFTSearchInfoDto {
 
 input GetCAHolderSearchTokenNFTDto {
   chainId: String
-  caAddress: String
+  caAddresses: [String]
   searchWord: String
   skipCount: Int!
   maxResultCount: Int!

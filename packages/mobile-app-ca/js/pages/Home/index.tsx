@@ -10,15 +10,25 @@ import Loading from 'components/Loading';
 import { contractQueries } from '@portkey/graphql/index';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
-import { getWallet } from 'utils/redux';
-import { useCredentials } from 'hooks/store';
-import { getAelfInstance } from '@portkey/utils/aelf';
-import { useGetGuardiansInfoWriteStore } from 'hooks/guardian';
+import { getManagerAccount } from 'utils/redux';
+import { usePin } from 'hooks/store';
+import { getContractBasic } from '@portkey/contracts/utils';
+import AElf from 'aelf-sdk';
+import { customFetch } from '@portkey/utils/fetch';
+import { useGetCurrentCAContract } from 'hooks/contract';
+import { addManager } from 'utils/wallet';
+import { request } from '@portkey/api/api-did';
+import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
+import { DEVICE_TYPE } from 'constants/common';
+import { useGetHolderInfo } from 'hooks/guardian';
 export default function HomeScreen() {
   const wallet = useCurrentWalletInfo();
-  const getGuardiansInfoWriteStore = useGetGuardiansInfoWriteStore();
-  const { pin } = useCredentials() || {};
+  const getCurrentCAContract = useGetCurrentCAContract();
+
+  const pin = usePin();
   const chainInfo = useCurrentChain('AELF');
+  const { connectUrl } = useCurrentNetworkInfo();
+  const getHolderInfo = useGetHolderInfo();
   return (
     <SafeAreaBox>
       <ScrollView>
@@ -49,58 +59,111 @@ export default function HomeScreen() {
           }}
         />
         <Button
-          title="getCAContract"
+          title="ManagerForwardCall Transfer"
           onPress={async () => {
             if (!chainInfo || !pin) return;
-            console.log(chainInfo, '==chainInfo.caContractAddress');
-            getGuardiansInfoWriteStore({ caHash: wallet.AELF?.caHash as any });
-            const account = getWallet(pin);
-            // const contract = await getELFContract({
-            //   contractAddress: chainInfo.caContractAddress,
-            //   rpcUrl: chainInfo.endPoint,
-            //   account: account,
-            // });
-            const instance = getAelfInstance('http://192.168.67.35:8000');
-            const aelfContract = await instance.chain.contractAt(
-              '2LUmicHyH4RXrMjG4beDwuDsiWJESyLkgkwPdGTR8kahRzq5XS',
+            const account = getManagerAccount(pin);
+            if (!account) return;
+            const contract = await getContractBasic({
+              contractAddress: chainInfo.caContractAddress,
+              rpcUrl: chainInfo.endPoint,
               account,
-            );
-
-            const req = await aelfContract.AddGuardian({
-              caHash: '2045f9b4859d0b9eb6015ec90cabdfb31939ae19500ef0b9970aade32f310650',
-              guardianToAdd: {
-                guardianType: {
-                  // type: 0,
-                  // guardianType: 'hong.lin@aelf.io',
-                },
-                verifier: {
-                  name: 'Verifier-002',
-                  signature:
-                    '4cafb0a1f39260fc4778f06d79a7894dc841d8627d463e4d65c84fadb5a011180265b69037c6863a9f2d387677edeaa6cc72ed0eb10e55bf3d26e2f3746357f000',
-                  verificationDoc:
-                    '0,hong.lin@aelf.io,01/05/2023 07:45:55,2mBnRTqXMb5Afz4CWM2QakLRVDfaq2doJNRNQT1MXoi2uc6Zy3',
-                },
-              },
-              guardiansApproved: [
-                {
-                  guardianType: {
-                    // type: 0,
-                    // guardianType: 'hong.lin@hoopox.com',
-                  },
-                  verifier: {
-                    name: 'Verifier-002',
-                    signature:
-                      '3ede00fb1865e01b48f7165d3e7e6b5ad0ce1e0ea0562ff39b3779bbadb43bd3150356144a6410659dffe87a636257d663b6e72fdc691c5407571b4d3f01dc6900',
-                    verificationDoc:
-                      '0,hong.lin@hoopox.com,01/05/2023 07:46:11,2mBnRTqXMb5Afz4CWM2QakLRVDfaq2doJNRNQT1MXoi2uc6Zy3',
-                  },
-                },
-              ],
             });
-            console.log(req, '====req');
+            const req = await contract?.callSendMethod('ManagerForwardCall', '', {
+              caHash: wallet.AELF?.caHash,
+              contractAddress: 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE',
+              methodName: 'Transfer',
+              args: {
+                symbol: 'ELF',
+                to: '2PfWcs9yhY5xVcJPskxjtAHiKyNUbX7wyWv2NcwFJEg9iNfnPj',
+                // amount: 1 * 10 ** 8,
+                memo: 'transfer address1 to address2',
+              },
+            });
+            console.log(req, '======req');
           }}
         />
+        <Button
+          title="ManagerForwardCall Transfer transactionHash"
+          onPress={async () => {
+            if (!chainInfo || !pin) return;
+            const account = getManagerAccount(pin);
+            if (!account) return;
+            const contract = await getContractBasic({
+              contractAddress: chainInfo.caContractAddress,
+              rpcUrl: chainInfo.endPoint,
+              account,
+            });
+            const req = await contract?.callSendMethod(
+              'ManagerForwardCall',
+              '',
+              {
+                caHash: wallet.AELF?.caHash,
+                contractAddress: 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE',
+                methodName: 'Transfer',
+                args: {
+                  symbol: 'ELF',
+                  to: '2PfWcs9yhY5xVcJPskxjtAHiKyNUbX7wyWv2NcwFJEg9iNfnPj',
+                  amount: 1 * 10 ** 8,
+                  memo: 'transfer address1 to address2',
+                },
+              },
+              { onMethod: 'transactionHash' },
+            );
+            console.log(req, '======req');
+          }}
+        />
+        <Button
+          title="addManager"
+          onPress={async () => {
+            if (!chainInfo || !pin || !wallet.caHash) return;
+            // const aa = await getVerifierServers();
+            // console.log(JSON.stringify(aa), '=====aa');
 
+            try {
+              const tmpWalletInfo = AElf.wallet.createNewWallet();
+              const contract = await getCurrentCAContract();
+              const req = await addManager({
+                contract,
+                caHash: wallet.caHash,
+                address: wallet.address,
+                managerAddress: tmpWalletInfo.address,
+                deviceType: DEVICE_TYPE,
+              });
+              console.log(req, '===req');
+            } catch (error) {
+              console.log(error, '====error');
+            }
+          }}
+        />
+        <Button
+          title="add contact"
+          onPress={async () => {
+            try {
+              console.log(wallet, '====wallet');
+              const holderInfo = await getHolderInfo({
+                caHash: 'f8e66f2ba4a17dce896b444b1ce0ac83c063481cceef81fc5460a7a0674852f4',
+              });
+              console.log(holderInfo, '===holderInfo');
+
+              if (!chainInfo || !pin || !wallet.AELF?.caHash) return;
+              const req = await request.contact.addContact({
+                params: {
+                  name: 'xxx',
+                  addresses: [
+                    {
+                      chainId: 'string',
+                      address: 'string',
+                    },
+                  ],
+                },
+              });
+              console.log(req, '====req');
+            } catch (error) {
+              console.log(error, '====error-1');
+            }
+          }}
+        />
         <CrashTest />
       </ScrollView>
     </SafeAreaBox>

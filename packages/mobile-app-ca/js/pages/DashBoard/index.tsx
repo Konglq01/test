@@ -16,6 +16,8 @@ import { MINUTE } from '@portkey/constants';
 import { fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
 import { useGetCurrentCAViewContract } from 'hooks/contract';
 import PageContainer from 'components/PageContainer';
+import { useAppDispatch } from 'store/hooks';
+import { getWalletNameAsync } from '@portkey/store/store-ca/wallet/actions';
 
 interface DashBoardTypes {
   navigation: any;
@@ -75,6 +77,7 @@ const DashBoard: React.FC<DashBoardTypes> = () => {
 
   useEffectOnce(() => {
     dispatch(fetchTokenListAsync({ type: 'MAIN' }));
+    dispatch(getWalletNameAsync());
   });
 
   return (

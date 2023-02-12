@@ -10,6 +10,10 @@ import CommonToast from 'components/CommonToast';
 
 const list: ListItemProps[] = [
   {
+    title: 'Devices',
+    onPress: () => navigationService.navigate('Devices'),
+  },
+  {
     title: 'Change Pin',
     // TODO: remove disable
     // onPress: () => navigationService.navigate('CheckPin'),

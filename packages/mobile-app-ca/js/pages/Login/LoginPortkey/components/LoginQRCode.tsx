@@ -14,7 +14,7 @@ import { TextL, TextM, TextXXXL } from 'components/CommonText';
 import { LoginType } from '..';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { WalletInfoType } from '@portkey/types/wallet';
-import { useCredentials } from 'hooks/store';
+import { usePin } from 'hooks/store';
 import { useIntervalQueryCAInfoByAddress } from '@portkey/hooks/hooks-ca/graphql';
 import CommonToast from 'components/CommonToast';
 import { handleWalletInfo } from '@portkey/utils/wallet';
@@ -22,12 +22,13 @@ import { LoginQRData } from '@portkey/types/types-ca/qrcode';
 import phone from 'assets/image/pngs/phone.png';
 import QRCode from 'react-native-qrcode-svg';
 import { useIsFocused } from '@react-navigation/native';
+import { DEVICE_TYPE } from 'constants/common';
 
 export default function LoginQRCode({ setLoginType }: { setLoginType: (type: LoginType) => void }) {
   const { walletInfo, currentNetwork } = useCurrentWallet();
   const [newWallet, setNewWallet] = useState<WalletInfoType>();
   const dispatch = useAppDispatch();
-  const { pin } = useCredentials() || {};
+  const pin = usePin();
   const caInfo = useIntervalQueryCAInfoByAddress(currentNetwork, newWallet?.address);
   const isFocused = useIsFocused();
   useEffect(() => {
@@ -86,6 +87,7 @@ export default function LoginQRCode({ setLoginType }: { setLoginType: (type: Log
       type: 'login',
       address: newWallet.address,
       netWorkType: currentNetwork,
+      deviceType: DEVICE_TYPE,
     };
     return JSON.stringify(data);
   }, [currentNetwork, newWallet]);

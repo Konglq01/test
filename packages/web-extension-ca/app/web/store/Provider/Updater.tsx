@@ -5,12 +5,18 @@ import useUpdateRedux from './useUpdateRedux';
 import { useChainListFetch } from '@portkey/hooks/hooks-ca/chainList';
 import { useCaInfoOnChain } from 'hooks/useCaInfoOnChain';
 import { useCurrentApiUrl } from '@portkey/hooks/hooks-ca/network';
-import myServer from '@portkey/api/server';
+import { useRefreshTokenConfig } from '@portkey/hooks/hooks-ca/api';
+import { useUserInfo } from './hooks';
+import { request } from '@portkey/api/api-did';
+import useLocking from 'hooks/useLocking';
 
 export default function Updater() {
+  const onLocking = useLocking();
+  const { passwordSeed } = useUserInfo();
   useVerifierList();
   useUpdateRedux();
   useChainListFetch();
+  useRefreshTokenConfig(passwordSeed);
   useEffect(() => {
     keepAliveOnPages();
   }, []);
@@ -18,11 +24,14 @@ export default function Updater() {
   const apiUrl = useCurrentApiUrl();
 
   useMemo(() => {
-    myServer.set('baseURL', apiUrl);
+    request.set('baseURL', apiUrl);
   }, [apiUrl]);
 
   // Query the caAddress of each chain by Contract
   useCaInfoOnChain();
 
+  useMemo(() => {
+    request.setLockCallBack(onLocking);
+  }, [onLocking]);
   return null;
 }

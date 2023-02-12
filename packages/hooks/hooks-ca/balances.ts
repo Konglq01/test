@@ -68,7 +68,7 @@ export function useCurrentELFBalances(dev?: boolean) {
       if (!dev) interval.remove();
       getBalances();
     },
-    10000,
+    60000,
     [getBalances],
   );
   return balance;

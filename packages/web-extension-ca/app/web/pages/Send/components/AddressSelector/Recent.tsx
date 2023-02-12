@@ -11,24 +11,24 @@ const list: (ContactItemType | AddressItem)[] = [
     chainType: 'MAIN',
     chainId: 'AELF',
   },
-  {
-    id: '1231',
-    index: 'A',
-    name: 'Ally0011',
-    addresses: [
-      { id: '1', chainType: 'MAIN', chainId: 'AELF', address: 'AviSYTKSFpNZwHwuAKGWQFtBQ4oG6babJJU7WtZexx8bNNAn5' },
-      { id: '2', chainType: 'MAIN', chainId: 'tDVW', address: 'zkWrJiNT8B4af6auBzn3WuhNrd3zHtmercyQ4sar7GxM8Xwy9' },
-    ],
-  },
-  {
-    id: '1232',
-    index: 'A',
-    name: 'Ally0022',
-    addresses: [
-      { id: '1', chainType: 'MAIN', chainId: 'AELF', address: 'AviSYTKSFpNZwHwuAKGWQFtBQ4oG6babJJU7WtZexx8bNNAn5' },
-      { id: '2', chainType: 'MAIN', chainId: 'tDVW', address: 'zkWrJiNT8B4af6auBzn3WuhNrd3zHtmercyQ4sar7GxM8Xwy9' },
-    ],
-  },
+  // {
+  //   id: '1231',
+  //   index: 'A',
+  //   name: 'Ally0011',
+  //   addresses: [
+  //     { id: '1', chainType: 'MAIN', chainId: 'AELF', address: 'AviSYTKSFpNZwHwuAKGWQFtBQ4oG6babJJU7WtZexx8bNNAn5' },
+  //     { id: '2', chainType: 'MAIN', chainId: 'tDVW', address: 'zkWrJiNT8B4af6auBzn3WuhNrd3zHtmercyQ4sar7GxM8Xwy9' },
+  //   ],
+  // },
+  // {
+  //   id: '1232',
+  //   index: 'A',
+  //   name: 'Ally0022',
+  //   addresses: [
+  //     { id: '1', chainType: 'MAIN', chainId: 'AELF', address: 'AviSYTKSFpNZwHwuAKGWQFtBQ4oG6babJJU7WtZexx8bNNAn5' },
+  //     { id: '2', chainType: 'MAIN', chainId: 'tDVW', address: 'zkWrJiNT8B4af6auBzn3WuhNrd3zHtmercyQ4sar7GxM8Xwy9' },
+  //   ],
+  // },
 ];
 
 function RecentItem({

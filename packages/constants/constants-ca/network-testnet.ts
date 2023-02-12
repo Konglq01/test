@@ -8,6 +8,7 @@ export const NetworkList: NetworkItem[] = [
     isActive: true,
     apiUrl: 'http://192.168.66.38:5577',
     graphqlUrl: 'http://192.168.66.150:8083/AElfIndexer_DApp/PortKeyIndexerCASchema/graphql',
+    connectUrl: '',
   },
   {
     name: 'aelf Mainnet',
@@ -15,6 +16,7 @@ export const NetworkList: NetworkItem[] = [
     networkType: 'MAIN',
     apiUrl: '',
     graphqlUrl: '',
+    connectUrl: '',
   },
 ];
 
