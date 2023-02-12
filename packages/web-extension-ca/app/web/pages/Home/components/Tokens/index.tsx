@@ -41,7 +41,7 @@ export default function TokenList({ tokenList }: { tokenList: TokenBaseItemType[
             <div className="info">
               <span>{item.token.symbol}</span>
               <span>
-                {item.chainId.toLowerCase() === 'aelf' ? 'MainChain' : 'SideChain'} {item.chainId} {isTestNet}
+                {item.chainId.toLowerCase() === 'aelf' ? 'MainChain' : 'SideChain'} {`${item.chainId} Testnet`}
               </span>
             </div>
             <div className="amount">
