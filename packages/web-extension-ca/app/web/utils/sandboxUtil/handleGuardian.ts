@@ -24,7 +24,7 @@ export const handleGuardian = async ({
     paramsOption: paramsOption.params,
   });
 
-  if (resMessage.code === SandboxErrorCode.error) throw resMessage.message;
+  if (resMessage.code === SandboxErrorCode.error) throw resMessage.error;
   const message = resMessage.message;
   return {
     code: resMessage.code,

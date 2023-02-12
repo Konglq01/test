@@ -26,7 +26,7 @@ export const getHolderInfo = async ({
 
   console.log(resMessage, 'resMessage===GetHolderInfo');
 
-  if (resMessage.code === SandboxErrorCode.error) throw resMessage.message;
+  if (resMessage.code === SandboxErrorCode.error) throw resMessage.error;
   return {
     code: resMessage.code,
     result: {

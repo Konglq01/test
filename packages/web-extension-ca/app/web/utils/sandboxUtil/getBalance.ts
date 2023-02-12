@@ -19,7 +19,7 @@ export const getBalance = async ({
     account,
     chainType: currentChain.chainType,
   });
-  if (balanceMessage.code === SandboxErrorCode.error) return balanceMessage;
+  if (balanceMessage.code === SandboxErrorCode.error) return balanceMessage.error;
   const balance = balanceMessage.message;
   const balances = tokenList.map((item, index) => ({
     symbol: item.symbol,

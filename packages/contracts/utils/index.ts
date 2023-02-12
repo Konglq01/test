@@ -19,7 +19,7 @@ export async function getContractBasic({
 }) {
   let instance = aelfInstance;
   if (rpcUrl) instance = getAelfInstance(rpcUrl);
-  if (!instance) return;
+  if (!instance) throw new Error('Get instance error');
   const aelfContract = await instance.chain.contractAt(contractAddress, account);
   return new ContractBasic({
     aelfContract,
