@@ -55,16 +55,14 @@ const SendButton = (props: SendButtonType) => {
     <View style={styles.buttonWrap}>
       <TouchableOpacity
         onPress={() => {
-          return CommonToast.text('Coming soon. Check back here for updates');
           // navigationService.navigate('SendHome', {
           //   tokenItem: {
           //     symbol: 'ELF',
           //     decimal: 8,s
           //   },
           // });
-          throw new Error('My first Sentry error!');
-
-          Sentry.nativeCrash();
+          // throw new Error('My first Sentry error!');
+          // Sentry.nativeCrash();
 
           if (themeType === 'innerPage') return navigationService.navigate('SendHome', { tokenItem: sentToken });
           // if (currentTokenList.length === 1)

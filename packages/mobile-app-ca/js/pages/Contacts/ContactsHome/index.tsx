@@ -10,7 +10,6 @@ import { pTd } from 'utils/unit';
 import { useLanguage } from 'i18n/hooks';
 
 import ContactsList from 'components/ContactList';
-import CommonToast from 'components/CommonToast';
 
 const ContactsHome: React.FC = () => {
   const { t } = useLanguage();
@@ -21,8 +20,6 @@ const ContactsHome: React.FC = () => {
       rightDom={
         <TouchableOpacity
           onPress={() => {
-            return CommonToast.text('Coming soon. Check back here for updates');
-
             navigationService.navigate('ContactEdit');
           }}>
           <Svg icon="add1" size={pTd(20)} color={defaultColors.font2} />

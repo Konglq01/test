@@ -160,8 +160,7 @@ const ContactsList: React.FC<ContactsListProps> = ({
           type="solid"
           containerStyle={contactListStyles.addButtonWrap}
           buttonStyle={[contactListStyles.addButton]}
-          onPress={() => CommonToast.text('Coming soon. Check back here for updates')}>
-          {/* onPress={() => navigationService.navigate('ContactEdit')}> */}
+          onPress={() => navigationService.navigate('ContactEdit')}>
           <Svg icon="add1" size={pTd(16)} color={defaultColors.icon2} />
           <Text style={contactListStyles.addText}>{t('Add New Contacts')}</Text>
         </CommonButton>

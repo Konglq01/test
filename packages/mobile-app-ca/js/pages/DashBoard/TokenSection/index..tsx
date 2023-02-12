@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import navigationService from 'utils/navigationService';
 import { useAppCASelector, useAppCommonDispatch } from '@portkey/hooks/index';
@@ -13,6 +13,9 @@ import { useLanguage } from 'i18n/hooks';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { fetchTokenList } from '@portkey/store/store-ca/assets/api';
 import CommonToast from 'components/CommonToast';
+import { request } from '@portkey/api/api-did';
+import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
+import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 
 const mockData = {
   items: [
@@ -64,6 +67,10 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
     accountToken: { accountTokenList },
   } = useAppCASelector(state => state.assets);
 
+  const currentNetworkInfo = useCurrentNetworkInfo();
+
+  const currentWallet = useCurrentWallet();
+
   const [, setTokenList] = useState<any[]>([]);
   const [, setTokenNumber] = useState(0);
 
@@ -71,8 +78,6 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
   const { accountToken } = useAppCASelector(state => state.assets);
 
   const onNavigate = useCallback((tokenInfo: TokenItemShowType) => {
-    return CommonToast.text('Coming soon. Check back here for updates');
-
     navigationService.navigate('TokenDetail', { tokenInfo });
   }, []);
 
@@ -100,6 +105,22 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
     () => dispatch(fetchTokenList({ pageNo: 1, pageSize: 1000, networkType: 'MAIN' }));
   });
 
+  useEffect(() => {
+    const {
+      walletInfo: { caAddressList },
+    } = currentWallet;
+    console.log('caAddressList', caAddressList);
+
+    request.token.fetchAccountTokenList({
+      baseURL: currentNetworkInfo.apiUrl,
+      params: {
+        CaAddresses: caAddressList,
+        SkipCount: 1,
+        MaxResultCount: 10,
+      },
+    });
+  }, []);
+
   return (
     <View style={styles.tokenListPageWrap}>
       <FlatList
@@ -116,8 +137,6 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
           <TouchableOpacity
             style={styles.addWrap}
             onPress={() => {
-              return CommonToast.text('Coming soon. Check back here for updates');
-
               navigationService.navigate('ManageTokenList');
             }}>
             <Svg icon="add-token" size={20} />

@@ -24,8 +24,6 @@ export default function ReceiveButton(props: SendButtonType) {
     <View style={styles.buttonWrap}>
       <TouchableOpacity
         onPress={() => {
-          return CommonToast.text('Coming soon. Check back here for updates');
-
           if (themeType === 'innerPage') return navigationService.navigate('Receive');
 
           TokenOverlay.showTokenList({
