@@ -49,7 +49,7 @@ const TokenListItem: React.FC<TokenListItemType> = props => {
             {item?.amount}
           </TextL>
           <TextS numberOfLines={1} ellipsizeMode={'tail'} style={itemStyle.dollar}>
-            $ {item?.amountUsd}
+            {/* $ {item?.amountUsd} */}
           </TextS>
         </View>
       </View>
@@ -95,6 +95,7 @@ const itemStyle = StyleSheet.create({
   chainInfo: {
     lineHeight: pTd(16),
     marginTop: pTd(2),
+    width: pTd(150),
   },
   balanceWrap: {
     flex: 1,
