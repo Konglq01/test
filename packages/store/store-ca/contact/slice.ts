@@ -29,7 +29,7 @@ export const contactSlice = createSlice({
           state.lastModified = lastModified;
         }
 
-        if (!isInit && eventList !== undefined && lastModified > state.lastModified) {
+        if (!isInit && eventList !== undefined) {
           let _contactIndexList = [...state.contactIndexList];
           _contactIndexList = executeEventToContactIndexList(_contactIndexList, eventList);
           state.contactIndexList = sortContactIndexList(_contactIndexList);
@@ -37,6 +37,7 @@ export const contactSlice = createSlice({
         }
 
         state.contactMap = transIndexesToContactMap(state.contactIndexList);
+        state.contactMap = {};
       })
       .addCase(fetchContractListAsync.rejected, (state, action) => {
         console.log('fetchContractListAsync.rejected: error', action.error.message);

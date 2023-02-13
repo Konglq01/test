@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Tabs } from 'antd';
+import { message, Tabs } from 'antd';
 import { useNavigate } from 'react-router';
 import './index.less';
 import BalanceCard from 'pages/components/BalanceCard';
@@ -32,33 +32,33 @@ const mockData: { items: TokenBaseItemType[]; totalCount: number } = {
         symbol: 'ELF',
         address: 'xxxxxx',
       },
-      amount: 10,
-      amountUsd: 1000,
+      amount: 0,
+      amountUsd: 0,
     },
     {
-      chainId: 'AELF',
+      chainId: 'tDVW',
       token: {
         id: Math.random().toString(),
-        chainId: 'AELF',
-        symbol: 'CPU',
+        chainId: 'tDVW',
+        symbol: 'ELF',
         address: 'xxxxxx',
       },
-      amount: 10,
-      amountUsd: 1000,
+      amount: 0,
+      amountUsd: 0,
     },
-    {
-      chainId: 'AELF',
-      token: {
-        id: Math.random().toString(),
-        chainId: 'AELF',
-        symbol: 'RAM',
-        address: 'xxxxxx',
-      },
-      amount: 10,
-      amountUsd: 1000,
-    },
+    // {
+    //   chainId: 'AELF',
+    //   token: {
+    //     id: Math.random().toString(),
+    //     chainId: 'AELF',
+    //     symbol: 'RAM',
+    //     address: 'xxxxxx',
+    //   },
+    //   amount: 10,
+    //   amountUsd: 1000,
+    // },
   ],
-  totalCount: 5,
+  totalCount: 2,
 };
 
 export default function MyBalance() {
@@ -157,15 +157,17 @@ export default function MyBalance() {
         amount={balanceUSD}
         onSend={() => {
           if (tokenList.length > 1) {
-            setNavTarget('send');
-            return setTokenOpen(true);
+            // setNavTarget('send');
+            // return setTokenOpen(true);
+            return message.info('Coming soon. Check back here for updates', 1);
           }
           navigate(`/send/${'ELF'}`);
         }}
         onReceive={() => {
           if (tokenList.length > 1) {
-            setNavTarget('receive');
-            return setTokenOpen(true);
+            return message.info('Coming soon. Check back here for updates', 1);
+            // setNavTarget('receive');
+            // return setTokenOpen(true);
           }
           navigate('/receive');
         }}

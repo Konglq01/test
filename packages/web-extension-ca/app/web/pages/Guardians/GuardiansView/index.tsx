@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router';
 import CustomSvg from 'components/CustomSvg';
 import SettingHeader from 'pages/components/SettingHeader';
 import { useAppDispatch, useGuardiansInfo, useLoading, useUserInfo } from 'store/Provider/hooks';
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { sendVerificationCode } from '@portkey/api/api-did/utils/verification';
 import { useTranslation } from 'react-i18next';
 import { handleGuardian } from 'utils/sandboxUtil/handleGuardian';
@@ -30,6 +30,7 @@ import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
+import useGuardianList from 'hooks/useGuardianList';
 
 enum SwitchFail {
   default = 0,
@@ -40,6 +41,7 @@ enum SwitchFail {
 export default function GuardiansView() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const getGuardianList = useGuardianList();
   const { currentGuardian, opGuardian, userGuardiansList } = useGuardiansInfo();
   const [tipOpen, setTipOpen] = useState<boolean>(false);
   const [switchFail, setSwitchFail] = useState<SwitchFail>(SwitchFail.default);
@@ -50,6 +52,10 @@ export default function GuardiansView() {
   const { walletInfo } = useCurrentWallet();
   const { passwordSeed } = useUserInfo();
   const editable = useMemo(() => Object.keys(userGuardiansList ?? {}).length > 1, [userGuardiansList]);
+
+  useEffect(() => {
+    getGuardianList({ caHash: walletInfo.caHash });
+  }, []);
 
   const verifyHandler = useCallback(async () => {
     try {
@@ -244,7 +250,7 @@ export default function GuardiansView() {
               navigate('/setting/guardians/edit');
             }}
             type="primary">
-            {t('Change Verifier')}
+            {t('Edit')}
           </Button>
         </div>
       </div>

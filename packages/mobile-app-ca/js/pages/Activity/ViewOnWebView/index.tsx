@@ -18,7 +18,7 @@ const ViewOnWebView: React.FC<ViewOnWebViewPropsType> = ({ route }) => {
 
   return (
     <PageContainer
-      titleDom={'aelf'}
+      titleDom={'AELF Block Explorer'}
       safeAreaColor={['blue', 'white']}
       containerStyles={pageStyles.pageWrap}
       scrollViewProps={{ disabled: true }}>

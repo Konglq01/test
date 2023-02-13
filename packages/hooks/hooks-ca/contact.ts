@@ -2,9 +2,16 @@ import { request } from '@portkey/api/api-did';
 import { CheckContactNameResponseType } from '@portkey/api/api-did/contact/type';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { AddContactItemApiType, ContactItemType, EditContactItemApiType } from '@portkey/types/types-ca/contact';
-import { useCallback } from 'react';
-import { addContractAction, deleteContractAction, editContractAction } from '@portkey/store/store-ca/contact/actions';
-import { useAppCommonDispatch } from '../index';
+import { useCallback, useEffect } from 'react';
+import {
+  addContractAction,
+  deleteContractAction,
+  editContractAction,
+  fetchContractListAsync,
+} from '@portkey/store/store-ca/contact/actions';
+import { useAppCommonDispatch, useAppCommonSelector } from '../index';
+
+const REFRESH_DELAY_TIME = 3 * 1000;
 
 export const useAddContact = () => {
   const dispatch = useAppCommonDispatch();
@@ -16,6 +23,9 @@ export const useAddContact = () => {
         params: contactItem,
       });
       dispatch(addContractAction(response));
+      setTimeout(() => {
+        dispatch(fetchContractListAsync());
+      }, REFRESH_DELAY_TIME);
       return response;
     },
     [currentNetworkInfo.apiUrl, dispatch],
@@ -33,6 +43,9 @@ export const useEditContact = () => {
         params: contactItem,
       });
       dispatch(editContractAction(response));
+      setTimeout(() => {
+        dispatch(fetchContractListAsync());
+      }, REFRESH_DELAY_TIME);
       return response;
     },
     [currentNetworkInfo.apiUrl, dispatch],
@@ -49,6 +62,9 @@ export const useDeleteContact = () => {
         resourceUrl: `${contactItem.id}`,
       });
       dispatch(deleteContractAction({ ...contactItem, isDeleted: true } as ContactItemType));
+      setTimeout(() => {
+        dispatch(fetchContractListAsync());
+      }, REFRESH_DELAY_TIME);
       return response;
     },
     [currentNetworkInfo.apiUrl, dispatch],
@@ -68,4 +84,12 @@ export const useCheckContactName = () => {
     },
     [currentNetworkInfo.apiUrl],
   );
+};
+
+export const useContact = (isFetch: boolean = true, isInit: boolean = false) => {
+  const dispatch = useAppCommonDispatch();
+  useEffect(() => {
+    isFetch && dispatch(fetchContractListAsync(isInit));
+  }, []);
+  return useAppCommonSelector(state => state.contact);
 };

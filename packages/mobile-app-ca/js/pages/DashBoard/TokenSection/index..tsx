@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import navigationService from 'utils/navigationService';
 import { useAppCASelector, useAppCommonDispatch } from '@portkey/hooks/index';
@@ -12,6 +12,10 @@ import TokenListItem from 'components/TokenListItem';
 import { useLanguage } from 'i18n/hooks';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { fetchTokenList } from '@portkey/store/store-ca/assets/api';
+import CommonToast from 'components/CommonToast';
+import { request } from '@portkey/api/api-did';
+import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
+import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 
 const mockData = {
   items: [
@@ -23,33 +27,22 @@ const mockData = {
         symbol: 'ELF',
         address: 'xxxxxx',
       },
-      amount: 10,
-      amountUsd: 1000,
+      amount: 0,
+      amountUsd: 0,
     },
     {
-      chainId: 'AELF',
+      chainId: 'tDVW',
       token: {
         id: 2,
-        chainId: 'AELF',
+        chainId: 'tDVW',
         symbol: 'ELF',
         address: 'xxxxxx',
       },
-      amount: 10,
-      amountUsd: 1000,
-    },
-    {
-      chainId: 'AELF',
-      token: {
-        id: 3,
-        chainId: 'AELF',
-        symbol: 'ELF',
-        address: 'xxxxxx',
-      },
-      amount: 10,
-      amountUsd: 1000,
+      amount: 0,
+      amountUsd: 0,
     },
   ],
-  totalCount: 5,
+  totalCount: 2,
 };
 
 export interface TokenSectionProps {
@@ -63,7 +56,7 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
     accountToken: { accountTokenList },
   } = useAppCASelector(state => state.assets);
 
-  const [, setTokenList] = useState<any[]>([]);
+  const [mockTokenList, setTokenList] = useState<any[]>([]);
   const [, setTokenNumber] = useState(0);
 
   const [refreshing, setRefreshing] = useState(false);
@@ -97,11 +90,27 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
     () => dispatch(fetchTokenList({ pageNo: 1, pageSize: 1000, networkType: 'MAIN' }));
   });
 
+  useEffect(() => {
+    const {
+      walletInfo: { caAddressList },
+    } = currentWallet;
+    console.log('caAddressList', caAddressList);
+
+    request.token.fetchAccountTokenList({
+      baseURL: currentNetworkInfo.apiUrl,
+      params: {
+        CaAddresses: caAddressList,
+        SkipCount: 1,
+        MaxResultCount: 10,
+      },
+    });
+  }, []);
+
   return (
     <View style={styles.tokenListPageWrap}>
       <FlatList
         refreshing={refreshing}
-        data={accountTokenList || []}
+        data={mockTokenList || []}
         renderItem={renderItem}
         keyExtractor={(item: any) => item?.token?.id}
         onRefresh={() => {

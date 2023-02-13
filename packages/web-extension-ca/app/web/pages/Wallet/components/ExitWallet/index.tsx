@@ -64,7 +64,8 @@ export default function ExitWallet({ open, onCancel }: ExitWalletProps) {
       setLoading(false);
     } catch (error: any) {
       setLoading(false);
-      message.error(contractErrorHandler(error));
+      const _error = contractErrorHandler(error) || 'Something error';
+      message.error(_error);
       console.log('---exist wallet error', error);
     }
   }, [

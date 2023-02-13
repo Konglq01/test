@@ -16,8 +16,8 @@ export interface ContactItemType {
   userId?: string;
 }
 
-export type EditContactItemApiType = PartialOption<ContactItemType, 'isDeleted' | 'modificationTime' | 'index'>;
-export type AddContactItemApiType = PartialOption<EditContactItemApiType, 'id'>;
+export type EditContactItemApiType = PartialOption<ContactItemType, 'isDeleted' | 'modificationTime'>;
+export type AddContactItemApiType = PartialOption<EditContactItemApiType, 'id' | 'index'>;
 
 export type GetContractListApiType = {
   totalCount: number;

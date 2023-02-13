@@ -40,7 +40,7 @@ export default function CheckPin() {
   );
   return (
     <PageContainer titleDom type="leftBack" backTitle={!openBiometrics ? 'Change Pin' : 'Authentication'}>
-      <PinContainer ref={pinRef} title="Enter Pin" errorMessage={errorMessage} onChangeText={onChangeText} />
+      <PinContainer showHeader ref={pinRef} title="Enter Pin" errorMessage={errorMessage} onChangeText={onChangeText} />
     </PageContainer>
   );
 }
