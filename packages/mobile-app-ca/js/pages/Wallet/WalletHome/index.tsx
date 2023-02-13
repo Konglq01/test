@@ -1,6 +1,6 @@
 import PageContainer from 'components/PageContainer';
 import { useLanguage } from 'i18n/hooks';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { pageStyles } from './style';
 import { pTd } from 'utils/unit';
 import { ScrollView, TouchableWithoutFeedback, View } from 'react-native';
@@ -18,6 +18,8 @@ import CommonToast from 'components/CommonToast';
 import useLogOut from 'hooks/useLogOut';
 import { removeManager } from 'utils/guardian';
 import { useGetCurrentCAContract } from 'hooks/contract';
+import { useAppDispatch } from 'store/hooks';
+import { getWalletNameAsync } from '@portkey/store/store-ca/wallet/actions';
 
 interface WalletHomeProps {
   name?: string;
@@ -25,10 +27,15 @@ interface WalletHomeProps {
 
 const WalletHome: React.FC<WalletHomeProps> = () => {
   const { t } = useLanguage();
+  const appDispatch = useAppDispatch();
   const { walletAvatar, walletName } = useWallet();
   const { caHash, address: managerAddress } = useCurrentWalletInfo();
   const getCurrentCAContract = useGetCurrentCAContract();
   const logout = useLogOut();
+
+  useEffect(() => {
+    appDispatch(getWalletNameAsync());
+  }, []);
 
   const onExitClick = useCallback(
     async (isConfirm: boolean) => {

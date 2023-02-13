@@ -86,10 +86,10 @@ export const useCheckContactName = () => {
   );
 };
 
-export const useContact = (isInit?: boolean) => {
+export const useContact = (isFetch: boolean = true, isInit: boolean = false) => {
   const dispatch = useAppCommonDispatch();
   useEffect(() => {
-    dispatch(fetchContractListAsync(isInit));
+    isFetch && dispatch(fetchContractListAsync(isInit));
   }, []);
   return useAppCommonSelector(state => state.contact);
 };
