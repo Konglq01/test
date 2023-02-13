@@ -33,7 +33,9 @@ const ContactDetail: React.FC = () => {
           <TextM style={pageStyles.addressLabel}>
             ELF_{addressItem.address}_{addressItem.chainId}
           </TextM>
-          <TextS style={FontStyles.font3}>AELF {currentNetwork}</TextS>
+          <TextS style={FontStyles.font3}>
+            {addressItem.chainId} {currentNetwork}
+          </TextS>
         </View>
         <Touchable
           style={GStyles.marginTop(12)}
