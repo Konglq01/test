@@ -1,7 +1,5 @@
-import { isVerifyApiError } from '@portkey/constants/apiErrorMessage';
-
 export const verifyErrorHandler = (error: any) => {
-  // let _error = isVerifyApiError(error);
+  if (typeof error === 'string') return error;
   let _error: string;
   if (error?.type) _error = error.type;
   // if (_error) return _error;

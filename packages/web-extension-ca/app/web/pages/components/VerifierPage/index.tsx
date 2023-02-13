@@ -84,27 +84,34 @@ export default function VerifierPage({ currentGuardian, guardianType, isInitStat
   );
 
   const resendCode = useCallback(async () => {
-    if (!currentGuardian?.guardianAccount) return message.error('Missing loginGuardianType');
-    if (!guardianType && guardianType !== 0) return message.error('Missing guardiansType');
-    setLoading(true);
-    const res = await sendVerificationCode({
-      guardianAccount: currentGuardian.guardianAccount,
-      type: LoginStrType[guardianType],
-      verifierId: currentGuardian.verifier?.id || '',
-      chainId: DefaultChainId,
-    });
-    setLoading(false);
-    if (res.verifierSessionId) {
-      setTimer(MAX_TIMER);
-      dispatch(
-        setUserGuardianSessionIdAction({
-          key: currentGuardian?.key ?? `${currentGuardian?.guardianAccount}&${currentGuardian?.verifier?.name}`,
-          verifierInfo: {
-            sessionId: res.verifierSessionId,
-            endPoint: res.endPoint,
-          },
-        }),
-      );
+    try {
+      if (!currentGuardian?.guardianAccount) throw 'Missing loginGuardianType';
+      if (!guardianType && guardianType !== 0) throw 'Missing guardiansType';
+      setLoading(true);
+      const res = await sendVerificationCode({
+        guardianAccount: currentGuardian.guardianAccount,
+        type: LoginStrType[guardianType],
+        verifierId: currentGuardian.verifier?.id || '',
+        chainId: DefaultChainId,
+      });
+      setLoading(false);
+      if (res.verifierSessionId) {
+        setTimer(MAX_TIMER);
+        dispatch(
+          setUserGuardianSessionIdAction({
+            key: currentGuardian?.key ?? `${currentGuardian?.guardianAccount}&${currentGuardian?.verifier?.name}`,
+            verifierInfo: {
+              sessionId: res.verifierSessionId,
+              endPoint: res.endPoint,
+            },
+          }),
+        );
+      }
+    } catch (error: any) {
+      console.log(error, 'error===');
+      setLoading(false);
+      const _error = verifyErrorHandler(error);
+      message.error(_error);
     }
   }, [currentGuardian, guardianType, dispatch, setLoading]);
 
