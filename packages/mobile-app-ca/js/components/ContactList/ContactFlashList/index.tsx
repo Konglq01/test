@@ -110,6 +110,7 @@ const ContactsList: React.FC<ContactsListProps> = ({
     <View style={[contactListStyles.sectionListWrap, !isIndexBarShow && contactListStyles.sectionListWrapFull]}>
       <FlashList
         ref={flashListRef}
+        showsVerticalScrollIndicator={false}
         data={dataArray}
         estimatedItemSize={contactListStyles.sectionIndex.height}
         overrideItemLayout={(layout, item) => {

@@ -25,23 +25,18 @@ export const contactSlice = createSlice({
       .addCase(fetchContractListAsync.fulfilled, (state, action) => {
         const { isInit, lastModified, contactIndexList, eventList } = action.payload;
         if (isInit && contactIndexList !== undefined) {
-          // state.contactIndexList = sortContactIndexList(contactIndexList);
-          // TODO: remove clean contacts
-          state.contactIndexList = [];
+          state.contactIndexList = sortContactIndexList(contactIndexList);
           state.lastModified = lastModified;
         }
 
-        if (!isInit && eventList !== undefined && lastModified > state.lastModified) {
+        if (!isInit && eventList !== undefined) {
           let _contactIndexList = [...state.contactIndexList];
           _contactIndexList = executeEventToContactIndexList(_contactIndexList, eventList);
-          // state.contactIndexList = sortContactIndexList(_contactIndexList);
-          // TODO: remove clean contacts
-          state.contactIndexList = [];
+          state.contactIndexList = sortContactIndexList(_contactIndexList);
           state.lastModified = lastModified;
         }
 
-        // state.contactMap = transIndexesToContactMap(state.contactIndexList);
-        // TODO: remove clean contacts
+        state.contactMap = transIndexesToContactMap(state.contactIndexList);
         state.contactMap = {};
       })
       .addCase(fetchContractListAsync.rejected, (state, action) => {

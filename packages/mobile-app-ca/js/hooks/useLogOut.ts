@@ -7,7 +7,7 @@ import { resetNetwork } from '@portkey/store/network/actions';
 
 import { resetWallet } from '@portkey/store/store-ca/wallet/actions';
 import { resetUser } from 'store/user/actions';
-import { resetToken } from '@portkey/store/token/slice';
+// import { resetToken } from '@portkey/store/token/slice';
 import { resetGuardiansState } from '@portkey/store/store-ca/guardians/actions';
 
 export default function useLogOut() {
@@ -16,7 +16,7 @@ export default function useLogOut() {
     try {
       dispatch(resetWallet());
       dispatch(resetUser());
-      dispatch(resetToken());
+      // dispatch(resetToken());
       dispatch(resetSettings());
       dispatch(resetNetwork());
       dispatch(resetGuardiansState());

@@ -15,6 +15,7 @@ import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { clearLocalStorage } from 'utils/storage/chromeStorage';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
 import useLogOut from 'hooks/useLogout';
+import { DEVICE_TYPE } from 'constants/index';
 
 interface ExitWalletProps {
   open: boolean;
@@ -50,7 +51,7 @@ export default function ExitWallet({ open, onCancel }: ExitWalletProps) {
           caHash: wallet?.caHash as string,
           manager: {
             managerAddress: wallet.address,
-            deviceString: new Date().getTime().toString(),
+            deviceString: `${DEVICE_TYPE},${Date.now()}`,
           },
         },
       });

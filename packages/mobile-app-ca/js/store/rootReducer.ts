@@ -1,7 +1,6 @@
 import { combineReducers } from '@reduxjs/toolkit';
 import { walletSlice } from '@portkey/store/store-ca/wallet/slice';
 import { contactSlice } from '@portkey/store/store-ca/contact/slice';
-import addressBook from '@portkey/store/addressBook/slice';
 import chainSlice from '@portkey/store/network/slice';
 import tokenSlice from '@portkey/store/token/slice';
 import tokenBalanceSlice from '@portkey/store/tokenBalance/slice';
@@ -60,7 +59,6 @@ export const guardiansReducer = persistReducer(guardiansPersistConfig, guardians
 const rootReducer = combineReducers({
   [userSlice.name]: userReducer,
   [walletSlice.name]: walletSlice.reducer,
-  [addressBook.name]: addressBook.reducer,
   [chainSlice.name]: chainSlice.reducer,
   [tokenSlice.name]: tokenReducer,
   [contactSlice.name]: contactSlice.reducer,

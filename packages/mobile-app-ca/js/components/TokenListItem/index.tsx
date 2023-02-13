@@ -36,7 +36,8 @@ const TokenListItem: React.FC<TokenListItemType> = props => {
           </TextL>
           <TextS numberOfLines={1} style={[FontStyles.font7, itemStyle.chainInfo]}>
             {item?.chainId === 'AELF' ? 'MainChain ' : 'SideChain '} {item?.chainId}{' '}
-            {currentNetwork === 'MAIN' && 'Testnet'}
+            {/* {currentNetwork === 'MAIN' && 'Testnet'} */}
+            {'Testnet'}
           </TextS>
         </View>
 
@@ -48,7 +49,7 @@ const TokenListItem: React.FC<TokenListItemType> = props => {
             {item?.amount}
           </TextL>
           <TextS numberOfLines={1} ellipsizeMode={'tail'} style={itemStyle.dollar}>
-            $ {item?.amountUsd}
+            {/* $ {item?.amountUsd} */}
           </TextS>
         </View>
       </View>
@@ -94,6 +95,7 @@ const itemStyle = StyleSheet.create({
   chainInfo: {
     lineHeight: pTd(16),
     marginTop: pTd(2),
+    width: pTd(150),
   },
   balanceWrap: {
     flex: 1,

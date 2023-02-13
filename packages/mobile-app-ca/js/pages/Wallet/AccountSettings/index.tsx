@@ -14,7 +14,6 @@ const list: ListItemProps[] = [
   },
   {
     title: 'Change Pin',
-    // TODO: remove disable
     onPress: () => navigationService.navigate('CheckPin'),
   },
 ];
@@ -34,7 +33,6 @@ export default function AccountSettings() {
         <ListItem
           style={styles.listStyle}
           title={t('Biometric Authentication')}
-          // TODO: remove disable
           onPress={() => navigationService.navigate('Biometric')}
         />
       )}

@@ -21,7 +21,7 @@ export default function getPrivateKeyAndMnemonic(
     let mnemonic = '';
 
     try {
-      privateKey = AElf.wallet.AESDecrypt(AESEncryptPrivateKey, password);
+      privateKey = AESEncryptPrivateKey ? AElf.wallet.AESDecrypt(AESEncryptPrivateKey, password) : null;
       mnemonic = AESEncryptMnemonic ? AElf.wallet.AESDecrypt(AESEncryptMnemonic, password) : null;
     } catch (e) {
       console.error(e);

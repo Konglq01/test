@@ -17,7 +17,7 @@ import Receive from 'pages/Receive';
 import AddGuardian from 'pages/Guardians/GuardiansAdd';
 import TokenDetail from 'pages/Token/Detail';
 import AccountSetting from 'pages/AccountSetting';
-import Contact from 'pages/ContactDetail';
+import Contact from 'pages/Contacts/ContactDetail';
 import My from 'pages/My';
 import Send from 'pages/Send';
 import Transaction from 'pages/Transaction';
@@ -25,14 +25,16 @@ import NFT from 'pages/NFT';
 import Unlock from 'pages/Unlock';
 import QueryPage from 'pages/QueryPage';
 import TestSocket from 'pages/TestSocket';
+import Device from 'pages/AccountSetting/Devices';
+import SetPin from 'pages/AccountSetting/SetPin';
 import NotFound from 'pages/NotFound';
 
 export const PageRouter = () =>
   useRoutes([
-    // {
-    //   path: '/',
-    //   element: <Home />,
-    // },
+    {
+      path: '/',
+      element: <Home />,
+    },
     {
       path: '/register',
       element: <ScreenOpeningPage />,
@@ -69,78 +71,86 @@ export const PageRouter = () =>
       path: '/login/verifier-account',
       element: <VerifierAccount />,
     },
-    // {
-    //   path: '/setting',
-    //   element: <My />,
-    // },
-    // {
-    //   path: '/setting/guardians',
-    //   element: <Guardians />,
-    // },
-    // {
-    //   path: '/setting/guardians/add',
-    //   element: <AddGuardian />,
-    // },
-    // {
-    //   path: '/setting/guardians/edit',
-    //   element: <GuardiansEdit />,
-    // },
-    // {
-    //   path: '/setting/guardians/view',
-    //   element: <GuardiansView />,
-    // },
-    // {
-    //   path: '/setting/guardians/verifier-account',
-    //   element: <VerifierAccount />,
-    // },
-    // {
-    //   path: '/setting/guardians/guardian-approval',
-    //   element: <GuardianApproval />,
-    // },
-    // {
-    //   path: '/setting/wallet',
-    //   element: <Wallet />,
-    // },
-    // {
-    //   path: '/add-token',
-    //   element: <AddToken />,
-    // },
-    // {
-    //   path: '/transaction',
-    //   element: <Transaction />,
-    // },
-    // {
-    //   path: '/token-detail',
-    //   element: <TokenDetail />,
-    // },
-    // {
-    //   path: '/send/:symbol',
-    //   element: <Send />,
-    // },
-    // {
-    //   path: '/send/:symbol/:tokenId',
-    //   element: <Send />,
-    // },
-    // {
-    //   path: '/receive/:symbol/:chainId',
-    //   element: <Receive />,
-    // },
-    // {
-    //   path: '/nft',
-    //   element: <NFT />,
-    // },
-    // {
-    //   path: 'setting/contacts',
-    //   element: <Contacts />,
-    // },
-    // {
-    //   path: '/setting/contacts/:type',
-    //   element: <Contact />,
-    // },
-    // {
-    //   path: '/setting/account-setting',
-    //   element: <AccountSetting />,
-    // },
+    {
+      path: '/setting',
+      element: <My />,
+    },
+    {
+      path: '/setting/guardians',
+      element: <Guardians />,
+    },
+    {
+      path: '/setting/guardians/add',
+      element: <AddGuardian />,
+    },
+    {
+      path: '/setting/guardians/edit',
+      element: <GuardiansEdit />,
+    },
+    {
+      path: '/setting/guardians/view',
+      element: <GuardiansView />,
+    },
+    {
+      path: '/setting/guardians/verifier-account',
+      element: <VerifierAccount />,
+    },
+    {
+      path: '/setting/guardians/guardian-approval',
+      element: <GuardianApproval />,
+    },
+    {
+      path: '/setting/wallet',
+      element: <Wallet />,
+    },
+    {
+      path: '/add-token',
+      element: <AddToken />,
+    },
+    {
+      path: '/transaction',
+      element: <Transaction />,
+    },
+    {
+      path: '/token-detail',
+      element: <TokenDetail />,
+    },
+    {
+      path: '/send/:symbol',
+      element: <Send />,
+    },
+    {
+      path: '/send/:symbol/:tokenId',
+      element: <Send />,
+    },
+    {
+      path: '/receive/:symbol/:chainId',
+      element: <Receive />,
+    },
+    {
+      path: '/nft',
+      element: <NFT />,
+    },
+    {
+      path: 'setting/contacts',
+      element: <Contacts />,
+    },
+    {
+      path: '/setting/contacts/:type',
+      element: <Contact />,
+    },
+    {
+      path: '/setting/account-setting',
+      element: <AccountSetting />,
+    },
+    {
+      path: '/setting/account-setting/device',
+      element: <Device />,
+    },
+    {
+      path: '/setting/account-setting/set-pin',
+      element: <SetPin />,
+    },
     {
       path: '/unlock',
       element: <Unlock />,
@@ -149,10 +159,10 @@ export const PageRouter = () =>
       path: 'query-page',
       element: <QueryPage />,
     },
-    // {
-    //   path: '/test/socket',
-    //   element: <TestSocket />,
-    // },
+    {
+      path: '/test/socket',
+      element: <TestSocket />,
+    },
     {
       path: '*',
       element: <NotFound />,

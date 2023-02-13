@@ -59,17 +59,30 @@ export const getContactIdMap = (contactIndexList: ContactIndexType[]) => {
   return contactIdMap;
 };
 
+const aggregateEvent = (_eventList: ContactItemType[]) => {
+  const eventMap: Record<string, ContactItemType> = {};
+  _eventList.forEach(event => {
+    if (!eventMap[event.id] || eventMap[event.id].modificationTime < event.modificationTime) {
+      eventMap[event.id] = event;
+    }
+  });
+  return Object.values(eventMap).sort((a, b) => a.modificationTime - b.modificationTime);
+};
+
 export const executeEventToContactIndexList = (
   contactIndexList: ContactIndexType[],
   eventList: ContactItemType[],
 ): ContactIndexType[] => {
   const contactIdMap = getContactIdMap(contactIndexList);
+  eventList = aggregateEvent(eventList);
   eventList.forEach(event => {
     const contactIndex = contactIndexList[getIndexFromChar(event.index)];
     if (!contactIdMap[event.id]) {
-      //ADD
-      contactIdMap[event.id] = event;
-      contactIndex.contacts.push(event);
+      if (!event.isDeleted) {
+        //ADD
+        contactIdMap[event.id] = event;
+        contactIndex.contacts.push(event);
+      }
       return;
     }
 

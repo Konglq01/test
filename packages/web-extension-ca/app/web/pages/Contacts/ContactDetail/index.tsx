@@ -1,6 +1,6 @@
 import { useParams } from 'react-router';
-import EditContact from './components/EditContact';
-import ViewContact from './components/ViewContact';
+import EditContact from '../EditContact';
+import ViewContact from '../ViewContact';
 
 export default function Contact() {
   const { type } = useParams();

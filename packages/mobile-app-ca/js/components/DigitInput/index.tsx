@@ -92,7 +92,7 @@ const DigitInput = forwardRef(
               ref={input}
               value={text}
               maxLength={maxLength}
-              // autoFocus={true}
+              autoFocus={type === 'pin'}
               keyboardType={keyboardType}
               onChangeText={value => {
                 if (value && !isValidPositiveInteger(value)) return;

@@ -16,7 +16,7 @@ import './index.less';
 const initContactItem: Partial<ContactItemType> = {
   id: '-1',
   name: '',
-  addresses: [{ id: '-1', chainType: 'MAIN', chainId: 'AELF', address: '' }],
+  addresses: [{ chainId: 'AELF', address: '' }],
 };
 
 export default function Contacts() {

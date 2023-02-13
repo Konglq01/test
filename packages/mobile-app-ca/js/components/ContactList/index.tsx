@@ -1,15 +1,12 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Text, View, TouchableOpacity } from 'react-native';
-import { useAppDispatch, useAppSelector } from 'store/hooks';
 import CommonInput from 'components/CommonInput';
 import navigationService from 'utils/navigationService';
 import Svg from 'components/Svg';
 import { styles as contactListStyles } from './style';
 import CommonButton from 'components/CommonButton';
 import { pTd } from 'utils/unit';
-import useEffectOnce from 'hooks/useEffectOnce';
 import { useLanguage } from 'i18n/hooks';
-import { fetchContractListAsync } from '@portkey/store/store-ca/contact/actions';
 import { ContactIndexType, ContactItemType } from '@portkey/types/types-ca/contact';
 import ContactItem, { styles as contactItemStyles } from 'components/ContactItem';
 import ContactFlashList from './ContactFlashList';
@@ -20,7 +17,7 @@ import GStyles from 'assets/theme/GStyles';
 import { ViewStyleType } from 'types/styles';
 import { getAelfAddress } from '@portkey/utils/aelf';
 import { transContactsToIndexes } from '@portkey/store/store-ca/contact/utils';
-import CommonToast from 'components/CommonToast';
+import { useContact } from '@portkey/hooks/hooks-ca/contact';
 
 interface ContactsListProps {
   isIndexBarShow?: boolean;
@@ -42,13 +39,8 @@ const ContactsList: React.FC<ContactsListProps> = ({
   style,
   ListFooterComponent,
 }) => {
-  const appDispatch = useAppDispatch();
   const { t } = useLanguage();
-  useEffectOnce(() => {
-    appDispatch(fetchContractListAsync(true));
-  });
-  const { contactIndexList, contactMap } = useAppSelector(state => state.contact);
-
+  const { contactIndexList, contactMap } = useContact();
   const [list, setList] = useState<ContactIndexType[]>([]);
 
   const flashListData = useMemo<FlashItemType[]>(() => {
