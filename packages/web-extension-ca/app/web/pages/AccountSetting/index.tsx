@@ -5,7 +5,6 @@ import BackHeader from 'components/BackHeader';
 import CustomSvg from 'components/CustomSvg';
 import MenuItem from 'components/MenuItem';
 import './index.less';
-import { message } from 'antd';
 
 interface MenuItemInfo {
   label: string;
@@ -21,8 +20,13 @@ export default function AccountSetting() {
       {
         label: t('Change Pin'),
         click: () => {
-          message.info('Coming soon. Check back here for updates', 1);
-          // setPinOpen(true);
+          navigate('/setting/account-setting/set-pin');
+        },
+      },
+      {
+        label: t('Devices'),
+        click: () => {
+          navigate('/setting/account-setting/device');
         },
       },
     ],

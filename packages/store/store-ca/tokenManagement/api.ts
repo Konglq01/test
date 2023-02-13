@@ -1,4 +1,5 @@
 import response from './data.json';
+import { request } from '@portkey/api/api-did';
 
 console.log(response);
 
@@ -11,16 +12,14 @@ const MOCK_RESPONSE = {
   }),
 };
 
-export function fetchTokenList({
-  // todo maybe remote tokenList change
-  chainId,
+export function fetchUserTokenList({
   pageSize,
   pageNo,
 }: {
-  chainId: string;
   pageSize: number;
   pageNo: number;
-}): Promise<{ data: any[] }> {
-  console.log('fetching....list', chainId, pageSize, pageNo);
-  return new Promise(resolve => setTimeout(() => resolve(MOCK_RESPONSE), 1000));
+}): Promise<{ items: any[] }> {
+  return request.es.getUserTokenList({
+    params: { skipCount: (pageNo - 1) * pageSize, maxResultCount: pageSize },
+  });
 }

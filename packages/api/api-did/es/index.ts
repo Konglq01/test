@@ -15,14 +15,7 @@ const KeyList = [
 const ApiObject: Record<typeof KeyList[number], ESBaseConfig> = {
   getUserTokenList: {
     target: `${BaseESUrl}usertokenindex`,
-    config: {
-      method: Method,
-      params: {
-        filter: '(token.symbol:ELF AND token.chainId:AELF) OR token.symbol:READ',
-        sort: 'token.symbol.keyword',
-        sortType: 0,
-      },
-    },
+    config: { method: Method },
   },
   getChainsInfo: {
     target: `${BaseESUrl}chainsinfoindex`,

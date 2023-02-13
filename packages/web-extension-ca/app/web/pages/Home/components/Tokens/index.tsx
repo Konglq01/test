@@ -4,29 +4,29 @@ import { message } from 'antd';
 import CustomSvg from 'components/CustomSvg';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-// import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 import { useWalletInfo } from 'store/Provider/hooks';
 import './index.less';
 
 export default function TokenList({ tokenList }: { tokenList: TokenBaseItemType[] }) {
   const { t } = useTranslation();
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const { currentNetwork } = useWalletInfo();
   const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? currentNetwork : ''), [currentNetwork]);
 
-  const onNavigate = useCallback((tokenInfo: TokenBaseItemType) => {
-    console.log(tokenInfo);
+  const onNavigate = useCallback(
+    (tokenInfo: TokenBaseItemType) => {
+      console.log(tokenInfo);
 
-    message.info('Coming soon. Check back here for updates', 1);
-    return;
-    // navigate('/token-detail', { state: { tokenInfo } });
-  }, []);
+      navigate('/token-detail', { state: { tokenInfo } });
+    },
+    [navigate],
+  );
 
   const handleAddToken = useCallback(() => {
-    message.info('Coming soon. Check back here for updates', 1);
-    // navigate('/add-token');
+    navigate('/add-token');
     return;
-  }, []);
+  }, [navigate]);
 
   return (
     <>
