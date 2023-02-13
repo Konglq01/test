@@ -104,12 +104,11 @@ const ContactEdit: React.FC = () => {
     }, 3000);
   }, [appDispatch]);
 
-  // TODO: should check that Why init error as INIT_HAS_ERROR
   const onNameChange = useCallback((value: string) => {
     setEditContact(preEditContact => ({
       ...preEditContact,
       name: value,
-      error: { ...INIT_HAS_ERROR },
+      error: { ...INIT_NONE_ERROR },
     }));
   }, []);
 

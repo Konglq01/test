@@ -7,7 +7,6 @@ import { localStorage } from 'redux-persist-webextension-storage';
 import { reduxStorageRoot } from 'constants/index';
 import { walletSlice } from '@portkey/store/store-ca/wallet/slice';
 import chainSlice from '@portkey/store/network/slice';
-import addressBook from '@portkey/store/addressBook/slice';
 import tokenBalanceSlice from '@portkey/store/tokenBalance/slice';
 import tradeSlice from '@portkey/store/trade/slice';
 import tokenSlice from '@portkey/store/token/slice';
@@ -72,7 +71,6 @@ const reduxPersistConfig = {
   // An empty array means 'don't store any reducers' -> infinite-red/ignite#409
   whitelist: [
     chainSlice.name,
-    addressBook.name,
     tokenBalanceSlice.name,
     tradeSlice.name,
     // tokenSlice.name,

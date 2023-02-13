@@ -6,7 +6,6 @@ import {
 import { FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE } from 'redux-persist';
 import { walletSlice } from '@portkey/store/wallet/slice';
 import { contactSlice } from '@portkey/store/store-ca/contact/slice';
-import { addressBookSlice } from '@portkey/store/addressBook/slice';
 import chainSlice from '@portkey/store/network/slice';
 import { tokenBalanceSlice } from '@portkey/store/tokenBalance/slice';
 import settingsSlice from '@portkey/store/settings/slice';
@@ -31,7 +30,6 @@ const reduxPersistConfig = {
   // Optionally, just specify the keys you DO want stored to persistence.
   // An empty array means 'don't store any reducers' -> infinite-red/ignite#409
   whitelist: [
-    addressBookSlice.name,
     walletSlice.name,
     contactSlice.name,
     tokenBalanceSlice.name,
