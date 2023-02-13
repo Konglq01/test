@@ -66,7 +66,7 @@ export const executeEventToContactIndexList = (
   const contactIdMap = getContactIdMap(contactIndexList);
   eventList.forEach(event => {
     const contactIndex = contactIndexList[getIndexFromChar(event.index)];
-    if (!contactIdMap[event.id]) {
+    if (!contactIdMap[event.id] && !event.isDeleted) {
       //ADD
       contactIdMap[event.id] = event;
       contactIndex.contacts.push(event);
