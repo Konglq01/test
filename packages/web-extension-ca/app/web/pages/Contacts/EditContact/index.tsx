@@ -32,8 +32,8 @@ interface CustomAddressItem extends AddressItem {
   validData: ValidData;
 }
 const initAddress: CustomAddressItem = {
-  id: '-1',
-  chainType: 'MAIN',
+  // id: '-1',
+  // chainType: 'MAIN',
   chainId: 'AELF',
   address: '',
   networkName: 'MainChain AELF Testnet',
