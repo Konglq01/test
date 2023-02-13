@@ -58,17 +58,7 @@ const Card: React.FC<CardProps> = () => {
         <Svg icon="scan" size={22} color={defaultColors.font2} />
       </TouchableOpacity>
       <Text style={styles.usdtBalance}>{currentNetwork === 'MAIN' ? `$${accountBalance}` : 'Dev Mode'}</Text>
-      <TextM
-        style={styles.accountName}
-        onPress={() => {
-          // AccountOverlay.showAccountInfo(currentAccount as AccountType);
-          // crashlytics().crash();
-          crashlytics().log('firebase error!');
-          crashlytics().recordError(new Error('firebase error!'));
-          crashlytics().crash();
-        }}>
-        {walletName}
-      </TextM>
+      <TextM style={styles.accountName}>{walletName}</TextM>
       <View style={styles.buttonGroupWrap}>
         <SendButton themeType="dashBoard" />
         <View style={styles.space} />

@@ -31,7 +31,7 @@ const AutoLockList: { value: number; label: string }[] = [
     label: 'After 10 minutes',
   },
   {
-    value: Infinity,
+    value: 86400,
     label: 'Never',
   },
 ];
