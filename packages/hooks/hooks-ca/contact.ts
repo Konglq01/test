@@ -11,6 +11,8 @@ import {
 } from '@portkey/store/store-ca/contact/actions';
 import { useAppCommonDispatch, useAppCommonSelector } from '../index';
 
+const REFRESH_DELAY_TIME = 3 * 1000;
+
 export const useAddContact = () => {
   const dispatch = useAppCommonDispatch();
   const currentNetworkInfo = useCurrentNetworkInfo();
@@ -21,6 +23,9 @@ export const useAddContact = () => {
         params: contactItem,
       });
       dispatch(addContractAction(response));
+      setTimeout(() => {
+        dispatch(fetchContractListAsync());
+      }, REFRESH_DELAY_TIME);
       return response;
     },
     [currentNetworkInfo.apiUrl, dispatch],
@@ -38,6 +43,9 @@ export const useEditContact = () => {
         params: contactItem,
       });
       dispatch(editContractAction(response));
+      setTimeout(() => {
+        dispatch(fetchContractListAsync());
+      }, REFRESH_DELAY_TIME);
       return response;
     },
     [currentNetworkInfo.apiUrl, dispatch],
@@ -54,6 +62,9 @@ export const useDeleteContact = () => {
         resourceUrl: `${contactItem.id}`,
       });
       dispatch(deleteContractAction({ ...contactItem, isDeleted: true } as ContactItemType));
+      setTimeout(() => {
+        dispatch(fetchContractListAsync());
+      }, REFRESH_DELAY_TIME);
       return response;
     },
     [currentNetworkInfo.apiUrl, dispatch],
