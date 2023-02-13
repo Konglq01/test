@@ -21,7 +21,6 @@ export default function AccountSetting() {
       {
         label: t('Change Pin'),
         click: () => {
-          message.info('Coming soon. Check back here for updates', 1);
           // setPinOpen(true);
         },
       },

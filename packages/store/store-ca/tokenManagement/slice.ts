@@ -2,7 +2,7 @@ import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { ChainItemType } from '@portkey/types/chain';
 import { TokenItemType, TokenState } from '@portkey/types/types-ca/token';
 import { AccountType } from '@portkey/types/wallet';
-import { fetchTokenList } from './api';
+import { fetchUserTokenList } from './api';
 import { isSameTypeToken } from '@portkey/utils/token';
 
 const initialState: TokenState = {
@@ -14,9 +14,9 @@ const initialState: TokenState = {
 export const fetchTokenListAsync = createAsyncThunk(
   'tokenManagement/fetchTokenList',
   async ({ pageNo, pageSize }: { pageNo: number; pageSize: number }) => {
-    const response = await fetchTokenList({ pageNo, pageSize, chainId: '' });
+    const response = await fetchUserTokenList({ pageNo, pageSize });
 
-    return { list: response.data };
+    return { list: response.items };
   },
 );
 
