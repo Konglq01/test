@@ -10,7 +10,6 @@ import { TextM } from 'components/CommonText';
 import Svg from 'components/Svg';
 import { pTd } from 'utils/unit';
 import navigationService from 'utils/navigationService';
-import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { ErrorType } from 'types/common';
 import { FontStyles } from 'assets/theme/styles';
 import Touchable from 'components/Touchable';
@@ -26,9 +25,8 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import CommonToast from 'components/CommonToast';
 import ActionSheet from 'components/ActionSheet';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
-import { useAddContact, useDeleteContact, useEditContact } from '@portkey/hooks/hooks-ca/contact';
+import { useAddContact, useContact, useDeleteContact, useEditContact } from '@portkey/hooks/hooks-ca/contact';
 import useRouterParams from '@portkey/hooks/useRouterParams';
-import { fetchContractListAsync } from '@portkey/store/store-ca/contact/actions';
 import Loading from 'components/Loading';
 
 type RouterParams = {
@@ -51,13 +49,12 @@ const initEditContact: EditContactType = {
 
 const ContactEdit: React.FC = () => {
   const { contact } = useRouterParams<RouterParams>();
-  const appDispatch = useAppDispatch();
   const { t } = useLanguage();
   const addContactApi = useAddContact();
   const editContactApi = useEditContact();
   const deleteContactApi = useDeleteContact();
 
-  const { contactIndexList } = useAppSelector(state => state.contact);
+  const { contactIndexList } = useContact();
   const [editContact, setEditContact] = useState<EditContactType>(initEditContact);
 
   useEffect(() => {
@@ -97,12 +94,6 @@ const ContactEdit: React.FC = () => {
       return _editContact;
     });
   }, [chainList, currentNetwork, isEdit]);
-
-  const refreshContactList = useCallback(() => {
-    setTimeout(() => {
-      appDispatch(fetchContractListAsync());
-    }, 3000);
-  }, [appDispatch]);
 
   const onNameChange = useCallback((value: string) => {
     setEditContact(preEditContact => ({
@@ -220,11 +211,9 @@ const ContactEdit: React.FC = () => {
     try {
       if (isEdit) {
         await editContactApi(editContact);
-        refreshContactList();
         CommonToast.success(t('Saved Successful'), undefined, 'bottom');
       } else {
         await addContactApi(editContact);
-        refreshContactList();
         CommonToast.success(t('Contact Added'), undefined, 'bottom');
       }
       navigationService.navigate('ContactsHome');
@@ -232,7 +221,7 @@ const ContactEdit: React.FC = () => {
       CommonToast.failError(err);
     }
     Loading.hide();
-  }, [addContactApi, checkError, editContact, editContactApi, isEdit, refreshContactList, t]);
+  }, [addContactApi, checkError, editContact, editContactApi, isEdit, t]);
 
   const onDelete = useCallback(() => {
     ActionSheet.alert({
@@ -251,7 +240,6 @@ const ContactEdit: React.FC = () => {
               await deleteContactApi(editContact);
               CommonToast.success(t('Contact Deleted'), undefined, 'bottom');
               navigationService.navigate('ContactsHome');
-              refreshContactList();
             } catch (error: any) {
               console.log('onDelete:error', error);
               CommonToast.failError(error.error);
@@ -261,7 +249,7 @@ const ContactEdit: React.FC = () => {
         },
       ],
     });
-  }, [deleteContactApi, editContact, refreshContactList, t]);
+  }, [deleteContactApi, editContact, t]);
 
   const onChainChange = useCallback(
     (addressIdx: number, chainItem: ChainItemType) => {
@@ -292,8 +280,7 @@ const ContactEdit: React.FC = () => {
         onChangeText={onNameChange}
         errorMessage={editContact.error.isError ? editContact.error.errorMsg : ''}
       />
-
-      <KeyboardAwareScrollView keyboardOpeningTime={0} keyboardShouldPersistTaps="handled" alwaysBounceVertical={false}>
+      <KeyboardAwareScrollView extraHeight={pTd(300)} keyboardShouldPersistTaps="handled" keyboardOpeningTime={0}>
         <TouchableWithoutFeedback>
           <View>
             {editContact.addresses.map((addressItem, addressIdx) => (

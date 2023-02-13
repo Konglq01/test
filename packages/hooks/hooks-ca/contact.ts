@@ -2,9 +2,14 @@ import { request } from '@portkey/api/api-did';
 import { CheckContactNameResponseType } from '@portkey/api/api-did/contact/type';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { AddContactItemApiType, ContactItemType, EditContactItemApiType } from '@portkey/types/types-ca/contact';
-import { useCallback } from 'react';
-import { addContractAction, deleteContractAction, editContractAction } from '@portkey/store/store-ca/contact/actions';
-import { useAppCommonDispatch } from '../index';
+import { useCallback, useEffect } from 'react';
+import {
+  addContractAction,
+  deleteContractAction,
+  editContractAction,
+  fetchContractListAsync,
+} from '@portkey/store/store-ca/contact/actions';
+import { useAppCommonDispatch, useAppCommonSelector } from '../index';
 
 export const useAddContact = () => {
   const dispatch = useAppCommonDispatch();
@@ -68,4 +73,12 @@ export const useCheckContactName = () => {
     },
     [currentNetworkInfo.apiUrl],
   );
+};
+
+export const useContact = (isInit?: boolean) => {
+  const dispatch = useAppCommonDispatch();
+  useEffect(() => {
+    dispatch(fetchContractListAsync(isInit));
+  }, []);
+  return useAppCommonSelector(state => state.contact);
 };
