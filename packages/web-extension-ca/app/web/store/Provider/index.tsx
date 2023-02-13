@@ -11,12 +11,12 @@ import { prefixCls } from '../../constants';
 import ReduxProvider from './ReduxProvider';
 import Updater from './Updater';
 import * as Sentry from '@sentry/react';
-import { BrowserTracing } from '@sentry/tracing';
+import { Integrations } from '@sentry/tracing';
 
 const bodyRootWrapper = document.body;
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
-  integrations: [new BrowserTracing()],
+  integrations: [new Integrations.BrowserTracing()],
   // Set tracesSampleRate to 1.0 to capture 100%
   // of transactions for performance monitoring.
   // We recommend adjusting this value in production
