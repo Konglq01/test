@@ -21,6 +21,8 @@ import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 import { randomId } from '@portkey/utils';
 import './index.less';
 import useFetchDidWallet from 'hooks/useFetchDidWallet';
+import { setPasswordSeed } from 'store/reducers/user/slice';
+import { DEVICE_TYPE } from 'constants/index';
 
 export default function SetWalletPin() {
   const [form] = Form.useForm();
@@ -49,7 +51,7 @@ export default function SetWalletPin() {
         type: LoginStrType[loginAccount.loginType],
         loginGuardianAccount: loginAccount.guardianAccount,
         managerAddress,
-        deviceString: Date.now().toString(), //navigator.userAgent,
+        deviceString: `${DEVICE_TYPE},${Date.now()}`, //navigator.userAgent,
         chainId: DefaultChainId,
         verifierId: registerVerifier.verifierId,
         verificationDoc: registerVerifier.verificationDoc,
@@ -88,7 +90,7 @@ export default function SetWalletPin() {
       const result = await recoveryDIDWallet({
         loginGuardianAccount: loginAccount.guardianAccount,
         managerAddress,
-        deviceString: Date.now().toString(), //navigator.userAgent,
+        deviceString: `${DEVICE_TYPE},${Date.now()}`, //navigator.userAgent,
         chainId: DefaultChainId,
         guardiansApproved,
         context: {
@@ -123,6 +125,7 @@ export default function SetWalletPin() {
       await setLocalStorage({
         registerStatus: 'Registered',
       });
+      dispatch(setPasswordSeed(pin));
       await setPinAction(pin);
       navigate(`/success-page/${state}`);
     },

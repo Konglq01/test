@@ -17,7 +17,7 @@ import Receive from 'pages/Receive';
 import AddGuardian from 'pages/Guardians/GuardiansAdd';
 import TokenDetail from 'pages/Token/Detail';
 import AccountSetting from 'pages/AccountSetting';
-import Contact from 'pages/ContactDetail';
+import Contact from 'pages/Contacts/ContactDetail';
 import My from 'pages/My';
 import Send from 'pages/Send';
 import Transaction from 'pages/Transaction';
@@ -25,6 +25,8 @@ import NFT from 'pages/NFT';
 import Unlock from 'pages/Unlock';
 import QueryPage from 'pages/QueryPage';
 import TestSocket from 'pages/TestSocket';
+import Device from 'pages/AccountSetting/Devices';
+import SetPin from 'pages/AccountSetting/SetPin';
 import NotFound from 'pages/NotFound';
 
 export const PageRouter = () =>
@@ -141,6 +143,14 @@ export const PageRouter = () =>
     //   path: '/setting/account-setting',
     //   element: <AccountSetting />,
     // },
+    {
+      path: '/setting/account-setting/device',
+      element: <Device />,
+    },
+    {
+      path: '/setting/account-setting/set-pin',
+      element: <SetPin />,
+    },
     {
       path: '/unlock',
       element: <Unlock />,

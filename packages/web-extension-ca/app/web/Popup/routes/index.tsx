@@ -9,7 +9,7 @@ import NFT from 'pages/NFT';
 import Transaction from 'pages/Transaction';
 import My from 'pages/My';
 import Contacts from 'pages/Contacts';
-import Contact from 'pages/ContactDetail';
+import Contact from 'pages/Contacts/ContactDetail';
 import AccountSetting from 'pages/AccountSetting';
 import Guardians from 'pages/Guardians';
 import AddGuardian from 'pages/Guardians/GuardiansAdd';
@@ -18,6 +18,8 @@ import GuardiansView from 'pages/Guardians/GuardiansView';
 import VerifierAccount from 'pages/VerifierAccount';
 import GuardianApproval from 'pages/GuardianApproval';
 import Unlock from 'pages/Unlock';
+import Device from 'pages/AccountSetting/Devices';
+import SetPin from 'pages/AccountSetting/SetPin';
 
 export const PageRouter = () =>
   useRoutes([
@@ -44,6 +46,14 @@ export const PageRouter = () =>
     {
       path: '/setting/account-setting',
       element: <AccountSetting />,
+    },
+    {
+      path: '/setting/account-setting/device',
+      element: <Device />,
+    },
+    {
+      path: '/setting/account-setting/set-pin',
+      element: <SetPin />,
     },
     {
       path: '/setting/guardians',

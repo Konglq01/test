@@ -8,7 +8,7 @@ const list: (ContactItemType | AddressItem)[] = [
     id: '121',
     index: '',
     address: '26icJLGpnQke1PRyi3tXsT9maaHJsdFsjMHqtrSVKYVpctCqy4',
-    chainType: 'MAIN',
+    // chainType: 'MAIN',
     chainId: 'AELF',
   },
   // {
@@ -51,7 +51,7 @@ function RecentItem({
       <p className="address">
         <span>ELF_</span>
         <span>{(item as AddressItem).address}</span>
-        <span>{(item as AddressItem).chainType}</span>
+        <span>{(item as AddressItem).chainId}</span>
       </p>
       <p className="network">
         {(item as AddressItem).chainId === 'AELF' ? 'MainChain' : 'SideChain'} {(item as AddressItem).chainId}{' '}
@@ -66,8 +66,8 @@ export default function Recent({ onChange }: { onChange: (account: AddressItem &
 
   return (
     <div className="recent">
-      {list.map((item) => (
-        <RecentItem item={item} key={item.id} onClick={onChange} />
+      {list.map((item, index) => (
+        <RecentItem item={item} key={index} onClick={onChange} />
       ))}
       {noData && <p className="no-data">No Data</p>}
     </div>

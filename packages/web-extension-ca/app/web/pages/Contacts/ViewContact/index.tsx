@@ -59,7 +59,7 @@ export default function ViewContact() {
             <div className="flex-between address-item" key={index}>
               <div>
                 <div className="address">{`ELF_${ads?.address}_${ads?.chainId}`}</div>
-                <div className="chain">{`${ads?.chainType} ${ads?.chainId}`}</div>
+                <div className="chain">{`${ads?.chainId} ${ads?.chainId}`}</div>
               </div>
               <CustomSvg onClick={() => handleCopy(ads?.address)} type="Copy2" className="address-copy-icon" />
             </div>
