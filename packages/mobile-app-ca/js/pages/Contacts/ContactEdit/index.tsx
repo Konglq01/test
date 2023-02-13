@@ -36,7 +36,6 @@ type RouterParams = {
 };
 
 export type EditAddressType = AddressItem & { error: ErrorType };
-
 interface EditContactType extends EditContactItemApiType {
   error: ErrorType;
   addresses: EditAddressType[];
@@ -76,7 +75,6 @@ const ContactEdit: React.FC = () => {
   const isEdit = useMemo(() => contact !== undefined, [contact]);
 
   const { chainList = [], currentNetwork } = useCurrentWallet();
-
   const chainMap = useMemo(() => {
     const _chainMap: { [k: string]: ChainItemType } = {};
     chainList.forEach(item => {

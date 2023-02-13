@@ -1,6 +1,6 @@
 import PageContainer from 'components/PageContainer';
 import { useLanguage } from 'i18n/hooks';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { pageStyles } from './style';
 import CommonButton from 'components/CommonButton';
 import CommonInput from 'components/CommonInput';
@@ -11,13 +11,20 @@ import navigationService from 'utils/navigationService';
 import CommonToast from 'components/CommonToast';
 import { useSetWalletName, useWallet } from '@portkey/hooks/hooks-ca/wallet';
 import Loading from 'components/Loading';
+import { getWalletNameAsync } from '@portkey/store/store-ca/wallet/actions';
+import { useAppDispatch } from 'store/hooks';
 
 const WalletName: React.FC = () => {
   const { t } = useLanguage();
+  const appDispatch = useAppDispatch();
   const { walletName } = useWallet();
   const [nameValue, setNameValue] = useState<string>(walletName);
   const [nameError, setNameError] = useState<ErrorType>(INIT_HAS_ERROR);
   const setWalletName = useSetWalletName();
+
+  useEffect(() => {
+    appDispatch(getWalletNameAsync());
+  }, [appDispatch]);
 
   const onNameChange = useCallback((value: string) => {
     setNameValue(value);
