@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { NetworkType } from '@portkey/types/index';
 import { ActivityItemType } from '@portkey/types/types-ca/activity';
 import { fetchActivities } from './api';
+import { setActivityListAction, getActivityListAsync } from './action';
 
 export type ActivityStateType = {
   MaxResultCount: number;
@@ -18,20 +19,6 @@ const initialState: ActivityStateType = {
   totalCount: 0,
   isFetchingActivities: false,
 };
-export const fetchActivitiesAsync = createAsyncThunk(
-  '/api/app/user-activities',
-  async ({ type }: { type: NetworkType }, { getState, dispatch }) => {
-    const { activity } = getState() as { activity: ActivityStateType };
-    const state = activity;
-    const { skipCount, totalCount, MaxResultCount } = state;
-    if (skipCount < totalCount || totalCount === 0) {
-      dispatch(addPage(type));
-      const response = await fetchActivities({ start: skipCount, limit: MaxResultCount });
-      return { type, list: response.data.items, totalCount: response.data.total };
-    }
-    return { type, list: [], totalCount };
-  },
-);
 
 //it automatically uses the immer library to let you write simpler immutable updates with normal mutative code
 export const activitySlice = createSlice({
@@ -45,14 +32,22 @@ export const activitySlice = createSlice({
   },
   extraReducers: builder => {
     builder
-      .addCase(fetchActivitiesAsync.pending, state => {})
-      .addCase(fetchActivitiesAsync.fulfilled, (state, action) => {
-        const { type, list, totalCount } = action.payload;
-        state.list = [...state.list, ...list];
-        state.totalCount = totalCount;
-        state.isFetchingActivities = false;
+      .addCase(setActivityListAction, (state: any, action: any) => {
+        console.log('🌈 🌈 🌈 🌈 🌈 🌈 ', state, action);
       })
-      .addCase(fetchActivitiesAsync.rejected, state => {});
+      .addCase(getActivityListAsync.pending, state => {
+        console.log('🌈 🌈 🌈 🌈 🌈 🌈 pending state', state);
+      })
+      .addCase(getActivityListAsync.fulfilled, (state, action) => {
+        console.log('🌈 🌈 🌈 🌈 🌈 🌈 fulfilled ====', state, action);
+        // const { type, list, totalCount } = action.payload;
+        // state.list = [...state.list, ...list];
+        // state.totalCount = totalCount;
+        // state.isFetchingActivities = false;
+      })
+      .addCase(getActivityListAsync.rejected, state => {
+        console.log('🌈 🌈 🌈 🌈 🌈 🌈 rejected state', state);
+      });
   },
 });
 

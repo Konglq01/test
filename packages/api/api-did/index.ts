@@ -7,6 +7,7 @@ import esApi from './es';
 import myServer, { DidService } from './server';
 import { API_REQ_FUNCTION } from '../types';
 import { ES_API_REQ_FUNCTION } from './es/type';
+import activityApi from './activity';
 
 export const DEFAULT_METHOD = 'POST';
 
@@ -32,6 +33,7 @@ export const EXPAND_APIS = {
   contact: contactApi,
   chain: chainApi,
   token: tokenApi,
+  activity: activityApi,
 };
 
 export type BASE_REQ_TYPES = {

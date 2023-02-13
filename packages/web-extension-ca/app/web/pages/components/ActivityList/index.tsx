@@ -7,40 +7,17 @@ import { useNavigate } from 'react-router';
 import { useWalletInfo } from 'store/Provider/hooks';
 import './index.less';
 
-export default function ActivityList({
-  hasMore,
-  loadMore,
-}: {
+export interface IActivityListProps {
+  data: Transaction[];
   hasMore: boolean;
   loadMore: (isRetry: boolean) => Promise<void>;
-}) {
+}
+
+export default function ActivityList({ data, hasMore, loadMore }: IActivityListProps) {
   const { currentNetwork } = useWalletInfo();
   const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'TESTNET' : ''), [currentNetwork]);
   const nav = useNavigate();
-  const data: Transaction[] = [
-    {
-      chainId: '123123',
-      token: { symbol: 'ELF', address: 'adasdasdaqea' },
-      method: 'Transfer',
-      from: '0xawe123eeafadafdawe',
-      to: '0xawe123eeafadafdawe',
-      transactionId: 'asdasdabkhk',
-      amount: '123',
-      timestamp: '1670660449961',
-      priceInUsd: '10',
-    },
-    {
-      chainId: '123123',
-      token: { symbol: 'ELF', address: 'adasdasdaqea' },
-      method: 'Transfer',
-      from: '0xawe123eeafadafdawe',
-      to: '0xawe123eeafadafdawe',
-      transactionId: 'asdasdabkhk',
-      amount: '123',
-      timestamp: '1670660449961',
-      priceInUsd: '10',
-    },
-  ];
+
   const InfiniteScrollContent = ({ hasMore }: { hasMore?: boolean }) => {
     return (
       <>

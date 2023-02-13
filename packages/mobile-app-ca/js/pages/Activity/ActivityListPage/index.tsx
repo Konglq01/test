@@ -9,7 +9,7 @@ import useEffectOnce from 'hooks/useEffectOnce';
 import { useLanguage } from 'i18n/hooks';
 import TransferItem from 'components/TransferList/components/TransferItem';
 import { FlatList } from 'react-native-gesture-handler';
-import { fetchActivitiesAsync } from '@portkey/store/store-ca/activity/slice';
+import { getActivityListAsync } from '@portkey/store/store-ca/activity/action';
 import { useAppCASelector, useAppCommonDispatch } from '@portkey/hooks';
 import NoData from 'components/NoData';
 
@@ -36,7 +36,7 @@ const ActivityListPage: React.FC<ActivityListPagePropsType> = (props: ActivityLi
 
   useEffectOnce(() => {
     //TODO fetch activity List
-    dispatch(fetchActivitiesAsync({ type: 'MAIN' }));
+    dispatch(getActivityListAsync({ type: 'MAIN' }));
   });
 
   const renderItem = useCallback(({ item }: any) => {
