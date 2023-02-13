@@ -244,7 +244,7 @@ export default function GuardiansView() {
               navigate('/setting/guardians/edit');
             }}
             type="primary">
-            {t('Change Verifier')}
+            {t('Edit')}
           </Button>
         </div>
       </div>

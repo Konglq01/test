@@ -20,6 +20,7 @@ import GStyles from 'assets/theme/GStyles';
 import { ViewStyleType } from 'types/styles';
 import { getAelfAddress } from '@portkey/utils/aelf';
 import { transContactsToIndexes } from '@portkey/store/store-ca/contact/utils';
+import CommonToast from 'components/CommonToast';
 
 interface ContactsListProps {
   isIndexBarShow?: boolean;
