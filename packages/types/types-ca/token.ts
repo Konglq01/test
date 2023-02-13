@@ -2,7 +2,8 @@ import { ChainItemType } from '../chain';
 import { AccountType } from '../wallet';
 
 export interface BaseToken {
-  id: string; // id
+  id?: string; // id
+  chainId: string;
   decimals: number; // 8
   address: string; // "ArPnUb5FtxG2oXTaWX2DxNZowDEruJLs2TEkhRCzDdrRDfg8B",        token address  contract address
   symbol: string; // "ELF"   the name showed
@@ -16,7 +17,10 @@ export interface TokenItemType extends BaseToken {
 }
 export interface TokenItemShowType extends TokenItemType {
   isAdded?: boolean; // boolean
+  tokenContractAddress?: string;
+  imageUrl?: string;
   balance?: string;
+  balanceInUsd?: string;
 }
 
 //  all Added TokenInfo（all chain all account tokenList）

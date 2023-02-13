@@ -25,19 +25,19 @@ const TokenListItem: React.FC<TokenListItemType> = props => {
     <TouchableOpacity style={itemStyle.wrap} onPress={() => onPress?.(item)}>
       <CommonAvatar
         style={itemStyle.left}
-        title={item?.token?.symbol}
+        title={item?.symbol}
         svgName={item?.token?.symbol === 'ELF' ? icon : undefined}
         avatarSize={pTd(48)}
+        imageUrl={item?.imageUrl}
       />
       <View style={itemStyle.right}>
         <View style={itemStyle.infoWrap}>
           <TextL numberOfLines={1} ellipsizeMode={'tail'} style={itemStyle.tokenName}>
-            {item?.token?.symbol}
+            {item?.symbol}
           </TextL>
           <TextS numberOfLines={1} style={[FontStyles.font7, itemStyle.chainInfo]}>
             {item?.chainId === 'AELF' ? 'MainChain ' : 'SideChain '} {item?.chainId}{' '}
-            {/* {currentNetwork === 'MAIN' && 'Testnet'} */}
-            {'Testnet'}
+            {currentNetwork === 'TESTNET' && 'Testnet'}
           </TextS>
         </View>
 
@@ -46,10 +46,10 @@ const TokenListItem: React.FC<TokenListItemType> = props => {
             ZERO.plus(item.balance).div(`1e${item.decimals}`),
           )} ${item?.token?.symbol}`}</TextL> */}
           <TextL style={itemStyle.token} numberOfLines={1} ellipsizeMode={'tail'}>
-            {item?.amount}
+            {item?.balance}
           </TextL>
           <TextS numberOfLines={1} ellipsizeMode={'tail'} style={itemStyle.dollar}>
-            {/* $ {item?.amountUsd} */}
+            $ {item?.balanceInUsd}
           </TextS>
         </View>
       </View>

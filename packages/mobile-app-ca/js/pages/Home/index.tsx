@@ -76,7 +76,7 @@ export default function HomeScreen() {
               args: {
                 symbol: 'ELF',
                 to: '2PfWcs9yhY5xVcJPskxjtAHiKyNUbX7wyWv2NcwFJEg9iNfnPj',
-                // amount: 1 * 10 ** 8,
+                amount: 1 * 10 ** 8,
                 memo: 'transfer address1 to address2',
               },
             });

@@ -39,8 +39,15 @@ const AssetItem = (props: any) => {
 
   const { currentNetwork } = useWallet();
 
-  if (item.type === 'token')
-    return <TokenListItem symbol={item.symbol} icon={'aelf-avatar'} item={item} onPress={() => onPress(item)} />;
+  if (item?.tokenInfo)
+    return (
+      <TokenListItem
+        symbol={item.symbol}
+        icon={'aelf-avatar'}
+        item={{ ...item, ...item?.tokenInfo, tokenContractAddress: item.address }}
+        onPress={() => onPress(item)}
+      />
+    );
 
   return (
     <TouchableOpacity style={itemStyle.wrap} onPress={() => onPress?.(item)}>
@@ -52,14 +59,14 @@ const AssetItem = (props: any) => {
       {/* <CommonAvatar style={itemStyle.left} title={symbol} svgName={undefined} avatarSize={pTd(48)} /> */}
       <View style={itemStyle.right}>
         <View>
-          <TextXL numberOfLines={1} ellipsizeMode={'tail'} style={[FontStyles.font5]}>
+          <TextL numberOfLines={1} ellipsizeMode={'tail'} style={[FontStyles.font5]}>
             {symbol || 'Name'} {'#0271'}
-          </TextXL>
+          </TextL>
 
-          {currentNetwork === 'MAIN' ? (
-            <TextM numberOfLines={1} style={[FontStyles.font7]}>
+          {currentNetwork ? (
+            <TextS numberOfLines={1} style={[FontStyles.font7, itemStyle.nftItemInfo]}>
               {item?.chainId === ' AELF' ? 'MainChain' : 'SideChain'} {item.chainId}
-            </TextM>
+            </TextS>
           ) : (
             <TextL style={[FontStyles.font7]}>$ 100 USD</TextL>
           )}
@@ -76,7 +83,7 @@ const AssetItem = (props: any) => {
 
 const AssetList = ({ onFinishSelectToken, account }: TokenListProps) => {
   const { t } = useLanguage();
-  const { accountAssets, accountToken } = useAppCASelector(state => state.assets);
+  const { accountAssets } = useAppCASelector(state => state.assets);
   const dispatch = useAppCommonDispatch();
 
   const [listShow, setListShow] = useState<any[]>([]);
@@ -116,9 +123,10 @@ const AssetList = ({ onFinishSelectToken, account }: TokenListProps) => {
   }, [debounceKeyword]);
 
   useEffect(() => {
-    const tokenList = accountToken.accountTokenList.map(ele => ({ ...ele, type: 'token' }));
-    setListShow([...tokenList, ...accountAssets.accountAssetsList]);
-  }, [accountAssets.accountAssetsList, accountToken.accountTokenList]);
+    console.log('accountAssetsListaccountAssetsListaccountAssetsList', accountAssets);
+
+    setListShow(accountAssets.accountAssetsList);
+  }, [accountAssets.accountAssetsList]);
 
   useEffectOnce(() => {
     if (accountAssets.accountAssetsList.length !== 0) return;
@@ -251,5 +259,8 @@ const itemStyle = StyleSheet.create({
   dollar: {
     marginTop: pTd(2),
     lineHeight: pTd(16),
+  },
+  nftItemInfo: {
+    marginTop: pTd(2),
   },
 });
