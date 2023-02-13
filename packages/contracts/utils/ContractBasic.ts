@@ -66,7 +66,7 @@ export class AElfContractBasic {
       if (!req?.error && (req?.result || req?.result === null)) return { data: req.result };
       return { data: req };
     } catch (error) {
-      return handleContractError(error);
+      return { error: handleContractError(error) };
     }
   };
 

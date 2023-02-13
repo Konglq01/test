@@ -2,7 +2,7 @@ import { useAppCASelector, useAppCommonDispatch } from '@portkey/hooks';
 import { clearState, fetchActivitiesAsync } from '@portkey/store/store-ca/activity/slice';
 import { Transaction } from '@portkey/types/types-ca/trade';
 import ActivityList from 'pages/components/ActivityList';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useEffectOnce } from 'react-use';
 import { useWalletInfo } from 'store/Provider/hooks';
@@ -22,6 +22,7 @@ export enum EmptyTipMessage {
 }
 
 export default function Activity({ data = [], total, loading, rate, appendData, clearData }: ActivityProps) {
+  console.log(data, rate);
   const { t } = useTranslation();
   const { currentNetwork } = useWalletInfo();
   // TODO use this selector to get data
@@ -72,10 +73,11 @@ export default function Activity({ data = [], total, loading, rate, appendData, 
 
   return (
     <div className="activity-wrapper">
-      {!total ? (
+      {total ? (
         <ActivityList
           hasMore={false}
           loadMore={function (isRetry: boolean): Promise<void> {
+            console.log(isRetry);
             throw new Error('Function not implemented.');
           }}
         />

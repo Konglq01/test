@@ -1,9 +1,11 @@
 import SandboxEventTypes from 'messages/SandboxEventTypes';
-import { encodedTx, getAelfInstance, getELFContract } from '@portkey/utils/aelf';
+import { encodedTx, getAelfInstance, getWallet } from '@portkey/utils/aelf';
 import SandboxEventService, { SandboxErrorCode } from 'service/SandboxEventService';
 import { ChainType } from '@portkey/types';
 import { TokenItemType } from '@portkey/types/types-ca/token';
 import { customFetch } from '@portkey/utils/fetch';
+import { getContractBasic } from '@portkey/contracts/utils';
+import { ContractBasic } from '@portkey/contracts/utils/ContractBasic';
 
 interface useBalancesProps {
   tokens: TokenItemType | TokenItemType[];
@@ -26,9 +28,8 @@ type SendBack = (
 type RpcUrl = string;
 type ContractAddress = string;
 type FromAccountPrivateKey = string;
-type ContractInstance = any;
-let contracts: Record<RpcUrl, Record<ContractAddress, ContractInstance>> = {};
-let accountContracts: Record<RpcUrl, Record<FromAccountPrivateKey, Record<string, ContractInstance>>> = {};
+const contracts: Record<RpcUrl, Record<ContractAddress, ContractBasic>> = {};
+const accountContracts: Record<RpcUrl, Record<FromAccountPrivateKey, Record<ContractAddress, ContractBasic>>> = {};
 
 class SandboxUtil {
   constructor() {
@@ -117,11 +118,11 @@ class SandboxUtil {
         // if (symbol) return getELFChainBalance(tokenContract, symbol, data.account ?? '');
         if (symbol) {
           const contract = await SandboxUtil._getELFViewContract(data.rpcUrl, tokenAddress);
-          const result = await contract.GetBalance.call({
+          const result = await contract.callViewMethod('GetBalance', {
             symbol,
             owner: data.account,
           });
-          return result?.balance ?? result?.amount ?? 0;
+          return result.data?.balance ?? result?.data?.amount ?? 0;
         }
       });
     } else if (data.chainType === 'ethereum') {
@@ -157,15 +158,13 @@ class SandboxUtil {
   static async _getELFViewContract(rpcUrl: string, address: string, privateKey?: string) {
     let _contract = contracts?.[rpcUrl]?.[address];
     if (!_contract) {
-      _contract = await getELFContract(rpcUrl, address, privateKey);
-      // contracts
-      contracts = {
-        ...contracts,
-        [rpcUrl]: {
-          ...(contracts[rpcUrl] ?? {}),
-          [address]: _contract,
-        },
-      };
+      _contract = await getContractBasic({
+        contractAddress: address,
+        account: getWallet(privateKey),
+        rpcUrl,
+      });
+      if (!contracts?.[rpcUrl]) contracts[rpcUrl] = {};
+      contracts[rpcUrl][address] = _contract;
     }
     return _contract;
   }
@@ -173,18 +172,14 @@ class SandboxUtil {
   static async _getELFSendContract(rpcUrl: string, address: string, privateKey: string) {
     let _contract = accountContracts?.[rpcUrl]?.[privateKey]?.[address];
     if (!_contract) {
-      _contract = await getELFContract(rpcUrl, address, privateKey);
-      // accountContracts
-      accountContracts = {
-        ...accountContracts,
-        [rpcUrl]: {
-          ...(contracts[rpcUrl] ?? {}),
-          [privateKey]: {
-            ...(contracts[rpcUrl]?.[privateKey] ?? {}),
-            [address]: _contract,
-          },
-        },
-      };
+      _contract = await getContractBasic({
+        contractAddress: address,
+        account: getWallet(privateKey),
+        rpcUrl,
+      });
+      if (!accountContracts?.[rpcUrl]) accountContracts[rpcUrl] = {};
+      if (!accountContracts?.[rpcUrl]?.[privateKey]) accountContracts[rpcUrl][privateKey] = {};
+      accountContracts[rpcUrl][privateKey][address] = _contract;
     }
     console.log(_contract, '_getELFSendContract');
 
@@ -210,19 +205,24 @@ class SandboxUtil {
         });
       }
       const contract = await SandboxUtil._getELFViewContract(rpcUrl, address);
-      console.log(contract, paramsOption, 'contract====callViewMethod');
-      const result = await contract[methodName].call(paramsOption);
+      const result = await contract?.callViewMethod(methodName, paramsOption);
+      if (result.error)
+        return callback(event, {
+          code: SandboxErrorCode.error,
+          error: result.error,
+          sid: data.sid,
+        });
       console.log(result, 'callViewMethod');
       callback(event, {
         code: SandboxErrorCode.success,
-        message: result,
+        message: result.data,
         sid: data.sid,
       });
-    } catch (error) {
+    } catch (error: any) {
       console.log(error, 'error===callViewMethod');
       callback(event, {
         code: SandboxErrorCode.error,
-        message: error,
+        message: error?.error || error,
         sid: data.sid,
       });
     }
@@ -232,8 +232,7 @@ class SandboxUtil {
     const data = event.data.data ?? {};
 
     try {
-      const { rpcUrl, address, methodName, privateKey, paramsOption, chainType, isGetSignTx = 0 } = data;
-      console.log(data, 'callSendMethod');
+      const { rpcUrl, address, methodName, privateKey, paramsOption, chainType, isGetSignTx = 0, sendOptions } = data;
 
       if (!rpcUrl || !address || !methodName)
         return callback(event, {
@@ -249,25 +248,18 @@ class SandboxUtil {
           sid: data.sid,
         });
       }
+      const account = getWallet(privateKey);
       const contract = await SandboxUtil._getELFSendContract(rpcUrl, address, privateKey);
-      console.log(contract, 'callSendMethod==contract===');
-      const functionNameUpper = methodName.replace(methodName[0], methodName[0].toLocaleUpperCase());
-      console.log(contract, '1callSendMethod==');
-      let contractMethod = contract[functionNameUpper];
-      contractMethod = !isGetSignTx ? contractMethod : contractMethod.getSignedTx;
-      const req = await contractMethod(...paramsOption);
-      if (req.error)
+      const contractMethod = !isGetSignTx ? contract?.callSendMethod : contract?.encodedTx;
+      const req = await contractMethod?.(methodName, account, paramsOption, sendOptions);
+      if (req?.error)
         return callback(event, {
           code: SandboxErrorCode.error,
-          message: req.errorMessage?.message || req.error.message?.Message,
+          message: req.error?.message,
           sid: data.sid,
           error: req.error,
         });
-      // const { TransactionId } = req.result || req;
-      // await sleep(1000);
-      // const aelfInstance = getAelfInstance(rpcUrl);
-      // const validTxId = await getTxResult(aelfInstance, TransactionId);
-      return callback(event, { code: SandboxErrorCode.success, message: req, sid: data.sid });
+      return callback(event, { code: SandboxErrorCode.success, message: req?.data, sid: data.sid });
     } catch (e: any) {
       callback(event, {
         code: SandboxErrorCode.error,

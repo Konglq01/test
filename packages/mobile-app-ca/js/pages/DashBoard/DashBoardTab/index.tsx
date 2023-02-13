@@ -27,18 +27,18 @@ const DashBoardTab: React.FC<DashBoardTabProps> = (props: DashBoardTabProps) => 
       },
     ];
   }, [props, t]);
-  if (__DEV__)
-    return (
-      <>
-        <TextTitle selectable>{balance}</TextTitle>
-        <CommonButton
-          title="Home"
-          onPress={() => {
-            navigationService.navigate('Home');
-          }}
-        />
-      </>
-    );
+  // if (__DEV__)
+  //   return (
+  //     <>
+  //       <TextTitle selectable>{balance}</TextTitle>
+  //       <CommonButton
+  //         title="Home"
+  //         onPress={() => {
+  //           navigationService.navigate('Home');
+  //         }}
+  //       />
+  //     </>
+  //   );
   return <CommonTopTab hasTabBarBorderRadius tabList={tabList} />;
 };
 export default DashBoardTab;

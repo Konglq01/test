@@ -25,6 +25,7 @@ import { setWalletNameAction } from '@portkey/store/store-ca/wallet/actions';
 
 export interface CurrentWalletType extends WalletInfoType, CAInfoType {
   caHash?: string;
+  caAddressList?: string[];
 }
 
 function getCurrentWalletInfo(
@@ -32,10 +33,18 @@ function getCurrentWalletInfo(
   currentNetwork: WalletState['currentNetwork'],
 ): CurrentWalletType {
   const currentCAInfo = walletInfo?.caInfo?.[currentNetwork];
+
+  console.log('currentCAInfocurrentCAInfo', currentCAInfo);
+
   const tmpWalletInfo: any = Object.assign({}, walletInfo, currentCAInfo, {
     caHash: currentCAInfo?.AELF?.caHash,
+    caAddressList: Object.values(currentCAInfo || {})
+      ?.filter((info: any) => !!info?.caAddress)
+      ?.map((i: any) => i?.caAddress),
   });
+
   if (tmpWalletInfo.caInfo) delete tmpWalletInfo.caInfo;
+
   return tmpWalletInfo;
 }
 
@@ -48,6 +57,7 @@ export const useCurrentWalletInfo = () => {
 
 export const useCurrentWallet = () => {
   const wallet = useWallet();
+
   return useMemo(() => {
     const { walletInfo, currentNetwork, chainInfo } = wallet;
     return {
