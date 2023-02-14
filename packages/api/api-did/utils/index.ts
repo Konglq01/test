@@ -3,6 +3,7 @@ import { customFetch } from '@portkey/utils/fetch';
 import { stringify } from 'query-string';
 import AElf from 'aelf-sdk';
 import { request } from '../index';
+import { DefaultChainId } from '@portkey/constants/constants-ca/network-test2';
 export type RefreshTokenConfig = {
   grant_type: 'signature';
   client_id: 'CAServer_App';
@@ -18,7 +19,7 @@ export const queryAuthorization = async (config: RefreshTokenConfig) => {
   const { access_token } = await customFetch(config.connectUrl + '/connect/token', {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     method: 'POST',
-    body: stringify(_config),
+    body: stringify({ ..._config, chain_id: DefaultChainId }),
   });
   console.log(access_token, '====access_token');
 

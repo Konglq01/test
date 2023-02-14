@@ -22,7 +22,6 @@ import ActionSheet from 'components/ActionSheet';
 import { ErrorType } from 'types/common';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import { FontStyles } from 'assets/theme/styles';
-import { request } from 'api';
 import Loading from 'components/Loading';
 import CommonToast from 'components/CommonToast';
 import useRouterParams from '@portkey/hooks/useRouterParams';
@@ -32,6 +31,7 @@ import { setPreGuardianAction } from '@portkey/store/store-ca/guardians/actions'
 import { VerifierImage } from '../components/VerifierImage';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network-test2';
+import { verification } from 'utils/api';
 
 type RouterParams = {
   guardian?: UserGuardianItem;
@@ -121,8 +121,8 @@ const GuardianEdit: React.FC = () => {
           onPress: async () => {
             try {
               Loading.show();
-              const req = await request.verify.sendCode({
-                data: {
+              const req = await verification.sendVerificationCode({
+                params: {
                   type: LoginStrType[selectedType.value],
                   guardianAccount: email,
                   verifierId: selectedVerifier.id,

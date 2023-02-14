@@ -16,16 +16,14 @@ export function useGetCurrentCAViewContract(chainId: ChainId = 'AELF') {
   const chainInfo = useCurrentChain(chainId);
   const [{ viewContracts }, dispatch] = useInterface();
 
-  const caContract = useMemo(() => {
-    if (!chainInfo?.caContractAddress) return;
-    return viewContracts?.[chainInfo.caContractAddress];
-  }, [chainInfo?.caContractAddress, viewContracts]);
-
   return useCallback(
     async (paramChainInfo?: ChainItemType) => {
-      if (caContract) return caContract;
       const _chainInfo = paramChainInfo || chainInfo;
       if (!_chainInfo) throw Error('Could not find chain information');
+
+      const caContract = viewContracts?.[_chainInfo.caContractAddress];
+      if (caContract) return caContract;
+
       const contract = await getContractBasic({
         contractAddress: _chainInfo.caContractAddress,
         rpcUrl: _chainInfo.endPoint,
@@ -35,7 +33,7 @@ export function useGetCurrentCAViewContract(chainId: ChainId = 'AELF') {
 
       return contract as ContractBasic;
     },
-    [caContract, chainInfo, dispatch],
+    [chainInfo, dispatch, viewContracts],
   );
 }
 

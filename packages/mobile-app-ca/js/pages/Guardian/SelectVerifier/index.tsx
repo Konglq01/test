@@ -23,8 +23,8 @@ import { VerifierImage } from '../components/VerifierImage';
 import { LoginType } from '@portkey/types/types-ca/wallet';
 import myEvents from 'utils/deviceEvent';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
-import { request } from 'api';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network-test2';
+import { verification } from 'utils/api';
 
 const ScrollViewProps = { disabled: true };
 export default function SelectVerifier() {
@@ -34,12 +34,13 @@ export default function SelectVerifier() {
   const [selectedVerifier, setSelectedVerifier] = useState(verifierList[0]);
 
   const { loginAccount } = useRouterParams<{ loginAccount?: string }>();
+
   const onConfirm = useCallback(async () => {
     const confirm = async () => {
       try {
         Loading.show();
-        const requestCodeResult = await request.verify.sendCode({
-          data: {
+        const requestCodeResult = await verification.sendVerificationCode({
+          params: {
             type: LoginStrType[LoginType.email],
             guardianAccount: loginAccount,
             verifierId: selectedVerifier.id,
