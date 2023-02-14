@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import TokenList from '../Tokens';
 import Activity from '../Activity/index';
 import { Transaction } from '@portkey/types/types-ca/trade';
-import { TokenBaseItemType } from '@portkey/types/types-ca/assets';
+import { TokenItemShowType } from '@portkey/types/types-ca/token';
 import { MINUTE } from '@portkey/constants';
 import { useEffectOnce } from 'react-use';
 import NFT from '../NFT/NFT';
@@ -22,42 +22,8 @@ export interface TransactionResult {
 
 let timer: any;
 
-const mockData: { items: TokenBaseItemType[]; totalCount: number } = {
-  items: [
-    {
-      chainId: 'AELF',
-      token: {
-        id: Math.random().toString(),
-        chainId: 'AELF',
-        symbol: 'ELF',
-        address: 'xxxxxx',
-      },
-      amount: 0,
-      amountUsd: 0,
-    },
-    {
-      chainId: 'tDVW',
-      token: {
-        id: Math.random().toString(),
-        chainId: 'tDVW',
-        symbol: 'ELF',
-        address: 'xxxxxx',
-      },
-      amount: 0,
-      amountUsd: 0,
-    },
-    // {
-    //   chainId: 'AELF',
-    //   token: {
-    //     id: Math.random().toString(),
-    //     chainId: 'AELF',
-    //     symbol: 'RAM',
-    //     address: 'xxxxxx',
-    //   },
-    //   amount: 10,
-    //   amountUsd: 1000,
-    // },
-  ],
+const mockData: { items: TokenItemShowType[]; totalCount: number } = {
+  items: [],
   totalCount: 2,
 };
 
