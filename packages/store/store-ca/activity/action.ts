@@ -1,35 +1,35 @@
+import { ActivityItemType } from '@portkey/types/types-ca/activity';
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
-import { fetchActivities } from './api';
-import { ActivityStateType } from './slice';
+import { fetchActivities, fetchActivity } from './api';
+import { ActivityStateType, IActivityApiParams, IActivitysApiParams } from './type';
 
 export const setActivityListAction = createAction<any>('activity/setActivityListAction');
+export const setActivityAction = createAction<any>('activity/setActivityAction');
 
 export const getActivityListAsync = createAsyncThunk(
   'activity/getActivityList',
-  async (params: any, { getState, dispatch }) => {
-    const { activity } = getState() as { activity: ActivityStateType };
-    // const _networkType = type ? type : currentNetwork;
-    // const baseUrl = NetworkList.find(item => item.networkType === _networkType)?.apiUrl;
-    // if (!baseUrl) throw Error('Unable to obtain the corresponding network');
-
+  async (params: IActivitysApiParams): Promise<ActivityStateType> => {
     const response = await fetchActivities(params);
-    // if (!response?.items) throw Error('No data');
-    // dispatch(setActivityListAction({ activity: response }));
-    return [response];
+    console.log('activities response========', response);
+    if (!response?.data || !response?.totalRecordCount) throw Error('No data');
+
+    // dispatch(addPage(type));
+    return {
+      data: response.data,
+      totalRecordCount: response.totalRecordCount,
+      maxResultCount: params.maxResultCount,
+      skipCount: params.skipCount,
+    };
   },
 );
 
-// export const fetchActivitiesAsync = createAsyncThunk(
-//   '/api/app/user-activities',
-//   async ({ type }: { type: NetworkType }, { getState, dispatch }) => {
-//     const { activity } = getState() as { activity: ActivityStateType };
-//     const state = activity;
-//     const { skipCount, totalCount, MaxResultCount } = state;
-//     if (skipCount < totalCount || totalCount === 0) {
-//       dispatch(addPage(type));
-//       const response = await fetchActivities({ start: skipCount, limit: MaxResultCount });
-//       return { type, list: response.data.items, totalCount: response.data.total };
-//     }
-//     return { type, list: [], totalCount };
-//   },
-// );
+export const getActivityAsync = createAsyncThunk(
+  'activity/getActivity',
+  async (params: IActivityApiParams): Promise<ActivityItemType> => {
+    const response = await fetchActivity(params);
+    console.log('activity response========', response);
+    if (!response?.transactionId) throw Error('No data');
+    // dispatch(setActivityAction({ activity: response }));
+    return response;
+  },
+);

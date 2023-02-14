@@ -1,3 +1,4 @@
+import { ActivityItemType } from '@portkey/types/types-ca/activity';
 import { Transaction } from '@portkey/types/types-ca/trade';
 import { DotLoading, InfiniteScroll, List } from 'antd-mobile';
 import CustomSvg from 'components/CustomSvg';
@@ -8,7 +9,7 @@ import { useWalletInfo } from 'store/Provider/hooks';
 import './index.less';
 
 export interface IActivityListProps {
-  data: Transaction[];
+  data?: ActivityItemType[];
   hasMore: boolean;
   loadMore: (isRetry: boolean) => Promise<void>;
 }
@@ -34,7 +35,7 @@ export default function ActivityList({ data, hasMore, loadMore }: IActivityListP
   };
 
   const navToDetail = useCallback(
-    (item: Transaction) => {
+    (item: ActivityItemType) => {
       nav('/transaction', { state: { info: item } });
     },
     [nav],
@@ -43,7 +44,7 @@ export default function ActivityList({ data, hasMore, loadMore }: IActivityListP
   return (
     <div className="activity-list">
       <List>
-        {data.map((item, index) => (
+        {data?.map((item, index) => (
           <List.Item key={`${item.transactionId}_${index}`}>
             <div className="activity-item" onClick={() => navToDetail(item)}>
               <div className="time">{moment(Number(item.timestamp)).format('MMM D [at] h:m a')}</div>
@@ -51,13 +52,13 @@ export default function ActivityList({ data, hasMore, loadMore }: IActivityListP
                 <CustomSvg type="Transfer" />
                 <div className="right">
                   <p className="row-1">
-                    <span>{item.method}</span>
+                    <span>{item.transactionType}</span>
                     <span>
-                      +{item.amount} {item.token.symbol}
+                      +{item.amount} {item.symbol}
                     </span>
                   </p>
                   <p className="row-2">
-                    <span>From: {item.from.replace(/(?<=^\w{7})\w*(?=\w{4}$)/, '...')}</span>
+                    <span>From: {item.fromaddress.replace(/(?<=^\w{7})\w*(?=\w{4}$)/, '...')}</span>
                     <span>${item.priceInUsd}</span>
                   </p>
                   {/* TODO Hidden during Social Recovery  */}

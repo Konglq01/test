@@ -6,12 +6,13 @@ import { recentSlice, RecentStateType } from '@portkey/store/store-ca/recent/sli
 import { TokenState } from './token';
 import { TokenBalanceState } from './tokenBalance';
 import { assetsSlice, AssetsStateType } from '@portkey/store/store-ca/assets/slice';
-import { activitySlice, ActivityStateType } from '@portkey/store/store-ca/activity/slice';
+import { activitySlice } from '@portkey/store/store-ca/activity/slice';
 import { walletSlice } from '@portkey/store/store-ca/wallet/slice';
 import { WalletState } from '@portkey/store/store-ca/wallet/type';
 import { GuardiansState } from '@portkey/store/store-ca/guardians/type';
 import { guardiansSlice } from '@portkey/store/store-ca/guardians/slice';
 import { contactSlice, ContactState } from '@portkey/store/store-ca/contact/slice';
+import { ActivityStateType } from '@portkey/store/store-ca/activity/type';
 
 export type CACommonState = RootCommonState & {
   [tokenManagementSlice.name]: TokenState;

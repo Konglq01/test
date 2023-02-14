@@ -1,23 +1,13 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import { NetworkType } from '@portkey/types/index';
-import { ActivityItemType } from '@portkey/types/types-ca/activity';
-import { fetchActivities } from './api';
 import { setActivityListAction, getActivityListAsync } from './action';
-
-export type ActivityStateType = {
-  MaxResultCount: number;
-  skipCount: number;
-  list: ActivityItemType[];
-  totalCount: number;
-  isFetchingActivities: boolean;
-};
+import { ActivityStateType } from './type';
 
 const initialState: ActivityStateType = {
-  MaxResultCount: 10,
+  maxResultCount: 10,
   skipCount: 0,
-  list: [],
-  totalCount: 0,
-  isFetchingActivities: false,
+  data: [],
+  totalRecordCount: 0,
 };
 
 //it automatically uses the immer library to let you write simpler immutable updates with normal mutative code
@@ -26,7 +16,7 @@ export const activitySlice = createSlice({
   initialState: initialState,
   reducers: {
     addPage: (state, { payload }: { payload: NetworkType }) => {
-      state.skipCount += state.MaxResultCount;
+      state.skipCount += state.maxResultCount;
     },
     clearState: state => (state = initialState),
   },
@@ -43,7 +33,6 @@ export const activitySlice = createSlice({
         // const { type, list, totalCount } = action.payload;
         // state.list = [...state.list, ...list];
         // state.totalCount = totalCount;
-        // state.isFetchingActivities = false;
       })
       .addCase(getActivityListAsync.rejected, state => {
         console.log('🌈 🌈 🌈 🌈 🌈 🌈 rejected state', state);

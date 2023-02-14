@@ -6,8 +6,9 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useEffectOnce } from 'react-use';
 import { useWalletInfo } from 'store/Provider/hooks';
-import { getActivityListAsync } from '@portkey/store/store-ca/activity/action';
+import { getActivityAsync, getActivityListAsync } from '@portkey/store/store-ca/activity/action';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { transactionTypes } from '@portkey/constants/constants-ca/activity';
 
 export interface ActivityProps {
   total?: number;
@@ -22,48 +23,67 @@ export enum EmptyTipMessage {
   NETWORK_NO_TRANSACTIONS = 'No transaction records accessible from the current custom network',
 }
 
-export default function Activity({ total, loading, rate, appendData, clearData }: ActivityProps) {
+export default function Activity({ loading, appendData, clearData }: ActivityProps) {
   const { t } = useTranslation();
-  const { currentNetwork } = useWalletInfo();
+  // const { currentNetwork } = useWalletInfo();
   // TODO use this selector to get data
-  const activities = useAppCASelector((state) => state.activity);
+  const activity = useAppCASelector((state) => state.activity);
   const dispatch = useAppCommonDispatch();
+  const currentWallet = useCurrentWallet();
   let ticking = false;
-  const data: Transaction[] = [
-    {
-      chainId: '123123',
-      token: { symbol: 'ELF', address: 'adasdasdaqea' },
-      method: 'Transfer',
-      from: '0xawe123eeafadafdawe',
-      to: '0xawe123eeafadafdawe',
-      transactionId: 'asdasdabkhk',
-      amount: '123',
-      timestamp: '1670660449961',
-      priceInUsd: '10',
-    },
-    {
-      chainId: '123123',
-      token: { symbol: 'ELF', address: 'adasdasdaqea' },
-      method: 'Transfer',
-      from: '0xawe123eeafadafdawe',
-      to: '0xawe123eeafadafdawe',
-      transactionId: 'asdasdabkhk',
-      amount: '123',
-      timestamp: '1670660449961',
-      priceInUsd: '10',
-    },
-  ];
+  // const data: Transaction[] = [
+  //   {
+  //     chainId: '123123',
+  //     token: { symbol: 'ELF', address: 'adasdasdaqea' },
+  //     method: 'Transfer',
+  //     from: '0xawe123eeafadafdawe',
+  //     to: '0xawe123eeafadafdawe',
+  //     transactionId: 'asdasdabkhk',
+  //     amount: '123',
+  //     timestamp: '1670660449961',
+  //     priceInUsd: '10',
+  //   },
+  //   {
+  //     chainId: '123123',
+  //     token: { symbol: 'ELF', address: 'adasdasdaqea' },
+  //     method: 'Transfer',
+  //     from: '0xawe123eeafadafdawe',
+  //     to: '0xawe123eeafadafdawe',
+  //     transactionId: 'asdasdabkhk',
+  //     amount: '123',
+  //     timestamp: '1670660449961',
+  //     priceInUsd: '10',
+  //   },
+  // ];
 
   useEffectOnce(() => {
     // TODO We need to get the activities of the current network
     // TODO If you want to get the latest data, please dispatch(clearState()) first
     dispatch(clearState());
-    // dispatch(getActivityListAsync({ type: currentNetwork }));
+
+    const {
+      walletInfo: { caAddressList },
+    } = currentWallet;
+
+    const params = {
+      maxResultCount: 10,
+      skipCount: 0,
+      caAddresses: caAddressList,
+      // transactionTypes: transactionTypes,
+      // chainId: 'AELF',
+      // symbol: 'ELF',
+    };
+    dispatch(getActivityListAsync(params));
+    // const param = {
+    //   transactionId: '',
+    //   blockHash: '',
+    // };
+    // dispatch(getActivityAsync(param));
   });
 
   useEffect(() => {
-    console.log('>>>>activities', activities);
-  }, [activities]);
+    console.log('>>>>activities', activity);
+  }, [activity]);
 
   const handleScroll: EventListener = (event) => {
     const target = event.target as Element;
@@ -95,39 +115,11 @@ export default function Activity({ total, loading, rate, appendData, clearData }
     return root?.removeEventListener('scroll', handleScroll);
   });
 
-  // const res = getActivityList({
-  //   maxResultCount: 1,
-  //   skipCount: 2,
-  //   caAddresses: [],
-  //   transactionTypes: [],
-  //   chainId: '',
-  //   symbol: '',
-  // });
-
-  const currentWallet = useCurrentWallet();
-
-  const {
-    walletInfo: { caAddressList },
-  } = currentWallet;
-  console.log('💩💩💩💩💩💩', caAddressList);
-  const params = {
-    maxResultCount: 1,
-    skipCount: 2,
-    caAddresses: [],
-    transactionTypes: [],
-    chainId: '',
-    symbol: '',
-  };
-  // dispatch(getActivityListAsync(params));
-
-  // console.log('🌈', res);
-
   return (
-    // api/app/user/activities/activities
     <div className="activity-wrapper">
-      {total ? (
+      {activity.totalRecordCount ? (
         <ActivityList
-          data={data}
+          data={activity.data}
           hasMore={false}
           loadMore={function (isRetry: boolean): Promise<void> {
             console.log(isRetry);
