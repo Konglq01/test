@@ -75,7 +75,8 @@ export default function HomeScreen() {
               methodName: 'Transfer',
               args: {
                 symbol: 'ELF',
-                to: '2PfWcs9yhY5xVcJPskxjtAHiKyNUbX7wyWv2NcwFJEg9iNfnPj',
+                // to: '2PfWcs9yhY5xVcJPskxjtAHiKyNUbX7wyWv2NcwFJEg9iNfnPj',
+                to: '6NLtKG7mW426EhQSVKm3SuFCsSaUhkyKjdw1QEMnswod7XAfK',
                 amount: 1 * 10 ** 8,
                 memo: 'transfer address1 to address2',
               },

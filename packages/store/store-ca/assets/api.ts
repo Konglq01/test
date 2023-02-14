@@ -54,7 +54,14 @@ export function fetchNFTSeriesList({
 }): Promise<{ data: any }> {
   console.log('fetching....list', networkType, pageSize, pageNo);
 
-  return new Promise(resolve => setTimeout(() => resolve(mockNFTSeriesData), 500));
+  // return new Promise(resolve => setTimeout(() => resolve(mockNFTSeriesData), 500));
+  return request.assets.fetchAccountNftProtocolList({
+    params: {
+      CaAddresses: ['TxXSwp2P9mxeFnGA9DARi2qW1p3PskLFXyBix1GDerQFL7VD5'],
+      SkipCount: 0,
+      MaxResultCount: 10,
+    },
+  });
 }
 
 export function fetchNFTList({

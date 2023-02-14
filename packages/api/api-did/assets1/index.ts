@@ -1,19 +1,9 @@
 export default {
-  fetchAccountTokenList: {
-    target: '/api/app/user/assets/token',
-    config: { method: 'POST' },
-  },
-  fetchAccountNftProtocolList: {
-    target: '/api/app/user/assets/nftProtocols',
-    config: { method: 'POST' },
-  },
-  fetchAccountNftProtocolItemList: {
-    target: '/api/app/user/assets/nftItems',
-    config: { method: 'POST' },
-  },
+  fetchAccountTokenList: '/api/app/user/assets/token',
+  fetchAccountNftProtocolList: '/api/app/user/assets/nftProtocols',
+  fetchAccountNftProtocolItemList: '/api/app/user/assets/nftItems',
   // nft and tokens
-  fetchAccountAssetsByKeywords: {
-    target: '/api/app/user/assets/searchUserAssets',
-    config: { method: 'POST' },
-  },
+  fetchAccountAssetsByKeywords: '/api/app/user/assets/searchUserAssets',
+
+  fetchActivityList: '/api/app/user/activities/activities',
 } as const;

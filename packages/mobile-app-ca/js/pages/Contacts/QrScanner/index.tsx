@@ -31,6 +31,7 @@ const QrScanner: React.FC<QrScannerProps> = ({ route }) => {
       try {
         if (typeof data === 'string') {
           const qrCodeData = JSON.parse(data);
+          // if not currentNetwork
           if (currentNetwork !== qrCodeData.netWorkType) return invalidQRCode();
           handleQRCodeData(qrCodeData);
         }

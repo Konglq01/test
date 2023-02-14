@@ -45,7 +45,7 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
 
   const renderItem = useCallback(
     ({ item }: { item: TokenItemShowType }) => {
-      return <TokenListItem key={item.symbol} icon={'aelf-avatar'} item={item} onPress={() => onNavigate(item)} />;
+      return <TokenListItem key={item.symbol} item={item} onPress={() => onNavigate(item)} />;
     },
     [onNavigate],
   );
