@@ -11,7 +11,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import CommonModal from 'components/CommonModal';
 import { useAppDispatch, useGuardiansInfo, useLoading } from 'store/Provider/hooks';
 import { EmailReg } from '@portkey/utils/reg';
-import { sendVerificationCode } from '@portkey/api/api-did/utils/verification';
 import { LoginType } from '@portkey/types/types-ca/wallet';
 import CustomSelect from 'pages/components/CustomSelect';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
@@ -24,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 import './index.less';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network';
+import { verification } from 'utils/api';
 
 const guardianTypeList = [{ label: 'Email', value: LoginType.email }];
 
@@ -130,11 +130,13 @@ export default function AddGuardian() {
       setLoading(true);
       dispatch(resetUserGuardianStatus());
       await userGuardianList({ caHash: walletInfo.caHash });
-      const result = await sendVerificationCode({
-        guardianAccount: emailVal as string,
-        type: LoginStrType[guardianType as LoginType],
-        verifierId: selectVerifierItem?.id || '',
-        chainId: DefaultChainId,
+      const result = await verification.sendVerificationCode({
+        params: {
+          guardianAccount: emailVal as string,
+          type: LoginStrType[guardianType as LoginType],
+          verifierId: selectVerifierItem?.id || '',
+          chainId: DefaultChainId,
+        },
       });
       setLoading(false);
       if (result.verifierSessionId) {

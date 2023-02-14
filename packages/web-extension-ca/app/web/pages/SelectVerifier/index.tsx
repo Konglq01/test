@@ -7,12 +7,12 @@ import { useAppDispatch, useLoginInfo, useGuardiansInfo, useLoading } from 'stor
 import PortKeyTitle from 'pages/components/PortKeyTitle';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
 import './index.less';
-import { sendVerificationCode } from '@portkey/api/api-did/utils/verification';
 import CommonSelect from 'components/CommonSelect1';
 import { useTranslation } from 'react-i18next';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network';
+import { verification } from 'utils/api';
 
 export default function SelectVerifier() {
   const { verifierMap } = useGuardiansInfo();
@@ -48,11 +48,13 @@ export default function SelectVerifier() {
       if (!selectItem) return message.error('Can not get verification');
 
       setLoading(true);
-      const result = await sendVerificationCode({
-        guardianAccount: loginAccount.guardianAccount,
-        type: LoginStrType[loginAccount.loginType],
-        verifierId: selectItem.id,
-        chainId: DefaultChainId,
+      const result = await verification.sendVerificationCode({
+        params: {
+          guardianAccount: loginAccount.guardianAccount,
+          type: LoginStrType[loginAccount.loginType],
+          verifierId: selectItem.id,
+          chainId: DefaultChainId,
+        },
       });
       setLoading(false);
       if (result.verifierSessionId) {
