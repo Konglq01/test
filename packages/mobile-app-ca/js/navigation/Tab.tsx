@@ -7,11 +7,13 @@ import { useLanguage } from 'i18n/hooks';
 import MyMenu from 'pages/MyMenu';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import useLogOut from 'hooks/useLogOut';
+import Home from 'pages/Home';
 
 const Tab = createBottomTabNavigator();
 
 export const tabMenuList = [
   { name: 'Wallet', label: 'Wallet', index: 0, icon: 'logo-icon', component: DashBoard },
+  { name: 'Home', label: 'Home', index: 1, icon: 'logo-icon', component: Home },
   { name: 'Settings', label: 'My', index: 2, icon: 'my', component: MyMenu },
 ] as const;
 

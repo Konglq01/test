@@ -5,7 +5,6 @@ import CustomSvg from 'components/CustomSvg';
 import SettingHeader from 'pages/components/SettingHeader';
 import { useAppDispatch, useGuardiansInfo, useLoading, useUserInfo } from 'store/Provider/hooks';
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { sendVerificationCode } from '@portkey/api/api-did/utils/verification';
 import { useTranslation } from 'react-i18next';
 import { handleGuardian } from 'utils/sandboxUtil/handleGuardian';
 import './index.less';
@@ -31,6 +30,7 @@ import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
 import useGuardianList from 'hooks/useGuardianList';
+import { verification } from 'utils/api';
 
 enum SwitchFail {
   default = 0,
@@ -111,11 +111,14 @@ export default function GuardiansView() {
           }),
         );
         setLoading(true);
-        const result = await sendVerificationCode({
-          guardianAccount: opGuardian?.guardianAccount as string,
-          type: LoginStrType[opGuardian?.guardianType as LoginType],
-          verifierId: opGuardian?.verifier?.id || '',
-          chainId: DefaultChainId,
+
+        const result = await verification.sendVerificationCode({
+          params: {
+            guardianAccount: opGuardian?.guardianAccount as string,
+            type: LoginStrType[opGuardian?.guardianType as LoginType],
+            verifierId: opGuardian?.verifier?.id || '',
+            chainId: DefaultChainId,
+          },
         });
         setLoading(false);
         if (result.verifierSessionId) {

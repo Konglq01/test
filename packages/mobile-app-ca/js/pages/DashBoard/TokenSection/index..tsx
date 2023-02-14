@@ -12,38 +12,9 @@ import TokenListItem from 'components/TokenListItem';
 import { useLanguage } from 'i18n/hooks';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { fetchTokenList } from '@portkey/store/store-ca/assets/api';
-import CommonToast from 'components/CommonToast';
 import { request } from '@portkey/api/api-did';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
-
-const mockData = {
-  items: [
-    {
-      chainId: 'AELF',
-      token: {
-        id: 1,
-        chainId: 'AELF',
-        symbol: 'ELF',
-        address: 'xxxxxx',
-      },
-      amount: 0,
-      amountUsd: 0,
-    },
-    {
-      chainId: 'tDVW',
-      token: {
-        id: 2,
-        chainId: 'tDVW',
-        symbol: 'ELF',
-        address: 'xxxxxx',
-      },
-      amount: 0,
-      amountUsd: 0,
-    },
-  ],
-  totalCount: 2,
-};
 
 export interface TokenSectionProps {
   getAccountBalance?: () => void;
@@ -56,7 +27,13 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
     accountToken: { accountTokenList },
   } = useAppCASelector(state => state.assets);
 
-  const [mockTokenList, setTokenList] = useState<any[]>([]);
+  console.log('accountTokenListaccountTokenListaccountTokenList', accountTokenList);
+
+  const currentNetworkInfo = useCurrentNetworkInfo();
+
+  const currentWallet = useCurrentWallet();
+
+  const [, setTokenList] = useState<any[]>([]);
   const [, setTokenNumber] = useState(0);
 
   const [refreshing, setRefreshing] = useState(false);
@@ -68,15 +45,15 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
 
   const renderItem = useCallback(
     ({ item }: { item: TokenItemShowType }) => {
-      return <TokenListItem symbol={item.symbol} icon={'aelf-avatar'} item={item} onPress={() => onNavigate(item)} />;
+      return <TokenListItem key={item.symbol} icon={'aelf-avatar'} item={item} onPress={() => onNavigate(item)} />;
     },
     [onNavigate],
   );
 
   const getAccountTokenList = useCallback(() => {
     const timer: any = setTimeout(() => {
-      setTokenList(mockData?.items ?? []);
-      setTokenNumber(mockData?.totalCount ?? 0);
+      // setTokenList(mockData?.items ?? []);
+      // setTokenNumber(mockData?.totalCount ?? 0);
       setRefreshing(false);
       return clearTimeout(timer);
     }, 1000);
@@ -96,23 +73,54 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
     } = currentWallet;
     console.log('caAddressList', caAddressList);
 
-    request.token.fetchAccountTokenList({
-      baseURL: currentNetworkInfo.apiUrl,
-      params: {
-        CaAddresses: caAddressList,
-        SkipCount: 1,
-        MaxResultCount: 10,
-      },
-    });
+    request.assets
+      .fetchAccountTokenList({
+        baseURL: currentNetworkInfo.apiUrl,
+        params: {
+          CaAddresses: caAddressList,
+          SkipCount: 0,
+          MaxResultCount: 10,
+        },
+      })
+      .then(res => console.log('!!!!', res));
   }, []);
+
+  // const TTT = () => {
+  //   const {
+  //     walletInfo: { caAddressList },
+  //   } = currentWallet;
+  //   console.log('caAddressList', caAddressList);
+
+  //   request.assets
+  //     .fetchAccountTokenList({
+  //       baseURL: currentNetworkInfo.apiUrl,
+  //       params: {
+  //         CaAddresses: caAddressList,
+  //         SkipCount: 1,
+  //         MaxResultCount: 10,
+  //       },
+  //     })
+  //     .then(res => console.log('!!!!', res));
+
+  //   request.assets
+  //     .fetchAccountTokenList({
+  //       baseURL: currentNetworkInfo.apiUrl,
+  //       params: {
+  //         CaAddresses: caAddressList,
+  //         SkipCount: 1,
+  //         MaxResultCount: 10,
+  //       },
+  //     })
+  //     .then(res => console.log('!!!!', res));
+  // };
 
   return (
     <View style={styles.tokenListPageWrap}>
       <FlatList
         refreshing={refreshing}
-        data={mockTokenList || []}
+        data={accountTokenList || []}
         renderItem={renderItem}
-        keyExtractor={(item: any) => item?.token?.id}
+        keyExtractor={(item: TokenItemShowType) => item.symbol + item.chainId}
         onRefresh={() => {
           setRefreshing(true);
           getAccountBalance?.();
