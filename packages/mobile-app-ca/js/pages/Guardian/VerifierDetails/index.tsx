@@ -10,7 +10,6 @@ import useRouterParams from '@portkey/hooks/useRouterParams';
 import { ApprovalType, VerificationType, VerifierInfo, VerifyStatus } from '@portkey/types/verifier';
 import GuardianItem from '../components/GuardianItem';
 import { FontStyles } from 'assets/theme/styles';
-import { request } from 'api';
 import Loading from 'components/Loading';
 import navigationService from 'utils/navigationService';
 import CommonToast from 'components/CommonToast';
@@ -24,6 +23,8 @@ import { LoginType } from '@portkey/types/types-ca/wallet';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 import { GuardiansStatusItem } from '../types';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network-test2';
+import { request } from '@portkey/api/api-did';
+import { verification } from 'utils/api';
 
 type RouterParams = {
   guardianItem?: UserGuardianItem;
@@ -100,8 +101,8 @@ export default function VerifierDetails() {
       if (!requestCodeResult || !guardianItem || !code) return;
       try {
         Loading.show();
-        const rst = await request.verify.verifyCode({
-          data: {
+        const rst = await request.verify.checkVerificationCode({
+          params: {
             type: LoginStrType[guardianItem?.guardianType as LoginType],
             verificationCode: code,
             guardianAccount: guardianItem.guardianAccount,
@@ -161,8 +162,8 @@ export default function VerifierDetails() {
   const resendCode = useCallback(async () => {
     Loading.show();
     try {
-      const req = await request.verify.sendCode({
-        data: {
+      const req = await verification.sendVerificationCode({
+        params: {
           type: LoginStrType[guardianItem?.guardianType as LoginType],
           guardianAccount: guardianItem?.guardianAccount,
           verifierId: guardianItem?.verifier?.id,

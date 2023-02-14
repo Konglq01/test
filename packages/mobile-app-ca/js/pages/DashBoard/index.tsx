@@ -87,7 +87,7 @@ const DashBoard: React.FC<DashBoardTypes> = () => {
       containerStyles={styles.container}
       scrollViewProps={{ disabled: true }}>
       <Card balanceUSD={balanceUSD} />
-      <DashBoardTab />
+      {/* <DashBoardTab /> */}
     </PageContainer>
   );
 
