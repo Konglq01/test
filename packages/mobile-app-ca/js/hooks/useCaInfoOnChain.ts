@@ -4,14 +4,13 @@ import useInterval from '@portkey/hooks/useInterval';
 import { setCAInfo } from '@portkey/store/store-ca/wallet/actions';
 import { ChainItemType } from '@portkey/store/store-ca/wallet/type';
 import { ChainId, ChainType } from '@portkey/types';
+import { isAddress } from '@portkey/utils';
 import { useCallback } from 'react';
 import { useAppDispatch } from 'store/hooks';
 import { useGetHolderInfo } from './guardian';
 import { usePin } from './store';
 export const useCaInfoOnChain = () => {
   const { walletInfo, chainList } = useCurrentWallet();
-  console.log(chainList, walletInfo, '=====chainList');
-
   const currentNetwork = useCurrentNetworkInfo();
   const dispatch = useAppDispatch();
   const getHolderInfo = useGetHolderInfo();
@@ -41,8 +40,9 @@ export const useCaInfoOnChain = () => {
     },
     [dispatch, getHolderInfo, pin],
   );
+
   const check = useCallback(
-    () => chainList?.every(chain => walletInfo[chain.chainId as ChainId]),
+    () => chainList?.every(chain => walletInfo[chain.chainId as ChainId] || !isAddress(chain.caContractAddress)),
     [chainList, walletInfo],
   );
   const fetch = useCallback(async () => {
@@ -71,6 +71,6 @@ export const useCaInfoOnChain = () => {
       }
     },
     5000,
-    [],
+    [check],
   );
 };
