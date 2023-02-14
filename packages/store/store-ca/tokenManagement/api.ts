@@ -10,7 +10,7 @@ export function fetchUserTokenList({
 }): Promise<{ items: UserTokenListType }> {
   return request.es.getUserTokenList({
     params: {
-      filter: 'token.symbol:*CP*',
+      // filter: 'token.symbol:*CP*',
       // filter: 'token.chainId:AELF AND token.chainId:tDVV',
       // sort: 'token.chainId',
       sort: 'sortWeight',
