@@ -1,56 +1,67 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useEffectOnce } from 'react-use';
 import { useNavigate } from 'react-router';
-import { Button } from 'antd';
+import { Button, message } from 'antd';
 import SettingHeader from 'pages/components/SettingHeader';
 import CustomSvg from 'components/CustomSvg';
 import { useToken } from '@portkey/hooks/hooks-ca/useToken';
-import { TokenItemShowType } from '@portkey/types/types-ca/token';
+import { UserTokenItemType } from '@portkey/types/types-ca/token';
 import { filterTokenList } from '@portkey/utils/extension/token-ca';
-import './index.less';
 import DropdownSearch from 'components/DropdownSearch';
 import { useTranslation } from 'react-i18next';
+import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
+import { useUserInfo } from 'store/Provider/hooks';
+import './index.less';
 
 export default function AddToken() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { networkType } = useCurrentNetworkInfo();
   const [tokenState, tokenActions] = useToken();
   const { tokenDataShowInMarket } = tokenState;
-  const { fetchTokenList, addToken, deleteToken } = tokenActions;
+  const { fetchTokenList, displayUserToken } = tokenActions;
   const [filterWord, setFilterWord] = useState<string>('');
   const [openDrop, setOpenDrop] = useState<boolean>(false);
-  const [tokenList, setTokenList] = useState<TokenItemShowType[]>([]);
-  const [topTokenList, setTopTokenList] = useState<TokenItemShowType[]>([]);
+  const [tokenList, setTokenList] = useState<UserTokenItemType[]>([]);
+  const [topTokenList, setTopTokenList] = useState<UserTokenItemType[]>([]);
+  const { passwordSeed } = useUserInfo();
 
-  useEffectOnce(() => {
-    if (tokenDataShowInMarket?.length) return;
-    fetchTokenList({ pageSize: 10000, pageNo: 1 });
-  });
+  useEffect(() => {
+    passwordSeed && fetchTokenList({ pageSize: 1000, pageNo: 1 });
+  }, [passwordSeed]);
 
   useEffect(() => {
     const allTokenList = filterTokenList(tokenDataShowInMarket, filterWord);
 
     if (filterWord) setOpenDrop(!allTokenList.length);
-    allTokenList.sort((a, b) => a.symbol.localeCompare(b.symbol));
 
-    const topTokenList: TokenItemShowType[] = [];
-    const _tokenList: TokenItemShowType[] = [];
+    const topTokenList: UserTokenItemType[] = [];
+    const _tokenList: UserTokenItemType[] = [];
     allTokenList.forEach((item) => {
-      if (item.symbol === 'ELF') topTokenList.push(item);
+      if (item.isDefault) topTokenList.push(item);
       else _tokenList.push(item);
     });
     setTopTokenList(topTokenList);
     setTokenList(_tokenList);
   }, [tokenDataShowInMarket, filterWord]);
 
-  const rightElement = useMemo(
-    () => <CustomSvg type="Close2" onClick={() => navigate(-1)} style={{ width: 18, height: 18 }} />,
-    [navigate],
+  const rightElement = useMemo(() => <CustomSvg type="Close2" onClick={() => navigate(-1)} />, [navigate]);
+
+  const handleUserTokenDisplay = useCallback(
+    (item: UserTokenItemType) => {
+      try {
+        displayUserToken(item);
+        message.success('success');
+      } catch (error: any) {
+        message.error('display error');
+        console.log('=== userToken display', error);
+      }
+    },
+    [displayUserToken],
   );
 
   const renderTokenItem = useCallback(
-    (item: TokenItemShowType) => {
-      const { isDefault = false, isAdded = true } = item;
+    (item: UserTokenItemType) => {
+      const { isDefault = false, isDisplay = true } = item;
       if (isDefault) {
         return (
           <span className="add-token-btn-icon">
@@ -63,34 +74,35 @@ export default function AddToken() {
         <Button
           className="add-token-btn"
           onClick={() => {
-            if (isAdded) deleteToken(item);
-            else addToken(item);
+            handleUserTokenDisplay(item);
           }}>
-          {t(isAdded ? 'Hide' : 'Add')}
+          {t(isDisplay ? 'Hide' : 'Add')}
         </Button>
       );
     },
-    [addToken, deleteToken, t],
+    [handleUserTokenDisplay, t],
   );
 
   const renderList = useCallback(
-    (item: TokenItemShowType) => (
-      <div className="token-item" key={item.symbol}>
+    (item: UserTokenItemType) => (
+      <div className="token-item" key={item.token.symbol}>
         <div className="token-item-content">
-          {item.symbol === 'ELF' ? (
-            <CustomSvg className="token-logo" type="Aelf" style={{ width: 28, height: 28 }} />
+          {item.token.symbol === 'ELF' ? (
+            <CustomSvg className="token-logo" type="Aelf" />
           ) : (
-            <div className="token-logo custom-word-logo">{(item.symbol && item.symbol[0]) || ''}</div>
+            <div className="token-logo custom-word-logo">{(item.token.symbol && item.token.symbol[0]) || ''}</div>
           )}
           <p className="token-info">
-            <span className="token-item-symbol">{item.symbol}</span>
-            <span className="token-item-net">MainChain AELF Testnet</span>
+            <span className="token-item-symbol">{item.token.symbol}</span>
+            <span className="token-item-net">
+              {`${item.token.chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${item.token.chainId} ${networkType}`}
+            </span>
           </p>
         </div>
         <div className="token-item-action">{renderTokenItem(item)}</div>
       </div>
     ),
-    [renderTokenItem],
+    [networkType, renderTokenItem],
   );
 
   return (

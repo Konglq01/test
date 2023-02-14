@@ -1,19 +1,18 @@
 import useToken from '@portkey/hooks/hooks-ca/useToken';
-import { TokenItemShowType } from '@portkey/types/types-ca/token';
+import { UserTokenItemType } from '@portkey/types/types-ca/token';
 import { filterTokenList } from '@portkey/utils/extension/token-ca';
 import { DrawerProps } from 'antd';
 import CustomSvg from 'components/CustomSvg';
 import DropdownSearch from 'components/DropdownSearch';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useEffectOnce } from 'react-use';
-import { useWalletInfo } from 'store/Provider/hooks';
+import { useUserInfo, useWalletInfo } from 'store/Provider/hooks';
 import BaseDrawer from '../BaseDrawer';
 import './index.less';
 
 interface CustomSelectProps extends DrawerProps {
   // onChange?: (v: TokenBaseItemType) => void;
-  onChange?: (v: TokenItemShowType) => void;
+  onChange?: (v: UserTokenItemType) => void;
   onClose?: () => void;
   searchPlaceHolder?: string;
 }
@@ -30,10 +29,11 @@ export default function CustomTokenDrawer({
   const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? currentNetwork : ''), [currentNetwork]);
   const [tokenState, { fetchTokenList }] = useToken();
   const { tokenDataShowInMarket } = tokenState;
-  const [tokenList, setTokenList] = useState<TokenItemShowType[]>([]);
-  const [topTokenList, setTopTokenList] = useState<TokenItemShowType[]>([]);
+  const [tokenList, setTokenList] = useState<UserTokenItemType[]>([]);
+  const [topTokenList, setTopTokenList] = useState<UserTokenItemType[]>([]);
   const [openDrop, setOpenDrop] = useState<boolean>(false);
   const [filterWord, setFilterWord] = useState<string>('');
+  const { passwordSeed } = useUserInfo();
 
   const assetList = useMemo(() => [...topTokenList, ...tokenList], [tokenList, topTokenList]);
   // const assetList = useMemo(() => [], [tokenList, topTokenList]);
@@ -42,23 +42,23 @@ export default function CustomTokenDrawer({
     // TODO search
   }, []);
 
-  useEffectOnce(() => {
+  useEffect(() => {
     if (tokenDataShowInMarket?.length) return;
     // TODO Need nft list and search interface
-    fetchTokenList({ pageSize: 10000, pageNo: 1 });
-  });
+    passwordSeed && fetchTokenList({ pageSize: 1000, pageNo: 1 });
+  }, [passwordSeed]);
 
   useEffect(() => {
     // const allTokenList = filterTokenList(tokenDataShowInMarket, filterWord);
     const allTokenList = filterTokenList(tokenDataShowInMarket, '');
 
     // if (filterWord) setOpenDrop(!allTokenList.length)
-    allTokenList.sort((a, b) => a.symbol.localeCompare(b.symbol));
+    allTokenList.sort((a, b) => a.token.symbol.localeCompare(b.token.symbol));
 
-    const topTokenList: TokenItemShowType[] = [];
-    const _tokenList: TokenItemShowType[] = [];
+    const topTokenList: UserTokenItemType[] = [];
+    const _tokenList: UserTokenItemType[] = [];
     allTokenList.forEach((item) => {
-      if (item.symbol === 'ELF') topTokenList.push(item);
+      if (item.token.symbol === 'ELF') topTokenList.push(item);
       else _tokenList.push(item);
     });
     setTopTokenList(topTokenList);
@@ -104,17 +104,17 @@ export default function CustomTokenDrawer({
             </p>
           </div>
         ) : (
-          assetList.map((token: TokenItemShowType) => (
-            <div className="item" key={token.symbol} onClick={onChange?.bind(undefined, token)}>
+          assetList.map((token: UserTokenItemType) => (
+            <div className="item" key={token.token.symbol} onClick={onChange?.bind(undefined, token)}>
               <div className="icon">
-                {token.symbol === 'ELF' ? (
+                {token.token.symbol === 'ELF' ? (
                   <CustomSvg type="Aelf" />
                 ) : (
-                  <div className="custom">{token.symbol?.slice(0, 1)}</div>
+                  <div className="custom">{token.token.symbol?.slice(0, 1)}</div>
                 )}
               </div>
               <div className="info">
-                <p className="symbol">{`${token.symbol}`}</p>
+                <p className="symbol">{`${token.token.symbol}`}</p>
                 <p className="network">MainChain AELF {isTestNet}</p>
               </div>
               <div className="amount">

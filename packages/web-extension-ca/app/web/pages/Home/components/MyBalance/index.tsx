@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import TokenList from '../Tokens';
 import Activity from '../Activity/index';
 import { Transaction } from '@portkey/types/types-ca/trade';
-import { TokenBaseItemType } from '@portkey/types/types-ca/assets';
+import { TokenItemShowType } from '@portkey/types/types-ca/token';
 import { MINUTE } from '@portkey/constants';
 import { useEffectOnce } from 'react-use';
 import NFT from '../NFT/NFT';
@@ -22,42 +22,8 @@ export interface TransactionResult {
 
 let timer: any;
 
-const mockData: { items: TokenBaseItemType[]; totalCount: number } = {
-  items: [
-    {
-      chainId: 'AELF',
-      token: {
-        id: Math.random().toString(),
-        chainId: 'AELF',
-        symbol: 'ELF',
-        address: 'xxxxxx',
-      },
-      amount: 0,
-      amountUsd: 0,
-    },
-    {
-      chainId: 'tDVW',
-      token: {
-        id: Math.random().toString(),
-        chainId: 'tDVW',
-        symbol: 'ELF',
-        address: 'xxxxxx',
-      },
-      amount: 0,
-      amountUsd: 0,
-    },
-    // {
-    //   chainId: 'AELF',
-    //   token: {
-    //     id: Math.random().toString(),
-    //     chainId: 'AELF',
-    //     symbol: 'RAM',
-    //     address: 'xxxxxx',
-    //   },
-    //   amount: 10,
-    //   amountUsd: 1000,
-    // },
-  ],
+const mockData: { items: TokenItemShowType[]; totalCount: number } = {
+  items: [],
   totalCount: 2,
 };
 
@@ -130,9 +96,9 @@ export default function MyBalance() {
           setTokenOpen(false);
           // navigate(`/${navTarget}/${v.token.symbol}`);
           if (navTarget === 'receive') {
-            navigate(`/${navTarget}/${v.symbol}/${v.chainId}`);
+            navigate(`/${navTarget}/${v.token.symbol}/${v.token.chainId}`);
           } else {
-            navigate(`/${navTarget}/${v.symbol}`);
+            navigate(`/${navTarget}/${v.token.symbol}`);
           }
         }}
       />
@@ -157,17 +123,15 @@ export default function MyBalance() {
         amount={balanceUSD}
         onSend={() => {
           if (tokenList.length > 1) {
-            // setNavTarget('send');
-            // return setTokenOpen(true);
-            return message.info('Coming soon. Check back here for updates', 1);
+            setNavTarget('send');
+            return setTokenOpen(true);
           }
           navigate(`/send/${'ELF'}`);
         }}
         onReceive={() => {
           if (tokenList.length > 1) {
-            return message.info('Coming soon. Check back here for updates', 1);
-            // setNavTarget('receive');
-            // return setTokenOpen(true);
+            setNavTarget('receive');
+            return setTokenOpen(true);
           }
           navigate('/receive');
         }}

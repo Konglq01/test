@@ -23,12 +23,25 @@ export interface TokenItemShowType extends TokenItemType {
   balanceInUsd?: string;
 }
 
+export type UserTokenItemTokenType = Omit<BaseToken, 'name'> & { chainId: string };
+
+export interface UserTokenItemType {
+  userId: string;
+  id: string; // user-token-id
+  isDisplay: boolean;
+  isDefault: boolean;
+  token: UserTokenItemTokenType;
+}
+
 //  all Added TokenInfo（all chain all account tokenList）
 export interface AddedTokenData {
   [rpcUrl: string]: TokenItemType[];
 }
 
 export type TokenListShowInMarketType = TokenItemShowType[];
+
+// add-token list
+export type UserTokenListType = UserTokenItemType[];
 
 export type UseTokenListAddType = (
   currentChain: ChainItemType,
@@ -44,7 +57,7 @@ export type FilterTokenList = (token_name: string, address: string) => TokenItem
 
 export interface TokenState {
   addedTokenData: AddedTokenData;
-  tokenDataShowInMarket: TokenListShowInMarketType;
+  tokenDataShowInMarket: UserTokenListType;
   isFetchingTokenList: Boolean;
 }
 
