@@ -12,7 +12,6 @@ import TokenListItem from 'components/TokenListItem';
 import { useLanguage } from 'i18n/hooks';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { fetchTokenList } from '@portkey/store/store-ca/assets/api';
-import CommonToast from 'components/CommonToast';
 import { request } from '@portkey/api/api-did';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
@@ -119,7 +118,7 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
     <View style={styles.tokenListPageWrap}>
       <FlatList
         refreshing={refreshing}
-        data={mockTokenList || []}
+        data={accountTokenList || []}
         renderItem={renderItem}
         keyExtractor={(item: TokenItemShowType) => item.symbol + item.chainId}
         onRefresh={() => {
