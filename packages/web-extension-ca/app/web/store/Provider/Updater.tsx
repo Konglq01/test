@@ -13,6 +13,7 @@ import useLocking from 'hooks/useLocking';
 export default function Updater() {
   const onLocking = useLocking();
   const { passwordSeed } = useUserInfo();
+  console.log('---------passwordSeed', passwordSeed);
   useVerifierList();
   useUpdateRedux();
   useChainListFetch();

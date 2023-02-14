@@ -2,23 +2,14 @@ import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { ChainItemType } from '@portkey/types/chain';
 import { TokenItemType, TokenState } from '@portkey/types/types-ca/token';
 import { AccountType } from '@portkey/types/wallet';
-import { fetchUserTokenList } from './api';
-import { isSameTypeToken } from '@portkey/utils/token';
+// import { isSameTypeToken } from '@portkey/utils/token';
+import { fetchTokenListAsync } from './action';
 
 const initialState: TokenState = {
   addedTokenData: {},
   tokenDataShowInMarket: [],
   isFetchingTokenList: false,
 };
-
-export const fetchTokenListAsync = createAsyncThunk(
-  'tokenManagement/fetchTokenList',
-  async ({ pageNo, pageSize }: { pageNo: number; pageSize: number }) => {
-    const response = await fetchUserTokenList({ pageNo, pageSize });
-
-    return { list: response.items };
-  },
-);
 
 //it automatically uses the immer library to let you write simpler immutable updates with normal mutative code
 export const tokenManagementSlice = createSlice({
@@ -33,17 +24,16 @@ export const tokenManagementSlice = createSlice({
         currentAccount: AccountType;
       }>,
     ) => {
-      const { tokenItem, currentChain } = action.payload;
-      const chainKey = currentChain.rpcUrl;
-
-      state.addedTokenData[chainKey].push(tokenItem);
-      state.tokenDataShowInMarket = state.tokenDataShowInMarket.map(ele => {
-        return {
-          ...ele,
-          isAdded: isSameTypeToken(ele, tokenItem) ? true : ele.isAdded,
-        };
-      });
-      state.addedTokenData = state.addedTokenData;
+      // const { tokenItem, currentChain } = action.payload;
+      // const chainKey = currentChain.rpcUrl;
+      // state.addedTokenData[chainKey].push(tokenItem);
+      // state.tokenDataShowInMarket = state.tokenDataShowInMarket.map(ele => {
+      //   return {
+      //     ...ele,
+      //     isAdded: isSameTypeToken(ele, tokenItem) ? true : ele.isAdded,
+      //   };
+      // });
+      // state.addedTokenData = state.addedTokenData;
     },
     deleteTokenInCurrentAccount: (
       state,
@@ -52,19 +42,16 @@ export const tokenManagementSlice = createSlice({
         currentChain: ChainItemType;
       }>,
     ) => {
-      const { tokenItem, currentChain } = action.payload;
-      const chainKey = currentChain.rpcUrl;
-
-      state.addedTokenData[chainKey] = state.addedTokenData[chainKey].filter(ele => !isSameTypeToken(ele, tokenItem));
-
-      state.tokenDataShowInMarket = state.tokenDataShowInMarket.map(ele => {
-        return {
-          ...ele,
-          isAdded: isSameTypeToken(ele, tokenItem) ? false : ele.isAdded,
-        };
-      });
-
-      state.addedTokenData = state.addedTokenData;
+      // const { tokenItem, currentChain } = action.payload;
+      // const chainKey = currentChain.rpcUrl;
+      // state.addedTokenData[chainKey] = state.addedTokenData[chainKey].filter(ele => !isSameTypeToken(ele, tokenItem));
+      // state.tokenDataShowInMarket = state.tokenDataShowInMarket.map(ele => {
+      //   return {
+      //     ...ele,
+      //     isAdded: isSameTypeToken(ele, tokenItem) ? false : ele.isAdded,
+      //   };
+      // });
+      // state.addedTokenData = state.addedTokenData;
     },
     clearMarketToken: (state, action: PayloadAction<any>) => {
       console.log('initCurrentAccountToken');

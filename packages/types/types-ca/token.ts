@@ -2,7 +2,8 @@ import { ChainItemType } from '../chain';
 import { AccountType } from '../wallet';
 
 export interface BaseToken {
-  id: string; // id
+  id?: string; // id
+  chainId: string;
   decimals: number; // 8
   address: string; // "ArPnUb5FtxG2oXTaWX2DxNZowDEruJLs2TEkhRCzDdrRDfg8B",        token address  contract address
   symbol: string; // "ELF"   the name showed
@@ -16,7 +17,20 @@ export interface TokenItemType extends BaseToken {
 }
 export interface TokenItemShowType extends TokenItemType {
   isAdded?: boolean; // boolean
+  tokenContractAddress?: string;
+  imageUrl?: string;
   balance?: string;
+  balanceInUsd?: string;
+}
+
+export type UserTokenItemTokenType = Omit<BaseToken, 'name'> & { chainId: string };
+
+export interface UserTokenItemType {
+  userId: string;
+  id: string; // user-token-id
+  isDisplay: boolean;
+  isDefault: boolean;
+  token: UserTokenItemTokenType;
 }
 
 //  all Added TokenInfo（all chain all account tokenList）
@@ -25,6 +39,9 @@ export interface AddedTokenData {
 }
 
 export type TokenListShowInMarketType = TokenItemShowType[];
+
+// add-token list
+export type UserTokenListType = UserTokenItemType[];
 
 export type UseTokenListAddType = (
   currentChain: ChainItemType,
@@ -40,7 +57,7 @@ export type FilterTokenList = (token_name: string, address: string) => TokenItem
 
 export interface TokenState {
   addedTokenData: AddedTokenData;
-  tokenDataShowInMarket: TokenListShowInMarketType;
+  tokenDataShowInMarket: UserTokenListType;
   isFetchingTokenList: Boolean;
 }
 

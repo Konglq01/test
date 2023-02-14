@@ -4,20 +4,20 @@ import { pTd } from 'utils/unit';
 import { Text, View } from 'react-native';
 import { StyleSheet } from 'react-native';
 import { defaultColors } from 'assets/theme';
-import { Image } from '@rneui/base';
+import { Image } from 'react-native';
 
 interface CommonAvatarProps {
   title: string;
   avatarSize?: string | number;
   svgName?: IconName;
-  url?: string;
+  imageUrl?: string;
   shapeType?: 'square' | 'circular';
   style?: any;
   color?: string;
 }
 
 export default function CommonAvatar(props: CommonAvatarProps) {
-  const { title, svgName, avatarSize = pTd(48), style = {}, color, url, shapeType = 'circular' } = props;
+  const { title, svgName, avatarSize = pTd(48), style = {}, color, imageUrl, shapeType = 'circular' } = props;
   const initialsTitle = title?.[0];
 
   const sizeStyle = {
@@ -27,11 +27,11 @@ export default function CommonAvatar(props: CommonAvatarProps) {
     borderRadius: shapeType === 'square' ? pTd(6) : Number(avatarSize) / 2,
   };
 
-  if (url)
+  if (imageUrl)
     return (
       <Image
         style={[styles.avatarWrap, shapeType === 'square' && styles.squareStyle, sizeStyle, style]}
-        source={{ uri: url }}
+        source={{ uri: imageUrl }}
       />
     );
 

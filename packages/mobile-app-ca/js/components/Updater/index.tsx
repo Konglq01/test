@@ -8,6 +8,7 @@ import { useMemo } from 'react';
 import { useRefreshTokenConfig } from '@portkey/hooks/hooks-ca/api';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import useLocking from 'hooks/useLocking';
+import { useCaInfoOnChain } from 'hooks/useCaInfoOnChain';
 export default function Updater() {
   // FIXME: delete language
   const { changeLanguage } = useLanguage();
@@ -19,6 +20,7 @@ export default function Updater() {
   const pin = usePin();
   const onLocking = useLocking();
   useRefreshTokenConfig(pin);
+  useCaInfoOnChain();
   useMemo(() => {
     request.set('baseURL', apiUrl);
     if (service.defaults.baseURL !== apiUrl) {

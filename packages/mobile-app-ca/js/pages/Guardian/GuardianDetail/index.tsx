@@ -14,7 +14,6 @@ import ActionSheet from 'components/ActionSheet';
 import { useGuardiansInfo } from 'hooks/store';
 import { useGetGuardiansInfo } from 'hooks/guardian';
 import Loading from 'components/Loading';
-import { request } from 'api';
 import CommonToast from 'components/CommonToast';
 import { VerificationType } from '@portkey/types/verifier';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
@@ -25,6 +24,7 @@ import { useGetCurrentCAContract } from 'hooks/contract';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network-test2';
 import useRouterParams from '@portkey/hooks/useRouterParams';
+import { verification } from 'utils/api';
 
 type RouterParams = {
   guardian?: UserGuardianItem;
@@ -62,8 +62,8 @@ export default function GuardianDetail() {
     if (!guardian) return;
     try {
       Loading.show();
-      const req = await request.verify.sendCode({
-        data: {
+      const req = await verification.sendVerificationCode({
+        params: {
           type: LoginStrType[guardian.guardianType],
           guardianAccount: guardian.guardianAccount,
           verifierId: guardian.verifier?.id,

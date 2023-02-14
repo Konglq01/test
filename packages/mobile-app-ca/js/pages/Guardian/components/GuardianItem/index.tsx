@@ -10,7 +10,6 @@ import navigationService from 'utils/navigationService';
 import fonts from 'assets/theme/fonts';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
 import Loading from 'components/Loading';
-import { request } from 'api';
 import CommonToast from 'components/CommonToast';
 import { sleep } from '@portkey/utils';
 import { ApprovalType, VerificationType, VerifyStatus } from '@portkey/types/verifier';
@@ -23,6 +22,7 @@ import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 import { GuardiansStatus, GuardiansStatusItem } from 'pages/Guardian/types';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network-test2';
 import useDebounceCallback from 'hooks/useDebounceCallback';
+import { verification } from 'utils/api';
 
 interface GuardianAccountItemProps {
   guardianItem: UserGuardianItem;
@@ -64,7 +64,6 @@ function GuardianItemButton({
       verificationType: _verificationType,
     };
   }, [approvalType, guardianItem]);
-
   const onSetGuardianStatus = useCallback(
     (guardianStatus: GuardiansStatusItem) => {
       setGuardianStatus?.(guardianItem.key, guardianStatus);
@@ -74,8 +73,8 @@ function GuardianItemButton({
   const onSendCode = useDebounceCallback(async () => {
     Loading.show();
     try {
-      const req = await request.verify.sendCode({
-        data: {
+      const req = await verification.sendVerificationCode({
+        params: {
           type: LoginStrType[guardianInfo.guardianItem.guardianType],
           guardianAccount: guardianInfo.guardianItem.guardianAccount,
           verifierId: guardianInfo.guardianItem.verifier?.id,

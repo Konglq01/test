@@ -7,12 +7,10 @@ import { isSameTypeToken } from '@portkey/utils/token';
 import { View, TouchableOpacity } from 'react-native';
 import { TextM } from 'components/CommonText';
 import { useLanguage } from 'i18n/hooks';
-import CommonToast from 'components/CommonToast';
-
-import * as Sentry from '@sentry/react-native';
 
 import { pTd } from 'utils/unit';
 import AssetsOverlay from 'pages/DashBoard/AssetsOverlay';
+import { useGetCurrentCAContract } from 'hooks/contract';
 interface SendButtonType {
   themeType?: 'dashBoard' | 'innerPage';
   sentToken?: TokenItemShowType;
@@ -51,10 +49,14 @@ const SendButton = (props: SendButtonType) => {
     console.log('navigate');
   };
 
+  const getCurrentCAContract = useGetCurrentCAContract();
+
   return (
     <View style={styles.buttonWrap}>
       <TouchableOpacity
-        onPress={() => {
+        onPress={async () => {
+          // const caContract = await getCurrentCAContract();
+
           // navigationService.navigate('SendHome', {
           //   tokenItem: {
           //     symbol: 'ELF',
@@ -63,8 +65,7 @@ const SendButton = (props: SendButtonType) => {
           // });
           // throw new Error('My first Sentry error!');
           // Sentry.nativeCrash();
-
-          if (themeType === 'innerPage') return navigationService.navigate('SendHome', { tokenItem: sentToken });
+          // if (themeType === 'innerPage') return navigationService.navigate('SendHome', { tokenItem: sentToken });
           // if (currentTokenList.length === 1)
           // return navigationService.navigate('SendHome', { tokenItem: currentTokenList?.[0] });
           AssetsOverlay.showAssetList({ onFinishSelectToken });

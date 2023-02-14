@@ -1,4 +1,3 @@
-import { sendVerificationCode } from '@portkey/api/api-did/utils/verification';
 import { setCurrentGuardianAction, setUserGuardianItemStatus } from '@portkey/store/store-ca/guardians/actions';
 import { UserGuardianItem, UserGuardianStatus } from '@portkey/store/store-ca/guardians/type';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
@@ -14,6 +13,7 @@ import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
 import { LoginInfo } from 'store/reducers/loginCache/type';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
+import { verification } from 'utils/api';
 
 interface GuardianItemProps {
   disabled?: boolean;
@@ -38,11 +38,13 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
             loginType: item.guardianType,
           }),
         );
-        const result = await sendVerificationCode({
-          guardianAccount: item?.guardianAccount,
-          type: LoginStrType[item.guardianType],
-          verifierId: item?.verifier?.id || '',
-          chainId: DefaultChainId,
+        const result = await verification.sendVerificationCode({
+          params: {
+            guardianAccount: item?.guardianAccount,
+            type: LoginStrType[item.guardianType],
+            verifierId: item?.verifier?.id || '',
+            chainId: DefaultChainId,
+          },
         });
         setLoading(false);
         if (result.verifierSessionId) {
@@ -87,11 +89,13 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
             'User registration information is invalid, please fill in the registration method again',
           );
         setLoading(true);
-        const result = await sendVerificationCode({
-          guardianAccount: item?.guardianAccount,
-          type: LoginStrType[loginAccount.loginType],
-          verifierId: item.verifier?.id || '',
-          chainId: DefaultChainId,
+        const result = await verification.sendVerificationCode({
+          params: {
+            guardianAccount: item?.guardianAccount,
+            type: LoginStrType[loginAccount.loginType],
+            verifierId: item.verifier?.id || '',
+            chainId: DefaultChainId,
+          },
         });
         setLoading(false);
         if (result.verifierSessionId) {

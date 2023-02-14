@@ -1,6 +1,8 @@
 import { mockAssetsData, mockNFTSeriesData, mockNFTsData, mockTokenData } from './data';
-
+import { request } from '@portkey/api/api-did';
 import { NetworkType } from '@portkey/types/index';
+import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
+
 const data = [0, 1, 2, 3, 4, 5, 6, 7].map((ele, index) => {
   return {
     isDefault: false, // boolean,

@@ -19,6 +19,7 @@ export const ACK_KEEP_ALIVE_WAIT_TIME = 60_000;
 
 // device
 export const DEVICE_TYPE = (() => {
+  if (!navigator?.userAgent) return DeviceType.other;
   const agent = navigator.userAgent.toLowerCase();
   const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
   if (isMac) {
