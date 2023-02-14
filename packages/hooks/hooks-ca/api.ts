@@ -9,6 +9,7 @@ export function useRefreshTokenConfig(pin?: string) {
   const { caHash, AESEncryptPrivateKey } = useCurrentWalletInfo();
   const { apiUrl, connectUrl } = useCurrentNetworkInfo();
   useMemo(() => {
+    console.log(pin, '===useRefreshTokenConfig, pin');
     if (!caHash || !AESEncryptPrivateKey || !pin) return;
     const account = AElf.wallet.getWalletByPrivateKey(aes.decrypt(AESEncryptPrivateKey, pin));
     setRefreshTokenConfig({

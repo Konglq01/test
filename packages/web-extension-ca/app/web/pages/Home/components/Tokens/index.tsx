@@ -1,6 +1,5 @@
 import { TokenBaseItemType } from '@portkey/types/types-ca/assets';
 import { unitConverter } from '@portkey/utils/converter';
-import { message } from 'antd';
 import CustomSvg from 'components/CustomSvg';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -32,7 +31,7 @@ export default function TokenList({ tokenList }: { tokenList: TokenBaseItemType[
     <>
       <ul className="token-list">
         {tokenList.map((item) => (
-          <li className="token-list-item" key={item.token.symbol} onClick={() => onNavigate(item)}>
+          <li className="token-list-item" key={item.token.chainId} onClick={() => onNavigate(item)}>
             {item.token.symbol === 'ELF' ? (
               <CustomSvg className="token-logo" type="Aelf" />
             ) : (

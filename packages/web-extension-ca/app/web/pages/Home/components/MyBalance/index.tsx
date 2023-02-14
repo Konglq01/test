@@ -130,9 +130,9 @@ export default function MyBalance() {
           setTokenOpen(false);
           // navigate(`/${navTarget}/${v.token.symbol}`);
           if (navTarget === 'receive') {
-            navigate(`/${navTarget}/${v.symbol}/${v.chainId}`);
+            navigate(`/${navTarget}/${v.token.symbol}/${v.token.chainId}`);
           } else {
-            navigate(`/${navTarget}/${v.symbol}`);
+            navigate(`/${navTarget}/${v.token.symbol}`);
           }
         }}
       />
@@ -157,17 +157,15 @@ export default function MyBalance() {
         amount={balanceUSD}
         onSend={() => {
           if (tokenList.length > 1) {
-            // setNavTarget('send');
-            // return setTokenOpen(true);
-            return message.info('Coming soon. Check back here for updates', 1);
+            setNavTarget('send');
+            return setTokenOpen(true);
           }
           navigate(`/send/${'ELF'}`);
         }}
         onReceive={() => {
           if (tokenList.length > 1) {
-            return message.info('Coming soon. Check back here for updates', 1);
-            // setNavTarget('receive');
-            // return setTokenOpen(true);
+            setNavTarget('receive');
+            return setTokenOpen(true);
           }
           navigate('/receive');
         }}

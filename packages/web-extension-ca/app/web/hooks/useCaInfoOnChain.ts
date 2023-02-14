@@ -4,6 +4,7 @@ import useInterval from '@portkey/hooks/useInterval';
 import { setCAInfo } from '@portkey/store/store-ca/wallet/actions';
 import { ChainItemType } from '@portkey/store/store-ca/wallet/type';
 import { ChainId, ChainType } from '@portkey/types';
+import { isAddress } from '@portkey/utils';
 import InternalMessage from 'messages/InternalMessage';
 import InternalMessageTypes from 'messages/InternalMessageTypes';
 import { useCallback } from 'react';
@@ -74,7 +75,7 @@ export const useCaInfoOnChain = () => {
   }, [chainList, currentNetwork.walletType, getHolderInfoByChainId, walletInfo]);
 
   const check = useCallback(
-    () => chainList?.every((chain) => walletInfo[chain.chainId as ChainId]),
+    () => chainList?.every((chain) => walletInfo[chain.chainId as ChainId] || !isAddress(chain.caContractAddress)),
     [chainList, walletInfo],
   );
 
