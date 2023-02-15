@@ -23,19 +23,26 @@ export const activitySlice = createSlice({
   extraReducers: builder => {
     builder
       .addCase(setActivityListAction, (state: any, action: any) => {
-        console.log('🌈 🌈 🌈 🌈 🌈 🌈 ', state, action);
+        console.log('🌈 🌈 🌈 🌈 🌈 🌈 setActivityListAction', state, action);
       })
       .addCase(getActivityListAsync.pending, state => {
-        console.log('🌈 🌈 🌈 🌈 🌈 🌈 pending state', state);
+        console.log('❌ pending state', state);
       })
       .addCase(getActivityListAsync.fulfilled, (state, action) => {
-        console.log('🌈 🌈 🌈 🌈 🌈 🌈 fulfilled ====', state, action);
-        // const { type, list, totalCount } = action.payload;
-        // state.list = [...state.list, ...list];
-        // state.totalCount = totalCount;
+        console.log(
+          '🌈 🌈 🌈 🌈 🌈 🌈 fulfilled state ====',
+          state.totalRecordCount,
+          state.data,
+          state.maxResultCount,
+          state.skipCount,
+        );
+        console.log('🌈 🌈 🌈 🌈 🌈 🌈 fulfilled action ====', action);
+        const { data, totalRecordCount } = action.payload;
+        state.data = [...state.data, ...data];
+        state.totalRecordCount = totalRecordCount;
       })
       .addCase(getActivityListAsync.rejected, state => {
-        console.log('🌈 🌈 🌈 🌈 🌈 🌈 rejected state', state);
+        console.log('❌ ❌ rejected state', state);
       });
   },
 });

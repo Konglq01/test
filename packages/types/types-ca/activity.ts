@@ -2,8 +2,9 @@ export type ActivityItemType = {
   chainId: string;
   transactionType: string;
   from: string; // wallet name
-  to: string; //to user nick name
-  fromaddress: string;
+  to: string; // to user nick name
+  fromAddress: string;
+  toAddress: string;
   fromChainId: string;
   toChainId: string;
   status: string;
@@ -12,9 +13,9 @@ export type ActivityItemType = {
   timestamp: string;
   amount: string;
   symbol: string;
-  decimal: string;
-  priceInUsd: string;
-  nftInfo: {
+  decimal?: string;
+  priceInUsd?: string;
+  nftInfo?: {
     imageUrl: string;
     alias: string;
     nftId: string;
@@ -24,5 +25,5 @@ export type ActivityItemType = {
     fee: string;
     feeInUsd: string;
   };
-  listIcon: string;
+  listIcon?: string;
 };

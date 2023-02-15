@@ -1,6 +1,6 @@
 import { ActivityItemType } from '@portkey/types/types-ca/activity';
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
-import { fetchActivities, fetchActivity } from './api';
+import { fetchActivities, fetchActivity, mockResponse } from './api';
 import { ActivityStateType, IActivityApiParams, IActivitysApiParams } from './type';
 
 export const setActivityListAction = createAction<any>('activity/setActivityListAction');
@@ -8,12 +8,12 @@ export const setActivityAction = createAction<any>('activity/setActivityAction')
 
 export const getActivityListAsync = createAsyncThunk(
   'activity/getActivityList',
-  async (params: IActivitysApiParams): Promise<ActivityStateType> => {
+  async (params: IActivitysApiParams, { dispatch }): Promise<ActivityStateType> => {
+    // const response = mockResponse;
     const response = await fetchActivities(params);
     console.log('activities response========', response);
     if (!response?.data || !response?.totalRecordCount) throw Error('No data');
 
-    // dispatch(addPage(type));
     return {
       data: response.data,
       totalRecordCount: response.totalRecordCount,

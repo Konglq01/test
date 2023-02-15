@@ -1,4 +1,5 @@
 import { ZERO } from '@portkey/constants/misc';
+import { ActivityItemType } from '@portkey/types/types-ca/activity';
 import { Transaction } from '@portkey/types/types-ca/trade';
 import { unitConverter } from '@portkey/utils/converter';
 import Copy from 'components/Copy';
@@ -15,30 +16,32 @@ export default function Transaction() {
   const { t } = useTranslation();
   const { currentNetwork } = useWalletInfo();
   const isTestNet = useMemo(() => currentNetwork === 'TESTNET', [currentNetwork]);
-  const { state } = useLocation();
+  const { state }: { state: ActivityItemType } = useLocation();
+
+  const isFromMainChain = useMemo(() => state.fromChainId === 'AELF', [state.fromChainId]);
+  const isToMainChain = useMemo(() => state.toChainId === 'AELF', [state.toChainId]);
   const nav = useNavigate();
-  const { info }: { info: Transaction } = state;
-  const isNft = false;
+  const isNft = true;
   const onClose = useCallback(() => {
     nav(-1);
   }, [nav]);
 
-  return info ? (
+  return state ? (
     <div className="transaction-detail-modal">
       <div className="header">
         <CustomSvg type="Close2" onClick={onClose} />
       </div>
       <div className="transaction-info">
         <div className="method-wrap">
-          <p className="method-name">{info.method}</p>
-          {isNft ? (
+          <p className="method-name">{state.transactionType}</p>
+          {!isNft ? (
             <div className="nft-amount">
               <div className="avatar">
                 <p>K</p>
               </div>
               <div className="info">
                 <p className="index">
-                  <span>Knight of Swords</span>
+                  <span>{state.nftInfo?.nftId}</span>
                   <span className="token-id">#0004</span>
                 </p>
                 <p className="quantity">Amount: 3</p>
@@ -46,8 +49,8 @@ export default function Transaction() {
             </div>
           ) : (
             <p className="amount">
-              {info.amount} {info.token.symbol}
-              <span className="usd">$ 0</span>
+              {state.amount} {state.symbol}
+              <span className="usd">{state.priceInUsd}</span>
             </p>
           )}
         </div>
@@ -57,8 +60,8 @@ export default function Transaction() {
             <span className="right">{t('Date')}</span>
           </p>
           <p className="value">
-            <span className="left">{t('Success')}</span>
-            <span className="right">{moment(Number(info.timestamp)).format('MMM D [at] h:m a')}</span>
+            <span className="left">{t(state.status)}</span>
+            <span className="right">{moment(Number(state.timestamp)).format('MMM D [at] h:m a')}</span>
           </p>
         </div>
         <div className="account-wrap">
@@ -68,13 +71,13 @@ export default function Transaction() {
           </p>
           <div className="value">
             <div className="content">
-              <span className="left name">Wallet 1</span>
-              <span className="left">{shortenCharacters(info.from)}</span>
+              <span className="left name">{state.from}</span>
+              <span className="left">{shortenCharacters(state.fromAddress)}</span>
             </div>
             <CustomSvg type="RightArrow" />
             <div className="content">
-              <span className="right name">Sally</span>
-              <span className="right">{shortenCharacters(info.to)}</span>
+              <span className="right name">{state.to}</span>
+              <span className="right">{shortenCharacters(state.toAddress)}</span>
             </div>
           </div>
         </div>
@@ -82,9 +85,9 @@ export default function Transaction() {
           <p className="label">
             <span className="left">{t('Network')}</span>
           </p>
-          <p className="value">{`MainChain AELF ${isTestNet ? 'Testnet ' : ''}-> MainChain AELF${
-            isTestNet ? ' Testnet' : ''
-          }`}</p>
+          <p className="value">{`${isFromMainChain ? 'MainChain' : ''} ${state.fromChainId} ${
+            isTestNet ? 'Testnet ' : ''
+          }-> ${isToMainChain ? 'MainChain' : ''} ${state.toChainId} ${isTestNet ? ' Testnet' : ''}`}</p>
         </div>
         <div className="money-wrap">
           <p className="label">
@@ -94,16 +97,18 @@ export default function Transaction() {
             <p className="value">
               <span className="left">{t('Transaction ID')}</span>
               <span className="right tx-id">
-                {info.transactionId.replace(/(?<=^\w{7})\w*(?=\w{4}$)/, '...')} <Copy toCopy={info.transactionId} />
+                {state.transactionId.replace(/(?<=^\w{7})\w*(?=\w{4}$)/, '...')} <Copy toCopy={state.transactionId} />
               </span>
             </p>
             <p className="value">
               <span className="left">{t('Transaction Fee')}</span>
-              <span className="right">{`${unitConverter(ZERO.plus(0))} ELF`}</span>
+              <span className="right">{`${unitConverter(ZERO.plus(state.transactionFees.fee))} ${
+                state.transactionFees.symbol
+              }`}</span>
             </p>
           </div>
         </div>
-        <a className="link" target="blank" href={`tx/${info.transactionId}`}>
+        <a className="link" target="blank" href={`tx/${state.transactionId}`}>
           {t('View on Explorer')}
         </a>
       </div>
