@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { RateBaseType, NFTBaseItemType, NFTSeriesBaseItemType } from '@portkey/types/types-ca/assets';
 import { fetchAssetList, fetchNFTSeriesList, fetchNFTList, fetchTokenList } from './api';
-import { TokenItemShowType } from '@portkey/types/types-ca/token';
+import { AccountAssets, TokenItemShowType } from '@portkey/types/types-ca/token';
 
 // asset = token + nft
 export type AssetsStateType = {
@@ -30,7 +30,7 @@ export type AssetsStateType = {
     isFetching: boolean;
     SkipCount: number;
     MaxResultCount: number;
-    accountAssetsList: TokenItemShowType[];
+    accountAssetsList: AccountAssets;
     totalRecordCount: number;
   };
 };
@@ -123,18 +123,20 @@ export const fetchNFTAsync = createAsyncThunk(
 // fetch current assets when add sent button
 export const fetchAssetAsync = createAsyncThunk(
   'fetchAssetsAsync',
-  async ({ type }: { type: any }, { getState, dispatch }) => {
-    const { assets } = getState() as { assets: AssetsStateType };
-    const {
-      accountAssets: { totalRecordCount, accountAssetsList },
-    } = assets;
+  async ({ caAddresses, keyWord }: { caAddresses: string[]; keyWord: string }, { getState, dispatch }) => {
+    // const { assets } = getState() as { assets: AssetsStateType };
+    // const {
+    //   accountAssets: { totalRecordCount, accountAssetsList },
+    // } = assets;
 
-    if (totalRecordCount === 0 || totalRecordCount > accountAssetsList.length) {
-      const response = await fetchAssetList({ networkType: type, pageNo: 1, pageSize: 1000 });
-      return { type, list: response.data.data, totalRecordCount: response.data.totalRecordCount };
-    }
+    // if (totalRecordCount === 0 || totalRecordCount > accountAssetsList.length) {
+    const response = await fetchAssetList({ caAddresses, keyWord, pageNo: 1, pageSize: 1000 });
+    console.log('---fetchAssetList', response);
 
-    return { type, list: [], totalRecordCount };
+    return { list: response.data, totalRecordCount: response.totalRecordCount };
+    // }
+
+    // return { type, list: [], totalRecordCount };
   },
 );
 
@@ -214,7 +216,7 @@ export const assetsSlice = createSlice({
         // state.status = 'loading';
       })
       .addCase(fetchAssetAsync.fulfilled, (state, action) => {
-        const { type, list, totalRecordCount } = action.payload;
+        const { list, totalRecordCount } = action.payload;
 
         state.accountAssets.accountAssetsList = [...state.accountAssets.accountAssetsList, ...list];
         state.accountAssets.SkipCount = state.accountAssets.accountAssetsList.length;

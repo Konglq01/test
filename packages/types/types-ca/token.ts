@@ -43,6 +43,30 @@ export type TokenListShowInMarketType = TokenItemShowType[];
 // add-token list
 export type UserTokenListType = UserTokenItemType[];
 
+// assets token+nft
+export interface TokenInfo {
+  balance: string;
+  decimals: string;
+  balanceInUsd: string;
+}
+
+export interface NftInfo {
+  imageUrl: string;
+  alias: string;
+  tokenId: string;
+  protocolName: string;
+  quantity: string;
+}
+export interface AccountAssetItem {
+  chainId: string;
+  symbol: string;
+  address: string;
+  tokenInfo?: TokenInfo[];
+  nftInfo?: NftInfo[];
+}
+
+export type AccountAssets = AccountAssetItem[];
+
 export type UseTokenListAddType = (
   currentChain: ChainItemType,
   currentAccount: AccountType,
