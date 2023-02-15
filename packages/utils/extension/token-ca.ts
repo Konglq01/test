@@ -5,8 +5,10 @@ export const filterTokenList = (tokenList: UserTokenItemType[], keyword: string)
     if (ele.token.chainId === 'AELF') {
       return ele.token.symbol.toLowerCase().includes(keyword.trim().toLowerCase());
     } else {
-      ele.token.address.toLowerCase().includes(keyword.trim().toLowerCase()) ||
-        ele.token.symbol.toLowerCase().includes(keyword.trim().toLowerCase());
+      return (
+        ele.token.address.toLowerCase().includes(keyword.trim().toLowerCase()) ||
+        ele.token.symbol.toLowerCase().includes(keyword.trim().toLowerCase())
+      );
     }
   });
 };
