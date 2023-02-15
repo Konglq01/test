@@ -53,9 +53,6 @@ export function fetchAssetList({
   console.log('fetching....list', caAddresses, pageSize, pageNo);
   return request.assets.fetchAccountAssetsByKeywords({
     params: {
-      // filter: filterWords,
-      // sort: 'token.symbol.keyword',
-      // sortType: 1,
       caAddresses,
       skipCount: (pageNo - 1) * pageSize,
       maxResultCount: pageSize,
@@ -65,22 +62,20 @@ export function fetchAssetList({
 }
 
 export function fetchNFTSeriesList({
-  networkType,
-  pageSize,
-  pageNo,
+  caAddresses = ['TxXSwp2P9mxeFnGA9DARi2qW1p3PskLFXyBix1GDerQFL7VD5'],
+  skipCount = 0,
+  maxResultCount = 100,
 }: {
-  networkType: NetworkType;
-  pageSize: number;
-  pageNo: number;
+  caAddresses: string[];
+  skipCount: number;
+  maxResultCount: number;
 }): Promise<{ data: any }> {
-  console.log('fetching....list', networkType, pageSize, pageNo);
-
   // return new Promise(resolve => setTimeout(() => resolve(mockNFTSeriesData), 500));
   return request.assets.fetchAccountNftProtocolList({
     params: {
-      CaAddresses: ['TxXSwp2P9mxeFnGA9DARi2qW1p3PskLFXyBix1GDerQFL7VD5'],
-      SkipCount: 0,
-      MaxResultCount: 10,
+      caAddresses,
+      skipCount,
+      maxResultCount,
     },
   });
 }

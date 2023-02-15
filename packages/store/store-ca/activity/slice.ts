@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { NetworkType } from '@portkey/types/index';
-import { ActivityItemType } from '@portkey/types/types-ca/activity';
+import { ActivityItemType, the2ThFailedActivityItemType } from '@portkey/types/types-ca/activity';
 import { fetchActivities } from './api';
 
 export type ActivityStateType = {
@@ -9,6 +9,7 @@ export type ActivityStateType = {
   list: ActivityItemType[];
   totalCount: number;
   isFetchingActivities: boolean;
+  failedActivityMap: { [transactionId: string]: the2ThFailedActivityItemType };
 };
 
 const initialState: ActivityStateType = {
@@ -17,6 +18,7 @@ const initialState: ActivityStateType = {
   list: [],
   totalCount: 0,
   isFetchingActivities: false,
+  failedActivityMap: {},
 };
 export const fetchActivitiesAsync = createAsyncThunk(
   '/api/app/user-activities',
@@ -41,6 +43,9 @@ export const activitySlice = createSlice({
     addPage: (state, { payload }: { payload: NetworkType }) => {
       state.skipCount += state.MaxResultCount;
     },
+    addFailedActivity: (state, { payload }: { payload: the2ThFailedActivityItemType }) => {
+      state.failedActivityMap[payload?.transactionId] = payload;
+    },
     clearState: state => (state = initialState),
   },
   extraReducers: builder => {
@@ -56,6 +61,6 @@ export const activitySlice = createSlice({
   },
 });
 
-export const { addPage, clearState } = activitySlice.actions;
+export const { addPage, addFailedActivity, clearState } = activitySlice.actions;
 
 export default activitySlice;
