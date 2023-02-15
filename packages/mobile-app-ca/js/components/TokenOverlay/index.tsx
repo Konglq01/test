@@ -18,6 +18,7 @@ import { useAppCommonDispatch } from '@portkey/hooks';
 import useDebounce from 'hooks/useDebounce';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
+import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 
 type onFinishSelectTokenType = (tokenItem: TokenItemShowType) => void;
 type TokenListProps = {
@@ -30,6 +31,7 @@ const TokenList = ({ onFinishSelectToken, account }: TokenListProps) => {
 
   const { accountToken } = useAppCASelector(state => state.assets);
   const dispatch = useAppCommonDispatch();
+  const currentWalletInfo = useCurrentWalletInfo();
 
   const [listShow, setListShow] = useState<any[]>([]);
 
@@ -48,8 +50,6 @@ const TokenList = ({ onFinishSelectToken, account }: TokenListProps) => {
     ({ item }: { item: TokenItemShowType }) => {
       return (
         <TokenListItem
-          symbol={item.symbol}
-          icon={'aelf-avatar'}
           item={item}
           onPress={() => {
             OverlayModal.hide();
@@ -72,12 +72,12 @@ const TokenList = ({ onFinishSelectToken, account }: TokenListProps) => {
   useEffectOnce(() => {
     if (accountToken.accountTokenList.length !== 0) return;
 
-    dispatch(fetchTokenListAsync({ type: 'MAIN' }));
+    // dispatch(fetchTokenListAsync({}));
   });
 
   return (
     <ModalBody modalBodyType="bottom" style={styles.modalStyle}>
-      <TextXL style={styles.title}>{t('Select Asset')}</TextXL>
+      <TextXL style={styles.title}>{t('Select Token')}</TextXL>
       <CommonInput
         placeholder={t('Token Name')}
         containerStyle={styles.containerStyle}
@@ -93,7 +93,7 @@ const TokenList = ({ onFinishSelectToken, account }: TokenListProps) => {
       />
       <FlatList
         style={styles.flatList}
-        data={listShow || []}
+        data={listShow.filter(ele => !!currentWalletInfo?.[ele?.chainId])}
         renderItem={renderItem}
         keyExtractor={(item: any) => item.id || ''}
       />

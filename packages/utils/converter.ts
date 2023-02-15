@@ -17,7 +17,7 @@ const zhList = [
 export const fixedDecimal = (count?: number | BigNumber | string, num = 4) => {
   const bigCount = BigNumber.isBigNumber(count) ? count : new BigNumber(count || '');
   if (bigCount.isNaN()) return '0';
-  return bigCount.dp(num, BigNumber.ROUND_DOWN).toFixed();
+  return bigCount.dp(num, BigNumber.ROUND_DOWN).toFixed(num);
 };
 
 export const unitConverter = (num?: number | BigNumber | string, decimal = 4, defaultVal = '0') => {

@@ -67,19 +67,19 @@ const initialState: AssetsStateType = {
 // fetch tokenList on Dashboard
 export const fetchTokenListAsync = createAsyncThunk(
   'fetchTokenListAsync',
-  async ({ type }: { type: any }, { getState, dispatch }) => {
+  async ({ CaAddresses }: { CaAddresses: string[] }, { getState, dispatch }) => {
     const { assets } = getState() as { assets: AssetsStateType };
     const {
       accountToken: { totalRecordCount, accountTokenList },
     } = assets;
 
     if (totalRecordCount === 0 || totalRecordCount > accountTokenList.length) {
-      const response = await fetchTokenList({ networkType: type, pageNo: 1, pageSize: 1000 });
+      const response = await fetchTokenList({ CaAddresses });
 
-      return { type, list: response.data.data, totalRecordCount: response.data.totalRecordCount };
+      return { list: response.data, totalRecordCount: response.totalRecordCount };
     }
 
-    return { type, list: [], totalRecordCount };
+    return { list: [], totalRecordCount };
   },
 );
 
@@ -160,7 +160,7 @@ export const assetsSlice = createSlice({
         // state.status = 'loading';
       })
       .addCase(fetchTokenListAsync.fulfilled, (state, action) => {
-        const { type, list, totalRecordCount } = action.payload;
+        const { list, totalRecordCount } = action.payload;
 
         // calc total;
         let totalBalance: number = 0;
