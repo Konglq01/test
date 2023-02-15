@@ -107,7 +107,6 @@ export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
   const { t } = useLanguage();
 
   const [currentNFT, setCurrentNFT] = useState('');
-  const { currentWallet } = useCurrentWallet();
   const currentNetworkInfo = useCurrentNetworkInfo();
 
   const caAddresses = useCaAddresses();
