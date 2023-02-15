@@ -9,8 +9,8 @@ export const deleteTokenInCurrentAccount = createAction<HandleTokenArgTypes>('to
 
 export const fetchTokenListAsync = createAsyncThunk(
   'tokenManagement/fetchTokenList',
-  async ({ pageNo, pageSize }: { pageNo: number; pageSize: number }) => {
-    const response = await fetchUserTokenList({ pageNo, pageSize });
+  async ({ pageNo, pageSize, filter }: { pageNo: number; pageSize: number; filter?: string }) => {
+    const response = await fetchUserTokenList({ pageNo, pageSize, filter });
     return { list: response.items };
   },
 );
