@@ -34,7 +34,9 @@ const ContactDetail: React.FC = () => {
             ELF_{addressItem.address}_{addressItem.chainId}
           </TextM>
           <TextS style={FontStyles.font3}>
-            {addressItem.chainId} {currentNetwork}
+            {`${addressItem.chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${addressItem.chainId} ${
+              currentNetwork === 'TESTNET' ? 'Testnet' : ''
+            }`}
           </TextS>
         </View>
         <Touchable
