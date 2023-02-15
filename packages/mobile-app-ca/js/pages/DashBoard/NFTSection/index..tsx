@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import NoData from 'components/NoData';
 import { StyleSheet, View, FlatList } from 'react-native';
 import { defaultColors } from 'assets/theme';
@@ -6,6 +6,9 @@ import { useLanguage } from 'i18n/hooks';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { pTd } from 'utils/unit';
 import NFTItem from './NFTItem';
+import { request } from '@portkey/api/api-did';
+import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
+import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 
 const mockData = {
   // items: [
@@ -102,6 +105,8 @@ export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
   const { t } = useLanguage();
 
   const [currentNFT, setCurrentNFT] = useState('');
+  const currentWallet = useCurrentWallet();
+  const currentNetworkInfo = useCurrentNetworkInfo();
 
   const [refreshing, setRefreshing] = useState(false);
   const [NFTList, setNFTList] = useState<any[]>([]);
@@ -121,6 +126,27 @@ export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
   useEffectOnce(() => {
     fetchNFTList();
   });
+
+  const TTT = () => {
+    const {
+      walletInfo: { caAddressList },
+    } = currentWallet;
+
+    request.assets
+      .fetchAccountNftProtocolList({
+        baseURL: currentNetworkInfo.apiUrl,
+        params: {
+          CaAddresses: caAddressList,
+          SkipCount: 1,
+          MaxResultCount: 10,
+        },
+      })
+      .then(res => console.log('nft res!!!!', res));
+  };
+
+  useEffect(() => {
+    TTT();
+  }, []);
 
   const renderItem = useCallback(
     ({ item }: { item: any }) => {

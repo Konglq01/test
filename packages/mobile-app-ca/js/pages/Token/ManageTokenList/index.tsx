@@ -18,6 +18,8 @@ import CommonSwitch from 'components/CommonSwitch';
 import CommonAvatar from 'components/CommonAvatar';
 import { useLanguage } from 'i18n/hooks';
 import NoData from 'components/NoData';
+import { fetchUserTokenList } from '@portkey/store/store-ca/tokenManagement/api';
+import { Button } from '@rneui/base';
 
 interface ManageTokenListProps {
   route?: any;
@@ -133,6 +135,11 @@ const ManageTokenList: React.FC<ManageTokenListProps> = () => {
   useEffect(() => {
     fetchAddedList();
   }, [fetchAddedList]);
+
+  useEffect(() => {
+    fetchUserTokenList({ pageSize: 1000, pageNo: 1 });
+  }, []);
+
   return (
     <PageContainer
       titleDom={t('Add Tokens')}
@@ -149,6 +156,12 @@ const ManageTokenList: React.FC<ManageTokenListProps> = () => {
           }}
         />
       </View>
+      <Button
+        onPress={() => {
+          fetchUserTokenList({ pageSize: 1000, pageNo: 1, keyword: keyword });
+        }}>
+        测试啊
+      </Button>
 
       {!!keyword && !filteredList.length && <NoData noPic message={t('There is no search result.')} />}
       <FlatList

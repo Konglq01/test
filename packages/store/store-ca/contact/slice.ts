@@ -37,7 +37,6 @@ export const contactSlice = createSlice({
         }
 
         state.contactMap = transIndexesToContactMap(state.contactIndexList);
-        state.contactMap = {};
       })
       .addCase(fetchContractListAsync.rejected, (state, action) => {
         console.log('fetchContractListAsync.rejected: error', action.error.message);

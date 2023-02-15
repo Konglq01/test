@@ -26,6 +26,7 @@ import { setWalletNameAction } from '@portkey/store/store-ca/wallet/actions';
 export interface CurrentWalletType extends WalletInfoType, CAInfoType {
   caHash?: string;
   caAddressList?: string[];
+  [key: string]: any;
 }
 
 function getCurrentWalletInfo(

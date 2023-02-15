@@ -15,7 +15,6 @@ import { useWallet } from 'hooks/store';
 import useQrScanPermission from 'hooks/useQrScanPermission';
 import ActionSheet from 'components/ActionSheet';
 import { useLanguage } from 'i18n/hooks';
-import crashlytics from '@react-native-firebase/crashlytics';
 
 interface CardProps {
   balanceShow?: string;

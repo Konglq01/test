@@ -5,7 +5,6 @@ import CommonTopTab from 'components/CommonTopTab';
 
 import { useLanguage } from 'i18n/hooks';
 import { useCurrentELFBalances } from '@portkey/hooks/hooks-ca/balances';
-import { TextTitle } from 'components/CommonText';
 import CommonButton from 'components/CommonButton';
 import navigationService from 'utils/navigationService';
 type DashBoardTabProps = {

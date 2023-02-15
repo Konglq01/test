@@ -7,19 +7,7 @@ export const useRecent = () => {
   const { recentContactList } = useAppCASelector(state => state.recent);
   const dispatch = useAppCommonDispatch();
 
-  const addRecent = (recentContact: RecentContactItemType) => {
-    dispatch(addRecentContact({ contact: recentContact }));
-  };
-
-  const upDateRecent = (recentContact: RecentContactItemType) => {
-    if (!!recentContactList.find(ele => ele.id === recentContact.id)) {
-      dispatch(addRecentContact({ contact: recentContact }));
-    }
-  };
-
   return {
     recentContactList: recentContactList ?? [],
-    addRecent,
-    upDateRecent,
   };
 };

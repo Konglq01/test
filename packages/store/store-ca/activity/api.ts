@@ -1,8 +1,6 @@
 import { ActivityItemType } from '@portkey/types/types-ca/activity';
 import response from './data.json';
 
-console.log(response);
-
 const MOCK_RESPONSE = {
   data: { total: response.data.total, items: response.data.items },
 };

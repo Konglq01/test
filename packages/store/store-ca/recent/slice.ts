@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { ContactItemType, RecentContactItemType } from '@portkey/types/types-ca/contact';
 
 export interface RecentStateType {

@@ -6,16 +6,23 @@ export function fetchUserTokenList({
   filter = '',
   pageSize,
   pageNo,
+  keyword,
+  chainIdArray = ['AELF'],
 }: {
   filter?: string;
   pageSize: number;
   pageNo: number;
+  keyword: string;
+  chainIdArray?: string[];
 }): Promise<{ items: UserTokenListType }> {
-  const filterWords = isAddress(filter) ? `token.address:'${filter}'` : `token.symbol:*${filter}~*`;
+  const chainIdSearchLanguage = chainIdArray.map(chainId => `token.chainId:${chainId}`).join(' AND ');
+
+  const filterKeyWords = keyword?.length < 10 ? `token.symbol:*${keyword}*~` : `token.address:${keyword}`;
+
   return request.es.getUserTokenList({
     params: {
-      filter: filterWords,
-      // sort: 'token.symbol.keyword',
+      filter: `${filterKeyWords} AND ${chainIdSearchLanguage}`,
+      // sort: 'token.chainId',
       sort: 'sortWeight',
       sortType: 1,
       skipCount: (pageNo - 1) * pageSize,
