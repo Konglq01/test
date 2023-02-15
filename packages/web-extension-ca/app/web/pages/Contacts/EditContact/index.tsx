@@ -198,9 +198,9 @@ export default function EditContact() {
         const checkAddress = handleCheckAddress(addresses);
         if (checkName && checkAddress) {
           if (isEdit) {
-            await editContactApi({ name, addresses, id: state.id, index: state.index });
+            await editContactApi({ name, addresses, id: state.id, index: state.index, chainId: '' });
           } else {
-            await addContactApi({ name, addresses });
+            await addContactApi({ name, addresses, chainId: '' });
           }
           appDispatch(fetchContractListAsync());
           navigate('/setting/contacts');

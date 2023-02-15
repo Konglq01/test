@@ -25,7 +25,7 @@ export function fetchTokenList({
   MaxResultCount?: number;
   CaAddresses: string[];
 }): Promise<{
-  data: TokenItemShowType;
+  data: TokenItemShowType[];
   totalRecordCount: number;
 }> {
   console.log('fetching....list', SkipCount, MaxResultCount);

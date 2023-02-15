@@ -23,7 +23,7 @@ export default function AddToken() {
   const { passwordSeed } = useUserInfo();
 
   useEffect(() => {
-    passwordSeed && fetchTokenList({ pageSize: 1000, pageNo: 1, filter: filterWord });
+    passwordSeed && fetchTokenList({ pageSize: 1000, pageNo: 1, keyword: filterWord });
   }, [passwordSeed, filterWord]);
 
   useEffect(() => {

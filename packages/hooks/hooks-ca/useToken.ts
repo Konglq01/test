@@ -6,7 +6,7 @@ import { useCurrentNetworkInfo } from './network';
 import { request } from '@portkey/api/api-did';
 
 export interface TokenFuncsType {
-  fetchTokenList: (params: { pageSize: number; pageNo: number; filter?: string }) => void;
+  fetchTokenList: (params: { pageSize: number; pageNo: number; keyword: string }) => void;
   displayUserToken: (tokenItem: UserTokenItemType) => Promise<void>;
 }
 
@@ -16,7 +16,7 @@ export const useToken = (): [TokenState, TokenFuncsType] => {
 
   const tokenState = useAppCASelector(state => state.tokenManagement);
 
-  const fetchTokenList = useCallback((params: { pageSize: number; pageNo: number; filter?: string }) => {
+  const fetchTokenList = useCallback((params: { pageSize: number; pageNo: number; keyword: string }) => {
     dispatch(
       fetchTokenListAsync({
         ...params,
@@ -33,7 +33,7 @@ export const useToken = (): [TokenState, TokenFuncsType] => {
       },
     });
     setTimeout(() => {
-      dispatch(fetchTokenListAsync({ pageSize: 1000, pageNo: 1 }));
+      dispatch(fetchTokenListAsync({ pageSize: 1000, pageNo: 1, keyword: '' }));
     }, 1000);
   }, []);
 
