@@ -68,18 +68,17 @@ const initialState: AssetsStateType = {
 export const fetchTokenListAsync = createAsyncThunk(
   'fetchTokenListAsync',
   async ({ CaAddresses }: { CaAddresses: string[] }, { getState, dispatch }) => {
-    const { assets } = getState() as { assets: AssetsStateType };
-    const {
-      accountToken: { totalRecordCount, accountTokenList },
-    } = assets;
+    // const { assets } = getState() as { assets: AssetsStateType };
+    // const {
+    //   accountToken: { totalRecordCount, accountTokenList },
+    // } = assets;
+    // if (totalRecordCount === 0 || totalRecordCount > accountTokenList.length) {
+    const response = await fetchTokenList({ CaAddresses });
 
-    if (totalRecordCount === 0 || totalRecordCount > accountTokenList.length) {
-      const response = await fetchTokenList({ CaAddresses });
+    return { list: response.data, totalRecordCount: response.totalRecordCount };
+    // }
 
-      return { list: response.data, totalRecordCount: response.totalRecordCount };
-    }
-
-    return { list: [], totalRecordCount };
+    // return { list: [], totalRecordCount };
   },
 );
 
@@ -131,12 +130,11 @@ export const fetchAssetAsync = createAsyncThunk(
 
     // if (totalRecordCount === 0 || totalRecordCount > accountAssetsList.length) {
     const response = await fetchAssetList({ caAddresses, keyWord, pageNo: 1, pageSize: 1000 });
-    console.log('---fetchAssetList', response);
 
     return { list: response.data, totalRecordCount: response.totalRecordCount };
     // }
 
-    // return { type, list: [], totalRecordCount };
+    // return { list: [], totalRecordCount };
   },
 );
 
@@ -218,7 +216,22 @@ export const assetsSlice = createSlice({
       .addCase(fetchAssetAsync.fulfilled, (state, action) => {
         const { list, totalRecordCount } = action.payload;
 
-        state.accountAssets.accountAssetsList = [...state.accountAssets.accountAssetsList, ...list];
+        state.accountAssets.accountAssetsList = [
+          {
+            chainId: 'AELF',
+            symbol: 'Mini Kove',
+            address: 'xxxxxxxxxxxxxxxx',
+            nftInfo: {
+              imageUrl: '',
+              alias: '',
+              tokenId: '',
+              protocolName: '002',
+              quantity: '3',
+            },
+          },
+          ...list,
+        ];
+        // state.accountAssets.accountAssetsList = [...state.accountAssets.accountAssetsList, ...list];
         state.accountAssets.SkipCount = state.accountAssets.accountAssetsList.length;
         state.accountAssets.totalRecordCount = totalRecordCount;
         state.accountAssets.isFetching = false;

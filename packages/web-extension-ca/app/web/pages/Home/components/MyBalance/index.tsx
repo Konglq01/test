@@ -15,7 +15,7 @@ import NFT from '../NFT/NFT';
 import { unitConverter } from '@portkey/utils/converter';
 import { useAppDispatch, useUserInfo, useWalletInfo, useAssetInfo } from 'store/Provider/hooks';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
-import { fetchAssetAsync } from '@portkey/store/store-ca/assets/slice';
+import { fetchAssetAsync, fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
 
 export interface TransactionResult {
   total: number;
@@ -24,20 +24,14 @@ export interface TransactionResult {
 
 let timer: any;
 
-const mockData: { items: TokenItemShowType[]; totalCount: number } = {
-  items: [],
-  totalCount: 2,
-};
-
 export default function MyBalance() {
   const { walletName, currentNetwork } = useWalletInfo();
   const { t } = useTranslation();
   const [balanceUSD, setBalanceUSD] = useState<string | number>('--');
   const [activeKey, setActiveKey] = useState<string>('assets');
-  const [navTarget, setNavTarget] = useState<'send' | 'receive'>();
+  const [navTarget, setNavTarget] = useState<'send' | 'receive'>('send');
   const [tokenOpen, setTokenOpen] = useState(false);
-  const [tokenList, setTokenList] = useState<any[]>([]);
-  const { accountAssets } = useAssetInfo();
+  const { accountToken } = useAssetInfo();
   const navigate = useNavigate();
   const { passwordSeed } = useUserInfo();
   const appDispatch = useAppDispatch();
@@ -46,6 +40,7 @@ export default function MyBalance() {
   } = useCurrentWallet();
 
   useEffect(() => {
+    console.log('---passwordSeed-fetchTokenList', passwordSeed);
     passwordSeed &&
       appDispatch(
         fetchAssetAsync({
@@ -53,60 +48,15 @@ export default function MyBalance() {
           keyWord: '',
         }),
       );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [passwordSeed]);
-
-  console.log('---accountAssets', accountAssets);
-
-  const [tokenNum, setTokenNumber] = useState(0);
-
-  const [refreshing, setRefreshing] = useState(false);
-
-  // TODO Waiting for interface
-  const getAccountTokenList = useCallback(() => {
-    const timer: any = setTimeout(() => {
-      setTokenList(mockData?.items ?? []);
-      setTokenNumber(mockData?.totalCount ?? 0);
-      setRefreshing(false);
-      return clearTimeout(timer);
-    }, 1000);
-  }, []);
-
-  useEffectOnce(() => {
-    getAccountTokenList();
-  });
-  // get account balance
-  const getAccountBalance = useCallback(async () => {
-    //TODO fetchBalance
-    const fetchBalance = (): Promise<number | string> =>
-      new Promise((resolve) => {
-        setTimeout(() => {
-          return resolve('100.00');
-        }, 1000);
-      });
-    const result = await fetchBalance();
-    setBalanceUSD(result);
-  }, []);
-
-  // get account Balance
-  const initAccountBalance = useCallback(() => {
-    if (timer) clearInterval(timer);
-    getAccountBalance();
-    timer = setInterval(() => {
-      getAccountBalance();
-    }, 6 * MINUTE);
-  }, [getAccountBalance]);
-
-  useEffectOnce(() => {
-    initAccountBalance();
-  });
+    passwordSeed && appDispatch(fetchTokenListAsync({ CaAddresses: caAddressList || [] }));
+  }, [passwordSeed, appDispatch, caAddressList]);
 
   useEffect(() => () => clearInterval(timer), []);
 
   const SelectTokenELe = useMemo(() => {
     return (
       <CustomTokenDrawer
-        drawerType="send"
+        drawerType={navTarget}
         open={tokenOpen}
         title={navTarget === 'receive' ? 'Select Token' : 'Select Assets'}
         searchPlaceHolder={navTarget === 'receive' ? 'Search Token' : 'Search Assets'}
@@ -145,7 +95,7 @@ export default function MyBalance() {
         amount={balanceUSD}
         onSend={() => {
           // if (tokenList.length > 1) {
-          // setNavTarget('send');
+          setNavTarget('send');
           return setTokenOpen(true);
           // }
           // navigate(`/send/${'ELF'}`);
@@ -167,7 +117,7 @@ export default function MyBalance() {
           {
             label: t('Tokens'),
             key: 'tokens',
-            children: <TokenList tokenList={tokenList} />,
+            children: <TokenList tokenList={accountToken.accountTokenList} />,
           },
           {
             label: t('NFTs'),

@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { ChainItemType } from '@portkey/types/chain';
-import { TokenItemType, TokenState } from '@portkey/types/types-ca/token';
+import { AccountAssets, TokenItemType, TokenState } from '@portkey/types/types-ca/token';
 import { AccountType } from '@portkey/types/wallet';
 // import { isSameTypeToken } from '@portkey/utils/token';
 import { fetchTokenListAsync } from './action';
@@ -8,6 +8,7 @@ import { fetchTokenListAsync } from './action';
 const initialState: TokenState = {
   addedTokenData: {},
   tokenDataShowInMarket: [],
+  tokenDataShowInReceive: [],
   isFetchingTokenList: false,
 };
 
@@ -70,7 +71,12 @@ export const tokenManagementSlice = createSlice({
       })
       .addCase(fetchTokenListAsync.fulfilled, (state, action) => {
         const { list } = action.payload;
-
+        const formatList: AccountAssets = list.map(item => ({
+          chainId: item.token.chainId,
+          symbol: item.token.symbol,
+          address: item.token.address,
+        }));
+        state.tokenDataShowInReceive = formatList;
         state.tokenDataShowInMarket = list;
         state.isFetchingTokenList = false;
       })

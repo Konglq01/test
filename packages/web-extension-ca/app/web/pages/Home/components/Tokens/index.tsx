@@ -1,10 +1,13 @@
+import { ZERO } from '@portkey/constants/misc';
+import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
 import { TokenItemShowType } from '@portkey/types/types-ca/token';
 import { unitConverter } from '@portkey/utils/converter';
 import CustomSvg from 'components/CustomSvg';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
-import { useWalletInfo } from 'store/Provider/hooks';
+import { useAppDispatch, useAssetInfo, useUserInfo, useWalletInfo } from 'store/Provider/hooks';
 import './index.less';
 
 export default function TokenList({ tokenList }: { tokenList: TokenItemShowType[] }) {
@@ -12,7 +15,12 @@ export default function TokenList({ tokenList }: { tokenList: TokenItemShowType[
   const navigate = useNavigate();
   const { currentNetwork } = useWalletInfo();
   const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? currentNetwork : ''), [currentNetwork]);
-
+  const { passwordSeed } = useUserInfo();
+  const { accountToken } = useAssetInfo();
+  const appDispatch = useAppDispatch();
+  const {
+    walletInfo: { caAddressList },
+  } = useCurrentWallet();
   const onNavigate = useCallback(
     (tokenInfo: TokenItemShowType) => {
       console.log(tokenInfo);
@@ -27,28 +35,35 @@ export default function TokenList({ tokenList }: { tokenList: TokenItemShowType[
     return;
   }, [navigate]);
 
+  useEffect(() => {
+    console.log('---passwordSeed-fetchTokenList', passwordSeed);
+    passwordSeed && appDispatch(fetchTokenListAsync({ CaAddresses: caAddressList || [] }));
+  }, [passwordSeed, appDispatch, caAddressList]);
+
   return (
     <>
       <ul className="token-list">
-        {/* {tokenList.map((item) => (
-          <li className="token-list-item" key={item.token.chainId} onClick={() => onNavigate(item)}>
-            {item.token.symbol === 'ELF' ? (
+        {accountToken.accountTokenList.map((item) => (
+          <li className="token-list-item" key={item.chainId} onClick={() => onNavigate(item)}>
+            {item.symbol === 'ELF' ? (
               <CustomSvg className="token-logo" type="Aelf" />
             ) : (
-              <div className="token-logo custom-word-logo">{(item.token.symbol && item.token.symbol[0]) || ''}</div>
+              <div className="token-logo custom-word-logo">{item.symbol?.slice(0, 1)}</div>
             )}
             <div className="info">
-              <span>{item.token.symbol}</span>
+              <span>{item.symbol}</span>
               <span>
-                {item.chainId.toLowerCase() === 'aelf' ? 'MainChain' : 'SideChain'} {`${item.chainId} Testnet`}
+                {item.chainId.toLowerCase() === 'aelf' ? 'MainChain' : 'SideChain'} {`${item.chainId} ${isTestNet}`}
               </span>
             </div>
             <div className="amount">
-              <p>{unitConverter(item.amount)}</p>
-              {isTestNet === 'TESTNET' || <p className="convert">$ {unitConverter(item.amountUsd)}</p>}
+              <p>{unitConverter(ZERO.plus(item?.balance || '').div(`1e${item?.decimal}`))}</p>
+              <p className="convert">
+                {`$ ${unitConverter(ZERO.plus(item?.balanceInUsd || '').div(`1e${item?.decimal}`))}`}
+              </p>
             </div>
           </li>
-        ))} */}
+        ))}
       </ul>
       <div>
         <div className="add-token-enter-btn" onClick={handleAddToken}>

@@ -4,7 +4,7 @@ import { AccountType } from '../wallet';
 export interface BaseToken {
   id?: string; // id
   chainId: string;
-  decimals: number; // 8
+  decimal: number; // 8
   address: string; // "ArPnUb5FtxG2oXTaWX2DxNZowDEruJLs2TEkhRCzDdrRDfg8B",        token address  contract address
   symbol: string; // "ELF"   the name showed
   name: string;
@@ -45,9 +45,9 @@ export type UserTokenListType = UserTokenItemType[];
 
 // assets token+nft
 export interface TokenInfo {
-  balance: string;
-  decimals: string;
-  balanceInUsd: string;
+  balance?: string;
+  decimal: string;
+  balanceInUsd?: string;
 }
 
 export interface NftInfo {
@@ -61,8 +61,8 @@ export interface AccountAssetItem {
   chainId: string;
   symbol: string;
   address: string;
-  tokenInfo?: TokenInfo[];
-  nftInfo?: NftInfo[];
+  tokenInfo?: TokenInfo;
+  nftInfo?: NftInfo;
 }
 
 export type AccountAssets = AccountAssetItem[];
@@ -82,6 +82,7 @@ export type FilterTokenList = (token_name: string, address: string) => TokenItem
 export interface TokenState {
   addedTokenData: AddedTokenData;
   tokenDataShowInMarket: UserTokenListType;
+  tokenDataShowInReceive: AccountAssets;
   isFetchingTokenList: Boolean;
 }
 

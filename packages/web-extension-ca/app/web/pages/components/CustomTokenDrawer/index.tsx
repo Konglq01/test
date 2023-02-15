@@ -6,11 +6,13 @@ import CustomSvg from 'components/CustomSvg';
 import DropdownSearch from 'components/DropdownSearch';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAssetInfo, useUserInfo, useWalletInfo } from 'store/Provider/hooks';
+import { useAssetInfo, useTokenInfo, useUserInfo, useWalletInfo } from 'store/Provider/hooks';
 import BaseDrawer from '../BaseDrawer';
 import { fetchAssetAsync, fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
 import './index.less';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { ZERO } from '@portkey/constants/misc';
+import { unitConverter } from '@portkey/utils/converter';
 
 interface CustomSelectProps extends DrawerProps {
   // onChange?: (v: TokenBaseItemType) => void;
@@ -32,6 +34,7 @@ export default function CustomTokenDrawer({
   const { currentNetwork } = useWalletInfo();
   const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? currentNetwork : ''), [currentNetwork]);
   const { accountAssets, accountToken } = useAssetInfo();
+  const { tokenDataShowInReceive } = useTokenInfo();
   const [openDrop, setOpenDrop] = useState<boolean>(false);
   const [filterWord, setFilterWord] = useState<string>('');
   const [assetList, setAssetList] = useState<AccountAssets>([]);
@@ -40,16 +43,13 @@ export default function CustomTokenDrawer({
     walletInfo: { caAddressList },
   } = useCurrentWallet();
 
-  console.log('---accountAssets', accountAssets);
-  console.log('---accountToken', accountToken);
-
   useEffect(() => {
     if (drawerType === 'send') {
       setAssetList(accountAssets.accountAssetsList);
     } else {
-      setAssetList(accountToken.accountTokenList);
+      setAssetList(tokenDataShowInReceive);
     }
-  }, [accountAssets.accountAssetsList, accountToken.accountTokenList, drawerType]);
+  }, [accountAssets.accountAssetsList, accountToken.accountTokenList, drawerType, tokenDataShowInReceive]);
 
   // const assetList = useMemo(() => {
   //   if (drawerType === 'send') {
@@ -70,6 +70,61 @@ export default function CustomTokenDrawer({
       passwordSeed && fetchTokenListAsync({ CaAddresses: caAddressList || [] });
     }
   }, [passwordSeed, filterWord, drawerType, caAddressList]);
+
+  const renderToken = useCallback(
+    (token: AccountAssetItem) => {
+      return (
+        <div className="item" key={token.symbol} onClick={onChange?.bind(undefined, token)}>
+          <div className="icon">
+            {token.symbol === 'ELF' ? (
+              <CustomSvg type="Aelf" />
+            ) : (
+              <div className="custom">{token.symbol?.slice(0, 1)}</div>
+            )}
+          </div>
+          <div className="info">
+            <p className="symbol">{`${token.symbol}`}</p>
+            <p className="network">
+              {`${token.chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${token.chainId} ${isTestNet}`}
+            </p>
+          </div>
+          {drawerType === 'send' && (
+            <div className="amount">
+              <p className="quantity">
+                {unitConverter(ZERO.plus(token?.tokenInfo?.balance || '').div(`1e${token?.tokenInfo?.decimal}`))}
+              </p>
+              <p className="convert">
+                {isTestNet
+                  ? ''
+                  : `$ ${unitConverter(
+                      ZERO.plus(token.tokenInfo?.balanceInUsd || '').div(`1e${token.tokenInfo?.decimal}`),
+                    )}`}
+              </p>
+            </div>
+          )}
+        </div>
+      );
+    },
+    [drawerType, isTestNet, onChange],
+  );
+
+  const renderNft = useCallback(
+    (token: AccountAssetItem) => {
+      return (
+        <div className="item protocol">
+          <div className="avatar">{token.nftInfo?.imageUrl || token.symbol?.slice(0, 1)}</div>
+          <div className="info">
+            <p className="alias">{`${token.symbol} ${token.nftInfo?.protocolName}`}</p>
+            <p className="network">
+              {`${token.chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${token.chainId} ${isTestNet}`}
+            </p>
+          </div>
+          <div className="amount">{token.nftInfo?.quantity}</div>
+        </div>
+      );
+    },
+    [isTestNet],
+  );
 
   return (
     <BaseDrawer {...props} onClose={onClose} className="change-token-drawer">
@@ -110,25 +165,9 @@ export default function CustomTokenDrawer({
             </p>
           </div>
         ) : (
-          assetList.map((token: AccountAssetItem) => (
-            <div className="item" key={token.symbol} onClick={onChange?.bind(undefined, token)}>
-              <div className="icon">
-                {token.symbol === 'ELF' ? (
-                  <CustomSvg type="Aelf" />
-                ) : (
-                  <div className="custom">{token.symbol?.slice(0, 1)}</div>
-                )}
-              </div>
-              <div className="info">
-                <p className="symbol">{`${token.symbol}`}</p>
-                <p className="network">MainChain AELF {isTestNet}</p>
-              </div>
-              <div className="amount">
-                <p className="quantity">321.12</p>
-                <p className="convert">{isTestNet ? '' : `$23.34`}</p>
-              </div>
-            </div>
-          ))
+          assetList.map((token: AccountAssetItem) => {
+            return token.nftInfo ? renderNft(token) : renderToken(token);
+          })
         )}
       </div>
     </BaseDrawer>
