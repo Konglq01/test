@@ -10,6 +10,7 @@ import chainSlice from '@portkey/store/network/slice';
 import { tokenBalanceSlice } from '@portkey/store/tokenBalance/slice';
 import settingsSlice from '@portkey/store/settings/slice';
 import recentSlice from '@portkey/store/store-ca/recent/slice';
+import activitySlice from '@portkey/store/store-ca/activity/slice';
 
 interface ThunkOptions<E = any> {
   extraArgument: E;
@@ -36,6 +37,7 @@ const reduxPersistConfig = {
     settingsSlice.name,
     chainSlice.name,
     recentSlice.name,
+    activitySlice.name,
   ],
 
   // More info here:  https://shift.infinite.red/shipping-persistant-reducers-7341691232b1
