@@ -28,6 +28,7 @@ import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { useAddContact, useContact, useDeleteContact, useEditContact } from '@portkey/hooks/hooks-ca/contact';
 import useRouterParams from '@portkey/hooks/useRouterParams';
 import Loading from 'components/Loading';
+import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 
 type RouterParams = {
   contact?: ContactItemType;
@@ -38,6 +39,10 @@ interface EditContactType extends EditContactItemApiType {
   error: ErrorType;
   addresses: EditAddressType[];
 }
+
+type CustomChainItemType = ChainItemType & {
+  customChainName: string;
+};
 
 const initEditContact: EditContactType = {
   id: '',
@@ -56,6 +61,7 @@ const ContactEdit: React.FC = () => {
 
   const { contactIndexList } = useContact();
   const [editContact, setEditContact] = useState<EditContactType>(initEditContact);
+  const currentNetworkInfo = useCurrentNetworkInfo();
 
   useEffect(() => {
     if (!contact) return;
@@ -72,13 +78,23 @@ const ContactEdit: React.FC = () => {
   const isEdit = useMemo(() => contact !== undefined, [contact]);
 
   const { chainList = [], currentNetwork } = useCurrentWallet();
+  const customChainList = useMemo<CustomChainItemType[]>(
+    () =>
+      chainList.map(chain => ({
+        ...chain,
+        customChainName: `${chain.chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${chain.chainName} ${
+          currentNetworkInfo.networkType === 'TESTNET' ? 'Testnet' : ''
+        }`,
+      })),
+    [chainList, currentNetworkInfo.networkType],
+  );
   const chainMap = useMemo(() => {
-    const _chainMap: { [k: string]: ChainItemType } = {};
-    chainList.forEach(item => {
+    const _chainMap: { [k: string]: CustomChainItemType } = {};
+    customChainList.forEach(item => {
       _chainMap[item.chainId] = item;
     });
     return _chainMap;
-  }, [chainList]);
+  }, [customChainList]);
 
   useEffect(() => {
     if (isEdit || chainList.length === 0) return;
@@ -252,7 +268,7 @@ const ContactEdit: React.FC = () => {
   }, [deleteContactApi, editContact, t]);
 
   const onChainChange = useCallback(
-    (addressIdx: number, chainItem: ChainItemType) => {
+    (addressIdx: number, chainItem: CustomChainItemType) => {
       onAddressChange('', addressIdx);
       setEditContact(preEditContact => {
         const _editContact = { ...preEditContact };
@@ -289,12 +305,12 @@ const ContactEdit: React.FC = () => {
                 editAddressItem={addressItem}
                 editAddressIdx={addressIdx}
                 onDelete={deleteAddress}
-                chainName={chainMap[addressItem.chainId]?.chainName || ''}
+                chainName={chainMap[addressItem.chainId]?.customChainName || ''}
                 onChainPress={() =>
                   ChainOverlay.showList({
-                    list: chainList,
+                    list: customChainList,
                     value: addressItem.chainId,
-                    labelAttrName: 'chainName',
+                    labelAttrName: 'customChainName',
                     callBack: item => {
                       onChainChange(addressIdx, item);
                     },

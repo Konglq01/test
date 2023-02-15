@@ -12,6 +12,7 @@ import DeleteContact from '../DeleteContact';
 import { getAelfAddress, isAelfAddress } from '@portkey/utils/aelf';
 import { isValidCAWalletName } from '@portkey/utils/reg';
 import './index.less';
+import { useAddContact, useDeleteContact, useEditContact } from '@portkey/hooks/hooks-ca/contact';
 
 const { Item: FormItem } = Form;
 export enum ContactInfoError {
@@ -54,6 +55,9 @@ export default function EditContact() {
   const [delOpen, setDelOpen] = useState<boolean>(false);
   const [validName, setValidName] = useState<ValidData>({ validateStatus: '', errorMsg: '' });
   const [addressArr, setAddressArr] = useState<CustomAddressItem[]>(state?.addresses);
+  const addContactApi = useAddContact();
+  const editContactApi = useEditContact();
+  const deleteContactApi = useDeleteContact();
 
   useEffect(() => {
     const { addresses } = state;
@@ -78,6 +82,7 @@ export default function EditContact() {
       prevAddresses.splice(index, 1, {
         address: '',
         networkName: v.networkName,
+        chainId: v.chainId,
         validData: { validateStatus: '', errorMsg: '' },
       });
       form.setFieldValue('addresses', [...prevAddresses]);
@@ -186,11 +191,17 @@ export default function EditContact() {
   const onFinish = useCallback(
     async (values: ContactItemType) => {
       const { name, addresses } = values;
+      console.log('---addresses', addresses);
+
       try {
         const checkName = handleCheckName(name.trim());
         const checkAddress = handleCheckAddress(addresses);
         if (checkName && checkAddress) {
-          // TODO: add or edit to save
+          if (isEdit) {
+            await editContactApi({ name, addresses, id: state.id, index: state.index });
+          } else {
+            await addContactApi({ name, addresses });
+          }
           appDispatch(fetchContractListAsync());
           navigate('/setting/contacts');
           message.success(isEdit ? 'Edit Contact successful' : 'Add Contact successful');
@@ -200,7 +211,18 @@ export default function EditContact() {
         message.error(t((e.errorMessage || {}).message || e.message || 'Please input the required form field'));
       }
     },
-    [appDispatch, handleCheckAddress, handleCheckName, isEdit, navigate, t],
+    [
+      addContactApi,
+      appDispatch,
+      editContactApi,
+      handleCheckAddress,
+      handleCheckName,
+      isEdit,
+      navigate,
+      state.id,
+      state.index,
+      t,
+    ],
   );
 
   const handleGoBack = useCallback(() => {
@@ -211,11 +233,11 @@ export default function EditContact() {
     }
   }, [isEdit, navigate, state]);
 
-  const handleDelConfirm = useCallback(() => {
-    // TODO
+  const handleDelConfirm = useCallback(async () => {
+    await deleteContactApi(state);
     navigate('/setting/contacts');
     message.success('Contact deleted successfully');
-  }, [navigate]);
+  }, [deleteContactApi, navigate, state]);
 
   return (
     <div className="edit-contact-frame">

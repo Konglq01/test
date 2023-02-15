@@ -1,12 +1,15 @@
 import { request } from '@portkey/api/api-did';
 import { UserTokenListType } from '@portkey/types/types-ca/token';
+import { isAddress } from '@portkey/utils';
 
 export function fetchUserTokenList({
+  filter = '',
   pageSize,
   pageNo,
   keyword,
   chainIdArray = ['AELF'],
 }: {
+  filter?: string;
   pageSize: number;
   pageNo: number;
   keyword: string;
