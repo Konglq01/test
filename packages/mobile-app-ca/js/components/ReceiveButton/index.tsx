@@ -34,16 +34,5 @@ export default function ReceiveButton(props: SendButtonType) {
       </TouchableOpacity>
       <TextM style={styles.titleStyle}>{t('Receive')}</TextM>
     </View>
-
-    // <CommonButton
-    //   title="receive"
-    //   iconPosition="left"
-    //   radius={8}
-    //   icon={<Svg icon="add1" size={20} iconStyle={styles.iconStyle} />}
-    //   titleStyle={styles.titleStyle}
-    //   buttonStyle={styles.buttonStyle}
-    //   onPress={() => {
-    //   }}
-    // />
   );
 }

@@ -39,7 +39,7 @@ const RecentContactItem: React.FC<ItemType> = props => {
           {contact?.addresses?.map((ele, index) => (
             <TouchableOpacity
               style={[index !== 0 && styles.addressItemWrap]}
-              key={`${ele?.address}${ele.chainType}`}
+              key={`${ele?.address}${ele?.chainId}`}
               onPress={() => {
                 onPress?.({ address: contact.addresses?.[0].address, name: contact.name });
               }}>

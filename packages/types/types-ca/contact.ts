@@ -14,6 +14,7 @@ export interface ContactItemType {
   modificationTime: number;
   isDeleted?: boolean;
   userId?: string;
+  chainId: string;
 }
 
 export type EditContactItemApiType = PartialOption<ContactItemType, 'isDeleted' | 'modificationTime'>;
@@ -26,6 +27,7 @@ export type GetContractListApiType = {
 
 export interface RecentContactItemType extends ContactItemType {
   transferTime: String | number;
+  caAddress?: string;
 }
 
 export type ContactIndexType = Pick<ContactItemType, 'index'> & { contacts: ContactItemType[] };
