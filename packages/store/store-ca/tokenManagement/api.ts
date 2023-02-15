@@ -4,14 +4,21 @@ import { UserTokenListType } from '@portkey/types/types-ca/token';
 export function fetchUserTokenList({
   pageSize,
   pageNo,
+  keyword,
+  chainIdArray = ['AELF'],
 }: {
   pageSize: number;
   pageNo: number;
+  keyword: string;
+  chainIdArray?: string[];
 }): Promise<{ items: UserTokenListType }> {
+  const chainIdSearchLanguage = chainIdArray.map(chainId => `token.chainId:${chainId}`).join(' AND ');
+
+  const filterKeyWords = keyword?.length < 10 ? `token.symbol:*${keyword}*~` : `token.address:${keyword}`;
+
   return request.es.getUserTokenList({
     params: {
-      filter: 'token.symbol:*CP*',
-      // filter: 'token.chainId:AELF AND token.chainId:tDVV',
+      filter: `${filterKeyWords} AND (${chainIdSearchLanguage})`,
       // sort: 'token.chainId',
       sort: 'sortWeight',
       sortType: 1,

@@ -76,7 +76,7 @@ const DashBoard: React.FC<DashBoardTypes> = () => {
   // useEffect(() => () => clearInterval(timer), []);
 
   useEffectOnce(() => {
-    dispatch(fetchTokenListAsync({ type: 'MAIN' }));
+    dispatch(fetchTokenListAsync({ CaAddresses: [] }));
     dispatch(getWalletNameAsync());
   });
 
@@ -87,7 +87,7 @@ const DashBoard: React.FC<DashBoardTypes> = () => {
       containerStyles={styles.container}
       scrollViewProps={{ disabled: true }}>
       <Card balanceUSD={balanceUSD} />
-      {/* <DashBoardTab /> */}
+      <DashBoardTab />
     </PageContainer>
   );
 

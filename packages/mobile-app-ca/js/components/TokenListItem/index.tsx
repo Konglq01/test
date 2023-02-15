@@ -13,12 +13,13 @@ import { pTd } from 'utils/unit';
 interface TokenListItemType {
   icon?: IconName;
   symbol?: string;
+  noBalanceShow?: boolean;
   item?: any;
   onPress?: (item: any) => void;
 }
 
 const TokenListItem: React.FC<TokenListItemType> = props => {
-  const { icon = 'aelf-avatar', symbol = 'ELF', onPress, item } = props;
+  const { icon = 'aelf-avatar', symbol = 'ELF', noBalanceShow = false, onPress, item } = props;
   const { currentNetwork } = useWallet();
 
   return (
@@ -41,17 +42,21 @@ const TokenListItem: React.FC<TokenListItemType> = props => {
           </TextS>
         </View>
 
-        <View style={itemStyle.balanceWrap}>
-          {/* <TextL style={itemStyle.token} numberOfLines={1} ellipsizeMode={'tail'}>{`${unitConverter(
+        {!noBalanceShow && (
+          <View style={itemStyle.balanceWrap}>
+            {/* <TextL style={itemStyle.token} numberOfLines={1} ellipsizeMode={'tail'}>{`${unitConverter(
             ZERO.plus(item.balance).div(`1e${item.decimals}`),
           )} ${item?.token?.symbol}`}</TextL> */}
-          <TextL style={itemStyle.token} numberOfLines={1} ellipsizeMode={'tail'}>
-            {item?.balance}
-          </TextL>
-          <TextS numberOfLines={1} ellipsizeMode={'tail'} style={itemStyle.dollar}>
-            $ {item?.balanceInUsd}
-          </TextS>
-        </View>
+            <TextL style={itemStyle.token} numberOfLines={1} ellipsizeMode={'tail'}>
+              {/* {item?.balance} */}
+
+              {unitConverter(ZERO.plus(item?.balance).div(`1e${item.decimal}`))}
+            </TextL>
+            <TextS numberOfLines={1} ellipsizeMode={'tail'} style={itemStyle.dollar}>
+              $ {unitConverter(ZERO.plus(item?.balanceInUsd).div(`1e${item.decimal}`))}
+            </TextS>
+          </View>
+        )}
       </View>
     </TouchableOpacity>
   );

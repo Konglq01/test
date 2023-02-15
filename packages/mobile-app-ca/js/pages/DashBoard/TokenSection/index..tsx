@@ -15,6 +15,7 @@ import { fetchTokenList } from '@portkey/store/store-ca/assets/api';
 import { request } from '@portkey/api/api-did';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
 
 export interface TokenSectionProps {
   getAccountBalance?: () => void;
@@ -24,14 +25,16 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
   const { t } = useLanguage();
   const dispatch = useAppCommonDispatch();
   const {
-    accountToken: { accountTokenList },
+    accountToken: { accountTokenList, isFetching, SkipCount, MaxResultCount, totalRecordCount },
   } = useAppCASelector(state => state.assets);
 
   console.log('accountTokenListaccountTokenListaccountTokenList', accountTokenList);
 
   const currentNetworkInfo = useCurrentNetworkInfo();
 
-  const currentWallet = useCurrentWallet();
+  const {
+    walletInfo: { caAddressList },
+  } = useCurrentWallet();
 
   const [, setTokenList] = useState<any[]>([]);
   const [, setTokenNumber] = useState(0);
@@ -52,25 +55,23 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
 
   const getAccountTokenList = useCallback(() => {
     const timer: any = setTimeout(() => {
+      dispatch(fetchTokenListAsync({ CaAddresses: caAddressList || [] }));
+
       // setTokenList(mockData?.items ?? []);
       // setTokenNumber(mockData?.totalCount ?? 0);
-      setRefreshing(false);
       return clearTimeout(timer);
     }, 1000);
-  }, []);
+  }, [caAddressList, dispatch]);
 
   useEffectOnce(() => {
     getAccountTokenList();
   });
 
   useEffectOnce(() => {
-    () => dispatch(fetchTokenList({ pageNo: 1, pageSize: 1000, networkType: 'MAIN' }));
+    () => dispatch(fetchTokenList({ CaAddresses: caAddressList || [] }));
   });
 
   useEffect(() => {
-    const {
-      walletInfo: { caAddressList },
-    } = currentWallet;
     console.log('caAddressList', caAddressList);
 
     request.assets

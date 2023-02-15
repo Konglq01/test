@@ -2,6 +2,7 @@ import { mockAssetsData, mockNFTSeriesData, mockNFTsData, mockTokenData } from '
 import { request } from '@portkey/api/api-did';
 import { NetworkType } from '@portkey/types/index';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
+import { TokenItemShowType } from '@portkey/types/types-ca/token';
 
 const data = [0, 1, 2, 3, 4, 5, 6, 7].map((ele, index) => {
   return {
@@ -16,16 +17,26 @@ const data = [0, 1, 2, 3, 4, 5, 6, 7].map((ele, index) => {
 
 export function fetchTokenList({
   // todo maybe remote tokenList change
-  networkType,
-  pageSize,
-  pageNo,
+  SkipCount = 0,
+  MaxResultCount = 1000,
+  CaAddresses,
 }: {
-  networkType: NetworkType;
-  pageSize: number;
-  pageNo: number;
-}): Promise<{ data: any }> {
-  console.log('fetching....list', networkType, pageSize, pageNo);
-  return new Promise(resolve => setTimeout(() => resolve(mockTokenData), 500));
+  SkipCount?: number;
+  MaxResultCount?: number;
+  CaAddresses: string[];
+}): Promise<{
+  data: TokenItemShowType;
+  totalRecordCount: number;
+}> {
+  console.log('fetching....list', SkipCount, MaxResultCount);
+  // return new Promise(resolve => setTimeout(() => resolve(mockTokenData), 500));
+  return request.assets.fetchAccountTokenList({
+    params: {
+      CaAddresses,
+      SkipCount,
+      MaxResultCount,
+    },
+  });
 }
 
 export function fetchAssetList({
