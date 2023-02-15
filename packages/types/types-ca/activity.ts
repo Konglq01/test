@@ -13,3 +13,8 @@ export type ActivityItemType = {
   type: number; // 0: login, 1；transfer
   timestamp: number;
 };
+
+export type the2ThFailedActivityItemType = {
+  timestamp: number;
+  transactionId: string;
+};

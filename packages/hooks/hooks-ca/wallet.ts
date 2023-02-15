@@ -35,8 +35,6 @@ function getCurrentWalletInfo(
 ): CurrentWalletType {
   const currentCAInfo = walletInfo?.caInfo?.[currentNetwork];
 
-  console.log('currentCAInfocurrentCAInfo', currentCAInfo);
-
   const tmpWalletInfo: any = Object.assign({}, walletInfo, currentCAInfo, {
     caHash: currentCAInfo?.AELF?.caHash,
     caAddressList: Object.values(currentCAInfo || {})
@@ -138,5 +136,19 @@ export const useSetWalletName = () => {
       dispatch(setWalletNameAction(nickName));
     },
     [dispatch, networkInfo],
+  );
+};
+
+export const useCaAddresses = () => {
+  const { walletInfo, currentNetwork } = useWallet();
+
+  const currentCAInfo = walletInfo?.caInfo?.[currentNetwork];
+
+  return useMemo(
+    () =>
+      Object.values(currentCAInfo || {})
+        ?.filter((info: any) => !!info?.caAddress)
+        ?.map((i: any) => i?.caAddress),
+    [currentCAInfo],
   );
 };
