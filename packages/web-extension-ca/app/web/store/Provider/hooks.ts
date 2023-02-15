@@ -16,6 +16,7 @@ export const useTokenBalance = () => useAppSelector((state) => state.tokenBalanc
 export const useUserInfo = () => useAppSelector((state) => state.userInfo);
 export const useGuardiansInfo = () => useAppSelector((state) => state.guardians);
 export const useTokenInfo = () => useAppSelector((state) => state.tokenManagement);
+export const useAssetInfo = () => useAppSelector((state) => state.assets);
 export const useCustomModal = () => useAppSelector((state) => state.modal);
 export const useCommonState = () => useAppSelector((state) => state.common);
 export const useLoading = () => {

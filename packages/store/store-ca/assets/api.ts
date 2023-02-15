@@ -25,7 +25,7 @@ export function fetchTokenList({
   MaxResultCount?: number;
   CaAddresses: string[];
 }): Promise<{
-  data: TokenItemShowType;
+  data: TokenItemShowType[];
   totalRecordCount: number;
 }> {
   console.log('fetching....list', SkipCount, MaxResultCount);
@@ -40,18 +40,28 @@ export function fetchTokenList({
 }
 
 export function fetchAssetList({
-  // todo maybe remote tokenList change
-  networkType,
+  caAddresses,
   pageSize,
   pageNo,
+  keyWord,
 }: {
-  networkType: NetworkType;
+  caAddresses: string[];
   pageSize: number;
   pageNo: number;
-}): Promise<{ data: any }> {
-  console.log('fetching....list', networkType, pageSize, pageNo);
-
-  return new Promise(resolve => setTimeout(() => resolve(mockAssetsData), 500));
+  keyWord: string;
+}): Promise<{ data: any[]; totalRecordCount: number }> {
+  console.log('fetching....list', caAddresses, pageSize, pageNo);
+  return request.assets.fetchAccountAssetsByKeywords({
+    params: {
+      // filter: filterWords,
+      // sort: 'token.symbol.keyword',
+      // sortType: 1,
+      caAddresses,
+      skipCount: (pageNo - 1) * pageSize,
+      maxResultCount: pageSize,
+      keyWord,
+    },
+  });
 }
 
 export function fetchNFTSeriesList({

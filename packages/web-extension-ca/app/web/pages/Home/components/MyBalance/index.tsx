@@ -13,7 +13,9 @@ import { MINUTE } from '@portkey/constants';
 import { useEffectOnce } from 'react-use';
 import NFT from '../NFT/NFT';
 import { unitConverter } from '@portkey/utils/converter';
-import { useWalletInfo } from 'store/Provider/hooks';
+import { useAppDispatch, useUserInfo, useWalletInfo, useAssetInfo } from 'store/Provider/hooks';
+import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { fetchAssetAsync } from '@portkey/store/store-ca/assets/slice';
 
 export interface TransactionResult {
   total: number;
@@ -35,7 +37,26 @@ export default function MyBalance() {
   const [navTarget, setNavTarget] = useState<'send' | 'receive'>();
   const [tokenOpen, setTokenOpen] = useState(false);
   const [tokenList, setTokenList] = useState<any[]>([]);
+  const { accountAssets } = useAssetInfo();
   const navigate = useNavigate();
+  const { passwordSeed } = useUserInfo();
+  const appDispatch = useAppDispatch();
+  const {
+    walletInfo: { caAddressList },
+  } = useCurrentWallet();
+
+  useEffect(() => {
+    passwordSeed &&
+      appDispatch(
+        fetchAssetAsync({
+          caAddresses: caAddressList || [],
+          keyWord: '',
+        }),
+      );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [passwordSeed]);
+
+  console.log('---accountAssets', accountAssets);
 
   const [tokenNum, setTokenNumber] = useState(0);
 
@@ -85,6 +106,7 @@ export default function MyBalance() {
   const SelectTokenELe = useMemo(() => {
     return (
       <CustomTokenDrawer
+        drawerType="send"
         open={tokenOpen}
         title={navTarget === 'receive' ? 'Select Token' : 'Select Assets'}
         searchPlaceHolder={navTarget === 'receive' ? 'Search Token' : 'Search Assets'}
@@ -96,9 +118,9 @@ export default function MyBalance() {
           setTokenOpen(false);
           // navigate(`/${navTarget}/${v.token.symbol}`);
           if (navTarget === 'receive') {
-            navigate(`/${navTarget}/${v.token.symbol}/${v.token.chainId}`);
+            navigate(`/${navTarget}/${v.symbol}/${v.chainId}`);
           } else {
-            navigate(`/${navTarget}/${v.token.symbol}`);
+            navigate(`/${navTarget}/${v.symbol}`);
           }
         }}
       />
@@ -122,18 +144,18 @@ export default function MyBalance() {
       <BalanceCard
         amount={balanceUSD}
         onSend={() => {
-          if (tokenList.length > 1) {
-            setNavTarget('send');
-            return setTokenOpen(true);
-          }
-          navigate(`/send/${'ELF'}`);
+          // if (tokenList.length > 1) {
+          // setNavTarget('send');
+          return setTokenOpen(true);
+          // }
+          // navigate(`/send/${'ELF'}`);
         }}
         onReceive={() => {
-          if (tokenList.length > 1) {
-            setNavTarget('receive');
-            return setTokenOpen(true);
-          }
-          navigate('/receive');
+          // if (tokenList.length > 1) {
+          setNavTarget('receive');
+          return setTokenOpen(true);
+          // }
+          // navigate('/receive');
         }}
       />
       {SelectTokenELe}

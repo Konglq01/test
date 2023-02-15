@@ -10,6 +10,7 @@ import chainSlice from '@portkey/store/network/slice';
 import tokenBalanceSlice from '@portkey/store/tokenBalance/slice';
 import tradeSlice from '@portkey/store/trade/slice';
 import tokenSlice from '@portkey/store/token/slice';
+import assetsSlice from '@portkey/store/store-ca/assets/slice';
 import { loginSlice } from 'store/reducers/loginCache/slice';
 import { contactSlice } from '@portkey/store/store-ca/contact/slice';
 import { guardiansSlice } from '@portkey/store/store-ca/guardians/slice';
@@ -29,6 +30,12 @@ export const tokenPersistConfig = {
   key: tokenSlice.name,
   storage: localStorage,
   blacklist: ['tokenDataShowInMarket'],
+};
+
+export const assetPersistConfig = {
+  key: assetsSlice.name,
+  storage: localStorage,
+  blacklist: [''],
 };
 
 export const activityPersistConfig = {

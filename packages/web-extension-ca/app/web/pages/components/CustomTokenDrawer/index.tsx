@@ -1,20 +1,23 @@
 import useToken from '@portkey/hooks/hooks-ca/useToken';
-import { UserTokenItemType } from '@portkey/types/types-ca/token';
+import { AccountAssetItem, AccountAssets, UserTokenItemType } from '@portkey/types/types-ca/token';
 import { filterTokenList } from '@portkey/utils/extension/token-ca';
 import { DrawerProps } from 'antd';
 import CustomSvg from 'components/CustomSvg';
 import DropdownSearch from 'components/DropdownSearch';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useUserInfo, useWalletInfo } from 'store/Provider/hooks';
+import { useAssetInfo, useUserInfo, useWalletInfo } from 'store/Provider/hooks';
 import BaseDrawer from '../BaseDrawer';
+import { fetchAssetAsync, fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
 import './index.less';
+import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 
 interface CustomSelectProps extends DrawerProps {
   // onChange?: (v: TokenBaseItemType) => void;
-  onChange?: (v: UserTokenItemType) => void;
+  onChange?: (v: AccountAssetItem) => void;
   onClose?: () => void;
   searchPlaceHolder?: string;
+  drawerType: 'send' | 'receive';
 }
 
 export default function CustomTokenDrawer({
@@ -22,48 +25,51 @@ export default function CustomTokenDrawer({
   onClose,
   title,
   searchPlaceHolder,
+  drawerType,
   ...props
 }: CustomSelectProps) {
   const { t } = useTranslation();
   const { currentNetwork } = useWalletInfo();
   const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? currentNetwork : ''), [currentNetwork]);
-  const [tokenState, { fetchTokenList }] = useToken();
-  const { tokenDataShowInMarket } = tokenState;
-  const [tokenList, setTokenList] = useState<UserTokenItemType[]>([]);
-  const [topTokenList, setTopTokenList] = useState<UserTokenItemType[]>([]);
+  const { accountAssets, accountToken } = useAssetInfo();
   const [openDrop, setOpenDrop] = useState<boolean>(false);
   const [filterWord, setFilterWord] = useState<string>('');
+  const [assetList, setAssetList] = useState<AccountAssets>([]);
   const { passwordSeed } = useUserInfo();
+  const {
+    walletInfo: { caAddressList },
+  } = useCurrentWallet();
 
-  const assetList = useMemo(() => [...topTokenList, ...tokenList], [tokenList, topTokenList]);
-  // const assetList = useMemo(() => [], [tokenList, topTokenList]);
+  console.log('---accountAssets', accountAssets);
+  console.log('---accountToken', accountToken);
+
+  useEffect(() => {
+    if (drawerType === 'send') {
+      setAssetList(accountAssets.accountAssetsList);
+    } else {
+      setAssetList(accountToken.accountTokenList);
+    }
+  }, [accountAssets.accountAssetsList, accountToken.accountTokenList, drawerType]);
+
+  // const assetList = useMemo(() => {
+  //   if (drawerType === 'send') {
+  //     return accountAssets.accountAssetsList;
+  //   } else {
+  //     return accountToken.accountTokenList;
+  //   }
+  // }, [accountAssets, accountToken, drawerType]);
 
   const handleSearch = useCallback(() => {
     // TODO search
   }, []);
 
   useEffect(() => {
-    if (tokenDataShowInMarket?.length) return;
-    // TODO Need nft list and search interface
-    passwordSeed && fetchTokenList({ pageSize: 1000, pageNo: 1 });
-  }, [passwordSeed]);
-
-  useEffect(() => {
-    // const allTokenList = filterTokenList(tokenDataShowInMarket, filterWord);
-    const allTokenList = filterTokenList(tokenDataShowInMarket, '');
-
-    // if (filterWord) setOpenDrop(!allTokenList.length)
-    allTokenList.sort((a, b) => a.token.symbol.localeCompare(b.token.symbol));
-
-    const topTokenList: UserTokenItemType[] = [];
-    const _tokenList: UserTokenItemType[] = [];
-    allTokenList.forEach((item) => {
-      if (item.token.symbol === 'ELF') topTokenList.push(item);
-      else _tokenList.push(item);
-    });
-    setTopTokenList(topTokenList);
-    setTokenList(_tokenList);
-  }, [tokenDataShowInMarket]);
+    if (drawerType === 'send') {
+      passwordSeed && fetchAssetAsync({ caAddresses: caAddressList || [], keyWord: filterWord });
+    } else {
+      passwordSeed && fetchTokenListAsync({ CaAddresses: caAddressList || [] });
+    }
+  }, [passwordSeed, filterWord, drawerType, caAddressList]);
 
   return (
     <BaseDrawer {...props} onClose={onClose} className="change-token-drawer">
@@ -104,17 +110,17 @@ export default function CustomTokenDrawer({
             </p>
           </div>
         ) : (
-          assetList.map((token: UserTokenItemType) => (
-            <div className="item" key={token.token.symbol} onClick={onChange?.bind(undefined, token)}>
+          assetList.map((token: AccountAssetItem) => (
+            <div className="item" key={token.symbol} onClick={onChange?.bind(undefined, token)}>
               <div className="icon">
-                {token.token.symbol === 'ELF' ? (
+                {token.symbol === 'ELF' ? (
                   <CustomSvg type="Aelf" />
                 ) : (
-                  <div className="custom">{token.token.symbol?.slice(0, 1)}</div>
+                  <div className="custom">{token.symbol?.slice(0, 1)}</div>
                 )}
               </div>
               <div className="info">
-                <p className="symbol">{`${token.token.symbol}`}</p>
+                <p className="symbol">{`${token.symbol}`}</p>
                 <p className="network">MainChain AELF {isTestNet}</p>
               </div>
               <div className="amount">
