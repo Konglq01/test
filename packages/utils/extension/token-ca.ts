@@ -1,12 +1,12 @@
-import { TokenItemShowType } from '@portkey/types/types-ca/token';
+import { TokenItemShowType, UserTokenItemType } from '@portkey/types/types-ca/token';
 
-export const filterTokenList = (tokenList: TokenItemShowType[], keyword: string): TokenItemShowType[] => {
+export const filterTokenList = (tokenList: UserTokenItemType[], keyword: string): UserTokenItemType[] => {
   return tokenList.filter(ele => {
-    if (ele.chainId === 'AELF') {
-      return ele.symbol.toLowerCase().includes(keyword.trim().toLowerCase());
+    if (ele.token.chainId === 'AELF') {
+      return ele.token.symbol.toLowerCase().includes(keyword.trim().toLowerCase());
     } else {
-      ele.address.toLowerCase().includes(keyword.trim().toLowerCase()) ||
-        ele.symbol.toLowerCase().includes(keyword.trim().toLowerCase());
+      ele.token.address.toLowerCase().includes(keyword.trim().toLowerCase()) ||
+        ele.token.symbol.toLowerCase().includes(keyword.trim().toLowerCase());
     }
   });
 };

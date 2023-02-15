@@ -1,4 +1,4 @@
-import { checkVerificationCode, sendVerificationCode } from '@portkey/api/api-did/utils/verification';
+import { checkVerificationCode } from '@portkey/api/api-did/utils/verification';
 import { Button, message } from 'antd';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAppDispatch, useCommonState, useLoading } from 'store/Provider/hooks';
@@ -16,6 +16,7 @@ import { LoginType } from '@portkey/types/types-ca/wallet';
 import { useEffectOnce } from 'react-use';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 import { DefaultChainId } from '@portkey/constants/constants-ca/network';
+import { verification } from 'utils/api';
 
 const MAX_TIMER = 60;
 
@@ -88,11 +89,13 @@ export default function VerifierPage({ currentGuardian, guardianType, isInitStat
       if (!currentGuardian?.guardianAccount) throw 'Missing loginGuardianType';
       if (!guardianType && guardianType !== 0) throw 'Missing guardiansType';
       setLoading(true);
-      const res = await sendVerificationCode({
-        guardianAccount: currentGuardian.guardianAccount,
-        type: LoginStrType[guardianType],
-        verifierId: currentGuardian.verifier?.id || '',
-        chainId: DefaultChainId,
+      const res = await verification.sendVerificationCode({
+        params: {
+          guardianAccount: currentGuardian.guardianAccount,
+          type: LoginStrType[guardianType],
+          verifierId: currentGuardian.verifier?.id || '',
+          chainId: DefaultChainId,
+        },
       });
       setLoading(false);
       if (res.verifierSessionId) {

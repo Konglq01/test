@@ -1,6 +1,5 @@
-import { TokenBaseItemType } from '@portkey/types/types-ca/assets';
+import { TokenItemShowType } from '@portkey/types/types-ca/token';
 import { unitConverter } from '@portkey/utils/converter';
-import { message } from 'antd';
 import CustomSvg from 'components/CustomSvg';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,14 +7,14 @@ import { useNavigate } from 'react-router';
 import { useWalletInfo } from 'store/Provider/hooks';
 import './index.less';
 
-export default function TokenList({ tokenList }: { tokenList: TokenBaseItemType[] }) {
+export default function TokenList({ tokenList }: { tokenList: TokenItemShowType[] }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { currentNetwork } = useWalletInfo();
   const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? currentNetwork : ''), [currentNetwork]);
 
   const onNavigate = useCallback(
-    (tokenInfo: TokenBaseItemType) => {
+    (tokenInfo: TokenItemShowType) => {
       console.log(tokenInfo);
 
       navigate('/token-detail', { state: { tokenInfo } });
@@ -31,8 +30,8 @@ export default function TokenList({ tokenList }: { tokenList: TokenBaseItemType[
   return (
     <>
       <ul className="token-list">
-        {tokenList.map((item) => (
-          <li className="token-list-item" key={item.token.symbol} onClick={() => onNavigate(item)}>
+        {/* {tokenList.map((item) => (
+          <li className="token-list-item" key={item.token.chainId} onClick={() => onNavigate(item)}>
             {item.token.symbol === 'ELF' ? (
               <CustomSvg className="token-logo" type="Aelf" />
             ) : (
@@ -49,7 +48,7 @@ export default function TokenList({ tokenList }: { tokenList: TokenBaseItemType[
               {isTestNet === 'TESTNET' || <p className="convert">$ {unitConverter(item.amountUsd)}</p>}
             </div>
           </li>
-        ))}
+        ))} */}
       </ul>
       <div>
         <div className="add-token-enter-btn" onClick={handleAddToken}>
