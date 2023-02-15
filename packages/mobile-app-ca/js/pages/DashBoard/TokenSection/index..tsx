@@ -57,8 +57,6 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
     const timer: any = setTimeout(() => {
       dispatch(fetchTokenListAsync({ CaAddresses: caAddressList || [] }));
 
-      // setTokenList(mockData?.items ?? []);
-      // setTokenNumber(mockData?.totalCount ?? 0);
       return clearTimeout(timer);
     }, 1000);
   }, [caAddressList, dispatch]);
@@ -118,12 +116,11 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
   return (
     <View style={styles.tokenListPageWrap}>
       <FlatList
-        refreshing={refreshing}
+        refreshing={isFetching}
         data={accountTokenList || []}
         renderItem={renderItem}
         keyExtractor={(item: TokenItemShowType) => item.symbol + item.chainId}
         onRefresh={() => {
-          setRefreshing(true);
           getAccountBalance?.();
           getAccountTokenList();
         }}

@@ -85,18 +85,28 @@ export const fetchTokenListAsync = createAsyncThunk(
 // fetch nftSeriesList on Dashboard
 export const fetchNFTSeriesAsync = createAsyncThunk(
   'fetchNFTSeriesAsync',
-  async ({ type }: { type: any }, { getState, dispatch }) => {
+  async (
+    {
+      caAddresses,
+      skipCount,
+      maxResultCount,
+    }: {
+      caAddresses: string[];
+      skipCount: number;
+      maxResultCount: number;
+    },
+    { getState, dispatch },
+  ) => {
     const { assets } = getState() as { assets: AssetsStateType };
     const {
       accountNFT: { totalRecordCount, accountNFTList },
     } = assets;
+    // if (totalRecordCount === 0 || totalRecordCount > accountNFTList.length) {
+    const response = await fetchNFTSeriesList({ caAddresses, skipCount, maxResultCount });
+    return { list: response.data, totalRecordCount: response.totalRecordCount };
+    // }
 
-    if (totalRecordCount === 0 || totalRecordCount > accountNFTList.length) {
-      const response = await fetchNFTSeriesList({ networkType: type, pageNo: 1, pageSize: 1000 });
-      return { type, list: response.data.data, totalRecordCount: response.data.totalRecordCount };
-    }
-
-    return { type, list: [], totalRecordCount };
+    return { list: [], totalRecordCount };
   },
 );
 

@@ -48,7 +48,8 @@ const TokenListItem: React.FC<TokenListItemType> = props => {
               {unitConverter(ZERO.plus(item?.balance).div(`1e${item.decimal}`))}
             </TextL>
             <TextS numberOfLines={1} ellipsizeMode={'tail'} style={itemStyle.dollar}>
-              $ {unitConverter(ZERO.plus(item?.balanceInUsd).div(`1e${item.decimal}`))}
+              {currentNetwork === 'MAIN' &&
+                `$ ${unitConverter(ZERO.plus(item?.balanceInUsd).div(`1e${item.decimal}`))}`}
             </TextS>
           </View>
         )}
