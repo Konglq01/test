@@ -48,7 +48,7 @@ export default function MyBalance() {
           keyWord: '',
         }),
       );
-    passwordSeed && appDispatch(fetchTokenListAsync({ CaAddresses: caAddressList || [] }));
+    passwordSeed && appDispatch(fetchTokenListAsync({ caAddresses: caAddressList || [] }));
   }, [passwordSeed, appDispatch, caAddressList]);
 
   useEffect(() => () => clearInterval(timer), []);

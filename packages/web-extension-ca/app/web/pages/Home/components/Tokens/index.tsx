@@ -37,7 +37,7 @@ export default function TokenList({ tokenList }: { tokenList: TokenItemShowType[
 
   useEffect(() => {
     console.log('---passwordSeed-fetchTokenList', passwordSeed);
-    passwordSeed && appDispatch(fetchTokenListAsync({ CaAddresses: caAddressList || [] }));
+    passwordSeed && appDispatch(fetchTokenListAsync({ caAddresses: caAddressList || [] }));
   }, [passwordSeed, appDispatch, caAddressList]);
 
   return (
