@@ -76,7 +76,7 @@ const DashBoard: React.FC<DashBoardTypes> = () => {
   // useEffect(() => () => clearInterval(timer), []);
 
   useEffectOnce(() => {
-    dispatch(fetchTokenListAsync({ CaAddresses: [] }));
+    dispatch(fetchTokenListAsync({ caAddresses: [] }));
     dispatch(getWalletNameAsync());
   });
 

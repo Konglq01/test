@@ -25,7 +25,7 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
   const { t } = useLanguage();
   const dispatch = useAppCommonDispatch();
   const {
-    accountToken: { accountTokenList, isFetching, SkipCount, MaxResultCount, totalRecordCount },
+    accountToken: { accountTokenList, isFetching, skipCount, maxResultCount, totalRecordCount },
   } = useAppCASelector(state => state.assets);
 
   console.log('accountTokenListaccountTokenListaccountTokenList', accountTokenList);
@@ -55,7 +55,7 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
 
   const getAccountTokenList = useCallback(() => {
     const timer: any = setTimeout(() => {
-      dispatch(fetchTokenListAsync({ CaAddresses: caAddressList || [] }));
+      dispatch(fetchTokenListAsync({ caAddresses: caAddressList || [] }));
 
       return clearTimeout(timer);
     }, 1000);
@@ -66,7 +66,7 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
   });
 
   useEffectOnce(() => {
-    () => dispatch(fetchTokenList({ CaAddresses: caAddressList || [] }));
+    () => dispatch(fetchTokenListAsync({ caAddresses: caAddressList || [] }));
   });
 
   useEffect(() => {
@@ -76,9 +76,9 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
       .fetchAccountTokenList({
         baseURL: currentNetworkInfo.apiUrl,
         params: {
-          CaAddresses: caAddressList,
-          SkipCount: 0,
-          MaxResultCount: 10,
+          caAddress: caAddressList,
+          skipCount: 0,
+          maxResultCount: 10,
         },
       })
       .then(res => console.log('!!!!', res));
@@ -94,9 +94,9 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
   //     .fetchAccountTokenList({
   //       baseURL: currentNetworkInfo.apiUrl,
   //       params: {
-  //         CaAddresses: caAddressList,
-  //         SkipCount: 1,
-  //         MaxResultCount: 10,
+  //         caAddress: caAddressList,
+  //         skipCount: 1,
+  //         maxResultCount: 10,
   //       },
   //     })
   //     .then(res => console.log('!!!!', res));
@@ -105,9 +105,9 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
   //     .fetchAccountTokenList({
   //       baseURL: currentNetworkInfo.apiUrl,
   //       params: {
-  //         CaAddresses: caAddressList,
-  //         SkipCount: 1,
-  //         MaxResultCount: 10,
+  //         caAddress: caAddressList,
+  //         skipCount: 1,
+  //         maxResultCount: 10,
   //       },
   //     })
   //     .then(res => console.log('!!!!', res));
