@@ -12,12 +12,11 @@ export interface ContactItemType {
   name: string;
   addresses: AddressItem[];
   modificationTime: number;
-  isDeleted?: boolean;
-  userId?: string;
-  chainId: string;
+  isDeleted: boolean;
+  userId: string;
 }
 
-export type EditContactItemApiType = PartialOption<ContactItemType, 'isDeleted' | 'modificationTime'>;
+export type EditContactItemApiType = PartialOption<ContactItemType, 'isDeleted' | 'modificationTime' | 'userId'>;
 export type AddContactItemApiType = PartialOption<EditContactItemApiType, 'id' | 'index'>;
 
 export type GetContractListApiType = {

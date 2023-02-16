@@ -180,7 +180,7 @@ export default function SelectContact(props: SelectContactProps) {
   console.log('contactMapcontactMapcontactMap', contactMap);
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [SkipCount, setSkipCount] = useState(0);
+  const [skipCount, setSkipCount] = useState(0);
   const [recentTotalNumber, setRecentTotalNumber] = useState(0);
   const [recentList, setRecentList] = useState<(ContactItemType | RecentContactItemType)[]>([]);
 
@@ -201,15 +201,15 @@ export default function SelectContact(props: SelectContactProps) {
     setLoading(true);
     return request.recent.fetchRecentTransactionUsers({
       params: {
-        CaAddresses: [
+        caAddresses: [
           'TxXSwp2P9mxeFnGA9DARi2qW1p3PskLFXyBix1GDerQFL7VD5',
           'bn3AAx9HpCtS5v8dcaXgjp1nRivc8RkxpH4GFaopGr77tZdFb',
         ],
-        SkipCount,
-        MaxResultCount: MAX_RESULT_ACCOUNT,
+        skipCount,
+        maxResultCount: MAX_RESULT_ACCOUNT,
       },
     });
-  }, [SkipCount]);
+  }, [skipCount]);
 
   const transFormData = useCallback(
     (data: ApiRecentAddressItemType[]): any[] =>
@@ -238,12 +238,12 @@ export default function SelectContact(props: SelectContactProps) {
     fetchRecents().then(res => {
       const { data, totalRecordCount } = res;
 
-      setSkipCount(SkipCount + MAX_RESULT_ACCOUNT);
+      setSkipCount(skipCount + MAX_RESULT_ACCOUNT);
       setLoading(false);
       setRecentList([...recentList, ...transFormData(data as ApiRecentAddressItemType[])]);
       setRecentTotalNumber(totalRecordCount);
     });
-  }, [SkipCount, fetchRecents, recentList, transFormData]);
+  }, [skipCount, fetchRecents, recentList, transFormData]);
 
   const tabList = useMemo(() => {
     return [

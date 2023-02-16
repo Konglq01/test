@@ -17,24 +17,24 @@ const data = [0, 1, 2, 3, 4, 5, 6, 7].map((ele, index) => {
 
 export function fetchTokenList({
   // todo maybe remote tokenList change
-  SkipCount = 0,
-  MaxResultCount = 1000,
-  CaAddresses,
+  skipCount = 0,
+  maxResultCount = 1000,
+  caAddresses,
 }: {
-  SkipCount?: number;
-  MaxResultCount?: number;
-  CaAddresses: string[];
+  skipCount?: number;
+  maxResultCount?: number;
+  caAddresses: string[];
 }): Promise<{
   data: TokenItemShowType[];
   totalRecordCount: number;
 }> {
-  console.log('fetching....list', SkipCount, MaxResultCount);
+  console.log('fetching....list', skipCount, maxResultCount);
   // return new Promise(resolve => setTimeout(() => resolve(mockTokenData), 500));
   return request.assets.fetchAccountTokenList({
     params: {
-      CaAddresses,
-      SkipCount,
-      MaxResultCount,
+      caAddresses,
+      skipCount,
+      maxResultCount,
     },
   });
 }
@@ -69,7 +69,7 @@ export function fetchNFTSeriesList({
   caAddresses: string[];
   skipCount: number;
   maxResultCount: number;
-}): Promise<{ data: any }> {
+}): Promise<{ data: any[]; totalRecordCount: number }> {
   // return new Promise(resolve => setTimeout(() => resolve(mockNFTSeriesData), 500));
   return request.assets.fetchAccountNftProtocolList({
     params: {
@@ -91,7 +91,7 @@ export function fetchNFTList({
   pageSize: number;
   pageNo: number;
   id: string;
-}): Promise<{ data: any }> {
+}): Promise<{ data: any[]; totalRecordCount: number }> {
   console.log('fetching....list', networkType, pageSize, pageNo);
 
   return new Promise(resolve => setTimeout(() => resolve(mockNFTsData), 500));

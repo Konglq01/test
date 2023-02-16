@@ -67,7 +67,7 @@ export default function CustomTokenDrawer({
     if (drawerType === 'send') {
       passwordSeed && fetchAssetAsync({ caAddresses: caAddressList || [], keyWord: filterWord });
     } else {
-      passwordSeed && fetchTokenListAsync({ CaAddresses: caAddressList || [] });
+      passwordSeed && fetchTokenListAsync({ caAddresses: caAddressList || [] });
     }
   }, [passwordSeed, filterWord, drawerType, caAddressList]);
 
