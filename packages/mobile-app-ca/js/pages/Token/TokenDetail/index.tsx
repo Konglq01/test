@@ -49,7 +49,7 @@ const transactionList: TransactionTypes[] = [
   TransactionTypes.SocialRecovery,
   TransactionTypes.Transfer,
 ];
-const MaxResultCount = 10;
+const maxResultCount = 10;
 
 const TokenDetail: React.FC = () => {
   const { t } = useLanguage();
@@ -73,7 +73,7 @@ const TokenDetail: React.FC = () => {
   // const { balances } = useAppCASelector(state => state.tokenBalance);
 
   const [currentToken] = useState<TokenItemShowType>(tokenInfo);
-  const [SkipCount, setSkipCount] = useState<number>(0);
+  const [skipCount, setSkipCount] = useState<number>(0);
   const [totalRecordCount, setTotalRecordCount] = useState<number>(0);
   const [noMoreData, setNoMoreData] = useState(false);
   const [initializing, setInitializing] = useState(false);
@@ -110,19 +110,19 @@ const TokenDetail: React.FC = () => {
       .fetchActivityList({
         params: {
           ...fixedParamObj,
-          SkipCount,
+          skipCount,
         },
       })
       .then(res => {
-        setSkipCount(SkipCount + MaxResultCount);
+        setSkipCount(skipCount + maxResultCount);
         setListShow([...listShow, ...res?.data?.data]);
 
-        setNoMoreData(res?.data.totalRecordCount > 0 && res?.data.totalRecordCount <= SkipCount);
+        setNoMoreData(res?.data.totalRecordCount > 0 && res?.data.totalRecordCount <= skipCount);
       })
       .catch(err => {
         CommonToast.fail(err);
       });
-  }, [SkipCount, fixedParamObj, listShow]);
+  }, [skipCount, fixedParamObj, listShow]);
 
   const initActivityList = useCallback(() => {
     setInitializing(true);
@@ -130,7 +130,7 @@ const TokenDetail: React.FC = () => {
       .fetchActivityList({
         params: {
           ...fixedParamObj,
-          SkipCount: 0,
+          skipCount: 0,
         },
       })
       .then(res => {
@@ -139,14 +139,14 @@ const TokenDetail: React.FC = () => {
         setTotalRecordCount(res?.data.totalRecordCount);
         setListShow(res?.data?.data);
 
-        setNoMoreData(res?.data.totalRecordCount > 0 && res?.data.totalRecordCount <= SkipCount);
+        setNoMoreData(res?.data.totalRecordCount > 0 && res?.data.totalRecordCount <= skipCount);
       })
       .catch(err => {
         setInitializing(false);
         setListShow([]);
         CommonToast.fail(err);
       });
-  }, [SkipCount, fixedParamObj]);
+  }, [skipCount, fixedParamObj]);
 
   useEffectOnce(() => initActivityList());
 

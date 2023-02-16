@@ -6,11 +6,10 @@ import { useLanguage } from 'i18n/hooks';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { pTd } from 'utils/unit';
 import NFTItem from './NFTItem';
-import { request } from '@portkey/api/api-did';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { useCaAddresses, useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { fetchNFTSeriesAsync } from '@portkey/store/store-ca/assets/slice';
-import { useDispatch } from 'react-redux';
+import { useAppCommonDispatch } from '@portkey/hooks';
 
 const mockData = {
   // items: [
@@ -110,7 +109,7 @@ export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
   const currentNetworkInfo = useCurrentNetworkInfo();
 
   const caAddresses = useCaAddresses();
-  const dispatch = useDispatch();
+  const dispatch = useAppCommonDispatch();
 
   const [refreshing, setRefreshing] = useState(false);
   const [NFTList, setNFTList] = useState<any[]>([]);
@@ -118,13 +117,13 @@ export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
 
   const fetchNFTList = useCallback(() => {
     const timer: any = setTimeout(() => {
-      // dispatch(fetchNFTSeriesAsync({ caAddresses, }));
+      dispatch(fetchNFTSeriesAsync({ caAddresses, skipCount: 0, maxResultCount: 100 }));
       // setNFTList(result?.items ?? []);
       // setNFTNum(result.totalCount ?? 0);
       // setRefreshing(false);
       return clearTimeout(timer);
     }, 1000);
-  }, []);
+  }, [caAddresses, dispatch]);
 
   useEffectOnce(() => {
     fetchNFTList();

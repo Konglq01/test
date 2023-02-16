@@ -14,7 +14,6 @@ export interface ContactItemType {
   modificationTime: number;
   isDeleted?: boolean;
   userId?: string;
-  chainId: string;
 }
 
 export type EditContactItemApiType = PartialOption<ContactItemType, 'isDeleted' | 'modificationTime'>;

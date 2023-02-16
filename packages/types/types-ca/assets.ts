@@ -10,8 +10,8 @@ export type NFTSeriesBaseItemType = {
   tokenHash: string;
   amount: string;
   isFetching: boolean;
-  SkipCount: number;
-  MaxResultCount: number;
+  skipCount: number;
+  maxResultCount: number;
   totalRecordCount: string | number;
   children?: NFTBaseItemType[];
 };

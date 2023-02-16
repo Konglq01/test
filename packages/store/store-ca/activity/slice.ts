@@ -4,7 +4,7 @@ import { ActivityItemType, the2ThFailedActivityItemType } from '@portkey/types/t
 import { fetchActivities } from './api';
 
 export type ActivityStateType = {
-  MaxResultCount: number;
+  maxResultCount: number;
   skipCount: number;
   list: ActivityItemType[];
   totalCount: number;
@@ -13,7 +13,7 @@ export type ActivityStateType = {
 };
 
 const initialState: ActivityStateType = {
-  MaxResultCount: 10,
+  maxResultCount: 10,
   skipCount: 0,
   list: [],
   totalCount: 0,
@@ -25,10 +25,10 @@ export const fetchActivitiesAsync = createAsyncThunk(
   async ({ type }: { type: NetworkType }, { getState, dispatch }) => {
     const { activity } = getState() as { activity: ActivityStateType };
     const state = activity;
-    const { skipCount, totalCount, MaxResultCount } = state;
+    const { skipCount, totalCount, maxResultCount } = state;
     if (skipCount < totalCount || totalCount === 0) {
       dispatch(addPage(type));
-      const response = await fetchActivities({ start: skipCount, limit: MaxResultCount });
+      const response = await fetchActivities({ start: skipCount, limit: maxResultCount });
       return { type, list: response.data.items, totalCount: response.data.total };
     }
     return { type, list: [], totalCount };
@@ -41,7 +41,7 @@ export const activitySlice = createSlice({
   initialState: initialState,
   reducers: {
     addPage: (state, { payload }: { payload: NetworkType }) => {
-      state.skipCount += state.MaxResultCount;
+      state.skipCount += state.maxResultCount;
     },
     addFailedActivity: (state, { payload }: { payload: the2ThFailedActivityItemType }) => {
       state.failedActivityMap[payload?.transactionId] = payload;
