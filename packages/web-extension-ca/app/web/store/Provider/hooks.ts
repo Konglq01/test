@@ -1,4 +1,4 @@
-import { opacityType } from '@portkey/types';
+import { OpacityType } from '@portkey/types';
 import { useCallback, useMemo } from 'react';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import { setGlobalLoading } from 'store/reducers/user/slice';
@@ -22,6 +22,6 @@ export const useCommonState = () => useAppSelector((state) => state.common);
 export const useLoading = () => {
   const { isLoading } = useAppSelector((state) => state.userInfo);
   const dispatch = useAppDispatch();
-  const setLoading = useCallback((v: boolean | opacityType) => dispatch(setGlobalLoading(v)), [dispatch]);
+  const setLoading = useCallback((v: boolean | OpacityType) => dispatch(setGlobalLoading(v)), [dispatch]);
   return useMemo(() => ({ isLoading: !!isLoading, setLoading }), [isLoading, setLoading]);
 };

@@ -20,7 +20,7 @@
     "default_popup": "popup.html"
   },
   "sandbox": {
-    "pages": ["sandbox.html"]
+    "pages": ["sandbox.html", "sandbox-index.html"]
   },
   "commands": {
     "_execute_action": {
@@ -48,6 +48,10 @@
     },
     {
       "resources": ["sandbox.html"],
+      "matches": ["<all_urls>"]
+    },
+    {
+      "resources": ["sandbox-index.html"],
       "matches": ["<all_urls>"]
     }
   ],
