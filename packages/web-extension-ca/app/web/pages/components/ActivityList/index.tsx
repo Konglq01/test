@@ -13,7 +13,7 @@ import './index.less';
 export interface IActivityListProps {
   data?: ActivityItemType[];
   hasMore: boolean;
-  loadMore: (isRetry?: boolean) => void;
+  loadMore: (isRetry?: boolean) => Promise<void>;
 }
 
 export default function ActivityList({ data, hasMore, loadMore }: IActivityListProps) {

@@ -7,11 +7,13 @@ export const setActivityAction = createAction<any>('activity/setActivityAction')
 
 export const getActivityListAsync = createAsyncThunk(
   'activity/getActivityList',
-  async (params: IActivitysApiParams, { dispatch }): Promise<ActivityStateType> => {
+  async (params: IActivitysApiParams, { getState, dispatch }): Promise<ActivityStateType> => {
+    const { activity } = getState() as { activity: ActivityStateType };
     const response = await fetchActivities(params);
     if (!response?.data || !response?.totalRecordCount) throw Error('No data');
 
     return {
+      ...activity,
       data: response.data,
       totalRecordCount: response.totalRecordCount,
       maxResultCount: params.maxResultCount,

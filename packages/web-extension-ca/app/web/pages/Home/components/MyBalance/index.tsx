@@ -177,7 +177,7 @@ export default function MyBalance() {
           {
             label: t('Activity'),
             key: 'activity',
-            children: <Activity rate={undefined} loading={false} />,
+            children: <Activity loading={false} />,
           },
         ]}
       />

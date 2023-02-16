@@ -11,11 +11,11 @@ import { transactionTypesForActivityList } from '@portkey/constants/constants-ca
 import { IActivitysApiParams } from '@portkey/store/store-ca/activity/type';
 
 export interface ActivityProps {
-  total?: number;
-  rate: any;
   loading: boolean;
   appendData?: Function;
   clearData?: Function;
+  chainId?: string;
+  symbol?: string;
 }
 
 export enum EmptyTipMessage {
@@ -23,15 +23,17 @@ export enum EmptyTipMessage {
   NETWORK_NO_TRANSACTIONS = 'No transaction records accessible from the current custom network',
 }
 
-export default function Activity({ loading, appendData, clearData }: ActivityProps) {
+export default function Activity({ loading, appendData, clearData, chainId, symbol }: ActivityProps) {
   const { t } = useTranslation();
   const activity = useAppCASelector((state) => state.activity);
+
   const dispatch = useAppCommonDispatch();
   const { passwordSeed } = useUserInfo();
   const currentWallet = useCurrentWallet();
   const {
     walletInfo: { caAddressList, address },
   } = currentWallet;
+  const maxResultCount = 10;
   let ticking = false;
 
   useEffect(() => {
@@ -41,10 +43,12 @@ export default function Activity({ loading, appendData, clearData }: ActivityPro
       dispatch(clearState());
 
       const params: IActivitysApiParams = {
-        maxResultCount: 10,
+        maxResultCount: maxResultCount,
         skipCount: 0,
         caAddresses: caAddressList,
         // managerAddresses: address,
+        chainId: chainId,
+        symbol: symbol,
         transactionTypes: transactionTypesForActivityList,
       };
       dispatch(getActivityListAsync(params));
@@ -83,14 +87,14 @@ export default function Activity({ loading, appendData, clearData }: ActivityPro
     return root?.removeEventListener('scroll', handleScroll);
   });
 
-  function loadMoreActivities(): void {
+  function loadMoreActivities() {
     if (activity.data.length < activity.totalRecordCount) {
       const params = {
-        maxResultCount: 10,
+        maxResultCount: maxResultCount,
         skipCount: activity.skipCount + activity.maxResultCount,
         caAddresses: caAddressList,
       };
-      dispatch(getActivityListAsync(params));
+      return dispatch(getActivityListAsync(params));
     }
   }
 

@@ -1,4 +1,4 @@
-import { ActivityItemType } from '@portkey/types/types-ca/activity';
+import { ActivityItemType, the2ThFailedActivityItemType } from '@portkey/types/types-ca/activity';
 import { TransactionTypes } from '@portkey/constants/constants-ca/activity';
 
 export type ActivityStateType = {
@@ -6,6 +6,8 @@ export type ActivityStateType = {
   skipCount: number;
   data: ActivityItemType[];
   totalRecordCount: number;
+  isFetchingActivities: boolean;
+  failedActivityMap: { [transactionId: string]: the2ThFailedActivityItemType };
 };
 
 export interface IActivitysApiParams {
