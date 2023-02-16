@@ -115,23 +115,28 @@ export default function Transaction() {
   }, [activityItem, isTestNet]);
 
   const feeUI = useCallback(() => {
-    const { fee, symbol, feeInUsd } = feeInfo[0]; // todoykx
-    const { decimal } = activityItem || {};
-    console.log('fee feeinfo', JSON.stringify(feeInfo));
-    console.log('fee decimal', decimal);
-    symbol;
     return (
       <p className="value">
         <span className="left">{t('Transaction Fee')}</span>
         <span className="right">
-          <span>{`${unitConverter(ZERO.plus(fee || 0).div(`1e${decimal}`))} ${symbol}`}</span>
-          {!isTestNet && (
-            <span className="right-usd">$ {unitConverter(ZERO.plus(feeInUsd ?? 0).div(`1e${decimal}`), 2)}</span>
-          )}
+          {feeInfo?.map((item, idx) => {
+            return (
+              <div key={'transactionFee' + idx} className="right-item">
+                <span>{`${unitConverter(ZERO.plus(item.fee || 0).div(`1e${activityItem?.decimal}`))} ${
+                  item.symbol
+                }`}</span>
+                {!isTestNet && (
+                  <span className="right-usd">
+                    $ {unitConverter(ZERO.plus(item.feeInUsd ?? 0).div(`1e${activityItem?.decimal}`), 2)}
+                  </span>
+                )}
+              </div>
+            );
+          })}
         </span>
       </p>
     );
-  }, [activityItem, feeInfo, isTestNet, t]);
+  }, [activityItem?.decimal, feeInfo, isTestNet, t]);
 
   return activityItem ? (
     <div className="transaction-detail-modal">

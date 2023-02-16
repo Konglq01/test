@@ -9,7 +9,11 @@ export const getActivityListAsync = createAsyncThunk(
   'activity/getActivityList',
   async (params: IActivitysApiParams, { getState, dispatch }): Promise<ActivityStateType> => {
     const { activity } = getState() as { activity: ActivityStateType };
-    const response = await fetchActivities(params);
+    const response = await fetchActivities(params).catch(error => {
+      if (error?.type) throw Error(error.type);
+      if (error?.error?.message) throw Error(error.error.message);
+      throw Error(JSON.stringify(error));
+    });
     if (!response?.data || !response?.totalRecordCount) throw Error('No data');
 
     return {
