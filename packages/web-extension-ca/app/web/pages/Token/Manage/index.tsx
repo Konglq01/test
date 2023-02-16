@@ -5,7 +5,6 @@ import SettingHeader from 'pages/components/SettingHeader';
 import CustomSvg from 'components/CustomSvg';
 import { useToken } from '@portkey/hooks/hooks-ca/useToken';
 import { UserTokenItemType } from '@portkey/types/types-ca/token';
-import { filterTokenList } from '@portkey/utils/extension/token-ca';
 import DropdownSearch from 'components/DropdownSearch';
 import { useTranslation } from 'react-i18next';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
@@ -21,35 +20,22 @@ export default function AddToken() {
   const { fetchTokenList, displayUserToken } = tokenActions;
   const [filterWord, setFilterWord] = useState<string>('');
   const [openDrop, setOpenDrop] = useState<boolean>(false);
-  const [tokenList, setTokenList] = useState<UserTokenItemType[]>([]);
-  const [topTokenList, setTopTokenList] = useState<UserTokenItemType[]>([]);
   const { passwordSeed } = useUserInfo();
 
   useEffect(() => {
-    passwordSeed && fetchTokenList({ pageSize: 1000, pageNo: 1 });
-  }, [passwordSeed]);
+    passwordSeed && fetchTokenList({ pageSize: 1000, pageNo: 1, keyword: filterWord });
+  }, [passwordSeed, filterWord]);
 
   useEffect(() => {
-    const allTokenList = filterTokenList(tokenDataShowInMarket, filterWord);
-
-    if (filterWord) setOpenDrop(!allTokenList.length);
-
-    const topTokenList: UserTokenItemType[] = [];
-    const _tokenList: UserTokenItemType[] = [];
-    allTokenList.forEach((item) => {
-      if (item.isDefault) topTokenList.push(item);
-      else _tokenList.push(item);
-    });
-    setTopTokenList(topTokenList);
-    setTokenList(_tokenList);
-  }, [tokenDataShowInMarket, filterWord]);
+    tokenDataShowInMarket.length ? setOpenDrop(false) : setOpenDrop(true);
+  }, [tokenDataShowInMarket]);
 
   const rightElement = useMemo(() => <CustomSvg type="Close2" onClick={() => navigate(-1)} />, [navigate]);
 
   const handleUserTokenDisplay = useCallback(
-    (item: UserTokenItemType) => {
+    async (item: UserTokenItemType) => {
       try {
-        displayUserToken(item);
+        await displayUserToken(item);
         message.success('success');
       } catch (error: any) {
         message.error('display error');
@@ -85,7 +71,7 @@ export default function AddToken() {
 
   const renderList = useCallback(
     (item: UserTokenItemType) => (
-      <div className="token-item" key={item.token.symbol}>
+      <div className="token-item" key={`${item.token.symbol}-${item.token.chainId}`}>
         <div className="token-item-content">
           {item.token.symbol === 'ELF' ? (
             <CustomSvg className="token-logo" type="Aelf" />
@@ -117,7 +103,7 @@ export default function AddToken() {
           inputProps={{
             onBlur: () => setOpenDrop(false),
             onFocus: () => {
-              if (filterWord && !tokenList.length) setOpenDrop(true);
+              if (filterWord && !tokenDataShowInMarket.length) setOpenDrop(true);
             },
             onChange: (e) => {
               const _value = e.target.value.replaceAll(' ', '');
@@ -129,10 +115,12 @@ export default function AddToken() {
           }}
         />
       </div>
-      <div className="add-token-content">
-        {topTokenList?.map((item) => renderList(item))}
-        {tokenList?.map((item) => renderList(item))}
-      </div>
+      {!!tokenDataShowInMarket.length && (
+        <div className="add-token-content">{tokenDataShowInMarket.map((item) => renderList(item))}</div>
+      )}
+      {/* {filterWord && !tokenDataShowInMarket.length && (
+        <div className="flex-center fix-max-content add-token-content-empty">{t('There is no search result.')}</div>
+      )} */}
     </div>
   );
 }

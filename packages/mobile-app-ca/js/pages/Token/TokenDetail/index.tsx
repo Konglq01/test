@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { View, Text } from 'react-native';
 // import { Dialog } from '@rneui/base';
 import PageContainer from 'components/PageContainer';
@@ -21,28 +21,45 @@ import { FontStyles } from 'assets/theme/styles';
 import { TextXL } from 'components/CommonText';
 import { getActivityListAsync } from '@portkey/store/store-ca/activity/action';
 import useEffectOnce from 'hooks/useEffectOnce';
-import { TokenItemShowType } from '@portkey/types/types-eoa/token';
+import { TokenItemShowType } from '@portkey/types/types-ca/token';
+import { useWallet } from 'hooks/store';
+import useRouterParams from '@portkey/hooks/useRouterParams';
+import { request } from '@portkey/api/api-did';
+import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import CommonToast from 'components/CommonToast';
+import { skipToken } from '@reduxjs/toolkit/dist/query';
 
-export interface TokenDetailProps {
-  route?: any;
+interface RouterParams {
+  tokenInfo: TokenItemShowType;
 }
 
-// const originalData = {
-//   currentPageNum: 0,
-//   noMoreData: false,
-//   refreshing: false,
-//   isLoadingMore: false,
-//   list: [],
-// };
+enum TransactionTypes {
+  'Transfer',
+  'CrossChainTransfer',
+  'CrossChainReceiveToken',
+  'SocialRecovery',
+  'RemoveManager',
+  'AddManager',
+}
+const transactionList: TransactionTypes[] = [
+  TransactionTypes.AddManager,
+  TransactionTypes.CrossChainReceiveToken,
+  TransactionTypes.CrossChainTransfer,
+  TransactionTypes.RemoveManager,
+  TransactionTypes.SocialRecovery,
+  TransactionTypes.Transfer,
+];
+const maxResultCount = 10;
 
-const currentNetworkMode = 'MAIN';
-
-const TokenDetail: React.FC<TokenDetailProps> = props => {
+const TokenDetail: React.FC = () => {
   const { t } = useLanguage();
-  const { route } = props;
-  const {
-    params: { tokenInfo },
-  } = route;
+  const { tokenInfo } = useRouterParams<RouterParams>();
+
+  console.log('====================================');
+  console.log(tokenInfo);
+  console.log('====================================');
+
+  const currentWallet = useCurrentWallet();
 
   const navigation = useNavigation();
 
@@ -56,6 +73,11 @@ const TokenDetail: React.FC<TokenDetailProps> = props => {
   // const { balances } = useAppCASelector(state => state.tokenBalance);
 
   const [currentToken] = useState<TokenItemShowType>(tokenInfo);
+  const [skipCount, setSkipCount] = useState<number>(0);
+  const [totalRecordCount, setTotalRecordCount] = useState<number>(0);
+  const [noMoreData, setNoMoreData] = useState(false);
+  const [initializing, setInitializing] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   // const [isLoadingFirstTime, setIsLoadingFirstTime] = useState(true); // first time
 
@@ -71,16 +93,73 @@ const TokenDetail: React.FC<TokenDetailProps> = props => {
     dispatch(getActivityListAsync({ type: 'MAIN' }));
   });
 
-  const balanceFormat = useCallback((symbol: string, decimals = 8) => ZERO.plus('0').div(`1e${decimals}`), []);
+  // const balanceFormat = useCallback((symbol: string, decimals = 8) => ZERO.plus('0').div(`1e${decimals}`), []);
+
+  const fixedParamObj = useMemo(
+    () => ({
+      caAddresses: currentWallet.walletInfo.caAddressList,
+      transactionTypes: transactionList,
+      symbol: tokenInfo.symbol,
+      chainId: tokenInfo.chainId,
+    }),
+    [currentWallet.walletInfo.caAddressList, tokenInfo.chainId, tokenInfo.symbol],
+  );
+
+  const getMoreActivityList = useCallback(() => {
+    request.assets
+      .fetchActivityList({
+        params: {
+          ...fixedParamObj,
+          skipCount,
+        },
+      })
+      .then(res => {
+        setSkipCount(skipCount + maxResultCount);
+        setListShow([...listShow, ...res?.data?.data]);
+
+        setNoMoreData(res?.data.totalRecordCount > 0 && res?.data.totalRecordCount <= skipCount);
+      })
+      .catch(err => {
+        CommonToast.fail(err);
+      });
+  }, [skipCount, fixedParamObj, listShow]);
+
+  const initActivityList = useCallback(() => {
+    setInitializing(true);
+    request.assets
+      .fetchActivityList({
+        params: {
+          ...fixedParamObj,
+          skipCount: 0,
+        },
+      })
+      .then(res => {
+        setInitializing(false);
+
+        setTotalRecordCount(res?.data.totalRecordCount);
+        setListShow(res?.data?.data);
+
+        setNoMoreData(res?.data.totalRecordCount > 0 && res?.data.totalRecordCount <= skipCount);
+      })
+      .catch(err => {
+        setInitializing(false);
+        setListShow([]);
+        CommonToast.fail(err);
+      });
+  }, [skipCount, fixedParamObj]);
+
+  useEffectOnce(() => initActivityList());
 
   return (
     <PageContainer
       type="leftBack"
-      backTitle={t('Back')}
+      backTitle={t('')}
       titleDom={
         <View>
-          <TextXL style={[GStyles.textAlignCenter, FontStyles.font2]}>ELF</TextXL>
-          <Text style={[GStyles.textAlignCenter, FontStyles.font2, styles.subTitle]}>MainChain AELF</Text>
+          <TextXL style={[GStyles.textAlignCenter, FontStyles.font2]}>{tokenInfo.symbol}</TextXL>
+          <Text style={[GStyles.textAlignCenter, FontStyles.font2, styles.subTitle]}>{`${
+            tokenInfo.chainId === 'AELF' ? 'MainChain' : 'SideChain'
+          } ${tokenInfo.chainId}`}</Text>
         </View>
       }
       safeAreaColor={['blue', 'white']}
@@ -88,17 +167,10 @@ const TokenDetail: React.FC<TokenDetailProps> = props => {
       containerStyles={styles.pageWrap}
       scrollViewProps={{ disabled: true }}>
       <View style={styles.card}>
-        <Text style={styles.tokenBalance}>
-          {`${unitConverter(balanceFormat(currentToken?.symbol, currentToken?.decimals))} ${
-            currentToken?.symbol || 'ELF'
-          }`}
-        </Text>
+        <Text style={styles.tokenBalance}>{`${tokenInfo.balance} ${tokenInfo.symbol}`}</Text>
         {/* TODO : multiply rate */}
-        {currentNetworkMode === 'MAIN' && (
-          <Text style={styles.dollarBalance}>{`$ ${unitConverter(
-            balanceFormat(currentToken?.symbol, currentToken?.decimals).multipliedBy('10'),
-            2,
-          )}`}</Text>
+        {currentWallet?.currentNetwork === 'MAIN' && (
+          <Text style={styles.dollarBalance}>{`$ ${tokenInfo?.balanceInUsd}`}</Text>
         )}
         <View style={styles.buttonGroupWrap}>
           <SendButton themeType="innerPage" sentToken={currentToken} />
@@ -113,6 +185,18 @@ const TokenDetail: React.FC<TokenDetailProps> = props => {
         data={listShow || []}
         renderItem={() => {
           return <TransferItem onPress={() => navigationService.navigate('ActivityDetail')} />;
+        }}
+        onRefresh={() => {
+          setInitializing(true);
+          initActivityList();
+          // TODO: refresh Token Balance
+        }}
+        onEndReached={() => {
+          if (noMoreData) return false;
+          if (isLoadingMore) return false;
+
+          setIsLoadingMore(true);
+          getMoreActivityList();
         }}
       />
     </PageContainer>

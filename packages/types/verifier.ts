@@ -1,10 +1,9 @@
-import { LoginType } from './types-ca/wallet';
-
 export enum VerifyStatus {
   NotVerified = 'NotVerified',
   Verifying = 'Verifying',
   Verified = 'Verified',
 }
+
 export interface VerifierItem {
   id: string; // aelf.Hash
   name: string;

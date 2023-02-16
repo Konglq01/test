@@ -83,6 +83,12 @@ let config = {
         ],
       },
       {
+        test: /\.m?js$/,
+        resolve: {
+          fullySpecified: false,
+        },
+      },
+      {
         test: /\.css$/,
         use: ['style-loader', 'css-loader'],
       },
@@ -153,6 +159,11 @@ let config = {
       template: './app/web/sandbox.html',
       filename: `./${outputDir}/sandbox.html`,
     }),
+    new HtmlWebpackPlugin({
+      chunks: [''],
+      template: './app/web/sandbox/index.html',
+      filename: `./${outputDir}/sandbox-index.html`,
+    }),
     new CopyWebpackPlugin({
       patterns: [
         {
@@ -197,7 +208,9 @@ module.exports = (env, argv) => {
       'process.env.NODE_ENV': JSON.stringify(argv.mode),
       'process.env.NODE_DEBUG': JSON.stringify(argv.mode),
       'process.env.DEVICE': JSON.stringify('extension'),
-      'process.env.SENTRY_DSN': JSON.stringify('https://f439a3f5052f4a578f87a09ac11a246d@o4504399844999168.ingest.sentry.io/4504647744421888'),
+      'process.env.SENTRY_DSN': JSON.stringify(
+        'https://f439a3f5052f4a578f87a09ac11a246d@o4504399844999168.ingest.sentry.io/4504647744421888',
+      ),
     }),
   );
 

@@ -14,7 +14,6 @@ import GStyles from 'assets/theme/GStyles';
 import { defaultColors } from 'assets/theme';
 import gSTyles from 'assets/theme/GStyles';
 import RecentContactItem from 'pages/Send/components/RecentContactItem';
-import { FlashList } from '@shopify/flash-list';
 
 const { font5, border6, font3, font7, font2, bg5 } = defaultColors;
 

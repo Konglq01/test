@@ -64,7 +64,6 @@ const ContactsList: React.FC<ContactsListProps> = ({
   // keyword filter;
   const onChangeKeywords = useCallback(
     (value: string) => {
-      console.log(value, 'search contact===');
       setKeyWord(value);
       let _value = value.trim();
       if (_value === '') {

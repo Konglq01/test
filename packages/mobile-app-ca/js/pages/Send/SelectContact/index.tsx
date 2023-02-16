@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useEffect, useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import CommonTopTab from 'components/CommonTopTab';
 import GStyles from 'assets/theme/GStyles';
@@ -7,14 +7,19 @@ import { pTd } from 'utils/unit';
 import { useLanguage } from 'i18n/hooks';
 import { FlashList } from '@shopify/flash-list';
 import RecentContactItem from 'pages/Send/components/RecentContactItem';
-import RecentList from '../components/RecentList';
+import { ContactItemType, RecentContactItemType } from '@portkey/types/types-ca/contact';
+
+// import RecentList from '../components/RecentList';
 import ContactsList from 'components/ContactList';
 import NoData from 'components/NoData';
 import { Text } from 'react-native-svg';
 import { TextS } from 'components/CommonText';
-import { useAppCASelector, useAppCommonDispatch } from '@portkey/hooks';
+import { useAppCASelector, useAppCommonDispatch, useAppCommonSelector } from '@portkey/hooks';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { fetchContractListAsync } from '@portkey/store/store-ca/contact/actions';
+import { request } from '@portkey/api/api-did';
+import { useContact } from '@portkey/hooks/hooks-ca/contact';
+import { isLoading } from 'expo-font';
 
 const mockList = [
   {
@@ -151,17 +156,34 @@ const mockList = [
   },
 ];
 
+interface ApiRecentAddressItemType {
+  caAddress: string;
+  chainId: string;
+  name: string;
+  transactionTime: string;
+  address: string;
+  addressChainId: string;
+}
+
 interface SelectContactProps {
   currentNetType?: string;
   onPress?: (contact: any) => void;
 }
 
+const MAX_RESULT_ACCOUNT = 10;
+
 export default function SelectContact(props: SelectContactProps) {
   const { onPress } = props;
   const { t } = useLanguage();
   const dispatch = useAppCommonDispatch();
+  const { contactMap } = useContact();
+  console.log('contactMapcontactMapcontactMap', contactMap);
 
-  // const [keyword, setKeyword] = useState('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [skipCount, setSkipCount] = useState(0);
+  const [recentTotalNumber, setRecentTotalNumber] = useState(0);
+  const [recentList, setRecentList] = useState<(ContactItemType | RecentContactItemType)[]>([]);
+
   // const debouncedKeyword = useDebounce(keyword, 500);
 
   useEffectOnce(() => {
@@ -169,11 +191,59 @@ export default function SelectContact(props: SelectContactProps) {
   });
 
   const renderItem = useCallback(
-    ({ item }: { item: any }) => {
+    ({ item }: { item: ContactItemType | RecentContactItemType }) => {
       return <RecentContactItem contact={item} onPress={onPress} />;
     },
     [onPress],
   );
+
+  const fetchRecents = useCallback(() => {
+    setLoading(true);
+    return request.recent.fetchRecentTransactionUsers({
+      params: {
+        caAddresses: [
+          'TxXSwp2P9mxeFnGA9DARi2qW1p3PskLFXyBix1GDerQFL7VD5',
+          'bn3AAx9HpCtS5v8dcaXgjp1nRivc8RkxpH4GFaopGr77tZdFb',
+        ],
+        skipCount,
+        maxResultCount: MAX_RESULT_ACCOUNT,
+      },
+    });
+  }, [skipCount]);
+
+  const transFormData = useCallback(
+    (data: ApiRecentAddressItemType[]): any[] =>
+      data.map((ele: ApiRecentAddressItemType) => {
+        if (contactMap?.[ele.address]) return { ...contactMap?.[ele.address], transactionTime: ele.transactionTime };
+        return { ...ele, addresses: [{ address: ele.address, chainId: ele.addressChainId }] };
+      }),
+    [contactMap],
+  );
+
+  // init Recent
+  useEffectOnce(() => {
+    fetchRecents().then(res => {
+      const { data, totalRecordCount } = res;
+
+      setSkipCount(MAX_RESULT_ACCOUNT);
+      setLoading(false);
+      setRecentList(transFormData(data as ApiRecentAddressItemType[]));
+      setRecentTotalNumber(totalRecordCount);
+    });
+  });
+
+  // fetchMoreRecent
+  useCallback;
+  const fetchMoreRecent = useCallback(() => {
+    fetchRecents().then(res => {
+      const { data, totalRecordCount } = res;
+
+      setSkipCount(skipCount + MAX_RESULT_ACCOUNT);
+      setLoading(false);
+      setRecentList([...recentList, ...transFormData(data as ApiRecentAddressItemType[])]);
+      setRecentTotalNumber(totalRecordCount);
+    });
+  }, [skipCount, fetchRecents, recentList, transFormData]);
 
   const tabList = useMemo(() => {
     return [
@@ -185,9 +255,17 @@ export default function SelectContact(props: SelectContactProps) {
           ) : (
             <View style={styles.recentListWrap}>
               <FlashList
-                data={mockList}
+                data={recentList}
                 renderItem={renderItem}
                 ListFooterComponent={<TextS style={styles.footer}>{t('No Data')}</TextS>}
+                onEndReached={() => {
+                  if (recentTotalNumber <= recentList.length) return;
+                  if (loading) return;
+
+                  console.log('recentTotalNumberrecentTotalNumberrecentTotalNumber', recentTotalNumber, loading);
+
+                  fetchMoreRecent();
+                }}
               />
             </View>
           ),
@@ -208,7 +286,7 @@ export default function SelectContact(props: SelectContactProps) {
           ),
       },
     ];
-  }, [renderItem, t]);
+  }, [fetchMoreRecent, loading, recentList, recentTotalNumber, renderItem, t]);
 
   return <CommonTopTab tabList={tabList} />;
 }

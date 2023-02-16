@@ -1,4 +1,4 @@
-import { LoginQRData, QRData } from '@portkey/types/types-ca/qrcode';
+import { LoginQRData, QRData, SendTokenQRData } from '@portkey/types/types-ca/qrcode';
 import { isAddress } from '@portkey/utils';
 import CommonToast from 'components/CommonToast';
 import navigationService from './navigationService';
@@ -9,14 +9,14 @@ export function invalidQRCode() {
 }
 
 export function handleQRCodeData(data: QRData) {
-  const { type } = data;
+  const { type, address, chainType } = data;
+  if (!isAddress(address, chainType)) return invalidQRCode();
+
   if (type !== 'login') {
     // send event
     // not current network
-    navigationService.navigate('SendHome', { sendInfo: data });
+    navigationService.navigate('SendHome', { sendInfo: data as SendTokenQRData });
   } else {
-    const { address, chainType } = data as LoginQRData;
-    if (!isAddress(address, chainType)) return invalidQRCode();
-    navigationService.navigate('ScanLogin', { data });
+    navigationService.navigate('ScanLogin', { data: data as LoginQRData });
   }
 }

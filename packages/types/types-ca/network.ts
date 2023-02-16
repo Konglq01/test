@@ -6,5 +6,6 @@ export type NetworkItem = {
   isActive?: boolean;
   apiUrl: string;
   graphqlUrl: string;
+  networkIconUrl?: string;
   connectUrl: string;
 };

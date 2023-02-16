@@ -21,9 +21,15 @@ import { request } from '@portkey/api/api-did';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { DEVICE_TYPE } from 'constants/common';
 import { useGetHolderInfo } from 'hooks/guardian';
+import { useAppCommonDispatch } from '@portkey/hooks';
+import { addFailedActivity } from '@portkey/store/store-ca/activity/slice';
+import { useAppCASelector } from '@portkey/hooks/hooks-ca';
+
 export default function HomeScreen() {
   const wallet = useCurrentWalletInfo();
   const getCurrentCAContract = useGetCurrentCAContract();
+  const dispatch = useAppCommonDispatch();
+  const activity = useAppCASelector(state => state.activity);
 
   const pin = usePin();
   const chainInfo = useCurrentChain('AELF');
@@ -75,7 +81,8 @@ export default function HomeScreen() {
               methodName: 'Transfer',
               args: {
                 symbol: 'ELF',
-                to: '2PfWcs9yhY5xVcJPskxjtAHiKyNUbX7wyWv2NcwFJEg9iNfnPj',
+                // to: '2PfWcs9yhY5xVcJPskxjtAHiKyNUbX7wyWv2NcwFJEg9iNfnPj',
+                to: 'ELF_nn659b9X1BLhnu5RWmEUbuuV7J9QKVVSN54j9UmeCbF3Dve5D_AELF',
                 amount: 1 * 10 ** 8,
                 memo: 'transfer address1 to address2',
               },
@@ -164,6 +171,13 @@ export default function HomeScreen() {
             }
           }}
         />
+        <Button
+          title="add failedActivity"
+          onPress={() => {
+            dispatch(addFailedActivity({ timestamp: 100, transactionId: String(Math.random()) }));
+          }}
+        />
+        <Text>{JSON.stringify(activity)}</Text>
         <CrashTest />
       </ScrollView>
     </SafeAreaBox>

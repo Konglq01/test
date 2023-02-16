@@ -28,6 +28,8 @@ import TestSocket from 'pages/TestSocket';
 import Device from 'pages/AccountSetting/Devices';
 import SetPin from 'pages/AccountSetting/SetPin';
 import NotFound from 'pages/NotFound';
+import Example from 'pages/Example';
+import SignUpUI from 'pages/Example/SignUpUI';
 
 export const PageRouter = () =>
   useRoutes([
@@ -158,6 +160,14 @@ export const PageRouter = () =>
     {
       path: 'query-page',
       element: <QueryPage />,
+    },
+    {
+      path: '/test/example-ui',
+      element: <Example />,
+    },
+    {
+      path: '/test/example-SignUpUI',
+      element: <SignUpUI />,
     },
     {
       path: '/test/socket',

@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import '../styles/globals.less';
 import '../styles/common.less';
 import '../styles/antd.less';
-import Header from 'components/Header';
+import '@portkey/did-ui-react/dist/assets/index.css';
 import dynamic from 'next/dynamic';
 import PageHead from 'components/PageHead';
 import { Provider as ReduxProvider } from 'react-redux';

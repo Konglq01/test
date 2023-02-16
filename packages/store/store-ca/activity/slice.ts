@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { NetworkType } from '@portkey/types/index';
+import { the2ThFailedActivityItemType } from '@portkey/types/types-ca/activity';
 import { getActivityListAsync } from './action';
 import { ActivityStateType } from './type';
 
@@ -8,6 +9,8 @@ const initialState: ActivityStateType = {
   skipCount: 0,
   data: [],
   totalRecordCount: 0,
+  isFetchingActivities: false,
+  failedActivityMap: {},
 };
 
 //it automatically uses the immer library to let you write simpler immutable updates with normal mutative code
@@ -17,6 +20,9 @@ export const activitySlice = createSlice({
   reducers: {
     addPage: (state, { payload }: { payload: NetworkType }) => {
       state.skipCount += state.maxResultCount;
+    },
+    addFailedActivity: (state, { payload }: { payload: the2ThFailedActivityItemType }) => {
+      state.failedActivityMap[payload?.transactionId] = payload;
     },
     clearState: state => (state = initialState),
   },
@@ -29,6 +35,6 @@ export const activitySlice = createSlice({
   },
 });
 
-export const { addPage, clearState } = activitySlice.actions;
+export const { addPage, addFailedActivity, clearState } = activitySlice.actions;
 
 export default activitySlice;

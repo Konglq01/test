@@ -4,7 +4,8 @@ const { ANALYZE, NODE_ENV } = process.env;
 const pluginConfig = require('./build/plugin');
 const development = require('./build/development');
 const production = require('./build/production');
+const withTM = require('next-transpile-modules')(['antd-mobile', '@portkey/did-ui-react']);
 
 const config = ANALYZE === 'true' || NODE_ENV === 'production' ? production : development;
 
-module.exports = withPlugins(pluginConfig, config);
+module.exports = withPlugins(pluginConfig, withTM(config));

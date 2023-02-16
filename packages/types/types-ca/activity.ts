@@ -34,3 +34,8 @@ export type TransactionFees = {
   fee: string;
   feeInUsd: string;
 };
+
+export type the2ThFailedActivityItemType = {
+  timestamp: number;
+  transactionId: string;
+};

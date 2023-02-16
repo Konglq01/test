@@ -1,21 +1,21 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { RateBaseType, NFTBaseItemType, NFTSeriesBaseItemType } from '@portkey/types/types-ca/assets';
 import { fetchAssetList, fetchNFTSeriesList, fetchNFTList, fetchTokenList } from './api';
-import { TokenItemShowType } from '@portkey/types/types-ca/token';
+import { AccountAssets, TokenItemShowType } from '@portkey/types/types-ca/token';
 
 // asset = token + nft
 export type AssetsStateType = {
   accountToken: {
     isFetching: boolean;
-    SkipCount: number;
-    MaxResultCount: number;
+    skipCount: number;
+    maxResultCount: number;
     accountTokenList: TokenItemShowType[];
     totalRecordCount: number;
   };
   accountNFT: {
     isFetching: boolean;
-    SkipCount: number;
-    MaxResultCount: number;
+    skipCount: number;
+    maxResultCount: number;
     accountNFTList: NFTSeriesBaseItemType[];
     totalRecordCount: number;
   };
@@ -28,9 +28,9 @@ export type AssetsStateType = {
   accountBalance: number;
   accountAssets: {
     isFetching: boolean;
-    SkipCount: number;
-    MaxResultCount: number;
-    accountAssetsList: TokenItemShowType[];
+    skipCount: number;
+    maxResultCount: number;
+    accountAssetsList: AccountAssets;
     totalRecordCount: number;
   };
 };
@@ -38,22 +38,22 @@ export type AssetsStateType = {
 const initialState: AssetsStateType = {
   accountToken: {
     isFetching: false,
-    SkipCount: 0,
-    MaxResultCount: 10,
+    skipCount: 0,
+    maxResultCount: 10,
     accountTokenList: [],
     totalRecordCount: 0,
   },
   accountNFT: {
     isFetching: false,
-    SkipCount: 0,
-    MaxResultCount: 10,
+    skipCount: 0,
+    maxResultCount: 10,
     accountNFTList: [],
     totalRecordCount: 0,
   },
   accountAssets: {
     isFetching: false,
-    SkipCount: 0,
-    MaxResultCount: 10,
+    skipCount: 0,
+    maxResultCount: 10,
     accountAssetsList: [],
     totalRecordCount: 0,
   },
@@ -67,37 +67,53 @@ const initialState: AssetsStateType = {
 // fetch tokenList on Dashboard
 export const fetchTokenListAsync = createAsyncThunk(
   'fetchTokenListAsync',
-  async ({ type }: { type: any }, { getState, dispatch }) => {
+  async (
+    {
+      caAddresses,
+      skipCount = 0,
+      maxResultCount = 1000,
+    }: { caAddresses: string[]; skipCount?: number; maxResultCount?: number },
+    { getState, dispatch },
+  ) => {
     const { assets } = getState() as { assets: AssetsStateType };
     const {
       accountToken: { totalRecordCount, accountTokenList },
     } = assets;
 
-    if (totalRecordCount === 0 || totalRecordCount > accountTokenList.length) {
-      const response = await fetchTokenList({ networkType: type, pageNo: 1, pageSize: 1000 });
+    // if (totalRecordCount === 0 || totalRecordCount > accountTokenList.length) {
+    const response = await fetchTokenList({ caAddresses, skipCount, maxResultCount });
+    return { list: response.data, totalRecordCount: response.totalRecordCount };
+    // }
 
-      return { type, list: response.data.data, totalRecordCount: response.data.totalRecordCount };
-    }
-
-    return { type, list: [], totalRecordCount };
+    // return { list: [], totalRecordCount };
   },
 );
 
 // fetch nftSeriesList on Dashboard
 export const fetchNFTSeriesAsync = createAsyncThunk(
   'fetchNFTSeriesAsync',
-  async ({ type }: { type: any }, { getState, dispatch }) => {
+  async (
+    {
+      caAddresses,
+      skipCount = 0,
+      maxResultCount = 1000,
+    }: {
+      caAddresses: string[];
+      skipCount: number;
+      maxResultCount: number;
+    },
+    { getState, dispatch },
+  ) => {
     const { assets } = getState() as { assets: AssetsStateType };
     const {
       accountNFT: { totalRecordCount, accountNFTList },
     } = assets;
+    // if (totalRecordCount === 0 || totalRecordCount > accountNFTList.length) {
+    const response = await fetchNFTSeriesList({ caAddresses, skipCount, maxResultCount });
+    return { list: response.data, totalRecordCount: response.totalRecordCount };
+    // }
 
-    if (totalRecordCount === 0 || totalRecordCount > accountNFTList.length) {
-      const response = await fetchNFTSeriesList({ networkType: type, pageNo: 1, pageSize: 1000 });
-      return { type, list: response.data.data, totalRecordCount: response.data.totalRecordCount };
-    }
-
-    return { type, list: [], totalRecordCount };
+    return { list: [], totalRecordCount };
   },
 );
 
@@ -113,7 +129,7 @@ export const fetchNFTAsync = createAsyncThunk(
 
     if (totalRecordCount === 0 || totalRecordCount > accountNFTList.length) {
       const response = await fetchNFTList({ networkType: type, pageNo: 1, pageSize: 1000, id });
-      return { type, list: response.data.data, totalRecordCount: response.data.totalRecordCount };
+      return { list: response.data, totalRecordCount: response.totalRecordCount };
     }
 
     return { type, list: [], totalRecordCount, id };
@@ -123,18 +139,20 @@ export const fetchNFTAsync = createAsyncThunk(
 // fetch current assets when add sent button
 export const fetchAssetAsync = createAsyncThunk(
   'fetchAssetsAsync',
-  async ({ type }: { type: any }, { getState, dispatch }) => {
-    const { assets } = getState() as { assets: AssetsStateType };
-    const {
-      accountAssets: { totalRecordCount, accountAssetsList },
-    } = assets;
+  async ({ caAddresses, keyWord }: { caAddresses: string[]; keyWord: string }, { getState, dispatch }) => {
+    // const { assets } = getState() as { assets: AssetsStateType };
+    // const {
+    //   accountAssets: { totalRecordCount, accountAssetsList },
+    // } = assets;
 
-    if (totalRecordCount === 0 || totalRecordCount > accountAssetsList.length) {
-      const response = await fetchAssetList({ networkType: type, pageNo: 1, pageSize: 1000 });
-      return { type, list: response.data.data, totalRecordCount: response.data.totalRecordCount };
-    }
+    // if (totalRecordCount === 0 || totalRecordCount > accountAssetsList.length) {
+    const response = await fetchAssetList({ caAddresses, keyWord, pageNo: 1, pageSize: 1000 });
+    console.log('---fetchAssetList', response);
 
-    return { type, list: [], totalRecordCount };
+    return { list: response.data, totalRecordCount: response.totalRecordCount };
+    // }
+
+    // return { type, list: [], totalRecordCount };
   },
 );
 
@@ -158,7 +176,7 @@ export const assetsSlice = createSlice({
         // state.status = 'loading';
       })
       .addCase(fetchTokenListAsync.fulfilled, (state, action) => {
-        const { type, list, totalRecordCount } = action.payload;
+        const { list, totalRecordCount } = action.payload;
 
         // calc total;
         let totalBalance: number = 0;
@@ -170,7 +188,7 @@ export const assetsSlice = createSlice({
 
         // state.accountToken.accountTokenList = [...state.accountToken.accountTokenList, ...list];
         state.accountToken.accountTokenList = list;
-        state.accountToken.SkipCount = state.accountToken.accountTokenList.length;
+        state.accountToken.skipCount = state.accountToken.accountTokenList.length;
         state.accountToken.totalRecordCount = totalRecordCount;
         state.accountToken.isFetching = false;
       })
@@ -182,10 +200,10 @@ export const assetsSlice = createSlice({
         // state.status = 'loading';
       })
       .addCase(fetchNFTSeriesAsync.fulfilled, (state, action) => {
-        const { type, list, totalRecordCount } = action.payload;
+        const { list, totalRecordCount } = action.payload;
 
         state.accountNFT.accountNFTList = [...state.accountNFT.accountNFTList, ...list];
-        state.accountNFT.SkipCount = state.accountNFT.accountNFTList.length;
+        state.accountNFT.skipCount = state.accountNFT.accountNFTList.length;
         state.accountNFT.totalRecordCount = totalRecordCount;
         state.accountNFT.isFetching = false;
       })
@@ -201,8 +219,8 @@ export const assetsSlice = createSlice({
         if (!currentNFTSeriesItem) return;
         if (!currentNFTSeriesItem?.children) currentNFTSeriesItem.children = [];
 
-        currentNFTSeriesItem.children = [...currentNFTSeriesItem?.children, list];
-        currentNFTSeriesItem.SkipCount = currentNFTSeriesItem.children.length;
+        currentNFTSeriesItem.children = [...currentNFTSeriesItem?.children, ...list];
+        currentNFTSeriesItem.skipCount = currentNFTSeriesItem.children.length;
         currentNFTSeriesItem.totalRecordCount = totalRecordCount;
         currentNFTSeriesItem.isFetching = false;
       })
@@ -214,10 +232,10 @@ export const assetsSlice = createSlice({
         // state.status = 'loading';
       })
       .addCase(fetchAssetAsync.fulfilled, (state, action) => {
-        const { type, list, totalRecordCount } = action.payload;
+        const { list, totalRecordCount } = action.payload;
 
         state.accountAssets.accountAssetsList = [...state.accountAssets.accountAssetsList, ...list];
-        state.accountAssets.SkipCount = state.accountAssets.accountAssetsList.length;
+        state.accountAssets.skipCount = state.accountAssets.accountAssetsList.length;
         state.accountAssets.totalRecordCount = totalRecordCount;
         state.accountAssets.isFetching = false;
       })

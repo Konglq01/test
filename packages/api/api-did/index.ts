@@ -4,6 +4,7 @@ import contactApi from './contact';
 import chainApi from './chain';
 import assetsApi from './assets1';
 import recentApi from './recent';
+import tokenApi from './token';
 
 import esApi from './es';
 import myServer, { DidService } from './server';
@@ -38,6 +39,7 @@ export const EXPAND_APIS = {
   activity: activityApi,
   assets: assetsApi,
   recent: recentApi,
+  token: tokenApi,
 };
 
 export type BASE_REQ_TYPES = {
