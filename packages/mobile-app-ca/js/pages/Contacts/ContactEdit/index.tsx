@@ -292,13 +292,14 @@ const ContactEdit: React.FC = () => {
         label={t('Name')}
         placeholder={t('Enter name')}
         inputStyle={pageStyles.nameInputStyle}
+        labelStyle={pageStyles.nameLableStyle}
         value={editContact.name}
         onChangeText={onNameChange}
         errorMessage={editContact.error.isError ? editContact.error.errorMsg : ''}
       />
       <KeyboardAwareScrollView extraHeight={pTd(300)} keyboardShouldPersistTaps="handled" keyboardOpeningTime={0}>
         <TouchableWithoutFeedback>
-          <View>
+          <View style={GStyles.paddingArg(0, 4)}>
             {editContact.addresses.map((addressItem, addressIdx) => (
               <ContactAddress
                 key={addressIdx}
@@ -338,7 +339,7 @@ const ContactEdit: React.FC = () => {
         {isEdit ? t('Save') : t('Add')}
       </CommonButton>
       {isEdit && (
-        <CommonButton style={GStyles.marginTop(12)} onPress={onDelete} titleStyle={FontStyles.font12} type="clear">
+        <CommonButton style={GStyles.marginTop(8)} onPress={onDelete} titleStyle={FontStyles.font12} type="clear">
           {t('Delete')}
         </CommonButton>
       )}
