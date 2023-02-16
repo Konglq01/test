@@ -8,10 +8,10 @@ import CustomPassword from 'components/CustomPassword';
 import ConfirmPassword from 'components/ConfirmPassword';
 import BackHeader from 'components/BackHeader';
 import CustomSvg from 'components/CustomSvg';
-import './index.less';
 import { useNavigate } from 'react-router';
 import BaseDrawer from 'components/BaseDrawer';
 import { setPasswordSeed } from 'store/reducers/user/slice';
+import './index.less';
 
 const FormItem = Form.Item;
 
@@ -122,7 +122,6 @@ export default function SetPin() {
           onFinishFailed={onFinishFailed}
           autoComplete="off">
           <div className="form-content">
-            {/* <FormItem name="newPin"> */}
             <ConfirmPassword
               label={{
                 password: 'Please choose a new pin',
@@ -131,7 +130,6 @@ export default function SetPin() {
               validateFields={form.validateFields}
               isPasswordLengthTipShow={true}
             />
-            {/* </FormItem> */}
           </div>
           <div className="form-footer">
             <FormItem shouldUpdate>

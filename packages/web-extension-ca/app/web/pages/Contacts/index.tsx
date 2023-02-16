@@ -122,7 +122,7 @@ export default function Contacts() {
         ) : (
           <IndexBar>
             {curList.map(({ index, contacts }) => {
-              return (
+              return contacts.length ? (
                 <IndexBar.Panel
                   className={!contacts.length && isSearch ? 'contact-empty' : ''}
                   index={index}
@@ -143,6 +143,8 @@ export default function Contacts() {
                     ))}
                   </List>
                 </IndexBar.Panel>
+              ) : (
+                <></>
               );
             })}
           </IndexBar>
