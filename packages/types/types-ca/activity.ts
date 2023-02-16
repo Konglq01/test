@@ -1,17 +1,38 @@
+import { TransactionTypes } from '@portkey/constants/constants-ca/activity';
+
 export type ActivityItemType = {
-  chainId: String;
-  token: {
-    id: String;
-    chainId: String;
-    symbol: String;
-    address: String;
-  };
-  from: String;
-  to: String;
-  transactionId: String;
-  amount: number;
-  type: number; // 0: login, 1；transfer
-  timestamp: number;
+  chainId: string;
+  transactionType: TransactionTypes;
+  from: string; // wallet name
+  to: string; // to user nick name
+  fromAddress: string;
+  toAddress: string;
+  fromChainId: string;
+  toChainId: string;
+  status: string;
+  transactionId: string;
+  blockHash: string; // The chain may have forks, use transactionId and blockHash to uniquely determine the transaction
+  timestamp: string;
+  isReceived: boolean; // Is it a received transaction
+  amount: string;
+  symbol: string;
+  decimal?: string;
+  priceInUsd?: string;
+  nftInfo?: NftInfo;
+  transactionFees: TransactionFees[];
+  listIcon?: string;
+};
+
+export type NftInfo = {
+  imageUrl: string;
+  alias: string;
+  nftId: string;
+};
+
+export type TransactionFees = {
+  symbol: string;
+  fee: string;
+  feeInUsd: string;
 };
 
 export type the2ThFailedActivityItemType = {

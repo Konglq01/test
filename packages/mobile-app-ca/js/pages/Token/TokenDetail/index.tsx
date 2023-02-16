@@ -19,7 +19,7 @@ import { FlashList } from '@shopify/flash-list';
 import GStyles from 'assets/theme/GStyles';
 import { FontStyles } from 'assets/theme/styles';
 import { TextXL } from 'components/CommonText';
-import { fetchActivitiesAsync } from '@portkey/store/store-ca/activity/slice';
+import { getActivityListAsync } from '@portkey/store/store-ca/activity/action';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { TokenItemShowType } from '@portkey/types/types-ca/token';
 import { useWallet } from 'hooks/store';
@@ -90,7 +90,7 @@ const TokenDetail: React.FC = () => {
   }, [activity]);
 
   useEffectOnce(() => {
-    dispatch(fetchActivitiesAsync({ type: 'MAIN' }));
+    dispatch(getActivityListAsync({ type: 'MAIN' }));
   });
 
   // const balanceFormat = useCallback((symbol: string, decimals = 8) => ZERO.plus('0').div(`1e${decimals}`), []);

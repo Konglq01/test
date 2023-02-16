@@ -136,8 +136,13 @@
       margin-bottom: 24px;
       .value {
         .left {
-          color: @font-15;
           font-weight: 500;
+        }
+        .confirmed {
+          color: @font-15;
+        }
+        .failed {
+          color: @font-14;
         }
         .right {
           color: @font-11;
@@ -208,6 +213,13 @@
           .right {
             color: @font-11;
             font-weight: 500;
+            .right-usd {
+              display: block;
+              text-align: right;
+              color: @font-13;
+              font-size: 12px;
+              font-weight: 400;
+            }
           }
           .tx-id {
             display: flex;
