@@ -12,6 +12,7 @@ export interface IActivitysApiParams {
   maxResultCount: number;
   skipCount: number;
   caAddresses?: string[];
+  managerAddresses?: string[];
   transactionTypes?: TransactionTypes[];
   chainId?: string;
   symbol?: string;
@@ -25,4 +26,5 @@ export interface IActivitysApiResponse {
 export interface IActivityApiParams {
   transactionId: string;
   blockHash: string;
+  caAddresses?: string[];
 }
