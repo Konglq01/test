@@ -31,7 +31,7 @@ export type NftInfo = {
 
 export type TransactionFees = {
   symbol: string;
-  fee: string;
+  fee: number;
   feeInUsd: string;
 };
 

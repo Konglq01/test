@@ -25,6 +25,10 @@ export const transactionTypesForActivityList = [
   TransactionTypes.REMOVE_MANAGER,
 ];
 
+/**
+ * According to the TransactionTypes, it is converted into a text for page display.
+ * @used ActivityListPage and ActivityDetailPage
+ */
 export const transactionTypesMap = (type: TransactionTypes, nftId?: string): string => {
   let newType: string = TransactionTypes.TRANSFER;
   switch (type) {
