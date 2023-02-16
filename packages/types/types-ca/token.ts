@@ -4,7 +4,7 @@ import { AccountType } from '../wallet';
 export interface BaseToken {
   id?: string; // id
   chainId: string;
-  decimals: number; // 8
+  decimal: number; // 8
   address: string; // "ArPnUb5FtxG2oXTaWX2DxNZowDEruJLs2TEkhRCzDdrRDfg8B",        token address  contract address
   symbol: string; // "ELF"   the name showed
   name: string;
@@ -12,7 +12,7 @@ export interface BaseToken {
 
 export interface TokenItemType extends BaseToken {
   isDefault: boolean; // boolean,
-  tokenName: string; //  "ELF"
+  tokenName?: string; //  "ELF"
   chainId: string; // string "AELF"
 }
 export interface TokenItemShowType extends TokenItemType {
@@ -21,6 +21,7 @@ export interface TokenItemShowType extends TokenItemType {
   imageUrl?: string;
   balance?: string;
   balanceInUsd?: string;
+  userTokenId?: string;
 }
 
 export type UserTokenItemTokenType = Omit<BaseToken, 'name'> & { chainId: string };
@@ -45,9 +46,9 @@ export type UserTokenListType = UserTokenItemType[];
 
 // assets token+nft
 export interface TokenInfo {
-  balance: string;
-  decimals: string;
-  balanceInUsd: string;
+  balance?: string;
+  decimal: string;
+  balanceInUsd?: string;
 }
 
 export interface NftInfo {
@@ -61,8 +62,8 @@ export interface AccountAssetItem {
   chainId: string;
   symbol: string;
   address: string;
-  tokenInfo?: TokenInfo[];
-  nftInfo?: NftInfo[];
+  tokenInfo?: TokenInfo;
+  nftInfo?: NftInfo;
 }
 
 export type AccountAssets = AccountAssetItem[];
@@ -80,9 +81,12 @@ export type UseTokenDeleteType = (
 export type FilterTokenList = (token_name: string, address: string) => TokenItemShowType;
 
 export interface TokenState {
-  addedTokenData: AddedTokenData;
-  tokenDataShowInMarket: UserTokenListType;
-  isFetchingTokenList: Boolean;
+  isFetching: boolean;
+  // addedTokenData: AddedTokenData;
+  tokenDataShowInMarket: TokenItemShowType[];
+  skipCount: number;
+  maxResultCount: number;
+  totalRecordCount: number;
 }
 
 export interface AccountItemType {

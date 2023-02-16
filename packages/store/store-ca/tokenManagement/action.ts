@@ -1,16 +1,22 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { createAction } from '@reduxjs/toolkit';
-import { HandleTokenArgTypes } from '@portkey/types/types-ca/token';
-import { fetchUserTokenList } from './api';
+import { HandleTokenArgTypes, TokenState } from '@portkey/types/types-ca/token';
+import { fetchAllTokenList } from './api';
 
 export const addTokenInCurrentAccount = createAction<HandleTokenArgTypes>('token/addTokenInCurrentAccount');
 
 export const deleteTokenInCurrentAccount = createAction<HandleTokenArgTypes>('token/deleteTokenInCurrentAccount');
 
-export const fetchTokenListAsync = createAsyncThunk(
-  'tokenManagement/fetchTokenList',
-  async ({ pageNo, pageSize, keyword }: { pageNo: number; pageSize: number; keyword: string }) => {
-    const response = await fetchUserTokenList({ pageNo, pageSize, keyword });
-    return { list: response.items };
+export const fetchAllTokenListAsync = createAsyncThunk(
+  'tokenManagement/fetchAllTokenListAsync',
+  async ({ keyword = '' }: { keyword?: string }, { getState, dispatch }) => {
+    const { totalRecordCount, skipCount, maxResultCount } = getState() as TokenState;
+
+    // if (totalRecordCount === 0 || totalRecordCount > accountTokenList.length) {
+    const response = await fetchAllTokenList({ skipCount, maxResultCount, keyword });
+    return { list: response.items, totalRecordCount: response.totalRecordCount };
+    // }
+
+    // return { list: [], totalRecordCount };
   },
 );

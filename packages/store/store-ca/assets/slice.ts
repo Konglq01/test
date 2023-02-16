@@ -146,13 +146,12 @@ export const fetchAssetAsync = createAsyncThunk(
     // } = assets;
 
     // if (totalRecordCount === 0 || totalRecordCount > accountAssetsList.length) {
-    const response = await fetchAssetList({ caAddresses, keyWord, pageNo: 1, pageSize: 1000 });
-    console.log('---fetchAssetList', response);
+    const response = await fetchAssetList({ caAddresses, keyWord, skipCount: 1, maxResultCount: 1000 });
 
     return { list: response.data, totalRecordCount: response.totalRecordCount };
     // }
 
-    // return { type, list: [], totalRecordCount };
+    // return { list: [], totalRecordCount };
   },
 );
 
@@ -234,7 +233,8 @@ export const assetsSlice = createSlice({
       .addCase(fetchAssetAsync.fulfilled, (state, action) => {
         const { list, totalRecordCount } = action.payload;
 
-        state.accountAssets.accountAssetsList = [...state.accountAssets.accountAssetsList, ...list];
+        state.accountAssets.accountAssetsList = list;
+        // state.accountAssets.accountAssetsList = [...state.accountAssets.accountAssetsList, ...list];
         state.accountAssets.skipCount = state.accountAssets.accountAssetsList.length;
         state.accountAssets.totalRecordCount = totalRecordCount;
         state.accountAssets.isFetching = false;

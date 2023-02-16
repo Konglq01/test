@@ -1,18 +1,16 @@
 import { request } from '@portkey/api/api-did';
-import { UserTokenListType } from '@portkey/types/types-ca/token';
-import { isAddress } from '@portkey/utils';
 
-export function fetchUserTokenList({
-  pageSize,
-  pageNo,
+export function fetchAllTokenList({
+  maxResultCount,
+  skipCount,
   keyword,
   chainIdArray = ['AELF'],
 }: {
-  pageSize: number;
-  pageNo: number;
+  maxResultCount: number;
+  skipCount: number;
   keyword: string;
   chainIdArray?: string[];
-}): Promise<{ items: UserTokenListType }> {
+}): Promise<{ items: any[]; totalRecordCount: number }> {
   const chainIdSearchLanguage = chainIdArray.map(chainId => `token.chainId:${chainId}`).join(' AND ');
 
   const filterKeyWords = keyword?.length < 10 ? `token.symbol:*${keyword}*~` : `token.address:${keyword}`;
@@ -23,8 +21,8 @@ export function fetchUserTokenList({
       // sort: 'token.chainId',
       sort: 'sortWeight',
       sortType: 1,
-      skipCount: (pageNo - 1) * pageSize,
-      maxResultCount: pageSize,
+      skipCount,
+      maxResultCount,
     },
   });
 }
