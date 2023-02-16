@@ -9,7 +9,7 @@ export const pageStyles = StyleSheet.create({
   pageWrap: {
     flex: 1,
     backgroundColor: bg4,
-    ...GStyles.paddingArg(24, 20, 20),
+    ...GStyles.paddingArg(24, 16, 20),
   },
   addAddressBtn: {
     alignSelf: 'center',
@@ -21,6 +21,9 @@ export const pageStyles = StyleSheet.create({
   nameInputStyle: {
     color: font5,
     fontSize: pTd(14),
+  },
+  nameLableStyle: {
+    marginLeft: pTd(4),
   },
   deleteTitle: {
     color: error1,
