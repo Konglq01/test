@@ -6,23 +6,21 @@ export function fetchUserTokenList({
   pageSize,
   pageNo,
   keyword,
-  chainIdArray = ['AELF'],
+  chainIdArray = ['AELF', 'tDVV', 'tDVW'],
 }: {
   pageSize: number;
   pageNo: number;
   keyword: string;
   chainIdArray?: string[];
 }): Promise<{ items: UserTokenListType }> {
-  const chainIdSearchLanguage = chainIdArray.map(chainId => `token.chainId:${chainId}`).join(' AND ');
+  const chainIdSearchLanguage = chainIdArray.map(chainId => `token.chainId:${chainId}`).join(' OR ');
 
-  const filterKeyWords = keyword?.length < 10 ? `token.symbol:*${keyword}*~` : `token.address:${keyword}`;
+  const filterKeywords = keyword?.length < 10 ? `token.symbol:*${keyword}*~` : `token.address:${keyword}`;
 
   return request.es.getUserTokenList({
     params: {
-      filter: `${filterKeyWords} AND ${chainIdSearchLanguage}`,
-      // sort: 'token.chainId',
-      sort: 'sortWeight',
-      sortType: 1,
+      filter: `${filterKeywords} AND (${chainIdSearchLanguage})`,
+      sort: 'sortWeight desc,token.symbol acs',
       skipCount: (pageNo - 1) * pageSize,
       maxResultCount: pageSize,
     },
