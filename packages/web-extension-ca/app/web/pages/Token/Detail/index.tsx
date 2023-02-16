@@ -20,6 +20,10 @@ function TokenDetail() {
   const { currentNetwork } = useWalletInfo();
   const { state } = useLocation();
   const isMain = useMemo(() => currentNetwork === 'MAIN', [currentNetwork]);
+  const currentChain = useMemo(
+    () => (currentToken?.chainId.toLocaleLowerCase() === 'aelf' ? 'MainChain' : 'SideChain'),
+    [currentToken],
+  );
 
   useEffect(() => {
     const { tokenInfo } = state;
@@ -31,8 +35,8 @@ function TokenDetail() {
       <SettingHeader
         title={
           <div className="title">
-            {/* <p className="symbol">{currentToken?.token.symbol}</p> */}
-            <p className="network">MainChain AELF {isMain || 'Testnet'}</p>
+            <p className="symbol">{currentToken?.symbol}</p>
+            <p className="network">{`${currentChain} ${currentToken?.chainId} ${isMain || 'Testnet'}`}</p>
           </div>
         }
         leftCallBack={() => navigate(-1)}
@@ -40,18 +44,18 @@ function TokenDetail() {
       <div className="token-detail-content">
         <div className="balance">
           <div className="balance-amount">
-            {/* <span className="amount">
-              {unitConverter(currentToken?.amount)} {currentToken?.token.symbol}
-            </span> */}
-            {/* {isMain && <span className="convert">$ {unitConverter(currentToken?.amountUsd)}</span>} */}
+            <span className="amount">
+              {unitConverter(currentToken?.balance)} {currentToken?.symbol}
+            </span>
+            {isMain && <span className="convert">$ {unitConverter(currentToken?.balanceInUsd)}</span>}
           </div>
-          {/* <BalanceCard
-            amount={currentToken?.amountUsd}
+          <BalanceCard
+            amount={currentToken?.balanceInUsd}
             onSend={() => {
-              navigate(`/send/${currentToken?.token.symbol}`);
+              navigate(`/send/${currentToken?.symbol}`);
             }}
-            onReceive={() => navigate(`/receive/${currentToken?.token.symbol}/${currentToken?.token.chainId}`)}
-          /> */}
+            onReceive={() => navigate(`/receive/${currentToken?.symbol}/${currentToken?.chainId}`)}
+          />
         </div>
       </div>
       <div className="token-detail-history">

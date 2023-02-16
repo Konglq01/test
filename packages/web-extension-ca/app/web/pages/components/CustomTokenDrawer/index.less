@@ -39,6 +39,44 @@
     margin-bottom: 0;
   }
   .list {
+    .protocol {
+      display: flex;
+      align-items: center;
+      .avatar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 6px;
+        background-color: @bg-15;
+        font-size: 20px;
+        color: @font-12;
+        margin-right: 12px;
+      }
+      .info {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        gap: 4px;
+        .alias {
+          line-height: 22px;
+          font-size: 16px;
+          color: @font-11;
+        }
+        .network {
+          line-height: 20px;
+          font-size: 14px;
+          color: @font-13;
+        }
+      }
+      .amount {
+        align-self: flex-start;
+        line-height: 22px;
+        font-size: 18px;
+        color: @font-11;
+      }
+    }
     .item {
       display: flex;
       align-items: center;

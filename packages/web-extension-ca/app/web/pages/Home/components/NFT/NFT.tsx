@@ -15,7 +15,7 @@ export default function NFT() {
   const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? currentNetwork : ''), [currentNetwork]);
   return (
     <div className="tab-nft">
-      {noData ? (
+      {!noData ? (
         <p className="empty-text">No NFTs yet</p>
       ) : (
         <List className="nft-list">
