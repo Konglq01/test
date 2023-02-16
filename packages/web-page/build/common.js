@@ -17,4 +17,29 @@ module.exports = {
   sentry: {
     hideSourceMaps: true,
   },
+  webpack: config => {
+    // Important: return the modified config
+    config.module.rules.push({
+      test: /\.ts?$/,
+      exclude: '/node-modules/',
+      use: [
+        {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env'],
+          },
+        },
+        {
+          loader: 'ts-loader',
+          options: {
+            compilerOptions: {
+              noEmit: false,
+            },
+          },
+        },
+      ],
+    });
+
+    return config;
+  },
 };

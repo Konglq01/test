@@ -28,14 +28,26 @@
     "app:ca": "yarn workspace mobile-ca run",
     "extension:ca": "yarn workspace web-extension-ca run",
     "graphql": "yarn workspace @portkey/graphql run",
-    "page": "yarn workspace web-page run"
+    "page": "yarn workspace web-page run",
+    "did-ui:build": "yarn workspace @portkey/did-ui-react run build"
   },
   "devDependencies": {
+    "rollup": "3.15.0",
     "eslint": "^8.23.1",
     "eslint-plugin-react": "^7.31.8",
     "husky": "^8.0.1",
     "lerna": "^5.5.2",
-    "lint-staged": ">=13"
+    "lint-staged": ">=13",
+    "@rollup/plugin-url": "^8.0.1",
+    "@rollup/plugin-image": "^3.0.2",
+    "rollup-plugin-copy": "^3.4.0",
+    "esbuild": "^0.17.7",
+    "postcss": "^8.4.21",
+    "rollup-plugin-css-porter": "^1.0.2",
+    "rollup-plugin-esbuild": "5.0.0",
+    "rollup-plugin-lit-css": "4.0.1",
+    "rollup-plugin-minify-html-literals": "1.2.6",
+    "rollup-plugin-postcss": "^4.0.2"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": "eslint --cache --fix"
