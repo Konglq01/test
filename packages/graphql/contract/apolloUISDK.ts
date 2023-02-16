@@ -1,5 +1,4 @@
 import { ApolloClient, HttpLink, InMemoryCache, NormalizedCacheObject } from '@apollo/client';
-import { NetworkType } from '@portkey/types';
 
 export const networkClientMap: Record<string, ApolloClient<NormalizedCacheObject>> = {};
 

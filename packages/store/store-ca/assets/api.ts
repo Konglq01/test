@@ -94,5 +94,5 @@ export function fetchNFTList({
 }): Promise<{ data: any[]; totalRecordCount: number }> {
   console.log('fetching....list', networkType, pageSize, pageNo);
 
-  return new Promise(resolve => setTimeout(() => resolve(mockNFTsData), 500));
+  return new Promise(resolve => setTimeout(() => resolve([] as any), 500));
 }
