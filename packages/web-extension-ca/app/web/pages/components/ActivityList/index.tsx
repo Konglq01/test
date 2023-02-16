@@ -66,30 +66,40 @@ export default function ActivityList({ data, hasMore, loadMore }: IActivityListP
     );
   };
 
-  const fromAndUsdUI = (item: ActivityItemType) => {
-    const { isReceived, fromAddress, toAddress, priceInUsd, nftInfo } = item;
-    const from = isReceived ? toAddress : fromAddress;
+  const fromAndUsdUI = useCallback(
+    (item: ActivityItemType) => {
+      const { isReceived, fromAddress, toAddress, priceInUsd, nftInfo } = item;
+      const from = isReceived ? toAddress : fromAddress;
 
-    return (
-      <p className="row-2">
-        <span>From: {from?.replace(/(?<=^\w{7})\w*(?=\w{4}$)/, '...')}</span>
-        {nftInfo?.nftId && <span>{nftInfo.alias}</span>}
-        {!isTestNet && !nftInfo?.nftId && <span>$ {unitConverter(ZERO.plus(priceInUsd ?? 0), 2)}</span>}
-      </p>
-    );
-  };
+      return (
+        <p className="row-2">
+          <span>From: {from?.replace(/(?<=^\w{7})\w*(?=\w{4}$)/, '...')}</span>
+          {nftInfo?.nftId && <span>{nftInfo.alias}</span>}
+          {!isTestNet && !nftInfo?.nftId && <span>$ {unitConverter(ZERO.plus(priceInUsd ?? 0), 2)}</span>}
+        </p>
+      );
+    },
+    [isTestNet],
+  );
 
-  const networkUI = (item: ActivityItemType) => {
-    /* Hidden during [SocialRecovery, AddManager, RemoveManager] */
-    const { transactionType, fromChainId, toChainId } = item;
-    const from = fromChainId === 'AELF' ? 'MainChain AELF' : `SideChain ${fromChainId}`;
-    const to = toChainId === 'AELF' ? 'MainChain AELF' : `SideChain ${toChainId}`;
-    const hiddenArr = [TransactionTypes.SOCIAL_RECOVERY, TransactionTypes.ADD_MANAGER, TransactionTypes.REMOVE_MANAGER];
+  const networkUI = useCallback(
+    (item: ActivityItemType) => {
+      /* Hidden during [SocialRecovery, AddManager, RemoveManager] */
+      const { transactionType, fromChainId, toChainId } = item;
+      const from = fromChainId === 'AELF' ? 'MainChain AELF' : `SideChain ${fromChainId}`;
+      const to = toChainId === 'AELF' ? 'MainChain AELF' : `SideChain ${toChainId}`;
+      const hiddenArr = [
+        TransactionTypes.SOCIAL_RECOVERY,
+        TransactionTypes.ADD_MANAGER,
+        TransactionTypes.REMOVE_MANAGER,
+      ];
 
-    return (
-      !hiddenArr.includes(transactionType) && <p className="row-3">{`${from} ${isTestNet}->${to} ${isTestNet}`}</p>
-    );
-  };
+      return (
+        !hiddenArr.includes(transactionType) && <p className="row-3">{`${from} ${isTestNet}->${to} ${isTestNet}`}</p>
+      );
+    },
+    [isTestNet],
+  );
 
   return (
     <div className="activity-list">

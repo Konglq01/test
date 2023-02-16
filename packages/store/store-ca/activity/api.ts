@@ -15,13 +15,7 @@ export function fetchActivities(params: IActivitysApiParams): Promise<IActivitys
 }
 
 export function fetchActivity(params: IActivityApiParams): Promise<ActivityItemType> {
-  try {
-    return request.activity.activity({
-      params: params,
-    });
-  } catch (error: any) {
-    if (error?.type) throw Error(error.type);
-    if (error?.error?.message) throw Error(error.error.message);
-    throw Error(JSON.stringify(error));
-  }
+  return request.activity.activity({
+    params: params,
+  });
 }

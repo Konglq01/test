@@ -29,19 +29,11 @@ export const transactionTypesMap = (type: TransactionTypes, nftId?: string): str
   let newType: string = TransactionTypes.TRANSFER;
   switch (type) {
     case TransactionTypes.TRANSFER:
-      if (nftId) {
-        newType = TransactionTypes.TRANSFER + ' NFT';
-      } else {
-        newType = TransactionTypes.TRANSFER;
-      }
+      newType = TransactionTypes.TRANSFER + (nftId ? ' NFT' : '');
       break;
 
     case TransactionTypes.CROSS_CHAIN_TRANSFER:
-      if (nftId) {
-        newType = TransactionTypes.CROSS_CHAIN_TRANSFER + ' NFT';
-      } else {
-        newType = TransactionTypes.CROSS_CHAIN_TRANSFER;
-      }
+      newType = 'CrossChain Transfer' + (nftId ? ' NFT' : '');
       break;
 
     case TransactionTypes.SOCIAL_RECOVERY:

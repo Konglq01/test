@@ -65,7 +65,7 @@ export default function Transaction() {
     nav(-1);
   }, [nav]);
 
-  const networkUI = () => {
+  const networkUI = useCallback(() => {
     /* Hidden during [SocialRecovery, AddManager, RemoveManager] */
     const { transactionType, fromChainId, toChainId } = activityItem || {};
     const from = fromChainId === 'AELF' ? 'MainChain AELF' : `SideChain ${fromChainId}`;
@@ -83,10 +83,10 @@ export default function Transaction() {
         </div>
       )
     );
-  };
+  }, [activityItem, isTestNet, t]);
 
   const isNft = activityItem?.nftInfo?.nftId;
-  const nftHeaderUI = () => {
+  const nftHeaderUI = useCallback(() => {
     const { nftInfo, amount } = activityItem || {};
     return (
       <div className="nft-amount">
@@ -102,9 +102,9 @@ export default function Transaction() {
         </div>
       </div>
     );
-  };
+  }, [activityItem]);
 
-  const tokenHeaderUI = () => {
+  const tokenHeaderUI = useCallback(() => {
     const { amount, decimal, symbol, priceInUsd } = activityItem || {};
     return (
       <p className="amount">
@@ -112,9 +112,9 @@ export default function Transaction() {
         {!isTestNet && <span className="usd">$ {unitConverter(ZERO.plus(priceInUsd ?? 0), 2)}</span>}
       </p>
     );
-  };
+  }, [activityItem, isTestNet]);
 
-  const feeUI = () => {
+  const feeUI = useCallback(() => {
     const { fee, symbol, feeInUsd } = feeInfo[0]; // todoykx
     const { decimal } = activityItem || {};
     console.log('fee feeinfo', JSON.stringify(feeInfo));
@@ -131,7 +131,7 @@ export default function Transaction() {
         </span>
       </p>
     );
-  };
+  }, [activityItem, feeInfo, isTestNet, t]);
 
   return activityItem ? (
     <div className="transaction-detail-modal">
