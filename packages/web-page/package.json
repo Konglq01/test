@@ -53,8 +53,6 @@
     "next-plugin-antd-less": "^1.8.0",
     "next-with-less": "^2.0.5",
     "query-string": "^7.1.1",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
     "react-i18next": "^11.18.0",
     "react-query": "^3.39.2",
     "react-redux": "^8.0.5",
@@ -62,13 +60,15 @@
     "web3": "^1.7.4",
     "web3-core": "^1.7.4"
   },
+  "resolutions": {
+    "@types/react": "18.0.14"
+  },
   "devDependencies": {
     "@coinbase/wallet-sdk": "^3.3.0",
     "@commitlint/cli": "^17.1.2",
     "@commitlint/config-conventional": "^17.1.0",
     "@next/bundle-analyzer": "^12.2.4",
     "@types/node": "18.0.1",
-    "@types/react": "18.0.14",
     "@types/react-dom": "18.0.5",
     "@typescript-eslint/eslint-plugin": "^5.30.4",
     "@typescript-eslint/parser": "^5.30.4",
