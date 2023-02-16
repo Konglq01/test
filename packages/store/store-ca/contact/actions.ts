@@ -57,9 +57,13 @@ export const fetchContractListAsync = createAsyncThunk<FetchContractListAsyncPay
           errorTimes++;
           console.log('getContactList: error', errorTimes);
           if (errorTimes >= CONTACT_API_RETRY_LIMIT) {
-            throw Error(`getContactList errorTimes too many ${err}`);
+            throw new Error(`getContactList errorTimes too many ${err}`);
           }
         }
+      }
+
+      if (contactList.length === 0) {
+        throw new Error('getContactList no data');
       }
 
       return {
@@ -91,6 +95,10 @@ export const fetchContractListAsync = createAsyncThunk<FetchContractListAsyncPay
           throw Error(`getContactEventList errorTimes too many ${err}`);
         }
       }
+    }
+
+    if (eventList.length === 0) {
+      throw new Error('getContactEventList no data');
     }
 
     return {
