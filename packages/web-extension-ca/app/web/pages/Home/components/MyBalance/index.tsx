@@ -8,14 +8,13 @@ import { useTranslation } from 'react-i18next';
 import TokenList from '../Tokens';
 import Activity from '../Activity/index';
 import { Transaction } from '@portkey/types/types-ca/trade';
-import { TokenItemShowType } from '@portkey/types/types-ca/token';
-import { MINUTE } from '@portkey/constants';
-import { useEffectOnce } from 'react-use';
 import NFT from '../NFT/NFT';
 import { unitConverter } from '@portkey/utils/converter';
-import { useAppDispatch, useUserInfo, useWalletInfo, useAssetInfo } from 'store/Provider/hooks';
+import { useAppDispatch, useUserInfo, useWalletInfo, useAssetInfo, useTokenInfo } from 'store/Provider/hooks';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { fetchAssetAsync, fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
+import { fetchAllTokenListAsync } from '@portkey/store/store-ca/tokenManagement/action';
+import { TokenItemShowType } from '@portkey/types/types-eoa/token';
 
 export interface TransactionResult {
   total: number;
@@ -31,25 +30,36 @@ export default function MyBalance() {
   const [activeKey, setActiveKey] = useState<string>('assets');
   const [navTarget, setNavTarget] = useState<'send' | 'receive'>('send');
   const [tokenOpen, setTokenOpen] = useState(false);
-  const { accountToken } = useAssetInfo();
+  const {
+    accountToken: { accountTokenList },
+  } = useAssetInfo();
   const navigate = useNavigate();
   const { passwordSeed } = useUserInfo();
   const appDispatch = useAppDispatch();
   const {
-    walletInfo: { caAddressList },
+    walletInfo: { caAddressList = [] },
   } = useCurrentWallet();
 
   useEffect(() => {
-    console.log('---passwordSeed-fetchTokenList', passwordSeed);
+    console.log('---passwordSeed-myBalance---', passwordSeed);
     passwordSeed &&
       appDispatch(
         fetchAssetAsync({
-          caAddresses: caAddressList || [],
+          caAddresses: caAddressList,
           keyWord: '',
         }),
       );
-    passwordSeed && appDispatch(fetchTokenListAsync({ caAddresses: caAddressList || [] }));
+    passwordSeed && appDispatch(fetchTokenListAsync({ caAddresses: caAddressList }));
+    passwordSeed && appDispatch(fetchAllTokenListAsync({}));
   }, [passwordSeed, appDispatch, caAddressList]);
+
+  useEffect(() => {
+    let tmpAllBalanceUsd = 0;
+    accountTokenList.forEach((item) => {
+      tmpAllBalanceUsd += Number(item.balanceInUsd);
+    });
+    setBalanceUSD(tmpAllBalanceUsd + '');
+  }, [accountTokenList]);
 
   useEffect(() => () => clearInterval(timer), []);
 
@@ -64,13 +74,13 @@ export default function MyBalance() {
         maskClosable={true}
         placement="bottom"
         onClose={() => setTokenOpen(false)}
-        onChange={(v) => {
+        onChange={(v, type) => {
           setTokenOpen(false);
           // navigate(`/${navTarget}/${v.token.symbol}`);
           if (navTarget === 'receive') {
             navigate(`/${navTarget}/${v.symbol}/${v.chainId}`);
           } else {
-            navigate(`/${navTarget}/${v.symbol}`);
+            navigate(`/${navTarget}/${v.symbol}`, { state: type });
           }
         }}
       />
@@ -117,7 +127,7 @@ export default function MyBalance() {
           {
             label: t('Tokens'),
             key: 'tokens',
-            children: <TokenList tokenList={accountToken.accountTokenList} />,
+            children: <TokenList tokenList={accountTokenList} />,
           },
           {
             label: t('NFTs'),

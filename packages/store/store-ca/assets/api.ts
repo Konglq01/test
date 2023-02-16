@@ -41,21 +41,21 @@ export function fetchTokenList({
 
 export function fetchAssetList({
   caAddresses,
-  pageSize,
-  pageNo,
-  keyWord,
+  maxResultCount,
+  skipCount,
+  keyWord = '',
 }: {
   caAddresses: string[];
-  pageSize: number;
-  pageNo: number;
+  maxResultCount: number;
+  skipCount: number;
   keyWord: string;
 }): Promise<{ data: any[]; totalRecordCount: number }> {
-  console.log('fetching....list', caAddresses, pageSize, pageNo);
+  console.log('fetching....list', caAddresses, maxResultCount, skipCount);
   return request.assets.fetchAccountAssetsByKeywords({
     params: {
       caAddresses,
-      skipCount: (pageNo - 1) * pageSize,
-      maxResultCount: pageSize,
+      skipCount,
+      maxResultCount,
       keyWord,
     },
   });

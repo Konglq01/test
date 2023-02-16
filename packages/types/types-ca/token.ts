@@ -12,7 +12,7 @@ export interface BaseToken {
 
 export interface TokenItemType extends BaseToken {
   isDefault: boolean; // boolean,
-  tokenName: string; //  "ELF"
+  tokenName?: string; //  "ELF"
   chainId: string; // string "AELF"
 }
 export interface TokenItemShowType extends TokenItemType {
@@ -21,6 +21,7 @@ export interface TokenItemShowType extends TokenItemType {
   imageUrl?: string;
   balance?: string;
   balanceInUsd?: string;
+  userTokenId?: string;
 }
 
 export type UserTokenItemTokenType = Omit<BaseToken, 'name'> & { chainId: string };
@@ -80,10 +81,12 @@ export type UseTokenDeleteType = (
 export type FilterTokenList = (token_name: string, address: string) => TokenItemShowType;
 
 export interface TokenState {
-  addedTokenData: AddedTokenData;
-  tokenDataShowInMarket: UserTokenListType;
-  tokenDataShowInReceive: AccountAssets;
-  isFetchingTokenList: Boolean;
+  isFetching: boolean;
+  // addedTokenData: AddedTokenData;
+  tokenDataShowInMarket: TokenItemShowType[];
+  skipCount: number;
+  maxResultCount: number;
+  totalRecordCount: number;
 }
 
 export interface AccountItemType {

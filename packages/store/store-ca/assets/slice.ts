@@ -146,7 +146,7 @@ export const fetchAssetAsync = createAsyncThunk(
     // } = assets;
 
     // if (totalRecordCount === 0 || totalRecordCount > accountAssetsList.length) {
-    const response = await fetchAssetList({ caAddresses, keyWord, pageNo: 1, pageSize: 1000 });
+    const response = await fetchAssetList({ caAddresses, keyWord, skipCount: 1, maxResultCount: 1000 });
 
     return { list: response.data, totalRecordCount: response.totalRecordCount };
     // }
@@ -233,21 +233,7 @@ export const assetsSlice = createSlice({
       .addCase(fetchAssetAsync.fulfilled, (state, action) => {
         const { list, totalRecordCount } = action.payload;
 
-        state.accountAssets.accountAssetsList = [
-          {
-            chainId: 'AELF',
-            symbol: 'Mini Kove',
-            address: 'xxxxxxxxxxxxxxxx',
-            nftInfo: {
-              imageUrl: '',
-              alias: '',
-              tokenId: '',
-              protocolName: '002',
-              quantity: '3',
-            },
-          },
-          ...list,
-        ];
+        state.accountAssets.accountAssetsList = list;
         // state.accountAssets.accountAssetsList = [...state.accountAssets.accountAssetsList, ...list];
         state.accountAssets.skipCount = state.accountAssets.accountAssetsList.length;
         state.accountAssets.totalRecordCount = totalRecordCount;

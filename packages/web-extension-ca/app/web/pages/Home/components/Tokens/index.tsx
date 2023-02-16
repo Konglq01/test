@@ -15,16 +15,9 @@ export default function TokenList({ tokenList }: { tokenList: TokenItemShowType[
   const navigate = useNavigate();
   const { currentNetwork } = useWalletInfo();
   const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? currentNetwork : ''), [currentNetwork]);
-  const { passwordSeed } = useUserInfo();
-  const { accountToken } = useAssetInfo();
-  const appDispatch = useAppDispatch();
-  const {
-    walletInfo: { caAddressList },
-  } = useCurrentWallet();
+
   const onNavigate = useCallback(
     (tokenInfo: TokenItemShowType) => {
-      console.log(tokenInfo);
-
       navigate('/token-detail', { state: { tokenInfo } });
     },
     [navigate],
@@ -35,15 +28,10 @@ export default function TokenList({ tokenList }: { tokenList: TokenItemShowType[
     return;
   }, [navigate]);
 
-  useEffect(() => {
-    console.log('---passwordSeed-fetchTokenList', passwordSeed);
-    passwordSeed && appDispatch(fetchTokenListAsync({ caAddresses: caAddressList || [] }));
-  }, [passwordSeed, appDispatch, caAddressList]);
-
   return (
     <>
       <ul className="token-list">
-        {accountToken.accountTokenList.map((item) => (
+        {tokenList.map((item) => (
           <li className="token-list-item" key={item.chainId} onClick={() => onNavigate(item)}>
             {item.symbol === 'ELF' ? (
               <CustomSvg className="token-logo" type="Aelf" />
