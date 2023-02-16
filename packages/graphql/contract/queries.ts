@@ -1,5 +1,6 @@
 import { NetworkType } from '@portkey/types';
 import { getApolloClient } from './apollo';
+import { getApolloClientByUri } from './apolloUISDK';
 import { GetCAHolderByManagerParamsType, CaHolderWithGuardian } from './types';
 
 import {
@@ -70,6 +71,15 @@ const getCAHolderManagerInfo = async (network: NetworkType, params: CaHolderMana
   return result;
 };
 
+const getCAHolderManagerInfoByUrl = async (uri: string, params: CaHolderManagerInfoQueryVariables) => {
+  const apolloClient = getApolloClientByUri(uri);
+  const result = await apolloClient.query<CaHolderManagerInfoQuery>({
+    query: CaHolderManagerInfoDocument,
+    variables: params,
+  });
+  return result;
+};
+
 // CAHolderTokenBalanceInfo
 const getCaHolderTokenBalance = async (network: NetworkType, params: CaHolderTokenBalanceInfoQueryVariables) => {
   const apolloClient = getApolloClient(network);
@@ -123,6 +133,16 @@ const getLoginGuardianAccountChangeRecord = async (
 // LoginGuardianType
 const getLoginGuardianAccount = async (network: NetworkType, params: LoginGuardianAccountInfoQueryVariables) => {
   const apolloClient = getApolloClient(network);
+
+  const result = await apolloClient.query<LoginGuardianAccountInfoQuery>({
+    query: LoginGuardianAccountInfoDocument,
+    variables: params,
+  });
+  return result;
+};
+
+const getLoginGuardianTypeByUri = async (uri: string, params: LoginGuardianAccountInfoQueryVariables) => {
+  const apolloClient = getApolloClientByUri(uri);
 
   const result = await apolloClient.query<LoginGuardianAccountInfoQuery>({
     query: LoginGuardianAccountInfoDocument,
@@ -217,6 +237,45 @@ const getCAHolderByManager = async (network: NetworkType, params: GetCAHolderByM
   return result;
 };
 
+const getCAHolderByManagerByUrl = async (uri: string, params: GetCAHolderByManagerParamsType) => {
+  const caResult = await getCAHolderManagerInfoByUrl(uri, {
+    dto: {
+      ...params,
+      skipCount: 0,
+      maxResultCount: 1,
+    },
+  });
+  if (caResult.error) throw caResult.error;
+  const result: {
+    caHolderManagerInfo: CaHolderWithGuardian[];
+  } = {
+    caHolderManagerInfo: caResult.data.caHolderManagerInfo
+      ? caResult.data.caHolderManagerInfo.map(item => ({ ...item, loginGuardianAccountInfo: [] }))
+      : [],
+  };
+
+  if (result.caHolderManagerInfo.length > 0) {
+    const caHash = result.caHolderManagerInfo[0].caHash;
+    const guardianResult = await getLoginGuardianTypeByUri(uri, {
+      dto: {
+        chainId: params.chainId,
+        caHash,
+        skipCount: 0,
+        maxResultCount: 100,
+      },
+    });
+
+    if (guardianResult.error) throw guardianResult.error;
+    if (guardianResult.data.loginGuardianAccountInfo) {
+      result.caHolderManagerInfo[0].loginGuardianAccountInfo = guardianResult.data.loginGuardianAccountInfo;
+    } else {
+      result.caHolderManagerInfo[0].loginGuardianAccountInfo = [];
+    }
+  }
+
+  return result;
+};
+
 export {
   getTokenInfo,
   getNFTProtocolInfo,
@@ -224,6 +283,7 @@ export {
   getCAHolderManagerInfo,
   getLoginGuardianAccount,
   getCAHolderByManager,
+  getCAHolderByManagerByUrl,
   getCaHolderTokenBalance,
   getCaHolderTransactionAddress,
   getCaHolderManagerChangeRecord,

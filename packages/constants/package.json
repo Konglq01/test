@@ -12,6 +12,6 @@
     "handle-network": "cd ./scripts && node handleNetwork.js && cd .."
   },
   "dependencies": {
-    "@portkey/types": "0.0.1"
+    "@portkey/types": "^0.0.1"
   }
 }
