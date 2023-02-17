@@ -20,6 +20,7 @@ import { fetchContractListAsync } from '@portkey/store/store-ca/contact/actions'
 import { request } from '@portkey/api/api-did';
 import { useContact } from '@portkey/hooks/hooks-ca/contact';
 import { isLoading } from 'expo-font';
+import { useCaAddresses } from '@portkey/hooks/hooks-ca/wallet';
 
 const mockList = [
   {
@@ -177,7 +178,8 @@ export default function SelectContact(props: SelectContactProps) {
   const { t } = useLanguage();
   const dispatch = useAppCommonDispatch();
   const { contactMap } = useContact();
-  console.log('contactMapcontactMapcontactMap', contactMap);
+
+  const caAddresses = useCaAddresses();
 
   const [loading, setLoading] = useState<boolean>(false);
   const [skipCount, setSkipCount] = useState(0);
@@ -191,7 +193,7 @@ export default function SelectContact(props: SelectContactProps) {
   });
 
   const renderItem = useCallback(
-    ({ item }: { item: ContactItemType | RecentContactItemType }) => {
+    ({ item }: { item: RecentContactItemType }) => {
       return <RecentContactItem contact={item} onPress={onPress} />;
     },
     [onPress],
@@ -201,20 +203,18 @@ export default function SelectContact(props: SelectContactProps) {
     setLoading(true);
     return request.recent.fetchRecentTransactionUsers({
       params: {
-        caAddresses: [
-          'TxXSwp2P9mxeFnGA9DARi2qW1p3PskLFXyBix1GDerQFL7VD5',
-          'bn3AAx9HpCtS5v8dcaXgjp1nRivc8RkxpH4GFaopGr77tZdFb',
-        ],
+        caAddresses: caAddresses,
         skipCount,
         maxResultCount: MAX_RESULT_ACCOUNT,
       },
     });
-  }, [skipCount]);
+  }, [caAddresses, skipCount]);
 
   const transFormData = useCallback(
     (data: ApiRecentAddressItemType[]): any[] =>
       data.map((ele: ApiRecentAddressItemType) => {
-        if (contactMap?.[ele.address]) return { ...contactMap?.[ele.address], transactionTime: ele.transactionTime };
+        if (contactMap?.[ele.address])
+          return { ...contactMap?.[ele.address]?.[0], transactionTime: ele.transactionTime };
         return { ...ele, addresses: [{ address: ele.address, chainId: ele.addressChainId }] };
       }),
     [contactMap],
@@ -233,7 +233,6 @@ export default function SelectContact(props: SelectContactProps) {
   });
 
   // fetchMoreRecent
-  useCallback;
   const fetchMoreRecent = useCallback(() => {
     fetchRecents().then(res => {
       const { data, totalRecordCount } = res;

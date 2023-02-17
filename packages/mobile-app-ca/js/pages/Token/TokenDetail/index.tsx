@@ -78,6 +78,7 @@ const TokenDetail: React.FC = () => {
   const [noMoreData, setNoMoreData] = useState(false);
   const [initializing, setInitializing] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [reFreshing, setFreshing] = useState(false);
 
   // const [isLoadingFirstTime, setIsLoadingFirstTime] = useState(true); // first time
 
@@ -182,6 +183,7 @@ const TokenDetail: React.FC = () => {
       {/* {isLoadingFirstTime && <Dialog.Loading />} */}
       {listShow.length === 0 && <NoData noPic message="You have no transactions." />}
       <FlashList
+        refreshing={reFreshing}
         data={listShow || []}
         renderItem={() => {
           return <TransferItem onPress={() => navigationService.navigate('ActivityDetail')} />;

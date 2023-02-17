@@ -33,8 +33,9 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
   const currentNetworkInfo = useCurrentNetworkInfo();
 
   const {
-    walletInfo: { caAddressList },
+    walletInfo: { caAddressList, address },
   } = useCurrentWallet();
+  const { walletInfo } = useCurrentWallet();
 
   const [, setTokenList] = useState<any[]>([]);
   const [, setTokenNumber] = useState(0);
@@ -66,7 +67,7 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
   });
 
   useEffectOnce(() => {
-    () => dispatch(fetchTokenListAsync({ caAddresses: caAddressList || [] }));
+    () => dispatch(fetchTokenList({ caAddresses: caAddressList || [] }));
   });
 
   useEffect(() => {
@@ -76,7 +77,7 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
       .fetchAccountTokenList({
         baseURL: currentNetworkInfo.apiUrl,
         params: {
-          caAddress: caAddressList,
+          caAddresses: caAddressList,
           skipCount: 0,
           maxResultCount: 10,
         },
@@ -94,7 +95,7 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
   //     .fetchAccountTokenList({
   //       baseURL: currentNetworkInfo.apiUrl,
   //       params: {
-  //         caAddress: caAddressList,
+  //         caAddresses: caAddressList,
   //         skipCount: 1,
   //         maxResultCount: 10,
   //       },
@@ -105,7 +106,7 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
   //     .fetchAccountTokenList({
   //       baseURL: currentNetworkInfo.apiUrl,
   //       params: {
-  //         caAddress: caAddressList,
+  //         caAddresses: caAddressList,
   //         skipCount: 1,
   //         maxResultCount: 10,
   //       },
