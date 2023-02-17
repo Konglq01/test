@@ -18,7 +18,7 @@ import { useAppCommonDispatch } from '@portkey/hooks';
 import useDebounce from 'hooks/useDebounce';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
-import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import { useCaAddresses, useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 
 type onFinishSelectTokenType = (tokenItem: TokenItemShowType) => void;
 type TokenListProps = {
@@ -32,6 +32,7 @@ const TokenList = ({ onFinishSelectToken, account }: TokenListProps) => {
   const { accountToken } = useAppCASelector(state => state.assets);
   const dispatch = useAppCommonDispatch();
   const currentWalletInfo = useCurrentWalletInfo();
+  const caAddresses = useCaAddresses();
 
   const [listShow, setListShow] = useState<any[]>([]);
 
@@ -72,7 +73,7 @@ const TokenList = ({ onFinishSelectToken, account }: TokenListProps) => {
   useEffectOnce(() => {
     if (accountToken.accountTokenList.length !== 0) return;
 
-    // dispatch(fetchTokenListAsync({}));
+    dispatch(fetchTokenListAsync({ caAddresses }));
   });
 
   return (

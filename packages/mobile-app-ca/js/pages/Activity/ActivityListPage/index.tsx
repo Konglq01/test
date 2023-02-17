@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { useAppSelector } from 'store/hooks';
+import { Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 import navigationService from 'utils/navigationService';
 import Svg from 'components/Svg';
 import PageContainer from 'components/PageContainer';
@@ -8,40 +7,64 @@ import { pTd } from 'utils/unit';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { useLanguage } from 'i18n/hooks';
 import TransferItem from 'components/TransferList/components/TransferItem';
-import { FlatList } from 'react-native-gesture-handler';
+
 import { getActivityListAsync } from '@portkey/store/store-ca/activity/action';
 import { useAppCASelector, useAppCommonDispatch } from '@portkey/hooks';
 import NoData from 'components/NoData';
+import { IActivitysApiParams } from '@portkey/store/store-ca/activity/type';
+import { clearState } from '@portkey/store/store-ca/activity/slice';
+import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import useRouterParams from '@portkey/hooks/useRouterParams';
+import { transactionTypesForActivityList } from '@portkey/constants/constants-ca/activity';
+import { ActivityItemType } from '@portkey/types/types-ca/activity';
 
-interface ActivityListPagePropsType {
-  netWork?: string;
+interface RouterParams {
+  chainId?: string;
+  symbol?: string;
 }
 
-const ActivityListPage: React.FC<ActivityListPagePropsType> = (props: ActivityListPagePropsType) => {
+const MAX_RESULT_COUNT = 10;
+
+const ActivityListPage = () => {
+  const { chainId, symbol } = useRouterParams<RouterParams>();
   const { t } = useLanguage();
-  console.log(props);
-
   const dispatch = useAppCommonDispatch();
+  const { data: activityList } = useAppCASelector(state => state.activity);
+  const currentWallet = useCurrentWallet();
 
-  const { currentChain } = useAppSelector(state => state.chain);
+  const getActivityList = useCallback(async () => {
+    setRefreshing(true);
+    dispatch(clearState());
 
-  const activity = useAppCASelector(state => state.activity);
-
-  const [list, setList] = useState<any[]>([]);
-  const [listShow, setListShow] = useState<any[]>([]);
-
-  useEffect(() => {
-    setListShow(activity.list);
-  }, [activity]);
+    const params: IActivitysApiParams = {
+      maxResultCount: MAX_RESULT_COUNT,
+      skipCount: 0,
+      caAddresses: currentWallet.walletInfo.caAddressList,
+      // managerAddresses: address,
+      chainId: chainId,
+      symbol: symbol,
+      transactionTypes: transactionTypesForActivityList,
+    };
+    await dispatch(getActivityListAsync(params));
+    setRefreshing(false);
+  }, [chainId, currentWallet.walletInfo.caAddressList, dispatch, symbol]);
 
   useEffectOnce(() => {
-    //TODO fetch activity List
-    dispatch(getActivityListAsync({ type: 'MAIN' }));
+    getActivityList();
   });
 
-  const renderItem = useCallback(({ item }: any) => {
-    return <TransferItem item={item} onPress={() => navigationService.navigate('ActivityDetail')} />;
+  const renderItem = useCallback(({ item }: { item: ActivityItemType }) => {
+    return (
+      <TransferItem
+        item={item}
+        onPress={() =>
+          navigationService.navigate('ActivityDetail', { transactionId: item.transactionId, blockHash: item.blockHash })
+        }
+      />
+    );
   }, []);
+
+  const [refreshing, setRefreshing] = useState(false);
 
   return (
     <PageContainer
@@ -49,9 +72,18 @@ const ActivityListPage: React.FC<ActivityListPagePropsType> = (props: ActivityLi
       safeAreaColor={['blue', 'white']}
       containerStyles={pageStyles.pageWrap}
       scrollViewProps={{ disabled: true }}>
-      {!listShow.length && <NoData message={t('You have no transactions.')} topDistance={pTd(160)} />}
-
-      <FlatList data={listShow || []} keyExtractor={(item: any) => item?.key ?? ''} renderItem={renderItem} />
+      {!activityList?.length && !refreshing && (
+        <NoData message={t('You have no transactions.')} topDistance={pTd(160)} />
+      )}
+      {activityList && (
+        <FlatList
+          refreshing={refreshing}
+          data={activityList || []}
+          keyExtractor={(_item: ActivityItemType, index: number) => `${index}`}
+          renderItem={renderItem}
+          onRefresh={getActivityList}
+        />
+      )}
     </PageContainer>
   );
 };

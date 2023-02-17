@@ -45,7 +45,7 @@ const TokenListItem: React.FC<TokenListItemType> = props => {
         {!noBalanceShow && (
           <View style={itemStyle.balanceWrap}>
             <TextL style={itemStyle.token} numberOfLines={1} ellipsizeMode={'tail'}>
-              {unitConverter(ZERO.plus(item?.balance).div(`1e${item.decimal}`))}
+              {unitConverter(ZERO.plus(item?.balance).div(`1e${item.decimals}`))}
             </TextL>
             <TextS numberOfLines={1} ellipsizeMode={'tail'} style={itemStyle.dollar}>
               {currentNetwork === 'MAIN' &&

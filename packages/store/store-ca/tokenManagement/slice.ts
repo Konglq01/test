@@ -74,20 +74,19 @@ export const tokenManagementSlice = createSlice({
       })
       .addCase(fetchAllTokenListAsync.fulfilled, (state, action) => {
         const { list } = action.payload;
-        const tmpToken: TokenItemShowType[] = list.map(item => {
-          return {
-            isAdded: item.isDisplay,
-            isDefault: item.isDefault,
-            userTokenId: item.id,
-            chainId: item.token.chainId,
-            decimal: item.token.decimal,
-            address: item.token.address,
-            symbol: item.token.symbol,
-            tokenName: item.token.symbol,
-            id: item.token.id,
-            name: item.token.symbol,
-          };
-        });
+        const tmpToken: TokenItemShowType[] = list.map(item => ({
+          isAdded: item.isDisplay,
+          isDefault: item.isDefault,
+          userTokenId: item.id,
+          chainId: item.token.chainId,
+          decimals: item.token.decimals,
+          address: item.token.address,
+          symbol: item.token.symbol,
+          tokenName: item.token.symbol,
+          id: item.token.id,
+          name: item.token.symbol,
+        }));
+
         state.tokenDataShowInMarket = tmpToken;
         state.isFetching = false;
       })

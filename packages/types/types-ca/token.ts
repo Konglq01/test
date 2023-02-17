@@ -4,7 +4,7 @@ import { AccountType } from '../wallet';
 export interface BaseToken {
   id?: string; // id
   chainId: string;
-  decimal: number; // 8
+  decimals: number; // 8
   address: string; // "ArPnUb5FtxG2oXTaWX2DxNZowDEruJLs2TEkhRCzDdrRDfg8B",        token address  contract address
   symbol: string; // "ELF"   the name showed
   name: string;
@@ -48,7 +48,7 @@ export type UserTokenListType = UserTokenItemType[];
 export interface TokenInfo {
   id: string;
   balance?: string;
-  decimal: string;
+  decimals: string;
   balanceInUsd?: string;
 }
 
@@ -60,6 +60,7 @@ export interface NftInfo {
   quantity: string;
   decimals: string;
 }
+
 export interface AccountAssetItem {
   chainId: string;
   symbol: string;
