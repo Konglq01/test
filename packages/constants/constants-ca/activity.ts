@@ -29,7 +29,8 @@ export const transactionTypesForActivityList = [
  * According to the TransactionTypes, it is converted into a text for page display.
  * @used ActivityListPage and ActivityDetailPage
  */
-export const transactionTypesMap = (type: TransactionTypes, nftId?: string): string => {
+export const transactionTypesMap = (type?: TransactionTypes, nftId?: string): string => {
+  if (!type) return '';
   let newType: string = TransactionTypes.TRANSFER;
   switch (type) {
     case TransactionTypes.TRANSFER:
