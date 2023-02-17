@@ -4,27 +4,30 @@ import { Button, message } from 'antd';
 import SettingHeader from 'pages/components/SettingHeader';
 import CustomSvg from 'components/CustomSvg';
 import { useToken } from '@portkey/hooks/hooks-ca/useToken';
-import { UserTokenItemType } from '@portkey/types/types-ca/token';
+import { TokenItemShowType } from '@portkey/types/types-ca/token';
 import DropdownSearch from 'components/DropdownSearch';
 import { useTranslation } from 'react-i18next';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { useUserInfo } from 'store/Provider/hooks';
+import { useAppDispatch, useTokenInfo, useUserInfo } from 'store/Provider/hooks';
+
 import './index.less';
+import { fetchAllTokenListAsync } from '@portkey/store/store-ca/tokenManagement/action';
 
 export default function AddToken() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { networkType } = useCurrentNetworkInfo();
-  const [tokenState, tokenActions] = useToken();
-  const { tokenDataShowInMarket } = tokenState;
-  const { fetchTokenList, displayUserToken } = tokenActions;
+  const [_, tokenActions] = useToken();
+  const { tokenDataShowInMarket } = useTokenInfo();
+  const { displayUserToken } = tokenActions;
   const [filterWord, setFilterWord] = useState<string>('');
   const [openDrop, setOpenDrop] = useState<boolean>(false);
   const { passwordSeed } = useUserInfo();
+  const appDispatch = useAppDispatch();
 
   useEffect(() => {
-    passwordSeed && fetchTokenList({ pageSize: 1000, pageNo: 1, keyword: filterWord });
-  }, [passwordSeed, filterWord]);
+    passwordSeed && appDispatch(fetchAllTokenListAsync({ keyword: filterWord }));
+  }, [passwordSeed, filterWord, appDispatch]);
 
   useEffect(() => {
     tokenDataShowInMarket.length ? setOpenDrop(false) : setOpenDrop(true);
@@ -33,7 +36,7 @@ export default function AddToken() {
   const rightElement = useMemo(() => <CustomSvg type="Close2" onClick={() => navigate(-1)} />, [navigate]);
 
   const handleUserTokenDisplay = useCallback(
-    async (item: UserTokenItemType) => {
+    async (item: TokenItemShowType) => {
       try {
         await displayUserToken(item);
         message.success('success');
@@ -46,8 +49,8 @@ export default function AddToken() {
   );
 
   const renderTokenItem = useCallback(
-    (item: UserTokenItemType) => {
-      const { isDefault = false, isDisplay = true } = item;
+    (item: TokenItemShowType) => {
+      const { isDefault = false, isAdded = true } = item;
       if (isDefault) {
         return (
           <span className="add-token-btn-icon">
@@ -62,7 +65,7 @@ export default function AddToken() {
           onClick={() => {
             handleUserTokenDisplay(item);
           }}>
-          {t(isDisplay ? 'Hide' : 'Add')}
+          {t(isAdded ? 'Hide' : 'Add')}
         </Button>
       );
     },
@@ -70,18 +73,18 @@ export default function AddToken() {
   );
 
   const renderList = useCallback(
-    (item: UserTokenItemType) => (
-      <div className="token-item" key={`${item.token.symbol}-${item.token.chainId}`}>
+    (item: TokenItemShowType) => (
+      <div className="token-item" key={`${item.symbol}-${item.chainId}`}>
         <div className="token-item-content">
-          {item.token.symbol === 'ELF' ? (
+          {item.symbol === 'ELF' ? (
             <CustomSvg className="token-logo" type="Aelf" />
           ) : (
-            <div className="token-logo custom-word-logo">{(item.token.symbol && item.token.symbol[0]) || ''}</div>
+            <div className="token-logo custom-word-logo">{(item.symbol && item.symbol[0]) || ''}</div>
           )}
           <p className="token-info">
-            <span className="token-item-symbol">{item.token.symbol}</span>
+            <span className="token-item-symbol">{item.symbol}</span>
             <span className="token-item-net">
-              {`${item.token.chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${item.token.chainId} ${networkType}`}
+              {`${item.chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${item.chainId} ${networkType}`}
             </span>
           </p>
         </div>

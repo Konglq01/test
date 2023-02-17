@@ -1,19 +1,17 @@
 import { request } from '@portkey/api/api-did';
-import { UserTokenListType } from '@portkey/types/types-ca/token';
-import { isAddress } from '@portkey/utils';
 
-export function fetchUserTokenList({
-  pageSize,
-  pageNo,
+export function fetchAllTokenList({
+  maxResultCount,
+  skipCount,
   keyword,
   chainIdArray = ['AELF', 'tDVV', 'tDVW'],
 }: {
-  pageSize: number;
-  pageNo: number;
+  maxResultCount: number;
+  skipCount: number;
   keyword: string;
   chainIdArray?: string[];
-}): Promise<{ items: UserTokenListType }> {
-  const chainIdSearchLanguage = chainIdArray.map(chainId => `token.chainId:${chainId}`).join(' OR ');
+}): Promise<{ items: any[]; totalRecordCount: number }> {
+  const chainIdSearchLanguage = chainIdArray.map(chainId => `token.chainId:${chainId}`).join(' AND ');
 
   const filterKeywords = keyword?.length < 10 ? `token.symbol:*${keyword}*~` : `token.address:${keyword}`;
 
@@ -21,8 +19,8 @@ export function fetchUserTokenList({
     params: {
       filter: `${filterKeywords} AND (${chainIdSearchLanguage})`,
       sort: 'sortWeight desc,token.symbol acs',
-      skipCount: (pageNo - 1) * pageSize,
-      maxResultCount: pageSize,
+      skipCount,
+      maxResultCount,
     },
   });
 }

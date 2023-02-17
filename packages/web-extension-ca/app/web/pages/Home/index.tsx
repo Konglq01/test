@@ -1,33 +1,38 @@
-import { Button, message } from 'antd';
+// import { Button, message } from 'antd';
 import PortKeyHeader from 'pages/components/PortKeyHeader';
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import MyBalance from './components/MyBalance';
 import './index.less';
-import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+// import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+// import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+// import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 
 export default function Home() {
   const navigate = useNavigate();
-  const currentChain = useCurrentChain();
-  const wallet = useCurrentWallet();
-  // 2A7tQJt8LgTPDvExTRSKdXQxgKWBcudSaUgBSkh7BPwxbHHMNw
-  console.log(wallet, 'walletInfo==');
-  const TestCode = (
-    <Button
-      onClick={async () => {
-        // await InternalMessage.payload(InternalMessageTypes.SET_SEED, '11111111').send();
+  // const currentChain = useCurrentChain();
+  // const wallet = useCurrentWallet();
+  // const currentNetwork = useCurrentNetworkInfo();
+  // console.log('😄😄😄😄😄😄😄currentChain', currentChain);
+  // console.log('😄😄😄😄😄😄😄currentNetwork', currentNetwork);
 
-        if (!currentChain?.endPoint) return message.error('error');
-        try {
-          //
-        } catch (error) {
-          console.log(error, 'error====addGuardian');
-        }
-      }}>
-      Check
-    </Button>
-  );
+  // 2A7tQJt8LgTPDvExTRSKdXQxgKWBcudSaUgBSkh7BPwxbHHMNw
+  // console.log(wallet, 'walletInfo==');
+  // const TestCode = (
+  //   <Button
+  //     onClick={async () => {
+  //       // await InternalMessage.payload(InternalMessageTypes.SET_SEED, '11111111').send();
+
+  //       if (!currentChain?.endPoint) return message.error('error');
+  //       try {
+  //         //
+  //       } catch (error) {
+  //         console.log(error, 'error====addGuardian');
+  //       }
+  //     }}>
+  //     Check
+  //   </Button>
+  // );
 
   const onUserClick = useCallback(() => {
     navigate(`/setting`);

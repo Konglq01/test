@@ -1,17 +1,15 @@
+import { request } from '@portkey/api/api-did';
 import { ActivityItemType } from '@portkey/types/types-ca/activity';
-import response from './data.json';
+import { IActivityApiParams, IActivitysApiParams, IActivitysApiResponse } from './type';
 
-const MOCK_RESPONSE = {
-  data: { total: response.data.total, items: response.data.items },
-};
+export function fetchActivities(params: IActivitysApiParams): Promise<IActivitysApiResponse> {
+  return request.activity.activityList({
+    params: params,
+  });
+}
 
-export function fetchActivities({
-  start,
-  limit,
-}: {
-  start: number;
-  limit: number;
-}): Promise<{ data: { total: number; items: ActivityItemType[] } }> {
-  console.log('>>>fetching....list', start, limit, MOCK_RESPONSE);
-  return new Promise(resolve => setTimeout(() => resolve(MOCK_RESPONSE), 1000));
+export function fetchActivity(params: IActivityApiParams): Promise<ActivityItemType> {
+  return request.activity.activity({
+    params: params,
+  });
 }

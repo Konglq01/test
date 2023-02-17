@@ -1,3 +1,4 @@
+import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { AddressBookError } from '@portkey/store/addressBook/types';
 import { AddressItem, ContactItemType } from '@portkey/types/types-ca/contact';
 import { isDIDAddress } from '@portkey/utils';
@@ -7,7 +8,7 @@ import CustomSvg from 'components/CustomSvg';
 import TitleWrapper from 'components/TitleWrapper';
 import { ReactElement, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router';
+import { useLocation, useNavigate, useParams } from 'react-router';
 import { useDebounce } from 'react-use';
 import { useContact, useWalletInfo } from 'store/Provider/hooks';
 import AddressSelector from './components/AddressSelector';
@@ -33,6 +34,8 @@ export default function Send() {
   const { walletName } = useWalletInfo();
   // TODO need get data from state and wait for BE data structure
   const { symbol } = useParams();
+  const { state } = useLocation();
+
   const { contactIndexList } = useContact();
   // const { state } = useLocation();
   const { t } = useTranslation();
@@ -40,6 +43,7 @@ export default function Send() {
   const [toAccount, setToAccount] = useState<{ name?: string; address: string }>({ address: '' });
   const [stage, setStage] = useState<Stage>(Stage.Address);
   const [amount, setAmount] = useState('');
+  // const { chainId: currentChainId } = useCurrentChain();
 
   const validateToAddress = useCallback((value: { name?: string; address: string } | undefined) => {
     if (!value) return false;
@@ -91,6 +95,7 @@ export default function Send() {
           const res = validateToAddress(toAccount);
 
           if (!res) return;
+
           Modal.confirm({
             width: 320,
             content: t('The receiving address is a cross-chain transfer transaction'),
@@ -137,7 +142,7 @@ export default function Send() {
               address: '',
             }}
             value={amount}
-            token={{ id: '12', decimals: 8, address: '213', symbol: 'ELF', name: 'ELF', chainId: 'AELF' }}
+            token={{ id: '12', decimal: 8, address: '213', symbol: 'ELF', name: 'ELF', chainId: 'AELF' }}
             onChange={(amount) => {
               setAmount(amount);
             }}
@@ -163,8 +168,7 @@ export default function Send() {
     <div className="page-send">
       <TitleWrapper
         className="page-title"
-        // TODO when sending nft, only 'Send' is displayed
-        title={'Send ' + symbol}
+        title={`Send ${state === 'token' ? symbol : ''}`}
         leftCallBack={() => {
           StageObj[stage].backFun();
         }}

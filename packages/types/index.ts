@@ -9,4 +9,4 @@ export type ConsoleLike = Pick<Console, 'log' | 'warn' | 'error' | 'debug' | 'in
 
 export type ChainId = 'AELF' | 'tDVV' | 'tDVW';
 
-export type opacityType = number; // 0-1
+export type OpacityType = number; // 0-1
