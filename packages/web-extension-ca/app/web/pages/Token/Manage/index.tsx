@@ -8,7 +8,7 @@ import { TokenItemShowType } from '@portkey/types/types-ca/token';
 import DropdownSearch from 'components/DropdownSearch';
 import { useTranslation } from 'react-i18next';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { useAppDispatch, useTokenInfo, useUserInfo } from 'store/Provider/hooks';
+import { useAppDispatch, useTokenInfo, useUserInfo, useWalletInfo } from 'store/Provider/hooks';
 
 import './index.less';
 import { fetchAllTokenListAsync } from '@portkey/store/store-ca/tokenManagement/action';
@@ -16,7 +16,6 @@ import { fetchAllTokenListAsync } from '@portkey/store/store-ca/tokenManagement/
 export default function AddToken() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { networkType } = useCurrentNetworkInfo();
   const [_, tokenActions] = useToken();
   const { tokenDataShowInMarket } = useTokenInfo();
   const { displayUserToken } = tokenActions;
@@ -24,6 +23,8 @@ export default function AddToken() {
   const [openDrop, setOpenDrop] = useState<boolean>(false);
   const { passwordSeed } = useUserInfo();
   const appDispatch = useAppDispatch();
+  const { currentNetwork } = useWalletInfo();
+  const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'Testnet' : ''), [currentNetwork]);
 
   useEffect(() => {
     passwordSeed && appDispatch(fetchAllTokenListAsync({ keyword: filterWord }));
@@ -31,7 +32,8 @@ export default function AddToken() {
 
   useEffect(() => {
     tokenDataShowInMarket.length ? setOpenDrop(false) : setOpenDrop(true);
-  }, [tokenDataShowInMarket]);
+    if (filterWord && !tokenDataShowInMarket.length) setOpenDrop(true);
+  }, [filterWord, tokenDataShowInMarket]);
 
   const rightElement = useMemo(() => <CustomSvg type="Close2" onClick={() => navigate(-1)} />, [navigate]);
 
@@ -41,7 +43,7 @@ export default function AddToken() {
         await displayUserToken(item);
         message.success('success');
       } catch (error: any) {
-        message.error('display error');
+        message.error(error?.message || 'handle display error');
         console.log('=== userToken display', error);
       }
     },
@@ -84,14 +86,14 @@ export default function AddToken() {
           <p className="token-info">
             <span className="token-item-symbol">{item.symbol}</span>
             <span className="token-item-net">
-              {`${item.chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${item.chainId} ${networkType}`}
+              {`${item.chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${item.chainId} ${isTestNet}`}
             </span>
           </p>
         </div>
         <div className="token-item-action">{renderTokenItem(item)}</div>
       </div>
     ),
-    [networkType, renderTokenItem],
+    [isTestNet, renderTokenItem],
   );
 
   return (
@@ -104,7 +106,7 @@ export default function AddToken() {
           overlay={<div className="empty-tip">{t('There is no search result.')}</div>}
           value={filterWord}
           inputProps={{
-            onBlur: () => setOpenDrop(false),
+            // onBlur: () => setOpenDrop(false),
             onFocus: () => {
               if (filterWord && !tokenDataShowInMarket.length) setOpenDrop(true);
             },

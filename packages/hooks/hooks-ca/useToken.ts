@@ -27,7 +27,7 @@ export const useToken = (): [TokenState, TokenFuncsType] => {
   const displayUserToken = useCallback(async (tokenItem: TokenItemShowType) => {
     await request.token.displayUserToken({
       baseURL: currentNetworkInfo.apiUrl,
-      resourceUrl: `${tokenItem.id}/display`,
+      resourceUrl: `${tokenItem.userTokenId}/display`,
       params: {
         isDisplay: !tokenItem.isAdded,
       },

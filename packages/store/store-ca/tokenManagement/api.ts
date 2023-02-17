@@ -18,9 +18,7 @@ export function fetchAllTokenList({
   return request.es.getUserTokenList({
     params: {
       filter: `${filterKeyWords} AND ${chainIdSearchLanguage}`,
-      // sort: 'token.chainId',
-      sort: 'sortWeight',
-      sortType: 1,
+      sort: 'sortWeight desc,token.symbol acs',
       skipCount,
       maxResultCount,
     },

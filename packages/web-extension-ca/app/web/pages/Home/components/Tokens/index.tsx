@@ -14,7 +14,7 @@ export default function TokenList({ tokenList }: { tokenList: TokenItemShowType[
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { currentNetwork } = useWalletInfo();
-  const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? currentNetwork : ''), [currentNetwork]);
+  const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'Testnet' : ''), [currentNetwork]);
 
   const onNavigate = useCallback(
     (tokenInfo: TokenItemShowType) => {
