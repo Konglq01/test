@@ -28,18 +28,19 @@ import { request } from '@portkey/api/api-did';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import CommonToast from 'components/CommonToast';
 import { skipToken } from '@reduxjs/toolkit/dist/query';
+import { ActivityItemType } from '@portkey/types/types-ca/activity';
 
 interface RouterParams {
   tokenInfo: TokenItemShowType;
 }
 
 enum TransactionTypes {
-  'Transfer',
-  'CrossChainTransfer',
-  'CrossChainReceiveToken',
-  'SocialRecovery',
-  'RemoveManager',
-  'AddManager',
+  'Transfer' = 'Transfer',
+  'CrossChainTransfer' = 'CrossChainTransfer',
+  'CrossChainReceiveToken' = 'CrossChainReceiveToken',
+  'SocialRecovery' = 'SocialRecovery',
+  'RemoveManager' = 'RemoveManager',
+  'AddManager' = 'AddManager',
 }
 const transactionList: TransactionTypes[] = [
   TransactionTypes.AddManager,
@@ -61,8 +62,6 @@ const TokenDetail: React.FC = () => {
 
   const dispatch = useAppCommonDispatch();
 
-  const activity = useAppCASelector(state => state.activity);
-
   // const [list, setList] = useState<any[]>([]);
   const [listShow, setListShow] = useState<any[]>([]);
 
@@ -82,10 +81,6 @@ const TokenDetail: React.FC = () => {
   // const upDateBalance = async () => {
   // };
 
-  useEffect(() => {
-    // setListShow(activity?.list);
-  }, [activity]);
-
   useEffectOnce(() => {
     // dispatch(getActivityListAsync({}));
   });
@@ -103,8 +98,8 @@ const TokenDetail: React.FC = () => {
   );
 
   const getMoreActivityList = useCallback(() => {
-    request.assets
-      .fetchActivityList({
+    request.activity
+      .activityList({
         params: {
           ...fixedParamObj,
           skipCount,
@@ -112,9 +107,9 @@ const TokenDetail: React.FC = () => {
       })
       .then(res => {
         setSkipCount(skipCount + maxResultCount);
-        setListShow([...listShow, ...res?.data?.data]);
+        setListShow([...listShow, ...res?.data]);
 
-        setNoMoreData(res?.data.totalRecordCount > 0 && res?.data.totalRecordCount <= skipCount);
+        setNoMoreData(res?.totalRecordCount > 0 && res?.totalRecordCount <= skipCount);
       })
       .catch(err => {
         CommonToast.fail(err);
@@ -123,20 +118,22 @@ const TokenDetail: React.FC = () => {
 
   const initActivityList = useCallback(() => {
     setInitializing(true);
-    request.assets
-      .fetchActivityList({
+
+    console.log(fixedParamObj);
+
+    request.activity
+      .activityList({
         params: {
           ...fixedParamObj,
           skipCount: 0,
+          maxResultCount: 1000,
         },
       })
       .then(res => {
         setInitializing(false);
-
-        setTotalRecordCount(res?.data.totalRecordCount);
-        setListShow(res?.data?.data);
-
-        setNoMoreData(res?.data.totalRecordCount > 0 && res?.data.totalRecordCount <= skipCount);
+        setTotalRecordCount(res?.totalRecordCount);
+        setListShow(res?.data);
+        setNoMoreData(res?.totalRecordCount > 0 && res?.totalRecordCount <= skipCount);
       })
       .catch(err => {
         setInitializing(false);
@@ -181,8 +178,18 @@ const TokenDetail: React.FC = () => {
       <FlashList
         refreshing={reFreshing}
         data={listShow || []}
-        renderItem={() => {
-          return <TransferItem onPress={() => navigationService.navigate('ActivityDetail')} />;
+        renderItem={({ item }: { item: ActivityItemType }) => {
+          return (
+            <TransferItem
+              item={item}
+              onPress={() =>
+                navigationService.navigate('ActivityDetail', {
+                  transactionId: item.transactionId,
+                  blockHash: item.blockHash,
+                })
+              }
+            />
+          );
         }}
         onRefresh={() => {
           setInitializing(true);

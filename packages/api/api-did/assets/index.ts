@@ -6,4 +6,8 @@ export default {
   fetchAccountAssetsByKeywords: '/api/app/user/assets/searchUserAssets',
 
   fetchActivityList: '/api/app/user/activities/activities',
+  fetchTokenPrice: {
+    target: '/api/app/tokens/prices',
+    config: { method: 'GET' },
+  },
 } as const;

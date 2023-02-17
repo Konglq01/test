@@ -189,3 +189,17 @@ export function fetchNFTList({
   return request.assets.fetchAccountNftProtocolItemList({ params: { symbol, caAddresses, skipCount, maxResultCount } });
   // return new Promise(resolve => setTimeout(() => resolve({ data: mockNftItem, totalRecordCount: 18 }), 500));
 }
+
+export function fetchTokenPrices({
+  symbols,
+}: {
+  symbols: string[];
+}): Promise<{ items: { symbol: string; priceInUsd: number }[]; totalRecordCount: number }> {
+  console.log('fetchTokenPrices....');
+
+  return request.token.fetchTokenPrice({
+    params: {
+      symbols,
+    },
+  });
+}
