@@ -24,6 +24,7 @@ import { useGetHolderInfo } from 'hooks/guardian';
 import { useAppCommonDispatch } from '@portkey/hooks';
 import { addFailedActivity } from '@portkey/store/store-ca/activity/slice';
 import { useAppCASelector } from '@portkey/hooks/hooks-ca';
+import { fetchTokensPriceAsync } from '@portkey/store/store-ca/assets/slice';
 
 export default function HomeScreen() {
   const wallet = useCurrentWalletInfo();
@@ -175,9 +176,16 @@ export default function HomeScreen() {
           title="add failedActivity"
           onPress={() => {
             dispatch(addFailedActivity({ timestamp: 100, transactionId: String(Math.random()) }));
+            console.log(activity);
           }}
         />
-        <Text>{JSON.stringify(activity)}</Text>
+        <Button
+          title="fetch token Price"
+          onPress={() => {
+            dispatch(fetchTokensPriceAsync({}));
+          }}
+        />
+
         <CrashTest />
       </ScrollView>
     </SafeAreaBox>
