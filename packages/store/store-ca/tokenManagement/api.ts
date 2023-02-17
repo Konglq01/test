@@ -19,8 +19,8 @@ export function fetchAllTokenList({
     params: {
       filter: `${filterKeywords} AND (${chainIdSearchLanguage})`,
       sort: 'sortWeight desc,token.symbol acs',
-      skipCount,
-      maxResultCount,
+      skipCount: 0,
+      maxResultCount: 1000,
     },
   });
 }
