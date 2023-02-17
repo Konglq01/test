@@ -1,16 +1,27 @@
+import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
+import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { AddressBookError } from '@portkey/store/addressBook/types';
+import { addFailedActivity, removeFailedActivity } from '@portkey/store/store-ca/activity/slice';
 import { AddressItem, ContactItemType } from '@portkey/types/types-ca/contact';
 import { isDIDAddress } from '@portkey/utils';
-import { getAelfAddress } from '@portkey/utils/aelf';
-import { Button, Modal } from 'antd';
+import { getAelfAddress, getWallet, isCrossChain } from '@portkey/utils/aelf';
+import aes from '@portkey/utils/aes';
+import { timesDecimals } from '@portkey/utils/converter';
+import { Button, message, Modal } from 'antd';
 import CustomSvg from 'components/CustomSvg';
 import TitleWrapper from 'components/TitleWrapper';
 import { ReactElement, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import { useDebounce } from 'react-use';
-import { useContact, useWalletInfo } from 'store/Provider/hooks';
+import { useAppDispatch, useContact, useLoading, useUserInfo, useWalletInfo } from 'store/Provider/hooks';
+import crossChainTransfer, {
+  CrossChainTransferIntervalParams,
+  intervalCrossChainTransfer,
+} from 'utils/sandboxUtil/crossChainTransfer';
+import sameChainTransfer from 'utils/sandboxUtil/sameChainTransfer';
 import AddressSelector from './components/AddressSelector';
 import AmountInput from './components/AmountInput';
 import SendPreview from './components/SendPreview';
@@ -33,17 +44,46 @@ export default function Send() {
   const navigate = useNavigate();
   const { walletName } = useWalletInfo();
   // TODO need get data from state and wait for BE data structure
-  const { symbol } = useParams();
+  const { type, symbol, tokenId } = useParams();
   const { state } = useLocation();
+  const chainInfo = useCurrentChain(DefaultChainId);
+  const wallet = useCurrentWallet();
+  const currentNetwork = useCurrentNetworkInfo();
+  const { passwordSeed } = useUserInfo();
+  console.log(wallet, 'wallet===');
+  const { setLoading } = useLoading();
+
+  const dispatch = useAppDispatch();
 
   const { contactIndexList } = useContact();
-  // const { state } = useLocation();
   const { t } = useTranslation();
   const [errorMsg, setErrorMsg] = useState('');
   const [toAccount, setToAccount] = useState<{ name?: string; address: string }>({ address: '' });
   const [stage, setStage] = useState<Stage>(Stage.Address);
   const [amount, setAmount] = useState('');
-  // const { chainId: currentChainId } = useCurrentChain();
+
+  const tokenInfo: any = useMemo(
+    () => ({
+      symbol: 'ELF',
+      decimals: 8,
+      address: 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE',
+    }),
+    // ({
+    //   symbol: 'BTX-2',
+    //   decimals: 0,
+    //   tokenName: '1155-BTX2',
+    //   address: 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE',
+    //   supply: '1000',
+    //   totalSupply: '1000',
+    //   issuer: '2KQWh5v6Y24VcGgsx2KHpQvRyyU5DnCZ4eAUPqGQbnuZgExKaV',
+    //   isBurnable: true,
+    //   issueChainId: 9992731,
+    //   issued: '1000',
+    //   externalInfo: { value: { __nft_image_url: 'nft_image_url', __nft_is_burned: 'true' } },
+    // }),
+
+    [],
+  );
 
   const validateToAddress = useCallback((value: { name?: string; address: string } | undefined) => {
     if (!value) return false;
@@ -87,6 +127,77 @@ export default function Send() {
     [contactIndexList, toAccount.address],
   );
 
+  const retryCrossChain = useCallback(
+    async ({ managerTransferTxId, data }: { managerTransferTxId: string; data: CrossChainTransferIntervalParams }) => {
+      try {
+        //
+        await intervalCrossChainTransfer(data);
+        dispatch(removeFailedActivity(managerTransferTxId));
+      } catch (error) {
+        // tip retryCrossChain()
+        // Modal.confirm
+      }
+    },
+    [dispatch],
+  );
+
+  const sendHandler = useCallback(async () => {
+    try {
+      if (!chainInfo || !passwordSeed) return;
+      const privateKey = aes.decrypt(wallet.walletInfo.AESEncryptPrivateKey, passwordSeed);
+      console.log(getWallet(privateKey || ''), 'getWallet-privateKey======sendHandler');
+      if (!privateKey) return;
+      // TODO
+      const amount = 10;
+      setLoading(true);
+      if (isCrossChain(toAccount.address, chainInfo?.chainId ?? 'AELF')) {
+        console.log('crossChainTransfer==sendHandler');
+        await crossChainTransfer({
+          chainInfo,
+          chainType: currentNetwork.walletType,
+          privateKey,
+          managerAddress: wallet.walletInfo.address,
+          tokenInfo,
+          caHash: wallet.walletInfo.AELF?.caHash || '',
+          amount: timesDecimals(amount, tokenInfo.decimals).toNumber(),
+          toAddress: toAccount.address,
+        });
+      } else {
+        console.log('sameChainTransfers==sendHandler');
+        await sameChainTransfer({
+          chainInfo,
+          chainType: currentNetwork.walletType,
+          privateKey,
+          tokenInfo,
+          caHash: wallet.walletInfo.AELF?.caHash || '',
+          amount: timesDecimals(amount, tokenInfo.decimals).toNumber(),
+          toAddress: toAccount.address,
+        });
+      }
+      message.success('success');
+    } catch (error: any) {
+      console.log('sendHandler==error', error);
+      if (!error?.type) return message.error(error);
+      if (error.type === 'managerTransfer') {
+        return message.error(error);
+      } else if (error.type === 'crossChainTransfer') {
+        // TODO tip retry
+        // retryCrossChain(error)
+        // dispatch(
+        //   addFailedActivity({
+        //     transactionId: managerTransferTxId,
+        //     params: data,
+        //   }),
+        // );
+        return;
+      } else {
+        message.error(error);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [amount, chainInfo, currentNetwork.walletType, passwordSeed, setLoading, toAccount.address, tokenInfo, wallet]);
+
   const StageObj: TypeStageObj = useMemo(
     () => ({
       0: {
@@ -95,18 +206,21 @@ export default function Send() {
           const res = validateToAddress(toAccount);
 
           if (!res) return;
+          if (!toAccount) return;
+          if (isCrossChain(toAccount.address, chainInfo?.chainId ?? 'AELF')) {
+            return Modal.confirm({
+              width: 320,
+              content: t('The receiving address is a cross-chain transfer transaction'),
+              className: 'cross-modal delete-modal',
+              icon: null,
+              centered: true,
+              okText: t('Continue'),
+              cancelText: t('Cancel'),
+              onOk: () => setStage(Stage.Amount),
+            });
+          }
 
-          Modal.confirm({
-            width: 320,
-            content: t('The receiving address is a cross-chain transfer transaction'),
-            className: 'cross-modal delete-modal',
-            icon: null,
-            centered: true,
-            okText: t('Continue'),
-            cancelText: t('Cancel'),
-            onOk: () => setStage(Stage.Amount),
-          });
-          // setStage(Stage.Amount);
+          setStage(Stage.Amount);
         },
         backFun: () => {
           navigate(-1);
@@ -152,8 +266,7 @@ export default function Send() {
       2: {
         btnText: 'Send',
         handler: () => {
-          console.log('>>>');
-          navigate('/');
+          sendHandler();
         },
         backFun: () => {
           setStage(Stage.Amount);
@@ -161,7 +274,7 @@ export default function Send() {
         element: <SendPreview toAccount={toAccount} amount={amount} symbol={'ELF'} transactionFee={'123'} />,
       },
     }),
-    [amount, navigate, t, toAccount, validateToAddress],
+    [amount, chainInfo, navigate, sendHandler, t, toAccount, validateToAddress],
   );
 
   return (

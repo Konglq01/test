@@ -65,6 +65,23 @@ export function fetchAssetList(
   });
 }
 
+const mockData: any[] = [
+  {
+    chainId: 'AELF',
+    symbol: '1',
+    imageUrl: '',
+    collectionName: 'Mini Kove 1',
+    itemCount: 12,
+  },
+  {
+    chainId: 'AELF',
+    symbol: '2',
+    imageUrl: '',
+    collectionName: 'Mini Kove 2',
+    itemCount: 12,
+  },
+];
+
 export function fetchNFTSeriesList({
   caAddresses = ['TxXSwp2P9mxeFnGA9DARi2qW1p3PskLFXyBix1GDerQFL7VD5'],
   skipCount = 0,
@@ -74,7 +91,9 @@ export function fetchNFTSeriesList({
   skipCount: number;
   maxResultCount: number;
 }): Promise<{ data: any[]; totalRecordCount: number }> {
-  // return new Promise(resolve => setTimeout(() => resolve(mockNFTSeriesData.data), 500));
+  // return new Promise(resolve => setTimeout(() => resolve({ data: mockData, totalRecordCount: 2 }), 500));
+  console.log('-----------test');
+
   return request.assets.fetchAccountNftProtocolList({
     params: {
       caAddresses,
@@ -83,6 +102,81 @@ export function fetchNFTSeriesList({
     },
   });
 }
+
+const mockNftItem: any[] = [
+  {
+    chainId: 'AELF',
+    symbol: '1',
+    tokenId: '#0001',
+    alias: 'Knight of Swords 123123',
+    quantity: '1',
+    imageUrl: '',
+  },
+  {
+    chainId: 'AELF',
+    symbol: '2',
+    tokenId: '#0002',
+    alias: 'Knight of Swords 123123',
+    quantity: '1',
+    imageUrl: '',
+  },
+  {
+    chainId: 'AELF',
+    symbol: '3',
+    tokenId: '#0003',
+    alias: 'Knight of Swords 123123',
+    quantity: '1',
+    imageUrl: '',
+  },
+  {
+    chainId: 'AELF',
+    symbol: '4',
+    tokenId: '#0004',
+    alias: 'Knight of Swords 123123',
+    quantity: '1',
+    imageUrl: '',
+  },
+  {
+    chainId: 'AELF',
+    symbol: '5',
+    tokenId: '#0005',
+    alias: 'Knight of Swords 123123',
+    quantity: '1',
+    imageUrl: '',
+  },
+  {
+    chainId: 'AELF',
+    symbol: '6',
+    tokenId: '#0006',
+    alias: 'Knight of Swords 123123',
+    quantity: '1',
+    imageUrl: '',
+  },
+  {
+    chainId: 'AELF',
+    symbol: '7',
+    tokenId: '#0007',
+    alias: 'Knight of Swords 123123',
+    quantity: '1',
+    imageUrl: '',
+  },
+  {
+    chainId: 'AELF',
+    symbol: '8',
+    tokenId: '#0008',
+    alias: 'Knight of Swords 123123',
+    quantity: '1',
+    imageUrl: '',
+  },
+  {
+    chainId: 'AELF',
+    symbol: '9',
+    tokenId: '#0009',
+    alias: 'Knight of Swords 123123',
+    quantity: '1',
+    imageUrl: '',
+  },
+];
 
 export function fetchNFTList({
   // todo maybe remote tokenList change
@@ -96,9 +190,8 @@ export function fetchNFTList({
   skipCount: number;
   maxResultCount: number;
 }): Promise<{ data: any[]; totalRecordCount: number }> {
-  console.log('fetching....list', symbol, caAddresses, skipCount, maxResultCount);
-
-  return new Promise(resolve => setTimeout(() => resolve(mockNFTsData.data), 500));
+  return request.assets.fetchAccountNftProtocolItemList({ params: { symbol, caAddresses, skipCount, maxResultCount } });
+  // return new Promise(resolve => setTimeout(() => resolve({ data: mockNftItem, totalRecordCount: 18 }), 500));
 }
 
 export function fetchTokenPrices({

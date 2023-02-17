@@ -32,7 +32,7 @@ export default function TokenList({ tokenList }: { tokenList: TokenItemShowType[
     <>
       <ul className="token-list">
         {tokenList.map((item) => (
-          <li className="token-list-item" key={item.chainId} onClick={() => onNavigate(item)}>
+          <li className="token-list-item" key={`${item.chainId}_${item.symbol}`} onClick={() => onNavigate(item)}>
             {item.symbol === 'ELF' ? (
               <CustomSvg className="token-logo" type="Aelf" />
             ) : (

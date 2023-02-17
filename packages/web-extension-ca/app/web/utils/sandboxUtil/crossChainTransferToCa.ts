@@ -1,32 +1,34 @@
-import { SendOptions } from '@portkey/contracts/types';
-import { ChainType } from '@portkey/types';
 import SandboxEventTypes from 'messages/SandboxEventTypes';
 import SandboxEventService, { SandboxErrorCode } from 'service/SandboxEventService';
+import { BaseSendOption } from './types';
 
-export const removeManager = async ({
+export const crossChainTransferToCa = async ({
   rpcUrl,
   chainType,
   address, // contract address
   privateKey,
-  sendOptions,
   paramsOption,
-}: {
-  rpcUrl: string;
-  address: string;
-  chainType: ChainType;
-  privateKey: string;
-  sendOptions?: SendOptions;
-  paramsOption: { caHash: string; manager: { managerAddress: string; deviceString: string } };
+  sendOptions,
+}: BaseSendOption & {
+  paramsOption: {
+    issueChainId: string;
+    toChainId: string;
+    symbol: string;
+    to: string;
+    amount: number;
+    memo?: string;
+  };
 }) => {
   const resMessage = await SandboxEventService.dispatchAndReceive(SandboxEventTypes.callSendMethod, {
     rpcUrl: rpcUrl,
     address,
     privateKey,
     chainType,
-    methodName: 'RemoveManager',
+    methodName: 'CrossChainTransfer',
+    paramsOption,
     sendOptions,
-    paramsOption: [paramsOption],
   });
+
   if (resMessage.code === SandboxErrorCode.error) throw resMessage.error;
   const message = resMessage.message;
   return {

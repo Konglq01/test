@@ -24,6 +24,9 @@ export const activitySlice = createSlice({
     addFailedActivity: (state, { payload }: { payload: the2ThFailedActivityItemType }) => {
       state.failedActivityMap[payload?.transactionId] = payload;
     },
+    removeFailedActivity: (state, { payload }: { payload: string }) => {
+      delete state.failedActivityMap[payload];
+    },
     clearState: state => (state = initialState),
   },
   extraReducers: builder => {
@@ -35,6 +38,6 @@ export const activitySlice = createSlice({
   },
 });
 
-export const { addPage, addFailedActivity, clearState } = activitySlice.actions;
+export const { addPage, addFailedActivity, removeFailedActivity, clearState } = activitySlice.actions;
 
 export default activitySlice;

@@ -21,6 +21,20 @@ export function isDIDAddress(address: string, chainType: ChainType = 'aelf') {
   return web3IsAddress(address);
 }
 
+export const getChainIdByAddress = (address: string, chainType: ChainType = 'aelf') => {
+  if (!isAddress(address)) throw Error(`${address} is not address`);
+
+  if (chainType === 'aelf') {
+    if (address.includes('_')) {
+      const arr = address.split('_');
+      return arr[arr.length - 1];
+    } else {
+      return 'AELF';
+    }
+  }
+  throw Error('Not support');
+};
+
 const protocolAndDomainRE = /^(?:\w+:)?\/\/(\S+)$/;
 const localhostDomainRE = /^localhost[\:?\d]*(?:[^\:?\d]\S*)?$/;
 const nonLocalhostDomainRE = /^[^\s\.]+\.\S{2,}$/;
