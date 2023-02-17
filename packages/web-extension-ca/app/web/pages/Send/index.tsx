@@ -1,6 +1,5 @@
-import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { AddressBookError } from '@portkey/store/addressBook/types';
-import { AddressItem, ContactItemType } from '@portkey/types/types-ca/contact';
+import { ContactItemType, IClickAddressProps } from '@portkey/types/types-ca/contact';
 import { isDIDAddress } from '@portkey/utils';
 import { getAelfAddress } from '@portkey/utils/aelf';
 import { Button, Modal } from 'antd';
@@ -113,7 +112,9 @@ export default function Send() {
         },
         element: (
           <AddressSelector
-            onClick={(account: AddressItem & { name?: string }) => {
+            onClick={(account: IClickAddressProps) => {
+              // from RecentList: Not recent contacts, not clickable
+              if (account.isDisable) return;
               const value = { name: account.name, address: `ELF_${account.address}_${account.chainId}` };
               setToAccount(value);
               // validateToAddress(value);

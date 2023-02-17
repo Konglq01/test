@@ -6,7 +6,7 @@ import { fetchActivity } from '@portkey/store/store-ca/activity/api';
 import { IActivityApiParams } from '@portkey/store/store-ca/activity/type';
 import { ActivityItemType, TransactionFees } from '@portkey/types/types-ca/activity';
 import { Transaction } from '@portkey/types/types-ca/trade';
-import { unitConverter } from '@portkey/utils/converter';
+import { formatStr2EllipsisStr, unitConverter } from '@portkey/utils/converter';
 import clsx from 'clsx';
 import Copy from 'components/Copy';
 import CustomSvg from 'components/CustomSvg';
@@ -19,10 +19,11 @@ import { useWalletInfo } from 'store/Provider/hooks';
 import { shortenCharacters } from 'utils/reg';
 import './index.less';
 
+const DEFAULT_DECIMAL = 8;
+
+// TODOykx: Bring data from the previous page to prevent network errors
 export default function Transaction() {
   const { t } = useTranslation();
-  const { currentNetwork } = useWalletInfo();
-  const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'TESTNET' : ''), [currentNetwork]);
   const { state }: { state: IActivityApiParams } = useLocation();
   const currentWallet = useCurrentWallet();
   const {
@@ -65,6 +66,8 @@ export default function Transaction() {
     nav(-1);
   }, [nav]);
 
+  const { currentNetwork } = useWalletInfo();
+  const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'TESTNET' : ''), [currentNetwork]);
   const networkUI = useCallback(() => {
     /* Hidden during [SocialRecovery, AddManager, RemoveManager] */
     const { transactionType, fromChainId, toChainId } = activityItem || {};
@@ -85,7 +88,7 @@ export default function Transaction() {
     );
   }, [activityItem, isTestNet, t]);
 
-  const isNft = activityItem?.nftInfo?.nftId;
+  const isNft = useMemo(() => !!activityItem?.nftInfo?.nftId, [activityItem?.nftInfo?.nftId]);
   const nftHeaderUI = useCallback(() => {
     const { nftInfo, amount } = activityItem || {};
     return (
@@ -98,18 +101,19 @@ export default function Transaction() {
             <span>{nftInfo?.alias}</span>
             <span className="token-id">#{nftInfo?.nftId}</span>
           </p>
-          <p className="quantity">Amount: {amount}</p>
+          <p className="quantity">{`Amount: ${amount}`}</p>
         </div>
       </div>
     );
   }, [activityItem]);
 
   const tokenHeaderUI = useCallback(() => {
-    const { amount, decimal, symbol, priceInUsd } = activityItem || {};
+    const { amount, decimals, symbol, priceInUsd } = activityItem || {};
     return (
       <p className="amount">
-        {unitConverter(ZERO.plus(amount || 0).div(`1e${decimal}`))} {symbol}
-        {!isTestNet && <span className="usd">$ {unitConverter(ZERO.plus(priceInUsd ?? 0), 2)}</span>}
+        {`${unitConverter(ZERO.plus(amount || 0).div(`1e${decimals ?? DEFAULT_DECIMAL}`))} `}
+        {symbol}
+        {!isTestNet && <span className="usd">{`$ ${unitConverter(ZERO.plus(priceInUsd ?? 0), 2)}`}</span>}
       </p>
     );
   }, [activityItem, isTestNet]);
@@ -122,12 +126,16 @@ export default function Transaction() {
           {feeInfo?.map((item, idx) => {
             return (
               <div key={'transactionFee' + idx} className="right-item">
-                <span>{`${unitConverter(ZERO.plus(item.fee || 0).div(`1e${activityItem?.decimal}`))} ${
-                  item.symbol
-                }`}</span>
+                <span>{`${unitConverter(
+                  ZERO.plus(item.fee || 0).div(`1e${activityItem?.decimals ?? DEFAULT_DECIMAL}`),
+                )} ${item.symbol}`}</span>
                 {!isTestNet && (
                   <span className="right-usd">
-                    $ {unitConverter(ZERO.plus(item.feeInUsd ?? 0).div(`1e${activityItem?.decimal}`), 2)}
+                    ${' '}
+                    {unitConverter(
+                      ZERO.plus(item.feeInUsd ?? 0).div(`1e${activityItem?.decimals ?? DEFAULT_DECIMAL}`),
+                      2,
+                    )}
                   </span>
                 )}
               </div>
@@ -136,7 +144,7 @@ export default function Transaction() {
         </span>
       </p>
     );
-  }, [activityItem?.decimal, feeInfo, isTestNet, t]);
+  }, [activityItem?.decimals, feeInfo, isTestNet, t]);
 
   return activityItem ? (
     <div className="transaction-detail-modal">
@@ -184,7 +192,7 @@ export default function Transaction() {
             <p className="value">
               <span className="left">{t('Transaction ID')}</span>
               <span className="right tx-id">
-                {activityItem.transactionId.replace(/(?<=^\w{7})\w*(?=\w{4}$)/, '...')}{' '}
+                {`${formatStr2EllipsisStr(activityItem.transactionId, [7, 4])} `}
                 <Copy toCopy={activityItem.transactionId} />
               </span>
             </p>

@@ -16,7 +16,7 @@ export type ActivityItemType = {
   isReceived: boolean; // Is it a received transaction
   amount: string;
   symbol: string;
-  decimal?: string;
+  decimals?: string;
   priceInUsd?: string;
   nftInfo?: NftInfo;
   transactionFees: TransactionFees[];
