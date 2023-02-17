@@ -34,12 +34,16 @@ import { getDefaultWallet } from 'utils/aelfUtils';
 import { usePin } from 'hooks/store';
 import aes from '@portkey/utils/aes';
 import { getManagerAccount } from 'utils/redux';
-import crossChainTransfer from 'utils/transfer/crossChainTransfer';
+import crossChainTransfer, {
+  CrossChainTransferIntervalParams,
+  intervalCrossChainTransfer,
+} from 'utils/transfer/crossChainTransfer';
 import { useCurrentNetwork } from '@portkey/hooks/network';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { timesDecimals } from '@portkey/utils/converter';
 import sameChainTransfer from 'utils/transfer/sameChainTransfer';
+import { removeFailedActivity } from '@portkey/store/store-ca/activity/slice';
 
 export interface SendHomeProps {
   route?: any;
@@ -99,6 +103,21 @@ const SendHome: React.FC<SendHomeProps> = props => {
 
     [],
   );
+
+  const retryCrossChain = useCallback(
+    async ({ managerTransferTxId, data }: { managerTransferTxId: string; data: CrossChainTransferIntervalParams }) => {
+      try {
+        //
+        await intervalCrossChainTransfer(data);
+        dispatch(removeFailedActivity(managerTransferTxId));
+      } catch (error) {
+        // tip retryCrossChain()
+        // Modal.confirm
+      }
+    },
+    [dispatch],
+  );
+
   //  TODO: when finish send upDate balance
   const pin = usePin();
   const chainInfo = useCurrentChain(DefaultChainId);
