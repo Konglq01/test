@@ -46,6 +46,7 @@ export type UserTokenListType = UserTokenItemType[];
 
 // assets token+nft
 export interface TokenInfo {
+  id: string;
   balance?: string;
   decimal: string;
   balanceInUsd?: string;
@@ -57,6 +58,7 @@ export interface NftInfo {
   tokenId: string;
   protocolName: string;
   quantity: string;
+  decimals: string;
 }
 export interface AccountAssetItem {
   chainId: string;

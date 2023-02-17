@@ -27,6 +27,7 @@
     "extension": "yarn workspace web-extension run",
     "app:ca": "yarn workspace mobile-ca run",
     "extension:ca": "yarn workspace web-extension-ca run",
+    "extension-ca:dev": "yarn extension:ca dev:watch",
     "graphql": "yarn workspace @portkey/graphql run",
     "page": "yarn workspace web-page run",
     "did-ui:build": "yarn workspace @portkey/did-ui-react run build"

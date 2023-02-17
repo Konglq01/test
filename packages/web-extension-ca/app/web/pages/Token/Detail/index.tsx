@@ -4,7 +4,7 @@ import './index.less';
 import SettingHeader from 'pages/components/SettingHeader';
 import BalanceCard from 'pages/components/BalanceCard';
 import { TokenItemShowType } from '@portkey/types/types-ca/token';
-import { unitConverter } from '@portkey/utils/converter';
+import { divDecimals, unitConverter } from '@portkey/utils/converter';
 import ActivityList from 'pages/components/ActivityList';
 import { useWalletInfo } from 'store/Provider/hooks';
 
@@ -30,6 +30,8 @@ function TokenDetail() {
     tokenInfo && setCurrentToken(tokenInfo);
   }, [state, symbol]);
 
+  console.log(currentToken, 'currentToken===');
+
   return (
     <div className="token-detail">
       <SettingHeader
@@ -45,14 +47,14 @@ function TokenDetail() {
         <div className="balance">
           <div className="balance-amount">
             <span className="amount">
-              {unitConverter(currentToken?.balance)} {currentToken?.symbol}
+              {unitConverter(divDecimals(currentToken?.balance, currentToken?.decimal || 8))} {currentToken?.symbol}
             </span>
             {isMain && <span className="convert">$ {unitConverter(currentToken?.balanceInUsd)}</span>}
           </div>
           <BalanceCard
             amount={currentToken?.balanceInUsd}
             onSend={() => {
-              navigate(`/send/${currentToken?.symbol}`);
+              navigate(`/send/token/${currentToken?.symbol}/${currentToken?.id ?? ''}`);
             }}
             onReceive={() => navigate(`/receive/${currentToken?.symbol}/${currentToken?.chainId}`)}
           />
