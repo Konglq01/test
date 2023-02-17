@@ -3,7 +3,7 @@ import { ChainType } from '@portkey/types';
 import { BaseToken } from '@portkey/types/types-ca/token';
 import { getChainIdByAddress } from '@portkey/utils';
 import { crossChainTransferToCa } from './crossChainTransferToCa';
-import { managerTransfer } from './ManagerTransfer';
+import { managerTransfer } from './managerTransfer';
 import { getChainNumber } from '@portkey/utils/aelf';
 
 export type CrossChainTransferIntervalParams = Omit<CrossChainTransferParams, 'caHash'>;

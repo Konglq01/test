@@ -256,7 +256,7 @@ export default function Send() {
               address: '',
             }}
             value={amount}
-            token={{ id: '12', decimal: 8, address: '213', symbol: 'ELF', name: 'ELF', chainId: 'AELF' }}
+            token={{ id: '12', decimals: 8, address: '213', symbol: 'ELF', name: 'ELF', chainId: 'AELF' }}
             onChange={(amount) => {
               setAmount(amount);
             }}

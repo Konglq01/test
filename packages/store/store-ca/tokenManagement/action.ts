@@ -9,11 +9,14 @@ export const deleteTokenInCurrentAccount = createAction<HandleTokenArgTypes>('to
 
 export const fetchAllTokenListAsync = createAsyncThunk(
   'tokenManagement/fetchAllTokenListAsync',
-  async ({ keyword = '' }: { keyword?: string }, { getState, dispatch }) => {
+  async (
+    { keyword = '', chainIdArray = [''] }: { keyword?: string; chainIdArray: string[] },
+    { getState, dispatch },
+  ) => {
     const { totalRecordCount, skipCount, maxResultCount } = getState() as TokenState;
 
     // if (totalRecordCount === 0 || totalRecordCount > accountTokenList.length) {
-    const response = await fetchAllTokenList({ skipCount, maxResultCount, keyword });
+    const response = await fetchAllTokenList({ skipCount, maxResultCount, keyword, chainIdArray });
     return { list: response.items, totalRecordCount: response.totalRecordCount };
     // }
 
