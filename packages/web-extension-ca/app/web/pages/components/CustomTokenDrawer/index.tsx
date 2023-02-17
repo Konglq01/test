@@ -11,7 +11,8 @@ import './index.less';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { ZERO } from '@portkey/constants/misc';
 import { unitConverter } from '@portkey/utils/converter';
-
+import { fetchAllTokenListAsync } from '@portkey/store/store-ca/tokenManagement/action';
+import { useCaAddresses } from '@portkey/hooks/hooks-ca/wallet';
 interface CustomSelectProps extends DrawerProps {
   // onChange?: (v: TokenBaseItemType) => void;
   onChange?: (v: AccountAssetItem, type: 'token' | 'nft') => void;
@@ -30,7 +31,7 @@ export default function CustomTokenDrawer({
 }: CustomSelectProps) {
   const { t } = useTranslation();
   const { currentNetwork } = useWalletInfo();
-  const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? currentNetwork : ''), [currentNetwork]);
+  const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'Testnet' : ''), [currentNetwork]);
   const { accountAssets, accountToken } = useAssetInfo();
   const { tokenDataShowInMarket } = useTokenInfo();
   const [openDrop, setOpenDrop] = useState<boolean>(false);
@@ -38,9 +39,7 @@ export default function CustomTokenDrawer({
   const [assetList, setAssetList] = useState<TokenItemShowType[] | AccountAssets>([]);
   const appDispatch = useAppDispatch();
   const { passwordSeed } = useUserInfo();
-  const {
-    walletInfo: { caAddressList = [] },
-  } = useCurrentWallet();
+  const caAddresses = useCaAddresses();
 
   useEffect(() => {
     if (drawerType === 'send') {
@@ -51,16 +50,20 @@ export default function CustomTokenDrawer({
   }, [accountAssets.accountAssetsList, accountToken.accountTokenList, drawerType, tokenDataShowInMarket]);
 
   useEffect(() => {
-    appDispatch(fetchAssetAsync({ caAddresses: caAddressList, keyWord: filterWord }));
-  }, [appDispatch, caAddressList, filterWord]);
+    if (drawerType === 'send') {
+      appDispatch(fetchAssetAsync({ caAddresses, keyword: filterWord }));
+    } else {
+      appDispatch(fetchAllTokenListAsync({ keyword: filterWord }));
+    }
+  }, [appDispatch, caAddresses, drawerType, filterWord]);
 
   useEffect(() => {
     if (drawerType === 'send') {
-      passwordSeed && fetchAssetAsync({ caAddresses: caAddressList || [], keyWord: filterWord });
+      passwordSeed && fetchAssetAsync({ caAddresses, keyword: filterWord });
     } else {
-      passwordSeed && fetchTokenListAsync({ caAddresses: caAddressList || [] });
+      passwordSeed && fetchTokenListAsync({ caAddresses });
     }
-  }, [passwordSeed, filterWord, drawerType, caAddressList]);
+  }, [passwordSeed, filterWord, drawerType, caAddresses]);
 
   const renderToken = useCallback(
     (token: AccountAssetItem) => {
