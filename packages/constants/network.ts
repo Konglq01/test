@@ -15,7 +15,7 @@ export const DefaultChain: ChainItemType = {
     id: '',
     name: 'ELF',
     symbol: 'ELF',
-    decimal: 8,
+    decimals: 8,
     address: 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE',
   },
   basicContracts: { tokenContract: 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE' },
