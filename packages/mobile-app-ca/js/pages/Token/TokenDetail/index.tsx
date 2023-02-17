@@ -34,12 +34,12 @@ interface RouterParams {
 }
 
 enum TransactionTypes {
-  'Transfer',
-  'CrossChainTransfer',
-  'CrossChainReceiveToken',
-  'SocialRecovery',
-  'RemoveManager',
-  'AddManager',
+  'Transfer' = 'Transfer',
+  'CrossChainTransfer' = 'CrossChainTransfer',
+  'CrossChainReceiveToken' = 'CrossChainReceiveToken',
+  'SocialRecovery' = 'SocialRecovery',
+  'RemoveManager' = 'RemoveManager',
+  'AddManager' = 'AddManager',
 }
 const transactionList: TransactionTypes[] = [
   TransactionTypes.AddManager,
@@ -61,8 +61,6 @@ const TokenDetail: React.FC = () => {
 
   const dispatch = useAppCommonDispatch();
 
-  const activity = useAppCASelector(state => state.activity);
-
   // const [list, setList] = useState<any[]>([]);
   const [listShow, setListShow] = useState<any[]>([]);
 
@@ -81,10 +79,6 @@ const TokenDetail: React.FC = () => {
   // TODO: upDate balance
   // const upDateBalance = async () => {
   // };
-
-  useEffect(() => {
-    // setListShow(activity?.list);
-  }, [activity]);
 
   useEffectOnce(() => {
     // dispatch(getActivityListAsync({}));
@@ -112,9 +106,9 @@ const TokenDetail: React.FC = () => {
       })
       .then(res => {
         setSkipCount(skipCount + maxResultCount);
-        setListShow([...listShow, ...res?.data?.data]);
+        setListShow([...listShow, ...res?.data]);
 
-        setNoMoreData(res?.data.totalRecordCount > 0 && res?.data.totalRecordCount <= skipCount);
+        setNoMoreData(res?.totalRecordCount > 0 && res?.totalRecordCount <= skipCount);
       })
       .catch(err => {
         CommonToast.fail(err);
@@ -123,20 +117,22 @@ const TokenDetail: React.FC = () => {
 
   const initActivityList = useCallback(() => {
     setInitializing(true);
+
+    console.log(fixedParamObj);
+
     request.activity
       .activityList({
         params: {
           ...fixedParamObj,
           skipCount: 0,
+          maxResultCount: 1000,
         },
       })
       .then(res => {
         setInitializing(false);
-
-        setTotalRecordCount(res?.data.totalRecordCount);
-        setListShow(res?.data?.data);
-
-        setNoMoreData(res?.data.totalRecordCount > 0 && res?.data.totalRecordCount <= skipCount);
+        setTotalRecordCount(res?.totalRecordCount);
+        setListShow(res?.data);
+        setNoMoreData(res?.totalRecordCount > 0 && res?.totalRecordCount <= skipCount);
       })
       .catch(err => {
         setInitializing(false);
