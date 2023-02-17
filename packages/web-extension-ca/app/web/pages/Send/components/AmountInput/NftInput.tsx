@@ -47,7 +47,7 @@ export default function NftInput({
 
   const handleAmountBlur = useCallback(() => {
     setAmount((v) => {
-      const reg = new RegExp(`.+\\.\\d{0,${token?.decimal || 8}}|.+`);
+      const reg = new RegExp(`.+\\.\\d{0,${token?.decimals || 8}}|.+`);
       const valueProcessed = v
         ?.replace(/\.+$/, '')
         .replace(/^0+\./, '0.')
@@ -55,7 +55,7 @@ export default function NftInput({
         .replace(/^\.+/, '0.')
         .match(reg)
         ?.toString();
-      const valueString = valueProcessed ? `${parseInputChange(valueProcessed, ZERO, token?.decimal) || 0}` : '';
+      const valueString = valueProcessed ? `${parseInputChange(valueProcessed, ZERO, token?.decimals) || 0}` : '';
       onChange(valueString);
 
       return valueString.length ? `${valueString}` : '';
@@ -63,7 +63,7 @@ export default function NftInput({
     setTimeout(() => {
       getTranslationInfo();
     }, 0);
-  }, [getTranslationInfo, onChange, token?.decimal]);
+  }, [getTranslationInfo, onChange, token?.decimals]);
 
   return (
     <div className="amount-wrap">
