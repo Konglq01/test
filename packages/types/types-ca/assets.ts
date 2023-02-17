@@ -4,7 +4,6 @@ export type NFTCollectionItemBaseType = {
   collectionName: string;
   imageUrl: string;
   itemCount: number;
-  nftType: string;
   symbol: string;
 };
 

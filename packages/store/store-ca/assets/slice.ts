@@ -95,22 +95,22 @@ export const fetchNFTCollectionsAsync = createAsyncThunk(
   async (
     {
       caAddresses,
-      skipCount = 0,
-      maxResultCount = 1000,
-    }: {
+    }: // skipCount = 0,
+    // maxResultCount = 1000,
+    {
       caAddresses: string[];
-      skipCount: number;
-      maxResultCount: number;
+      // skipCount: number;
+      // maxResultCount: number;
     },
     { getState, dispatch },
   ) => {
     const { assets } = getState() as { assets: AssetsStateType };
     const {
-      accountNFT: { totalRecordCount, accountNFTList },
+      accountNFT: { totalRecordCount, accountNFTList, skipCount, maxResultCount },
     } = assets;
 
     // if (totalRecordCount === 0 || totalRecordCount > accountNFTList.length) {
-    const response = await fetchNFTSeriesList({ caAddresses, skipCount, maxResultCount });
+    const response = await fetchNFTSeriesList({ caAddresses, skipCount: 0, maxResultCount });
     return { list: response.data, totalRecordCount: response.totalRecordCount };
     // }
 
@@ -119,32 +119,34 @@ export const fetchNFTCollectionsAsync = createAsyncThunk(
 );
 
 // fetch current nftSeries on Dashboard
-
 export const fetchNFTAsync = createAsyncThunk(
   'fetchNFTAsync',
   async (
     {
       symbol,
       caAddresses,
-      skipCount = 0,
-      maxResultCount = 1000,
-    }: {
+    }: // skipCount = 0,
+    // maxResultCount = 9,
+    {
       symbol: string;
       caAddresses: string[];
-      skipCount: number;
-      maxResultCount: number;
+      // skipCount: number;
+      // maxResultCount: number;
     },
     { getState, dispatch },
   ) => {
     const { assets } = getState() as { assets: AssetsStateType };
     const {
-      accountNFT: { totalRecordCount, accountNFTList },
+      accountNFT: { accountNFTList },
     } = assets;
-
-    // if (totalRecordCount === 0 || totalRecordCount > accountNFTList.length) {
-    const response = await fetchNFTList({ symbol, caAddresses, skipCount, maxResultCount });
-    return { symbol, list: response.data, totalRecordCount: response.totalRecordCount };
-    // }
+    const targetNFTCollection = accountNFTList.find(item => item.symbol === symbol);
+    if (!targetNFTCollection) return;
+    const { skipCount, maxResultCount, totalRecordCount, children } = targetNFTCollection;
+    if (totalRecordCount === 0 || totalRecordCount > children.length) {
+      const response = await fetchNFTList({ symbol, caAddresses, skipCount, maxResultCount });
+      return { symbol, list: response.data, totalRecordCount: response.totalRecordCount };
+    }
+    return { symbol, list: [], totalRecordCount };
   },
 );
 
@@ -179,6 +181,33 @@ export const assetsSlice = createSlice({
     clearAssets: (state, action: PayloadAction<any>) => {
       state = initialState;
     },
+    clearNftItem: (state, action: PayloadAction<any>) => {
+      const symbol = action.payload;
+      if (symbol) {
+        const newAccountNFTList = state.accountNFT.accountNFTList.map(item => {
+          if (item.symbol === symbol) {
+            return {
+              ...item,
+              skipCount: 0,
+              maxResultCount: 9,
+              totalRecordCount: 0,
+              children: [],
+            };
+          }
+          return item;
+        });
+        state.accountNFT.accountNFTList = newAccountNFTList;
+      } else {
+        const newAccountNFTList = state.accountNFT.accountNFTList.map(item => ({
+          ...item,
+          skipCount: 0,
+          maxResultCount: 9,
+          totalRecordCount: 0,
+          children: [],
+        }));
+        state.accountNFT.accountNFTList = newAccountNFTList;
+      }
+    },
   },
   extraReducers: builder => {
     builder
@@ -212,10 +241,18 @@ export const assetsSlice = createSlice({
       })
       .addCase(fetchNFTCollectionsAsync.fulfilled, (state, action) => {
         const { list, totalRecordCount } = action.payload;
-
-        state.accountNFT.accountNFTList = [...state.accountNFT.accountNFTList, ...list];
-        state.accountNFT.skipCount = state.accountNFT.accountNFTList.length;
-        state.accountNFT.totalRecordCount = totalRecordCount;
+        const newAccountList: NFTCollectionItemShowType[] = list.map(item => ({
+          isFetching: false,
+          skipCount: 0,
+          maxResultCount: 9,
+          totalRecordCount: 0,
+          children: [],
+          ...item,
+        }));
+        state.accountNFT.accountNFTList = newAccountList;
+        // state.accountNFT.accountNFTList = [...state.accountNFT.accountNFTList, ...newAccountList];
+        // state.accountNFT.skipCount = state.accountNFT.accountNFTList.length;
+        // state.accountNFT.totalRecordCount = totalRecordCount;
         state.accountNFT.isFetching = false;
       })
       .addCase(fetchNFTCollectionsAsync.rejected, state => {})
@@ -224,15 +261,11 @@ export const assetsSlice = createSlice({
         // state.status = 'loading';
       })
       .addCase(fetchNFTAsync.fulfilled, (state, action) => {
+        if (!action.payload) return;
         const { list, totalRecordCount, symbol } = action.payload;
-
-        console.log('====================================');
-        console.log('sss');
-        console.log('====================================');
-
         const currentNFTSeriesItem = state.accountNFT.accountNFTList.find(ele => ele.symbol === symbol);
         if (!currentNFTSeriesItem) return;
-        if (!currentNFTSeriesItem?.children) currentNFTSeriesItem.children = [];
+        // if (!currentNFTSeriesItem?.children) currentNFTSeriesItem.children = [];
 
         currentNFTSeriesItem.children = [...currentNFTSeriesItem?.children, ...list];
         currentNFTSeriesItem.skipCount = currentNFTSeriesItem.children.length;
@@ -261,6 +294,6 @@ export const assetsSlice = createSlice({
   },
 });
 
-export const { addTokenInCurrentAccount } = assetsSlice.actions;
+export const { addTokenInCurrentAccount, clearNftItem } = assetsSlice.actions;
 
 export default assetsSlice;
