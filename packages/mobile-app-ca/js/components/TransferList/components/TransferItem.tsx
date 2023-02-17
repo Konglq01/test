@@ -2,74 +2,66 @@ import { defaultColors } from 'assets/theme';
 import { FontStyles } from 'assets/theme/styles';
 import GStyles from 'assets/theme/GStyles';
 import CommonAvatar from 'components/CommonAvatar';
-import { IconName } from 'components/Svg';
-import { useWallet } from 'hooks/store';
 import { useLanguage } from 'i18n/hooks';
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { formatStr2EllipsisStr, formatTransferTime } from 'utils';
 import { pTd } from 'utils/unit';
+import { ActivityItemType } from '@portkey/types/types-ca/activity';
+import { TransactionTypes, transactionTypesMap } from '@portkey/constants/constants-ca/activity';
+import { unitConverter } from '@portkey/utils/converter';
+import { ZERO } from '@portkey/constants/misc';
 
-type ItemType = {
-  amount?: number | string;
-  amount_o?: number | string;
-  block: number | string;
-  category: 'send' | 'receive';
-  chain?: string; //AELF
-  fee?: number | string; // 0.29
-  feeSymbol?: string; // "ELF"
-  from?: string; // "2GHgmYRXPyxTxmPF48kdbsMaiJhTU3PCZ65fmZzkGD8rEXRH7n"
-  from_chainid?: string; //"AELF"
-  memo?: string; //" "
-  method?: string; // "crosschaintransfer"
-  status?: number; // 1
-  statusText?: string; //"Transferred"
-  status_o: number; // 1
-  symbol: string; //"ELF"
-  time: string | number; //1667286912
-  timeOffset: string; // "1667382114"
-  to?: string; //"2GHgmYRXPyxTxmPF48kdbsMaiJhTU3PCZ65fmZzkGD8rEXRH7n"
-  to_chainid?: string; //"tDVW"
-  txid?: string; //"56f419061433f4102b1378127850096cc9cf8bcab60220162157734cf5a7ac18
-};
-
-interface TokenListItemType {
-  icon?: IconName;
-  symbol?: string;
-  tokenBalance?: number | string;
-  usdtBalance?: number | string;
-  rate?: { USDT: string | number };
-  item?: ItemType;
+interface ActivityItemPropsType {
+  item?: ActivityItemType;
   onPress?: (item: any) => void;
 }
 
-const ActivityItem: React.FC<TokenListItemType> = props => {
-  const { rate, onPress, item } = props;
+const ActivityItem: React.FC<ActivityItemPropsType> = ({ item, onPress }) => {
   const { t } = useLanguage();
 
-  const { currentNetwork } = useWallet();
-  // console.log(item);
+  const amountString = useMemo(() => {
+    const { amount = '', isReceived, decimal = '', symbol } = item || {};
+    let _amountString = '';
+    if (amount) _amountString += isReceived ? '+' : '-';
+    _amountString += unitConverter(ZERO.plus(amount).div(`1e${decimal}`));
+    _amountString += symbol ? ` ${symbol}` : '';
+    return _amountString;
+  }, [item]);
+
+  const activityListLeftIcon = (type?: TransactionTypes) => {
+    if (!type) return 'transfer';
+    const loginRelatedTypeArr = [
+      TransactionTypes.ADD_MANAGER,
+      TransactionTypes.REMOVE_MANAGER,
+      TransactionTypes.SOCIAL_RECOVERY,
+    ];
+    return loginRelatedTypeArr.includes(type) ? 'social-recovery' : 'transfer';
+  };
 
   return (
     <TouchableOpacity style={itemStyle.itemWrap} onPress={() => onPress?.(item)}>
-      <Text style={itemStyle.time}>{formatTransferTime(Date.now())}</Text>
+      <Text style={itemStyle.time}>{formatTransferTime(Number(item?.timestamp) * 1000)}</Text>
       <View style={itemStyle.contentWrap}>
         <CommonAvatar
           style={itemStyle.left}
           title={item?.symbol || ''}
           // svgName="transfer"
-          svgName="social-recovery"
+          // TODO: dynamic icon
+          svgName={activityListLeftIcon(item?.transactionType)}
           avatarSize={pTd(32)}
           color={defaultColors.primaryColor}
         />
 
         <View style={itemStyle.center}>
           {/* TODO:  sent and received not send */}
-          <Text style={itemStyle.centerType}>{t('Transfer')}</Text>
+          <Text style={itemStyle.centerType}>
+            {item?.transactionType ? transactionTypesMap(item.transactionType, item.nftInfo?.nftId) : ''}
+          </Text>
           <Text style={[itemStyle.centerStatus, FontStyles.font3]}>
             {t('From')}
             {':  '}
-            {formatStr2EllipsisStr('0x46f4e431f49adsadasdas5b78d135a26', 12)}
+            {formatStr2EllipsisStr(item?.isReceived ? item?.toAddress : item?.fromAddress, 10)}
           </Text>
           <Text style={[itemStyle.centerStatus, FontStyles.font3]}>
             {'MainChain AELF'}
@@ -79,13 +71,16 @@ const ActivityItem: React.FC<TokenListItemType> = props => {
         </View>
 
         <View style={itemStyle.right}>
-          <Text style={[itemStyle.tokenBalance]}>{`${item?.amount} ${item?.symbol || 'ELF'}`}</Text>
-          {currentNetwork === 'MAIN' && (
-            // <Text style={itemStyle.usdtBalance}>{`$ ${
-            //   (Number(item?.amount) * Number(rate?.USDT)).toFixed(2) || 1000.0
-            // }`}</Text>
+          <Text style={[itemStyle.tokenBalance]}>
+            {item?.nftInfo?.nftId ? `#${item?.nftInfo?.nftId}` : ''}
+            {!item?.nftInfo?.nftId ? amountString : ''}
+          </Text>
+          {/* {currentNetwork === 'MAIN' && (
+            <Text style={itemStyle.usdtBalance}>{`$ ${
+              (Number(item?.amount) * Number(rate?.USDT)).toFixed(2) || 1000.0
+            }`}</Text>
             <Text style={itemStyle.usdtBalance}>{`$ 1000.00`}</Text>
-          )}
+          )} */}
         </View>
       </View>
     </TouchableOpacity>

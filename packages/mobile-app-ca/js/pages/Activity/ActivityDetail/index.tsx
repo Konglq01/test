@@ -1,47 +1,140 @@
-import React, { useMemo } from 'react';
-import PageContainer from 'components/PageContainer';
-import { Text, View, StyleSheet, TouchableOpacity, StatusBar } from 'react-native';
-import Svg from 'components/Svg';
-import { pTd } from 'utils/unit';
+import { TransactionTypes, transactionTypesMap } from '@portkey/constants/constants-ca/activity';
+import { ZERO } from '@portkey/constants/misc';
+import { TransactionStatus } from '@portkey/graphql/contract/__generated__/types';
+import { useCaAddresses, useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentNetwork } from '@portkey/hooks/network';
+import useRouterParams from '@portkey/hooks/useRouterParams';
+import { fetchActivity } from '@portkey/store/store-ca/activity/api';
+import { ActivityItemType } from '@portkey/types/types-ca/activity';
 import { getExploreLink } from '@portkey/utils';
+import { unitConverter } from '@portkey/utils/converter';
+import { Image } from '@rneui/base';
 import { defaultColors } from 'assets/theme';
+import fonts from 'assets/theme/fonts';
 import GStyles from 'assets/theme/GStyles';
 import CommonButton from 'components/CommonButton';
 import { TextL, TextM, TextS } from 'components/CommonText';
-import fonts from 'assets/theme/fonts';
-import navigationService from 'utils/navigationService';
-import { formatStr2EllipsisStr, formatTransferTime } from 'utils';
-import { useCurrentNetwork } from '@portkey/hooks/network';
-import { useWallet } from 'hooks/store';
-import { useLanguage } from 'i18n/hooks';
 import CommonToast from 'components/CommonToast';
+import PageContainer from 'components/PageContainer';
+import Svg from 'components/Svg';
 import * as Clipboard from 'expo-clipboard';
-import { Image } from '@rneui/base';
+import useEffectOnce from 'hooks/useEffectOnce';
+import { useLanguage } from 'i18n/hooks';
+import React, { useMemo, useState } from 'react';
+import { StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { formatStr2EllipsisStr, formatTransferTime } from 'utils';
+import navigationService from 'utils/navigationService';
+import { pTd } from 'utils/unit';
 
-interface ActivityDetailProps {
-  route?: any;
-  transfer?: string;
+interface RouterParams {
+  transactionId?: string;
+  blockHash?: string;
 }
 
-const type = 'nft';
-const mockUrl =
-  'https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/fotojet-5-1650369753.jpg?crop=0.498xw:0.997xh;0,0&resize=640:*';
-
-const ActivityDetail: React.FC<ActivityDetailProps> = ({ route, transfer }) => {
-  const { walletName } = useWallet();
+const ActivityDetail = () => {
   const { t } = useLanguage();
-  const { params } = route;
-  // const { transferInfo } = params;
-  const transferInfo = {
-    category: 'send',
-    title: 'test',
-  };
-
+  const { transactionId = '', blockHash = '' } = useRouterParams<RouterParams>();
+  const caAddresses = useCaAddresses();
+  const { currentNetwork } = useCurrentWallet();
   const { blockExplorerURL } = useCurrentNetwork();
+  const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'TESTNET' : ''), [currentNetwork]);
 
-  console.log('transferInfo........', transferInfo, transfer);
+  const [activityItem, setActivityItem] = useState<ActivityItemType>();
+  useEffectOnce(() => {
+    const params = {
+      caAddresses,
+      transactionId,
+      blockHash,
+    };
+    fetchActivity(params)
+      .then(res => {
+        setActivityItem(res);
+      })
+      .catch(error => {
+        throw Error(JSON.stringify(error));
+      });
+  });
 
-  // const title = useMemo(() => {}, [transferInfo.category]);
+  const isNft = useMemo(() => !!activityItem?.nftInfo?.nftId, [activityItem?.nftInfo?.nftId]);
+  const status = useMemo(() => {
+    if (activityItem?.status === TransactionStatus.Mined)
+      return {
+        text: 'Confirmed',
+        style: 'confirmed',
+      };
+    return {
+      text: 'Failed',
+      style: 'failed',
+    };
+  }, [activityItem]);
+
+  const networkUI = useMemo(() => {
+    const { transactionType, fromChainId, toChainId, transactionId: _transactionId = '' } = activityItem || {};
+    const from = fromChainId === 'AELF' ? 'MainChain AELF' : `SideChain ${fromChainId}`;
+    const to = toChainId === 'AELF' ? 'MainChain AELF' : `SideChain ${toChainId}`;
+    const hiddenArr = [TransactionTypes.SOCIAL_RECOVERY, TransactionTypes.ADD_MANAGER, TransactionTypes.REMOVE_MANAGER];
+
+    return (
+      transactionType &&
+      !hiddenArr.includes(transactionType) && (
+        <>
+          <View style={styles.section}>
+            <View style={[styles.flexSpaceBetween]}>
+              <TextM style={[styles.lightGrayFontColor]}>{t('Network')}</TextM>
+              <View style={styles.networkInfoContent}>
+                <TextM style={[styles.blackFontColor]}>{`${from} ${isTestNet}`}</TextM>
+                <View style={GStyles.flexRow}>
+                  <TextM style={[styles.lightGrayFontColor]}>{` → `}</TextM>
+                  <TextM style={[styles.blackFontColor]}>{`${to} ${isTestNet}`}</TextM>
+                </View>
+              </View>
+            </View>
+            <View style={[styles.flexSpaceBetween, styles.marginTop16]}>
+              <TextM style={[styles.lightGrayFontColor]}>{t('Transaction ID')}</TextM>
+              <View style={[GStyles.flexRow, styles.alignItemsCenter]}>
+                <TextM style={{}}>{formatStr2EllipsisStr(_transactionId, 10, 'tail')}</TextM>
+                <TouchableOpacity
+                  style={styles.marginLeft8}
+                  onPress={async () => {
+                    const isCopy = await Clipboard.setStringAsync(_transactionId);
+                    isCopy && CommonToast.success(t('Copy Success'));
+                  }}>
+                  <Svg icon="copy" size={pTd(13)} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+          <Text style={[styles.divider, styles.marginTop0]} />
+        </>
+      )
+    );
+  }, [activityItem, isTestNet, t]);
+
+  const feeUI = useMemo(() => {
+    const transactionFees = activityItem?.transactionFees || [];
+    return (
+      <View style={styles.section}>
+        <View style={[styles.flexSpaceBetween]}>
+          <TextM style={[styles.blackFontColor, styles.fontBold]}>{t('Transaction Fee')}</TextM>
+          <View>
+            {transactionFees.map((item, index) => (
+              <View key={index} style={[styles.transactionFeeItemWrap, index > 0 && styles.marginTop8]}>
+                <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${unitConverter(
+                  ZERO.plus(item.fee || 0).div(`1e${activityItem?.decimal}`),
+                )} ${item.symbol}`}</TextM>
+                {!isTestNet && (
+                  <TextS style={[styles.lightGrayFontColor, styles.marginTop4]}>{`$ ${unitConverter(
+                    ZERO.plus(item.feeInUsd ?? 0).div(`1e${activityItem?.decimal}`),
+                    2,
+                  )}`}</TextS>
+                )}
+              </View>
+            ))}
+          </View>
+        </View>
+      </View>
+    );
+  }, [activityItem?.decimal, activityItem?.transactionFees, isTestNet, t]);
 
   return (
     <PageContainer
@@ -53,24 +146,36 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ route, transfer }) => {
       <TouchableOpacity style={styles.closeWrap} onPress={() => navigationService.goBack()}>
         <Svg icon="close" size={pTd(16)} />
       </TouchableOpacity>
-      {/* TODO: names */}
-      <Text style={styles.typeTitle}>{t('Transfer')}</Text>
+      <Text style={styles.typeTitle}>
+        {transactionTypesMap(activityItem?.transactionType, activityItem?.nftInfo?.nftId)}
+      </Text>
 
-      <Text style={styles.tokenCount}>-12.2 READ</Text>
-      <Text style={styles.usdtCount}>$ 0.11</Text>
-
-      {type !== 'nft' && (
-        <View style={styles.topWrap}>
-          {/* <Text style={styles.noImg}>A</Text> */}
-          <Image style={styles.img} source={{ uri: mockUrl }} />
-          <View style={styles.topLeft}>
-            <TextL style={styles.nftTitle}>BoxcatPlanet #2271</TextL>
-            <TextS>Amount：3</TextS>
+      {isNft ? (
+        <>
+          <View style={styles.topWrap}>
+            {/* <Text style={styles.noImg}>A</Text> */}
+            <Image style={styles.img} source={{ uri: activityItem?.nftInfo?.imageUrl || '' }} />
+            <View style={styles.topLeft}>
+              <TextL style={styles.nftTitle}>{`${activityItem?.nftInfo?.alias || ''} #${
+                activityItem?.nftInfo?.nftId || ''
+              }`}</TextL>
+              <TextS>Amount: {activityItem?.amount || ''}</TextS>
+            </View>
           </View>
-        </View>
+          <View style={styles.divider} />
+        </>
+      ) : (
+        <>
+          <Text style={styles.tokenCount}>
+            {`${unitConverter(ZERO.plus(activityItem?.amount || 0).div(`1e${activityItem?.decimal}`))} ${
+              activityItem?.symbol || ''
+            }`}
+          </Text>
+          {!isTestNet && (
+            <Text style={styles.usdtCount}>{`$ ${unitConverter(ZERO.plus(activityItem?.priceInUsd ?? 0), 2)}`}</Text>
+          )}
+        </>
       )}
-
-      {type !== 'nft' && <View style={styles.divider} />}
 
       <View style={[styles.flexSpaceBetween, styles.titles1]}>
         <TextM style={styles.lightGrayFontColor}>{t('Status')}</TextM>
@@ -78,8 +183,10 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ route, transfer }) => {
       </View>
 
       <View style={[styles.flexSpaceBetween, styles.values1]}>
-        <TextM style={styles.greenFontColor}>{t('Success')}</TextM>
-        <TextM style={styles.blackFontColor}>{formatTransferTime(Date.now() || '')}</TextM>
+        <TextM style={styles.greenFontColor}>{t(status.text)}</TextM>
+        <TextM style={styles.blackFontColor}>
+          {activityItem && activityItem.timestamp ? formatTransferTime(Number(activityItem?.timestamp) * 1000) : ''}
+        </TextM>
       </View>
 
       <View style={styles.card}>
@@ -87,13 +194,10 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ route, transfer }) => {
         <View style={styles.section}>
           <View style={[styles.flexSpaceBetween]}>
             <TextM style={styles.lightGrayFontColor}>{t('From')}</TextM>
-            <TextM style={styles.blackFontColor}>{walletName}</TextM>
-          </View>
-          <View style={[styles.flexSpaceBetween]}>
-            <TextM style={styles.lightGrayFontColor} />
-            <TextM style={styles.lightGrayFontColor}>
-              {formatStr2EllipsisStr('ELF_xsasadsadsaddasd_xasxasdsadsad_AELF')}
-            </TextM>
+            <View style={styles.alignItemsEnd}>
+              {activityItem?.from && <TextM style={styles.blackFontColor}>{activityItem.from}</TextM>}
+              <TextS style={styles.lightGrayFontColor}>{formatStr2EllipsisStr(activityItem?.fromAddress)}</TextS>
+            </View>
           </View>
         </View>
         <Text style={[styles.divider, styles.marginTop0]} />
@@ -101,60 +205,28 @@ const ActivityDetail: React.FC<ActivityDetailProps> = ({ route, transfer }) => {
         <View style={styles.section}>
           <View style={[styles.flexSpaceBetween]}>
             <TextM style={[styles.lightGrayFontColor]}>{t('To')}</TextM>
-            <TextM style={[styles.blackFontColor, styles.fontBold]}>{`Sally`}</TextM>
-          </View>
-          <View style={[styles.flexSpaceBetween]}>
-            <Text />
-            <TextS style={styles.lightGrayFontColor}>
-              {formatStr2EllipsisStr('ELF_xsasadsadsaddasd_xasxasdsadsad_AELF')}
-            </TextS>
-          </View>
-        </View>
-        <Text style={[styles.divider, styles.marginTop0]} />
-        {/* more Info */}
-        <View style={styles.section}>
-          <View style={[styles.flexSpaceBetween]}>
-            <TextM style={[styles.lightGrayFontColor]}>{t('Network')}</TextM>
-            <TextM style={[styles.blackFontColor]}>{`${'MainChain AELF'} → ${'MainChain AELF'} `}</TextM>
-          </View>
-          <View style={[styles.flexSpaceBetween, styles.marginTop16]}>
-            <TextM style={[styles.lightGrayFontColor]}>{t('Transaction ID')}</TextM>
-            <View style={[GStyles.flexRow, styles.alignItemsCenter]}>
-              <TextM style={{}}>{formatStr2EllipsisStr('xsadxxxxxx', 10, 'tail')}</TextM>
-              <TouchableOpacity
-                style={styles.marginLeft8}
-                onPress={async () => {
-                  const isCopy = await Clipboard.setStringAsync('xxxxx');
-                  isCopy && CommonToast.success(t('Copy Success'));
-                }}>
-                <Svg icon="copy" size={pTd(13)} />
-              </TouchableOpacity>
+            <View style={styles.alignItemsEnd}>
+              {activityItem?.to && <TextM style={[styles.blackFontColor, styles.fontBold]}>{activityItem.to}</TextM>}
+              <TextS style={styles.lightGrayFontColor}>{formatStr2EllipsisStr(activityItem?.toAddress)}</TextS>
             </View>
           </View>
         </View>
         <Text style={[styles.divider, styles.marginTop0]} />
+        {/* more Info */}
+
+        {networkUI}
         {/* transaction Fee */}
-        <View style={styles.section}>
-          <View style={[styles.flexSpaceBetween]}>
-            <TextM style={[styles.blackFontColor, styles.fontBold]}>{t('Transaction Fee')}</TextM>
-            <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${'0.0001'} ${'ELF'} `}</TextM>
-          </View>
-          <View style={[styles.flexSpaceBetween, styles.marginTop4]}>
-            <Text />
-            <TextS style={styles.lightGrayFontColor}>{`$ ${'0.11'}`}</TextS>
-          </View>
-        </View>
+        {feeUI}
       </View>
 
       <View style={styles.space} />
 
       {blockExplorerURL ? (
         <CommonButton
-          // onPress={() => Linking.openURL(getExploreLink(blockExplorerURL, currentAccount?.address || ''))}
           containerStyle={[GStyles.marginTop(pTd(8)), styles.bottomButton]}
           onPress={() =>
             navigationService.navigate('ViewOnWebView', {
-              url: getExploreLink(blockExplorerURL, 'currentAccount?.address' || ''),
+              url: getExploreLink(blockExplorerURL, activityItem?.transactionId || '', 'transaction'),
             })
           }
           title={t('View on Explorer')}
@@ -235,9 +307,8 @@ export const styles = StyleSheet.create({
   flexSpaceBetween: {
     display: 'flex',
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    height: pTd(20),
+    minHeight: pTd(20),
     width: '100%',
   },
   titles1: {
@@ -271,6 +342,9 @@ export const styles = StyleSheet.create({
   marginTop16: {
     marginTop: pTd(16),
   },
+  marginTop8: {
+    marginTop: pTd(8),
+  },
   marginTop4: {
     marginTop: pTd(4),
   },
@@ -301,7 +375,20 @@ export const styles = StyleSheet.create({
   alignItemsCenter: {
     alignItems: 'center',
   },
+  alignItemsEnd: {
+    alignItems: 'flex-end',
+  },
   bottomButton: {
     backgroundColor: defaultColors.bg1,
+  },
+  networkInfoContent: {
+    flexDirection: 'row',
+    flexShrink: 1,
+    flexWrap: 'wrap',
+    justifyContent: 'flex-end',
+    marginLeft: pTd(20),
+  },
+  transactionFeeItemWrap: {
+    alignItems: 'flex-end',
   },
 });
