@@ -3,7 +3,7 @@ export default {
   fetchAccountNftProtocolList: '/api/app/user/assets/nftProtocols',
   fetchAccountNftProtocolItemList: '/api/app/user/assets/nftItems',
   // nft and tokens
-  fetchAccountAssetsByKeywords: '/api/app/user/assets/searchUserAssets',
+  fetchAccountAssetsByKeywords: '/api/app/user/assets/nftCollections',
 
   fetchActivityList: '/api/app/user/activities/activities',
 } as const;

@@ -19,6 +19,7 @@ import { defaultColors } from 'assets/theme';
 import { useWallet } from 'hooks/store';
 import TokenListItem from 'components/TokenListItem';
 import { FontStyles } from 'assets/theme/styles';
+import { useCaAddresses } from '@portkey/hooks/hooks-ca/wallet';
 
 type onFinishSelectTokenType = (tokenItem: any) => void;
 type TokenListProps = {
@@ -86,6 +87,8 @@ const AssetList = ({ onFinishSelectToken, account }: TokenListProps) => {
   const { accountAssets } = useAppCASelector(state => state.assets);
   const dispatch = useAppCommonDispatch();
 
+  const caAddresses = useCaAddresses();
+
   const [listShow, setListShow] = useState<any[]>([]);
 
   const [filterListInfo, setFilterListInfo] = useState({
@@ -126,11 +129,11 @@ const AssetList = ({ onFinishSelectToken, account }: TokenListProps) => {
     console.log('accountAssetsListaccountAssetsListaccountAssetsList', accountAssets);
 
     setListShow(accountAssets.accountAssetsList);
-  }, [accountAssets.accountAssetsList]);
+  }, [accountAssets, accountAssets.accountAssetsList]);
 
   useEffectOnce(() => {
     if (accountAssets.accountAssetsList.length !== 0) return;
-    dispatch(fetchAssetAsync({ type: 'MAIN' }));
+    dispatch(fetchAssetAsync({ caAddresses, keyword: ' ' }));
   });
 
   return (

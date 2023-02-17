@@ -58,6 +58,7 @@ export interface NftInfo {
   protocolName: string;
   quantity: string;
 }
+
 export interface AccountAssetItem {
   chainId: string;
   symbol: string;

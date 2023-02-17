@@ -55,10 +55,6 @@ const TokenDetail: React.FC = () => {
   const { t } = useLanguage();
   const { tokenInfo } = useRouterParams<RouterParams>();
 
-  console.log('====================================');
-  console.log(tokenInfo);
-  console.log('====================================');
-
   const currentWallet = useCurrentWallet();
 
   const navigation = useNavigation();
@@ -78,6 +74,7 @@ const TokenDetail: React.FC = () => {
   const [noMoreData, setNoMoreData] = useState(false);
   const [initializing, setInitializing] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [reFreshing, setFreshing] = useState(false);
 
   // const [isLoadingFirstTime, setIsLoadingFirstTime] = useState(true); // first time
 
@@ -86,11 +83,11 @@ const TokenDetail: React.FC = () => {
   // };
 
   useEffect(() => {
-    setListShow(activity.list);
+    // setListShow(activity?.list);
   }, [activity]);
 
   useEffectOnce(() => {
-    dispatch(getActivityListAsync({ type: 'MAIN' }));
+    // dispatch(getActivityListAsync({}));
   });
 
   // const balanceFormat = useCallback((symbol: string, decimals = 8) => ZERO.plus('0').div(`1e${decimals}`), []);
@@ -182,6 +179,7 @@ const TokenDetail: React.FC = () => {
       {/* {isLoadingFirstTime && <Dialog.Loading />} */}
       {listShow.length === 0 && <NoData noPic message="You have no transactions." />}
       <FlashList
+        refreshing={reFreshing}
         data={listShow || []}
         renderItem={() => {
           return <TransferItem onPress={() => navigationService.navigate('ActivityDetail')} />;
