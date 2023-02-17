@@ -1,4 +1,6 @@
 import { ZERO } from '@portkey/constants/misc';
+import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
+import { getChainIdByAddress } from '@portkey/utils';
 import clsx from 'clsx';
 import { useMemo } from 'react';
 import { useWalletInfo } from 'store/Provider/hooks';
@@ -17,14 +19,15 @@ export default function SendPreview({
   transactionFee: string | number;
   type?: 'nft' | 'token';
 }) {
-  const { walletName, currentNetwork } = useWalletInfo();
+  const { walletName, currentNetwork, walletInfo } = useWalletInfo();
+  const networkInfo = useCurrentNetworkInfo();
   const isTestNet = useMemo(() => currentNetwork === 'TESTNET', [currentNetwork]);
   return (
     <div className="send-preview">
       {type !== 'nft' ? (
         <div className="amount-preview">
           <p className="amount">
-            - {amount} {symbol}
+            {amount} {symbol}
           </p>
           <p className="convert">{isTestNet ? '' : `$ ${amount}`}</p>
         </div>
@@ -49,7 +52,7 @@ export default function SendPreview({
           <span className="label">From</span>
           <div className="value">
             <p className="name">{walletName}</p>
-            <p className="address">ELF_asdad_AELF</p>
+            <p className="address">{walletInfo?.address}</p>
           </div>
         </div>
         <div className={clsx('item', toAccount.name?.length || 'no-name')}>
@@ -66,7 +69,9 @@ export default function SendPreview({
         <div className="item network">
           <span>Network</span>
           <div>
-            <p>{`${'MainChain AELF'}->${'MainChain AELF'}`}</p>
+            <p>{`${networkInfo.name} ${getChainIdByAddress(walletInfo?.address || '', networkInfo.walletType)}->${
+              networkInfo.name
+            } ${getChainIdByAddress(toAccount.address, networkInfo.walletType)}`}</p>
           </div>
         </div>
       </div>

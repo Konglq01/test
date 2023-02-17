@@ -5,6 +5,7 @@ export type NFTCollectionItemBaseType = {
   imageUrl: string;
   itemCount: number;
   symbol: string;
+  decimals: number; // 0
 };
 
 export interface NFTCollectionItemShowType extends NFTCollectionItemBaseType {
