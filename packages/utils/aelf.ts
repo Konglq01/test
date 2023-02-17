@@ -19,6 +19,10 @@ export function isAelfAddress(value?: string) {
   }
 }
 
+export const getChainNumber = (chainId: string) => {
+  return AElf.utils.chainIdConvertor.base58ToChainId(chainId);
+};
+
 export function isDIDAelfAddress(value?: string) {
   if (!value) return false;
   if (/[\u4e00-\u9fa5]/.test(value)) return false;
@@ -48,8 +52,7 @@ export function getAelfAddress(value: string = '') {
 }
 
 export function getWallet(privateKey = COMMON_PRIVATE) {
-  if (!wallet) wallet = Wallet.getWalletByPrivateKey(privateKey);
-  return wallet;
+  return Wallet.getWalletByPrivateKey(privateKey);
 }
 
 export const getAelfInstance = (rpcUrl: string) => {

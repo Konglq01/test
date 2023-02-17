@@ -118,15 +118,15 @@ export const PageRouter = () =>
       element: <TokenDetail />,
     },
     {
-      path: '/send/:symbol',
+      path: '/send/:type/:symbol',
       element: <Send />,
     },
     {
-      path: '/send/:symbol/:tokenId',
+      path: '/send/:type/:symbol/:tokenId',
       element: <Send />,
     },
     {
-      path: '/receive/:symbol/:chainId',
+      path: '/receive/:type/:symbol/:chainId',
       element: <Receive />,
     },
     {
