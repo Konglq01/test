@@ -70,14 +70,14 @@ export function fetchNFTSeriesList({
   skipCount: number;
   maxResultCount: number;
 }): Promise<{ data: any[]; totalRecordCount: number }> {
-  // return new Promise(resolve => setTimeout(() => resolve(mockNFTSeriesData.data), 500));
-  return request.assets.fetchAccountNftProtocolList({
-    params: {
-      caAddresses,
-      skipCount,
-      maxResultCount,
-    },
-  });
+  return new Promise(resolve => setTimeout(() => resolve(mockNFTSeriesData.data), 500));
+  // return request.assets.fetchAccountNftProtocolList({
+  //   params: {
+  //     caAddresses,
+  //     skipCount,
+  //     maxResultCount,
+  //   },
+  // });
 }
 
 export function fetchNFTList({
@@ -95,4 +95,18 @@ export function fetchNFTList({
   console.log('fetching....list', symbol, caAddresses, skipCount, maxResultCount);
 
   return new Promise(resolve => setTimeout(() => resolve(mockNFTsData.data), 500));
+}
+
+export function fetchTokenPrices({
+  symbols,
+}: {
+  symbols: string[];
+}): Promise<{ items: { symbol: string; priceInUsd: number }[]; totalRecordCount: number }> {
+  console.log('fetchTokenPrices....');
+
+  return request.token.fetchTokenPrice({
+    params: {
+      symbols,
+    },
+  });
 }

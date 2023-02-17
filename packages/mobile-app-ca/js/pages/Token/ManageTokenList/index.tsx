@@ -3,7 +3,7 @@ import { useIsFetchingTokenList, useToken } from '@portkey/hooks/hooks-ca/useTok
 import { UserTokenItemTokenType, UserTokenItemType } from '@portkey/types/types-ca/token';
 import { filterTokenList } from '@portkey/utils/token';
 import CommonInput from 'components/CommonInput';
-import { useAppCASelector } from '@portkey/hooks/index';
+import { useAppCASelector } from '@portkey/hooks/hooks-ca';
 import { Dialog } from '@rneui/themed';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import gStyles from 'assets/theme/GStyles';
@@ -70,9 +70,10 @@ Item.displayName = 'Item';
 
 const ManageTokenList: React.FC<ManageTokenListProps> = () => {
   const { t } = useLanguage();
-  const [tokenState] = useToken();
-  const { tokenDataShowInMarket } = tokenState;
+
   const isLoading = useIsFetchingTokenList();
+
+  const { tokenDataShowInMarket } = useAppCASelector(state => state.tokenManagement);
 
   console.log('------', tokenDataShowInMarket);
 
