@@ -43,6 +43,7 @@ export default function createConfig(packageName) {
     targets: [
       // Need to copy the files over for usage
       { src: 'src/assets/fonts', dest: 'dist/assets' },
+      { src: 'src/sandbox', dest: 'dist' },
     ],
   });
 
