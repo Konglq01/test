@@ -47,7 +47,7 @@ function TokenDetail() {
         <div className="balance">
           <div className="balance-amount">
             <span className="amount">
-              {unitConverter(divDecimals(currentToken?.balance, currentToken?.decimal || 8))} {currentToken?.symbol}
+              {unitConverter(divDecimals(currentToken?.balance, currentToken?.decimals || 8))} {currentToken?.symbol}
             </span>
             {isMain && <span className="convert">$ {unitConverter(currentToken?.balanceInUsd)}</span>}
           </div>

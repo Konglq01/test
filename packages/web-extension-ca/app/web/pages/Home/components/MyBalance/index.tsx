@@ -24,7 +24,7 @@ export interface TransactionResult {
 let timer: any;
 
 export default function MyBalance() {
-  const { walletName, currentNetwork } = useWalletInfo();
+  const { walletName, currentNetwork, walletInfo } = useWalletInfo();
   const { t } = useTranslation();
   const [balanceUSD, setBalanceUSD] = useState<string | number>('--');
   const [activeKey, setActiveKey] = useState<string>('assets');
@@ -37,6 +37,10 @@ export default function MyBalance() {
   const { passwordSeed } = useUserInfo();
   const appDispatch = useAppDispatch();
   const caAddresses = useCaAddresses();
+  const chainIdArray = useMemo(
+    () => Object.keys(walletInfo?.caInfo?.TESTNET || {}).filter((item) => item !== 'managerInfo'),
+    [walletInfo?.caInfo?.TESTNET],
+  );
 
   useEffect(() => {
     console.log('---passwordSeed-myBalance---', passwordSeed);
@@ -48,8 +52,8 @@ export default function MyBalance() {
         }),
       );
     passwordSeed && appDispatch(fetchTokenListAsync({ caAddresses }));
-    passwordSeed && appDispatch(fetchAllTokenListAsync({}));
-  }, [passwordSeed, appDispatch, caAddresses]);
+    passwordSeed && appDispatch(fetchAllTokenListAsync({ keyword: '', chainIdArray }));
+  }, [passwordSeed, appDispatch, caAddresses, chainIdArray]);
 
   useEffect(() => {
     let tmpAllBalanceUsd = 0;
@@ -76,9 +80,9 @@ export default function MyBalance() {
           setTokenOpen(false);
           // navigate(`/${navTarget}/${v.token.symbol}`);
           if (navTarget === 'receive') {
-            navigate(`/${navTarget}/${v.symbol}/${v.chainId}`);
+            navigate(`/${navTarget}/${type}/${v.symbol}/${v.chainId}`, { state: v });
           } else {
-            navigate(`/${navTarget}/${v.symbol}`, { state: type });
+            navigate(`/${navTarget}/${type}/${v.symbol}/${v.chainId}`, { state: type });
           }
         }}
       />

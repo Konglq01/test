@@ -23,12 +23,16 @@ export default function AddToken() {
   const [openDrop, setOpenDrop] = useState<boolean>(false);
   const { passwordSeed } = useUserInfo();
   const appDispatch = useAppDispatch();
-  const { currentNetwork } = useWalletInfo();
+  const { currentNetwork, walletInfo } = useWalletInfo();
+  const chainIdArray = useMemo(
+    () => Object.keys(walletInfo?.caInfo?.TESTNET || {}).filter((item) => item !== 'managerInfo'),
+    [walletInfo?.caInfo?.TESTNET],
+  );
   const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'Testnet' : ''), [currentNetwork]);
 
   useEffect(() => {
-    passwordSeed && appDispatch(fetchAllTokenListAsync({ keyword: filterWord }));
-  }, [passwordSeed, filterWord, appDispatch]);
+    passwordSeed && appDispatch(fetchAllTokenListAsync({ keyword: filterWord, chainIdArray }));
+  }, [passwordSeed, filterWord, appDispatch, chainIdArray]);
 
   useEffect(() => {
     tokenDataShowInMarket.length ? setOpenDrop(false) : setOpenDrop(true);
@@ -40,7 +44,7 @@ export default function AddToken() {
   const handleUserTokenDisplay = useCallback(
     async (item: TokenItemShowType) => {
       try {
-        await displayUserToken(item);
+        await displayUserToken({ tokenItem: item, keyword: filterWord, chainIdArray });
         message.success('success');
       } catch (error: any) {
         message.error(error?.message || 'handle display error');

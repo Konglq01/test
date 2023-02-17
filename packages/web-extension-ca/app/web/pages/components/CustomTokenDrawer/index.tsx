@@ -8,13 +8,11 @@ import { useAppDispatch, useAssetInfo, useTokenInfo, useUserInfo, useWalletInfo 
 import BaseDrawer from '../BaseDrawer';
 import { fetchAssetAsync, fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
 import './index.less';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { ZERO } from '@portkey/constants/misc';
 import { unitConverter } from '@portkey/utils/converter';
 import { fetchAllTokenListAsync } from '@portkey/store/store-ca/tokenManagement/action';
 import { useCaAddresses } from '@portkey/hooks/hooks-ca/wallet';
 interface CustomSelectProps extends DrawerProps {
-  // onChange?: (v: TokenBaseItemType) => void;
   onChange?: (v: AccountAssetItem, type: 'token' | 'nft') => void;
   onClose?: () => void;
   searchPlaceHolder?: string;
@@ -30,7 +28,7 @@ export default function CustomTokenDrawer({
   ...props
 }: CustomSelectProps) {
   const { t } = useTranslation();
-  const { currentNetwork } = useWalletInfo();
+  const { currentNetwork, walletInfo } = useWalletInfo();
   const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'Testnet' : ''), [currentNetwork]);
   const { accountAssets, accountToken } = useAssetInfo();
   const { tokenDataShowInMarket } = useTokenInfo();
@@ -40,6 +38,10 @@ export default function CustomTokenDrawer({
   const appDispatch = useAppDispatch();
   const { passwordSeed } = useUserInfo();
   const caAddresses = useCaAddresses();
+  const chainIdArray = useMemo(
+    () => Object.keys(walletInfo?.caInfo?.TESTNET || {}).filter((item) => item !== 'managerInfo'),
+    [walletInfo?.caInfo?.TESTNET],
+  );
 
   useEffect(() => {
     if (drawerType === 'send') {
@@ -53,9 +55,9 @@ export default function CustomTokenDrawer({
     if (drawerType === 'send') {
       appDispatch(fetchAssetAsync({ caAddresses, keyword: filterWord }));
     } else {
-      appDispatch(fetchAllTokenListAsync({ keyword: filterWord }));
+      appDispatch(fetchAllTokenListAsync({ keyword: filterWord, chainIdArray }));
     }
-  }, [appDispatch, caAddresses, drawerType, filterWord]);
+  }, [appDispatch, caAddresses, chainIdArray, drawerType, filterWord]);
 
   useEffect(() => {
     if (drawerType === 'send') {
@@ -68,12 +70,15 @@ export default function CustomTokenDrawer({
   const renderToken = useCallback(
     (token: AccountAssetItem) => {
       return (
-        <div className="item" key={token.symbol} onClick={onChange?.bind(undefined, token, 'token')}>
+        <div
+          className="item"
+          key={`${token.symbol}_${token.chainId}`}
+          onClick={onChange?.bind(undefined, token, 'token')}>
           <div className="icon">
             {token.symbol === 'ELF' ? (
               <CustomSvg type="Aelf" />
             ) : (
-              <div className="custom">{token.symbol?.slice(0, 1)}</div>
+              <div className="custom">{token?.symbol?.slice(0, 1)}</div>
             )}
           </div>
           <div className="info">
@@ -87,13 +92,13 @@ export default function CustomTokenDrawer({
           {drawerType === 'send' && (
             <div className="amount">
               <p className="quantity">
-                {unitConverter(ZERO.plus(token?.tokenInfo?.balance || '').div(`1e${token?.tokenInfo?.decimal}`))}
+                {unitConverter(ZERO.plus(token?.tokenInfo?.balance || '').div(`1e${token?.tokenInfo?.decimals}`))}
               </p>
               <p className="convert">
                 {isTestNet
                   ? ''
                   : `$ ${unitConverter(
-                      ZERO.plus(token.tokenInfo?.balanceInUsd || '').div(`1e${token.tokenInfo?.decimal}`),
+                      ZERO.plus(token.tokenInfo?.balanceInUsd || '').div(`1e${token.tokenInfo?.decimals}`),
                     )}`}
               </p>
             </div>
@@ -108,7 +113,9 @@ export default function CustomTokenDrawer({
     (token: AccountAssetItem) => {
       return (
         <div className="item protocol" onClick={onChange?.bind(undefined, token, 'nft')}>
-          <div className="avatar">{token.nftInfo?.imageUrl || token.nftInfo?.alias.slice(0, 1)}</div>
+          <div className="avatar">
+            {token.nftInfo?.imageUrl ? <img src={token.nftInfo.imageUrl} /> : token.nftInfo?.alias?.slice(0, 1)}
+          </div>
           <div className="info">
             <p className="alias">{token.nftInfo?.alias}</p>
             <p className="network">

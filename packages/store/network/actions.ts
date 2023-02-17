@@ -38,7 +38,7 @@ export const addCustomChainItem = createAsyncThunk('chain/addCustomChainItem', a
           id: '', // TODO
           name: 'ELF',
           symbol: 'ELF',
-          decimal: 8,
+          decimals: 8,
           address: tokenAddress,
         };
         basicContracts = { tokenContract: tokenAddress };

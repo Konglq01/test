@@ -59,7 +59,9 @@ export default function NFT() {
           key={nft.symbol}
           header={
             <div className="protocol" onClick={() => handleChange(nft.symbol)}>
-              <div className="avatar">{nft.imageUrl || nft.collectionName?.slice(0, 1) || 'M'}</div>
+              <div className="avatar">
+                {nft.imageUrl ? <img src={nft.imageUrl} /> : nft.collectionName?.slice(0, 1)}
+              </div>
               <div className="info">
                 <p className="alias">{nft.collectionName}</p>
                 <p className="network">{`${nft?.chainId?.toLocaleUpperCase() === 'AELF' ? 'MainChain' : 'SideChain'} ${
@@ -72,12 +74,18 @@ export default function NFT() {
           <div className="list">
             {nft.children.length > 0 &&
               nft.children.map((nftItem: NFTItemBaseType) => {
+                console.log('---------image', nftItem.imageUrl);
+
                 return (
                   <div
                     key={`${nft.symbol}-${nftItem.symbol}`}
+                    // style={{
+                    //   background: "url('https://upload-images.jianshu.io/upload_images/5809200-7fe8c323e533f656.jpg')",
+                    // }}
+                    // style={{ background: `url(${nftItem?.imageUrl})` }}
                     className="item"
                     onClick={() => {
-                      nav('/nft', { state: { info: {} } });
+                      nav('/nft', { state: nftItem });
                     }}>
                     <div className="mask">
                       <p className="alias">{nftItem.alias}</p>
