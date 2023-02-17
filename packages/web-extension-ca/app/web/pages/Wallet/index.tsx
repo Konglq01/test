@@ -38,7 +38,7 @@ export default function Wallet() {
         setCurMenu(null);
         message.success(t('Saved Successful'));
       } catch (error) {
-        // TODO: should show error?
+        message.error('set wallet name error');
         console.log('setWalletName: error', error);
       }
     },

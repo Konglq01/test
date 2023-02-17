@@ -7,6 +7,7 @@ import { AddressItem } from '@portkey/types/types-ca/contact';
 import { useCopyToClipboard } from 'react-use';
 import './index.less';
 import { useCallback } from 'react';
+import { useWalletInfo } from 'store/Provider/hooks';
 
 export default function ViewContact() {
   const { state } = useLocation();
@@ -14,6 +15,7 @@ export default function ViewContact() {
   const { t } = useTranslation();
   const { name, addresses, index } = state;
   const [, setCopied] = useCopyToClipboard();
+  const { currentNetwork } = useWalletInfo();
 
   const handleCopy = useCallback(
     (v: string) => {
@@ -21,6 +23,14 @@ export default function ViewContact() {
       message.success(t('Copy Success'));
     },
     [setCopied, t],
+  );
+
+  const showChain = useCallback(
+    (chainId: string) =>
+      `${chainId.toLocaleLowerCase() === 'aelf' ? 'MainChain' : 'SideChain'} ${chainId} ${
+        currentNetwork.toLocaleLowerCase() === 'testnet' ? 'Testnet' : ''
+      }`,
+    [currentNetwork],
   );
 
   return (
@@ -59,9 +69,9 @@ export default function ViewContact() {
             <div className="flex-between address-item" key={index}>
               <div>
                 <div className="address">{`ELF_${ads?.address}_${ads?.chainId}`}</div>
-                <div className="chain">{`${ads?.chainId} ${ads?.chainId}`}</div>
+                <div className="chain">{showChain(ads.chainId)}</div>
               </div>
-              <CustomSvg onClick={() => handleCopy(ads?.address)} type="Copy2" className="address-copy-icon" />
+              <CustomSvg onClick={() => handleCopy(ads?.address)} type="Copy" className="address-copy-icon" />
             </div>
           ))}
         </div>

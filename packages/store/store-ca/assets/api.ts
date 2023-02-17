@@ -43,12 +43,12 @@ export function fetchAssetList({
   caAddresses,
   maxResultCount,
   skipCount,
-  keyWord = '',
+  keyword = '',
 }: {
   caAddresses: string[];
   maxResultCount: number;
   skipCount: number;
-  keyWord: string;
+  keyword: string;
 }): Promise<{ data: any[]; totalRecordCount: number }> {
   console.log('fetching....list', caAddresses, maxResultCount, skipCount);
   return request.assets.fetchAccountAssetsByKeywords({
@@ -56,7 +56,7 @@ export function fetchAssetList({
       caAddresses,
       skipCount,
       maxResultCount,
-      keyWord,
+      keyword,
     },
   });
 }

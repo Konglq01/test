@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { NetworkType } from '@portkey/types';
 import { useAppDispatch } from 'store/Provider/hooks';
-// import { useAppDispatch, useWalletInfo } from 'store/Provider/hooks';
 import { changeNetworkType } from '@portkey/store/store-ca/wallet/actions';
 import CustomSvg from 'components/CustomSvg';
 import './index.less';
@@ -19,10 +18,8 @@ interface Network {
 export default function SwitchNetwork() {
   const { t } = useTranslation();
   const appDispatch = useAppDispatch();
-  // const { networkType } = useWalletInfo();
   const [curNet, setCurNet] = useState<string>('aelf-Testnet');
 
-  // mock
   const allNetworkType: Network[] = useMemo(
     () => [
       {
@@ -46,7 +43,6 @@ export default function SwitchNetwork() {
   const handleChangeNet = useCallback(
     (net: Network) => {
       if (!net.disabled) {
-        // TODO: judge userInfo login status
         setCurNet(net.key);
         appDispatch(changeNetworkType(net.networkType));
       }

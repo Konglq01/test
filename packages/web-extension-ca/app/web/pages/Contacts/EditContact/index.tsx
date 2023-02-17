@@ -5,14 +5,14 @@ import { useTranslation } from 'react-i18next';
 import BackHeader from 'components/BackHeader';
 import { ContactItemType, AddressItem } from '@portkey/types/types-ca/contact';
 import { fetchContractListAsync } from '@portkey/store/store-ca/contact/actions';
-import { useAppDispatch, useContact } from 'store/Provider/hooks';
+import { useAppDispatch } from 'store/Provider/hooks';
 import CustomSvg from 'components/CustomSvg';
 import NetworkDrawer from '../NetworkDrawer';
 import DeleteContact from '../DeleteContact';
 import { getAelfAddress, isAelfAddress } from '@portkey/utils/aelf';
 import { isValidCAWalletName } from '@portkey/utils/reg';
 import './index.less';
-import { useAddContact, useDeleteContact, useEditContact } from '@portkey/hooks/hooks-ca/contact';
+import { useAddContact, useDeleteContact, useEditContact, useCheckContactName } from '@portkey/hooks/hooks-ca/contact';
 
 const { Item: FormItem } = Form;
 export enum ContactInfoError {
@@ -33,8 +33,6 @@ interface CustomAddressItem extends AddressItem {
   validData: ValidData;
 }
 const initAddress: CustomAddressItem = {
-  // id: '-1',
-  // chainType: 'MAIN',
   chainId: 'AELF',
   address: '',
   networkName: 'MainChain AELF Testnet',
@@ -48,7 +46,6 @@ export default function EditContact() {
   const { type } = useParams();
   const appDispatch = useAppDispatch();
   const isEdit = type === 'edit';
-  const { contactIndexList } = useContact();
   const [disable, setDisabled] = useState<boolean>(true);
   const [netOpen, setNetOpen] = useState<boolean>(false);
   const [index, setIndex] = useState<number>(-1);
@@ -58,6 +55,7 @@ export default function EditContact() {
   const addContactApi = useAddContact();
   const editContactApi = useEditContact();
   const deleteContactApi = useDeleteContact();
+  const checkExistNameApi = useCheckContactName();
 
   useEffect(() => {
     const { addresses } = state;
@@ -137,23 +135,25 @@ export default function EditContact() {
   );
 
   const checkExistName = useCallback(
-    (v: string) => {
+    async (v: string) => {
       if (isEdit && state.name === v) {
         return false;
       }
-      return contactIndexList.some(({ contacts }) => contacts.some((contact) => contact.name === v));
+      const { existed } = await checkExistNameApi(v);
+      return existed;
     },
-    [contactIndexList, isEdit, state.name],
+    [checkExistNameApi, isEdit, state.name],
   );
 
   const handleCheckName = useCallback(
-    (v: string) => {
+    async (v: string) => {
+      const existed = await checkExistName(v);
       if (!v) {
         form.setFieldValue('name', '');
         setValidName({ validateStatus: 'error', errorMsg: ContactInfoError.noName });
         setDisabled(true);
         return false;
-      } else if (checkExistName(v)) {
+      } else if (existed) {
         setDisabled(true);
         setValidName({ validateStatus: 'error', errorMsg: ContactInfoError.alreadyExists });
         return false;
@@ -191,10 +191,9 @@ export default function EditContact() {
   const onFinish = useCallback(
     async (values: ContactItemType) => {
       const { name, addresses } = values;
-      console.log('---addresses', addresses);
 
       try {
-        const checkName = handleCheckName(name.trim());
+        const checkName = await handleCheckName(name.trim());
         const checkAddress = handleCheckAddress(addresses);
         if (checkName && checkAddress) {
           if (isEdit) {
