@@ -22,141 +22,6 @@ import { useContact } from '@portkey/hooks/hooks-ca/contact';
 import { isLoading } from 'expo-font';
 import { useCaAddresses } from '@portkey/hooks/hooks-ca/wallet';
 
-const mockList = [
-  {
-    id: '100',
-    name: '',
-    address: '',
-    addresses: [{ address: 'ELF_mfzJTsv5UGQGoZw4gdrivTihVoZgtdm2f8ppnY7W2t6nGYfS1_AELF' }],
-  },
-  {
-    id: '200',
-    index: 1000,
-    name: 'Sally',
-    addresses: [
-      {
-        id: 1,
-        index: 1,
-        chainType: 'MAIN',
-        chainId: 'AELF',
-        address: 'ELF_SADASsdasdasdasdasD_AELF',
-      },
-      {
-        id: 2,
-        index: 2,
-        chainType: 'MAIN',
-        chainId: 'AELF',
-        address: 'ELF_SADASsdaaasdasdasdasD_AELF',
-      },
-    ],
-  },
-  {
-    id: '200',
-    index: 1000,
-    name: 'Sally',
-    addresses: [
-      {
-        id: 1,
-        index: 1,
-        chainType: 'MAIN',
-        chainId: 'AELF',
-        address: 'ELF_SADASsdasdasdasdasD_AELF',
-      },
-      {
-        id: 2,
-        index: 2,
-        chainType: 'MAIN',
-        chainId: 'AELF',
-        address: 'ELF_SADASsdaaasdasdasdasD_AELF',
-      },
-    ],
-  },
-  {
-    id: '200',
-    index: 1000,
-    name: 'Sally',
-    addresses: [
-      {
-        id: 1,
-        index: 1,
-        chainType: 'MAIN',
-        chainId: 'AELF',
-        address: 'ELF_SADASsdasdasdasdasD_AELF',
-      },
-      {
-        id: 2,
-        index: 2,
-        chainType: 'MAIN',
-        chainId: 'AELF',
-        address: 'ELF_SADASsdaaasdasdasdasD_AELF',
-      },
-    ],
-  },
-  {
-    id: '200',
-    index: 1000,
-    name: 'Sally',
-    addresses: [
-      {
-        id: 1,
-        index: 1,
-        chainType: 'MAIN',
-        chainId: 'AELF',
-        address: 'ELF_SADASsdasdasdasdasD_AELF',
-      },
-      {
-        id: 2,
-        index: 2,
-        chainType: 'MAIN',
-        chainId: 'AELF',
-        address: 'ELF_SADASsdaaasdasdasdasD_AELF',
-      },
-    ],
-  },
-  {
-    id: '200',
-    index: 1000,
-    name: 'Sally',
-    addresses: [
-      {
-        id: 1,
-        index: 1,
-        chainType: 'MAIN',
-        chainId: 'AELF',
-        address: 'ELF_SADASsdasdasdasdasD_AELF',
-      },
-      {
-        id: 2,
-        index: 2,
-        chainType: 'MAIN',
-        chainId: 'AELF',
-        address: 'ELF_SADASsdaaasdasdasdasD_AELF',
-      },
-    ],
-  },
-  {
-    id: '200',
-    index: 1000,
-    name: 'Sally',
-    addresses: [
-      {
-        id: 1,
-        index: 1,
-        chainType: 'MAIN',
-        chainId: 'AELF',
-        address: 'ELF_SADASsdasdasdasdasD_AELF',
-      },
-      {
-        id: 2,
-        index: 2,
-        chainType: 'MAIN',
-        chainId: 'AELF',
-        address: 'ELF_SADASsdaaasdasdasdasD_AELF',
-      },
-    ],
-  },
-];
-
 interface ApiRecentAddressItemType {
   caAddress: string;
   chainId: string;
@@ -249,12 +114,12 @@ export default function SelectContact(props: SelectContactProps) {
       {
         name: t('Recents'),
         tabItemDom:
-          mockList.length === 0 ? (
+          recentList.length === 0 ? (
             <NoData noPic message={t('There is no recents.')} />
           ) : (
             <View style={styles.recentListWrap}>
               <FlashList
-                data={recentList}
+                data={recentList || []}
                 renderItem={renderItem}
                 ListFooterComponent={<TextS style={styles.footer}>{t('No Data')}</TextS>}
                 onEndReached={() => {
@@ -271,18 +136,16 @@ export default function SelectContact(props: SelectContactProps) {
       },
       {
         name: t('Contacts'),
-        tabItemDom:
-          mockList.length === 0 ? (
-            <NoData noPic message={t('There is no contacts.')} />
-          ) : (
-            <ContactsList
-              style={styles.contactWrap}
-              isIndexBarShow={false}
-              isSearchShow={false}
-              renderContactItem={(item: RecentContactItemType) => <RecentContactItem contact={item} />}
-              ListFooterComponent={<View style={styles.footer} />}
-            />
-          ),
+        tabItemDom: (
+          <ContactsList
+            style={styles.contactWrap}
+            isReadOnly
+            isIndexBarShow={false}
+            isSearchShow={false}
+            renderContactItem={(item: ContactItemType) => <RecentContactItem contact={item as RecentContactItemType} />}
+            ListFooterComponent={<View style={styles.footer} />}
+          />
+        ),
       },
     ];
   }, [fetchMoreRecent, loading, recentList, recentTotalNumber, renderItem, t]);

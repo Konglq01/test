@@ -103,8 +103,8 @@ const TokenDetail: React.FC = () => {
   );
 
   const getMoreActivityList = useCallback(() => {
-    request.assets
-      .fetchActivityList({
+    request.activity
+      .activityList({
         params: {
           ...fixedParamObj,
           skipCount,
@@ -123,8 +123,8 @@ const TokenDetail: React.FC = () => {
 
   const initActivityList = useCallback(() => {
     setInitializing(true);
-    request.assets
-      .fetchActivityList({
+    request.activity
+      .activityList({
         params: {
           ...fixedParamObj,
           skipCount: 0,

@@ -35,7 +35,6 @@ export const mockNFTSeriesData = {
     data: new Array(13).fill('').map(ele => ({
       chainId: 'AELF',
       symbol: Math.floor(Math.random() * 10000) + 'symbol',
-      nftType: '',
       imageUrl: '',
       collectionName: Math.floor(Math.random() * 100) + 'collectionName',
       itemCount: 200,

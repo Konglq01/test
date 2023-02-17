@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { RateBaseType, NFTCollectionItemShowType } from '@portkey/types/types-ca/assets';
-import { fetchAssetList, fetchNFTSeriesList, fetchNFTList, fetchTokenList } from './api';
+import { fetchAssetList, fetchNFTSeriesList, fetchNFTList, fetchTokenList, fetchTokenPrices } from './api';
 import { AccountAssets, TokenItemShowType } from '@portkey/types/types-ca/token';
 
 // asset = token + nft
@@ -19,13 +19,12 @@ export type AssetsStateType = {
     accountNFTList: NFTCollectionItemShowType[];
     totalRecordCount: number;
   };
-  tokenRate: {
+  tokenPrices: {
     isFetching: boolean;
-    tokenRateObject: {
-      [symbol: string]: RateBaseType;
+    tokenPriceObject: {
+      [symbol: string]: number;
     };
   };
-  accountBalance: number;
   accountAssets: {
     isFetching: boolean;
     skipCount: number;
@@ -33,6 +32,7 @@ export type AssetsStateType = {
     accountAssetsList: AccountAssets;
     totalRecordCount: number;
   };
+  accountBalance: number;
 };
 
 const initialState: AssetsStateType = {
@@ -57,9 +57,9 @@ const initialState: AssetsStateType = {
     accountAssetsList: [],
     totalRecordCount: 0,
   },
-  tokenRate: {
+  tokenPrices: {
     isFetching: false,
-    tokenRateObject: {},
+    tokenPriceObject: {},
   },
   accountBalance: 0,
 };
@@ -167,6 +167,27 @@ export const fetchAssetAsync = createAsyncThunk(
   },
 );
 
+// fetch current tokenRate
+export const fetchTokensPriceAsync = createAsyncThunk(
+  'fetchTokensPriceAsync',
+  async ({ symbols = ['ELF', 'CPU'] }: { symbols?: string[] }, { getState, dispatch }) => {
+    const {
+      assets: {
+        accountToken: { accountTokenList },
+      },
+    } = getState() as { assets: AssetsStateType };
+    // const {
+    //   accountAssets: { totalRecordCount, accountAssetsList },
+    // } = assets;
+
+    const response = await fetchTokenPrices({ symbols: symbols || accountTokenList.map(ele => ele.symbol) });
+
+    return { list: response.items };
+
+    // return { list: [], totalRecordCount };
+  },
+);
+
 //it automatically uses the immer library to let you write simpler immutable updates with normal mutative code
 export const assetsSlice = createSlice({
   name: 'assets',
@@ -228,7 +249,6 @@ export const assetsSlice = createSlice({
 
         console.log('====================================');
         console.log('sss');
-        console.log('====================================');
 
         const currentNFTSeriesItem = state.accountNFT.accountNFTList.find(ele => ele.symbol === symbol);
         if (!currentNFTSeriesItem) return;
@@ -256,6 +276,22 @@ export const assetsSlice = createSlice({
         state.accountAssets.isFetching = false;
       })
       .addCase(fetchAssetAsync.rejected, state => {
+        state.accountToken.isFetching = false;
+      })
+      .addCase(fetchTokensPriceAsync.pending, state => {
+        state.accountToken.isFetching = true;
+      })
+      .addCase(fetchTokensPriceAsync.fulfilled, (state, action) => {
+        const { list } = action.payload;
+
+        list.map(ele => {
+          state.tokenPrices.tokenPriceObject[ele?.symbol] = ele?.priceInUsd;
+        });
+        // state.accountAssets.accountAssetsList = [...state.accountAssets.accountAssetsList, ...list];
+        state.accountAssets.skipCount = state.accountAssets.accountAssetsList.length;
+        state.accountAssets.isFetching = false;
+      })
+      .addCase(fetchTokensPriceAsync.rejected, state => {
         state.accountToken.isFetching = false;
       });
   },
