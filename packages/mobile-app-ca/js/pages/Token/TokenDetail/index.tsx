@@ -28,6 +28,7 @@ import { request } from '@portkey/api/api-did';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import CommonToast from 'components/CommonToast';
 import { skipToken } from '@reduxjs/toolkit/dist/query';
+import { ActivityItemType } from '@portkey/types/types-ca/activity';
 
 interface RouterParams {
   tokenInfo: TokenItemShowType;
@@ -177,8 +178,18 @@ const TokenDetail: React.FC = () => {
       <FlashList
         refreshing={reFreshing}
         data={listShow || []}
-        renderItem={() => {
-          return <TransferItem onPress={() => navigationService.navigate('ActivityDetail')} />;
+        renderItem={({ item }: { item: ActivityItemType }) => {
+          return (
+            <TransferItem
+              item={item}
+              onPress={() =>
+                navigationService.navigate('ActivityDetail', {
+                  transactionId: item.transactionId,
+                  blockHash: item.blockHash,
+                })
+              }
+            />
+          );
         }}
         onRefresh={() => {
           setInitializing(true);
