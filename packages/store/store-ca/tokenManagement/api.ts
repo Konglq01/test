@@ -11,7 +11,7 @@ export function fetchAllTokenList({
   keyword: string;
   chainIdArray?: string[];
 }): Promise<{ items: any[]; totalRecordCount: number }> {
-  const chainIdSearchLanguage = chainIdArray.map(chainId => `token.chainId:${chainId}`).join(' AND ');
+  const chainIdSearchLanguage = chainIdArray.map(chainId => `token.chainId:${chainId}`).join(' OR ');
 
   const filterKeywords = keyword?.length < 10 ? `token.symbol:*${keyword}*~` : `token.address:${keyword}`;
 

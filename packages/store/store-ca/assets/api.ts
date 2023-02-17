@@ -70,14 +70,14 @@ export function fetchNFTSeriesList({
   skipCount: number;
   maxResultCount: number;
 }): Promise<{ data: any[]; totalRecordCount: number }> {
-  return new Promise(resolve => setTimeout(() => resolve(mockNFTSeriesData.data), 500));
-  // return request.assets.fetchAccountNftProtocolList({
-  //   params: {
-  //     caAddresses,
-  //     skipCount,
-  //     maxResultCount,
-  //   },
-  // });
+  // return new Promise(resolve => setTimeout(() => resolve(mockNFTSeriesData.data), 500));
+  return request.assets.fetchAccountNftProtocolList({
+    params: {
+      caAddresses,
+      skipCount,
+      maxResultCount,
+    },
+  });
 }
 
 export function fetchNFTList({
