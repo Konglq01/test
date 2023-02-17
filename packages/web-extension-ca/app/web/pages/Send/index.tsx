@@ -3,7 +3,7 @@ import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { AddressBookError } from '@portkey/store/addressBook/types';
-import { addFailedActivity } from '@portkey/store/store-ca/activity/slice';
+import { addFailedActivity, removeFailedActivity } from '@portkey/store/store-ca/activity/slice';
 import { AddressItem, ContactItemType } from '@portkey/types/types-ca/contact';
 import { isDIDAddress } from '@portkey/utils';
 import { getAelfAddress, getWallet, isCrossChain } from '@portkey/utils/aelf';
@@ -132,13 +132,10 @@ export default function Send() {
       try {
         //
         await intervalCrossChainTransfer(data);
+        dispatch(removeFailedActivity(managerTransferTxId));
       } catch (error) {
-        dispatch(
-          addFailedActivity({
-            transactionId: managerTransferTxId,
-            params: data,
-          }),
-        );
+        // tip retryCrossChain()
+        // Modal.confirm
       }
     },
     [dispatch],
@@ -180,11 +177,21 @@ export default function Send() {
       message.success('success');
     } catch (error: any) {
       console.log('sendHandler==error', error);
+      if (!error?.type) return message.error(error);
       if (error.type === 'managerTransfer') {
         return message.error(error);
-      } else {
+      } else if (error.type === 'crossChainTransfer') {
         // TODO tip retry
         // retryCrossChain(error)
+        // dispatch(
+        //   addFailedActivity({
+        //     transactionId: managerTransferTxId,
+        //     params: data,
+        //   }),
+        // );
+        return;
+      } else {
+        message.error(error);
       }
     } finally {
       setLoading(false);
