@@ -1,10 +1,6 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useRef } from 'react';
 import { View, Text } from 'react-native';
-// import { Dialog } from '@rneui/base';
 import PageContainer from 'components/PageContainer';
-import { unitConverter } from '@portkey/utils/converter';
-import { ZERO } from '@portkey/constants/misc';
-import { useAppCASelector, useAppCommonDispatch } from '@portkey/hooks/index';
 import SendButton from 'components/SendButton';
 import ReceiveButton from 'components/ReceiveButton';
 import { styles } from './style';
@@ -14,20 +10,14 @@ import navigationService from 'utils/navigationService';
 import NoData from 'components/NoData';
 import { useLanguage } from 'i18n/hooks';
 import TransferItem from 'components/TransferList/components/TransferItem';
-
 import { FlashList } from '@shopify/flash-list';
 import GStyles from 'assets/theme/GStyles';
 import { FontStyles } from 'assets/theme/styles';
 import { TextXL } from 'components/CommonText';
-import { getActivityListAsync } from '@portkey/store/store-ca/activity/action';
-import useEffectOnce from 'hooks/useEffectOnce';
 import { TokenItemShowType } from '@portkey/types/types-ca/token';
-import { useWallet } from 'hooks/store';
 import useRouterParams from '@portkey/hooks/useRouterParams';
 import { request } from '@portkey/api/api-did';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
-import CommonToast from 'components/CommonToast';
-import { skipToken } from '@reduxjs/toolkit/dist/query';
 import { ActivityItemType } from '@portkey/types/types-ca/activity';
 
 interface RouterParams {
@@ -50,42 +40,20 @@ const transactionList: TransactionTypes[] = [
   TransactionTypes.SocialRecovery,
   TransactionTypes.Transfer,
 ];
-const maxResultCount = 10;
+
+const MAX_RESULT_COUNT = 10;
+const INIT_PAGE_INFO = {
+  curPage: 0,
+  total: 0,
+  isLoading: false,
+};
 
 const TokenDetail: React.FC = () => {
   const { t } = useLanguage();
   const { tokenInfo } = useRouterParams<RouterParams>();
-
   const currentWallet = useCurrentWallet();
-
   const navigation = useNavigation();
-
-  const dispatch = useAppCommonDispatch();
-
-  // const [list, setList] = useState<any[]>([]);
   const [listShow, setListShow] = useState<any[]>([]);
-
-  // const { balances } = useAppCASelector(state => state.tokenBalance);
-
-  const [currentToken] = useState<TokenItemShowType>(tokenInfo);
-  const [skipCount, setSkipCount] = useState<number>(0);
-  const [totalRecordCount, setTotalRecordCount] = useState<number>(0);
-  const [noMoreData, setNoMoreData] = useState(false);
-  const [initializing, setInitializing] = useState(false);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [reFreshing, setFreshing] = useState(false);
-
-  // const [isLoadingFirstTime, setIsLoadingFirstTime] = useState(true); // first time
-
-  // TODO: upDate balance
-  // const upDateBalance = async () => {
-  // };
-
-  useEffectOnce(() => {
-    // dispatch(getActivityListAsync({}));
-  });
-
-  // const balanceFormat = useCallback((symbol: string, decimals = 8) => ZERO.plus('0').div(`1e${decimals}`), []);
 
   const fixedParamObj = useMemo(
     () => ({
@@ -96,53 +64,49 @@ const TokenDetail: React.FC = () => {
     }),
     [currentWallet.walletInfo.caAddressList, tokenInfo.chainId, tokenInfo.symbol],
   );
+  const pageInfoRef = useRef({
+    ...INIT_PAGE_INFO,
+  });
 
-  const getMoreActivityList = useCallback(() => {
-    request.activity
-      .activityList({
-        params: {
-          ...fixedParamObj,
-          skipCount,
-        },
-      })
-      .then(res => {
-        setSkipCount(skipCount + maxResultCount);
-        setListShow([...listShow, ...res?.data]);
+  const getActivityList = useCallback(
+    async (isInit = false) => {
+      if (!isInit && listShow.length > 0 && listShow.length >= pageInfoRef.current.total) return;
+      if (pageInfoRef.current.isLoading) return;
+      pageInfoRef.current.isLoading = true;
+      try {
+        const response = await request.activity.activityList({
+          params: {
+            ...fixedParamObj,
+            skipCount: pageInfoRef.current.curPage * MAX_RESULT_COUNT,
+            maxResultCount: MAX_RESULT_COUNT,
+          },
+        });
+        pageInfoRef.current.curPage = pageInfoRef.current.curPage + 1;
+        pageInfoRef.current.total = response.totalRecordCount;
+        console.log('request.activity.activityList:', response);
+        if (isInit) {
+          setListShow(response.data);
+        } else {
+          setListShow(pre => pre.concat(response.data));
+        }
+      } catch (err) {
+        console.log('request.activity.activityList: err', err);
+      }
+      pageInfoRef.current.isLoading = false;
+    },
+    [fixedParamObj, listShow.length],
+  );
 
-        setNoMoreData(res?.totalRecordCount > 0 && res?.totalRecordCount <= skipCount);
-      })
-      .catch(err => {
-        CommonToast.fail(err);
-      });
-  }, [skipCount, fixedParamObj, listShow]);
-
-  const initActivityList = useCallback(() => {
-    setInitializing(true);
-
-    console.log(fixedParamObj);
-
-    request.activity
-      .activityList({
-        params: {
-          ...fixedParamObj,
-          skipCount: 0,
-          maxResultCount: 1000,
-        },
-      })
-      .then(res => {
-        setInitializing(false);
-        setTotalRecordCount(res?.totalRecordCount);
-        setListShow(res?.data);
-        setNoMoreData(res?.totalRecordCount > 0 && res?.totalRecordCount <= skipCount);
-      })
-      .catch(err => {
-        setInitializing(false);
-        setListShow([]);
-        CommonToast.fail(err);
-      });
-  }, [skipCount, fixedParamObj]);
-
-  useEffectOnce(() => initActivityList());
+  const [currentToken] = useState<TokenItemShowType>(tokenInfo);
+  const [reFreshing, setFreshing] = useState(false);
+  const onRefreshList = useCallback(async () => {
+    pageInfoRef.current = {
+      ...INIT_PAGE_INFO,
+    };
+    setFreshing(true);
+    await getActivityList(true);
+    setFreshing(false);
+  }, [getActivityList]);
 
   return (
     <PageContainer
@@ -178,6 +142,7 @@ const TokenDetail: React.FC = () => {
       <FlashList
         refreshing={reFreshing}
         data={listShow || []}
+        keyExtractor={(_item, index) => `${index}`}
         renderItem={({ item }: { item: ActivityItemType }) => {
           return (
             <TransferItem
@@ -192,16 +157,10 @@ const TokenDetail: React.FC = () => {
           );
         }}
         onRefresh={() => {
-          setInitializing(true);
-          initActivityList();
-          // TODO: refresh Token Balance
+          onRefreshList();
         }}
         onEndReached={() => {
-          if (noMoreData) return false;
-          if (isLoadingMore) return false;
-
-          setIsLoadingMore(true);
-          getMoreActivityList();
+          getActivityList();
         }}
       />
     </PageContainer>

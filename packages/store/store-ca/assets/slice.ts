@@ -268,6 +268,7 @@ export const assetsSlice = createSlice({
           maxResultCount: 9,
           totalRecordCount: 0,
           children: [],
+          decimals: 0,
           ...item,
         }));
         state.accountNFT.accountNFTList = newAccountList;

@@ -224,11 +224,11 @@ const ActivityDetail = () => {
       {blockExplorerURL ? (
         <CommonButton
           containerStyle={[GStyles.marginTop(pTd(8)), styles.bottomButton]}
-          onPress={() =>
+          onPress={() => {
             navigationService.navigate('ViewOnWebView', {
               url: getExploreLink(blockExplorerURL, activityItem?.transactionId || '', 'transaction'),
-            })
-          }
+            });
+          }}
           title={t('View on Explorer')}
           type="clear"
           style={styles.button}

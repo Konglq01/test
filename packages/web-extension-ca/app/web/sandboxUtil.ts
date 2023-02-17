@@ -277,14 +277,8 @@ class SandboxUtil {
       console.log('>>>>>data', data);
       // TODO only support aelf
       if (chainType !== 'aelf') throw 'Not support';
-      const aelfInstance = getAelfInstance(rpcUrl);
       const aelfContract = await SandboxUtil._getELFSendContract(rpcUrl, address, privateKey);
-      const raw = await encodedTx({
-        instance: aelfInstance,
-        contract: aelfContract,
-        functionName: methodName,
-        paramsOption,
-      });
+      const raw = await aelfContract.encodedTx(methodName, paramsOption);
       if (raw.error) throw raw.error;
       const transaction = await customFetch(`${rpcUrl}/api/blockChain/calculateTransactionFee`, {
         method: 'POST',
