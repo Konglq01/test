@@ -6,8 +6,8 @@ export function fetchAllTokenList({
   keyword,
   chainIdArray = ['AELF', 'tDVV', 'tDVW'],
 }: {
-  maxResultCount: number;
-  skipCount: number;
+  maxResultCount?: number;
+  skipCount?: number;
   keyword: string;
   chainIdArray?: string[];
 }): Promise<{ items: any[]; totalRecordCount: number }> {

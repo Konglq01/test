@@ -184,7 +184,7 @@ export default function SelectContact(props: SelectContactProps) {
   const [loading, setLoading] = useState<boolean>(false);
   const [skipCount, setSkipCount] = useState(0);
   const [recentTotalNumber, setRecentTotalNumber] = useState(0);
-  const [recentList, setRecentList] = useState<(ContactItemType | RecentContactItemType)[]>([]);
+  const [recentList, setRecentList] = useState<RecentContactItemType[]>([]);
 
   // const debouncedKeyword = useDebounce(keyword, 500);
 
@@ -279,7 +279,7 @@ export default function SelectContact(props: SelectContactProps) {
               style={styles.contactWrap}
               isIndexBarShow={false}
               isSearchShow={false}
-              renderContactItem={item => <RecentContactItem contact={item} />}
+              renderContactItem={(item: RecentContactItemType) => <RecentContactItem contact={item} />}
               ListFooterComponent={<View style={styles.footer} />}
             />
           ),

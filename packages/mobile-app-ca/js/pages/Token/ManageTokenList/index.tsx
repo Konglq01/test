@@ -18,7 +18,7 @@ import CommonSwitch from 'components/CommonSwitch';
 import CommonAvatar from 'components/CommonAvatar';
 import { useLanguage } from 'i18n/hooks';
 import NoData from 'components/NoData';
-import { fetchUserTokenList } from '@portkey/store/store-ca/tokenManagement/api';
+import { fetchAllTokenList } from '@portkey/store/store-ca/tokenManagement/api';
 import { Button } from '@rneui/base';
 import useDebounce from 'hooks/useDebounce';
 
@@ -70,10 +70,9 @@ Item.displayName = 'Item';
 
 const ManageTokenList: React.FC<ManageTokenListProps> = () => {
   const { t } = useLanguage();
-  const [tokenState, tokenActions] = useToken();
+  const [tokenState] = useToken();
   const { tokenDataShowInMarket } = tokenState;
   const isLoading = useIsFetchingTokenList();
-  const { fetchTokenList } = tokenActions;
 
   console.log('------', tokenDataShowInMarket);
 
@@ -82,7 +81,7 @@ const ManageTokenList: React.FC<ManageTokenListProps> = () => {
 
   useEffect(() => {
     if (tokenDataShowInMarket.length) return;
-    fetchTokenList({ pageSize: 10000, pageNo: 1, keyword });
+    fetchAllTokenList({ keyword });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -117,7 +116,7 @@ const ManageTokenList: React.FC<ManageTokenListProps> = () => {
   // }, [fetchAddedList]);
 
   useEffect(() => {
-    fetchUserTokenList({ pageSize: 1000, pageNo: 1, keyword: debounceWord });
+    fetchAllTokenList({ keyword: debounceWord });
   }, [debounceWord]);
 
   return (
@@ -146,7 +145,7 @@ const ManageTokenList: React.FC<ManageTokenListProps> = () => {
       <FlatList
         style={pageStyles.list}
         data={tokenDataShowInMarket || []}
-        renderItem={({ item }) => <Item item={item} onHandleToken={onHandleTokenItem} />}
+        renderItem={({ item }: { item: UserTokenItemType }) => <Item item={item} onHandleToken={onHandleTokenItem} />}
         keyExtractor={(item: any) => item.symbol || ''}
       />
       {isLoading && <Dialog.Loading />}

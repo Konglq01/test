@@ -133,7 +133,7 @@ const AssetList = ({ onFinishSelectToken, account }: TokenListProps) => {
 
   useEffectOnce(() => {
     if (accountAssets.accountAssetsList.length !== 0) return;
-    dispatch(fetchAssetAsync({ caAddresses, keyWord: ' ' }));
+    dispatch(fetchAssetAsync({ caAddresses, keyword: ' ' }));
   });
 
   return (

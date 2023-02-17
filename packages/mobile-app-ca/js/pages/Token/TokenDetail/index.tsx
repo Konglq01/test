@@ -55,10 +55,6 @@ const TokenDetail: React.FC = () => {
   const { t } = useLanguage();
   const { tokenInfo } = useRouterParams<RouterParams>();
 
-  console.log('====================================');
-  console.log(tokenInfo);
-  console.log('====================================');
-
   const currentWallet = useCurrentWallet();
 
   const navigation = useNavigation();
@@ -87,11 +83,11 @@ const TokenDetail: React.FC = () => {
   // };
 
   useEffect(() => {
-    setListShow(activity.list);
+    // setListShow(activity?.list);
   }, [activity]);
 
   useEffectOnce(() => {
-    dispatch(getActivityListAsync({ type: 'MAIN' }));
+    // dispatch(getActivityListAsync({}));
   });
 
   // const balanceFormat = useCallback((symbol: string, decimals = 8) => ZERO.plus('0').div(`1e${decimals}`), []);
