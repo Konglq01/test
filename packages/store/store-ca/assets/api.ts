@@ -3,6 +3,7 @@ import { request } from '@portkey/api/api-did';
 import { NetworkType } from '@portkey/types/index';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { TokenItemShowType } from '@portkey/types/types-ca/token';
+import { IAssetItemType } from './type';
 
 const data = [0, 1, 2, 3, 4, 5, 6, 7].map((ele, index) => {
   return {
@@ -39,24 +40,27 @@ export function fetchTokenList({
   });
 }
 
-export function fetchAssetList({
-  caAddresses,
-  maxResultCount,
-  skipCount,
-  keyword = '',
-}: {
-  caAddresses: string[];
-  maxResultCount: number;
-  skipCount: number;
-  keyword: string;
-}): Promise<{ data: any[]; totalRecordCount: number }> {
-  console.log('fetching....list', caAddresses, maxResultCount, skipCount);
+export function fetchAssetList(
+  baseURL: string,
+  {
+    caAddresses,
+    maxResultCount,
+    skipCount,
+    keyword = '',
+  }: {
+    caAddresses: string[];
+    maxResultCount: number;
+    skipCount: number;
+    keyword: string;
+  },
+): Promise<{ data: IAssetItemType[]; totalRecordCount: number }> {
   return request.assets.fetchAccountAssetsByKeywords({
+    baseURL,
     params: {
-      caAddresses,
-      skipCount,
-      maxResultCount,
-      keyword,
+      CaAddresses: caAddresses,
+      SkipCount: skipCount,
+      MaxResultCount: maxResultCount,
+      Keyword: keyword,
     },
   });
 }
