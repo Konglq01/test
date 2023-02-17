@@ -1,23 +1,20 @@
-import { ChainItemType } from '@portkey/store/store-ca/wallet/type';
 import { ChainType } from '@portkey/types';
 import { BaseToken } from '@portkey/types/types-ca/token';
 import { getChainIdByAddress } from '@portkey/utils';
 import { crossChainTransferToCa } from './crossChainTransferToCa';
-import { managerTransfer } from './managerTransfer';
+import { managerTransfer } from './ManagerTransfer';
 import { getChainNumber } from '@portkey/utils/aelf';
+import { ContractBasic } from '@portkey/contracts/utils/ContractBasic';
 
 export type CrossChainTransferIntervalParams = Omit<CrossChainTransferParams, 'caHash'>;
 
 export const intervalCrossChainTransfer = async (params: CrossChainTransferIntervalParams, count = 0) => {
-  const { chainInfo, chainType, privateKey, managerAddress, amount, tokenInfo, memo = '', toAddress } = params;
+  const { contract, managerAddress, chainType, amount, tokenInfo, memo = '', toAddress } = params;
   const issueChainId = getChainIdByAddress(managerAddress, chainType);
   const toChainId = getChainIdByAddress(toAddress, chainType);
   try {
     await crossChainTransferToCa({
-      rpcUrl: chainInfo.endPoint,
-      address: tokenInfo.address,
-      chainType,
-      privateKey,
+      contract,
       paramsOption: {
         issueChainId: getChainNumber(issueChainId),
         toChainId: getChainNumber(toChainId),
@@ -36,9 +33,8 @@ export const intervalCrossChainTransfer = async (params: CrossChainTransferInter
 };
 
 interface CrossChainTransferParams {
-  chainInfo: ChainItemType;
+  contract: ContractBasic;
   chainType: ChainType;
-  privateKey: string;
   managerAddress: string;
   tokenInfo: BaseToken;
   caHash: string;
@@ -47,9 +43,8 @@ interface CrossChainTransferParams {
   memo?: string;
 }
 const crossChainTransfer = async ({
-  chainInfo,
   chainType,
-  privateKey,
+  contract,
   managerAddress,
   caHash,
   amount,
@@ -61,10 +56,7 @@ const crossChainTransfer = async ({
   try {
     // first transaction:transfer to manager itself
     managerTransferResult = await managerTransfer({
-      rpcUrl: chainInfo.endPoint,
-      address: chainInfo.caContractAddress,
-      chainType,
-      privateKey,
+      contract,
       paramsOption: {
         caHash,
         symbol: tokenInfo.symbol,
@@ -85,9 +77,8 @@ const crossChainTransfer = async ({
 
   // TODO Only support chainType: aelf
   const CrossChainTransferParams = {
-    chainInfo,
+    contract,
     chainType,
-    privateKey,
     managerAddress,
     amount,
     tokenInfo,
@@ -101,7 +92,7 @@ const crossChainTransfer = async ({
     throw {
       type: 'crossChainTransfer',
       error: error,
-      managerTransferTxId: managerTransferResult.result.message.TransactionId,
+      managerTransferTxId: managerTransferResult.transactionId,
       data: CrossChainTransferParams,
     };
   }
