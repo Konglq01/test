@@ -29,6 +29,13 @@ export default function AmountInput({
       onTxFeeChange={onTxFeeChange}
     />
   ) : (
-    <NftInput toAccount={toAccount} value={value} token={token} onChange={onChange} />
+    <NftInput
+      fromAccount={fromAccount}
+      toAccount={toAccount}
+      value={value}
+      token={token}
+      onChange={onChange}
+      onTxFeeChange={onTxFeeChange}
+    />
   );
 }
