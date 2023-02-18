@@ -66,7 +66,7 @@ export default function PermissionCheck({
         _sleep(),
       ]);
       console.log(res, 'CHECK_WALLET_STATUS');
-      // if (typeof res !== 'object') return chrome.runtime.reload(); // navigate('/unlock');
+      if (typeof res !== 'object') return chrome.runtime.reload(); // navigate('/unlock');
       const detail = (res as any)?.data;
       if (detail?.registerStatus === 'Registered') {
         detail?.privateKey && dispatch(setPasswordSeed(detail.privateKey));
@@ -79,7 +79,7 @@ export default function PermissionCheck({
     } catch (error) {
       console.error(error, 'CHECK_WALLET_STATUS==error');
     }
-  }, [navigate, dispatch]);
+  }, [_sleep, dispatch, navigate]);
 
   const goQueryPage = useCallback(async () => {
     const registerStatus = await getLocalStorage('registerStatus');
@@ -105,7 +105,7 @@ export default function PermissionCheck({
     if (location.pathname.includes('/test')) return;
     if (locked && !noCheckRegister && !isRegisterPage) return navigate('/unlock');
     checkRegisterHandler();
-  }, [isRegisterPage, locked, noCheckRegister, navigate, getPassword, checkRegisterHandler]);
+  }, [isRegisterPage, locked, noCheckRegister, navigate, getPassword, checkRegisterHandler, location.pathname]);
 
   return <>{children}</>;
 }

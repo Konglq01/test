@@ -32,7 +32,7 @@ export default function Updater() {
   }, [apiUrl]);
   // TODO
   // Query the caAddress of each chain by Contract
-  // useCaInfoOnChain();
+  useCaInfoOnChain();
 
   useMemo(() => {
     request.setLockCallBack(onLocking);

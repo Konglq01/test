@@ -262,6 +262,7 @@ export default function Send() {
         });
       }
       message.success('success');
+      navigate('/');
     } catch (error: any) {
       console.log('sendHandler==error', error);
       if (!error?.type) return message.error(error);
@@ -290,6 +291,7 @@ export default function Send() {
     checkValue.fee,
     currentNetwork.walletType,
     dispatch,
+    navigate,
     passwordSeed,
     setLoading,
     showErrorModal,
@@ -462,7 +464,6 @@ export default function Send() {
           {StageObj[stage].btnText}
         </Button>
       </div>
-      <Button onClick={() => showErrorModal({})}>test</Button>
     </div>
   );
 }

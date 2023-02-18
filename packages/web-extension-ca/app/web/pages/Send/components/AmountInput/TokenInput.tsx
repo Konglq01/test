@@ -46,7 +46,7 @@ export default function TokenInput({
   const isMain = useMemo(() => currentNetwork.networkType === 'MAIN', [currentNetwork]);
   const { t } = useTranslation();
   const [amount, setAmount] = useState<string>(value ? `${value} ${token.symbol}` : '');
-  const [balance, setBalance] = useState<string>();
+  const [balance, setBalance] = useState<string>('');
   const { passwordSeed } = useUserInfo();
   const [fee, setTransactionFee] = useState<string>();
   const wallet = useCurrentWalletInfo();
