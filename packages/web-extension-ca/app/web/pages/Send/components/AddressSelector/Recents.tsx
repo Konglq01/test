@@ -50,7 +50,7 @@ export default function Recents({ onChange }: { onChange: (account: IClickAddres
       data.map((ele: ApiRecentAddressItemType) => {
         if (contactMap?.[ele.address]) {
           const contactInfo = contactMap?.[ele.address][0];
-          return { ...contactInfo, transactionTime: ele.transactionTime };
+          return { ...contactInfo, address: ele.address, transactionTime: ele.transactionTime };
         }
         return { ...ele, addresses: [{ address: ele.address, chainId: ele.addressChainId }] };
       }),

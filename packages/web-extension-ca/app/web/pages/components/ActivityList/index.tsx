@@ -10,6 +10,8 @@ import './index.less';
 import LoadingMore from 'components/LoadingMore/LoadingMore';
 import { useIsTestnet } from 'hooks/useActivity';
 import { formatAmount, transNetworkText } from '@portkey/utils/activity';
+import { Button } from 'antd';
+import { useAppCASelector } from '@portkey/hooks/hooks-ca';
 
 export interface IActivityListProps {
   data?: ActivityItemType[];
@@ -18,6 +20,7 @@ export interface IActivityListProps {
 }
 
 export default function ActivityList({ data, hasMore, loadMore }: IActivityListProps) {
+  const activity = useAppCASelector((state) => state.activity);
   const isTestNet = useIsTestnet();
 
   const activityListLeftIcon = (type: TransactionTypes) => {
@@ -94,6 +97,26 @@ export default function ActivityList({ data, hasMore, loadMore }: IActivityListP
     [isTestNet],
   );
 
+  function handleResend(e: any) {
+    e?.stopPropagation();
+    console.log('🌈 TODO: resend');
+  }
+
+  const resendUI = useCallback(
+    (item: ActivityItemType) => {
+      if (!activity.failedActivityMap[item.transactionId]) return;
+
+      return (
+        <div className="row-4">
+          <Button type="primary" className="resend-btn" onClick={(e) => handleResend(e)}>
+            Resend
+          </Button>
+        </div>
+      );
+    },
+    [activity.failedActivityMap],
+  );
+
   return (
     <div className="activity-list">
       <List>
@@ -107,6 +130,7 @@ export default function ActivityList({ data, hasMore, loadMore }: IActivityListP
                   {amountOrIdUI(item)}
                   {fromAndUsdUI(item)}
                   {networkUI(item)}
+                  {resendUI(item)}
                 </div>
               </div>
             </div>
