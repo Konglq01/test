@@ -1,4 +1,5 @@
 import { ChainType } from '@portkey/types';
+import { SandboxErrorCode } from '@portkey/utils/sandboxService';
 import SandboxEventTypes from 'messages/SandboxEventTypes';
 import SandboxEventService from 'service/SandboxEventService';
 
@@ -18,8 +19,8 @@ const getTransactionFee = async ({
   chainType,
   methodName,
   privateKey,
-}: GetTransitionFeeParams) =>
-  await SandboxEventService.dispatchAndReceive(SandboxEventTypes.getTransactionFee, {
+}: GetTransitionFeeParams) => {
+  const resMessage = await SandboxEventService.dispatchAndReceive(SandboxEventTypes.getTransactionFee, {
     rpcUrl,
     address: contractAddress,
     paramsOption,
@@ -27,5 +28,15 @@ const getTransactionFee = async ({
     methodName,
     privateKey,
   });
+
+  if (resMessage.code === SandboxErrorCode.error) throw resMessage.error;
+  return {
+    code: resMessage.code,
+    result: {
+      rpcUrl,
+      ...resMessage.message,
+    },
+  };
+};
 
 export default getTransactionFee;

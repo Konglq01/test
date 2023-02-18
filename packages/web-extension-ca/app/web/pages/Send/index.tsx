@@ -88,7 +88,7 @@ export default function Send() {
       // };
     }
     if (type === 'token') {
-      const token = accountToken.accountTokenList.find((item) => item.symbol === symbol);
+      const token = accountToken.accountTokenList.find((item: any) => item.symbol === symbol);
       if (!token) {
         message.error('No symbol info');
         return;
@@ -208,7 +208,7 @@ export default function Send() {
           privateKey,
           managerAddress: wallet.walletInfo.address,
           tokenInfo,
-          caHash: wallet.walletInfo.AELF?.caHash || '',
+          caHash: wallet?.caHash || '',
           amount: timesDecimals(amount, tokenInfo.decimals).toNumber(),
           toAddress: toAccount.address,
         });
@@ -219,7 +219,7 @@ export default function Send() {
           chainType: currentNetwork.walletType,
           privateKey,
           tokenInfo,
-          caHash: wallet.walletInfo.AELF?.caHash || '',
+          caHash: wallet?.caHash || '',
           amount: timesDecimals(amount, tokenInfo.decimals).toNumber(),
           toAddress: toAccount.address,
         });
@@ -299,7 +299,7 @@ export default function Send() {
           <AmountInput
             type={type as any}
             fromAccount={{
-              address: wallet.address,
+              address: wallet[DefaultChainId]?.caAddress || '',
               AESEncryptPrivateKey: wallet.AESEncryptPrivateKey,
             }}
             toAccount={{

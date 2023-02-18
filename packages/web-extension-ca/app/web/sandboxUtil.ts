@@ -274,7 +274,6 @@ class SandboxUtil {
     const data = event.data.data ?? {};
     try {
       const { rpcUrl, address, paramsOption, chainType, methodName, privateKey } = data;
-      console.log('>>>>>data', data);
       // TODO only support aelf
       if (chainType !== 'aelf') throw 'Not support';
       const aelfContract = await SandboxUtil._getELFSendContract(rpcUrl, address, privateKey);
@@ -286,7 +285,6 @@ class SandboxUtil {
           RawTransaction: raw,
         },
       });
-      console.log(transaction, 'gas===getTransactionFee');
       if (!transaction?.Success) throw 'Transaction failed';
       callback(event, {
         code: SandboxErrorCode.success,

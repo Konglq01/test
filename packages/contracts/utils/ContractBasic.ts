@@ -107,11 +107,17 @@ export class AElfContractBasic {
     if (!this.aelfContract) return { error: { code: 401, message: 'Contract init error' } };
     if (!this.aelfInstance) return { error: { code: 401, message: 'instance init error' } };
     try {
+      const _functionName = handleFunctionName(functionName);
+      const _params = await handleContractParams({
+        instance: this.aelfInstance,
+        paramsOption,
+        functionName: _functionName,
+      });
       const raw = await encodedTx({
         instance: this.aelfInstance,
         contract: this.aelfContract,
-        functionName,
-        paramsOption,
+        paramsOption: _params,
+        functionName: _functionName,
       });
       return raw;
     } catch (error) {
