@@ -3,6 +3,7 @@ import { loginSlice } from 'store/reducers/loginCache/slice';
 import { contactSlice } from '@portkey/store/store-ca/contact/slice';
 import userReducer, { userSlice } from 'store/reducers/user/slice';
 import tokenBalanceSlice from '@portkey/store/tokenBalance/slice';
+import chainSlice from '@portkey/store/network/slice';
 import tokenSlice from '@portkey/store/store-ca/tokenManagement/slice';
 import assetsSlice from '@portkey/store/store-ca/assets/slice';
 import activitySlice from '@portkey/store/store-ca/activity/slice';
@@ -36,6 +37,7 @@ const rootReducer = customCombineReducers({
   [contactSlice.name]: contactReducer,
   [userSlice.name]: userReducer,
   [tokenBalanceSlice.name]: tokenBalanceSlice.reducer,
+  [chainSlice.name]: chainSlice.reducer,
   [tokenSlice.name]: tokenReducer,
   [activitySlice.name]: activityReducer,
   [ModalSlice.name]: ModalSlice.reducer,

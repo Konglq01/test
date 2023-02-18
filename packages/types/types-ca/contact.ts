@@ -1,4 +1,3 @@
-import type { NetworkType } from '../index';
 import { PartialOption } from '../common';
 
 export interface AddressItem {
