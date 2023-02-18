@@ -1,9 +1,9 @@
-import React, { memo, useCallback, useMemo, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import PageContainer from 'components/PageContainer';
 import navigationService from 'utils/navigationService';
 import { useFocusEffect } from '@react-navigation/native';
-import { isAddress } from '@portkey/utils';
+import { addressFormat, isAddress } from '@portkey/utils';
 import Svg from 'components/Svg';
 import From from '../From';
 import To from '../To';
@@ -30,6 +30,14 @@ import NFTInfo from '../NFTInfo';
 import GStyles from 'assets/theme/GStyles';
 import CommonButton from 'components/CommonButton';
 import useRouterParams from '@portkey/hooks/useRouterParams';
+import { TokenItemShowType } from '@portkey/types/types-ca/token';
+import { getContractBasic } from '@portkey/contracts/utils';
+import { useCurrentWalletInfo, useWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+import { getManagerAccount } from 'utils/redux';
+import { usePin } from 'hooks/store';
+import { unitConverter } from '@portkey/utils/converter';
+
 export interface SendHomeProps {
   route?: any;
 }
@@ -43,8 +51,20 @@ enum ErrorMessage {
 const SendHome: React.FC<SendHomeProps> = props => {
   const { t } = useLanguage();
 
-  const { tokenItem, nftItem, name, sendType, chainId, address } = useRouterParams<{
-    tokenItem: any;
+  const {
+    tokenItem = {
+      symbol: 'ELF',
+      decimals: 8,
+      address: 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE',
+      tokenContractAddress: 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE',
+    },
+    nftItem,
+    name,
+    sendType,
+    chainId,
+    address,
+  } = useRouterParams<{
+    tokenItem: TokenItemShowType;
     nftItem: any;
     name: string;
     sendType: 'nft' | 'token';
@@ -55,14 +75,20 @@ const SendHome: React.FC<SendHomeProps> = props => {
   // tokenItem, address, name,
   const { data, refetch } = useGetELFRateQuery({});
 
+  const wallet = useCurrentWalletInfo();
+  const chainInfo = useCurrentChain();
+  const pin = usePin();
+
   const [, requestQrPermission] = useQrScanPermission();
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const [selectedFromAccount] = useState({ name: '11', address: '' }); // from
+  const [selectedFromAccount] = useState({ name: '', address: '' }); // from
   const [selectedToContact, setSelectedToContact] = useState({ name: '', address: '0' }); // to
   const [selectedToken, setSelectedToken] = useState(tokenItem); // tokenType
+  const [isCrossChainTransfer, setIsCrossChainTransfer] = useState(false);
+  const [selectedNft, setSelectedNft] = useState(nftItem);
   const [sendNumber, setSendNumber] = useState<string>('0'); // tokenNumber  like 100
-  const debounceSendNumber = useDebounce(sendNumber, 1000);
+  const debounceSendNumber = useDebounce(sendNumber, 500);
   const [transactionFee, setTransactionFee] = useState<string>('0'); // like 1.2ELF
 
   const [step, setStep] = useState<1 | 2>(1);
@@ -81,6 +107,56 @@ const SendHome: React.FC<SendHomeProps> = props => {
   );
 
   // get transfer fee
+  useEffect(() => {
+    (async () => {
+      if (debounceSendNumber === '' || debounceSendNumber === '0') return;
+
+      if (!chainInfo || !pin) return;
+      const account = getManagerAccount(pin);
+      if (!account) return;
+
+      const contract = await getContractBasic({
+        contractAddress: chainInfo.caContractAddress,
+        rpcUrl: chainInfo?.endPoint,
+        account: account,
+      });
+
+      const raw = await contract.encodedTx('ManagerForwardCall', {
+        caHash: wallet.caHash,
+        contractAddress: tokenItem.tokenContractAddress,
+        methodName: 'Transfer',
+        args: {
+          symbol: selectedToken.symbol,
+          to: selectedToContact.address,
+          amount: debounceSendNumber,
+          memo: '',
+        },
+      });
+
+      const { TransactionFee } = await customFetch(`${chainInfo?.endPoint}/api/blockChain/calculateTransactionFee`, {
+        method: 'POST',
+        params: {
+          RawTransaction: raw,
+        },
+      });
+
+      console.log('====TransactionFee======', TransactionFee);
+
+      setTransactionFee(unitConverter(ZERO.plus(TransactionFee.ELF).div('1e8')));
+
+      // const tmpTransactionFee = divDecimals(ZERO.plus(TransactionFee[selectedToken.symbol]), selectedToken.decimals);
+    })();
+  }, [
+    chainInfo,
+    pin,
+    selectedToContact.address,
+    selectedToken.address,
+    selectedToken.symbol,
+    debounceSendNumber,
+    tokenItem.tokenContractAddress,
+    wallet,
+    wallet.caHash,
+  ]);
 
   const totalPay = useMemo(() => {
     // TODO: TransferNumber + Transaction Fee
@@ -97,7 +173,6 @@ const SendHome: React.FC<SendHomeProps> = props => {
     if (!selectedToContact.address) return true;
     if (Number(sendNumber) <= 0) return true;
     // if (transactionFee[0] === '-') return true;
-
     return false;
   }, [selectedToContact.address, sendNumber]);
 
@@ -156,7 +231,10 @@ const SendHome: React.FC<SendHomeProps> = props => {
               {
                 title: t('Confirm'),
                 type: 'primary',
-                onPress: () => nextStep(true),
+                onPress: () => {
+                  setIsCrossChainTransfer(true);
+                  nextStep(true);
+                },
               },
             ],
           });
@@ -188,12 +266,36 @@ const SendHome: React.FC<SendHomeProps> = props => {
   };
 
   const checkCanPreview = () => {
-    console.log('checkCanPreview');
+    if (transactionFee === '0' || transactionFee === '') return;
+
+    const tokenBalanceBigNumber = ZERO.plus(tokenItem?.balance || 0).div(`1e${tokenItem?.decimals}`);
+
+    if (sendType === 'nft') {
+      if (ZERO.plus(sendNumber).isGreaterThan(nftItem.balance)) {
+        setErrorMessage([ErrorMessage.InsufficientFunds]);
+        return false;
+      }
+    } else {
+      // Insufficient funds
+      if (ZERO.plus(sendNumber).isGreaterThan(tokenBalanceBigNumber)) {
+        setErrorMessage([ErrorMessage.InsufficientFunds]);
+        return false;
+      }
+      // InsufficientFundsForTransactionFee
+      if (ZERO.plus(sendNumber).plus(transactionFee).isGreaterThan(tokenBalanceBigNumber)) {
+        setErrorMessage([ErrorMessage.InsufficientFundsForTransactionFee]);
+        return false;
+      }
+    }
+
+    return true;
   };
 
   const nextStep = (directNext?: boolean) => {
     // directNext true , is cross chain and has finished check
-    if (directNext) return setStep(2);
+    if (directNext) {
+      return setStep(2);
+    }
 
     if (!checkCanNext()) return;
     setStep(2);
@@ -201,11 +303,21 @@ const SendHome: React.FC<SendHomeProps> = props => {
 
   const preview = () => {
     // TODO : getTransactionFee and check the balance
+
+    let tmpAddress = selectedToContact.address;
+    if (!selectedToContact.address.includes('_')) {
+      tmpAddress = `ELF_${tmpAddress}_AELF`;
+    }
+
     navigationService.navigate('SendPreview', {
       sendType,
       sendInfo: {
-        selectedToContact,
+        isCrossChainTransfer,
+        selectedToContact: { ...selectedToContact, address: tmpAddress },
         tokenItem,
+        nftItem,
+        sendNumber,
+        transactionFee,
       },
     });
   };
@@ -247,7 +359,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
         <View style={styles.group}>
           <AmountToken
             rate={data ?? { USDT: 0 }}
-            balanceShow={'0'}
+            balanceShow={tokenItem.balance}
             sendTokenNumber={sendNumber}
             setSendTokenNumber={setSendNumber}
             selectedToken={selectedToken}
@@ -259,7 +371,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
 
       {sendType === 'nft' && step === 2 && (
         <View style={styles.group}>
-          <NFTInfo />
+          <NFTInfo nftItem={nftItem} />
         </View>
       )}
 
@@ -270,7 +382,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
       )}
 
       {errorMessage.includes(ErrorMessage.InsufficientFunds) && (
-        <Text style={styles.errorMessage}>{t(ErrorMessage.InsufficientFunds)}</Text>
+        <Text style={[styles.errorMessage, GStyles.textAlignCenter]}>{t(ErrorMessage.InsufficientFunds)}</Text>
       )}
 
       {errorMessage.includes(ErrorMessage.InsufficientFundsForTransactionFee) && (
@@ -326,7 +438,11 @@ const SendHome: React.FC<SendHomeProps> = props => {
       </View> */}
       <View style={styles.space} />
       {step === 1 && (
-        <SelectContact onPress={(item: { address: string; name: string }) => setSelectedToContact(item)} />
+        <SelectContact
+          onPress={(item: { address: string; name: string }) => {
+            setSelectedToContact(item);
+          }}
+        />
       )}
 
       <View style={styles.buttonWrapStyle}>

@@ -1,7 +1,6 @@
 import { TokenItemShowType } from '@portkey/types/types-eoa/token';
 import React, { useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import Svg from 'components/Svg';
 import TokenOverlay from 'components/TokenOverlay';
 import { pTd } from 'utils/unit';
 import { parseInputChange } from '@portkey/utils/input';
@@ -12,6 +11,7 @@ import { Input } from '@rneui/themed';
 import { TextS } from 'components/CommonText';
 import { unitConverter } from '@portkey/utils/converter';
 import { useLanguage } from 'i18n/hooks';
+import CommonAvatar from 'components/CommonAvatar';
 
 interface AmountTokenProps {
   rate: { USDT: string | number };
@@ -24,19 +24,13 @@ interface AmountTokenProps {
 }
 
 export default function AmountToken({
-  rate,
   balanceShow,
   sendTokenNumber,
   setSendTokenNumber,
-  selectedAccount,
   selectedToken,
   setSelectedToken,
 }: AmountTokenProps) {
   const { t } = useLanguage();
-
-  const tokenList = useMemo(() => {
-    return [];
-  }, []);
 
   const onFinishSelectToken = (tokenItem: TokenItemShowType) => {
     setSelectedToken(tokenItem);
@@ -57,12 +51,16 @@ export default function AmountToken({
       </View>
       <View style={styles.bottom}>
         <View style={styles.bottomLeft}>
-          <Svg icon="aelf-avatar" size={pTd(28)} />
+          {/* <Svg icon="aelf-avatar" size={pTd(28)} /> */}
+          {selectedToken?.imageUrl ? (
+            <CommonAvatar shapeType="circular" imageUrl={selectedToken?.imageUrl || ''} avatarSize={28} title={''} />
+          ) : (
+            <Text style={styles.imgStyle}>{selectedToken?.symbol[0]}</Text>
+          )}
           <Text style={styles.symbolName}>
             {selectedToken?.symbol?.length > 5 ? formatTokenNameToSuffix(selectedToken?.symbol) : selectedToken?.symbol}
           </Text>
         </View>
-        {/* TODO: search is contact?  */}
         <View style={styles.bottomRight}>
           <Input
             onFocus={() => {
@@ -78,14 +76,14 @@ export default function AmountToken({
               setSendTokenNumber(newAmount);
             }}
           />
-          {selectedToken.symbol === 'ELF' && (
+          {/* {selectedToken.symbol === 'ELF' && (
             <TextS style={styles.usdtNumSent}>
               ${' '}
               {sendTokenNumber === ' '
                 ? '0.00'
                 : unitConverter(ZERO.plus(sendTokenNumber ? sendTokenNumber : '0').times(rate.USDT), 2)}
             </TextS>
-          )}
+          )} */}
         </View>
       </View>
     </View>
@@ -127,6 +125,15 @@ export const styles = StyleSheet.create({
     ...GStyles.paddingArg(6, 10),
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  imgStyle: {
+    width: pTd(28),
+    height: pTd(28),
+    lineHeight: pTd(28),
+    borderColor: defaultColors.border1,
+    borderWidth: pTd(1),
+    borderRadius: pTd(14),
+    textAlign: 'center',
   },
   symbolName: {
     flex: 1,

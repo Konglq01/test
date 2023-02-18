@@ -17,8 +17,5 @@ export const crossChainTransferToCa = ({
   };
   sendOptions?: SendOptions;
 }) => {
-  return contract.callSendMethod('CrossChainTransfer', '', {
-    paramsOption,
-    sendOptions,
-  });
+  return contract.callSendMethod('CrossChainTransfer', '', paramsOption, sendOptions);
 };

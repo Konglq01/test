@@ -45,14 +45,14 @@ export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
   const [currentNFT, setCurrentNFT] = useState('');
   const currentNetworkInfo = useCurrentNetworkInfo();
 
+  const [reFreshing, setReFreshing] = useState(false);
+
   const caAddresses = useCaAddresses();
 
   const dispatch = useAppCommonDispatch();
   const {
     accountNFT: { accountNFTList, skipCount, totalRecordCount },
   } = useAppCASelector(state => state.assets);
-
-  console.log('[[[[[[[accountNFTList', accountNFTList);
 
   const [refreshing, setRefreshing] = useState(false);
   const [NFTList, setNFTList] = useState<any[]>([]);
@@ -73,12 +73,10 @@ export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
 
   if (totalRecordCount === 0) return <NoData type="top" message={t('No NFTs yet ')} />;
 
-  console.log('accountNFTList<<<<<', accountNFTList);
-
   return (
     <View style={styles.wrap}>
       <FlatList
-        refreshing={refreshing}
+        refreshing={reFreshing}
         data={accountNFTList || []}
         renderItem={({ item }: { item: NFTCollectionItemShowType }) => (
           <NFTCollection

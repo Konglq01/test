@@ -43,9 +43,6 @@ export default function NFTItem(props: NFTItemPropsType) {
 
   const { t } = useLanguage();
 
-  const setResult = symbol === currentNFT ? '' : symbol;
-  console.log('setResult', props, setResult);
-
   return (
     <View style={styles.wrap}>
       <TouchableOpacity
@@ -80,7 +77,7 @@ export default function NFTItem(props: NFTItemPropsType) {
               key={ele.symbol}
               data={ele}
               onPress={() => {
-                navigationService.navigate('NFTDetail', { item: ele });
+                navigationService.navigate('NFTDetail', ele);
               }}
             />
           ))}

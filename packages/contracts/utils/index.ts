@@ -138,6 +138,7 @@ export const handleContractParams = async ({ paramsOption, functionName, instanc
   if (functionName === 'ManagerForwardCall') {
     const { contractAddress, methodName, args, caHash } = paramsOption || {};
     if (!(contractAddress && methodName && args && caHash)) {
+      debugger;
       throw new Error('ManagerForwardCall parameter is missing');
     }
     const methods = await getContractMethods(instance, paramsOption.contractAddress);

@@ -8,10 +8,9 @@ import { useLanguage } from 'i18n/hooks';
 import TokenOverlay from 'components/TokenOverlay';
 import { TokenItemShowType } from '@portkey/types/types-ca/token';
 import { pTd } from 'utils/unit';
-import CommonToast from 'components/CommonToast';
 
 interface SendButtonType {
-  currentTokenInfo?: any;
+  currentTokenInfo?: TokenItemShowType;
   themeType?: 'dashBoard' | 'innerPage';
   receiveButton?: any;
 }
@@ -28,8 +27,8 @@ export default function ReceiveButton(props: SendButtonType) {
           if (themeType === 'innerPage') return navigationService.navigate('Receive', currentTokenInfo);
 
           TokenOverlay.showTokenList({
-            onFinishSelectToken: (token: TokenItemShowType) => {
-              navigationService.navigate('Receive', token);
+            onFinishSelectToken: (tokenInfo: TokenItemShowType) => {
+              navigationService.navigate('Receive', tokenInfo);
             },
           });
         }}>

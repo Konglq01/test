@@ -22,7 +22,9 @@ import useDebounce from 'hooks/useDebounce';
 import { useAppCommonDispatch } from '@portkey/hooks';
 import { request } from '@portkey/api/api-did';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { useChainIdList } from '@portkey/hooks/hooks-ca/wallet';
+import { useCaAddresses, useChainIdList } from '@portkey/hooks/hooks-ca/wallet';
+import { fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
+import Loading from 'components/Loading';
 
 interface ManageTokenListProps {
   route?: any;
@@ -75,6 +77,7 @@ const ManageTokenList: React.FC<ManageTokenListProps> = () => {
   const chainList = useChainIdList();
 
   const dispatch = useAppCommonDispatch();
+  const caAddressArray = useCaAddresses();
 
   const { tokenDataShowInMarket } = useAppCASelector(state => state.tokenManagement);
 
@@ -98,7 +101,7 @@ const ManageTokenList: React.FC<ManageTokenListProps> = () => {
   const onHandleTokenItem = useCallback(
     async (item: TokenItemShowType, isAdded: boolean) => {
       // TODO
-
+      Loading.show();
       await request.token
         .displayUserToken({
           baseURL: currentNetworkInfo.apiUrl,
@@ -110,6 +113,9 @@ const ManageTokenList: React.FC<ManageTokenListProps> = () => {
         .then(res => {
           setTimeout(() => {
             dispatch(fetchAllTokenListAsync({ keyword: debounceWord, chainIdArray: chainList }));
+            dispatch(fetchTokenListAsync({ caAddresses: caAddressArray }));
+            Loading.hide();
+
             CommonToast.success('Success');
           }, 1000);
         })
@@ -118,7 +124,7 @@ const ManageTokenList: React.FC<ManageTokenListProps> = () => {
           CommonToast.fail('Fail');
         });
     },
-    [chainList, currentNetworkInfo.apiUrl, debounceWord, dispatch],
+    [caAddressArray, chainList, currentNetworkInfo.apiUrl, debounceWord, dispatch],
   );
 
   useEffect(() => {

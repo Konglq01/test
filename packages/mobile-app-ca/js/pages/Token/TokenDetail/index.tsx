@@ -110,7 +110,7 @@ const TokenDetail: React.FC = () => {
     setFreshing(false);
   }, [getActivityList]);
 
-  const balanceShow = `${unitConverter(ZERO.plus(tokenInfo?.balance).div(`1e${tokenInfo.decimals}`))}`;
+  const balanceShow = `${unitConverter(ZERO.plus(tokenInfo?.balance || 0).div(`1e${tokenInfo.decimals}`))}`;
 
   return (
     <PageContainer
@@ -137,7 +137,7 @@ const TokenDetail: React.FC = () => {
         <View style={styles.buttonGroupWrap}>
           <SendButton themeType="innerPage" sentToken={currentToken} />
           <View style={styles.space} />
-          <ReceiveButton themeType="innerPage" receiveButton={currentToken} />
+          <ReceiveButton currentTokenInfo={tokenInfo} themeType="innerPage" receiveButton={currentToken} />
         </View>
       </View>
       {/* first time loading  */}

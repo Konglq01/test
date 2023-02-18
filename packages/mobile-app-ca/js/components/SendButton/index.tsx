@@ -11,6 +11,7 @@ import { useLanguage } from 'i18n/hooks';
 import { pTd } from 'utils/unit';
 import AssetsOverlay from 'pages/DashBoard/AssetsOverlay';
 import { useGetCurrentCAContract } from 'hooks/contract';
+import assets from '@portkey/api/api-did/assets';
 interface SendButtonType {
   themeType?: 'dashBoard' | 'innerPage';
   sentToken?: TokenItemShowType;
@@ -55,17 +56,8 @@ const SendButton = (props: SendButtonType) => {
     <View style={styles.buttonWrap}>
       <TouchableOpacity
         onPress={async () => {
-          // const caContract = await getCurrentCAContract();
-
-          // navigationService.navigate('SendHome', {
-          //   tokenItem: {
-          //     symbol: 'ELF',
-          //     decimal: 8,s
-          //   },
-          // });
-          // throw new Error('My first Sentry error!');
-          // Sentry.nativeCrash();
-          // if (themeType === 'innerPage') return navigationService.navigate('SendHome', { tokenItem: sentToken });
+          if (themeType === 'innerPage')
+            return navigationService.navigate('SendHome', { sendType: 'token', tokenItem: sentToken });
           // if (currentTokenList.length === 1)
           // return navigationService.navigate('SendHome', { tokenItem: currentTokenList?.[0] });
           AssetsOverlay.showAssetList({ onFinishSelectToken });
