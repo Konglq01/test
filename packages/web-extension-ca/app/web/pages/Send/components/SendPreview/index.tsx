@@ -54,7 +54,11 @@ export default function SendPreview({
           <span className="label">From</span>
           <div className="value">
             <p className="name">{walletName}</p>
-            <p className="address">{walletInfo?.address}</p>
+            <p className="address">
+              {walletInfo?.address.includes('ELF_')
+                ? toAccount.address.replace(/(?<=^\w{9})\w+(?=\w{10})/, '...')
+                : toAccount.address.replace(/(?<=^\w{6})\w+(?=\w{6})/, '...')}
+            </p>
           </div>
         </div>
         <div className={clsx('item', toAccount.name?.length || 'no-name')}>
