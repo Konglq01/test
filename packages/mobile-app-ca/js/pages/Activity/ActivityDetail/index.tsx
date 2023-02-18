@@ -31,6 +31,8 @@ interface RouterParams {
   blockHash?: string;
 }
 
+const DEFAULT_DECIMAL = 8;
+
 const ActivityDetail = () => {
   const { t } = useLanguage();
   const { transactionId = '', blockHash = '' } = useRouterParams<RouterParams>();
@@ -120,11 +122,11 @@ const ActivityDetail = () => {
             {transactionFees.map((item, index) => (
               <View key={index} style={[styles.transactionFeeItemWrap, index > 0 && styles.marginTop8]}>
                 <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${unitConverter(
-                  ZERO.plus(item.fee || 0).div(`1e${activityItem?.decimal}`),
+                  ZERO.plus(item.fee || 0).div(`1e${activityItem?.decimals || DEFAULT_DECIMAL}`),
                 )} ${item.symbol}`}</TextM>
                 {!isTestNet && (
                   <TextS style={[styles.lightGrayFontColor, styles.marginTop4]}>{`$ ${unitConverter(
-                    ZERO.plus(item.feeInUsd ?? 0).div(`1e${activityItem?.decimal}`),
+                    ZERO.plus(item.feeInUsd ?? 0).div(`1e${activityItem?.decimals || DEFAULT_DECIMAL}`),
                     2,
                   )}`}</TextS>
                 )}
@@ -134,7 +136,7 @@ const ActivityDetail = () => {
         </View>
       </View>
     );
-  }, [activityItem?.decimal, activityItem?.transactionFees, isTestNet, t]);
+  }, [activityItem?.decimals, activityItem?.transactionFees, isTestNet, t]);
 
   return (
     <PageContainer
@@ -167,9 +169,9 @@ const ActivityDetail = () => {
       ) : (
         <>
           <Text style={styles.tokenCount}>
-            {`${unitConverter(ZERO.plus(activityItem?.amount || 0).div(`1e${activityItem?.decimal}`))} ${
-              activityItem?.symbol || ''
-            }`}
+            {`${unitConverter(
+              ZERO.plus(activityItem?.amount || 0).div(`1e${activityItem?.decimals || DEFAULT_DECIMAL}`),
+            )} ${activityItem?.symbol || ''}`}
           </Text>
           {!isTestNet && (
             <Text style={styles.usdtCount}>{`$ ${unitConverter(ZERO.plus(activityItem?.priceInUsd ?? 0), 2)}`}</Text>

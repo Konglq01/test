@@ -5,11 +5,13 @@ import { useCaAddresses } from '@portkey/hooks/hooks-ca/wallet';
 import { fetchActivity } from '@portkey/store/store-ca/activity/api';
 import { ActivityItemType } from '@portkey/types/types-ca/activity';
 import { Transaction } from '@portkey/types/types-ca/trade';
+import { getExploreLink } from '@portkey/utils';
 import { formatStr2EllipsisStr, unitConverter } from '@portkey/utils/converter';
 import clsx from 'clsx';
 import Copy from 'components/Copy';
 import CustomSvg from 'components/CustomSvg';
 import moment from 'moment';
+import { useCurrentNetwork } from '@portkey/hooks/network';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
@@ -24,6 +26,7 @@ export default function Transaction() {
   const { t } = useTranslation();
   const { state }: { state: ActivityItemType } = useLocation();
   const caAddresses = useCaAddresses();
+  const { blockExplorerURL } = useCurrentNetwork();
 
   // Obtain data through routing to ensure that the page must have data and prevent Null Data Errors.
   const [activityItem, setActivityItem] = useState<ActivityItemType>(state);
@@ -201,13 +204,17 @@ export default function Transaction() {
     );
   }, [activityItem.transactionId, feeUI, t]);
 
+  const openOnExplorer = useCallback(() => {
+    return getExploreLink(blockExplorerURL || '', activityItem.transactionId || '', 'transaction');
+  }, [activityItem.transactionId, blockExplorerURL]);
+
   const viewOnExplorerUI = useCallback(() => {
     return (
-      <a className="link" target="blank" href={`tx/${activityItem.transactionId}`}>
+      <a className="link" target="blank" href={openOnExplorer()}>
         {t('View on Explorer')}
       </a>
     );
-  }, [activityItem.transactionId, t]);
+  }, [openOnExplorer, t]);
 
   return (
     <div className="transaction-detail-modal">
