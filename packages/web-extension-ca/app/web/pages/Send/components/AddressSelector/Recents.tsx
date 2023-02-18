@@ -18,6 +18,7 @@ interface ApiRecentAddressItemType {
 }
 
 const MAX_RESULT_ACCOUNT = 10;
+const RECENT_COUNT_LIMIT = 100;
 const NO_RECENT_TEXT = 'There is no recents.';
 
 export default function Recents({ onChange }: { onChange: (account: IClickAddressProps) => void }) {
@@ -56,40 +57,46 @@ export default function Recents({ onChange }: { onChange: (account: IClickAddres
     [contactMap],
   );
 
+  const recentsListLimit = (list: any[]) => {
+    if (list.length <= RECENT_COUNT_LIMIT) return list;
+    return list.slice(0, RECENT_COUNT_LIMIT);
+  };
+
   // init Recents
   useEffectOnce(() => {
     fetchRecents().then((res) => {
       const { data, totalRecordCount } = res;
-
       setSkipCount(MAX_RESULT_ACCOUNT);
+      setRecentList(recentsListLimit(parseRecentsListToContactMap(data as ApiRecentAddressItemType[])));
+      setRecentTotalNumber(totalRecordCount);
       setLoading(false);
-      setRecentList(parseRecentsListToContactMap(data as ApiRecentAddressItemType[]));
-      setRecentTotalNumber(totalRecordCount); // todoykx max_count = 100
     });
   });
 
   // load more recents
   const fetchMoreRecent = useCallback(async () => {
+    if (loading || recentTotalNumber >= RECENT_COUNT_LIMIT) return;
+
     try {
-      setLoading(true);
       const res = await fetchRecents();
       const { data, totalRecordCount } = res;
-      setSkipCount(skipCount + MAX_RESULT_ACCOUNT);
-      setLoading(false);
+      const skipCountCompute =
+        skipCount + MAX_RESULT_ACCOUNT < RECENT_COUNT_LIMIT ? skipCount + MAX_RESULT_ACCOUNT : RECENT_COUNT_LIMIT;
+      setSkipCount(skipCountCompute);
       setRecentList([...recentList, ...parseRecentsListToContactMap(data as ApiRecentAddressItemType[])]);
       setRecentTotalNumber(totalRecordCount);
+      setLoading(false);
     } catch (error) {
-      // message.error(error); // todoykx
       throw Error(JSON.stringify(error));
     }
-  }, [skipCount, fetchRecents, recentList, parseRecentsListToContactMap]);
+  }, [loading, recentTotalNumber, fetchRecents, skipCount, recentList, parseRecentsListToContactMap]);
 
   return (
     <div className="recents">
       {recentList.map((item, index) => (
         <RecentItem item={item} key={index} onClick={onChange} />
       ))}
-      <LoadingMore hasMore={recentList.length < recentTotalNumber} isLoading={loading} loadMore={fetchMoreRecent} />
+      <LoadingMore hasMore={recentList.length < recentTotalNumber} loadMore={fetchMoreRecent} />
       {recentList.length === 0 && <p className="no-data">{t(NO_RECENT_TEXT)}</p>}
     </div>
   );

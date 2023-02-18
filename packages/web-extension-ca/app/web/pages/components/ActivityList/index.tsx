@@ -36,7 +36,7 @@ export default function ActivityList({ data, hasMore, loadMore }: IActivityListP
 
   const navToDetail = useCallback(
     (item: ActivityItemType) => {
-      nav('/transaction', { state: { transactionId: item.transactionId, blockHash: item.blockHash } });
+      nav('/transaction', { state: item });
     },
     [nav],
   );
