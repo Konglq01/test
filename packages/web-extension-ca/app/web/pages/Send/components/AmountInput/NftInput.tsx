@@ -9,12 +9,15 @@ import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { ChainId } from '@portkey/types';
 import { getBalance } from 'utils/sandboxUtil/getBalance';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { divDecimals, divDecimalsStr, unitConverter } from '@portkey/utils/converter';
+import { divDecimals, divDecimalsStr, timesDecimals, unitConverter } from '@portkey/utils/converter';
 import getTransactionFee from 'utils/sandboxUtil/getTransactionFee';
 import { WalletError } from '@portkey/store/wallet/type';
 import { useUserInfo } from 'store/Provider/hooks';
 import aes from '@portkey/utils/aes';
 import { SandboxErrorCode } from '@portkey/utils/sandboxService';
+import getTransferFee from 'pages/Send/utils/getTransferFee';
+import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import { contractErrorHandler } from '@portkey/did-ui-react/src/utils/errorHandler';
 
 export default function NftInput({
   toAccount,
@@ -40,44 +43,45 @@ export default function NftInput({
   const currentChain = useCurrentChain(token.chainId as ChainId);
   const currentNetwork = useCurrentNetworkInfo();
   const [fee, setTransactionFee] = useState<string>();
+  const wallet = useCurrentWalletInfo();
 
   const getTranslationInfo = useCallback(async () => {
-    if (!toAccount?.address) return;
-    const privateKey = await aes.decrypt(fromAccount.AESEncryptPrivateKey, passwordSeed);
-    if (!privateKey) return message.error(t(WalletError.invalidPrivateKey));
-    const transactionRes = await getTransactionFee({
-      contractAddress: token?.address || '',
-      privateKey: privateKey,
-      paramsOption: {
-        symbol: token?.symbol,
-        memo: '',
-        to: toAccount?.address,
-        amount: amount?.replace(` ${token?.symbol}`, ''),
-      },
-      chainType: currentNetwork.walletType,
-      methodName: 'Transfer',
-      rpcUrl: currentChain?.endPoint || '',
-    });
-    if (!transactionRes?.message || transactionRes?.code === SandboxErrorCode.error)
-      throw Error(transactionRes?.message?.Error?.Message ?? transactionRes?.message ?? 'something error');
-    const _fee = transactionRes.message['ELF'];
+    try {
+      if (!toAccount?.address) throw 'No toAccount';
+      const privateKey = await aes.decrypt(fromAccount.AESEncryptPrivateKey, passwordSeed);
+      if (!privateKey) throw t(WalletError.invalidPrivateKey);
+      if (!currentChain) throw 'No ChainInfo';
+      const _amount = amount?.replace(` ${token?.symbol}`, '') || 0;
 
-    if (_fee) {
-      const fee = divDecimalsStr(ZERO.plus(_fee), 8);
-      setTransactionFee(fee);
-      onTxFeeChange?.(fee);
+      const feeRes = await getTransferFee({
+        managerAddress: wallet.address,
+        toAddress: toAccount?.address,
+        privateKey,
+        chainInfo: currentChain,
+        chainType: currentNetwork.walletType,
+        token,
+        caHash: wallet.caHash as string,
+        amount: timesDecimals(_amount, token.decimals).toNumber(),
+      });
+      console.log(feeRes, 'transactionRes===');
+
+      setTransactionFee(feeRes);
+      onTxFeeChange?.(feeRes);
+    } catch (error) {
+      const _error = contractErrorHandler(error);
+      message.error(_error);
     }
   }, [
     amount,
-    currentChain?.endPoint,
+    currentChain,
     currentNetwork.walletType,
     fromAccount.AESEncryptPrivateKey,
     onTxFeeChange,
     passwordSeed,
     t,
     toAccount?.address,
-    token?.address,
-    token?.symbol,
+    token,
+    wallet.caHash,
   ]);
 
   const handleAmountBlur = useCallback(() => {
@@ -109,7 +113,7 @@ export default function NftInput({
       address: token?.address,
       chainType: currentNetwork.walletType,
       paramsOption: {
-        owner: fromAccount.address,
+        owner: '2b8294NW2u7wiHg6pePWxab1He2AoMMdSE1mdbNiv7k6nXubLy',
         symbol: token.symbol,
       },
     });

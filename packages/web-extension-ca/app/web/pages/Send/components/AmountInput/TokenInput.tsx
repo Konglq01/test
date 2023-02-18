@@ -1,6 +1,6 @@
 import { ZERO } from '@portkey/constants/misc';
 import { BaseToken } from '@portkey/types/types-ca/token';
-import { divDecimals, divDecimalsStr, unitConverter } from '@portkey/utils/converter';
+import { divDecimals, divDecimalsStr, timesDecimals, unitConverter } from '@portkey/utils/converter';
 import { Input, message } from 'antd';
 import { parseInputChange } from '@portkey/utils/input';
 import clsx from 'clsx';
@@ -17,6 +17,10 @@ import { useUserInfo } from 'store/Provider/hooks';
 import { WalletError } from '@portkey/store/store-ca/wallet/type';
 import { SandboxErrorCode } from '@portkey/utils/sandboxService';
 import getTransactionFee from 'utils/sandboxUtil/getTransactionFee';
+import getTransferFee from 'pages/Send/utils/getTransferFee';
+import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import { DefaultChainId } from '@portkey/constants/constants-ca/network-test2';
+import { contractErrorHandler } from '@portkey/did-ui-react/src/utils/errorHandler';
 
 export default function TokenInput({
   fromAccount,
@@ -42,35 +46,36 @@ export default function TokenInput({
   const [balance, setBalance] = useState<string>();
   const { passwordSeed } = useUserInfo();
   const [fee, setTransactionFee] = useState<string>();
+  const wallet = useCurrentWalletInfo();
 
   const getTranslationInfo = useCallback(async () => {
-    if (!toAccount?.address) return;
-    const privateKey = await aes.decrypt(fromAccount.AESEncryptPrivateKey, passwordSeed);
-    if (!privateKey) return message.error(t(WalletError.invalidPrivateKey));
-    const transactionRes = await getTransactionFee({
-      contractAddress: token?.address || '',
-      privateKey: privateKey,
-      paramsOption: {
-        symbol: token?.symbol,
-        memo: '',
-        to: toAccount?.address,
-        amount: amount?.replace(` ${token?.symbol}`, ''),
-      },
-      chainType: currentNetwork.walletType,
-      methodName: 'Transfer',
-      rpcUrl: currentChain?.endPoint || '',
-    });
-    if (!transactionRes?.message || transactionRes?.code === SandboxErrorCode.error)
-      throw Error(transactionRes?.message?.Error?.Message ?? transactionRes?.message ?? 'something error');
-    const _fee = transactionRes.message['ELF'];
-    if (_fee) {
-      const fee = divDecimalsStr(ZERO.plus(_fee), 8);
+    try {
+      if (!toAccount?.address) throw 'No toAccount';
+      const privateKey = await aes.decrypt(fromAccount.AESEncryptPrivateKey, passwordSeed);
+      if (!privateKey) throw t(WalletError.invalidPrivateKey);
+      if (!currentChain) throw 'No ChainInfo';
+      const _amount = amount?.replace(` ${token?.symbol}`, '') || 0;
+      const fee = await getTransferFee({
+        managerAddress: wallet.address,
+        toAddress: toAccount?.address,
+        privateKey,
+        chainInfo: currentChain,
+        chainType: currentNetwork.walletType,
+        token,
+        caHash: wallet.caHash as string,
+        amount: timesDecimals(_amount, token.decimals).toNumber(),
+      });
+
       setTransactionFee(fee);
       onTxFeeChange?.(fee);
+    } catch (error) {
+      console.log(error, 'transactionRes==error');
+      const _error = contractErrorHandler(error) || 'Get translation fee error';
+      message.error(_error);
     }
   }, [
     amount,
-    currentChain?.endPoint,
+    currentChain,
     currentNetwork.walletType,
     fromAccount.AESEncryptPrivateKey,
     onTxFeeChange,
@@ -78,6 +83,8 @@ export default function TokenInput({
     t,
     toAccount?.address,
     token,
+    wallet.address,
+    wallet.caHash,
   ]);
 
   console.log('getTokenBalance', currentChain);
