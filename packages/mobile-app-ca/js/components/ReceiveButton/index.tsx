@@ -11,12 +11,13 @@ import { pTd } from 'utils/unit';
 import CommonToast from 'components/CommonToast';
 
 interface SendButtonType {
+  currentTokenInfo?: any;
   themeType?: 'dashBoard' | 'innerPage';
   receiveButton?: any;
 }
 
 export default function ReceiveButton(props: SendButtonType) {
-  const { themeType = 'dashBoard' } = props;
+  const { themeType = 'dashBoard', currentTokenInfo = {} } = props;
   const { t } = useLanguage();
   const styles = themeType === 'dashBoard' ? dashBoardBtnStyle : innerPageStyles;
 
@@ -24,10 +25,12 @@ export default function ReceiveButton(props: SendButtonType) {
     <View style={styles.buttonWrap}>
       <TouchableOpacity
         onPress={() => {
-          if (themeType === 'innerPage') return navigationService.navigate('Receive');
+          if (themeType === 'innerPage') return navigationService.navigate('Receive', currentTokenInfo);
 
           TokenOverlay.showTokenList({
-            onFinishSelectToken: () => navigationService.navigate('Receive'),
+            onFinishSelectToken: (token: TokenItemShowType) => {
+              navigationService.navigate('Receive', token);
+            },
           });
         }}>
         <Svg icon={themeType === 'dashBoard' ? 'receive' : 'receive1'} size={pTd(46)} />

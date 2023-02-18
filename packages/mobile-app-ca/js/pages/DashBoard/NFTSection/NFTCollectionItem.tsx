@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { defaultColors } from 'assets/theme';
 import navigationService from 'utils/navigationService';
@@ -43,7 +43,6 @@ export default function NFTItem(props: NFTItemPropsType) {
 
   const { t } = useLanguage();
 
-  // console.log('22222', collapsed, currentNFT, data?.name);
   const setResult = symbol === currentNFT ? '' : symbol;
   console.log('setResult', props, setResult);
 
@@ -86,10 +85,12 @@ export default function NFTItem(props: NFTItemPropsType) {
             />
           ))}
         </View>
-        <TouchableOpacity style={styles.loadMore} onPress={() => loadMoreItem?.()}>
-          <TextM style={FontStyles.font4}>More</TextM>
-          <Svg icon="down-arrow" size={pTd(16)} color={defaultColors.primaryColor} iconStyle={styles.downArrow} />
-        </TouchableOpacity>
+        {children.length === 0 && (
+          <TouchableOpacity style={styles.loadMore} onPress={() => loadMoreItem?.()}>
+            <TextM style={FontStyles.font4}>More</TextM>
+            <Svg icon="down-arrow" size={pTd(16)} color={defaultColors.primaryColor} iconStyle={styles.downArrow} />
+          </TouchableOpacity>
+        )}
       </Collapsible>
       <View style={styles.divider} />
     </View>

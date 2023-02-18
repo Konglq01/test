@@ -45,10 +45,12 @@ export default function TokenList({ tokenList }: { tokenList: TokenItemShowType[
               </span>
             </div>
             <div className="amount">
-              <p>{unitConverter(ZERO.plus(item?.balance || '').div(`1e${item?.decimal}`))}</p>
-              <p className="convert">
-                {`$ ${unitConverter(ZERO.plus(item?.balanceInUsd || '').div(`1e${item?.decimal}`))}`}
-              </p>
+              <p>{unitConverter(ZERO.plus(item?.balance || '').div(`1e${item?.decimals}`))}</p>
+              {!isTestNet && (
+                <p className="convert">
+                  {`$ ${unitConverter(ZERO.plus(item?.balanceInUsd || '').div(`1e${item?.decimals}`))}`}
+                </p>
+              )}
             </div>
           </li>
         ))}

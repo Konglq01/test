@@ -25,6 +25,8 @@ type NFTCollectionProps = NFTCollectionItemShowType & {
 };
 
 function areEqual(prevProps: NFTCollectionProps, nextProps: NFTCollectionProps) {
+  return false;
+  // eslint-disable-next-line no-self-compare
   return nextProps.isCollapsed === prevProps.isCollapsed;
 }
 
@@ -57,7 +59,7 @@ export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
 
   const fetchNFTList = useCallback(() => {
     const timer: any = setTimeout(() => {
-      dispatch(fetchNFTCollectionsAsync({ caAddresses, skipCount: 0, maxResultCount: 100 }));
+      dispatch(fetchNFTCollectionsAsync({ caAddresses }));
       // setNFTList(result?.items ?? []);
       // setNFTNum(result.totalCount ?? 0);
       // setRefreshing(false);
@@ -70,6 +72,8 @@ export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
   });
 
   if (totalRecordCount === 0) return <NoData type="top" message={t('No NFTs yet ')} />;
+
+  console.log('accountNFTList<<<<<', accountNFTList);
 
   return (
     <View style={styles.wrap}>
@@ -84,12 +88,12 @@ export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
             setCurrentNFT={setCurrentNFT}
             loadMoreItem={() => {
               console.log('item symbol', item.symbol);
-              dispatch(fetchNFTAsync({ caAddresses, skipCount, maxResultCount: 10, symbol: item.symbol }));
+              dispatch(fetchNFTAsync({ caAddresses, symbol: item.symbol }));
             }}
             {...item}
           />
         )}
-        keyExtractor={(item: NFTCollectionItemShowType) => item?.symbol}
+        keyExtractor={(item: NFTCollectionItemShowType) => item?.symbol + item.chainId}
         onRefresh={() => {
           setRefreshing(true);
           getAccountBalance?.();
@@ -97,7 +101,7 @@ export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
         }}
         onEndReached={() => {
           if (accountNFTList.length >= totalRecordCount) return;
-          dispatch(fetchNFTCollectionsAsync({ caAddresses, skipCount, maxResultCount: 10 }));
+          dispatch(fetchNFTCollectionsAsync({ caAddresses }));
         }}
       />
     </View>

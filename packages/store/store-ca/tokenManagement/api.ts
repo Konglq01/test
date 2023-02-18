@@ -4,12 +4,12 @@ export function fetchAllTokenList({
   maxResultCount,
   skipCount,
   keyword,
-  chainIdArray = ['AELF', 'tDVV', 'tDVW'],
+  chainIdArray,
 }: {
   maxResultCount?: number;
   skipCount?: number;
   keyword: string;
-  chainIdArray?: string[];
+  chainIdArray: string[];
 }): Promise<{ items: any[]; totalRecordCount: number }> {
   const chainIdSearchLanguage = chainIdArray.map(chainId => `token.chainId:${chainId}`).join(' OR ');
 
@@ -17,7 +17,7 @@ export function fetchAllTokenList({
 
   return request.es.getUserTokenList({
     params: {
-      filter: `${filterKeywords} AND (${chainIdSearchLanguage})`,
+      filter: `${filterKeywords} OR (${chainIdSearchLanguage})`,
       sort: 'sortWeight desc,token.symbol acs',
       skipCount: 0,
       maxResultCount: 1000,

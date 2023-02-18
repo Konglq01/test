@@ -120,7 +120,7 @@ export default function TokenInput({
     setTimeout(() => {
       getTranslationInfo();
     }, 0);
-  }, [getTranslationInfo, onChange, token]);
+  }, [getTranslationInfo, onChange, token?.decimals, token.symbol]);
 
   return (
     <div className="amount-wrap">
