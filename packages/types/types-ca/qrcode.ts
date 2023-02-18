@@ -1,7 +1,6 @@
 import { ChainType, NetworkType } from '..';
 import { TokenItemShowType } from './token';
 import { DeviceType } from './wallet';
-import { TokenItemShowType } from './token';
 
 export interface QRData {
   type: 'login' | 'send';
