@@ -8,7 +8,12 @@ import { getChainNumber } from '@portkey/utils/aelf';
 import { getBalance } from './getBalance';
 import token from '@portkey/api/api-did/token';
 import { ZERO } from '@portkey/constants/misc';
-import { FEE } from '@portkey/constants/constants-ca/wallet';
+import { CROSS_FEE } from '@portkey/constants/constants-ca/wallet';
+
+const nativeToken = {
+  symbol: 'ELF',
+  decimals: 8,
+};
 
 export type CrossChainTransferIntervalParams = Omit<CrossChainTransferParams, 'caHash' | 'fee'>;
 
@@ -65,19 +70,27 @@ const crossChainTransfer = async ({
   toAddress,
   fee,
 }: CrossChainTransferParams) => {
-  const res1 = await getBalance({
-    rpcUrl: chainInfo.endPoint,
-    chainType: chainType,
-    address: tokenInfo.address,
-    paramsOption: {
-      symbol: tokenInfo.symbol,
-      owner: managerAddress,
-    },
-  });
-  console.log(res1, 'res===getBalance1');
-
   let managerTransferResult;
   try {
+    let _amount = amount;
+    if (tokenInfo.symbol === nativeToken.symbol) {
+      //
+      _amount = ZERO.plus(amount).plus(fee).toNumber();
+    } else {
+      await managerTransfer({
+        rpcUrl: chainInfo.endPoint,
+        address: chainInfo.caContractAddress,
+        chainType,
+        privateKey,
+        paramsOption: {
+          caHash,
+          symbol: 'ELF',
+          to: managerAddress,
+          amount: fee,
+          memo,
+        },
+      });
+    }
     // first transaction:transfer to manager itself
     managerTransferResult = await managerTransfer({
       rpcUrl: chainInfo.endPoint,
@@ -88,11 +101,10 @@ const crossChainTransfer = async ({
         caHash,
         symbol: tokenInfo.symbol,
         to: managerAddress,
-        amount,
+        amount: _amount,
         memo,
       },
     });
-    console.log(managerTransferResult, 'sendHandler===managerTransfer');
   } catch (error) {
     throw {
       type: 'managerTransfer',
@@ -103,19 +115,6 @@ const crossChainTransfer = async ({
 
   // second transaction:crossChain transfer to toAddress
 
-  const res = await getBalance({
-    rpcUrl: chainInfo.endPoint,
-    chainType: chainType,
-    address: tokenInfo.address,
-    paramsOption: {
-      symbol: tokenInfo.symbol,
-      owner: managerAddress,
-    },
-  });
-
-  console.log(res, 'res===getBalance');
-  console.log(amount, 'res===getBalance amount');
-  console.log(fee, 'res===getBalance fee');
   // return;
   // TODO Only support chainType: aelf
   const CrossChainTransferParams = {
@@ -123,7 +122,7 @@ const crossChainTransfer = async ({
     chainType,
     privateKey,
     managerAddress,
-    amount: ZERO.plus(amount).minus(fee).toNumber(),
+    amount,
     tokenInfo,
     memo,
     toAddress,

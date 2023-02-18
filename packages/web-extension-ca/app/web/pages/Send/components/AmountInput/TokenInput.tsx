@@ -109,6 +109,8 @@ export default function TokenInput({
   }, [currentChain, currentNetwork.walletType, fromAccount.address, token.address, token.symbol]);
 
   useEffect(() => {
+    console.log('getTokenBalance==');
+
     getTokenBalance();
   }, [getTokenBalance]);
 
