@@ -12,6 +12,7 @@ import { ZERO } from '@portkey/constants/misc';
 import { unitConverter } from '@portkey/utils/converter';
 import { fetchAllTokenListAsync } from '@portkey/store/store-ca/tokenManagement/action';
 import { useCaAddresses } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 interface CustomSelectProps extends DrawerProps {
   onChange?: (v: AccountAssetItem, type: 'token' | 'nft') => void;
   onClose?: () => void;
@@ -42,6 +43,7 @@ export default function CustomTokenDrawer({
     () => Object.keys(walletInfo?.caInfo?.TESTNET || {}).filter((item) => item !== 'managerInfo'),
     [walletInfo?.caInfo?.TESTNET],
   );
+  const currentNetworkInfo = useCurrentNetworkInfo();
 
   useEffect(() => {
     if (drawerType === 'send') {
@@ -58,6 +60,7 @@ export default function CustomTokenDrawer({
       appDispatch(fetchAllTokenListAsync({ keyword: filterWord, chainIdArray }));
     }
   }, [appDispatch, caAddresses, chainIdArray, drawerType, filterWord]);
+  console.log('-------------accountAssets', accountAssets);
 
   useEffect(() => {
     if (drawerType === 'send') {
@@ -117,12 +120,12 @@ export default function CustomTokenDrawer({
             {token.nftInfo?.imageUrl ? <img src={token.nftInfo.imageUrl} /> : token.nftInfo?.alias?.slice(0, 1)}
           </div>
           <div className="info">
-            <p className="alias">{token.nftInfo?.alias}</p>
+            <p className="alias">{`${token.nftInfo?.alias} #${token.nftInfo?.tokenId}`}</p>
             <p className="network">
               {`${token.chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${token.chainId} ${isTestNet}`}
             </p>
           </div>
-          <div className="amount">{token.nftInfo?.quantity}</div>
+          <div className="amount">{token.nftInfo?.balance}</div>
         </div>
       );
     },
@@ -169,7 +172,7 @@ export default function CustomTokenDrawer({
           </div>
         ) : (
           assetList.map((token: AccountAssetItem) => {
-            return token.nftInfo ? renderNft(token) : renderToken(token);
+            return token.nftInfo?.tokenId ? renderNft(token) : renderToken(token);
           })
         )}
       </div>

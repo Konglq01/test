@@ -79,10 +79,17 @@ export default function MyBalance() {
         onChange={(v, type) => {
           setTokenOpen(false);
           // navigate(`/${navTarget}/${v.token.symbol}`);
+          const state = {
+            chainId: v.chainId,
+            decimals: type === 'nft' ? 0 : v.tokenInfo?.decimals,
+            address: type === 'nft' ? v?.nftInfo?.tokenContractAddress : v?.tokenInfo?.tokenContractAddress,
+            symbol: v.symbol,
+            name: v.symbol,
+          };
           if (navTarget === 'receive') {
-            navigate(`/${navTarget}/${type}/${v.symbol}/${v.chainId}`, { state: v });
+            navigate(`/${navTarget}/${type}/${v.symbol}/${v.chainId}`, { state });
           } else {
-            navigate(`/${navTarget}/${type}/${v.symbol}/${v.chainId}`, { state: type });
+            navigate(`/${navTarget}/${type}/${v.symbol}/${v.chainId}`, { state });
           }
         }}
       />

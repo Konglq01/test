@@ -79,13 +79,17 @@ export default function NFT() {
                 return (
                   <div
                     key={`${nft.symbol}-${nftItem.symbol}`}
-                    // style={{
-                    //   background: "url('https://upload-images.jianshu.io/upload_images/5809200-7fe8c323e533f656.jpg')",
-                    // }}
-                    // style={{ background: `url(${nftItem?.imageUrl})` }}
+                    style={{
+                      // eslint-disable-next-line no-inline-styles/no-inline-styles
+                      // backgroundPosition: 'center',
+                      // eslint-disable-next-line no-inline-styles/no-inline-styles
+                      // backgroundSize: 'cover',
+                      // eslint-disable-next-line no-inline-styles/no-inline-styles
+                      backgroundImage: `url('${nftItem.imageUrl}')`,
+                    }}
                     className="item"
                     onClick={() => {
-                      nav('/nft', { state: nftItem });
+                      nav('/nft', { state: { ...nftItem, address: nftItem.tokenContractAddress } });
                     }}>
                     <div className="mask">
                       <p className="alias">{nftItem.alias}</p>

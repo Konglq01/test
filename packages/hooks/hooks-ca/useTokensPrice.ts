@@ -16,9 +16,10 @@ export function useTokenPrice(symbols: string[]) {
 
   const chainTokenPrices = useMemo(
     // TODO
-    () => symbols.map(symbol => tokenPrices.tokenPriceObject?.[symbol.toLocaleLowerCase()] || 0),
+    () => symbols.map(symbol => tokenPrices.tokenPriceObject?.[symbol] || 0),
     [tokenPrices, symbols],
   );
+  console.log('-----chainTokenPrices', chainTokenPrices);
 
   return useMemo(() => chainTokenPrices, [chainTokenPrices]);
 }

@@ -50,6 +50,7 @@ export interface TokenInfo {
   balance?: string;
   decimals: string;
   balanceInUsd?: string;
+  tokenContractAddress: string;
 }
 
 export interface NftInfo {
@@ -58,7 +59,9 @@ export interface NftInfo {
   tokenId: string;
   protocolName: string;
   quantity: string;
+  balance?: string;
   decimals: string;
+  tokenContractAddress: string;
 }
 
 export interface AccountAssetItem {

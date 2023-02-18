@@ -3,7 +3,7 @@ import { BaseToken } from '@portkey/types/types-ca/token';
 import { Input, message } from 'antd';
 import { parseInputChange } from '@portkey/utils/input';
 import { handleKeyDownInt } from 'pages/Send/utils/util.keyDown';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { ChainId } from '@portkey/types';
@@ -24,26 +24,30 @@ export default function NftInput({
   fromAccount,
   token,
   value,
+  errorMsg,
   onChange,
   onTxFeeChange,
+  onCheckValue,
 }: {
   fromAccount: { address: string; AESEncryptPrivateKey: string };
 
   toAccount: { address: string };
   token: BaseToken;
   value: string;
+  errorMsg: string;
   onChange: (amount: string) => void;
   onTxFeeChange?: (fee: string) => void;
+  onCheckValue?: (params: { balance: string; fee: string; amount: string }) => void;
 }) {
-  const isMain = true;
   const { t } = useTranslation();
-  const [errorMsg, setErrorMsg] = useState('Insufficient funds');
+  // const [errorMsg, setErrorMsg] = useState('Insufficient funds');
   const [amount, setAmount] = useState<string>(value);
   const { passwordSeed } = useUserInfo();
   const currentChain = useCurrentChain(token.chainId as ChainId);
   const currentNetwork = useCurrentNetworkInfo();
   const [fee, setTransactionFee] = useState<string>();
   const wallet = useCurrentWalletInfo();
+  const isMain = useMemo(() => currentNetwork.networkType === 'MAIN', [currentNetwork]);
 
   const getTranslationInfo = useCallback(async () => {
     try {
@@ -81,28 +85,31 @@ export default function NftInput({
     t,
     toAccount?.address,
     token,
+    wallet.address,
     wallet.caHash,
   ]);
 
   const handleAmountBlur = useCallback(() => {
-    setAmount((v) => {
-      const reg = new RegExp(`.+\\.\\d{0,${token?.decimals || 8}}|.+`);
-      const valueProcessed = v
-        ?.replace(/\.+$/, '')
-        .replace(/^0+\./, '0.')
-        .replace(/^0+/, '')
-        .replace(/^\.+/, '0.')
-        .match(reg)
-        ?.toString();
-      const valueString = valueProcessed ? `${parseInputChange(valueProcessed, ZERO, token?.decimals) || 0}` : '';
-      onChange(valueString);
+    // setAmount((v) => {
+    //   const reg = new RegExp(`.+\\.\\d{0,${token?.decimals || 8}}|.+`);
+    //   const valueProcessed = v
+    //     ?.replace(/\.+$/, '')
+    //     .replace(/^0+\./, '0.')
+    //     .replace(/^0+/, '')
+    //     .replace(/^\.+/, '0.')
+    //     .match(reg)
+    //     ?.toString();
+    //   const valueString = valueProcessed ? `${parseInputChange(valueProcessed, ZERO, token?.decimals) || 0}` : '';
+    //   onChange(valueString);
 
-      return valueString.length ? `${valueString}` : '';
-    });
+    //   return valueString.length ? `${valueString}` : '';
+    // });
+    onChange(amount);
+
     setTimeout(() => {
       getTranslationInfo();
     }, 0);
-  }, [getTranslationInfo, onChange, token?.decimals]);
+  }, [amount, getTranslationInfo, onChange]);
 
   const [balance, setBalance] = useState<string>();
 
@@ -113,7 +120,7 @@ export default function NftInput({
       address: token?.address,
       chainType: currentNetwork.walletType,
       paramsOption: {
-        owner: '2b8294NW2u7wiHg6pePWxab1He2AoMMdSE1mdbNiv7k6nXubLy',
+        owner: fromAccount.address,
         symbol: token.symbol,
       },
     });
@@ -125,6 +132,10 @@ export default function NftInput({
   useEffect(() => {
     getTokenBalance();
   }, [getTokenBalance]);
+
+  useEffect(() => {
+    onCheckValue?.({ balance: balance || '', amount, fee: fee || '' });
+  }, [amount, balance, fee, onCheckValue]);
 
   return (
     <div className="amount-wrap">

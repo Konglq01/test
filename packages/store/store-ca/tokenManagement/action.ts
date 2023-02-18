@@ -15,8 +15,8 @@ export const fetchAllTokenListAsync = createAsyncThunk(
     // if (totalRecordCount === 0 || totalRecordCount > accountTokenList.length) {
     const response = await fetchAllTokenList({ skipCount, maxResultCount, keyword, chainIdArray: chainIdArray || [] });
     return { list: response.items, totalRecordCount: response.totalRecordCount };
-    // }
-
-    // return { list: [], totalRecordCount };
   },
+
+  // return { list: [], totalRecordCount };
+  // },
 );
