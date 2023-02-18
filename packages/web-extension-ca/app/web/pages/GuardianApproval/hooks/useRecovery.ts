@@ -8,6 +8,7 @@ import {
 } from '@portkey/store/store-ca/guardians/actions';
 import { sleep } from '@portkey/utils';
 import { getAelfInstance } from '@portkey/utils/aelf';
+import aes from '@portkey/utils/aes';
 import { message } from 'antd';
 import { useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -17,7 +18,6 @@ import { GuardianMth } from 'types/guardians';
 import { getTxResult } from 'utils/aelfUtils';
 import { handleGuardian } from 'utils/sandboxUtil/handleGuardian';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
-import getPrivateKeyAndMnemonic from 'utils/Wallet/getPrivateKeyAndMnemonic';
 import { formatAddGuardianValue } from '../utils/formatAddGuardianValue';
 import { formatDelGuardianValue } from '../utils/formatDelGuardianValue';
 import { formatEditGuardianValue } from '../utils/formatEditGuardianValue';
@@ -42,13 +42,8 @@ export const useRecovery = () => {
   return useCallback(async () => {
     try {
       setLoading(true);
-      const res = await getPrivateKeyAndMnemonic(
-        {
-          AESEncryptPrivateKey: walletInfo.AESEncryptPrivateKey,
-        },
-        passwordSeed,
-      );
-      if (!currentChain?.endPoint || !res?.privateKey) return message.error('handle guardian error');
+      const privateKey = aes.decrypt(walletInfo.AESEncryptPrivateKey, passwordSeed);
+      if (!currentChain?.endPoint || !privateKey) return message.error('handle guardian error');
       let value;
       switch (state) {
         case 'guardians/add':
@@ -67,7 +62,7 @@ export const useRecovery = () => {
         rpcUrl: currentChain.endPoint,
         chainType: currentNetwork.walletType,
         address: currentChain.caContractAddress,
-        privateKey: res.privateKey,
+        privateKey,
         paramsOption: {
           method: MethodType[state],
           params: [

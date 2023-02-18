@@ -67,18 +67,25 @@ export default function Send() {
   console.log(type, 'type===');
   const tokenInfo = useMemo(() => {
     if (type === 'nft') {
-      const nft = accountNFT.accountNFTList.find((item) => item.symbol === symbol);
-      if (!nft) {
-        message.error('No symbol info');
-        return;
-      }
       return {
-        chainId: nft.chainId,
-        decimals: nft.decimals, // 8
-        address: (nft as any).address, // "ArPnUb5FtxG2oXTaWX2DxNZowDEruJLs2TEkhRCzDdrRDfg8B",        token address  contract address
-        symbol: nft.symbol, // "ELF"   the name showed
-        name: nft.symbol,
+        symbol: 'BTX-2',
+        decimals: 0,
+        address: 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE',
+        name: 'ELF',
+        chainId: 'AELF',
       };
+      // const nft = accountNFT.accountNFTList.find((item) => item.symbol === symbol);
+      // if (!nft) {
+      //   message.error('No symbol info');
+      //   return;
+      // }
+      // return {
+      //   chainId: nft.chainId,
+      //   decimals: nft.decimals, // 8
+      //   address: (nft as any).address, // "ArPnUb5FtxG2oXTaWX2DxNZowDEruJLs2TEkhRCzDdrRDfg8B",        token address  contract address
+      //   symbol: nft.symbol, // "ELF"   the name showed
+      //   name: nft.symbol,
+      // };
     }
     if (type === 'token') {
       const token = accountToken.accountTokenList.find((item) => item.symbol === symbol);
@@ -240,7 +247,7 @@ export default function Send() {
       setLoading(false);
     }
   }, [chainInfo, currentNetwork.walletType, passwordSeed, setLoading, toAccount.address, tokenInfo, wallet]);
-
+  console.log(tokenInfo, 'token===');
   const StageObj: TypeStageObj = useMemo(
     () => ({
       0: {

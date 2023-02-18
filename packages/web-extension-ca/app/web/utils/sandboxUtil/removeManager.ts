@@ -25,8 +25,9 @@ export const removeManager = async ({
     chainType,
     methodName: 'RemoveManager',
     sendOptions,
-    paramsOption: [paramsOption],
+    paramsOption,
   });
+  console.log(resMessage, 'resMessage===RemoveManager');
   if (resMessage.code === SandboxErrorCode.error) throw resMessage.error;
   const message = resMessage.message;
   return {
