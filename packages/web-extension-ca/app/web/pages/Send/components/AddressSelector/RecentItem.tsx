@@ -1,13 +1,8 @@
 import { ContactItemType, IClickAddressProps } from '@portkey/types/types-ca/contact';
+import { transNetworkText } from '@portkey/utils/activity';
 import { formatStr2EllipsisStr } from '@portkey/utils/converter';
-import { useMemo } from 'react';
-import { useWalletInfo } from 'store/Provider/hooks';
+import { useIsTestnet } from 'hooks/useActivity';
 import ContactCard from './ContactCard';
-
-const MAIN_CHAIN_ID = 'AELF';
-const MAIN_CHAIL = 'MainChain';
-const SIDE_CHAIN = 'SideChain';
-const TEST_NET = 'Testnet';
 
 export default function RecentItem({
   item,
@@ -16,8 +11,7 @@ export default function RecentItem({
   item: ContactItemType;
   onClick: (account: IClickAddressProps) => void;
 }) {
-  const { currentNetwork } = useWalletInfo();
-  const isTestNet = useMemo(() => currentNetwork === 'TESTNET', [currentNetwork]);
+  const isTestNet = useIsTestnet();
 
   return item.name ? (
     <ContactCard user={item} onChange={onClick} />
@@ -34,10 +28,7 @@ export default function RecentItem({
           {formatStr2EllipsisStr(item.addresses[0].address, [6, 6])}_{item.addresses[0].chainId}
         </span>
       </p>
-      <p className="network">
-        {item.addresses[0].chainId === MAIN_CHAIN_ID ? MAIN_CHAIL : SIDE_CHAIN} {item.addresses[0].chainId}{' '}
-        {isTestNet && TEST_NET}
-      </p>
+      <p className="network">{transNetworkText(item.addresses[0].chainId, isTestNet)}</p>
     </div>
   );
 }

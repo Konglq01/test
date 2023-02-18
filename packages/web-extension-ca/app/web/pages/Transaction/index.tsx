@@ -1,12 +1,12 @@
-import { TransactionTypes } from '@portkey/constants/constants-ca/activity';
-import { ZERO } from '@portkey/constants/misc';
+import { TransactionTypes, VIEW_ON_EXPLORER } from '@portkey/constants/constants-ca/activity';
 import { TransactionStatus } from '@portkey/graphql/contract/__generated__/types';
 import { useCaAddresses } from '@portkey/hooks/hooks-ca/wallet';
 import { fetchActivity } from '@portkey/store/store-ca/activity/api';
 import { ActivityItemType } from '@portkey/types/types-ca/activity';
 import { Transaction } from '@portkey/types/types-ca/trade';
 import { getExploreLink } from '@portkey/utils';
-import { formatStr2EllipsisStr, unitConverter } from '@portkey/utils/converter';
+import { formatAmount, transNetworkText } from '@portkey/utils/activity';
+import { formatStr2EllipsisStr } from '@portkey/utils/converter';
 import clsx from 'clsx';
 import Copy from 'components/Copy';
 import CustomSvg from 'components/CustomSvg';
@@ -16,17 +16,16 @@ import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { useEffectOnce } from 'react-use';
-import { useWalletInfo } from 'store/Provider/hooks';
 import { shortenCharacters } from 'utils/reg';
 import './index.less';
-
-const DEFAULT_DECIMAL = 8;
+import { useIsTestnet } from 'hooks/useActivity';
 
 export default function Transaction() {
   const { t } = useTranslation();
   const { state }: { state: ActivityItemType } = useLocation();
   const caAddresses = useCaAddresses();
   const { blockExplorerURL } = useCurrentNetwork();
+  const isTestNet = useIsTestnet();
 
   // Obtain data through routing to ensure that the page must have data and prevent Null Data Errors.
   const [activityItem, setActivityItem] = useState<ActivityItemType>(state);
@@ -66,8 +65,6 @@ export default function Transaction() {
     nav(-1);
   }, [nav]);
 
-  const { currentNetwork } = useWalletInfo();
-  const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'TESTNET' : ''), [currentNetwork]);
   const isNft = useMemo(() => !!activityItem?.nftInfo?.nftId, [activityItem?.nftInfo?.nftId]);
 
   const nftHeaderUI = useCallback(() => {
@@ -92,9 +89,10 @@ export default function Transaction() {
     const { amount, decimals, symbol, priceInUsd } = activityItem || {};
     return (
       <p className="amount">
-        {`${unitConverter(ZERO.plus(amount || 0).div(`1e${decimals ?? DEFAULT_DECIMAL}`))} `}
-        {symbol}
-        {!isTestNet && <span className="usd">{`$ ${unitConverter(ZERO.plus(priceInUsd ?? 0), 2)}`}</span>}
+        {`${formatAmount({ amount, decimals })} ${symbol ?? ''}`}
+        {!isTestNet && (
+          <span className="usd">{`$ ${formatAmount({ amount: priceInUsd, decimals: 0, digits: 2 })}`}</span>
+        )}
       </p>
     );
   }, [activityItem, isTestNet]);
@@ -139,8 +137,8 @@ export default function Transaction() {
   const networkUI = useCallback(() => {
     /* Hidden during [SocialRecovery, AddManager, RemoveManager] */
     const { transactionType, fromChainId, toChainId } = activityItem || {};
-    const from = fromChainId === 'AELF' ? 'MainChain AELF' : `SideChain ${fromChainId}`;
-    const to = toChainId === 'AELF' ? 'MainChain AELF' : `SideChain ${toChainId}`;
+    const from = transNetworkText(fromChainId, isTestNet);
+    const to = transNetworkText(toChainId, isTestNet);
     const hiddenArr = [TransactionTypes.SOCIAL_RECOVERY, TransactionTypes.ADD_MANAGER, TransactionTypes.REMOVE_MANAGER];
 
     return (
@@ -150,7 +148,7 @@ export default function Transaction() {
           <p className="label">
             <span className="left">{t('Network')}</span>
           </p>
-          <p className="value">{`${from} ${isTestNet}->${to} ${isTestNet}`}</p>
+          <p className="value">{`${from}->${to}`}</p>
         </div>
       )
     );
@@ -164,16 +162,12 @@ export default function Transaction() {
           {feeInfo?.map((item, idx) => {
             return (
               <div key={'transactionFee' + idx} className="right-item">
-                <span>{`${unitConverter(
-                  ZERO.plus(item.fee || 0).div(`1e${activityItem?.decimals ?? DEFAULT_DECIMAL}`),
-                )} ${item.symbol}`}</span>
+                <span>{`${formatAmount({ amount: item.fee, decimals: activityItem.decimals })} ${
+                  item.symbol ?? ''
+                }`}</span>
                 {!isTestNet && (
                   <span className="right-usd">
-                    ${' '}
-                    {unitConverter(
-                      ZERO.plus(item.feeInUsd ?? 0).div(`1e${activityItem?.decimals ?? DEFAULT_DECIMAL}`),
-                      2,
-                    )}
+                    $ {formatAmount({ amount: item.feeInUsd, decimals: activityItem.decimals, digits: 2 })}
                   </span>
                 )}
               </div>
@@ -211,7 +205,7 @@ export default function Transaction() {
   const viewOnExplorerUI = useCallback(() => {
     return (
       <a className="link" target="blank" href={openOnExplorer()}>
-        {t('View on Explorer')}
+        {t(VIEW_ON_EXPLORER)}
       </a>
     );
   }, [openOnExplorer, t]);

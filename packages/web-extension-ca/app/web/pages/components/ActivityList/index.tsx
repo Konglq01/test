@@ -1,15 +1,15 @@
 import { TransactionTypes, transactionTypesMap } from '@portkey/constants/constants-ca/activity';
 import { ActivityItemType } from '@portkey/types/types-ca/activity';
-import { formatStr2EllipsisStr, unitConverter } from '@portkey/utils/converter';
+import { formatStr2EllipsisStr } from '@portkey/utils/converter';
 import { List } from 'antd-mobile';
 import CustomSvg from 'components/CustomSvg';
 import moment from 'moment';
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
-import { useWalletInfo } from 'store/Provider/hooks';
-import { ZERO } from '@portkey/constants/misc';
 import './index.less';
 import LoadingMore from 'components/LoadingMore/LoadingMore';
+import { useIsTestnet } from 'hooks/useActivity';
+import { formatAmount, transNetworkText } from '@portkey/utils/activity';
 
 export interface IActivityListProps {
   data?: ActivityItemType[];
@@ -17,11 +17,8 @@ export interface IActivityListProps {
   loadMore: (isRetry?: boolean) => Promise<void>;
 }
 
-const DEFAULT_DECIMAL = 8;
-
 export default function ActivityList({ data, hasMore, loadMore }: IActivityListProps) {
-  const { currentNetwork } = useWalletInfo();
-  const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'TESTNET' : ''), [currentNetwork]);
+  const isTestNet = useIsTestnet();
 
   const activityListLeftIcon = (type: TransactionTypes) => {
     const loginRelatedTypeArr = [
@@ -53,9 +50,7 @@ export default function ActivityList({ data, hasMore, loadMore }: IActivityListP
             {!nftInfo?.nftId && (
               <>
                 {amount && <span>{isReceived ? '+' : '-'}</span>}
-                <span>
-                  {unitConverter(ZERO.plus(amount).div(`1e${decimals ?? DEFAULT_DECIMAL}`))} {symbol ?? ''}
-                </span>
+                <span>{`${formatAmount({ amount, decimals, digits: 4 })} ${symbol ?? ''}`}</span>
               </>
             )}
           </span>
@@ -73,7 +68,9 @@ export default function ActivityList({ data, hasMore, loadMore }: IActivityListP
         <p className="row-2">
           <span>From: {formatStr2EllipsisStr(from, [7, 4])}</span>
           {nftInfo?.nftId && <span>{nftInfo.alias}</span>}
-          {!isTestNet && !nftInfo?.nftId && <span>$ {unitConverter(ZERO.plus(priceInUsd ?? 0), 2)}</span>}
+          {!isTestNet && !nftInfo?.nftId && (
+            <span>$ {formatAmount({ amount: priceInUsd, decimals: 0, digits: 2 })}</span>
+          )}
         </p>
       );
     },
@@ -84,17 +81,15 @@ export default function ActivityList({ data, hasMore, loadMore }: IActivityListP
     (item: ActivityItemType) => {
       /* Hidden during [SocialRecovery, AddManager, RemoveManager] */
       const { transactionType, fromChainId, toChainId } = item;
-      const from = fromChainId === 'AELF' ? 'MainChain AELF' : `SideChain ${fromChainId}`;
-      const to = toChainId === 'AELF' ? 'MainChain AELF' : `SideChain ${toChainId}`;
+      const from = transNetworkText(fromChainId, isTestNet);
+      const to = transNetworkText(toChainId, isTestNet);
       const hiddenArr = [
         TransactionTypes.SOCIAL_RECOVERY,
         TransactionTypes.ADD_MANAGER,
         TransactionTypes.REMOVE_MANAGER,
       ];
 
-      return (
-        !hiddenArr.includes(transactionType) && <p className="row-3">{`${from} ${isTestNet}->${to} ${isTestNet}`}</p>
-      );
+      return !hiddenArr.includes(transactionType) && <p className="row-3">{`${from}->${to}`}</p>;
     },
     [isTestNet],
   );

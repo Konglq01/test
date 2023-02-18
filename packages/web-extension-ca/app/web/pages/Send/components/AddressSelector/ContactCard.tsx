@@ -1,9 +1,10 @@
 import { ContactItemType, IClickAddressProps } from '@portkey/types/types-ca/contact';
+import { transNetworkText } from '@portkey/utils/activity';
 import { formatStr2EllipsisStr } from '@portkey/utils/converter';
 import { Collapse } from 'antd';
 import clsx from 'clsx';
+import { useIsTestnet } from 'hooks/useActivity';
 import { useMemo } from 'react';
-import { useWalletInfo } from 'store/Provider/hooks';
 
 export interface IContactCardProps {
   user: ContactItemType;
@@ -12,8 +13,7 @@ export interface IContactCardProps {
   className?: string;
 }
 export default function ContactCard({ user, className, fromRecents = true, onChange }: IContactCardProps) {
-  const { currentNetwork } = useWalletInfo();
-  const isTestnet = useMemo(() => currentNetwork === 'TESTNET', [currentNetwork]);
+  const isTestnet = useIsTestnet();
   const disabledStyle = useMemo(() => (!fromRecents ? '' : 'disabled'), [fromRecents]);
   const header = useMemo(
     () => (
@@ -36,10 +36,7 @@ export default function ContactCard({ user, className, fromRecents = true, onCha
               <span className="address">
                 ELF_{formatStr2EllipsisStr(address.address, [6, 6])}_{address.chainId}
               </span>
-              <span className="network">
-                {address.chainId === 'AELF' ? 'MainChain' : 'SideChain'} {address.chainId}
-                {isTestnet && ' Testnet'}
-              </span>
+              <span className="network">{transNetworkText(address.chainId, isTestnet)}</span>
             </p>
           ))}
         </div>

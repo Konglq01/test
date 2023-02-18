@@ -55,3 +55,8 @@ export const transactionTypesMap = (type?: TransactionTypes, nftId?: string): st
   }
   return newType;
 };
+
+export const DEFAULT_AMOUNT = 0;
+export const DEFAULT_DECIMAL = 8;
+export const DEFAULT_DIGITS = 4;
+export const VIEW_ON_EXPLORER = 'View on Explorer';
