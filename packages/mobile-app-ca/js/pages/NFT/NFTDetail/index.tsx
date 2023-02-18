@@ -12,14 +12,28 @@ import { TextL, TextXL, TextXXXL } from 'components/CommonText';
 import { FontStyles } from 'assets/theme/styles';
 import fonts from 'assets/theme/fonts';
 import navigationService from 'utils/navigationService';
+import useRouterParams from '@portkey/hooks/useRouterParams';
 
 export interface TokenDetailProps {
   route?: any;
 }
 
+interface NftItemType {
+  alias: string;
+  balance: string;
+  chainId: string;
+  imageUrl: string;
+  symbol: string;
+  tokenContractAddress: string;
+  tokenId: string;
+}
+
 const NFTDetail: React.FC<TokenDetailProps> = props => {
   const { t } = useLanguage();
-  const { route } = props;
+
+  const nftItem = useRouterParams<NftItemType>();
+
+  const { alias, balance, chainId, imageUrl, symbol, tokenContractAddress, tokenId } = nftItem;
 
   const navigation = useNavigation();
 
@@ -32,26 +46,30 @@ const NFTDetail: React.FC<TokenDetailProps> = props => {
       leftCallback={() => navigation.goBack()}
       containerStyles={styles.pageWrap}
       scrollViewProps={{ disabled: true }}>
-      <TextXXXL style={styles.title}>
-        {'AoxcatPlanet'} {'#2271'}
-      </TextXXXL>
-      <TextL style={[FontStyles.font3]}>{'Amount 3'}</TextL>
+      <TextXXXL style={styles.title}>{`${alias} #${tokenId}`}</TextXXXL>
+      <TextL style={[FontStyles.font3]}>{`Amount ${balance}`}</TextL>
 
-      <Text style={styles.image}>A</Text>
-      {/* <Image
-        source={{
-          uri: 'https://source.unsplash.com/random?sig=1',
-        }}
-        style={styles.image}
-      /> */}
-      <CommonButton style={{}} type="primary" onPress={() => navigationService.navigate('SendHome', { type: 'nft' })}>
+      {!imageUrl ? (
+        <Text style={styles.image}>{alias[0]}</Text>
+      ) : (
+        <Image
+          source={{
+            uri: imageUrl,
+          }}
+          style={styles.image1}
+        />
+      )}
+
+      <CommonButton
+        style={{}}
+        type="primary"
+        onPress={() => {
+          navigationService.navigate('SendHome', { sendType: 'nft', nftItem: nftItem });
+        }}>
         Send
       </CommonButton>
-      <TextXL style={styles.symbolDescribeTitle}>Symbol Content</TextXL>
-      <TextXL style={[styles.symbolContent, FontStyles.font3]}>
-        Symbol Symbol Content Symbol Content Symbol Content Symbol Content Symbol Content Symbol Content Symbol Content
-        Symbol Content askdhaksfhahdalhdlah
-      </TextXL>
+      <TextXL style={styles.symbolDescribeTitle}>{symbol}</TextXL>
+      <TextXL style={[styles.symbolContent, FontStyles.font3]} />
     </PageContainer>
   );
 };
@@ -70,7 +88,6 @@ export const styles = StyleSheet.create({
     marginTop: pTd(8),
   },
   image: {
-    overflow: 'hidden',
     marginTop: pTd(16),
     marginBottom: pTd(16),
     width: pTd(335),
@@ -81,6 +98,16 @@ export const styles = StyleSheet.create({
     fontSize: pTd(100),
     backgroundColor: defaultColors.bg7,
     color: defaultColors.font7,
+  },
+  image1: {
+    marginTop: pTd(16),
+    marginBottom: pTd(16),
+    width: pTd(335),
+    height: pTd(335),
+    borderRadius: pTd(8),
+    lineHeight: pTd(335),
+    textAlign: 'center',
+    fontSize: pTd(100),
   },
   symbolDescribeTitle: {
     marginTop: pTd(32),

@@ -10,8 +10,5 @@ export const managerTransfer = ({
   sendOptions?: SendOptions;
   paramsOption: { caHash: string; symbol: string; to: string; amount: number; memo?: string };
 }) => {
-  return contract.callSendMethod('ManagerTransfer', '', {
-    paramsOption,
-    sendOptions,
-  });
+  return contract.callSendMethod('ManagerTransfer', '', paramsOption, sendOptions);
 };

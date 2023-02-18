@@ -19,6 +19,7 @@ import { useCaAddresses } from '@portkey/hooks/hooks-ca/wallet';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { fetchAssetList } from '@portkey/store/store-ca/assets/api';
 import { IAssetItemType } from '@portkey/store/store-ca/assets/type';
+import navigationService from 'utils/navigationService';
 
 type onFinishSelectTokenType = (tokenItem: any) => void;
 type TokenListProps = {
@@ -67,7 +68,7 @@ const AssetItem = (props: { symbol: string; onPress: (item: any) => void; item: 
               </TextS>
             ) : (
               // TODO: price use witch one
-              <TextL style={[FontStyles.font7]}>$ 100 USD</TextL>
+              <TextL style={[FontStyles.font7]}>$ -</TextL>
             )}
           </View>
 
@@ -133,7 +134,7 @@ const AssetList = ({ onFinishSelectToken, account }: TokenListProps) => {
 
   useEffect(() => {
     onKeywordChange();
-  }, [debounceKeyword, onKeywordChange]);
+  }, [debounceKeyword]);
 
   const onKeywordChange = useCallback(() => {
     pageInfoRef.current = {
@@ -142,22 +143,27 @@ const AssetList = ({ onFinishSelectToken, account }: TokenListProps) => {
     getList(keyword, true);
   }, [getList, keyword]);
 
-  const renderItem = useCallback(
-    ({ item }: { item: IAssetItemType }) => {
-      return (
-        <AssetItem
-          symbol={item.symbol || ''}
-          // icon={'aelf-avatar'}
-          item={item}
-          onPress={() => {
-            OverlayModal.hide();
-            onFinishSelectToken?.(item);
-          }}
-        />
-      );
-    },
-    [onFinishSelectToken],
-  );
+  const renderItem = useCallback(({ item }: { item: IAssetItemType }) => {
+    return (
+      <AssetItem
+        symbol={item.symbol || ''}
+        // icon={'aelf-avatar'}
+        item={item}
+        onPress={() => {
+          OverlayModal.hide();
+          // onFinishSelectToken?.(item);
+          navigationService.navigate('SendHome', {
+            sendType: item?.nftInfo ? 'nft' : 'token',
+            tokenItem: { ...item?.tokenInfo, symbol: item.symbol },
+            nftInfo: { ...item?.nftInfo, symbol: item.symbol },
+            addresses: '',
+          });
+        }}
+      />
+    );
+  }, []);
+
+  console.log('listShowlistShowlistShow', listShow);
 
   return (
     <ModalBody modalBodyType="bottom" style={styles.modalStyle}>

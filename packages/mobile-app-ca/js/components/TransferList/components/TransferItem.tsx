@@ -21,10 +21,10 @@ const ActivityItem: React.FC<ActivityItemPropsType> = ({ item, onPress }) => {
   const { t } = useLanguage();
 
   const amountString = useMemo(() => {
-    const { amount = '', isReceived, decimal = '', symbol } = item || {};
+    const { amount = '', isReceived, decimals = '', symbol } = item || {};
     let _amountString = '';
     if (amount) _amountString += isReceived ? '+' : '-';
-    _amountString += unitConverter(ZERO.plus(amount).div(`1e${decimal}`));
+    _amountString += unitConverter(ZERO.plus(amount).div(`1e${decimals}`));
     _amountString += symbol ? ` ${symbol}` : '';
     return _amountString;
   }, [item]);

@@ -41,8 +41,8 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
   const [refreshing, setRefreshing] = useState(false);
   const { accountToken } = useAppCASelector(state => state.assets);
 
-  const onNavigate = useCallback((tokenInfo: TokenItemShowType) => {
-    navigationService.navigate('TokenDetail', { tokenInfo });
+  const onNavigate = useCallback((tokenItem: TokenItemShowType) => {
+    navigationService.navigate('TokenDetail', { tokenInfo: tokenItem });
   }, []);
 
   const renderItem = useCallback(

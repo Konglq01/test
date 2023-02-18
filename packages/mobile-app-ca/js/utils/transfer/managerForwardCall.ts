@@ -34,8 +34,5 @@ export interface ManagerForwardCallParams {
 }
 
 export const managerForwardCall = ({ contract, paramsOption, sendOptions }: ManagerForwardCallParams) => {
-  return contract.callSendMethod('ManagerForwardCall', '', {
-    paramsOption,
-    sendOptions,
-  });
+  return contract.callSendMethod('ManagerForwardCall', '', paramsOption, sendOptions);
 };
