@@ -108,7 +108,7 @@ const AssetList = ({ onFinishSelectToken, account }: TokenListProps) => {
       if (pageInfoRef.current.isLoading) return;
       pageInfoRef.current.isLoading = true;
       try {
-        const response = await fetchAssetList(currentNetworkInfo.apiUrl, {
+        const response = await fetchAssetList({
           caAddresses,
           maxResultCount: MAX_RESULT_COUNT,
           skipCount: pageInfoRef.current.curPage * MAX_RESULT_COUNT,
@@ -128,12 +128,12 @@ const AssetList = ({ onFinishSelectToken, account }: TokenListProps) => {
       }
       pageInfoRef.current.isLoading = false;
     },
-    [caAddresses, currentNetworkInfo.apiUrl, listShow.length],
+    [caAddresses, listShow.length],
   );
 
   useEffect(() => {
     onKeywordChange();
-  }, [debounceKeyword]);
+  }, [debounceKeyword, onKeywordChange]);
 
   const onKeywordChange = useCallback(() => {
     pageInfoRef.current = {

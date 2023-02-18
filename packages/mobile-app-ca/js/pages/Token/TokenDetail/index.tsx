@@ -19,6 +19,8 @@ import useRouterParams from '@portkey/hooks/useRouterParams';
 import { request } from '@portkey/api/api-did';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { ActivityItemType } from '@portkey/types/types-ca/activity';
+import { unitConverter } from '@portkey/utils/converter';
+import { ZERO } from '@portkey/constants/misc';
 
 interface RouterParams {
   tokenInfo: TokenItemShowType;
@@ -108,6 +110,8 @@ const TokenDetail: React.FC = () => {
     setFreshing(false);
   }, [getActivityList]);
 
+  const balanceShow = `${unitConverter(ZERO.plus(tokenInfo?.balance).div(`1e${tokenInfo.decimals}`))}`;
+
   return (
     <PageContainer
       type="leftBack"
@@ -125,7 +129,7 @@ const TokenDetail: React.FC = () => {
       containerStyles={styles.pageWrap}
       scrollViewProps={{ disabled: true }}>
       <View style={styles.card}>
-        <Text style={styles.tokenBalance}>{`${tokenInfo.balance} ${tokenInfo.symbol}`}</Text>
+        <Text style={styles.tokenBalance}>{`${balanceShow} ${tokenInfo.symbol}`}</Text>
         {/* TODO : multiply rate */}
         {currentWallet?.currentNetwork === 'MAIN' && (
           <Text style={styles.dollarBalance}>{`$ ${tokenInfo?.balanceInUsd}`}</Text>

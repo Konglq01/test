@@ -14,38 +14,61 @@ import { defaultColors } from 'assets/theme';
 import { useLanguage } from 'i18n/hooks';
 import CommonAvatar from 'components/CommonAvatar';
 import GStyles from 'assets/theme/GStyles';
+import { TokenItemShowType } from '@portkey/types/types-ca/token';
+import useRouterParams from '@portkey/hooks/useRouterParams';
+import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 
 export default function Receive() {
   const { t } = useLanguage();
   const { currentChain } = useAppCASelector(state => state.chain);
+  const { currentNetwork } = useWallet();
 
-  const [account, setAccount] = useState<AccountType>({
-    address: 'ELFSASA',
-  } as AccountType);
+  const tokenItem = useRouterParams<TokenItemShowType>();
+  const { address, chainId, decimals, id, name, symbol, imageUrl } = tokenItem;
 
-  const addressShow = useMemo(() => {
-    if (account?.address.match(/^ELF_.+_AELF$/g)) return account?.address || '';
-    if (currentChain?.chainType === 'aelf') return `ELF_${account?.address || ''}_AELF`;
-    return account?.address;
-  }, [account?.address, currentChain.chainType]);
+  const currentWallet = useCurrentWalletInfo();
+
+  const currentCaAddress = currentWallet?.[chainId].caAddress;
+
+  const [account, setAccount] = useState<TokenItemShowType>(tokenItem);
+
+  // const addressShow = useMemo(() => {
+  //   if (account?.address.match(/^ELF_.+_AELF$/g)) return account?.address || '';
+  //   if (currentChain?.chainType === 'aelf') return `ELF_${account?.address || ''}_AELF`;
+  //   return account?.address;
+  // }, [account?.address, currentChain.chainType]);
 
   return (
     <PageContainer titleDom={t('Receive')} safeAreaColor={['blue', 'gray']} containerStyles={styles.containerStyles}>
       <TextXL style={styles.tips}>{t('You can provide QR code to receive')}</TextXL>
       <View style={styles.topWrap}>
-        <CommonAvatar title={'ELF'} svgName={'aelf-avatar'} avatarSize={pTd(32)} style={styles.svgStyle} />
+        <CommonAvatar
+          title={symbol}
+          svgName={'aelf-avatar'}
+          avatarSize={pTd(32)}
+          imageUrl={imageUrl}
+          style={styles.svgStyle}
+        />
         <View>
-          <TextL>ELF</TextL>
-          <TextS>MainChain AELF</TextS>
+          <TextL>{symbol}</TextL>
+          <TextS>
+            {chainId === 'AELF' ? 'MainChain ' : 'SideChain '} {chainId} {currentNetwork === 'TESTNET' && 'Testnet'}
+          </TextS>
         </View>
       </View>
-      <AccountCard account={account} style={styles.accountCardStyle} />
+
+      <AccountCard
+        toCaAddress={`ELF_${currentCaAddress}_${chainId}`}
+        tokenInfo={tokenItem}
+        style={styles.accountCardStyle}
+      />
 
       <View style={styles.buttonWrap}>
         <TouchableOpacity
           style={styles.buttonTop}
           onPress={async () => {
-            const isCopy = await setStringAsync(addressShow);
+            const tmpStr = `ELF_${currentCaAddress}_${chainId}`;
+            const isCopy = await setStringAsync(tmpStr);
             isCopy && CommonToast.success(t('Copy Success'));
           }}>
           <Svg icon="copy" size={pTd(20)} color={defaultColors.font2} />

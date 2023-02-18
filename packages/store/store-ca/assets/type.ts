@@ -13,6 +13,7 @@ export interface INftInfoType {
 }
 
 export interface IAssetItemType {
+  id: string;
   chainId: string;
   symbol: string;
   address: string;

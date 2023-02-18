@@ -12,19 +12,41 @@ import React from 'react';
 import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { pTd } from 'utils/unit';
+import { SendTokenQRDataType } from '@portkey/types/types-ca/qrcode';
+import { TokenItemShowType } from '@portkey/types/types-ca/token';
+import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 
 const cardWidth = ScreenWidth * 0.63;
 
-const info = {
-  chainId: 'ELF',
-  tokenSymbol: 'xxx',
-  caAddress: 'xxxx',
-  networkType: 'MAIN',
-};
+// const info = {
+//   chainId: 'ELF',
+//   tokenSymbol: 'xxx',
+//   caAddress: 'xxxx',
+//   networkType: 'MAIN',
+// };
 
-export default function AccountCard({ account, style }: { account: AccountType; style?: StyleProp<ViewStyle> }) {
-  const { chainType, chainId } = useCurrentNetwork();
-  const address = addressFormat(account.address, chainId, chainType);
+export default function AccountCard({
+  tokenInfo,
+  toCaAddress,
+  style,
+}: {
+  tokenInfo: TokenItemShowType;
+  toCaAddress: string;
+  style?: StyleProp<ViewStyle>;
+}) {
+  const { chainType } = useCurrentNetwork();
+  // const address = addressFormat(account.address, chainId, chainType);
+
+  const currentNetWork = useCurrentNetworkInfo();
+
+  const info: SendTokenQRDataType = {
+    address: toCaAddress,
+    netWorkType: currentNetWork.networkType,
+    chainType,
+    type: 'send',
+    tokenInfo,
+    toCaAddress,
+  };
 
   return (
     <View style={[styles.container, style]}>
@@ -32,14 +54,7 @@ export default function AccountCard({ account, style }: { account: AccountType; 
         <Svg size={ScreenWidth * 0.13} icon="logo-icon" color={defaultColors.font9} />
       </View>
       <QRCode size={cardWidth} value={JSON.stringify(info)} />
-      <TextM
-        onPress={async () => {
-          const isCopy = await setStringAsync(account.address);
-          isCopy && CommonToast.success(i18n.t('Copy Success'));
-        }}
-        style={styles.textStyle}>
-        {address}
-      </TextM>
+      <TextM style={styles.textStyle}>{toCaAddress}</TextM>
     </View>
   );
 }
