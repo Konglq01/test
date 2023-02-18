@@ -20,7 +20,7 @@ import useGuardiansList from 'hooks/useGuardianList';
 import './index.less';
 
 const wallet = AElf.wallet.createNewWallet();
-const guardianAccount = '1165915516@qq.com';
+const guardianAccount = '';
 
 const VERIFIER = {
   endPoints: ['http://192.168.66.250:5599'],
@@ -107,8 +107,7 @@ export default function Example() {
                 type: 'Email',
                 value: guardianAccount,
                 verifierId: 'a609b5f0f73a9ac46208a18ea526af8a2ed9525866caf46285095b4a8df009ad',
-                verificationDoc:
-                  '0,1165915516@qq.com,02/02/2023 09:49:16,2mBnRTqXMb5Afz4CWM2QakLRVDfaq2doJNRNQT1MXoi2uc6Zy3',
+                verificationDoc: '0,@qq.com,02/02/2023 09:49:16,2mBnRTqXMb5Afz4CWM2QakLRVDfaq2doJNRNQT1MXoi2uc6Zy3',
                 signature:
                   '0611040f8c354be856200690e1208b2c266df9530645ab64eb32d94ba73557a714701bd72220f1d1429491df0c741d2ee6c632653249281aa5f4883b0264102001',
               },

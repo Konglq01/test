@@ -345,8 +345,7 @@ export default function Send() {
       txFee,
       type,
       validateToAddress,
-      wallet.AESEncryptPrivateKey,
-      wallet.address,
+      wallet,
     ],
   );
 

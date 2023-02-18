@@ -4,6 +4,7 @@ import { getChainIdByAddress } from '@portkey/utils';
 import clsx from 'clsx';
 import { useMemo } from 'react';
 import { useWalletInfo } from 'store/Provider/hooks';
+import { useTokenPrice } from '@portkey/hooks/hooks-ca/useTokensPrice';
 import './index.less';
 
 export default function SendPreview({
@@ -22,6 +23,7 @@ export default function SendPreview({
   const { walletName, currentNetwork, walletInfo } = useWalletInfo();
   const networkInfo = useCurrentNetworkInfo();
   const isTestNet = useMemo(() => currentNetwork === 'TESTNET', [currentNetwork]);
+  const ElfPrice = useTokenPrice(['ELF']);
   return (
     <div className="send-preview">
       {type !== 'nft' ? (
@@ -81,7 +83,7 @@ export default function SendPreview({
           <span className="symbol">
             {transactionFee || 0} {symbol}
           </span>
-          <span className="usd">{`$ ${ZERO}`}</span>
+          <span className="usd">{`$ ${ZERO.plus(ElfPrice[0]).times(transactionFee).toFixed(2)}`}</span>
         </p>
       </div>
     </div>

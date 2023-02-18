@@ -1,3 +1,4 @@
+import { FEE } from '@portkey/constants/constants-ca/wallet';
 import { ZERO } from '@portkey/constants/misc';
 import { ChainItemType } from '@portkey/store/store-ca/wallet/type';
 import { ChainType } from '@portkey/types';
@@ -49,7 +50,7 @@ const getTransferFee = async ({
     const firstFee = divDecimalsStr(ZERO.plus(_firstFee), 8);
     console.log(firstFee, 'transactionRes===');
 
-    return '0.35';
+    return FEE;
   } else {
     //
     const transactionRes = await getTransactionFee({
