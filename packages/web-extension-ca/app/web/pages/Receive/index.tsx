@@ -34,10 +34,10 @@ export default function Receive() {
   const value: SendTokenQRDataType = useMemo(
     () => ({
       type: 'send',
-      toCaAddress: state.address,
+      toCaAddress: state?.address,
       netWorkType: currentNetwork,
       chainType: 'aelf',
-      address: state.address,
+      address: state?.address,
       tokenInfo: {
         ...state,
       },

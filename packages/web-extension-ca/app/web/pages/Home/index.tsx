@@ -22,9 +22,6 @@ export default function Home() {
   const chainInfo = useCurrentChain(DefaultChainId);
   const wallet = useCurrentWallet();
   const currentNetwork = useCurrentNetworkInfo();
-  // const currentNetwork = useCurrentNetworkInfo();
-  // console.log('😄😄😄😄😄😄😄currentChain', currentChain);
-  // console.log('😄😄😄😄😄😄😄currentNetwork', currentNetwork);
   const { passwordSeed } = useUserInfo();
 
   // 2A7tQJt8LgTPDvExTRSKdXQxgKWBcudSaUgBSkh7BPwxbHHMNw

@@ -1,6 +1,6 @@
 import { DeviceType, DeviceTypeInfo } from '@portkey/types/types-ca/wallet';
 
-export const FEE = '0.35';
+export const FEE = '0.5';
 
 export const DEVICE_TYPE_INFO: Record<DeviceType, DeviceTypeInfo> = {
   [DeviceType.other]: {

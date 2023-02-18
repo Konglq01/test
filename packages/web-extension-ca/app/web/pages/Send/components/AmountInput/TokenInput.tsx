@@ -27,21 +27,24 @@ export default function TokenInput({
   toAccount,
   token,
   value,
+  errorMsg,
   onChange,
   onTxFeeChange,
+  onCheckValue,
 }: {
   fromAccount: { address: string; AESEncryptPrivateKey: string };
   toAccount: { address: string };
   token: BaseToken;
   value: string;
+  errorMsg: string;
   onChange: (amount: string) => void;
   onTxFeeChange?: (fee: string) => void;
+  onCheckValue?: (params: { balance: string; fee: string; amount: string }) => void;
 }) {
   const currentNetwork = useCurrentNetworkInfo();
   const currentChain = useCurrentChain(token.chainId as ChainId);
   const isMain = useMemo(() => currentNetwork.networkType === 'MAIN', [currentNetwork]);
   const { t } = useTranslation();
-  const [errorMsg, setErrorMsg] = useState('Insufficient funds');
   const [amount, setAmount] = useState<string>(value ? `${value} ${token.symbol}` : '');
   const [balance, setBalance] = useState<string>();
   const { passwordSeed } = useUserInfo();
@@ -110,24 +113,29 @@ export default function TokenInput({
   }, [getTokenBalance]);
 
   const handleAmountBlur = useCallback(() => {
-    setAmount((v) => {
-      const reg = new RegExp(`.+\\.\\d{0,${token?.decimals || 8}}|.+`);
-      const valueProcessed = v
-        ?.replace(/\.+$/, '')
-        .replace(/^0+\./, '0.')
-        .replace(/^0+/, '')
-        .replace(/^\.+/, '0.')
-        .match(reg)
-        ?.toString();
-      const valueString = valueProcessed ? `${parseInputChange(valueProcessed, ZERO, token?.decimals) || 0}` : '';
-      onChange(valueString);
+    // setAmount((v) => {
+    // const reg = new RegExp(`.+\\.\\d{0,${token?.decimals || 8}}|.+`);
+    // const valueProcessed = v
+    //   ?.replace(/\.+$/, '')
+    //   .replace(/^0+\./, '0.')
+    //   .replace(/^0+/, '')
+    //   .replace(/^\.+/, '0.')
+    //   .match(reg)
+    //   ?.toString();
+    // const valueString = valueProcessed ? `${parseInputChange(valueProcessed, ZERO, token?.decimals) || 0}` : '';
+    // onChange(valueString);
 
-      return valueString.length ? `${valueString} ${token.symbol}` : '';
-    });
+    // return valueString.length ? `${valueString} ${token.symbol}` : '';
+    // });
+    onChange(amount);
     setTimeout(() => {
       getTranslationInfo();
     }, 0);
-  }, [getTranslationInfo, onChange, token?.decimals, token.symbol]);
+  }, [amount, getTranslationInfo, onChange]);
+
+  useEffect(() => {
+    onCheckValue?.({ balance: balance || '', fee: fee || '', amount });
+  }, [amount, balance, fee, onCheckValue]);
 
   return (
     <div className="amount-wrap">

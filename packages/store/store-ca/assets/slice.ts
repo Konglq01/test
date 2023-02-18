@@ -53,7 +53,7 @@ const initialState: AssetsStateType = {
   accountAssets: {
     isFetching: false,
     skipCount: 0,
-    maxResultCount: 10,
+    maxResultCount: 1000,
     accountAssetsList: [],
     totalRecordCount: 0,
   },
@@ -160,7 +160,7 @@ export const fetchAssetAsync = createAsyncThunk(
     // } = assets;
 
     // if (totalRecordCount === 0 || totalRecordCount > accountAssetsList.length) {
-    const response = await fetchAssetList({ caAddresses, keyword, skipCount: 1, maxResultCount: 1000 });
+    const response = await fetchAssetList({ caAddresses, keyword, skipCount: 0, maxResultCount: 1000 });
 
     return { list: response.data, totalRecordCount: response.totalRecordCount };
     // }

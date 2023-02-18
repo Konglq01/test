@@ -17,7 +17,7 @@ export function fetchAllTokenList({
 
   return request.es.getUserTokenList({
     params: {
-      filter: `${filterKeywords} OR (${chainIdSearchLanguage})`,
+      filter: `${filterKeywords} AND (${chainIdSearchLanguage})`,
       sort: 'sortWeight desc,token.symbol acs',
       skipCount: 0,
       maxResultCount: 1000,

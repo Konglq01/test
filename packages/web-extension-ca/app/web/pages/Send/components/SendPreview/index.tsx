@@ -80,9 +80,7 @@ export default function SendPreview({
       <div className="fee-preview">
         <span className="label">Transaction fee</span>
         <p className="value">
-          <span className="symbol">
-            {transactionFee || 0} {symbol}
-          </span>
+          <span className="symbol">{`${transactionFee || 0} ELF`}</span>
           <span className="usd">{`$ ${ZERO.plus(ElfPrice[0]).times(transactionFee).toFixed(2)}`}</span>
         </p>
       </div>

@@ -73,7 +73,7 @@ export const tokenManagementSlice = createSlice({
         // state.status = 'loading';
       })
       .addCase(fetchAllTokenListAsync.fulfilled, (state, action) => {
-        const { list } = action.payload;
+        const { list, totalRecordCount } = action.payload;
         const tmpToken: TokenItemShowType[] = list.map(item => ({
           isAdded: item.isDisplay,
           isDefault: item.isDefault,
@@ -88,6 +88,9 @@ export const tokenManagementSlice = createSlice({
         }));
 
         state.tokenDataShowInMarket = tmpToken;
+        // state.tokenDataShowInMarket = [...state.tokenDataShowInMarket, ...tmpToken];
+        // state.skipCount = tmpToken.length;
+        // state.totalRecordCount = totalRecordCount;
         state.isFetching = false;
       })
       .addCase(fetchAllTokenListAsync.rejected, state => {

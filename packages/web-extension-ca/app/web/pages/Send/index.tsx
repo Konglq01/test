@@ -13,6 +13,7 @@ import { timesDecimals } from '@portkey/utils/converter';
 import { Button, message, Modal } from 'antd';
 import CustomSvg from 'components/CustomSvg';
 import TitleWrapper from 'components/TitleWrapper';
+import { check } from 'prettier';
 import { ReactElement, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router';
@@ -59,56 +60,61 @@ export default function Send() {
   const { contactIndexList } = useContact();
   const { t } = useTranslation();
   const [errorMsg, setErrorMsg] = useState('');
+  const [tipMsg, setTipMsg] = useState('');
   const [toAccount, setToAccount] = useState<{ name?: string; address: string }>({ address: '' });
   const [stage, setStage] = useState<Stage>(Stage.Address);
   const [amount, setAmount] = useState('');
+  const [checkValue, setCheckValue] = useState({ balance: '', fee: '', amount: '' });
+  console.log('-------------accountNFT', accountNFT.accountNFTList);
+  console.log('---------state', state);
 
   const [txFee, setTransactionFee] = useState<string>();
   console.log(type, 'type===');
   const tokenInfo = useMemo(() => {
     if (type === 'nft') {
-      return {
-        symbol: 'BTX-2',
-        decimals: 0,
-        address: 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE',
-        name: 'ELF',
-        chainId: 'AELF',
-      };
+      // return {
+      //   symbol: 'BTX-2',
+      //   decimals: 0,
+      //   address: 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE',
+      //   name: 'ELF',
+      //   chainId: 'AELF',
+      // };
       // const nft = accountNFT.accountNFTList.find((item) => item.symbol === symbol);
+
       // if (!nft) {
       //   message.error('No symbol info');
       //   return;
       // }
-      // return {
-      //   chainId: nft.chainId,
-      //   decimals: nft.decimals, // 8
-      //   address: (nft as any).address, // "ArPnUb5FtxG2oXTaWX2DxNZowDEruJLs2TEkhRCzDdrRDfg8B",        token address  contract address
-      //   symbol: nft.symbol, // "ELF"   the name showed
-      //   name: nft.symbol,
-      // };
+      return {
+        chainId: state.chainId,
+        decimals: state.decimals || 0, // 8
+        address: (state as any).address, // "ArPnUb5FtxG2oXTaWX2DxNZowDEruJLs2TEkhRCzDdrRDfg8B",        token address  contract address
+        symbol: state.symbol, // "ELF"   the name showed
+        name: state.symbol,
+      };
     }
     if (type === 'token') {
-      const token = accountToken.accountTokenList.find((item: any) => item.symbol === symbol);
-      if (!token) {
-        message.error('No symbol info');
-        return;
-      }
-      return {
-        symbol: 'ELF',
-        decimals: 8,
-        address: 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE',
-        name: 'ELF',
-        chainId: 'AELF',
-      };
+      // const token = accountToken.accountTokenList.find((item: any) => item.symbol === symbol);
+      // if (!token) {
+      //   message.error('No symbol info');
+      //   return;
+      // }
       // return {
-      //   chainId: token.chainId,
-      //   decimals: token.decimals, // 8
-      //   address: token.address, // "ArPnUb5FtxG2oXTaWX2DxNZowDEruJLs2TEkhRCzDdrRDfg8B",        token address  contract address
-      //   symbol: token.symbol, // "ELF"   the name showed
-      //   name: token.symbol,
+      //   symbol: 'ELF',
+      //   decimals: 8,
+      //   address: 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE',
+      //   name: 'ELF',
+      //   chainId: 'AELF',
       // };
+      return {
+        chainId: state.chainId,
+        decimals: state.decimals, // 8
+        address: state.address, // "ArPnUb5FtxG2oXTaWX2DxNZowDEruJLs2TEkhRCzDdrRDfg8B",        state address  contract address
+        symbol: state.symbol, // "ELF"   the name showed
+        name: state.symbol,
+      };
     }
-  }, [accountNFT, accountToken, symbol, type]);
+  }, [state, type]);
 
   // useMemo(
   //   () => ({
@@ -179,15 +185,45 @@ export default function Send() {
     async ({ managerTransferTxId, data }: { managerTransferTxId: string; data: CrossChainTransferIntervalParams }) => {
       try {
         //
+        setLoading(true);
         await intervalCrossChainTransfer(data);
         dispatch(removeFailedActivity(managerTransferTxId));
       } catch (error) {
+        showErrorModal(error);
         // tip retryCrossChain()
         // Modal.confirm
+      } finally {
+        setLoading(false);
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [dispatch],
   );
+  const showErrorModal = useCallback(
+    (error: any) => {
+      Modal.error({
+        width: 320,
+        className: 'transaction-modal',
+        okText: t('Resend'),
+        icon: null,
+        closable: false,
+        centered: true,
+        title: (
+          <div className="flex-column-center transaction-msg">
+            <CustomSvg type="Warning" />
+            {t('Transaction failed ！')}
+          </div>
+        ),
+        onOk: () => {
+          retryCrossChain(error);
+        },
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [t],
+  );
+
+  console.log('---------amount', amount);
 
   const sendHandler = useCallback(async () => {
     try {
@@ -197,7 +233,7 @@ export default function Send() {
       if (!privateKey) return;
       if (!tokenInfo) throw 'No Symbol info';
       // TODO
-      const amount = 10;
+      // const amount = 10;
       setLoading(true);
 
       if (isCrossChain(toAccount.address, chainInfo?.chainId ?? 'AELF')) {
@@ -206,11 +242,12 @@ export default function Send() {
           chainInfo,
           chainType: currentNetwork.walletType,
           privateKey,
-          managerAddress: wallet.walletInfo.address,
+          managerAddress: wallet.address,
           tokenInfo,
           caHash: wallet?.caHash || '',
           amount: timesDecimals(amount, tokenInfo.decimals).toNumber(),
           toAddress: toAccount.address,
+          fee: timesDecimals(checkValue.fee, 8).toNumber(),
         });
       } else {
         console.log('sameChainTransfers==sendHandler');
@@ -219,7 +256,7 @@ export default function Send() {
           chainType: currentNetwork.walletType,
           privateKey,
           tokenInfo,
-          caHash: wallet?.caHash || '',
+          caHash: wallet.AELF?.caHash || '',
           amount: timesDecimals(amount, tokenInfo.decimals).toNumber(),
           toAddress: toAccount.address,
         });
@@ -231,14 +268,15 @@ export default function Send() {
       if (error.type === 'managerTransfer') {
         return message.error(error);
       } else if (error.type === 'crossChainTransfer') {
-        // TODO tip retry
-        // retryCrossChain(error)
-        // dispatch(
-        //   addFailedActivity({
-        //     transactionId: managerTransferTxId,
-        //     params: data,
-        //   }),
-        // );
+        dispatch(
+          addFailedActivity({
+            transactionId: error.managerTransferTxId,
+            params: error.data,
+          }),
+        );
+        console.log('addFailedActivity', error.data);
+
+        showErrorModal(error);
         return;
       } else {
         message.error(error);
@@ -246,8 +284,24 @@ export default function Send() {
     } finally {
       setLoading(false);
     }
-  }, [chainInfo, currentNetwork.walletType, passwordSeed, setLoading, toAccount.address, tokenInfo, wallet]);
-  console.log(tokenInfo, 'token===');
+  }, [
+    amount,
+    chainInfo,
+    checkValue.fee,
+    currentNetwork.walletType,
+    dispatch,
+    passwordSeed,
+    setLoading,
+    showErrorModal,
+    toAccount.address,
+    tokenInfo,
+    wallet.AELF?.caHash,
+    wallet.AESEncryptPrivateKey,
+    wallet.address,
+    wallet?.caHash,
+  ]);
+  console.log(checkValue, 'checkValue===');
+
   const StageObj: TypeStageObj = useMemo(
     () => ({
       0: {
@@ -290,8 +344,15 @@ export default function Send() {
       1: {
         btnText: 'Preview',
         handler: () => {
-          // TODO check balance and transaction fee
-          setStage(Stage.Preview);
+          const { balance, fee, amount } = checkValue;
+          if (Number(amount) > Number(balance)) {
+            setTipMsg(type === 'nft' ? 'Insufficient quantity' : 'Insufficient funds');
+          } else if (Number(fee) > Number(balance) - Number(amount)) {
+            setTipMsg('Insufficient funds for transaction fee');
+          } else {
+            setTipMsg('');
+            setStage(Stage.Preview);
+          }
         },
         backFun: () => {
           setStage(Stage.Address);
@@ -308,6 +369,7 @@ export default function Send() {
               address: toAccount.address,
             }}
             value={amount}
+            errorMsg={tipMsg}
             token={tokenInfo as BaseToken}
             onChange={(amount) => {
               setAmount(amount);
@@ -315,6 +377,7 @@ export default function Send() {
             onTxFeeChange={(fee) => {
               setTransactionFee(fee);
             }}
+            onCheckValue={setCheckValue}
           />
         ),
       },
@@ -337,17 +400,19 @@ export default function Send() {
       },
     }),
     [
-      amount,
-      chainInfo?.chainId,
-      navigate,
-      sendHandler,
-      t,
+      type,
+      wallet,
       toAccount,
+      amount,
+      tipMsg,
       tokenInfo,
       txFee,
-      type,
       validateToAddress,
-      wallet,
+      chainInfo?.chainId,
+      t,
+      navigate,
+      checkValue,
+      sendHandler,
     ],
   );
 
@@ -397,6 +462,7 @@ export default function Send() {
           {StageObj[stage].btnText}
         </Button>
       </div>
+      <Button onClick={() => showErrorModal({})}>test</Button>
     </div>
   );
 }
