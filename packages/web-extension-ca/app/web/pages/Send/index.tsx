@@ -4,7 +4,7 @@ import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { useCurrentWallet, useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { AddressBookError } from '@portkey/store/addressBook/types';
 import { addFailedActivity, removeFailedActivity } from '@portkey/store/store-ca/activity/slice';
-import { AddressItem, ContactItemType } from '@portkey/types/types-ca/contact';
+import { AddressItem, ContactItemType, IClickAddressProps } from '@portkey/types/types-ca/contact';
 import { BaseToken } from '@portkey/types/types-ca/token';
 import { isDIDAddress } from '@portkey/utils';
 import { getAelfAddress, getWallet, isCrossChain } from '@portkey/utils/aelf';
@@ -277,7 +277,9 @@ export default function Send() {
         },
         element: (
           <AddressSelector
-            onClick={(account: AddressItem & { name?: string }) => {
+            onClick={(account: IClickAddressProps) => {
+              // from RecentList: Not recent contacts, not clickable
+              if (account.isDisable) return;
               const value = { name: account.name, address: `ELF_${account.address}_${account.chainId}` };
               setToAccount(value);
               // validateToAddress(value);

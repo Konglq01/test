@@ -34,3 +34,8 @@ export interface RecentContactItemType extends ContactItemType {
 export type ContactIndexType = Pick<ContactItemType, 'index'> & { contacts: ContactItemType[] };
 
 export type ContactMapType = { [key: string]: ContactItemType[] };
+
+export interface IClickAddressProps extends AddressItem {
+  name?: string;
+  isDisable?: boolean;
+}

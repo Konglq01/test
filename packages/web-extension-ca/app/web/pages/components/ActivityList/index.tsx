@@ -1,7 +1,7 @@
 import { TransactionTypes, transactionTypesMap } from '@portkey/constants/constants-ca/activity';
 import { ActivityItemType } from '@portkey/types/types-ca/activity';
-import { unitConverter } from '@portkey/utils/converter';
-import { DotLoading, InfiniteScroll, List } from 'antd-mobile';
+import { formatStr2EllipsisStr, unitConverter } from '@portkey/utils/converter';
+import { List } from 'antd-mobile';
 import CustomSvg from 'components/CustomSvg';
 import moment from 'moment';
 import { useCallback, useMemo } from 'react';
@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router';
 import { useWalletInfo } from 'store/Provider/hooks';
 import { ZERO } from '@portkey/constants/misc';
 import './index.less';
+import LoadingMore from 'components/LoadingMore/LoadingMore';
 
 export interface IActivityListProps {
   data?: ActivityItemType[];
@@ -16,35 +17,32 @@ export interface IActivityListProps {
   loadMore: (isRetry?: boolean) => Promise<void>;
 }
 
+const DEFAULT_DECIMAL = 8;
+
 export default function ActivityList({ data, hasMore, loadMore }: IActivityListProps) {
   const { currentNetwork } = useWalletInfo();
   const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'TESTNET' : ''), [currentNetwork]);
-  const nav = useNavigate();
 
-  const InfiniteScrollContent = ({ hasMore }: { hasMore?: boolean }) => {
-    return (
-      <>
-        {hasMore ? (
-          <>
-            <span>Loading</span>
-            <DotLoading />
-          </>
-        ) : (
-          <span>No Data</span>
-        )}
-      </>
-    );
+  const activityListLeftIcon = (type: TransactionTypes) => {
+    const loginRelatedTypeArr = [
+      TransactionTypes.ADD_MANAGER,
+      TransactionTypes.REMOVE_MANAGER,
+      TransactionTypes.SOCIAL_RECOVERY,
+    ];
+    return loginRelatedTypeArr.includes(type) ? 'socialRecovery' : 'Transfer';
   };
+
+  const nav = useNavigate();
 
   const navToDetail = useCallback(
     (item: ActivityItemType) => {
-      nav('/transaction', { state: { transactionId: item.transactionId, blockHash: item.blockHash } });
+      nav('/transaction', { state: item });
     },
     [nav],
   );
 
   const amountOrIdUI = (item: ActivityItemType) => {
-    const { transactionType, isReceived, amount, symbol, nftInfo, decimal } = item;
+    const { transactionType, isReceived, amount, symbol, nftInfo, decimals } = item;
 
     return (
       <p className="row-1">
@@ -56,7 +54,7 @@ export default function ActivityList({ data, hasMore, loadMore }: IActivityListP
               <>
                 {amount && <span>{isReceived ? '+' : '-'}</span>}
                 <span>
-                  {unitConverter(ZERO.plus(amount).div(`1e${decimal}`))} {symbol ?? ''}
+                  {unitConverter(ZERO.plus(amount).div(`1e${decimals ?? DEFAULT_DECIMAL}`))} {symbol ?? ''}
                 </span>
               </>
             )}
@@ -73,7 +71,7 @@ export default function ActivityList({ data, hasMore, loadMore }: IActivityListP
 
       return (
         <p className="row-2">
-          <span>From: {from?.replace(/(?<=^\w{7})\w*(?=\w{4}$)/, '...')}</span>
+          <span>From: {formatStr2EllipsisStr(from, [7, 4])}</span>
           {nftInfo?.nftId && <span>{nftInfo.alias}</span>}
           {!isTestNet && !nftInfo?.nftId && <span>$ {unitConverter(ZERO.plus(priceInUsd ?? 0), 2)}</span>}
         </p>
@@ -109,7 +107,7 @@ export default function ActivityList({ data, hasMore, loadMore }: IActivityListP
             <div className="activity-item" onClick={() => navToDetail(item)}>
               <div className="time">{moment(Number(item.timestamp)).format('MMM D [at] h:m a')}</div>
               <div className="info">
-                <CustomSvg type="Transfer" />
+                <CustomSvg type={activityListLeftIcon(item.transactionType)} />
                 <div className="right">
                   {amountOrIdUI(item)}
                   {fromAndUsdUI(item)}
@@ -120,9 +118,7 @@ export default function ActivityList({ data, hasMore, loadMore }: IActivityListP
           </List.Item>
         ))}
       </List>
-      <InfiniteScroll loadMore={loadMore} hasMore={hasMore}>
-        <InfiniteScrollContent hasMore={hasMore} />
-      </InfiniteScroll>
+      <LoadingMore hasMore={hasMore} loadMore={loadMore} />
     </div>
   );
 }

@@ -1,9 +1,8 @@
 import { useAppCASelector, useAppCommonDispatch } from '@portkey/hooks';
 import { clearState } from '@portkey/store/store-ca/activity/slice';
 import ActivityList from 'pages/components/ActivityList';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useEffectOnce } from 'react-use';
 import { getActivityListAsync } from '@portkey/store/store-ca/activity/action';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { useUserInfo } from 'store/Provider/hooks';
@@ -11,7 +10,6 @@ import { transactionTypesForActivityList } from '@portkey/constants/constants-ca
 import { IActivitysApiParams } from '@portkey/store/store-ca/activity/type';
 
 export interface ActivityProps {
-  loading: boolean;
   appendData?: Function;
   clearData?: Function;
   chainId?: string;
@@ -23,7 +21,10 @@ export enum EmptyTipMessage {
   NETWORK_NO_TRANSACTIONS = 'No transaction records accessible from the current custom network',
 }
 
-export default function Activity({ loading, appendData, clearData, chainId, symbol }: ActivityProps) {
+const AMX_RESULT_COUNT = 10;
+const SKIP_COUNT = 0;
+
+export default function Activity({ appendData, clearData, chainId, symbol }: ActivityProps) {
   const { t } = useTranslation();
   const activity = useAppCASelector((state) => state.activity);
 
@@ -31,10 +32,8 @@ export default function Activity({ loading, appendData, clearData, chainId, symb
   const { passwordSeed } = useUserInfo();
   const currentWallet = useCurrentWallet();
   const {
-    walletInfo: { caAddressList, address },
+    walletInfo: { caAddressList },
   } = currentWallet;
-  const maxResultCount = 10;
-  let ticking = false;
 
   useEffect(() => {
     if (passwordSeed) {
@@ -43,37 +42,17 @@ export default function Activity({ loading, appendData, clearData, chainId, symb
       dispatch(clearState());
 
       const params: IActivitysApiParams = {
-        maxResultCount: maxResultCount,
-        skipCount: 0,
+        maxResultCount: AMX_RESULT_COUNT,
+        skipCount: SKIP_COUNT,
         caAddresses: caAddressList,
-        // managerAddresses: address,
         chainId: chainId,
         symbol: symbol,
         transactionTypes: transactionTypesForActivityList,
       };
       dispatch(getActivityListAsync(params));
     }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [passwordSeed]);
-
-  const handleScroll: EventListener = (event) => {
-    const target = event.target as Element;
-    if (!ticking) {
-      window.requestAnimationFrame(() => {
-        if (target) {
-          if (target.clientHeight === target.scrollHeight - target.scrollTop) {
-            if (!loading) {
-              // TODO page change
-              // dispatch(getActivityListAsync({ type: 'MAIN' }));
-            }
-          }
-        }
-        ticking = false;
-      });
-      ticking = true;
-    }
-  };
 
   useEffect(() => {
     clearData?.();
@@ -81,22 +60,17 @@ export default function Activity({ loading, appendData, clearData, chainId, symb
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffectOnce(() => {
-    const root = document.querySelector('#root');
-    root?.addEventListener('scroll', handleScroll);
-    return root?.removeEventListener('scroll', handleScroll);
-  });
-
-  function loadMoreActivities() {
-    if (activity.data.length < activity.totalRecordCount) {
+  const loadMoreActivities = useCallback(() => {
+    const { data, maxResultCount, skipCount, totalRecordCount } = activity;
+    if (data.length < totalRecordCount) {
       const params = {
-        maxResultCount: maxResultCount,
-        skipCount: activity.skipCount + activity.maxResultCount,
+        maxResultCount: AMX_RESULT_COUNT,
+        skipCount: skipCount + maxResultCount,
         caAddresses: caAddressList,
       };
       return dispatch(getActivityListAsync(params));
     }
-  }
+  }, [activity, caAddressList, dispatch]);
 
   return (
     <div className="activity-wrapper">
