@@ -10,6 +10,7 @@ import { useStorage } from 'hooks/useStorage';
 import { fetchContractListAsync } from '@portkey/store/store-ca/contact/actions';
 import { getLocalStorage } from 'utils/storage/chromeStorage';
 import { useEffectOnce } from 'react-use';
+import { sleep } from '@portkey/utils';
 
 export default function PermissionCheck({
   children,
@@ -52,22 +53,29 @@ export default function PermissionCheck({
 
   const locked = useStorage('locked');
 
+  const _sleep = useCallback(async () => {
+    // TODO This is a bug
+    await sleep(1000);
+    return 'Extension error';
+  }, []);
+
   const getPassword = useCallback(async () => {
     try {
-      InternalMessage.payload(PortkeyMessageTypes.CHECK_WALLET_STATUS)
-        .send()
-        .then((res) => {
-          console.log(res, 'CHECK_WALLET_STATUS');
-          const detail = res?.data;
-          if (detail?.registerStatus === 'Registered') {
-            detail?.privateKey && dispatch(setPasswordSeed(detail.privateKey));
-            !detail?.privateKey && navigate('/unlock');
-          } else if (detail?.registerStatus === 'registeredNotGetCaAddress') {
-            navigate('/query-page');
-          } else {
-            navigate('/register/start');
-          }
-        });
+      const res = await Promise.race([
+        InternalMessage.payload(PortkeyMessageTypes.CHECK_WALLET_STATUS).send(),
+        _sleep(),
+      ]);
+      console.log(res, 'CHECK_WALLET_STATUS');
+      // if (typeof res !== 'object') return chrome.runtime.reload(); // navigate('/unlock');
+      const detail = (res as any)?.data;
+      if (detail?.registerStatus === 'Registered') {
+        detail?.privateKey && dispatch(setPasswordSeed(detail.privateKey));
+        !detail?.privateKey && navigate('/unlock');
+      } else if (detail?.registerStatus === 'registeredNotGetCaAddress') {
+        navigate('/query-page');
+      } else {
+        navigate('/register/start');
+      }
     } catch (error) {
       console.error(error, 'CHECK_WALLET_STATUS==error');
     }
