@@ -175,7 +175,7 @@ export default function HomeScreen() {
         <Button
           title="add failedActivity"
           onPress={() => {
-            dispatch(addFailedActivity({ timestamp: 100, transactionId: String(Math.random()) }));
+            dispatch(addFailedActivity({ transactionId: String(Math.random()) }));
             console.log(activity);
           }}
         />

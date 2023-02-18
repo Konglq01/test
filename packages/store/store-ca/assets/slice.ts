@@ -91,7 +91,7 @@ export const fetchTokenListAsync = createAsyncThunk(
 
 // fetch nftSeriesList on Dashboard
 export const fetchNFTCollectionsAsync = createAsyncThunk(
-  'fetchNFTSeriesAsync',
+  'fetchNFTCollectionsAsync',
   async (
     {
       caAddresses,
@@ -268,13 +268,12 @@ export const assetsSlice = createSlice({
           maxResultCount: 9,
           totalRecordCount: 0,
           children: [],
-          decimals: 0,
           ...item,
         }));
         state.accountNFT.accountNFTList = newAccountList;
         // state.accountNFT.accountNFTList = [...state.accountNFT.accountNFTList, ...newAccountList];
         // state.accountNFT.skipCount = state.accountNFT.accountNFTList.length;
-        // state.accountNFT.totalRecordCount = totalRecordCount;
+        state.accountNFT.totalRecordCount = totalRecordCount;
         state.accountNFT.isFetching = false;
       })
       .addCase(fetchNFTCollectionsAsync.rejected, state => {})
@@ -304,7 +303,7 @@ export const assetsSlice = createSlice({
       .addCase(fetchAssetAsync.fulfilled, (state, action) => {
         const { list, totalRecordCount } = action.payload;
 
-        state.accountAssets.accountAssetsList = list;
+        state.accountAssets.accountAssetsList = list as AccountAssets;
         // state.accountAssets.accountAssetsList = [...state.accountAssets.accountAssetsList, ...list];
         state.accountAssets.skipCount = state.accountAssets.accountAssetsList.length;
         state.accountAssets.totalRecordCount = totalRecordCount;

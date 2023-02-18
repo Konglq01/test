@@ -17,8 +17,9 @@ import { useLanguage } from 'i18n/hooks';
 import { useAppCommonDispatch } from '@portkey/hooks';
 import useDebounce from 'hooks/useDebounce';
 import useEffectOnce from 'hooks/useEffectOnce';
-import { fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
-import { useCaAddresses, useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import { useCaAddresses, useCurrentWalletInfo, useChainIdList } from '@portkey/hooks/hooks-ca/wallet';
+import { fetchAllTokenListAsync } from '@portkey/store/store-ca/tokenManagement/action';
+import NoData from 'components/NoData';
 
 type onFinishSelectTokenType = (tokenItem: TokenItemShowType) => void;
 type TokenListProps = {
@@ -29,28 +30,19 @@ type TokenListProps = {
 const TokenList = ({ onFinishSelectToken, account }: TokenListProps) => {
   const { t } = useLanguage();
 
-  const { accountToken } = useAppCASelector(state => state.assets);
+  const { tokenDataShowInMarket } = useAppCASelector(state => state.tokenManagement);
   const dispatch = useAppCommonDispatch();
-  const currentWalletInfo = useCurrentWalletInfo();
-  const caAddresses = useCaAddresses();
+  const chainIdList = useChainIdList();
 
-  const [listShow, setListShow] = useState<any[]>([]);
+  const [keyword, setKeyword] = useState('');
 
-  const [filterListInfo, setFilterListInfo] = useState({
-    pageSize: 10,
-    pageNum: 1,
-    keyword: '',
-    list: [],
-    total: 0,
-    isLoading: false,
-  });
-
-  const debounceKeyword = useDebounce(filterListInfo.keyword, 800);
+  const debounceKeyword = useDebounce(keyword, 800);
 
   const renderItem = useCallback(
     ({ item }: { item: TokenItemShowType }) => {
       return (
         <TokenListItem
+          noBalanceShow
           item={item}
           onPress={() => {
             OverlayModal.hide();
@@ -63,17 +55,12 @@ const TokenList = ({ onFinishSelectToken, account }: TokenListProps) => {
   );
 
   useEffect(() => {
-    console.log('enter ' + debounceKeyword);
-  }, [debounceKeyword]);
-
-  useEffect(() => {
-    setListShow(accountToken.accountTokenList);
-  }, [accountToken.accountTokenList]);
+    dispatch(fetchAllTokenListAsync({ chainIdArray: chainIdList, keyword: debounceKeyword }));
+  }, [chainIdList, debounceKeyword, dispatch]);
 
   useEffectOnce(() => {
-    if (accountToken.accountTokenList.length !== 0) return;
-
-    dispatch(fetchTokenListAsync({ caAddresses }));
+    if (tokenDataShowInMarket.length !== 0) return;
+    dispatch(fetchAllTokenListAsync({ chainIdArray: chainIdList, keyword: debounceKeyword }));
   });
 
   return (
@@ -84,17 +71,15 @@ const TokenList = ({ onFinishSelectToken, account }: TokenListProps) => {
         containerStyle={styles.containerStyle}
         inputContainerStyle={styles.inputContainerStyle}
         inputStyle={styles.inputStyle}
-        value={filterListInfo.keyword}
+        value={keyword}
         onChangeText={v => {
-          setFilterListInfo({
-            ...filterListInfo,
-            keyword: v.trim(),
-          });
+          setKeyword(v.trim());
         }}
       />
+      {!!debounceKeyword && !tokenDataShowInMarket.length && <NoData noPic message={t('There is no search result.')} />}
       <FlatList
         style={styles.flatList}
-        data={listShow.filter(ele => !!currentWalletInfo?.[ele?.chainId])}
+        data={tokenDataShowInMarket || []}
         renderItem={renderItem}
         keyExtractor={(item: any) => item.id || ''}
       />

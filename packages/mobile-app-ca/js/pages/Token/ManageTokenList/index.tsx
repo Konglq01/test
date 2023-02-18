@@ -22,6 +22,7 @@ import useDebounce from 'hooks/useDebounce';
 import { useAppCommonDispatch } from '@portkey/hooks';
 import { request } from '@portkey/api/api-did';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
+import { useChainIdList } from '@portkey/hooks/hooks-ca/wallet';
 
 interface ManageTokenListProps {
   route?: any;
@@ -58,10 +59,7 @@ const Item = memo(({ item, onHandleToken }: ItemProps) => {
         {item.isDefault ? (
           <Svg icon="lock" size={pTd(20)} iconStyle={itemStyle.addedStyle} />
         ) : (
-          <CommonSwitch
-            value={!!item.isAdded}
-            onValueChange={() => onHandleToken(item, item.isAdded ? 'delete' : 'add')}
-          />
+          <CommonSwitch value={!!item.isAdded} onChange={() => onHandleToken(item, item.isAdded ? 'delete' : 'add')} />
         )}
       </View>
     </TouchableOpacity>
@@ -74,19 +72,26 @@ const ManageTokenList: React.FC<ManageTokenListProps> = () => {
 
   const isLoading = useIsFetchingTokenList();
   const currentNetworkInfo = useCurrentNetworkInfo();
+  const chainList = useChainIdList();
 
   const dispatch = useAppCommonDispatch();
 
   const { tokenDataShowInMarket } = useAppCASelector(state => state.tokenManagement);
+
+  const [tokenList, setTokenList] = useState([]);
 
   const [keyword, setKeyword] = useState<string>('');
   // const [tokenList, setTokenList] = useState(tokenDataShowInMarket);
 
   const debounceWord = useDebounce(keyword, 500);
 
+  // useEffect(() => {
+  //   return setTokenList(tokenDataShowInMarket);
+  // }, [tokenDataShowInMarket]);
+
   useEffect(() => {
     if (tokenDataShowInMarket.length) return;
-    dispatch(fetchAllTokenListAsync({ keyword: debounceWord }));
+    dispatch(fetchAllTokenListAsync({ keyword: debounceWord, chainIdArray: chainList }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -104,7 +109,7 @@ const ManageTokenList: React.FC<ManageTokenListProps> = () => {
         })
         .then(res => {
           setTimeout(() => {
-            dispatch(fetchAllTokenListAsync({ keyword: '' }));
+            dispatch(fetchAllTokenListAsync({ keyword: debounceWord, chainIdArray: chainList }));
             CommonToast.success('Success');
           }, 1000);
         })
@@ -113,12 +118,12 @@ const ManageTokenList: React.FC<ManageTokenListProps> = () => {
           CommonToast.fail('Fail');
         });
     },
-    [currentNetworkInfo.apiUrl, dispatch],
+    [chainList, currentNetworkInfo.apiUrl, debounceWord, dispatch],
   );
 
   useEffect(() => {
-    dispatch(fetchAllTokenListAsync({ keyword: debounceWord }));
-  }, [debounceWord, dispatch]);
+    dispatch(fetchAllTokenListAsync({ keyword: debounceWord, chainIdArray: chainList }));
+  }, [chainList, debounceWord, dispatch]);
 
   return (
     <PageContainer
