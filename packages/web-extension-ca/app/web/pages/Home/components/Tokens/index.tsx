@@ -14,7 +14,7 @@ export default function TokenList({ tokenList }: { tokenList: TokenItemShowType[
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { currentNetwork } = useWalletInfo();
-  const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? currentNetwork : ''), [currentNetwork]);
+  const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'Testnet' : ''), [currentNetwork]);
 
   const onNavigate = useCallback(
     (tokenInfo: TokenItemShowType) => {
@@ -32,7 +32,7 @@ export default function TokenList({ tokenList }: { tokenList: TokenItemShowType[
     <>
       <ul className="token-list">
         {tokenList.map((item) => (
-          <li className="token-list-item" key={item.chainId} onClick={() => onNavigate(item)}>
+          <li className="token-list-item" key={`${item.chainId}_${item.symbol}`} onClick={() => onNavigate(item)}>
             {item.symbol === 'ELF' ? (
               <CustomSvg className="token-logo" type="Aelf" />
             ) : (
@@ -45,10 +45,12 @@ export default function TokenList({ tokenList }: { tokenList: TokenItemShowType[
               </span>
             </div>
             <div className="amount">
-              <p>{unitConverter(ZERO.plus(item?.balance || '').div(`1e${item?.decimal}`))}</p>
-              <p className="convert">
-                {`$ ${unitConverter(ZERO.plus(item?.balanceInUsd || '').div(`1e${item?.decimal}`))}`}
-              </p>
+              <p>{unitConverter(ZERO.plus(item?.balance || '').div(`1e${item?.decimals}`))}</p>
+              {!isTestNet && (
+                <p className="convert">
+                  {`$ ${unitConverter(ZERO.plus(item?.balanceInUsd || '').div(`1e${item?.decimals}`))}`}
+                </p>
+              )}
             </div>
           </li>
         ))}

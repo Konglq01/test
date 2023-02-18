@@ -2,7 +2,7 @@ import walletApi from './wallet';
 import verificationApi from './verification';
 import contactApi from './contact';
 import chainApi from './chain';
-import assetsApi from './assets1';
+import assetsApi from './assets';
 import recentApi from './recent';
 import tokenApi from './token';
 

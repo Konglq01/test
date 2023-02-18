@@ -24,6 +24,7 @@ import { useGetHolderInfo } from 'hooks/guardian';
 import { useAppCommonDispatch } from '@portkey/hooks';
 import { addFailedActivity } from '@portkey/store/store-ca/activity/slice';
 import { useAppCASelector } from '@portkey/hooks/hooks-ca';
+import { fetchTokensPriceAsync } from '@portkey/store/store-ca/assets/slice';
 
 export default function HomeScreen() {
   const wallet = useCurrentWalletInfo();
@@ -82,7 +83,7 @@ export default function HomeScreen() {
               args: {
                 symbol: 'ELF',
                 // to: '2PfWcs9yhY5xVcJPskxjtAHiKyNUbX7wyWv2NcwFJEg9iNfnPj',
-                to: 'ELF_nn659b9X1BLhnu5RWmEUbuuV7J9QKVVSN54j9UmeCbF3Dve5D_AELF',
+                to: '2b8294NW2u7wiHg6pePWxab1He2AoMMdSE1mdbNiv7k6nXubLy',
                 amount: 1 * 10 ** 8,
                 memo: 'transfer address1 to address2',
               },
@@ -174,10 +175,17 @@ export default function HomeScreen() {
         <Button
           title="add failedActivity"
           onPress={() => {
-            dispatch(addFailedActivity({ timestamp: 100, transactionId: String(Math.random()) }));
+            // dispatch(addFailedActivity({ transactionId: String(Math.random()) }));
+            console.log(activity);
           }}
         />
-        <Text>{JSON.stringify(activity)}</Text>
+        <Button
+          title="fetch token Price"
+          onPress={() => {
+            dispatch(fetchTokensPriceAsync({}));
+          }}
+        />
+
         <CrashTest />
       </ScrollView>
     </SafeAreaBox>

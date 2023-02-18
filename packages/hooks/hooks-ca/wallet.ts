@@ -152,3 +152,14 @@ export const useCaAddresses = () => {
     [currentCAInfo],
   );
 };
+
+export const useChainIdList = () => {
+  const { walletInfo, currentNetwork } = useWallet();
+
+  const currentCAInfo = walletInfo?.caInfo?.[currentNetwork];
+
+  return useMemo(
+    () => Object.keys(currentCAInfo || {})?.filter((info: any) => info !== 'managerInfo'),
+    [currentCAInfo],
+  );
+};

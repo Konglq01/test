@@ -20,13 +20,30 @@ import { useGetELFRateQuery } from '@portkey/store/rate/api';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { formatAddress2NoPrefix, formatStr2EllipsisStr } from 'utils';
 import { addRecentContact } from '@portkey/store/store-ca/recent/slice';
-import { isAelfAddress } from '@portkey/utils/aelf';
+import { isAelfAddress, isCrossChain } from '@portkey/utils/aelf';
 import { updateBalance } from '@portkey/store/tokenBalance/slice';
 import { useLanguage } from 'i18n/hooks';
 import { useAppCommonDispatch } from '@portkey/hooks';
 import GStyles from 'assets/theme/GStyles';
 import fonts from 'assets/theme/fonts';
 import { Image, ScreenHeight } from '@rneui/base';
+import { getContractBasic } from '@portkey/contracts/utils';
+import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+import { DefaultChainId } from '@portkey/constants/constants-ca/network-test2';
+import { getDefaultWallet } from 'utils/aelfUtils';
+import { usePin } from 'hooks/store';
+import aes from '@portkey/utils/aes';
+import { getManagerAccount } from 'utils/redux';
+import crossChainTransfer, {
+  CrossChainTransferIntervalParams,
+  intervalCrossChainTransfer,
+} from 'utils/transfer/crossChainTransfer';
+import { useCurrentNetwork } from '@portkey/hooks/network';
+import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
+import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import { timesDecimals } from '@portkey/utils/converter';
+import sameChainTransfer from 'utils/transfer/sameChainTransfer';
+import { removeFailedActivity } from '@portkey/store/store-ca/activity/slice';
 
 export interface SendHomeProps {
   route?: any;
@@ -36,7 +53,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
   const { t } = useLanguage();
   const { route } = props;
   const { params } = route;
-  const { sendType } = params;
+  const { sendType, to } = params;
   const tokenItem = {
     symbol: 'ELF',
     address: 'xxx',
@@ -47,6 +64,8 @@ const SendHome: React.FC<SendHomeProps> = props => {
   const dispatch = useAppCommonDispatch();
 
   const [isLoading] = useState(false);
+  const currentNetwork = useCurrentNetwork();
+  const wallet = useCurrentWalletInfo();
 
   // TODO
   // const totalPay = useMemo(() => {
@@ -62,13 +81,105 @@ const SendHome: React.FC<SendHomeProps> = props => {
   // const showCrossChainTips = () => {
   //   CrossChainTransferModal.alert({});
   // };
+  const tokenInfo: any = useMemo(
+    () => ({
+      symbol: 'ELF',
+      decimals: 8,
+      address: 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE',
+    }),
+    // ({
+    //   symbol: 'BTX-2',
+    //   decimals: 0,
+    //   tokenName: '1155-BTX2',
+    //   address: 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE',
+    //   supply: '1000',
+    //   totalSupply: '1000',
+    //   issuer: '2KQWh5v6Y24VcGgsx2KHpQvRyyU5DnCZ4eAUPqGQbnuZgExKaV',
+    //   isBurnable: true,
+    //   issueChainId: 9992731,
+    //   issued: '1000',
+    //   externalInfo: { value: { __nft_image_url: 'nft_image_url', __nft_is_burned: 'true' } },
+    // }),
+
+    [],
+  );
+
+  const retryCrossChain = useCallback(
+    async ({ managerTransferTxId, data }: { managerTransferTxId: string; data: CrossChainTransferIntervalParams }) => {
+      try {
+        //
+        await intervalCrossChainTransfer(data);
+        dispatch(removeFailedActivity(managerTransferTxId));
+      } catch (error) {
+        // tip retryCrossChain()
+        // Modal.confirm
+      }
+    },
+    [dispatch],
+  );
 
   //  TODO: when finish send upDate balance
-
+  const pin = usePin();
+  const chainInfo = useCurrentChain(DefaultChainId);
   const transfer = async () => {
-    // TODO
-    CommonToast.success(t('Transfer Successful'));
-    navigationService.navigate('DashBoard');
+    try {
+      // TODO
+      CommonToast.success(t('Transfer Successful'));
+      navigationService.navigate('DashBoard');
+      if (!chainInfo || !pin) return;
+      const account = getManagerAccount(pin);
+      if (!account) return;
+      const contract = await getContractBasic({
+        contractAddress: chainInfo.caContractAddress,
+        rpcUrl: chainInfo.endPoint,
+        account,
+      });
+      // TODO
+      const amount = 10;
+      // setLoading(true);
+      if (isCrossChain(to, chainInfo?.chainId ?? 'AELF')) {
+        console.log('crossChainTransfer==sendHandler');
+        await crossChainTransfer({
+          contract,
+          chainType: currentNetwork.chainType ?? 'aelf',
+          managerAddress: wallet.address,
+          tokenInfo,
+          caHash: wallet.walletInfo.AELF?.caHash || '',
+          amount: timesDecimals(amount, tokenInfo.decimals).toNumber(),
+          toAddress: to,
+        });
+      } else {
+        console.log('sameChainTransfers==sendHandler');
+        await sameChainTransfer({
+          contract,
+          tokenInfo,
+          caHash: wallet.walletInfo.AELF?.caHash || '',
+          amount: timesDecimals(amount, tokenInfo.decimals).toNumber(),
+          toAddress: to,
+        });
+      }
+      // message.success('success');
+    } catch (error: any) {
+      console.log('sendHandler==error', error);
+      // if (!error?.type) return message.error(error);
+      if (error.type === 'managerTransfer') {
+        // return message.error(error);
+      } else if (error.type === 'crossChainTransfer') {
+        // TODO tip retry
+        // retryCrossChain(error)
+        // dispatch(
+        //   addFailedActivity({
+        //     transactionId: managerTransferTxId,
+        //     params: data,
+        //   }),
+        // );
+        return;
+      } else {
+        // message.error(error);
+      }
+    } finally {
+      // setLoading(false);
+    }
 
     return;
 

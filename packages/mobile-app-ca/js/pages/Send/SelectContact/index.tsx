@@ -20,141 +20,7 @@ import { fetchContractListAsync } from '@portkey/store/store-ca/contact/actions'
 import { request } from '@portkey/api/api-did';
 import { useContact } from '@portkey/hooks/hooks-ca/contact';
 import { isLoading } from 'expo-font';
-
-const mockList = [
-  {
-    id: '100',
-    name: '',
-    address: '',
-    addresses: [{ address: 'ELF_mfzJTsv5UGQGoZw4gdrivTihVoZgtdm2f8ppnY7W2t6nGYfS1_AELF' }],
-  },
-  {
-    id: '200',
-    index: 1000,
-    name: 'Sally',
-    addresses: [
-      {
-        id: 1,
-        index: 1,
-        chainType: 'MAIN',
-        chainId: 'AELF',
-        address: 'ELF_SADASsdasdasdasdasD_AELF',
-      },
-      {
-        id: 2,
-        index: 2,
-        chainType: 'MAIN',
-        chainId: 'AELF',
-        address: 'ELF_SADASsdaaasdasdasdasD_AELF',
-      },
-    ],
-  },
-  {
-    id: '200',
-    index: 1000,
-    name: 'Sally',
-    addresses: [
-      {
-        id: 1,
-        index: 1,
-        chainType: 'MAIN',
-        chainId: 'AELF',
-        address: 'ELF_SADASsdasdasdasdasD_AELF',
-      },
-      {
-        id: 2,
-        index: 2,
-        chainType: 'MAIN',
-        chainId: 'AELF',
-        address: 'ELF_SADASsdaaasdasdasdasD_AELF',
-      },
-    ],
-  },
-  {
-    id: '200',
-    index: 1000,
-    name: 'Sally',
-    addresses: [
-      {
-        id: 1,
-        index: 1,
-        chainType: 'MAIN',
-        chainId: 'AELF',
-        address: 'ELF_SADASsdasdasdasdasD_AELF',
-      },
-      {
-        id: 2,
-        index: 2,
-        chainType: 'MAIN',
-        chainId: 'AELF',
-        address: 'ELF_SADASsdaaasdasdasdasD_AELF',
-      },
-    ],
-  },
-  {
-    id: '200',
-    index: 1000,
-    name: 'Sally',
-    addresses: [
-      {
-        id: 1,
-        index: 1,
-        chainType: 'MAIN',
-        chainId: 'AELF',
-        address: 'ELF_SADASsdasdasdasdasD_AELF',
-      },
-      {
-        id: 2,
-        index: 2,
-        chainType: 'MAIN',
-        chainId: 'AELF',
-        address: 'ELF_SADASsdaaasdasdasdasD_AELF',
-      },
-    ],
-  },
-  {
-    id: '200',
-    index: 1000,
-    name: 'Sally',
-    addresses: [
-      {
-        id: 1,
-        index: 1,
-        chainType: 'MAIN',
-        chainId: 'AELF',
-        address: 'ELF_SADASsdasdasdasdasD_AELF',
-      },
-      {
-        id: 2,
-        index: 2,
-        chainType: 'MAIN',
-        chainId: 'AELF',
-        address: 'ELF_SADASsdaaasdasdasdasD_AELF',
-      },
-    ],
-  },
-  {
-    id: '200',
-    index: 1000,
-    name: 'Sally',
-    addresses: [
-      {
-        id: 1,
-        index: 1,
-        chainType: 'MAIN',
-        chainId: 'AELF',
-        address: 'ELF_SADASsdasdasdasdasD_AELF',
-      },
-      {
-        id: 2,
-        index: 2,
-        chainType: 'MAIN',
-        chainId: 'AELF',
-        address: 'ELF_SADASsdaaasdasdasdasD_AELF',
-      },
-    ],
-  },
-];
+import { useCaAddresses } from '@portkey/hooks/hooks-ca/wallet';
 
 interface ApiRecentAddressItemType {
   caAddress: string;
@@ -177,12 +43,13 @@ export default function SelectContact(props: SelectContactProps) {
   const { t } = useLanguage();
   const dispatch = useAppCommonDispatch();
   const { contactMap } = useContact();
-  console.log('contactMapcontactMapcontactMap', contactMap);
+
+  const caAddresses = useCaAddresses();
 
   const [loading, setLoading] = useState<boolean>(false);
   const [skipCount, setSkipCount] = useState(0);
   const [recentTotalNumber, setRecentTotalNumber] = useState(0);
-  const [recentList, setRecentList] = useState<(ContactItemType | RecentContactItemType)[]>([]);
+  const [recentList, setRecentList] = useState<RecentContactItemType[]>([]);
 
   // const debouncedKeyword = useDebounce(keyword, 500);
 
@@ -191,7 +58,7 @@ export default function SelectContact(props: SelectContactProps) {
   });
 
   const renderItem = useCallback(
-    ({ item }: { item: ContactItemType | RecentContactItemType }) => {
+    ({ item }: { item: RecentContactItemType }) => {
       return <RecentContactItem contact={item} onPress={onPress} />;
     },
     [onPress],
@@ -201,20 +68,18 @@ export default function SelectContact(props: SelectContactProps) {
     setLoading(true);
     return request.recent.fetchRecentTransactionUsers({
       params: {
-        caAddresses: [
-          'TxXSwp2P9mxeFnGA9DARi2qW1p3PskLFXyBix1GDerQFL7VD5',
-          'bn3AAx9HpCtS5v8dcaXgjp1nRivc8RkxpH4GFaopGr77tZdFb',
-        ],
+        caAddresses: caAddresses,
         skipCount,
         maxResultCount: MAX_RESULT_ACCOUNT,
       },
     });
-  }, [skipCount]);
+  }, [caAddresses, skipCount]);
 
   const transFormData = useCallback(
     (data: ApiRecentAddressItemType[]): any[] =>
       data.map((ele: ApiRecentAddressItemType) => {
-        if (contactMap?.[ele.address]) return { ...contactMap?.[ele.address], transactionTime: ele.transactionTime };
+        if (contactMap?.[ele.address])
+          return { ...contactMap?.[ele.address]?.[0], transactionTime: ele.transactionTime };
         return { ...ele, addresses: [{ address: ele.address, chainId: ele.addressChainId }] };
       }),
     [contactMap],
@@ -233,7 +98,6 @@ export default function SelectContact(props: SelectContactProps) {
   });
 
   // fetchMoreRecent
-  useCallback;
   const fetchMoreRecent = useCallback(() => {
     fetchRecents().then(res => {
       const { data, totalRecordCount } = res;
@@ -250,12 +114,12 @@ export default function SelectContact(props: SelectContactProps) {
       {
         name: t('Recents'),
         tabItemDom:
-          mockList.length === 0 ? (
+          recentList.length === 0 ? (
             <NoData noPic message={t('There is no recents.')} />
           ) : (
             <View style={styles.recentListWrap}>
               <FlashList
-                data={recentList}
+                data={recentList || []}
                 renderItem={renderItem}
                 ListFooterComponent={<TextS style={styles.footer}>{t('No Data')}</TextS>}
                 onEndReached={() => {
@@ -272,18 +136,16 @@ export default function SelectContact(props: SelectContactProps) {
       },
       {
         name: t('Contacts'),
-        tabItemDom:
-          mockList.length === 0 ? (
-            <NoData noPic message={t('There is no contacts.')} />
-          ) : (
-            <ContactsList
-              style={styles.contactWrap}
-              isIndexBarShow={false}
-              isSearchShow={false}
-              renderContactItem={item => <RecentContactItem contact={item} />}
-              ListFooterComponent={<View style={styles.footer} />}
-            />
-          ),
+        tabItemDom: (
+          <ContactsList
+            style={styles.contactWrap}
+            isReadOnly
+            isIndexBarShow={false}
+            isSearchShow={false}
+            renderContactItem={(item: ContactItemType) => <RecentContactItem contact={item as RecentContactItemType} />}
+            ListFooterComponent={<View style={styles.footer} />}
+          />
+        ),
       },
     ];
   }, [fetchMoreRecent, loading, recentList, recentTotalNumber, renderItem, t]);

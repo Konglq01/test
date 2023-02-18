@@ -6,8 +6,12 @@ import { useCurrentNetworkInfo } from './network';
 import { request } from '@portkey/api/api-did';
 
 export interface TokenFuncsType {
-  fetchTokenList: (params: { keyword: string }) => void;
-  displayUserToken: (tokenItem: TokenItemShowType) => Promise<void>;
+  fetchTokenList: (params: { keyword: string; chainIdArray: string[] }) => void;
+  displayUserToken: (params: {
+    tokenItem: TokenItemShowType;
+    keyword: string;
+    chainIdArray: string[];
+  }) => Promise<void>;
 }
 
 export const useToken = (): [TokenState, TokenFuncsType] => {
@@ -16,7 +20,7 @@ export const useToken = (): [TokenState, TokenFuncsType] => {
 
   const tokenState = useAppCASelector(state => state.tokenManagement);
 
-  const fetchTokenList = useCallback((params: { keyword: string }) => {
+  const fetchTokenList = useCallback((params: { keyword: string; chainIdArray: string[] }) => {
     dispatch(
       fetchAllTokenListAsync({
         ...params,
@@ -24,18 +28,29 @@ export const useToken = (): [TokenState, TokenFuncsType] => {
     );
   }, []);
 
-  const displayUserToken = useCallback(async (tokenItem: TokenItemShowType) => {
-    await request.token.displayUserToken({
-      baseURL: currentNetworkInfo.apiUrl,
-      resourceUrl: `${tokenItem.id}/display`,
-      params: {
-        isDisplay: !tokenItem.isAdded,
-      },
-    });
-    setTimeout(() => {
-      dispatch(fetchAllTokenListAsync({ keyword: '' }));
-    }, 1000);
-  }, []);
+  const displayUserToken = useCallback(
+    async ({
+      tokenItem,
+      keyword,
+      chainIdArray,
+    }: {
+      tokenItem: TokenItemShowType;
+      keyword: string;
+      chainIdArray: string[];
+    }) => {
+      await request.token.displayUserToken({
+        baseURL: currentNetworkInfo.apiUrl,
+        resourceUrl: `${tokenItem.userTokenId}/display`,
+        params: {
+          isDisplay: !tokenItem.isAdded,
+        },
+      });
+      setTimeout(() => {
+        dispatch(fetchAllTokenListAsync({ keyword, chainIdArray }));
+      }, 1000);
+    },
+    [],
+  );
 
   const tokenStoreFuncs = {
     fetchTokenList,

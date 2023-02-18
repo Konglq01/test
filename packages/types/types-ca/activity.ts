@@ -1,4 +1,7 @@
 import { TransactionTypes } from '@portkey/constants/constants-ca/activity';
+import { ChainItemType } from '@portkey/store/store-ca/wallet/type';
+import { ChainType } from '..';
+import { BaseToken } from './token';
 
 export type ActivityItemType = {
   chainId: string;
@@ -36,6 +39,15 @@ export type TransactionFees = {
 };
 
 export type the2ThFailedActivityItemType = {
-  timestamp: number;
   transactionId: string;
+  params: {
+    chainInfo: ChainItemType;
+    chainType: ChainType;
+    privateKey: string;
+    managerAddress: string;
+    tokenInfo: BaseToken;
+    amount: number;
+    toAddress: string;
+    memo?: string;
+  };
 };

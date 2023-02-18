@@ -1,7 +1,7 @@
 import { TransactionTypes } from '@portkey/constants/constants-ca/activity';
 import { ZERO } from '@portkey/constants/misc';
 import { TransactionStatus } from '@portkey/graphql/contract/__generated__/types';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { useCaAddresses, useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { fetchActivity } from '@portkey/store/store-ca/activity/api';
 import { IActivityApiParams } from '@portkey/store/store-ca/activity/type';
 import { ActivityItemType, TransactionFees } from '@portkey/types/types-ca/activity';
@@ -25,17 +25,14 @@ const DEFAULT_DECIMAL = 8;
 export default function Transaction() {
   const { t } = useTranslation();
   const { state }: { state: IActivityApiParams } = useLocation();
-  const currentWallet = useCurrentWallet();
-  const {
-    walletInfo: { caAddressList },
-  } = currentWallet;
+  const caAddresses = useCaAddresses();
 
   const [activityItem, setActivityItem] = useState<ActivityItemType>();
   const [feeInfo, setFeeInfo] = useState<TransactionFees[]>([]);
 
   useEffectOnce(() => {
     const params = {
-      caAddresses: caAddressList,
+      caAddresses,
       transactionId: state.transactionId,
       blockHash: state.blockHash,
     };

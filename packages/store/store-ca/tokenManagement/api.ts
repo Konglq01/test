@@ -4,25 +4,23 @@ export function fetchAllTokenList({
   maxResultCount,
   skipCount,
   keyword,
-  chainIdArray = ['AELF'],
+  chainIdArray,
 }: {
-  maxResultCount: number;
-  skipCount: number;
+  maxResultCount?: number;
+  skipCount?: number;
   keyword: string;
-  chainIdArray?: string[];
+  chainIdArray: string[];
 }): Promise<{ items: any[]; totalRecordCount: number }> {
-  const chainIdSearchLanguage = chainIdArray.map(chainId => `token.chainId:${chainId}`).join(' AND ');
+  const chainIdSearchLanguage = chainIdArray.map(chainId => `token.chainId:${chainId}`).join(' OR ');
 
-  const filterKeyWords = keyword?.length < 10 ? `token.symbol:*${keyword}*~` : `token.address:${keyword}`;
+  const filterKeywords = keyword?.length < 10 ? `token.symbol:*${keyword}*~` : `token.address:${keyword}`;
 
   return request.es.getUserTokenList({
     params: {
-      filter: `${filterKeyWords} AND ${chainIdSearchLanguage}`,
-      // sort: 'token.chainId',
-      sort: 'sortWeight',
-      sortType: 1,
-      skipCount,
-      maxResultCount,
+      filter: `${filterKeywords} OR (${chainIdSearchLanguage})`,
+      sort: 'sortWeight desc,token.symbol acs',
+      skipCount: 0,
+      maxResultCount: 1000,
     },
   });
 }

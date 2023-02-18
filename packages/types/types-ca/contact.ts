@@ -27,6 +27,8 @@ export type GetContractListApiType = {
 export interface RecentContactItemType extends ContactItemType {
   transferTime: String | number;
   caAddress?: string;
+  chainId?: string;
+  addressChainId?: string;
 }
 
 export type ContactIndexType = Pick<ContactItemType, 'index'> & { contacts: ContactItemType[] };

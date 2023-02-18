@@ -14,7 +14,7 @@ import useEffectOnce from 'hooks/useEffectOnce';
 import { fetchTokenList } from '@portkey/store/store-ca/assets/api';
 import { request } from '@portkey/api/api-did';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { useChainIdList, useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
 
 export interface TokenSectionProps {
@@ -25,7 +25,7 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
   const { t } = useLanguage();
   const dispatch = useAppCommonDispatch();
   const {
-    accountToken: { accountTokenList, isFetching, skipCount, maxResultCount, totalRecordCount },
+    accountToken: { accountTokenList, skipCount, maxResultCount, totalRecordCount },
   } = useAppCASelector(state => state.assets);
 
   console.log('accountTokenListaccountTokenListaccountTokenList', accountTokenList);
@@ -33,12 +33,11 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
   const currentNetworkInfo = useCurrentNetworkInfo();
 
   const {
-    walletInfo: { caAddressList },
+    walletInfo: { caAddressList, address },
   } = useCurrentWallet();
+  const { walletInfo } = useCurrentWallet();
 
-  const [, setTokenList] = useState<any[]>([]);
-  const [, setTokenNumber] = useState(0);
-
+  const [isFetching] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const { accountToken } = useAppCASelector(state => state.assets);
 
@@ -54,64 +53,12 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
   );
 
   const getAccountTokenList = useCallback(() => {
-    const timer: any = setTimeout(() => {
-      dispatch(fetchTokenListAsync({ caAddresses: caAddressList || [] }));
-
-      return clearTimeout(timer);
-    }, 1000);
+    dispatch(fetchTokenListAsync({ caAddresses: caAddressList || [] }));
   }, [caAddressList, dispatch]);
 
   useEffectOnce(() => {
     getAccountTokenList();
   });
-
-  useEffectOnce(() => {
-    () => dispatch(fetchTokenListAsync({ caAddresses: caAddressList || [] }));
-  });
-
-  useEffect(() => {
-    console.log('caAddressList', caAddressList);
-
-    request.assets
-      .fetchAccountTokenList({
-        baseURL: currentNetworkInfo.apiUrl,
-        params: {
-          caAddress: caAddressList,
-          skipCount: 0,
-          maxResultCount: 10,
-        },
-      })
-      .then(res => console.log('!!!!', res));
-  }, []);
-
-  // const TTT = () => {
-  //   const {
-  //     walletInfo: { caAddressList },
-  //   } = currentWallet;
-  //   console.log('caAddressList', caAddressList);
-
-  //   request.assets
-  //     .fetchAccountTokenList({
-  //       baseURL: currentNetworkInfo.apiUrl,
-  //       params: {
-  //         caAddress: caAddressList,
-  //         skipCount: 1,
-  //         maxResultCount: 10,
-  //       },
-  //     })
-  //     .then(res => console.log('!!!!', res));
-
-  //   request.assets
-  //     .fetchAccountTokenList({
-  //       baseURL: currentNetworkInfo.apiUrl,
-  //       params: {
-  //         caAddress: caAddressList,
-  //         skipCount: 1,
-  //         maxResultCount: 10,
-  //       },
-  //     })
-  //     .then(res => console.log('!!!!', res));
-  // };
 
   return (
     <View style={styles.tokenListPageWrap}>

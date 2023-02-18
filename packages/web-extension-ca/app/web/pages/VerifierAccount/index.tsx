@@ -17,7 +17,6 @@ import PortKeyTitle from 'pages/components/PortKeyTitle';
 import clsx from 'clsx';
 import SettingHeader from 'pages/components/SettingHeader';
 import useLocationState from 'hooks/useLocationState';
-import getPrivateKeyAndMnemonic from 'utils/Wallet/getPrivateKeyAndMnemonic';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { handleGuardian } from 'utils/sandboxUtil/handleGuardian';
 import { GuardianMth } from 'types/guardians';
@@ -28,6 +27,7 @@ import { sleep } from '@portkey/utils';
 import { getAelfInstance } from '@portkey/utils/aelf';
 import { getTxResult } from 'utils/aelfUtils';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
+import aes from '@portkey/utils/aes';
 
 export default function VerifierAccount() {
   const { loginAccount } = useLoginInfo();
@@ -49,18 +49,13 @@ export default function VerifierAccount() {
       if (state === 'guardians/setLoginAccount') {
         try {
           setLoading(true);
-          const res = await getPrivateKeyAndMnemonic(
-            {
-              AESEncryptPrivateKey: walletInfo.AESEncryptPrivateKey,
-            },
-            passwordSeed,
-          );
-          if (!currentChain?.endPoint || !res?.privateKey) return message.error('set login account error');
+          const privateKey = aes.decrypt(walletInfo.AESEncryptPrivateKey, passwordSeed);
+          if (!currentChain?.endPoint || !privateKey) return message.error('set login account error');
           const result = await handleGuardian({
             rpcUrl: currentChain.endPoint,
             chainType: currentNetwork.walletType,
             address: currentChain.caContractAddress,
-            privateKey: res.privateKey,
+            privateKey,
             paramsOption: {
               method: GuardianMth.SetGuardianTypeForLogin,
               params: [

@@ -1,9 +1,8 @@
 import PageContainer from 'components/PageContainer';
 import { useIsFetchingTokenList, useToken } from '@portkey/hooks/hooks-ca/useToken';
 import { TokenItemShowType } from '@portkey/types/types-ca/token';
-import { filterTokenList } from '@portkey/utils/token';
 import CommonInput from 'components/CommonInput';
-import { useAppCASelector } from '@portkey/hooks/index';
+import { useAppCASelector } from '@portkey/hooks/hooks-ca';
 import { Dialog } from '@rneui/themed';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import gStyles from 'assets/theme/GStyles';
@@ -18,8 +17,12 @@ import CommonSwitch from 'components/CommonSwitch';
 import CommonAvatar from 'components/CommonAvatar';
 import { useLanguage } from 'i18n/hooks';
 import NoData from 'components/NoData';
-import { fetchUserTokenList } from '@portkey/store/store-ca/tokenManagement/api';
-import { Button } from '@rneui/base';
+import { fetchAllTokenListAsync } from '@portkey/store/store-ca/tokenManagement/action';
+import useDebounce from 'hooks/useDebounce';
+import { useAppCommonDispatch } from '@portkey/hooks';
+import { request } from '@portkey/api/api-did';
+import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
+import { useChainIdList } from '@portkey/hooks/hooks-ca/wallet';
 
 interface ManageTokenListProps {
   route?: any;
@@ -35,7 +38,7 @@ function areEqual(prevProps: ItemProps, nextProps: ItemProps) {
 
 const Item = memo(({ item, onHandleToken }: ItemProps) => {
   return (
-    <TouchableOpacity style={itemStyle.wrap} key={item.symbol}>
+    <TouchableOpacity style={itemStyle.wrap} key={`${item.symbol}${item.address}${item.chainId}}`}>
       {item.symbol === 'ELF' ? (
         <CommonAvatar
           shapeType="circular"
@@ -56,10 +59,7 @@ const Item = memo(({ item, onHandleToken }: ItemProps) => {
         {item.isDefault ? (
           <Svg icon="lock" size={pTd(20)} iconStyle={itemStyle.addedStyle} />
         ) : (
-          <CommonSwitch
-            value={!!item.isAdded}
-            onValueChange={() => onHandleToken(item, item.isAdded ? 'delete' : 'add')}
-          />
+          <CommonSwitch value={!!item.isAdded} onChange={() => onHandleToken(item, item.isAdded ? 'delete' : 'add')} />
         )}
       </View>
     </TouchableOpacity>
@@ -69,76 +69,61 @@ Item.displayName = 'Item';
 
 const ManageTokenList: React.FC<ManageTokenListProps> = () => {
   const { t } = useLanguage();
-  const [tokenState, tokenActions] = useToken();
-  const { tokenDataShowInMarket } = tokenState;
 
   const isLoading = useIsFetchingTokenList();
-  const { fetchTokenList } = tokenActions;
+  const currentNetworkInfo = useCurrentNetworkInfo();
+  const chainList = useChainIdList();
+
+  const dispatch = useAppCommonDispatch();
+
+  const { tokenDataShowInMarket } = useAppCASelector(state => state.tokenManagement);
+
+  const [tokenList, setTokenList] = useState([]);
 
   const [keyword, setKeyword] = useState<string>('');
+  // const [tokenList, setTokenList] = useState(tokenDataShowInMarket);
 
-  const [addedTokenList, setAddedTokenList] = useState<any[]>([]);
-  const [handledList, setHandledList] = useState<any[]>([]);
-  const [filteredList, setFilteredList] = useState<any[]>([]);
+  const debounceWord = useDebounce(keyword, 500);
+
+  // useEffect(() => {
+  //   return setTokenList(tokenDataShowInMarket);
+  // }, [tokenDataShowInMarket]);
 
   useEffect(() => {
     if (tokenDataShowInMarket.length) return;
-    fetchTokenList({ pageSize: 10000, pageNo: 1 });
+    dispatch(fetchAllTokenListAsync({ keyword: debounceWord, chainIdArray: chainList }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onHandleTokenItem = useCallback(async (item: TokenItemShowType, type: 'add' | 'delete') => {
-    // TODO
+  const onHandleTokenItem = useCallback(
+    async (item: TokenItemShowType, isAdded: boolean) => {
+      // TODO
 
-    const setAccountToken = (data: any) => {
-      return true;
-    };
-
-    const data = {
-      tokenId: item?.id,
-      enable: type === 'add',
-    };
-    const result = setAccountToken(data);
-    if (result) CommonToast.success('Success');
-  }, []);
-
-  const fetchAddedList = useCallback(() => {
-    // TODO
-    const mockAddedTokenList = [
-      {
-        chainId: 'AELF',
-        id: 4,
-        name: 'STORAGE Token',
-        symbol: 'STORAGE',
-      },
-    ];
-    setAddedTokenList(mockAddedTokenList);
-  }, []);
-
-  // handle tokenList
-  useEffect(() => {
-    if (!tokenDataShowInMarket.length) return;
-    if (!addedTokenList.length) return;
-
-    const tmpList = tokenDataShowInMarket?.map(ele => {
-      return { ...ele, isAdded: !!addedTokenList.find(item => item.id === ele?.id) };
-    });
-    setHandledList(tmpList);
-    setFilteredList(tmpList);
-  }, [addedTokenList, handledList.length, tokenDataShowInMarket]);
-
-  // keyword filter list
-  useEffect(() => {
-    setFilteredList(filterTokenList(handledList, keyword));
-  }, [tokenDataShowInMarket, keyword, handledList]);
+      await request.token
+        .displayUserToken({
+          baseURL: currentNetworkInfo.apiUrl,
+          resourceUrl: `${item.userTokenId}/display`,
+          params: {
+            isDisplay: isAdded,
+          },
+        })
+        .then(res => {
+          setTimeout(() => {
+            dispatch(fetchAllTokenListAsync({ keyword: debounceWord, chainIdArray: chainList }));
+            CommonToast.success('Success');
+          }, 1000);
+        })
+        .catch(err => {
+          console.log(err);
+          CommonToast.fail('Fail');
+        });
+    },
+    [chainList, currentNetworkInfo.apiUrl, debounceWord, dispatch],
+  );
 
   useEffect(() => {
-    fetchAddedList();
-  }, [fetchAddedList]);
-
-  useEffect(() => {
-    fetchUserTokenList({ pageSize: 1000, pageNo: 1 });
-  }, []);
+    dispatch(fetchAllTokenListAsync({ keyword: debounceWord, chainIdArray: chainList }));
+  }, [chainList, debounceWord, dispatch]);
 
   return (
     <PageContainer
@@ -156,21 +141,16 @@ const ManageTokenList: React.FC<ManageTokenListProps> = () => {
           }}
         />
       </View>
-      <Button
-        onPress={() => {
-          fetchUserTokenList({ pageSize: 1000, pageNo: 1, keyword: keyword });
-        }}>
-        测试啊
-      </Button>
-
-      {!!keyword && !filteredList.length && <NoData noPic message={t('There is no search result.')} />}
+      {!!keyword && !tokenDataShowInMarket.length && <NoData noPic message={t('There is no search result.')} />}
       <FlatList
         style={pageStyles.list}
-        data={filteredList || []}
-        renderItem={({ item }) => <Item item={item} onHandleToken={onHandleTokenItem} />}
-        keyExtractor={(item: any) => item.symbol || ''}
+        data={tokenDataShowInMarket || []}
+        renderItem={({ item }: { item: TokenItemShowType }) => (
+          <Item item={item} onHandleToken={() => onHandleTokenItem(item, !item?.isAdded)} />
+        )}
+        keyExtractor={(item: TokenItemShowType) => item?.id || item?.symbol}
       />
-      {isLoading && <Dialog.Loading />}
+      {/* {isLoading && <Dialog.Loading />} */}
     </PageContainer>
   );
 };

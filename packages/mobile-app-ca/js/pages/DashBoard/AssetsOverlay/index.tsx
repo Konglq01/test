@@ -1,24 +1,24 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import OverlayModal from 'components/OverlayModal';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { TextL, TextM, TextS, TextXL } from 'components/CommonText';
+import { TextL, TextS, TextXL } from 'components/CommonText';
 import { ModalBody } from 'components/ModalBody';
 import CommonInput from 'components/CommonInput';
-import { useAppCASelector } from '@portkey/hooks/hooks-ca';
 import { AccountType } from '@portkey/types/wallet';
 import { pTd } from 'utils/unit';
 import { screenHeight } from '@portkey/utils/mobile/device';
 import { useLanguage } from 'i18n/hooks';
 import useDebounce from 'hooks/useDebounce';
-import useEffectOnce from 'hooks/useEffectOnce';
-import { fetchAssetAsync } from '@portkey/store/store-ca/assets/slice';
-import { useAppCommonDispatch } from '@portkey/hooks';
 import NoData from 'components/NoData';
 import { Image } from '@rneui/themed';
 import { defaultColors } from 'assets/theme';
 import { useWallet } from 'hooks/store';
 import TokenListItem from 'components/TokenListItem';
 import { FontStyles } from 'assets/theme/styles';
+import { useCaAddresses } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
+import { fetchAssetList } from '@portkey/store/store-ca/assets/api';
+import { IAssetItemType } from '@portkey/store/store-ca/assets/type';
 
 type onFinishSelectTokenType = (tokenItem: any) => void;
 type TokenListProps = {
@@ -26,20 +26,17 @@ type TokenListProps = {
   onFinishSelectToken?: onFinishSelectTokenType;
 };
 
-const mockUrl =
-  'https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/fotojet-5-1650369753.jpg?crop=0.498xw:0.997xh;0,0&resize=640:*';
-
 // const enum noResult {
 //   'There are currently no assets to send' = 'There are currently no assets to send',
 //   'There is no search result.' = 'There is no search result.',
 // }
 
-const AssetItem = (props: any) => {
+const AssetItem = (props: { symbol: string; onPress: (item: any) => void; item: IAssetItemType }) => {
   const { symbol, onPress, item } = props;
 
   const { currentNetwork } = useWallet();
 
-  if (item?.tokenInfo)
+  if (item.tokenInfo)
     return (
       <TokenListItem
         symbol={item.symbol}
@@ -49,63 +46,108 @@ const AssetItem = (props: any) => {
       />
     );
 
-  return (
-    <TouchableOpacity style={itemStyle.wrap} onPress={() => onPress?.(item)}>
-      {!mockUrl ? (
-        <Image style={[itemStyle.left]} source={{ uri: mockUrl }} />
-      ) : (
-        <Text style={[itemStyle.left, itemStyle.noPic]}>M</Text>
-      )}
-      {/* <CommonAvatar style={itemStyle.left} title={symbol} svgName={undefined} avatarSize={pTd(48)} /> */}
-      <View style={itemStyle.right}>
-        <View>
-          <TextL numberOfLines={1} ellipsizeMode={'tail'} style={[FontStyles.font5]}>
-            {symbol || 'Name'} {'#0271'}
-          </TextL>
+  if (item.nftInfo) {
+    return (
+      <TouchableOpacity style={itemStyle.wrap} onPress={() => onPress?.(item)}>
+        {item.nftInfo.imageUrl ? (
+          <Image style={[itemStyle.left]} source={{ uri: item.nftInfo.imageUrl }} />
+        ) : (
+          <Text style={[itemStyle.left, itemStyle.noPic]}>{item.symbol[0]}</Text>
+        )}
+        <View style={itemStyle.right}>
+          <View>
+            <TextL numberOfLines={1} ellipsizeMode={'tail'} style={[FontStyles.font5]}>
+              {`${symbol || 'Name'} #${item.nftInfo.tokenId}`}
+            </TextL>
 
-          {currentNetwork ? (
-            <TextS numberOfLines={1} style={[FontStyles.font7, itemStyle.nftItemInfo]}>
-              {item?.chainId === ' AELF' ? 'MainChain' : 'SideChain'} {item.chainId}
-            </TextS>
-          ) : (
-            <TextL style={[FontStyles.font7]}>$ 100 USD</TextL>
-          )}
-        </View>
+            {/* TODO: why use currentNetwork   */}
+            {currentNetwork ? (
+              <TextS numberOfLines={1} style={[FontStyles.font7, itemStyle.nftItemInfo]}>
+                {item?.chainId === ' AELF' ? 'MainChain' : 'SideChain'} {item.chainId}
+              </TextS>
+            ) : (
+              // TODO: price use witch one
+              <TextL style={[FontStyles.font7]}>$ 100 USD</TextL>
+            )}
+          </View>
 
-        <View style={itemStyle.balanceWrap}>
-          <TextXL style={[itemStyle.token, FontStyles.font5]}>{`2`}</TextXL>
-          <TextS style={itemStyle.dollar} />
+          {/* TODO: num of nft use witch one */}
+          <View style={itemStyle.balanceWrap}>
+            <TextXL style={[itemStyle.token, FontStyles.font5]}>{`2`}</TextXL>
+            <TextS style={itemStyle.dollar} />
+          </View>
         </View>
-      </View>
-    </TouchableOpacity>
-  );
+      </TouchableOpacity>
+    );
+  }
+  return <></>;
+};
+const MAX_RESULT_COUNT = 10;
+const INIT_PAGE_INFO = {
+  curPage: 0,
+  total: 0,
+  isLoading: false,
 };
 
 const AssetList = ({ onFinishSelectToken, account }: TokenListProps) => {
   const { t } = useLanguage();
-  const { accountAssets } = useAppCASelector(state => state.assets);
-  const dispatch = useAppCommonDispatch();
+  const caAddresses = useCaAddresses();
+  const currentNetworkInfo = useCurrentNetworkInfo();
+  const [keyword, setKeywork] = useState('');
 
-  const [listShow, setListShow] = useState<any[]>([]);
+  const debounceKeyword = useDebounce(keyword, 800);
 
-  const [filterListInfo, setFilterListInfo] = useState({
-    pageSize: 10,
-    pageNum: 1,
-    keyword: '',
-    list: [],
-    total: 0,
-    isLoading: false,
+  const [listShow, setListShow] = useState<IAssetItemType[]>([]);
+  const pageInfoRef = useRef({
+    ...INIT_PAGE_INFO,
   });
 
-  const debounceKeyword = useDebounce(filterListInfo.keyword, 800);
+  const getList = useCallback(
+    async (_keyword = '', isInit = false) => {
+      if (!isInit && listShow.length > 0 && listShow.length >= pageInfoRef.current.total) return;
+      if (pageInfoRef.current.isLoading) return;
+      pageInfoRef.current.isLoading = true;
+      try {
+        const response = await fetchAssetList({
+          caAddresses,
+          maxResultCount: MAX_RESULT_COUNT,
+          skipCount: pageInfoRef.current.curPage * MAX_RESULT_COUNT,
+          keyword: _keyword,
+        });
+        pageInfoRef.current.curPage = pageInfoRef.current.curPage + 1;
+        pageInfoRef.current.total = response.totalRecordCount;
+        console.log('fetchAccountAssetsByKeywords:', response);
+        if (isInit) {
+          setListShow(response.data);
+        } else {
+          setListShow(pre => pre.concat(response.data));
+        }
+      } catch (err) {
+        // TODO: should show err?
+        console.log('fetchAccountAssetsByKeywords err:', err);
+      }
+      pageInfoRef.current.isLoading = false;
+    },
+    [caAddresses, listShow.length],
+  );
+
+  useEffect(() => {
+    onKeywordChange();
+  }, [debounceKeyword, onKeywordChange]);
+
+  const onKeywordChange = useCallback(() => {
+    pageInfoRef.current = {
+      ...INIT_PAGE_INFO,
+    };
+    getList(keyword, true);
+  }, [getList, keyword]);
 
   const renderItem = useCallback(
-    ({ item }: { item: any }) => {
+    ({ item }: { item: IAssetItemType }) => {
       return (
         <AssetItem
-          key={item.id}
-          symbol={item.symbol}
-          icon={'aelf-avatar'}
+          symbol={item.symbol || ''}
+          // icon={'aelf-avatar'}
           item={item}
           onPress={() => {
             OverlayModal.hide();
@@ -117,45 +159,22 @@ const AssetList = ({ onFinishSelectToken, account }: TokenListProps) => {
     [onFinishSelectToken],
   );
 
-  useEffect(() => {
-    // return setListShow(filterTokenList(list, keyword));
-    console.log('change words');
-  }, [debounceKeyword]);
-
-  useEffect(() => {
-    console.log('accountAssetsListaccountAssetsListaccountAssetsList', accountAssets);
-
-    setListShow(accountAssets.accountAssetsList);
-  }, [accountAssets.accountAssetsList]);
-
-  useEffectOnce(() => {
-    if (accountAssets.accountAssetsList.length !== 0) return;
-    dispatch(fetchAssetAsync({ type: 'MAIN' }));
-  });
-
   return (
     <ModalBody modalBodyType="bottom" style={styles.modalStyle}>
       <TextXL style={[styles.title, FontStyles.font5]}>{t('Select Assets')}</TextXL>
 
       {/* no assets in this accout  */}
       {/* '{ import { list } from 'pages/SettingsPage/HelpAndFeedBack/config';' has been removed } */}
-      {filterListInfo?.list?.length ? (
-        <NoData noPic message={t('There are currently no assets to send')} />
-      ) : (
-        <CommonInput
-          placeholder={t('Search Assets')}
-          containerStyle={styles.containerStyle}
-          inputContainerStyle={styles.inputContainerStyle}
-          inputStyle={styles.inputStyle}
-          value={filterListInfo.keyword}
-          onChangeText={v => {
-            setFilterListInfo({
-              ...filterListInfo,
-              keyword: v.trim(),
-            });
-          }}
-        />
-      )}
+      <CommonInput
+        placeholder={t('Search Assets')}
+        containerStyle={styles.containerStyle}
+        inputContainerStyle={styles.inputContainerStyle}
+        inputStyle={styles.inputStyle}
+        value={keyword}
+        onChangeText={v => {
+          setKeywork(v.trim());
+        }}
+      />
 
       {listShow.length === 0 ? (
         <NoData noPic message={t('There are currently no assets to send.')} />
@@ -164,7 +183,10 @@ const AssetList = ({ onFinishSelectToken, account }: TokenListProps) => {
           style={styles.flatList}
           data={listShow || []}
           renderItem={renderItem}
-          keyExtractor={(item: any) => item.id || ''}
+          keyExtractor={(_item, index) => `${index}`}
+          onEndReached={() => {
+            getList();
+          }}
         />
       )}
     </ModalBody>

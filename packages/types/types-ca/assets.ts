@@ -1,35 +1,32 @@
-export type NFTSeriesBaseItemType = {
-  id?: string;
-  symbol: string;
-  nftType: string;
+// nft collection types
+export type NFTCollectionItemBaseType = {
   chainId: string;
-  protocolName: string;
+  collectionName: string;
+  imageUrl: string;
   itemCount: number;
+  symbol: string;
+  decimals: number; // 0
+};
 
-  nftTokenId: string;
-  tokenHash: string;
-  amount: string;
+export interface NFTCollectionItemShowType extends NFTCollectionItemBaseType {
   isFetching: boolean;
   skipCount: number;
   maxResultCount: number;
   totalRecordCount: string | number;
-  children?: NFTBaseItemType[];
-};
+  children: NFTItemBaseType[];
+}
 
-export type NFTBaseItemType = {
+// nft item types
+export type NFTItemBaseType = {
   chainId: string;
+  symbol: string;
   tokenId: string;
   alias: string;
   quantity: string;
   imageUrl: string;
-
-  symbol: string;
-  nftType: string;
-  totalSupply: string;
-  baseUri: string;
-  totalRecordCount: string | number;
 };
 
+// assets types
 export type AssetsItemType = {
   chainId: string;
   symbol: string;

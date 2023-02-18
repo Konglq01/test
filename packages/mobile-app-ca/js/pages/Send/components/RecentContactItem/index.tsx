@@ -13,7 +13,7 @@ import { formatStr2EllipsisStr } from 'utils';
 import { pTd } from 'utils/unit';
 
 export interface ItemType {
-  contact: ContactItemType | RecentContactItemType;
+  contact: RecentContactItemType;
   onPress?: (item: any) => void;
 }
 
@@ -44,7 +44,7 @@ const RecentContactItem: React.FC<ItemType> = props => {
                 onPress?.({ address: contact.addresses?.[0].address, name: contact.name });
               }}>
               <Text style={[styles.address, Math.random() > 0.5 && FontStyles.font7]}>
-                {formatStr2EllipsisStr(ele?.address, 10)}
+                {formatStr2EllipsisStr(`ELF_${ele?.address}_${ele.chainId}`, 10)}
               </Text>
               {/* TODO */}
               <Text style={[styles.address, Math.random() > 0.5 && FontStyles.font7]}>
@@ -64,10 +64,12 @@ const RecentContactItem: React.FC<ItemType> = props => {
       onPress={() => {
         onPress?.({ address: contact.addresses?.[0].address, name: '' });
       }}>
-      <TextS style={styles.address1}>{formatStr2EllipsisStr(contact.addresses?.[0].address, 10)}</TextS>
-      <Text style={styles.chainInfo1}>{`${contact?.id === 'AELF' ? 'MainChain' : 'SideChain'} ${contact?.id} ${
-        currentNetwork === 'TESTNET' && 'Testnet'
-      }`}</Text>
+      <TextS style={styles.address1}>
+        {formatStr2EllipsisStr(`ELF_${contact.addresses?.[0].address}_${contact.addressChainId}`, 10)}
+      </TextS>
+      <Text style={styles.chainInfo1}>{`${contact?.addressChainId === 'AELF' ? 'MainChain' : 'SideChain'} ${
+        contact?.addressChainId
+      } ${currentNetwork === 'TESTNET' && 'Testnet'}`}</Text>
     </TouchableOpacity>
   );
 };

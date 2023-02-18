@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { defaultColors } from 'assets/theme';
 import navigationService from 'utils/navigationService';
@@ -9,61 +9,72 @@ import NFTAvatar from 'components/NFTAvatar';
 import GStyles from 'assets/theme/GStyles';
 import CommonAvatar from 'components/CommonAvatar';
 import Svg from 'components/Svg';
-import { TextM, TextXL } from 'components/CommonText';
+import { TextM, TextS, TextXL } from 'components/CommonText';
 import { FontStyles } from 'assets/theme/styles';
 import { useWallet } from 'hooks/store';
+import { NFTCollectionItemShowType } from '@portkey/types/types-ca/assets';
 
 export enum NoDataMessage {
   CustomNetWorkNoData = 'No transaction records accessible from the current custom network',
   CommonNoData = 'You have no transactions',
 }
 
-export type NFTItemType = {
-  data: any;
+export type NFTItemPropsType = NFTCollectionItemShowType & {
   collapsed?: boolean;
   currentNFT?: any;
   setCurrentNFT?: any;
-  loadMoreItem?: (id: string) => void;
+  loadMoreItem?: () => void;
 };
 
-export default function NFTItem(props: NFTItemType) {
-  const { collapsed = false, data, currentNFT, setCurrentNFT, loadMoreItem } = props;
+export default function NFTItem(props: NFTItemPropsType) {
+  const {
+    chainId,
+    collectionName,
+    imageUrl,
+    itemCount,
+    children,
+    symbol,
+    collapsed = false,
+    currentNFT,
+    setCurrentNFT,
+    loadMoreItem,
+  } = props;
   const { currentNetwork } = useWallet();
 
   const { t } = useLanguage();
 
-  console.log(data?.nftInfo?.nftProtocolInfo);
-
-  console.log('22222', collapsed, currentNFT, data?.name);
-  const setResult = data?.name === currentNFT ? '' : data?.name;
-  console.log('setResult', setResult);
+  const setResult = symbol === currentNFT ? '' : symbol;
+  console.log('setResult', props, setResult);
 
   return (
     <View style={styles.wrap}>
       <TouchableOpacity
         style={styles.topSeries}
-        onPress={() => setCurrentNFT(data?.name === currentNFT ? '' : data?.name)}>
+        onPress={() => {
+          setCurrentNFT(symbol === currentNFT ? '' : symbol);
+          loadMoreItem?.();
+        }}>
         <Svg
           icon={collapsed ? 'right-arrow' : 'down-arrow'}
           size={pTd(16)}
           color={defaultColors.font3}
           iconStyle={styles.touchIcon}
         />
-        <CommonAvatar title={data?.name} shapeType={'square'} style={styles.avatarStyle} />
+        <CommonAvatar imageUrl={imageUrl} title={collectionName} shapeType={'square'} style={styles.avatarStyle} />
         <View style={styles.topSeriesCenter}>
-          <TextXL style={styles.nftSeriesName}>{data?.name}</TextXL>
-          <TextM style={styles.nftSeriesChainInfo}>
-            {data?.chainId} {currentNetwork !== 'MAIN' && 'Testnet'}
-          </TextM>
+          <TextXL style={styles.nftSeriesName}>{collectionName}</TextXL>
+          <TextS style={styles.nftSeriesChainInfo}>
+            {`${chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${chainId} ${currentNetwork !== 'MAIN' && 'Testnet'}`}
+          </TextS>
         </View>
         <View>
-          <TextXL style={styles.nftSeriesName}>{4}</TextXL>
+          <TextXL style={styles.nftSeriesName}>{itemCount}</TextXL>
           <TextM style={styles.nftSeriesChainInfo} />
         </View>
       </TouchableOpacity>
       <Collapsible collapsed={collapsed}>
         <View style={styles.listWrap}>
-          {data?.nftInfo?.nftProtocolInfo?.map((ele: any, index: number) => (
+          {children?.map((ele: any, index: number) => (
             <NFTAvatar
               style={[styles.itemAvatarStyle, index % 3 === 2 ? styles.noMarginRight : {}]}
               key={ele.symbol}
@@ -74,10 +85,12 @@ export default function NFTItem(props: NFTItemType) {
             />
           ))}
         </View>
-        <TouchableOpacity style={styles.loadMore} onPress={() => loadMoreItem?.(data.name)}>
-          <TextM style={FontStyles.font4}>More</TextM>
-          <Svg icon="down-arrow" size={pTd(16)} color={defaultColors.primaryColor} iconStyle={styles.downArrow} />
-        </TouchableOpacity>
+        {children.length === 0 && (
+          <TouchableOpacity style={styles.loadMore} onPress={() => loadMoreItem?.()}>
+            <TextM style={FontStyles.font4}>More</TextM>
+            <Svg icon="down-arrow" size={pTd(16)} color={defaultColors.primaryColor} iconStyle={styles.downArrow} />
+          </TouchableOpacity>
+        )}
       </Collapsible>
       <View style={styles.divider} />
     </View>

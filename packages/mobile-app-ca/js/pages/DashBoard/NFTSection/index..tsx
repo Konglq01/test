@@ -1,106 +1,43 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, memo } from 'react';
 import NoData from 'components/NoData';
 import { StyleSheet, View, FlatList } from 'react-native';
 import { defaultColors } from 'assets/theme';
 import { useLanguage } from 'i18n/hooks';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { pTd } from 'utils/unit';
-import NFTItem from './NFTItem';
+import NFTCollectionItem from './NFTCollectionItem';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { useCaAddresses, useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
-import { fetchNFTSeriesAsync } from '@portkey/store/store-ca/assets/slice';
+import { fetchNFTAsync, fetchNFTCollectionsAsync } from '@portkey/store/store-ca/assets/slice';
 import { useAppCommonDispatch } from '@portkey/hooks';
-
-const mockData = {
-  // items: [
-  //   {
-  //     chainId: 'AELF',
-  //     name: 'Mini Kove',
-  //     amount: '1000',
-  //     nftInfo: {
-  //       nftTokenId: '#1001',
-  //       tokenHash: 'xxxxx',
-  //       count: 50,
-  //       nftProtocolInfo: Array(50)
-  //         .fill('')
-  //         .map(ele => ({
-  //           symbol: 'Mini Kove' + Math.random(),
-  //           nftType: 'Type',
-  //           totalSupply: '1000',
-  //           baseUri: 'baseUri',
-  //         })),
-  //       // [
-  //       //   {
-  //       //     symbol: 'Mini Kove',
-  //       //     nftType: 'Type',
-  //       //     totalSupply: '1000',
-  //       //     baseUri: 'baseUri',
-  //       //   },
-  //       //   {
-  //       //     symbol: 'Mini Kove1',
-  //       //     nftType: 'Type',
-  //       //     totalSupply: '1000',
-  //       //     baseUri: 'baseUri',
-  //       //   },
-  //       //   {
-  //       //     symbol: 'Mini Kove2',
-  //       //     nftType: 'Type',
-  //       //     totalSupply: '1000',
-  //       //     baseUri: 'baseUri',
-  //       //   },
-  //       //   {
-  //       //     symbol: 'Mini Kove3',
-  //       //     nftType: 'Type',
-  //       //     totalSupply: '1000',
-  //       //     baseUri: 'baseUri',
-  //       //   },
-  //       // ],
-  //     },
-  //   },
-  //   {
-  //     chainId: 'tDVV',
-  //     name: 'Mini Kove1',
-  //     amount: '1000',
-  //     nftInfo: {
-  //       nftTokenId: '#1002',
-  //       tokenHash: 'xxxxx',
-  //       count: 100,
-  //       nftProtocolInfo: [
-  //         {
-  //           symbol: 'Mini Kove',
-  //           nftType: 'Type',
-  //           totalSupply: '1000',
-  //           baseUri: 'baseUri',
-  //         },
-  //         {
-  //           symbol: 'Mini Kove1',
-  //           nftType: 'Type',
-  //           totalSupply: '1000',
-  //           baseUri: 'baseUri',
-  //         },
-  //         {
-  //           symbol: 'Mini Kove3',
-  //           nftType: 'Type',
-  //           totalSupply: '1000',
-  //           baseUri: 'baseUri',
-  //         },
-  //         {
-  //           symbol: 'Mini Kove4',
-  //           nftType: 'Type',
-  //           totalSupply: '1000',
-  //           baseUri: 'baseUri',
-  //         },
-  //       ],
-  //     },
-  //   },
-  // ],
-  item: [],
-  totalCount: 0,
-};
+import { useAppCASelector } from '@portkey/hooks';
+import { NFTCollectionItemShowType } from '@portkey/types/types-ca/assets';
 
 type NFTSectionPropsType = {
   getAccountBalance?: () => void;
 };
+
+type NFTCollectionProps = NFTCollectionItemShowType & {
+  isCollapsed: boolean;
+  currentNFT: string;
+  setCurrentNFT: any;
+  loadMoreItem: () => void;
+};
+
+function areEqual(prevProps: NFTCollectionProps, nextProps: NFTCollectionProps) {
+  return false;
+  // eslint-disable-next-line no-self-compare
+  return nextProps.isCollapsed === prevProps.isCollapsed;
+}
+
+const NFTCollection: React.FC<NFTCollectionProps> = memo((props: NFTCollectionProps) => {
+  const { symbol, isCollapsed } = props;
+  const dispatch = useAppCommonDispatch();
+
+  return <NFTCollectionItem key={symbol} collapsed={isCollapsed} {...props} />;
+}, areEqual);
+
+NFTCollection.displayName = 'NFTCollection';
 
 export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
   const { t } = useLanguage();
@@ -109,15 +46,20 @@ export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
   const currentNetworkInfo = useCurrentNetworkInfo();
 
   const caAddresses = useCaAddresses();
+
   const dispatch = useAppCommonDispatch();
+  const {
+    accountNFT: { accountNFTList, skipCount, totalRecordCount },
+  } = useAppCASelector(state => state.assets);
+
+  console.log('[[[[[[[accountNFTList', accountNFTList);
 
   const [refreshing, setRefreshing] = useState(false);
   const [NFTList, setNFTList] = useState<any[]>([]);
-  const [NFTNum, setNFTNum] = useState(0);
 
   const fetchNFTList = useCallback(() => {
     const timer: any = setTimeout(() => {
-      dispatch(fetchNFTSeriesAsync({ caAddresses, skipCount: 0, maxResultCount: 100 }));
+      dispatch(fetchNFTCollectionsAsync({ caAddresses }));
       // setNFTList(result?.items ?? []);
       // setNFTNum(result.totalCount ?? 0);
       // setRefreshing(false);
@@ -129,40 +71,37 @@ export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
     fetchNFTList();
   });
 
-  const renderItem = useCallback(
-    ({ item }: { item: any }) => {
-      return (
-        <NFTItem
-          key={item?.name}
-          data={item}
-          collapsed={item?.name !== currentNFT}
-          currentNFT={currentNFT}
-          setCurrentNFT={setCurrentNFT}
-          loadMoreItem={(id: string) => {
-            console.log(`current series id ${id} `);
-          }}
-        />
-      );
-    },
-    [currentNFT],
-  );
+  if (totalRecordCount === 0) return <NoData type="top" message={t('No NFTs yet ')} />;
 
-  if (NFTNum === 0) return <NoData type="top" message={t('No NFTs yet ')} />;
+  console.log('accountNFTList<<<<<', accountNFTList);
 
   return (
     <View style={styles.wrap}>
       <FlatList
         refreshing={refreshing}
-        data={NFTList || []}
-        renderItem={renderItem}
-        keyExtractor={(item: any) => item?.nftInfo?.nftTokenId || ''}
+        data={accountNFTList || []}
+        renderItem={({ item }: { item: NFTCollectionItemShowType }) => (
+          <NFTCollection
+            key={item.symbol}
+            isCollapsed={item.symbol !== currentNFT}
+            currentNFT={currentNFT}
+            setCurrentNFT={setCurrentNFT}
+            loadMoreItem={() => {
+              console.log('item symbol', item.symbol);
+              dispatch(fetchNFTAsync({ caAddresses, symbol: item.symbol }));
+            }}
+            {...item}
+          />
+        )}
+        keyExtractor={(item: NFTCollectionItemShowType) => item?.symbol + item.chainId}
         onRefresh={() => {
           setRefreshing(true);
           getAccountBalance?.();
           fetchNFTList();
         }}
         onEndReached={() => {
-          console.log('load more series');
+          if (accountNFTList.length >= totalRecordCount) return;
+          dispatch(fetchNFTCollectionsAsync({ caAddresses }));
         }}
       />
     </View>

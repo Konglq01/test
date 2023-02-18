@@ -7,11 +7,11 @@ import InternalMessage from 'messages/InternalMessage';
 import InternalMessageTypes from 'messages/InternalMessageTypes';
 import { ReactNode, useCallback, useState } from 'react';
 import { getLocalStorage } from 'utils/storage/chromeStorage';
-import getPrivateKeyAndMnemonic from 'utils/Wallet/getPrivateKeyAndMnemonic';
 import { setPasswordSeed } from 'store/reducers/user/slice';
 import { useDispatch } from 'react-redux';
 import './index.less';
 import { useTranslation } from 'react-i18next';
+import aes from '@portkey/utils/aes';
 
 interface LockPageProps extends FormProps {
   onUnLockHandler?: (pwd: string) => void;
@@ -38,21 +38,13 @@ export default function LockPage({ header, onUnLockHandler, ...props }: LockPage
       }
       if (!walletInfo) return message.error(WalletError.noCreateWallet);
 
-      try {
-        const result = await getPrivateKeyAndMnemonic(
-          {
-            AESEncryptMnemonic: walletInfo?.AESEncryptMnemonic,
-            AESEncryptPrivateKey: walletInfo?.AESEncryptPrivateKey,
-          },
-          password,
-        );
-        if (result) {
-          setIsPassword(1);
-          dispatch(setPasswordSeed(password));
-          await InternalMessage.payload(InternalMessageTypes.SET_SEED, password).send();
-          onUnLockHandler?.(password);
-        }
-      } catch (error: any) {
+      const privateKey = aes.decrypt(walletInfo.AESEncryptPrivateKey, password);
+      if (privateKey) {
+        setIsPassword(1);
+        dispatch(setPasswordSeed(password));
+        InternalMessage.payload(InternalMessageTypes.SET_SEED, password).send();
+        onUnLockHandler?.(password);
+      } else {
         setIsPassword(0);
       }
     },

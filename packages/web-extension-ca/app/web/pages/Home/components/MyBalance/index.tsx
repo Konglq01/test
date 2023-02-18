@@ -11,7 +11,7 @@ import { Transaction } from '@portkey/types/types-ca/trade';
 import NFT from '../NFT/NFT';
 import { unitConverter } from '@portkey/utils/converter';
 import { useAppDispatch, useUserInfo, useWalletInfo, useAssetInfo, useTokenInfo } from 'store/Provider/hooks';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { useCaAddresses, useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { fetchAssetAsync, fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
 import { fetchAllTokenListAsync } from '@portkey/store/store-ca/tokenManagement/action';
 import { TokenItemShowType } from '@portkey/types/types-eoa/token';
@@ -24,7 +24,7 @@ export interface TransactionResult {
 let timer: any;
 
 export default function MyBalance() {
-  const { walletName, currentNetwork } = useWalletInfo();
+  const { walletName, currentNetwork, walletInfo } = useWalletInfo();
   const { t } = useTranslation();
   const [balanceUSD, setBalanceUSD] = useState<string | number>('--');
   const [activeKey, setActiveKey] = useState<string>('assets');
@@ -36,22 +36,24 @@ export default function MyBalance() {
   const navigate = useNavigate();
   const { passwordSeed } = useUserInfo();
   const appDispatch = useAppDispatch();
-  const {
-    walletInfo: { caAddressList = [] },
-  } = useCurrentWallet();
+  const caAddresses = useCaAddresses();
+  const chainIdArray = useMemo(
+    () => Object.keys(walletInfo?.caInfo?.TESTNET || {}).filter((item) => item !== 'managerInfo'),
+    [walletInfo?.caInfo?.TESTNET],
+  );
 
   useEffect(() => {
     console.log('---passwordSeed-myBalance---', passwordSeed);
     passwordSeed &&
       appDispatch(
         fetchAssetAsync({
-          caAddresses: caAddressList,
-          keyWord: '',
+          caAddresses,
+          keyword: '',
         }),
       );
-    passwordSeed && appDispatch(fetchTokenListAsync({ caAddresses: caAddressList }));
-    passwordSeed && appDispatch(fetchAllTokenListAsync({}));
-  }, [passwordSeed, appDispatch, caAddressList]);
+    passwordSeed && appDispatch(fetchTokenListAsync({ caAddresses }));
+    passwordSeed && appDispatch(fetchAllTokenListAsync({ keyword: '', chainIdArray }));
+  }, [passwordSeed, appDispatch, caAddresses, chainIdArray]);
 
   useEffect(() => {
     let tmpAllBalanceUsd = 0;
@@ -78,9 +80,9 @@ export default function MyBalance() {
           setTokenOpen(false);
           // navigate(`/${navTarget}/${v.token.symbol}`);
           if (navTarget === 'receive') {
-            navigate(`/${navTarget}/${v.symbol}/${v.chainId}`);
+            navigate(`/${navTarget}/${type}/${v.symbol}/${v.chainId}`, { state: v });
           } else {
-            navigate(`/${navTarget}/${v.symbol}`, { state: type });
+            navigate(`/${navTarget}/${type}/${v.symbol}/${v.chainId}`, { state: type });
           }
         }}
       />

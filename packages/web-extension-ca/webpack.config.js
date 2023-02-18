@@ -1,17 +1,10 @@
-/**
- * @file
- * @author huangzongzhe
- */
 /* eslint-disable */
-const webpack = require('webpack'); // 用于访问内置插件
+const webpack = require('webpack');
 const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin'); // 通过 npm 安装
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
-
-// TODO ^1.1.9 MV3 is not supported yet
-// const ExtReloader = require('webpack-ext-reloader');
 
 const ROOT = path.resolve(__dirname, './');
 const { version } = require(path.resolve(ROOT, 'package.json'));
@@ -116,7 +109,7 @@ let config = {
         ],
       },
       {
-        test: /\.(png|svg|jpg|gif|ico)$/,
+        test: /\.(png|svg|jpg|gif|ico|ttf)$/,
         use: [
           {
             loader: 'file-loader',
