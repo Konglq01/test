@@ -19,7 +19,6 @@ import {
   setPreGuardianAction,
 } from '@portkey/store/store-ca/guardians/actions';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
-import getPrivateKeyAndMnemonic from 'utils/Wallet/getPrivateKeyAndMnemonic';
 import { GuardianMth } from 'types/guardians';
 import { sleep } from '@portkey/utils';
 import { getAelfInstance } from '@portkey/utils/aelf';
@@ -31,6 +30,7 @@ import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
 import useGuardianList from 'hooks/useGuardianList';
 import { verification } from 'utils/api';
+import aes from '@portkey/utils/aes';
 
 enum SwitchFail {
   default = 0,
@@ -55,24 +55,19 @@ export default function GuardiansView() {
 
   useEffect(() => {
     getGuardianList({ caHash: walletInfo.caHash });
-  }, []);
+  }, [getGuardianList, walletInfo.caHash]);
 
   const verifyHandler = useCallback(async () => {
     try {
       if (opGuardian?.isLoginAccount) {
-        const res = await getPrivateKeyAndMnemonic(
-          {
-            AESEncryptPrivateKey: walletInfo.AESEncryptPrivateKey,
-          },
-          passwordSeed,
-        );
-        if (!currentChain?.endPoint || !res?.privateKey) return message.error('unset login account error');
+        const privateKey = aes.decrypt(walletInfo.AESEncryptPrivateKey, passwordSeed);
+        if (!currentChain?.endPoint || !privateKey) return message.error('unset login account error');
         setLoading(true);
         const result = await handleGuardian({
           rpcUrl: currentChain.endPoint,
           chainType: currentNetwork.walletType,
           address: currentChain.caContractAddress,
-          privateKey: res.privateKey,
+          privateKey: privateKey,
           paramsOption: {
             method: GuardianMth.UnsetGuardianTypeForLogin,
             params: [

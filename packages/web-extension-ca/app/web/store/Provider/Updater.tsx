@@ -9,6 +9,7 @@ import { useRefreshTokenConfig } from '@portkey/hooks/hooks-ca/api';
 import { useUserInfo } from './hooks';
 import { request } from '@portkey/api/api-did';
 import useLocking from 'hooks/useLocking';
+import { useNavigate } from 'react-router';
 
 export default function Updater() {
   const onLocking = useLocking();
@@ -18,9 +19,11 @@ export default function Updater() {
   useUpdateRedux();
   useChainListFetch();
   useRefreshTokenConfig(passwordSeed);
+
+  const navigate = useNavigate();
   useEffect(() => {
-    keepAliveOnPages();
-  }, []);
+    keepAliveOnPages({ onError: () => navigate('/unlock') });
+  }, [navigate]);
 
   const apiUrl = useCurrentApiUrl();
 

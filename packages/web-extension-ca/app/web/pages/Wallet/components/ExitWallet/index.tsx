@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import CommonModal from 'components/CommonModal';
 import './index.less';
 import { useCurrentWallet, useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
-import getPrivateKeyAndMnemonic from 'utils/Wallet/getPrivateKeyAndMnemonic';
 import { useLoading, useUserInfo } from 'store/Provider/hooks';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { removeManager } from 'utils/sandboxUtil/removeManager';
@@ -16,6 +15,7 @@ import { clearLocalStorage } from 'utils/storage/chromeStorage';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
 import useLogOut from 'hooks/useLogout';
 import { DEVICE_TYPE } from 'constants/index';
+import aes from '@portkey/utils/aes';
 
 interface ExitWalletProps {
   open: boolean;
@@ -34,19 +34,15 @@ export default function ExitWallet({ open, onCancel }: ExitWalletProps) {
 
   const onConfirm = useCallback(async () => {
     try {
-      const res = await getPrivateKeyAndMnemonic(
-        {
-          AESEncryptPrivateKey: walletInfo.AESEncryptPrivateKey,
-        },
-        passwordSeed,
-      );
-      if (!currentChain?.endPoint || !res?.privateKey) return message.error('error');
+      if (!passwordSeed) throw 'Missing pin';
+      const privateKey = aes.decrypt(walletInfo.AESEncryptPrivateKey, passwordSeed);
+      if (!currentChain?.endPoint || !privateKey) return message.error('error');
       setLoading(true);
       const result = await removeManager({
         rpcUrl: currentChain.endPoint,
         chainType: currentNetwork.walletType,
         address: currentChain.caContractAddress,
-        privateKey: res.privateKey,
+        privateKey,
         paramsOption: {
           caHash: wallet?.caHash as string,
           manager: {
@@ -55,6 +51,7 @@ export default function ExitWallet({ open, onCancel }: ExitWalletProps) {
           },
         },
       });
+      console.log('removeManager', 'removeManager==result');
       const { TransactionId } = result.result.message || result;
       await sleep(1000);
       const aelfInstance = getAelfInstance(currentChain.endPoint);
@@ -66,7 +63,6 @@ export default function ExitWallet({ open, onCancel }: ExitWalletProps) {
       setLoading(false);
       const _error = contractErrorHandler(error) || 'Something error';
       message.error(_error);
-      console.log('---exist wallet error', error);
     }
   }, [
     currentChain,
