@@ -15,18 +15,23 @@ export const intervalCrossChainTransfer = async (params: CrossChainTransferInter
   const issueChainId = getChainIdByAddress(managerAddress, chainType);
   const toChainId = getChainIdByAddress(toAddress, chainType);
 
+  console.log('intervalCrossChainTransferAmount', amount);
+  const paramsOption: any = {
+    issueChainId: getChainNumber(issueChainId),
+    toChainId: getChainNumber(toChainId),
+    symbol: tokenInfo.symbol,
+    to: toAddress,
+    amount,
+  };
+  if (memo) paramsOption.memo = memo;
+
   try {
     const crossChainResult = await crossChainTransferToCa({
       contract: tokenContract,
-      paramsOption: {
-        issueChainId: getChainNumber(issueChainId),
-        toChainId: getChainNumber(toChainId),
-        symbol: tokenInfo.symbol,
-        to: toAddress,
-        amount,
-        memo,
-      },
+      paramsOption,
     });
+
+    console.log('intervalCrossChainTransferResult', crossChainResult);
 
     if (crossChainResult.error) throw crossChainResult.error;
   } catch (error) {
@@ -62,6 +67,9 @@ const crossChainTransfer = async ({
   let managerTransferResult;
   try {
     // first transaction:transfer to manager itself
+
+    console.log('first transaction:transfer to manager itself Amount', amount);
+
     managerTransferResult = await managerTransfer({
       contract,
       paramsOption: {
