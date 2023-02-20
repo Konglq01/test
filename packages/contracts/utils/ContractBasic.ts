@@ -85,8 +85,6 @@ export class AElfContractBasic {
       });
       const req = await this.aelfContract[_functionName](_params);
 
-      console.log('reqreqreq', req);
-
       const { TransactionId } = req?.result || req;
       if (req?.error) return { error: handleContractError(undefined, req), transactionId: TransactionId };
 
