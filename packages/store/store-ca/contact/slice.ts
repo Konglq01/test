@@ -7,7 +7,12 @@ import {
   deleteContactAction,
   resetContactAction,
 } from './actions';
-import { executeEventToContactIndexList, sortContactIndexList, transIndexesToContactMap } from './utils';
+import {
+  executeEventToContactIndexList,
+  getInitContactIndexList,
+  sortContactIndexList,
+  transIndexesToContactMap,
+} from './utils';
 
 export interface ContactState {
   lastModified: number;
@@ -17,7 +22,7 @@ export interface ContactState {
 
 export const initialState: ContactState = {
   lastModified: 0,
-  contactIndexList: [],
+  contactIndexList: getInitContactIndexList(),
   contactMap: {},
 };
 
@@ -42,6 +47,9 @@ export const contactSlice = createSlice({
           state.lastModified = lastModified;
         }
 
+        if (state.contactIndexList.length === 0) {
+          state.contactIndexList = getInitContactIndexList();
+        }
         state.contactMap = transIndexesToContactMap(state.contactIndexList);
       })
       .addCase(fetchContactListAsync.rejected, (state, action) => {
@@ -63,7 +71,7 @@ export const contactSlice = createSlice({
         state.contactIndexList = sortContactIndexList(_contactIndexList);
       })
       .addCase(resetContactAction, state => {
-        state.contactIndexList = [];
+        state.contactIndexList = getInitContactIndexList();
         state.contactMap = {};
         state.lastModified = 0;
       });
