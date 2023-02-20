@@ -16,7 +16,7 @@ import { Text } from 'react-native-svg';
 import { TextS } from 'components/CommonText';
 import { useAppCASelector, useAppCommonDispatch, useAppCommonSelector } from '@portkey/hooks';
 import useEffectOnce from 'hooks/useEffectOnce';
-import { fetchContractListAsync } from '@portkey/store/store-ca/contact/actions';
+import { fetchContactListAsync } from '@portkey/store/store-ca/contact/actions';
 import { request } from '@portkey/api/api-did';
 import { useContact } from '@portkey/hooks/hooks-ca/contact';
 import { isLoading } from 'expo-font';
@@ -54,7 +54,7 @@ export default function SelectContact(props: SelectContactProps) {
   // const debouncedKeyword = useDebounce(keyword, 500);
 
   useEffectOnce(() => {
-    dispatch(fetchContractListAsync());
+    dispatch(fetchContactListAsync());
   });
 
   const renderItem = useCallback(

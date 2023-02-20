@@ -4,7 +4,7 @@ import { useNavigate, useLocation, useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import BackHeader from 'components/BackHeader';
 import { ContactItemType, AddressItem } from '@portkey/types/types-ca/contact';
-import { fetchContractListAsync } from '@portkey/store/store-ca/contact/actions';
+import { fetchContactListAsync } from '@portkey/store/store-ca/contact/actions';
 import { useAppDispatch } from 'store/Provider/hooks';
 import CustomSvg from 'components/CustomSvg';
 import NetworkDrawer from '../NetworkDrawer';
@@ -201,7 +201,7 @@ export default function EditContact() {
           } else {
             await addContactApi({ name, addresses });
           }
-          appDispatch(fetchContractListAsync());
+          appDispatch(fetchContactListAsync());
           navigate('/setting/contacts');
           message.success(isEdit ? 'Edit Contact successful' : 'Add Contact successful');
         }

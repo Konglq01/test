@@ -1,6 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { ContactIndexType, ContactMapType } from '@portkey/types/types-ca/contact';
-import { fetchContractListAsync, addContractAction, editContractAction, deleteContractAction } from './actions';
+import {
+  fetchContactListAsync,
+  addContactAction,
+  editContactAction,
+  deleteContactAction,
+  resetContactAction,
+} from './actions';
 import { executeEventToContactIndexList, sortContactIndexList, transIndexesToContactMap } from './utils';
 
 export interface ContactState {
@@ -22,7 +28,7 @@ export const contactSlice = createSlice({
   extraReducers: builder => {
     builder
       // getContactList
-      .addCase(fetchContractListAsync.fulfilled, (state, action) => {
+      .addCase(fetchContactListAsync.fulfilled, (state, action) => {
         const { isInit, lastModified, contactIndexList, eventList } = action.payload;
         if (isInit && contactIndexList !== undefined) {
           state.contactIndexList = sortContactIndexList(contactIndexList);
@@ -38,23 +44,28 @@ export const contactSlice = createSlice({
 
         state.contactMap = transIndexesToContactMap(state.contactIndexList);
       })
-      .addCase(fetchContractListAsync.rejected, (state, action) => {
-        console.log('fetchContractListAsync.rejected: error', action.error.message);
+      .addCase(fetchContactListAsync.rejected, (state, action) => {
+        console.log('fetchContactListAsync.rejected: error', action.error.message);
       })
-      .addCase(addContractAction, (state, action) => {
+      .addCase(addContactAction, (state, action) => {
         let _contactIndexList = [...state.contactIndexList];
         _contactIndexList = executeEventToContactIndexList(_contactIndexList, [action.payload]);
         state.contactIndexList = sortContactIndexList(_contactIndexList);
       })
-      .addCase(editContractAction, (state, action) => {
+      .addCase(editContactAction, (state, action) => {
         let _contactIndexList = [...state.contactIndexList];
         _contactIndexList = executeEventToContactIndexList(_contactIndexList, [action.payload]);
         state.contactIndexList = sortContactIndexList(_contactIndexList);
       })
-      .addCase(deleteContractAction, (state, action) => {
+      .addCase(deleteContactAction, (state, action) => {
         let _contactIndexList = [...state.contactIndexList];
         _contactIndexList = executeEventToContactIndexList(_contactIndexList, [action.payload]);
         state.contactIndexList = sortContactIndexList(_contactIndexList);
+      })
+      .addCase(resetContactAction, state => {
+        state.contactIndexList = [];
+        state.contactMap = {};
+        state.lastModified = 0;
       });
   },
 });
