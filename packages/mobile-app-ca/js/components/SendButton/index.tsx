@@ -3,6 +3,8 @@ import Svg from 'components/Svg';
 import { dashBoardBtnStyle, innerPageStyles } from './style';
 import navigationService from 'utils/navigationService';
 import { TokenItemShowType } from '@portkey/types/types-ca/token';
+import { IToSendHomeParamsType } from '@portkey/types/types-ca/routeParams';
+
 import { isSameTypeToken } from '@portkey/utils/token';
 import { View, TouchableOpacity } from 'react-native';
 import { TextM } from 'components/CommonText';
@@ -39,16 +41,16 @@ const SendButton = (props: SendButtonType) => {
   //   }
   // };
 
-  const onFinishSelectToken = (item: any) => {
-    navigationService.navigate('SendHome', {
-      type: item.type,
-      tokenItem: {
-        symbol: 'ELF',
-        decimal: 8,
-      },
-    });
-    console.log('navigate');
-  };
+  // const onFinishSelectToken = (item: TokenItemShowType) => {
+  //   navigationService.navigate('SendHome', {
+  //     type: item.type,
+  //     tokenItem: {
+  //       symbol: 'ELF',
+  //       decimal: 8,
+  //     },
+  //   });
+  //   console.log('navigate');
+  // };
 
   const getCurrentCAContract = useGetCurrentCAContract();
 
@@ -57,10 +59,17 @@ const SendButton = (props: SendButtonType) => {
       <TouchableOpacity
         onPress={async () => {
           if (themeType === 'innerPage')
-            return navigationService.navigate('SendHome', { sendType: 'token', tokenItem: sentToken });
+            return navigationService.navigate('SendHome', {
+              sendType: 'token',
+              assetInfo: sentToken,
+              toInfo: {
+                name: '',
+                address: '',
+              },
+            } as unknown as IToSendHomeParamsType);
           // if (currentTokenList.length === 1)
           // return navigationService.navigate('SendHome', { tokenItem: currentTokenList?.[0] });
-          AssetsOverlay.showAssetList({ onFinishSelectToken });
+          AssetsOverlay.showAssetList({});
         }}>
         <Svg icon={themeType === 'dashBoard' ? 'send' : 'send1'} size={pTd(46)} />
       </TouchableOpacity>

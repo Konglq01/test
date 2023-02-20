@@ -5,7 +5,7 @@ import CommonAvatar from 'components/CommonAvatar';
 import { useLanguage } from 'i18n/hooks';
 import React, { memo, useMemo } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { formatStr2EllipsisStr, formatTransferTime } from 'utils';
+import { formatChainInfo, formatStr2EllipsisStr, formatTransferTime } from 'utils';
 import { pTd } from 'utils/unit';
 import { ActivityItemType } from '@portkey/types/types-ca/activity';
 import { TransactionTypes, transactionTypesMap } from '@portkey/constants/constants-ca/activity';
@@ -64,9 +64,9 @@ const ActivityItem: React.FC<ActivityItemPropsType> = ({ item, onPress }) => {
             {formatStr2EllipsisStr(item?.isReceived ? item?.toAddress : item?.fromAddress, 10)}
           </Text>
           <Text style={[itemStyle.centerStatus, FontStyles.font3]}>
-            {'MainChain AELF'}
+            {formatChainInfo(item?.fromChainId)}
             {'-->'}
-            {'MainChain tDVV'}
+            {formatChainInfo(item?.toChainId)}
           </Text>
         </View>
 

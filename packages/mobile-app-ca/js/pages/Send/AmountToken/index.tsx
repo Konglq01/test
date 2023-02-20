@@ -1,17 +1,16 @@
 import { TokenItemShowType } from '@portkey/types/types-eoa/token';
-import React, { useEffect, useMemo } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import TokenOverlay from 'components/TokenOverlay';
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { pTd } from 'utils/unit';
 import { parseInputChange } from '@portkey/utils/input';
 import { ZERO } from '@portkey/constants/misc';
 import { defaultColors } from 'assets/theme';
 import GStyles from 'assets/theme/GStyles';
 import { Input } from '@rneui/themed';
-import { TextS } from 'components/CommonText';
 import { unitConverter } from '@portkey/utils/converter';
 import { useLanguage } from 'i18n/hooks';
 import CommonAvatar from 'components/CommonAvatar';
+import { IToSendAssetParamsType } from '@portkey/types/types-ca/routeParams';
 
 interface AmountTokenProps {
   rate: { USDT: string | number };
@@ -19,7 +18,7 @@ interface AmountTokenProps {
   sendTokenNumber: string;
   setSendTokenNumber: any;
   selectedAccount: any;
-  selectedToken: TokenItemShowType;
+  selectedToken: IToSendAssetParamsType;
   setSelectedToken: any;
 }
 
@@ -55,7 +54,7 @@ export default function AmountToken({
           {selectedToken?.imageUrl ? (
             <CommonAvatar shapeType="circular" imageUrl={selectedToken?.imageUrl || ''} avatarSize={28} title={''} />
           ) : (
-            <Text style={styles.imgStyle}>{selectedToken?.symbol[0]}</Text>
+            <Text style={styles.imgStyle}>{selectedToken?.symbol?.[0]}</Text>
           )}
           <Text style={styles.symbolName}>
             {selectedToken?.symbol?.length > 5 ? formatTokenNameToSuffix(selectedToken?.symbol) : selectedToken?.symbol}

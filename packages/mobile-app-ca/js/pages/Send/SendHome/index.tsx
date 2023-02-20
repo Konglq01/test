@@ -37,6 +37,7 @@ import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { getManagerAccount } from 'utils/redux';
 import { usePin } from 'hooks/store';
 import { unitConverter } from '@portkey/utils/converter';
+import { IToSendHomeParamsType, IToSendPreviewParamsType } from '@portkey/types/types-ca/routeParams';
 
 export interface SendHomeProps {
   route?: any;
@@ -51,42 +52,43 @@ enum ErrorMessage {
 const SendHome: React.FC<SendHomeProps> = props => {
   const { t } = useLanguage();
 
-  const {
-    tokenItem = {
-      symbol: 'ELF',
-      decimals: 8,
-      address: 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE',
-      tokenContractAddress: 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE',
-    },
-    nftItem,
-    name,
-    sendType,
-    chainId,
-    address,
-  } = useRouterParams<{
-    tokenItem: TokenItemShowType;
-    nftItem: any;
-    name: string;
-    sendType: 'nft' | 'token';
-    chainId: string;
-    address: string;
-  }>();
+  // const {
+  //   tokenItem = {
+  //     symbol: 'ELF',
+  //     decimals: 8,
+  //     address: 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE',
+  //     tokenContractAddress: 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE',
+  //   },
+  //   nftItem,
+  //   name,
+  //   sendType,
+  //   chainId,
+  //   address,
+  // } = useRouterParams<{
+  //   tokenItem: TokenItemShowType;
+  //   nftItem: any;
+  //   name: string;
+  //   sendType: 'nft' | 'token';
+  //   chainId: string;
+  //   address: string;
+  // }>();
+
+  const { sendType, toInfo, assetInfo } = useRouterParams<IToSendHomeParamsType>();
 
   // tokenItem, address, name,
   const { data, refetch } = useGetELFRateQuery({});
 
   const wallet = useCurrentWalletInfo();
-  const chainInfo = useCurrentChain();
+  const chainInfo = useCurrentChain(assetInfo?.chainId);
+
   const pin = usePin();
 
   const [, requestQrPermission] = useQrScanPermission();
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const [selectedFromAccount] = useState({ name: '', address: '' }); // from
-  const [selectedToContact, setSelectedToContact] = useState({ name: '', address: '0' }); // to
-  const [selectedToken, setSelectedToken] = useState(tokenItem); // tokenType
-  const [isCrossChainTransfer, setIsCrossChainTransfer] = useState(false);
-  const [selectedNft, setSelectedNft] = useState(nftItem);
+  const [selectedToContact, setSelectedToContact] = useState(toInfo); // to
+  const [selectedAssets, setSelectedAssets] = useState(assetInfo); // token or nft
   const [sendNumber, setSendNumber] = useState<string>('0'); // tokenNumber  like 100
   const debounceSendNumber = useDebounce(sendNumber, 500);
   const [transactionFee, setTransactionFee] = useState<string>('0'); // like 1.2ELF
@@ -99,12 +101,12 @@ const SendHome: React.FC<SendHomeProps> = props => {
     refetch();
   });
 
-  useFocusEffect(
-    useCallback(() => {
-      const tmpAddress = formatAddress2NoPrefix(address || '');
-      setSelectedToContact({ name, address: tmpAddress });
-    }, [address, name]),
-  );
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     const tmpAddress = formatAddress2NoPrefix(address || '');
+  //     setSelectedToContact({ name, address: tmpAddress });
+  //   }, [address, name]),
+  // );
 
   // get transfer fee
   useEffect(() => {
@@ -123,10 +125,10 @@ const SendHome: React.FC<SendHomeProps> = props => {
 
       const raw = await contract.encodedTx('ManagerForwardCall', {
         caHash: wallet.caHash,
-        contractAddress: tokenItem.tokenContractAddress,
+        contractAddress: selectedAssets.tokenContractAddress,
         methodName: 'Transfer',
         args: {
-          symbol: selectedToken.symbol,
+          symbol: selectedAssets.symbol,
           to: selectedToContact.address,
           amount: debounceSendNumber,
           memo: '',
@@ -150,22 +152,21 @@ const SendHome: React.FC<SendHomeProps> = props => {
     chainInfo,
     pin,
     selectedToContact.address,
-    selectedToken.address,
-    selectedToken.symbol,
     debounceSendNumber,
-    tokenItem.tokenContractAddress,
     wallet,
     wallet.caHash,
+    selectedAssets.tokenContractAddress,
+    selectedAssets.symbol,
   ]);
 
   const totalPay = useMemo(() => {
     // TODO: TransferNumber + Transaction Fee
     const totalTransactionFee = ZERO.plus(transactionFee).times(data?.USDT || 0);
-    const totalTransferNumber = selectedToken === 'ELF' ? ZERO.plus(sendNumber).times(data?.USDT || 0) : ZERO;
+    const totalTransferNumber = assetInfo.symbol === 'ELF' ? ZERO.plus(sendNumber).times(data?.USDT || 0) : ZERO;
     console.log(totalTransactionFee.valueOf(), totalTransferNumber.valueOf());
 
     return totalTransactionFee.plus(totalTransferNumber);
-  }, [data?.USDT, selectedToken, sendNumber, transactionFee]);
+  }, [assetInfo.symbol, data?.USDT, sendNumber, transactionFee]);
 
   const buttonDisabled = useMemo(() => {
     console.log(!selectedToContact.address, Number(sendNumber));
@@ -221,18 +222,17 @@ const SendHome: React.FC<SendHomeProps> = props => {
 
         case 'crossChain':
           ActionSheet.alert({
-            title: t('Enable Camera Access'),
+            title: t(''),
             message: t('The receiving address is a cross-chain transfer transaction'),
             buttons: [
               {
                 title: t('Cancel'),
-                type: 'solid',
+                type: 'outline',
               },
               {
                 title: t('Confirm'),
                 type: 'primary',
                 onPress: () => {
-                  setIsCrossChainTransfer(true);
                   nextStep(true);
                 },
               },
@@ -260,7 +260,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
     if (errorArr.length) return false;
 
     // TODO: check if  cross chain
-    if (isCrossChain(selectedToContact.address, 'AELF')) return showDialog('crossChain');
+    if (isCrossChain(selectedToContact.address, assetInfo.chainId)) return showDialog('crossChain');
 
     return true;
   };
@@ -268,10 +268,10 @@ const SendHome: React.FC<SendHomeProps> = props => {
   const checkCanPreview = () => {
     if (transactionFee === '0' || transactionFee === '') return;
 
-    const tokenBalanceBigNumber = ZERO.plus(tokenItem?.balance || 0).div(`1e${tokenItem?.decimals}`);
+    const tokenBalanceBigNumber = ZERO.plus(selectedAssets?.balance || 0).div(`1e${selectedAssets?.decimals}`);
 
     if (sendType === 'nft') {
-      if (ZERO.plus(sendNumber).isGreaterThan(nftItem.balance)) {
+      if (ZERO.plus(sendNumber).isGreaterThan(selectedAssets.balance)) {
         setErrorMessage([ErrorMessage.InsufficientFunds]);
         return false;
       }
@@ -311,15 +311,11 @@ const SendHome: React.FC<SendHomeProps> = props => {
 
     navigationService.navigate('SendPreview', {
       sendType,
-      sendInfo: {
-        isCrossChainTransfer,
-        selectedToContact: { ...selectedToContact, address: tmpAddress },
-        tokenItem,
-        nftItem,
-        sendNumber,
-        transactionFee,
-      },
-    });
+      assetInfo: selectedAssets,
+      toInfo: { ...selectedToContact, address: tmpAddress },
+      transactionFee,
+      sendNumber,
+    } as IToSendPreviewParamsType);
   };
 
   return (
@@ -341,37 +337,39 @@ const SendHome: React.FC<SendHomeProps> = props => {
       }
       containerStyles={styles.pageWrap}
       scrollViewProps={{ disabled: true }}>
+      {/* Group 1 */}
       <View style={styles.group}>
         <From selectedFromAccount={selectedFromAccount} />
         <To
           step={step}
-          tokenItem={tokenItem}
+          setStep={setStep}
           selectedToContact={selectedToContact}
           setSelectedToContact={setSelectedToContact}
-          setStep={setStep}
         />
       </View>
       {errorMessage.includes(ErrorMessage.RecipientAddressIsInvalid) && (
         <Text style={styles.errorMessage}>{t(ErrorMessage.RecipientAddressIsInvalid)}</Text>
       )}
 
+      {/* Group 2 token */}
       {sendType === 'token' && step === 2 && (
         <View style={styles.group}>
           <AmountToken
             rate={data ?? { USDT: 0 }}
-            balanceShow={tokenItem.balance}
+            balanceShow={assetInfo.balance}
             sendTokenNumber={sendNumber}
             setSendTokenNumber={setSendNumber}
-            selectedToken={selectedToken}
+            selectedToken={assetInfo}
             selectedAccount={selectedFromAccount}
-            setSelectedToken={setSelectedToken}
+            setSelectedToken={setSelectedAssets}
           />
         </View>
       )}
 
+      {/* Group 2 nft */}
       {sendType === 'nft' && step === 2 && (
         <View style={styles.group}>
-          <NFTInfo nftItem={nftItem} />
+          <NFTInfo nftItem={assetInfo} />
         </View>
       )}
 
@@ -436,6 +434,8 @@ const SendHome: React.FC<SendHomeProps> = props => {
           </View>
         )}
       </View> */}
+
+      {/* Group 3 contact */}
       <View style={styles.space} />
       {step === 1 && (
         <SelectContact
