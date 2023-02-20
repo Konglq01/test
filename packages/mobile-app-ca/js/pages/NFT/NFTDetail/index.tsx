@@ -13,6 +13,7 @@ import { FontStyles } from 'assets/theme/styles';
 import fonts from 'assets/theme/fonts';
 import navigationService from 'utils/navigationService';
 import useRouterParams from '@portkey/hooks/useRouterParams';
+import { IToSendHomeParamsType } from '@portkey/types/types-ca/routeParams';
 
 export interface TokenDetailProps {
   route?: any;
@@ -64,7 +65,11 @@ const NFTDetail: React.FC<TokenDetailProps> = props => {
         style={{}}
         type="primary"
         onPress={() => {
-          navigationService.navigate('SendHome', { sendType: 'nft', nftItem: nftItem });
+          navigationService.navigate('SendHome', {
+            sendType: 'nft',
+            assetInfo: nftItem,
+            toInfo: { name: '', address: '' },
+          } as unknown as IToSendHomeParamsType);
         }}>
         Send
       </CommonButton>

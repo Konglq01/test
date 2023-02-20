@@ -1,6 +1,7 @@
 import AElf from 'aelf-sdk';
 import { COMMON_PRIVATE } from '@portkey/constants';
 import { AElfInterface } from '@portkey/types/aelf';
+import { ChainId } from '@portkey/types';
 const Wallet = AElf.wallet;
 let wallet: any = null;
 
@@ -131,14 +132,14 @@ export const encodedTx = async ({ instance, functionName, paramsOption, contract
 };
 
 /**
- *
- * @param address
- * @param currentChainId
+ * to check if the transfer is crossChain
+ * @param toAddress
+ * @param fromChainId
  */
-export const isCrossChain = (address: string, currentChainId: string) => {
-  if (!address.includes('_')) return false;
+export const isCrossChain = (toAddress: string, fromChainId: ChainId): boolean => {
+  if (!toAddress.includes('_')) return false;
 
-  const arr = address.split('_');
+  const arr = toAddress.split('_');
   const addressChainId = arr[arr.length - 1];
-  return addressChainId !== currentChainId;
+  return addressChainId !== fromChainId;
 };

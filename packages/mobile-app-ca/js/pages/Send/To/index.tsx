@@ -14,9 +14,8 @@ import { pTd } from 'utils/unit';
 interface ToProps {
   selectedToContact: { name: string; address: string };
   setSelectedToContact: (contact: any) => void;
-  tokenItem: any;
   step: 1 | 2;
-  setStep: any;
+  setStep: (step: 1 | 2) => void;
 }
 
 export default function To({ selectedToContact, setSelectedToContact, step, setStep }: ToProps) {

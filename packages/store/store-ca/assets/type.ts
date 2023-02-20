@@ -2,6 +2,7 @@ export interface ITokenInfoType {
   balance: string;
   decimals: string;
   balanceInUsd: string;
+  chainId: string;
 }
 
 export interface INftInfoType {
@@ -10,6 +11,8 @@ export interface INftInfoType {
   tokenId: string;
   collectionName: string;
   quantity: string;
+  chainId: string;
+  balance: string;
 }
 
 export interface IAssetItemType {
