@@ -68,7 +68,7 @@ export default function Transaction() {
   const isNft = useMemo(() => !!activityItem?.nftInfo?.nftId, [activityItem?.nftInfo?.nftId]);
 
   const nftHeaderUI = useCallback(() => {
-    const { nftInfo, amount } = activityItem || {};
+    const { nftInfo, amount } = activityItem;
     return (
       <div className="nft-amount">
         <div className="avatar" style={{ backgroundImage: nftInfo?.imageUrl }}>
@@ -86,7 +86,7 @@ export default function Transaction() {
   }, [activityItem]);
 
   const tokenHeaderUI = useCallback(() => {
-    const { amount, isReceived, decimals, symbol, priceInUsd } = activityItem || {};
+    const { amount, isReceived, decimals, symbol, priceInUsd } = activityItem;
     const sign = isReceived ? AmountSign.PLUS : AmountSign.MINUS;
     return (
       <p className="amount">
@@ -137,7 +137,7 @@ export default function Transaction() {
 
   const networkUI = useCallback(() => {
     /* Hidden during [SocialRecovery, AddManager, RemoveManager] */
-    const { transactionType, fromChainId, toChainId } = activityItem || {};
+    const { transactionType, fromChainId, toChainId } = activityItem;
     const from = transNetworkText(fromChainId, isTestNet);
     const to = transNetworkText(toChainId, isTestNet);
     const hiddenArr = [TransactionTypes.SOCIAL_RECOVERY, TransactionTypes.ADD_MANAGER, TransactionTypes.REMOVE_MANAGER];
