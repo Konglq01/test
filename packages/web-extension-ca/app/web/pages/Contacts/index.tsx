@@ -8,7 +8,7 @@ import BackHeader from 'components/BackHeader';
 import CustomSvg from 'components/CustomSvg';
 import { useContact } from '@portkey/hooks/hooks-ca/contact';
 import { useAppDispatch } from 'store/Provider/hooks';
-import { fetchContractListAsync } from '@portkey/store/store-ca/contact/actions';
+import { fetchContactListAsync } from '@portkey/store/store-ca/contact/actions';
 import { getAelfAddress } from '@portkey/utils/aelf';
 import { ContactIndexType, ContactItemType } from '@portkey/types/types-ca/contact';
 import { useEffectOnce } from 'react-use';
@@ -29,7 +29,7 @@ export default function Contacts() {
   const [isSearch, setIsSearch] = useState<boolean>(false);
 
   useEffectOnce(() => {
-    appDispatch(fetchContractListAsync());
+    appDispatch(fetchContactListAsync());
   });
 
   useEffect(() => {
