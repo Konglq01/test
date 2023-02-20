@@ -19,6 +19,9 @@ export const crossChainTransferToCa = async ({
     memo?: string;
   };
 }) => {
+  if (!paramsOption.memo) {
+    delete paramsOption.memo;
+  }
   const resMessage = await SandboxEventService.dispatchAndReceive(SandboxEventTypes.callSendMethod, {
     rpcUrl: rpcUrl,
     address,

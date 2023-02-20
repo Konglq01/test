@@ -26,18 +26,20 @@ export default function NFT() {
     },
     [caAddresses, dispatch],
   );
-  console.log('--------accountNFTList------------', accountNFTList);
 
   const handleChange = useCallback(
-    (symbol: string) => {
-      const isOpen = openPanel.some((item) => item === symbol);
-      if (isOpen) {
-        dispatch(clearNftItem(symbol));
-        setOpenPanel([...openPanel.filter((item) => item !== symbol)]);
-      } else {
-        dispatch(fetchNFTAsync({ symbol, caAddresses }));
-        setOpenPanel([...openPanel, symbol]);
-      }
+    (arr: any) => {
+      openPanel.forEach((prev: string) => {
+        if (!arr.some((cur: string) => cur === prev)) {
+          dispatch(clearNftItem(prev));
+        }
+      });
+      arr.forEach((cur: string) => {
+        if (!openPanel.some((prev: string) => cur === prev)) {
+          dispatch(fetchNFTAsync({ symbol: cur, caAddresses }));
+        }
+      });
+      setOpenPanel(arr);
     },
     [caAddresses, dispatch, openPanel],
   );
@@ -46,19 +48,13 @@ export default function NFT() {
     dispatch(fetchNFTCollectionsAsync({ caAddresses }));
   }, [caAddresses, dispatch]);
 
-  useEffect(() => {
-    return () => {
-      dispatch(clearNftItem(''));
-    };
-  }, [dispatch]);
-
   const renderItem = useCallback(
     (nft: NFTCollectionItemShowType) => {
       return (
         <Collapse.Panel
           key={nft.symbol}
           header={
-            <div className="protocol" onClick={() => handleChange(nft.symbol)}>
+            <div className="protocol">
               <div className="avatar">
                 {nft.imageUrl ? <img src={nft.imageUrl} /> : nft.collectionName?.slice(0, 1)}
               </div>
@@ -74,17 +70,10 @@ export default function NFT() {
           <div className="list">
             {nft.children.length > 0 &&
               nft.children.map((nftItem: NFTItemBaseType) => {
-                console.log('---------image', nftItem.imageUrl);
-
                 return (
                   <div
                     key={`${nft.symbol}-${nftItem.symbol}`}
                     style={{
-                      // eslint-disable-next-line no-inline-styles/no-inline-styles
-                      // backgroundPosition: 'center',
-                      // eslint-disable-next-line no-inline-styles/no-inline-styles
-                      // backgroundSize: 'cover',
-                      // eslint-disable-next-line no-inline-styles/no-inline-styles
                       backgroundImage: `url('${nftItem.imageUrl}')`,
                     }}
                     className="item"
@@ -111,7 +100,7 @@ export default function NFT() {
         </Collapse.Panel>
       );
     },
-    [getMore, handleChange, isTestNet, nav],
+    [getMore, isTestNet, nav],
   );
 
   return (
@@ -121,7 +110,7 @@ export default function NFT() {
       ) : (
         <List className="nft-list">
           <List.Item>
-            <Collapse>{accountNFTList.map((item) => renderItem(item))}</Collapse>
+            <Collapse onChange={handleChange}>{accountNFTList.map((item) => renderItem(item))}</Collapse>
           </List.Item>
         </List>
       )}

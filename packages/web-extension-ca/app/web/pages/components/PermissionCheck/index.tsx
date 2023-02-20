@@ -7,7 +7,7 @@ import { useLocation, useNavigate } from 'react-router';
 import { useAppDispatch } from 'store/Provider/hooks';
 import { setIsPrompt } from 'store/reducers/common/slice';
 import { useStorage } from 'hooks/useStorage';
-import { fetchContractListAsync } from '@portkey/store/store-ca/contact/actions';
+import { fetchContactListAsync } from '@portkey/store/store-ca/contact/actions';
 import { getLocalStorage } from 'utils/storage/chromeStorage';
 import { useEffectOnce } from 'react-use';
 import { sleep } from '@portkey/utils';
@@ -31,7 +31,7 @@ export default function PermissionCheck({
   }, [appDispatch, pageType]);
 
   useEffect(() => {
-    appDispatch(fetchContractListAsync());
+    appDispatch(fetchContactListAsync());
   }, [appDispatch]);
 
   const noCheckRegister = useMemo(

@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { pTd } from 'utils/unit';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { useLanguage } from 'i18n/hooks';
-import { fetchContractListAsync } from '@portkey/store/store-ca/contact/actions';
+import { fetchContactListAsync } from '@portkey/store/store-ca/contact/actions';
 import { ContactIndexType, ContactItemType } from '@portkey/types/types-ca/contact';
 import { styles as contactItemStyles } from 'components/ContactItem';
 import { isValidWalletName } from '@portkey/utils/reg';
@@ -66,7 +66,7 @@ const RecentList: React.FC<ContactsListProps> = ({ isIndexBarShow = true, render
   const { t } = useLanguage();
   useEffectOnce(() => {
     // refetch();
-    appDispatch(fetchContractListAsync());
+    appDispatch(fetchContactListAsync());
   });
   const { contactIndexList } = useAppSelector(state => state.contact);
   const [list, setList] = useState<ListItemType[]>([]);

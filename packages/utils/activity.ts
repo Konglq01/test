@@ -11,12 +11,24 @@ export interface IFormatAmountProps {
   amount?: string | number;
   decimals?: string | number;
   digits?: number;
+  sign?: AmountSign;
+}
+
+export enum AmountSign {
+  PLUS = '+',
+  MINUS = '-',
+  EMPTY = '',
 }
 
 export function formatAmount({
   amount = DEFAULT_AMOUNT,
   decimals = DEFAULT_DECIMAL,
   digits = DEFAULT_DIGITS,
+  sign = AmountSign.EMPTY,
 }: IFormatAmountProps): string {
-  return `${unitConverter(ZERO.plus(amount).div(`1e${decimals}`), digits)}`;
+  let amountTrans = `${unitConverter(ZERO.plus(amount).div(`1e${decimals}`), digits)}`;
+  if (sign && amountTrans !== '0') {
+    return `${sign}${amountTrans}`;
+  }
+  return amountTrans;
 }

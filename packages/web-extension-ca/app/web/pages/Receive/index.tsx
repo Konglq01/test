@@ -1,3 +1,4 @@
+import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { SendTokenQRDataType } from '@portkey/types/types-ca/qrcode';
 import clsx from 'clsx';
 import Copy from 'components/Copy';
@@ -6,22 +7,18 @@ import TitleWrapper from 'components/TitleWrapper';
 import QRCode from 'qrcode.react';
 import { useMemo } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router';
-import { useTokenInfo, useWalletInfo } from 'store/Provider/hooks';
+import { useWalletInfo } from 'store/Provider/hooks';
 import './index.less';
 
 export default function Receive() {
   const navigate = useNavigate();
   const { symbol, chainId } = useParams();
+  const wallet = useCurrentWalletInfo();
   const { currentNetwork } = useWalletInfo();
-  const { tokenDataShowInMarket } = useTokenInfo();
   const isMainChain = useMemo(() => chainId?.toLowerCase() === 'aelf', [chainId]);
   const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'Testnet' : ''), [currentNetwork]);
-  const receiveAddress = useMemo(() => {
-    const adr =
-      tokenDataShowInMarket.filter((item) => item.chainId === chainId && item.symbol === symbol)?.[0].address || '';
-    return adr ? `ELF_${adr}_${chainId}` : '';
-  }, [chainId, symbol, tokenDataShowInMarket]);
   const { state } = useLocation();
+  const caAddress = useMemo(() => `ELF_${wallet?.[chainId || 'AELF'].caAddress}_${chainId}`, [chainId, wallet]);
 
   const rightElement = useMemo(() => {
     return (
@@ -34,7 +31,7 @@ export default function Receive() {
   const value: SendTokenQRDataType = useMemo(
     () => ({
       type: 'send',
-      toCaAddress: state?.address,
+      toCaAddress: caAddress,
       netWorkType: currentNetwork,
       chainType: 'aelf',
       address: state?.address,
@@ -42,7 +39,7 @@ export default function Receive() {
         ...state,
       },
     }),
-    [currentNetwork, state],
+    [caAddress, currentNetwork, state],
   );
 
   return (
@@ -58,14 +55,14 @@ export default function Receive() {
           <p className="network">{`${isMainChain ? 'MainChain' : 'SideChain'} ${chainId} ${isTestNet}`}</p>
         </div>
         <QRCode
-          // imageSettings={{ src: '../', height: 48, width: 48 }}
+          imageSettings={{ src: 'assets/svgIcon/PortKey.svg', height: 30, width: 30, excavate: true }}
           value={JSON.stringify(value)}
           // eslint-disable-next-line no-inline-styles/no-inline-styles
           style={{ width: 140, height: 140 }}
         />
         <div className="receive-address">
-          <div className="address">{receiveAddress}</div>
-          <Copy className="copy-icon" toCopy={receiveAddress}></Copy>
+          <div className="address">{caAddress}</div>
+          <Copy className="copy-icon" toCopy={caAddress}></Copy>
         </div>
       </div>
     </div>

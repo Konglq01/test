@@ -22,7 +22,7 @@ const getIndexFromChar = (char: string) => {
   return char === '#' ? OTHER_INDEX : char.charCodeAt(0) - CHAR_CODE_A;
 };
 
-const getInitContactIndexList = (): ContactIndexType[] => {
+export const getInitContactIndexList = (): ContactIndexType[] => {
   // A~Z & #
   return new Array(27).fill('').map((_, i) => {
     const index = i === OTHER_INDEX ? '#' : String.fromCharCode(CHAR_CODE_A + i);

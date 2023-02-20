@@ -1,5 +1,5 @@
 import { useAppCommonDispatch } from '@portkey/hooks';
-import { fetchContractListAsync } from '@portkey/store/store-ca/contact/actions';
+import { fetchContactListAsync } from '@portkey/store/store-ca/contact/actions';
 import { IClickAddressProps } from '@portkey/types/types-ca/contact';
 import { Tabs } from 'antd';
 
@@ -15,7 +15,7 @@ export default function AddressSelector({ onClick }: { onClick: (account: IClick
   const { t } = useTranslation();
   useEffectOnce(() => {
     // refetch();
-    dispatch(fetchContractListAsync());
+    dispatch(fetchContactListAsync());
   });
 
   return (

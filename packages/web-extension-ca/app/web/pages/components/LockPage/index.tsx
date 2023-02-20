@@ -12,6 +12,7 @@ import { useDispatch } from 'react-redux';
 import './index.less';
 import { useTranslation } from 'react-i18next';
 import aes from '@portkey/utils/aes';
+import { sleep } from '@portkey/utils';
 
 interface LockPageProps extends FormProps {
   onUnLockHandler?: (pwd: string) => void;
@@ -43,6 +44,7 @@ export default function LockPage({ header, onUnLockHandler, ...props }: LockPage
         setIsPassword(1);
         dispatch(setPasswordSeed(password));
         InternalMessage.payload(InternalMessageTypes.SET_SEED, password).send();
+        await sleep(100);
         onUnLockHandler?.(password);
       } else {
         setIsPassword(0);
