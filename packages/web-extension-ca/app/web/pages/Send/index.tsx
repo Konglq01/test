@@ -13,12 +13,11 @@ import { timesDecimals } from '@portkey/utils/converter';
 import { Button, message, Modal } from 'antd';
 import CustomSvg from 'components/CustomSvg';
 import TitleWrapper from 'components/TitleWrapper';
-import { check } from 'prettier';
 import { ReactElement, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import { useDebounce } from 'react-use';
-import { useAppDispatch, useAssetInfo, useContact, useLoading, useUserInfo, useWalletInfo } from 'store/Provider/hooks';
+import { useAppDispatch, useContact, useLoading, useUserInfo, useWalletInfo } from 'store/Provider/hooks';
 import crossChainTransfer, {
   CrossChainTransferIntervalParams,
   intervalCrossChainTransfer,
@@ -48,13 +47,12 @@ export default function Send() {
   // TODO need get data from state and wait for BE data structure
   const { type, symbol, tokenId } = useParams();
   const { state } = useLocation();
-  const chainInfo = useCurrentChain(DefaultChainId);
+  const chainInfo = useCurrentChain(state.chainId);
   const wallet = useCurrentWalletInfo();
   const currentNetwork = useCurrentNetworkInfo();
   const { passwordSeed } = useUserInfo();
   console.log(wallet, 'wallet===');
   const { setLoading } = useLoading();
-  const { accountToken, accountNFT } = useAssetInfo();
   const dispatch = useAppDispatch();
 
   const { contactIndexList } = useContact();
@@ -65,93 +63,27 @@ export default function Send() {
   const [stage, setStage] = useState<Stage>(Stage.Address);
   const [amount, setAmount] = useState('');
   const [checkValue, setCheckValue] = useState({ balance: '', fee: '', amount: '' });
-  console.log('-------------accountNFT', accountNFT.accountNFTList);
-  console.log('---------state', state);
 
   const [txFee, setTransactionFee] = useState<string>();
-  console.log(type, 'type===');
-  const tokenInfo = useMemo(() => {
-    if (type === 'nft') {
-      // return {
-      //   symbol: 'BTX-2',
-      //   decimals: 0,
-      //   address: 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE',
-      //   name: 'ELF',
-      //   chainId: 'AELF',
-      // };
-      // const nft = accountNFT.accountNFTList.find((item) => item.symbol === symbol);
-
-      // if (!nft) {
-      //   message.error('No symbol info');
-      //   return;
-      // }
-      return {
-        chainId: state.chainId,
-        decimals: state.decimals || 0, // 8
-        address: (state as any).address, // "ArPnUb5FtxG2oXTaWX2DxNZowDEruJLs2TEkhRCzDdrRDfg8B",        token address  contract address
-        symbol: state.symbol, // "ELF"   the name showed
-        name: state.symbol,
-      };
-    }
-    if (type === 'token') {
-      // const token = accountToken.accountTokenList.find((item: any) => item.symbol === symbol);
-      // if (!token) {
-      //   message.error('No symbol info');
-      //   return;
-      // }
-      // return {
-      //   symbol: 'ELF',
-      //   decimals: 8,
-      //   address: 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE',
-      //   name: 'ELF',
-      //   chainId: 'AELF',
-      // };
-      return {
-        chainId: state.chainId,
-        decimals: state.decimals, // 8
-        address: state.address, // "ArPnUb5FtxG2oXTaWX2DxNZowDEruJLs2TEkhRCzDdrRDfg8B",        state address  contract address
-        symbol: state.symbol, // "ELF"   the name showed
-        name: state.symbol,
-      };
-    }
-  }, [state, type]);
-
-  // useMemo(
-  //   () => ({
-  //     symbol: 'ELF',
-  //     decimals: 8,
-  //     address: 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE',
-  //   }),
-  //   // ({
-  //   //   symbol: 'BTX-2',
-  //   //   decimals: 0,
-  //   //   tokenName: '1155-BTX2',
-  //   //   address: 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE',
-  //   //   supply: '1000',
-  //   //   totalSupply: '1000',
-  //   //   issuer: '2KQWh5v6Y24VcGgsx2KHpQvRyyU5DnCZ4eAUPqGQbnuZgExKaV',
-  //   //   isBurnable: true,
-  //   //   issueChainId: 9992731,
-  //   //   issued: '1000',
-  //   //   externalInfo: { value: { __nft_image_url: 'nft_image_url', __nft_is_burned: 'true' } },
-  //   // }),
-
-  //   [],
-  // );
+  const tokenInfo = useMemo(
+    () => ({
+      chainId: state.chainId,
+      decimals: state.decimals, // 8
+      address: state.address, // "ArPnUb5FtxG2oXTaWX2DxNZowDEruJLs2TEkhRCzDdrRDfg8B",        state address  contract address
+      symbol: state.symbol, // "ELF"   the name showed
+      name: state.symbol,
+      imageUrl: state.imageUrl,
+    }),
+    [state],
+  );
 
   const validateToAddress = useCallback((value: { name?: string; address: string } | undefined) => {
     if (!value) return false;
-    // console.log('>>>value', !isDIDAddress(value.address));
-    // const { address } = value;
     if (!isDIDAddress(value.address)) {
       setErrorMsg(AddressBookError.recipientAddressIsInvalid);
       return false;
     }
     setErrorMsg('');
-    // const item = (currentAddressBook || [])
-    //   .concat(myAccounts || [])
-    //   .find((item) => item.address === address && (value.name ? item.name === value.name : true));
-    // item && setToAddress(item);
     return true;
   }, []);
 
@@ -190,8 +122,6 @@ export default function Send() {
         dispatch(removeFailedActivity(managerTransferTxId));
       } catch (error) {
         showErrorModal(error);
-        // tip retryCrossChain()
-        // Modal.confirm
       } finally {
         setLoading(false);
       }
@@ -232,8 +162,6 @@ export default function Send() {
       console.log(getWallet(privateKey || ''), 'getWallet-privateKey======sendHandler');
       if (!privateKey) return;
       if (!tokenInfo) throw 'No Symbol info';
-      // TODO
-      // const amount = 10;
       setLoading(true);
 
       if (isCrossChain(toAccount.address, chainInfo?.chainId ?? 'AELF')) {
@@ -422,7 +350,7 @@ export default function Send() {
     <div className="page-send">
       <TitleWrapper
         className="page-title"
-        title={`Send ${state === 'token' ? symbol : ''}`}
+        title={`Send ${type === 'token' ? symbol : ''}`}
         leftCallBack={() => {
           StageObj[stage].backFun();
         }}

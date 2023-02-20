@@ -85,6 +85,7 @@ export default function MyBalance() {
             address: type === 'nft' ? v?.nftInfo?.tokenContractAddress : v?.tokenInfo?.tokenContractAddress,
             symbol: v.symbol,
             name: v.symbol,
+            imageUrl: type === 'nft' ? v.nftInfo?.imageUrl : '',
           };
           if (navTarget === 'receive') {
             navigate(`/${navTarget}/${type}/${v.symbol}/${v.chainId}`, { state });

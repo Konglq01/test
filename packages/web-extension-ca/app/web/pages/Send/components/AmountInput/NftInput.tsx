@@ -140,13 +140,10 @@ export default function NftInput({
   return (
     <div className="amount-wrap">
       <div className="item asset nft">
-        <div className="avatar">
-          <p>{token.symbol[0]}</p>
-        </div>
+        <div className="avatar">{token.imageUrl ? <img src={token.imageUrl} /> : <p>{token.symbol[0]}</p>}</div>
         <div className="info">
           <p className="index">
             <span>{token.symbol}</span>
-            {/* TODO */}
             <span className="token-id">{token.decimals}</span>
           </p>
           <p className="quantity">
