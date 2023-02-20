@@ -19,7 +19,6 @@ import { SandboxErrorCode } from '@portkey/utils/sandboxService';
 import getTransactionFee from 'utils/sandboxUtil/getTransactionFee';
 import getTransferFee from 'pages/Send/utils/getTransferFee';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
-import { DefaultChainId } from '@portkey/constants/constants-ca/network-test2';
 import { contractErrorHandler } from '@portkey/did-ui-react/src/utils/errorHandler';
 
 export default function TokenInput({
@@ -130,9 +129,10 @@ export default function TokenInput({
     // return valueString.length ? `${valueString} ${token.symbol}` : '';
     // });
     onChange(amount);
-    setTimeout(() => {
-      getTranslationInfo();
-    }, 0);
+    amount &&
+      setTimeout(() => {
+        getTranslationInfo();
+      }, 0);
   }, [amount, getTranslationInfo, onChange]);
 
   useEffect(() => {
@@ -182,7 +182,7 @@ export default function TokenInput({
                 ZERO.plus(amount?.replace(` ${token?.symbol}`, '') || 0),
               )}`}</span>
             )}
-            {fee ? `${fee} ELF` : ''}
+            {/* {fee ? `${fee} ELF` : ''} */}
           </div>
         </div>
       </div>

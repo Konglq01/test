@@ -107,7 +107,7 @@ export default function AddToken() {
         <DropdownSearch
           overlayClassName="empty-dropdown"
           open={openDrop}
-          overlay={<div className="empty-tip">{t('There is no search result.')}</div>}
+          overlay={<div className="empty-tip">{t('There is no search result')}</div>}
           value={filterWord}
           inputProps={{
             // onBlur: () => setOpenDrop(false),

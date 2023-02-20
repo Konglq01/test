@@ -12,7 +12,6 @@ import { ZERO } from '@portkey/constants/misc';
 import { unitConverter } from '@portkey/utils/converter';
 import { fetchAllTokenListAsync } from '@portkey/store/store-ca/tokenManagement/action';
 import { useCaAddresses } from '@portkey/hooks/hooks-ca/wallet';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 interface CustomSelectProps extends DrawerProps {
   onChange?: (v: AccountAssetItem, type: 'token' | 'nft') => void;
   onClose?: () => void;
@@ -43,7 +42,6 @@ export default function CustomTokenDrawer({
     () => Object.keys(walletInfo?.caInfo?.TESTNET || {}).filter((item) => item !== 'managerInfo'),
     [walletInfo?.caInfo?.TESTNET],
   );
-  const currentNetworkInfo = useCurrentNetworkInfo();
 
   useEffect(() => {
     if (drawerType === 'send') {
