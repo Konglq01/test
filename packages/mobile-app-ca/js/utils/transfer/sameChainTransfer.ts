@@ -3,7 +3,7 @@ import { ContractBasic } from '@portkey/contracts/utils/ContractBasic';
 import { BaseToken } from '@portkey/types/types-ca/token';
 import { managerForwardCall } from './managerForwardCall';
 
-const sameChainTransfer = async ({
+const sameChainTransfer = ({
   contract,
   caHash,
   amount,
@@ -19,7 +19,7 @@ const sameChainTransfer = async ({
   memo?: string;
   sendOptions?: SendOptions;
 }) => {
-  await managerForwardCall({
+  return managerForwardCall({
     contract,
     paramsOption: {
       caHash,

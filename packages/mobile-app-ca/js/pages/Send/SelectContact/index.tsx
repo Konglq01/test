@@ -16,7 +16,7 @@ import { Text } from 'react-native-svg';
 import { TextS } from 'components/CommonText';
 import { useAppCASelector, useAppCommonDispatch, useAppCommonSelector } from '@portkey/hooks';
 import useEffectOnce from 'hooks/useEffectOnce';
-import { fetchContractListAsync } from '@portkey/store/store-ca/contact/actions';
+import { fetchContactListAsync } from '@portkey/store/store-ca/contact/actions';
 import { request } from '@portkey/api/api-did';
 import { useContact } from '@portkey/hooks/hooks-ca/contact';
 import { isLoading } from 'expo-font';
@@ -54,7 +54,7 @@ export default function SelectContact(props: SelectContactProps) {
   // const debouncedKeyword = useDebounce(keyword, 500);
 
   useEffectOnce(() => {
-    dispatch(fetchContractListAsync());
+    dispatch(fetchContactListAsync());
   });
 
   const renderItem = useCallback(
@@ -78,8 +78,9 @@ export default function SelectContact(props: SelectContactProps) {
   const transFormData = useCallback(
     (data: ApiRecentAddressItemType[]): any[] =>
       data.map((ele: ApiRecentAddressItemType) => {
-        if (contactMap?.[ele.address])
+        if (contactMap?.[ele.address]) {
           return { ...contactMap?.[ele.address]?.[0], transactionTime: ele.transactionTime };
+        }
         return { ...ele, addresses: [{ address: ele.address, chainId: ele.addressChainId }] };
       }),
     [contactMap],
@@ -121,7 +122,7 @@ export default function SelectContact(props: SelectContactProps) {
               <FlashList
                 data={recentList || []}
                 renderItem={renderItem}
-                ListFooterComponent={<TextS style={styles.footer}>{t('No Data')}</TextS>}
+                ListFooterComponent={<TextS style={styles.footer}>{t('No More Data')}</TextS>}
                 onEndReached={() => {
                   if (recentTotalNumber <= recentList.length) return;
                   if (loading) return;
@@ -142,13 +143,15 @@ export default function SelectContact(props: SelectContactProps) {
             isReadOnly
             isIndexBarShow={false}
             isSearchShow={false}
-            renderContactItem={(item: ContactItemType) => <RecentContactItem contact={item as RecentContactItemType} />}
+            renderContactItem={(item: ContactItemType) => (
+              <RecentContactItem contact={item as RecentContactItemType} onPress={onPress} />
+            )}
             ListFooterComponent={<View style={styles.footer} />}
           />
         ),
       },
     ];
-  }, [fetchMoreRecent, loading, recentList, recentTotalNumber, renderItem, t]);
+  }, [fetchMoreRecent, loading, onPress, recentList, recentTotalNumber, renderItem, t]);
 
   return <CommonTopTab tabList={tabList} />;
 }

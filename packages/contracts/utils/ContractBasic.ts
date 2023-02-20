@@ -72,6 +72,9 @@ export class AElfContractBasic {
 
   public callSendMethod: AElfCallSendMethod = async (functionName, paramsOption, sendOptions) => {
     if (!this.aelfContract) return { error: { code: 401, message: 'Contract init error' } };
+
+    console.log('paramsOption', paramsOption);
+
     try {
       const { onMethod = 'receipt' } = sendOptions || {};
       const _functionName = handleFunctionName(functionName);
@@ -82,14 +85,19 @@ export class AElfContractBasic {
       });
       const req = await this.aelfContract[_functionName](_params);
 
-      const { TransactionId } = req.result || req;
-      if (req.error) return { error: handleContractError(undefined, req), transactionId: TransactionId };
+      console.log('reqreqreq', req);
+
+      const { TransactionId } = req?.result || req;
+      if (req?.error) return { error: handleContractError(undefined, req), transactionId: TransactionId };
 
       // receipt
       if (onMethod === 'receipt') {
         await sleep(1000);
         try {
           const txResult = await getTxResult(this.aelfInstance, TransactionId);
+
+          console.log('txResult', txResult);
+
           return { data: txResult, transactionId: TransactionId };
         } catch (error) {
           return { error: handleContractError(error, req), transactionId: TransactionId };

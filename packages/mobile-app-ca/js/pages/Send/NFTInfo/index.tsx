@@ -12,19 +12,20 @@ import { TextL, TextS } from 'components/CommonText';
 import CommonAvatar from 'components/CommonAvatar';
 
 interface AmountNFT {
+  nftItem: any;
   selectedToken: TokenItemShowType;
   setSelectedToken: any;
 }
 
-export default function NFTInfo() {
+export default function NFTInfo({ nftItem = { alias: '', balance: 0 } }: AmountNFT) {
   const { t } = useLanguage();
 
   return (
     <View style={styles.wrap}>
-      <CommonAvatar shapeType="square" title="ff" avatarSize={pTd(56)} style={styles.avatar} />
+      <CommonAvatar shapeType="square" title={nftItem?.alias || ''} avatarSize={pTd(56)} style={styles.avatar} />
       <View>
-        <TextL>Amount</TextL>
-        <TextS style={styles.balance}>Balance: 3</TextS>
+        <TextL>{`${nftItem?.alias || 'alias'}`}</TextL>
+        <TextS style={styles.balance}>{`Balance: ${nftItem?.balance}`}</TextS>
       </View>
     </View>
   );

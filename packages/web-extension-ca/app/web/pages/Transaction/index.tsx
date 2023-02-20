@@ -5,12 +5,11 @@ import { fetchActivity } from '@portkey/store/store-ca/activity/api';
 import { ActivityItemType } from '@portkey/types/types-ca/activity';
 import { Transaction } from '@portkey/types/types-ca/trade';
 import { getExploreLink } from '@portkey/utils';
-import { formatAmount, transNetworkText } from '@portkey/utils/activity';
+import { AmountSign, formatAmount, transNetworkText } from '@portkey/utils/activity';
 import { formatStr2EllipsisStr } from '@portkey/utils/converter';
 import clsx from 'clsx';
 import Copy from 'components/Copy';
 import CustomSvg from 'components/CustomSvg';
-import moment from 'moment';
 import { useCurrentNetwork } from '@portkey/hooks/network';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -19,6 +18,7 @@ import { useEffectOnce } from 'react-use';
 import { shortenCharacters } from 'utils/reg';
 import './index.less';
 import { useIsTestnet } from 'hooks/useActivity';
+import { dateFormat } from 'utils';
 
 export default function Transaction() {
   const { t } = useTranslation();
@@ -68,7 +68,7 @@ export default function Transaction() {
   const isNft = useMemo(() => !!activityItem?.nftInfo?.nftId, [activityItem?.nftInfo?.nftId]);
 
   const nftHeaderUI = useCallback(() => {
-    const { nftInfo, amount } = activityItem || {};
+    const { nftInfo, amount } = activityItem;
     return (
       <div className="nft-amount">
         <div className="avatar" style={{ backgroundImage: nftInfo?.imageUrl }}>
@@ -86,10 +86,11 @@ export default function Transaction() {
   }, [activityItem]);
 
   const tokenHeaderUI = useCallback(() => {
-    const { amount, decimals, symbol, priceInUsd } = activityItem || {};
+    const { amount, isReceived, decimals, symbol, priceInUsd } = activityItem;
+    const sign = isReceived ? AmountSign.PLUS : AmountSign.MINUS;
     return (
       <p className="amount">
-        {`${formatAmount({ amount, decimals })} ${symbol ?? ''}`}
+        {`${formatAmount({ amount, decimals, sign })} ${symbol ?? ''}`}
         {!isTestNet && (
           <span className="usd">{`$ ${formatAmount({ amount: priceInUsd, decimals: 0, digits: 2 })}`}</span>
         )}
@@ -106,7 +107,7 @@ export default function Transaction() {
         </p>
         <p className="value">
           <span className={clsx(['left', status.style])}>{t(status.text)}</span>
-          <span className="right">{moment(Number(activityItem.timestamp)).format('MMM D [at] h:m a')}</span>
+          <span className="right">{dateFormat(activityItem.timestamp)}</span>
         </p>
       </div>
     );
@@ -136,7 +137,7 @@ export default function Transaction() {
 
   const networkUI = useCallback(() => {
     /* Hidden during [SocialRecovery, AddManager, RemoveManager] */
-    const { transactionType, fromChainId, toChainId } = activityItem || {};
+    const { transactionType, fromChainId, toChainId } = activityItem;
     const from = transNetworkText(fromChainId, isTestNet);
     const to = transNetworkText(toChainId, isTestNet);
     const hiddenArr = [TransactionTypes.SOCIAL_RECOVERY, TransactionTypes.ADD_MANAGER, TransactionTypes.REMOVE_MANAGER];

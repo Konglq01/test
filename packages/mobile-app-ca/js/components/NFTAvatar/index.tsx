@@ -3,45 +3,50 @@ import { StyleSheet, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { pTd } from 'utils/unit';
 import { TextL, TextM } from 'components/CommonText';
 import { defaultColors } from 'assets/theme';
-import Svg from 'components/Svg';
 import { Image } from '@rneui/themed';
-import { both } from 'ramda';
 import GStyles from 'assets/theme/GStyles';
 
 export type NoDataPropsType = {
   style?: ViewStyle | ViewStyle[];
-  data?: any;
+  data: {
+    alias: string;
+    balance: string;
+    chainId: string;
+    imageUrl: string;
+    symbol: string;
+    tokenContractAddress: string;
+    tokenId: string;
+  };
   onPress?: () => void;
 };
 
-const mockNFTUrl =
-  'https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/fotojet-5-1650369753.jpg?crop=0.498xw:0.997xh;0,0&resize=640:*';
-
-// const mockNFTUrl = '';
-
 const NFTAvatar: React.FC<NoDataPropsType> = props => {
-  const { style = {}, data, onPress } = props;
+  const {
+    style = {},
+    data: { imageUrl, symbol },
+    onPress,
+  } = props;
 
   const outStyles = Array.isArray(style) ? style : [style];
 
   return (
     <TouchableOpacity style={[styles.wrap, ...outStyles]} onPress={onPress}>
-      {mockNFTUrl && (
+      {imageUrl && (
         <Image
           source={{
-            uri: mockNFTUrl,
+            uri: imageUrl,
           }}
           containerStyle={styles.img}
         />
       )}
       <TextL
-        numberOfLines={mockNFTUrl ? 1 : 2}
+        numberOfLines={imageUrl ? 1 : 2}
         ellipsizeMode="tail"
-        style={[styles.title, !!mockNFTUrl && styles.titleNoPic]}>
-        {data?.symbol}
+        style={[styles.title, !!imageUrl && styles.titleNoPic]}>
+        {symbol}
       </TextL>
-      <TextM style={[styles.id, !!mockNFTUrl && styles.idNoPic]}>{'#2001'}</TextM>
-      {mockNFTUrl && <View style={styles.mask} />}
+      <TextM style={[styles.id, !!imageUrl && styles.idNoPic]}>{'#2001'}</TextM>
+      {imageUrl && <View style={styles.mask} />}
     </TouchableOpacity>
   );
 };

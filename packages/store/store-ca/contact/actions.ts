@@ -11,8 +11,8 @@ import {
   getContactEventList as getContactEventListEs,
 } from '@portkey/api/api-did/es/utils';
 
-export const fetchContractListAsync = createAsyncThunk<FetchContractListAsyncPayloadType, boolean | undefined>(
-  'contact/fetchContractListAsync',
+export const fetchContactListAsync = createAsyncThunk<FetchContractListAsyncPayloadType, boolean | undefined>(
+  'contact/fetchContactListAsync',
   async (isInit = false, thunkAPI) => {
     const {
       contact: contactState,
@@ -109,8 +109,10 @@ export const fetchContractListAsync = createAsyncThunk<FetchContractListAsyncPay
   },
 );
 
-export const addContractAction = createAction<ContactItemType>('contact/addContract');
+export const addContactAction = createAction<ContactItemType>('contact/addContract');
 
-export const editContractAction = createAction<ContactItemType>('contact/editContract');
+export const editContactAction = createAction<ContactItemType>('contact/editContract');
 
-export const deleteContractAction = createAction<ContactItemType>('contact/deleteContract');
+export const deleteContactAction = createAction<ContactItemType>('contact/deleteContract');
+
+export const resetContactAction = createAction<void>('contact/resetContactAction');
