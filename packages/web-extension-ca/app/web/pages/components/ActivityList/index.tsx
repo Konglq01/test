@@ -3,15 +3,15 @@ import { ActivityItemType } from '@portkey/types/types-ca/activity';
 import { formatStr2EllipsisStr } from '@portkey/utils/converter';
 import { List } from 'antd-mobile';
 import CustomSvg from 'components/CustomSvg';
-import moment from 'moment';
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import './index.less';
 import LoadingMore from 'components/LoadingMore/LoadingMore';
 import { useIsTestnet } from 'hooks/useActivity';
-import { formatAmount, transNetworkText } from '@portkey/utils/activity';
+import { AmountSign, formatAmount, transNetworkText } from '@portkey/utils/activity';
 import { Button } from 'antd';
 import { useAppCASelector } from '@portkey/hooks/hooks-ca';
+import { dateFormat } from 'utils';
 
 export interface IActivityListProps {
   data?: ActivityItemType[];
@@ -43,19 +43,14 @@ export default function ActivityList({ data, hasMore, loadMore }: IActivityListP
 
   const amountOrIdUI = (item: ActivityItemType) => {
     const { transactionType, isReceived, amount, symbol, nftInfo, decimals } = item;
-
+    const sign = isReceived ? AmountSign.PLUS : AmountSign.MINUS;
     return (
       <p className="row-1">
         <span>{transactionTypesMap(transactionType, nftInfo?.nftId)}</span>
         <span>
           <span>
             {nftInfo?.nftId && <span>#{nftInfo.nftId}</span>}
-            {!nftInfo?.nftId && (
-              <>
-                {amount && <span>{isReceived ? '+' : '-'}</span>}
-                <span>{`${formatAmount({ amount, decimals, digits: 4 })} ${symbol ?? ''}`}</span>
-              </>
-            )}
+            {!nftInfo?.nftId && <span>{`${formatAmount({ sign, amount, decimals, digits: 4 })} ${symbol ?? ''}`}</span>}
           </span>
         </span>
       </p>
@@ -123,7 +118,7 @@ export default function ActivityList({ data, hasMore, loadMore }: IActivityListP
         {data?.map((item, index) => (
           <List.Item key={`activityList_${item.transactionId}_${index}`}>
             <div className="activity-item" onClick={() => navToDetail(item)}>
-              <div className="time">{moment(Number(item.timestamp)).format('MMM D [at] h:m a')}</div>
+              <div className="time">{dateFormat(Number(item.timestamp))}</div>
               <div className="info">
                 <CustomSvg type={activityListLeftIcon(item.transactionType)} />
                 <div className="right">
