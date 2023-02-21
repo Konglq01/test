@@ -18,7 +18,7 @@ import { Image, ScreenHeight } from '@rneui/base';
 import { getContractBasic } from '@portkey/contracts/utils';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { getDefaultWallet } from 'utils/aelfUtils';
-import { usePin } from 'hooks/store';
+import { usePin, useWallet } from 'hooks/store';
 import { getManagerAccount } from 'utils/redux';
 import crossChainTransfer, {
   CrossChainTransferIntervalParams,
@@ -68,6 +68,8 @@ const SendHome: React.FC<SendHomeProps> = props => {
   const [isLoading] = useState(false);
   const currentNetwork = useCurrentNetwork();
   const wallet = useCurrentWalletInfo();
+  const { walletName } = useWallet();
+
   const caAddresses = useCaAddresses();
 
   const showRetry = (retryFunc: any) => {
@@ -273,11 +275,13 @@ const SendHome: React.FC<SendHomeProps> = props => {
         <View style={styles.section}>
           <View style={[styles.flexSpaceBetween]}>
             <TextM style={styles.lightGrayFontColor}>{t('From')}</TextM>
-            <TextM style={styles.blackFontColor}>{'Wallet1'}</TextM>
+            <TextM style={styles.blackFontColor}>{walletName}</TextM>
           </View>
           <View style={[styles.flexSpaceBetween]}>
             <TextM style={styles.lightGrayFontColor} />
-            <TextS style={styles.lightGrayFontColor}>{formatStr2EllipsisStr(`ELF_${caAddresses[0]}_AELF`)}</TextS>
+            <TextS style={styles.lightGrayFontColor}>
+              {formatStr2EllipsisStr(`ELF_${caAddresses[0]}_${assetInfo.chainId}`)}
+            </TextS>
           </View>
         </View>
         <Text style={[styles.divider, styles.marginTop0]} />
