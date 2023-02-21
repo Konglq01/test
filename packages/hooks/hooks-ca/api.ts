@@ -7,11 +7,12 @@ import { setRefreshTokenConfig } from '@portkey/api/api-did/utils';
 
 export function useRefreshTokenConfig(pin?: string) {
   const { caHash, AESEncryptPrivateKey } = useCurrentWalletInfo();
-  const { apiUrl, connectUrl } = useCurrentNetworkInfo();
+  const { connectUrl } = useCurrentNetworkInfo();
   useMemo(() => {
-    console.log(pin, '===useRefreshTokenConfig, pin');
     if (!caHash || !AESEncryptPrivateKey || !pin) return;
-    const account = AElf.wallet.getWalletByPrivateKey(aes.decrypt(AESEncryptPrivateKey, pin));
+    const privateKey = aes.decrypt(AESEncryptPrivateKey, pin);
+    if (!privateKey) return;
+    const account = AElf.wallet.getWalletByPrivateKey(privateKey);
     setRefreshTokenConfig({
       account,
       caHash,
