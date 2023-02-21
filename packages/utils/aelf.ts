@@ -138,8 +138,11 @@ export const encodedTx = async ({ instance, functionName, paramsOption, contract
  */
 export const isCrossChain = (toAddress: string, fromChainId: ChainId): boolean => {
   if (!toAddress.includes('_')) return false;
-
   const arr = toAddress.split('_');
   const addressChainId = arr[arr.length - 1];
+  // no suffix
+  if (isAelfAddress(addressChainId)) {
+    return 'AELF' !== fromChainId;
+  }
   return addressChainId !== fromChainId;
 };

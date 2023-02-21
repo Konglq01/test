@@ -1,4 +1,4 @@
-import { useCaAddresses } from '@portkey/hooks/hooks-ca/wallet';
+import { useCaAddresses, useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { clearNftItem, fetchNFTAsync, fetchNFTCollectionsAsync } from '@portkey/store/store-ca/assets/slice';
 import { NFTCollectionItemShowType, NFTItemBaseType } from '@portkey/types/types-ca/assets';
 import { Collapse } from 'antd';
@@ -19,12 +19,13 @@ export default function NFT() {
   } = useAssetInfo();
   const dispatch = useAppDispatch();
   const caAddresses = useCaAddresses();
+  const wallet = useCurrentWalletInfo();
 
   const getMore = useCallback(
-    (symbol: string) => {
-      dispatch(fetchNFTAsync({ symbol, caAddresses }));
+    (symbol: string, chainId: string) => {
+      dispatch(fetchNFTAsync({ symbol, caAddresses: [wallet[chainId].caAddress] }));
     },
-    [caAddresses, dispatch],
+    [dispatch, wallet],
   );
 
   const handleChange = useCallback(
@@ -32,17 +33,18 @@ export default function NFT() {
       const openArr = typeof arr === 'string' ? [arr] : arr;
       openPanel.forEach((prev: string) => {
         if (!openArr.some((cur: string) => cur === prev)) {
-          dispatch(clearNftItem(prev));
+          dispatch(clearNftItem(prev.split('_')[0]));
         }
       });
       openArr.forEach((cur: string) => {
         if (!openPanel.some((prev: string) => cur === prev)) {
-          dispatch(fetchNFTAsync({ symbol: cur, caAddresses }));
+          const curTmp = cur.split('_');
+          dispatch(fetchNFTAsync({ symbol: curTmp[0], caAddresses: [wallet[curTmp[1]].caAddress] }));
         }
       });
       setOpenPanel(openArr);
     },
-    [caAddresses, dispatch, openPanel],
+    [dispatch, openPanel, wallet],
   );
 
   useEffect(() => {
@@ -53,7 +55,7 @@ export default function NFT() {
     (nft: NFTCollectionItemShowType) => {
       return (
         <Collapse.Panel
-          key={nft.symbol}
+          key={`${nft.symbol}_${nft.chainId}`}
           header={
             <div className="protocol">
               <div className="avatar">
@@ -92,7 +94,7 @@ export default function NFT() {
               <div
                 className="load-more"
                 onClick={() => {
-                  getMore(nft.symbol);
+                  getMore(nft.symbol, nft.chainId);
                 }}>
                 <CustomSvg type="Down" /> More
               </div>

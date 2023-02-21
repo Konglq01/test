@@ -8,6 +8,8 @@ import { useTokenPrice } from '@portkey/hooks/hooks-ca/useTokensPrice';
 import './index.less';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { CROSS_FEE } from '@portkey/constants/constants-ca/wallet';
+import { unitConverter } from '@portkey/utils/converter';
+import { isAelfAddress } from '@portkey/utils/aelf';
 
 export default function SendPreview({
   amount,
@@ -36,15 +38,18 @@ export default function SendPreview({
   const isMain = useMemo(() => (chainId === 'AELF' ? 'MainChain' : 'SideChain'), [chainId]);
   const txFee = useMemo(() => {
     if (isCross && symbol === 'ELF') {
-      return ZERO.plus(CROSS_FEE).plus(transactionFee);
+      return unitConverter(ZERO.plus(CROSS_FEE).plus(transactionFee).toNumber());
     } else {
       return transactionFee;
     }
   }, [isCross, symbol, transactionFee]);
-  const toChain = useMemo(
-    () => getChainIdByAddress(toAccount.address, networkInfo.walletType),
-    [networkInfo.walletType, toAccount.address],
-  );
+  const toChain = useMemo(() => {
+    const arr = toAccount.address.split('_');
+    if (isAelfAddress(arr[arr.length - 1])) {
+      return 'AELF';
+    }
+    return arr[arr.length - 1];
+  }, [toAccount.address]);
 
   return (
     <div className="send-preview">
@@ -110,7 +115,7 @@ export default function SendPreview({
         <div className="fee-preview">
           <span className="label">Estimated Amount Received</span>
           <p className="value">
-            <span className="symbol">{`${ZERO.plus(amount).minus(ZERO.plus(CROSS_FEE))} ELF`}</span>
+            <span className="symbol">{`${unitConverter(ZERO.plus(amount).minus(ZERO.plus(CROSS_FEE)))} ELF`}</span>
           </p>
         </div>
       )}

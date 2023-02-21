@@ -48,7 +48,7 @@ export default function AccountName(props: AccountNameProps) {
       } else if (!isValidCAWalletName(name)) {
         setValidName({
           validateStatus: 'error',
-          errorMsg: 'only a-z, A-Z, 0-9 and "_" "空格" allowed',
+          errorMsg: 'only a-z, A-Z, 0-9 and "_" allowed',
         });
         setDisable(true);
       } else {

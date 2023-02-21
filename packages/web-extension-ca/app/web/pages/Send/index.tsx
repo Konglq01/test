@@ -182,7 +182,7 @@ export default function Send() {
       return feeRes;
     } catch (error) {
       const _error = contractErrorHandler(error);
-      message.error(_error || 'amount is greater then balance');
+      console.log('getFee===error', _error);
     }
   }, [
     amount,
@@ -213,16 +213,19 @@ export default function Send() {
 
   const handleCheckPreview = useCallback(async () => {
     try {
+      if (!ZERO.plus(amount).toNumber()) return 'Please input amount';
       if (type === 'token') {
         if (ZERO.plus(amount).times(`1e${tokenInfo.decimals}`).isGreaterThan(ZERO.plus(balance))) {
           return TransactionError.TOKEN_NOTE_ENOUGH;
         }
-        const fee = await getTranslationInfo();
-        setTxFee(fee);
-        if (symbol === 'ELF') {
+        if (tokenInfo.symbol === 'ELF') {
           if (ZERO.plus(amount).times(`1e${tokenInfo.decimals}`).isEqualTo(ZERO.plus(balance))) {
             return TransactionError.FEE_NOTE_ENOUGH;
           }
+        }
+        const fee = await getTranslationInfo();
+        setTxFee(fee);
+        if (symbol === 'ELF') {
           if (
             ZERO.plus(amount)
               .plus(fee || '')
@@ -259,9 +262,9 @@ export default function Send() {
       return '';
     } catch (error: any) {
       console.log('checkTransactionValue===', error);
-      return 'ERROR';
+      return TransactionError.FEE_NOTE_ENOUGH;
     }
-  }, [type, amount, tokenInfo.decimals, balance, getTranslationInfo, symbol, getEleBalance]);
+  }, [type, amount, tokenInfo.decimals, tokenInfo.symbol, balance, getTranslationInfo, symbol, getEleBalance]);
 
   const sendHandler = useCallback(async () => {
     try {
@@ -383,6 +386,8 @@ export default function Send() {
           const res = await handleCheckPreview();
           if (!res) {
             setTipMsg('');
+            const fee = await getTranslationInfo();
+            setTxFee(fee);
             setStage(Stage.Preview);
           } else {
             setTipMsg(res);
@@ -391,6 +396,7 @@ export default function Send() {
         backFun: () => {
           setStage(Stage.Address);
           setAmount('');
+          setTipMsg('');
         },
         element: (
           <AmountInput

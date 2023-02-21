@@ -77,20 +77,22 @@ export default function Contacts() {
             navigate('/setting');
           }}
           rightElement={
-            <div className="flex-center header-right-close">
-              <Button
-                onClick={() => {
-                  navigate('/setting/contacts/add', { state: initContactItem });
-                }}>
-                {t('Add contact')}
-              </Button>
-              <CustomSvg
-                type="Close2"
-                onClick={() => {
-                  navigate('/setting');
-                }}
-              />
-            </div>
+            (curTotalContactsNum !== 0 || (curTotalContactsNum === 0 && isSearch)) && (
+              <div className="flex-center header-right-close">
+                <Button
+                  onClick={() => {
+                    navigate('/setting/contacts/add', { state: initContactItem });
+                  }}>
+                  {t('Add contact')}
+                </Button>
+                <CustomSvg
+                  type="Close2"
+                  onClick={() => {
+                    navigate('/setting');
+                  }}
+                />
+              </div>
+            )
           }
         />
         <Input

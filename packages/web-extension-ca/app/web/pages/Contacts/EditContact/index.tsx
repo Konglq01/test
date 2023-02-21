@@ -16,11 +16,11 @@ import { useAddContact, useDeleteContact, useEditContact, useCheckContactName } 
 
 const { Item: FormItem } = Form;
 export enum ContactInfoError {
-  invalidAddress = 'Invalid Address',
+  invalidAddress = 'Invalid address',
   recipientAddressIsInvalid = 'Recipient address is invalid',
-  noName = 'Please enter name',
-  alreadyExists = 'This Name Already Exists',
-  inValidName = 'only a-z, A-Z, 0-9 and "_" "空格" allowed',
+  noName = 'Please enter contact name',
+  alreadyExists = 'This name already exists.',
+  inValidName = '3-16 characters, only a-z, A-Z, 0-9 and "_" allowed',
 }
 
 type ValidateStatus = Parameters<typeof Form.Item>[0]['validateStatus'];
@@ -304,7 +304,7 @@ export default function EditContact() {
                         help={addressArr?.[i]?.validData?.errorMsg}>
                         <Input
                           onChange={(e) => handleAddressChange(i, e.target.value)}
-                          placeholder={t("Enter Contact's Address")}
+                          placeholder={t("Enter contact's address")}
                           addonBefore="ELF"
                           addonAfter={addressArr[i]?.chainId}
                         />
@@ -333,7 +333,7 @@ export default function EditContact() {
             <div className="form-btn-add">
               <FormItem>
                 <Button className="add-btn" type="primary" htmlType="submit" disabled={disable}>
-                  {t('Save')}
+                  {t('Add')}
                 </Button>
               </FormItem>
             </div>

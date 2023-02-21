@@ -20,7 +20,7 @@ export default function NetworkDrawer({ onChange, onClose, ...props }: CustomSel
   const networkLists = useMemo(
     () => [
       { networkType: 'TESTNET', chainId: 'AELF', networkName: 'MainChain AELF Testnet' },
-      { networkType: 'TESTNET', chainId: 'tDVW', networkName: 'SideChain tDVW Testnet' },
+      { networkType: 'TESTNET', chainId: 'tDVV', networkName: 'SideChain tDVV Testnet' },
     ],
     [],
   );

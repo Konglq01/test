@@ -68,7 +68,7 @@ function TokenDetail() {
         </div>
       </div>
       <div className="token-detail-history">
-        <Activity />
+        <Activity chainId={currentToken.chainId} symbol={currentToken.symbol} />
       </div>
     </div>
   );

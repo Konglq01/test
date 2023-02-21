@@ -1,13 +1,8 @@
-import RegisterStart from 'pages/RegisterStart';
-import SelectVerifier from 'pages/SelectVerifier';
 import { useRoutes } from 'react-router-dom';
 import Home from 'pages/Home';
-import ScreenOpeningPage from 'pages/ScreenOpening';
 import Wallet from 'pages/Wallet';
 import VerifierAccount from 'pages/VerifierAccount';
 import Contacts from 'pages/Contacts';
-import SetWalletPin from 'pages/SetWalletPin';
-import SuccessPage from 'pages/SuccessPage';
 import GuardianApproval from 'pages/GuardianApproval';
 import Guardians from 'pages/Guardians';
 import GuardiansEdit from 'pages/Guardians/GuardiansEdit';
@@ -36,42 +31,6 @@ export const PageRouter = () =>
     {
       path: '/',
       element: <Home />,
-    },
-    {
-      path: '/register',
-      element: <ScreenOpeningPage />,
-    },
-    {
-      path: '/register/start',
-      element: <RegisterStart />,
-    },
-    {
-      path: '/register/start/:type',
-      element: <RegisterStart />,
-    },
-    {
-      path: '/register/select-verifier',
-      element: <SelectVerifier />,
-    },
-    {
-      path: '/register/verifier-account',
-      element: <VerifierAccount />,
-    },
-    {
-      path: '/login/set-pin/:type',
-      element: <SetWalletPin />,
-    },
-    {
-      path: '/success-page/:type',
-      element: <SuccessPage />,
-    },
-    {
-      path: '/login/guardian-approval',
-      element: <GuardianApproval />,
-    },
-    {
-      path: '/login/verifier-account',
-      element: <VerifierAccount />,
     },
     {
       path: '/setting',
