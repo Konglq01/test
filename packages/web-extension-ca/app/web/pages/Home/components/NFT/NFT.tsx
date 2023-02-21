@@ -1,5 +1,6 @@
 import { useCaAddresses, useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { clearNftItem, fetchNFTAsync, fetchNFTCollectionsAsync } from '@portkey/store/store-ca/assets/slice';
+import { ChainId } from '@portkey/types';
 import { NFTCollectionItemShowType, NFTItemBaseType } from '@portkey/types/types-ca/assets';
 import { Collapse } from 'antd';
 import { List } from 'antd-mobile';
@@ -23,7 +24,7 @@ export default function NFT() {
 
   const getMore = useCallback(
     (symbol: string, chainId: string) => {
-      dispatch(fetchNFTAsync({ symbol, caAddresses: [wallet[chainId].caAddress] }));
+      dispatch(fetchNFTAsync({ symbol, chainId: chainId as ChainId, caAddresses: [wallet[chainId].caAddress] }));
     },
     [dispatch, wallet],
   );
@@ -39,7 +40,13 @@ export default function NFT() {
       openArr.forEach((cur: string) => {
         if (!openPanel.some((prev: string) => cur === prev)) {
           const curTmp = cur.split('_');
-          dispatch(fetchNFTAsync({ symbol: curTmp[0], caAddresses: [wallet[curTmp[1]].caAddress] }));
+          dispatch(
+            fetchNFTAsync({
+              symbol: curTmp[0],
+              chainId: curTmp[1] as ChainId,
+              caAddresses: [wallet[curTmp[1]].caAddress],
+            }),
+          );
         }
       });
       setOpenPanel(openArr);
@@ -81,7 +88,7 @@ export default function NFT() {
                     }}
                     className="item"
                     onClick={() => {
-                      nav('/nft', { state: { ...nftItem, address: nftItem.tokenContractAddress } });
+                      nav('/nft', { state: { ...nftItem, address: nftItem.tokenContractAddress, decimals: 0 } });
                     }}>
                     <div className="mask">
                       <p className="alias">{nftItem.alias}</p>
