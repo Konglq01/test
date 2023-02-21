@@ -55,7 +55,7 @@ export default function MyBalance() {
     //   }),
     // );
     appDispatch(fetchTokenListAsync({ caAddresses }));
-    // appDispatch(fetchAllTokenListAsync({ keyword: '', chainIdArray }));
+    appDispatch(fetchAllTokenListAsync({ keyword: '', chainIdArray }));
   }, [passwordSeed, appDispatch, caAddresses, chainIdArray]);
 
   useEffect(() => () => clearInterval(timer), []);
