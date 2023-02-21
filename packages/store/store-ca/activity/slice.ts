@@ -31,9 +31,11 @@ export const activitySlice = createSlice({
   },
   extraReducers: builder => {
     builder.addCase(getActivityListAsync.fulfilled, (state, action) => {
-      const { data, totalRecordCount } = action.payload;
+      const { data, totalRecordCount, skipCount, maxResultCount } = action.payload;
       state.data = [...state.data, ...data];
       state.totalRecordCount = totalRecordCount;
+      state.skipCount = skipCount;
+      state.maxResultCount = maxResultCount;
     });
   },
 });
