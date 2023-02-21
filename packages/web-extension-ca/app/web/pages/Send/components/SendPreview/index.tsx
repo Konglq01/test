@@ -36,7 +36,7 @@ export default function SendPreview({
   const isMain = useMemo(() => (chainId === 'AELF' ? 'MainChain' : 'SideChain'), [chainId]);
   const txFee = useMemo(() => {
     if (isCross && symbol === 'ELF') {
-      return CROSS_FEE + transactionFee;
+      return ZERO.plus(CROSS_FEE).plus(transactionFee);
     } else {
       return transactionFee;
     }
@@ -102,9 +102,7 @@ export default function SendPreview({
       <div className="fee-preview">
         <span className="label">Transaction fee</span>
         <p className="value">
-          <span className="symbol">{`${
-            isCross && symbol === 'ELF' ? ZERO.plus(txFee).plus(CROSS_FEE) : txFee
-          } ELF`}</span>
+          <span className="symbol">{`${txFee} ELF`}</span>
           {/* <span className="usd">{`$ ${ZERO.plus(ElfPrice[0]).times(txFee).toFixed(2)}`}</span> */}
         </p>
       </div>
