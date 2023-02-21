@@ -28,17 +28,13 @@ export default function TokenInput({
   value,
   errorMsg,
   onChange,
-  onTxFeeChange,
-  onCheckValue,
 }: {
   fromAccount: { address: string; AESEncryptPrivateKey: string };
   toAccount: { address: string };
   token: BaseToken;
   value: string;
   errorMsg: string;
-  onChange: (amount: string) => void;
-  onTxFeeChange?: (fee: string) => void;
-  onCheckValue?: (params: { balance: string; fee: string; amount: string }) => void;
+  onChange: (params: { amount: string; balance: string }) => void;
 }) {
   const currentNetwork = useCurrentNetworkInfo();
   const currentChain = useCurrentChain(token.chainId as ChainId);
@@ -47,49 +43,7 @@ export default function TokenInput({
   const [amount, setAmount] = useState<string>(value ? `${value} ${token.symbol}` : '');
   const [balance, setBalance] = useState<string>('');
   const { passwordSeed } = useUserInfo();
-  const [fee, setTransactionFee] = useState<string>();
   const wallet = useCurrentWalletInfo();
-
-  const getTranslationInfo = useCallback(async () => {
-    try {
-      if (!toAccount?.address) throw 'No toAccount';
-      const privateKey = await aes.decrypt(fromAccount.AESEncryptPrivateKey, passwordSeed);
-      if (!privateKey) throw t(WalletError.invalidPrivateKey);
-      if (!currentChain) throw 'No ChainInfo';
-      const _amount = amount?.replace(` ${token?.symbol}`, '') || 0;
-      const fee = await getTransferFee({
-        managerAddress: wallet.address,
-        toAddress: toAccount?.address,
-        privateKey,
-        chainInfo: currentChain,
-        chainType: currentNetwork.walletType,
-        token,
-        caHash: wallet.caHash as string,
-        amount: timesDecimals(_amount, token.decimals).toNumber(),
-      });
-
-      setTransactionFee(fee);
-      onTxFeeChange?.(fee);
-    } catch (error) {
-      console.log(error, 'transactionRes==error');
-      const _error = contractErrorHandler(error) || 'Get translation fee error';
-      message.error(_error);
-    }
-  }, [
-    amount,
-    currentChain,
-    currentNetwork.walletType,
-    fromAccount.AESEncryptPrivateKey,
-    onTxFeeChange,
-    passwordSeed,
-    t,
-    toAccount?.address,
-    token,
-    wallet.address,
-    wallet.caHash,
-  ]);
-
-  console.log('getTokenBalance', currentChain);
 
   const getTokenBalance = useCallback(async () => {
     if (!currentChain) return;
@@ -128,16 +82,8 @@ export default function TokenInput({
 
     // return valueString.length ? `${valueString} ${token.symbol}` : '';
     // });
-    onChange(amount);
-    amount &&
-      setTimeout(() => {
-        getTranslationInfo();
-      }, 0);
-  }, [amount, getTranslationInfo, onChange]);
-
-  useEffect(() => {
-    onCheckValue?.({ balance: balance || '', fee: fee || '', amount });
-  }, [amount, balance, fee, onCheckValue]);
+    onChange({ amount, balance });
+  }, [amount, balance, onChange]);
 
   return (
     <div className="amount-wrap">
@@ -182,7 +128,6 @@ export default function TokenInput({
                 ZERO.plus(amount?.replace(` ${token?.symbol}`, '') || 0),
               )}`}</span>
             )}
-            {/* {fee ? `${fee} ELF` : ''} */}
           </div>
         </div>
       </div>

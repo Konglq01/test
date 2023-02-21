@@ -55,7 +55,7 @@ export default function Receive() {
           <p className="network">{`${isMainChain ? 'MainChain' : 'SideChain'} ${chainId} ${isTestNet}`}</p>
         </div>
         <QRCode
-          imageSettings={{ src: 'assets/svgIcon/PortKey.svg', height: 30, width: 30, excavate: true }}
+          imageSettings={{ src: 'assets/svgIcon/PortkeyQR.svg', height: 48, width: 48, excavate: true }}
           value={JSON.stringify(value)}
           // eslint-disable-next-line no-inline-styles/no-inline-styles
           style={{ width: 140, height: 140 }}

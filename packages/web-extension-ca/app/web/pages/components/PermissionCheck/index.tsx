@@ -55,7 +55,7 @@ export default function PermissionCheck({
 
   const _sleep = useCallback(async () => {
     // TODO This is a bug
-    await sleep(1000);
+    await sleep(2000);
     return 'Extension error';
   }, []);
 
@@ -66,7 +66,7 @@ export default function PermissionCheck({
         _sleep(),
       ]);
       console.log(res, 'CHECK_WALLET_STATUS');
-      if (typeof res !== 'object') return chrome.runtime.reload(); // navigate('/unlock');
+      if (typeof res === 'string') return chrome.runtime.reload(); // navigate('/unlock');
       const detail = (res as any)?.data;
       if (detail?.registerStatus === 'Registered') {
         detail?.privateKey && dispatch(setPasswordSeed(detail.privateKey));

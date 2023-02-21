@@ -10,7 +10,6 @@ import { fetchAssetAsync, fetchTokenListAsync } from '@portkey/store/store-ca/as
 import './index.less';
 import { ZERO } from '@portkey/constants/misc';
 import { unitConverter } from '@portkey/utils/converter';
-import { fetchAllTokenListAsync } from '@portkey/store/store-ca/tokenManagement/action';
 import { useCaAddresses } from '@portkey/hooks/hooks-ca/wallet';
 interface CustomSelectProps extends DrawerProps {
   onChange?: (v: AccountAssetItem, type: 'token' | 'nft') => void;
@@ -52,21 +51,13 @@ export default function CustomTokenDrawer({
   }, [accountAssets.accountAssetsList, accountToken.accountTokenList, drawerType, tokenDataShowInMarket]);
 
   useEffect(() => {
+    if (!passwordSeed) return;
     if (drawerType === 'send') {
       appDispatch(fetchAssetAsync({ caAddresses, keyword: filterWord }));
     } else {
-      appDispatch(fetchAllTokenListAsync({ keyword: filterWord, chainIdArray }));
+      appDispatch(fetchTokenListAsync({ caAddresses }));
     }
-  }, [appDispatch, caAddresses, chainIdArray, drawerType, filterWord]);
-  console.log('-------------accountAssets', accountAssets);
-
-  useEffect(() => {
-    if (drawerType === 'send') {
-      passwordSeed && fetchAssetAsync({ caAddresses, keyword: filterWord });
-    } else {
-      passwordSeed && fetchTokenListAsync({ caAddresses });
-    }
-  }, [passwordSeed, filterWord, drawerType, caAddresses]);
+  }, [passwordSeed, filterWord, drawerType, caAddresses, appDispatch]);
 
   const renderToken = useCallback(
     (token: AccountAssetItem) => {

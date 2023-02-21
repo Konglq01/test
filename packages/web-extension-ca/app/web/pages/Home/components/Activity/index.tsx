@@ -67,10 +67,13 @@ export default function Activity({ appendData, clearData, chainId, symbol }: Act
         maxResultCount: AMX_RESULT_COUNT,
         skipCount: skipCount + maxResultCount,
         caAddresses: caAddressList,
+        chainId: chainId,
+        symbol: symbol,
+        transactionTypes: transactionTypesForActivityList,
       };
       return dispatch(getActivityListAsync(params));
     }
-  }, [activity, caAddressList, dispatch]);
+  }, [activity, caAddressList, chainId, dispatch, symbol]);
 
   return (
     <div className="activity-wrapper">

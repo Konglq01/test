@@ -18,6 +18,7 @@ import { SandboxErrorCode } from '@portkey/utils/sandboxService';
 import getTransferFee from 'pages/Send/utils/getTransferFee';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { contractErrorHandler } from '@portkey/did-ui-react/src/utils/errorHandler';
+import { isCrossChain } from '@portkey/utils/aelf';
 
 export default function NftInput({
   toAccount,
@@ -26,18 +27,13 @@ export default function NftInput({
   value,
   errorMsg,
   onChange,
-  onTxFeeChange,
-  onCheckValue,
 }: {
   fromAccount: { address: string; AESEncryptPrivateKey: string };
-
   toAccount: { address: string };
   token: BaseToken;
   value: string;
   errorMsg: string;
-  onChange: (amount: string) => void;
-  onTxFeeChange?: (fee: string) => void;
-  onCheckValue?: (params: { balance: string; fee: string; amount: string }) => void;
+  onChange: (params: { amount: string; balance: string }) => void;
 }) {
   const { t } = useTranslation();
   // const [errorMsg, setErrorMsg] = useState('Insufficient funds');
@@ -45,49 +41,9 @@ export default function NftInput({
   const { passwordSeed } = useUserInfo();
   const currentChain = useCurrentChain(token.chainId as ChainId);
   const currentNetwork = useCurrentNetworkInfo();
-  const [fee, setTransactionFee] = useState<string>();
   const wallet = useCurrentWalletInfo();
   const isMain = useMemo(() => currentNetwork.networkType === 'MAIN', [currentNetwork]);
-
-  const getTranslationInfo = useCallback(async () => {
-    try {
-      if (!toAccount?.address) throw 'No toAccount';
-      const privateKey = await aes.decrypt(fromAccount.AESEncryptPrivateKey, passwordSeed);
-      if (!privateKey) throw t(WalletError.invalidPrivateKey);
-      if (!currentChain) throw 'No ChainInfo';
-      const _amount = amount?.replace(` ${token?.symbol}`, '') || 0;
-
-      const feeRes = await getTransferFee({
-        managerAddress: wallet.address,
-        toAddress: toAccount?.address,
-        privateKey,
-        chainInfo: currentChain,
-        chainType: currentNetwork.walletType,
-        token,
-        caHash: wallet.caHash as string,
-        amount: timesDecimals(_amount, token.decimals).toNumber(),
-      });
-      console.log(feeRes, 'transactionRes===');
-
-      setTransactionFee(feeRes);
-      onTxFeeChange?.(feeRes);
-    } catch (error) {
-      const _error = contractErrorHandler(error);
-      message.error(_error);
-    }
-  }, [
-    amount,
-    currentChain,
-    currentNetwork.walletType,
-    fromAccount.AESEncryptPrivateKey,
-    onTxFeeChange,
-    passwordSeed,
-    t,
-    toAccount?.address,
-    token,
-    wallet.address,
-    wallet.caHash,
-  ]);
+  const [balance, setBalance] = useState<string>('');
 
   const handleAmountBlur = useCallback(() => {
     // setAmount((v) => {
@@ -101,17 +57,10 @@ export default function NftInput({
     //     ?.toString();
     //   const valueString = valueProcessed ? `${parseInputChange(valueProcessed, ZERO, token?.decimals) || 0}` : '';
     //   onChange(valueString);
-
     //   return valueString.length ? `${valueString}` : '';
     // });
-    onChange(amount);
-
-    setTimeout(() => {
-      getTranslationInfo();
-    }, 0);
-  }, [amount, getTranslationInfo, onChange]);
-
-  const [balance, setBalance] = useState<string>();
+    onChange({ amount, balance });
+  }, [amount, balance, onChange]);
 
   const getTokenBalance = useCallback(async () => {
     if (!currentChain) return;
@@ -133,18 +82,14 @@ export default function NftInput({
     getTokenBalance();
   }, [getTokenBalance]);
 
-  useEffect(() => {
-    onCheckValue?.({ balance: balance || '', amount, fee: fee || '' });
-  }, [amount, balance, fee, onCheckValue]);
-
   return (
     <div className="amount-wrap">
       <div className="item asset nft">
         <div className="avatar">{token.imageUrl ? <img src={token.imageUrl} /> : <p>{token.symbol[0]}</p>}</div>
         <div className="info">
           <p className="index">
-            <span>{token.symbol}</span>
-            <span className="token-id">{token.decimals}</span>
+            <span>{token.alias}</span>
+            <span className="token-id"># {token.tokenId}</span>
           </p>
           <p className="quantity">
             Balance: <span>{`${unitConverter(divDecimals(balance, token.decimals))}`}</span>

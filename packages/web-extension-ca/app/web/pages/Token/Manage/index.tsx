@@ -7,11 +7,9 @@ import { useToken } from '@portkey/hooks/hooks-ca/useToken';
 import { TokenItemShowType } from '@portkey/types/types-ca/token';
 import DropdownSearch from 'components/DropdownSearch';
 import { useTranslation } from 'react-i18next';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { useAppDispatch, useTokenInfo, useUserInfo, useWalletInfo } from 'store/Provider/hooks';
-
-import './index.less';
 import { fetchAllTokenListAsync } from '@portkey/store/store-ca/tokenManagement/action';
+import './index.less';
 
 export default function AddToken() {
   const { t } = useTranslation();
@@ -51,7 +49,7 @@ export default function AddToken() {
         console.log('=== userToken display', error);
       }
     },
-    [displayUserToken],
+    [chainIdArray, displayUserToken, filterWord],
   );
 
   const renderTokenItem = useCallback(
@@ -85,7 +83,7 @@ export default function AddToken() {
           {item.symbol === 'ELF' ? (
             <CustomSvg className="token-logo" type="Aelf" />
           ) : (
-            <div className="token-logo custom-word-logo">{(item.symbol && item.symbol[0]) || ''}</div>
+            <div className="token-logo custom-word-logo">{item.symbol?.[0] || ''}</div>
           )}
           <p className="token-info">
             <span className="token-item-symbol">{item.symbol}</span>

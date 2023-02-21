@@ -72,25 +72,25 @@ const crossChainTransfer = async ({
 }: CrossChainTransferParams) => {
   let managerTransferResult;
   try {
-    let _amount = amount;
-    if (tokenInfo.symbol === nativeToken.symbol) {
-      //
-      _amount = ZERO.plus(amount).plus(fee).toNumber();
-    } else {
-      await managerTransfer({
-        rpcUrl: chainInfo.endPoint,
-        address: chainInfo.caContractAddress,
-        chainType,
-        privateKey,
-        paramsOption: {
-          caHash,
-          symbol: 'ELF',
-          to: managerAddress,
-          amount: fee,
-          memo,
-        },
-      });
-    }
+    // let _amount = amount;
+    // if (tokenInfo.symbol === nativeToken.symbol) {
+    //   //
+    //   _amount = ZERO.plus(amount).plus(fee).toNumber();
+    // } else {
+    //   await managerTransfer({
+    //     rpcUrl: chainInfo.endPoint,
+    //     address: chainInfo.caContractAddress,
+    //     chainType,
+    //     privateKey,
+    //     paramsOption: {
+    //       caHash,
+    //       symbol: 'ELF',
+    //       to: managerAddress,
+    //       amount: fee,
+    //       memo,
+    //     },
+    //   });
+    // }
     // first transaction:transfer to manager itself
     managerTransferResult = await managerTransfer({
       rpcUrl: chainInfo.endPoint,
@@ -101,7 +101,7 @@ const crossChainTransfer = async ({
         caHash,
         symbol: tokenInfo.symbol,
         to: managerAddress,
-        amount: _amount,
+        amount: amount,
         memo,
       },
     });
