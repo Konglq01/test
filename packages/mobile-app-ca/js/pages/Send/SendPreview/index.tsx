@@ -188,7 +188,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
 
         console.log('crossChainTransferResult', crossChainTransferResult);
 
-        navigationService.navigate('DashBoard');
+        navigationService.navigate('Tab');
         CommonToast.success('success');
       } else {
         console.log('sameChainTransfers==sendHandler', tokenInfo);
@@ -207,7 +207,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
         }
 
         console.log('sameTransferResult', sameTransferResult);
-        navigationService.navigate('DashBoard');
+        navigationService.navigate('Tab');
         CommonToast.success('success');
       }
     } catch (error: any) {

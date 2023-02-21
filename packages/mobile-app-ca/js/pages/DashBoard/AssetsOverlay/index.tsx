@@ -209,6 +209,7 @@ const AssetList = ({ onFinishSelectToken, account }: TokenListProps) => {
 export const showAssetList = (props: TokenListProps) => {
   OverlayModal.show(<AssetList {...props} />, {
     position: 'bottom',
+    autoKeyboardInsets: false,
   });
 };
 
