@@ -21,6 +21,7 @@ import { fetchAssetList } from '@portkey/store/store-ca/assets/api';
 import { IAssetItemType } from '@portkey/store/store-ca/assets/type';
 import navigationService from 'utils/navigationService';
 import { IToSendAssetParamsType, IToSendHomeParamsType } from '@portkey/types/types-ca/routeParams';
+import useEffectOnce from 'hooks/useEffectOnce';
 
 type onFinishSelectTokenType = (tokenItem: any) => void;
 type TokenListProps = {
@@ -122,6 +123,7 @@ const AssetList = ({ onFinishSelectToken, account }: TokenListProps) => {
         pageInfoRef.current.curPage = pageInfoRef.current.curPage + 1;
         pageInfoRef.current.total = response.totalRecordCount;
         console.log('fetchAccountAssetsByKeywords:', response);
+
         if (isInit) {
           setListShow(response.data);
         } else {
@@ -140,12 +142,16 @@ const AssetList = ({ onFinishSelectToken, account }: TokenListProps) => {
     pageInfoRef.current = {
       ...INIT_PAGE_INFO,
     };
-    getList(keyword, true);
-  }, [getList, keyword]);
+    getList(debounceKeyword, true);
+  }, [getList, debounceKeyword]);
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   onKeywordChange();
+  // }, [debounceKeyword, onKeywordChange]);
+
+  useEffectOnce(() => {
     onKeywordChange();
-  }, [debounceKeyword, onKeywordChange]);
+  });
 
   const renderItem = useCallback(({ item }: { item: IAssetItemType }) => {
     return (
