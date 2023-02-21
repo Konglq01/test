@@ -27,6 +27,12 @@ import AddressSelector from './components/AddressSelector';
 import AmountInput from './components/AmountInput';
 import SendPreview from './components/SendPreview';
 import ToAccount from './components/ToAccount';
+import { getBalance } from 'utils/sandboxUtil/getBalance';
+import { WalletError } from '@portkey/store/wallet/type';
+import getTransferFee from './utils/getTransferFee';
+import { contractErrorHandler } from '@portkey/did-ui-react/src/utils/errorHandler';
+import { ZERO } from '@portkey/constants/misc';
+import { TransactionError } from '@portkey/constants/constants-ca/assets';
 import './index.less';
 
 export type Account = { address: string; name?: string };
@@ -62,9 +68,11 @@ export default function Send() {
   const [toAccount, setToAccount] = useState<{ name?: string; address: string }>({ address: '' });
   const [stage, setStage] = useState<Stage>(Stage.Address);
   const [amount, setAmount] = useState('');
-  const [checkValue, setCheckValue] = useState({ balance: '', fee: '', amount: '' });
+  const [balance, setBalance] = useState('');
 
-  const [txFee, setTransactionFee] = useState<string>();
+  const [txFee, setTxFee] = useState<string>();
+  const currentChain = useCurrentChain(state.chainId);
+
   const tokenInfo = useMemo(
     () => ({
       chainId: state.chainId,
@@ -73,6 +81,8 @@ export default function Send() {
       symbol: state.symbol, // "ELF"   the name showed
       name: state.symbol,
       imageUrl: state.imageUrl,
+      alias: state.alias,
+      tokenId: state.tokenId,
     }),
     [state],
   );
@@ -150,10 +160,108 @@ export default function Send() {
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [t],
+    [],
   );
 
-  console.log('---------amount', amount);
+  const getTranslationInfo = useCallback(async () => {
+    try {
+      if (!toAccount?.address) throw 'No toAccount';
+      const privateKey = await aes.decrypt(wallet.AESEncryptPrivateKey, passwordSeed);
+      if (!privateKey) throw t(WalletError.invalidPrivateKey);
+      if (!currentChain) throw 'No ChainInfo';
+      const feeRes = await getTransferFee({
+        managerAddress: wallet.address,
+        toAddress: toAccount?.address,
+        privateKey,
+        chainInfo: currentChain,
+        chainType: currentNetwork.walletType,
+        token: tokenInfo,
+        caHash: wallet.caHash as string,
+        amount: timesDecimals(amount, tokenInfo.decimals).toNumber(),
+      });
+      return feeRes;
+    } catch (error) {
+      const _error = contractErrorHandler(error);
+      message.error(_error || 'amount is greater then balance');
+    }
+  }, [
+    amount,
+    currentChain,
+    currentNetwork.walletType,
+    passwordSeed,
+    t,
+    toAccount?.address,
+    tokenInfo,
+    wallet.AESEncryptPrivateKey,
+    wallet.address,
+    wallet.caHash,
+  ]);
+
+  const getEleBalance = useCallback(async () => {
+    if (!currentChain) return;
+    const result = await getBalance({
+      rpcUrl: currentChain.endPoint,
+      address: state.address,
+      chainType: currentNetwork.walletType,
+      paramsOption: {
+        owner: wallet[state.chainId].caAddress,
+        symbol: 'ELF',
+      },
+    });
+    return result.result.balance;
+  }, [currentChain, currentNetwork.walletType, state.address, state.chainId, wallet]);
+
+  const handleCheckPreview = useCallback(async () => {
+    try {
+      if (type === 'token') {
+        if (ZERO.plus(amount).times(`1e${tokenInfo.decimals}`).isGreaterThan(ZERO.plus(balance))) {
+          return TransactionError.TOKEN_NOTE_ENOUGH;
+        }
+        const fee = await getTranslationInfo();
+        setTxFee(fee);
+        if (symbol === 'ELF') {
+          if (ZERO.plus(amount).times(`1e${tokenInfo.decimals}`).isEqualTo(ZERO.plus(balance))) {
+            return TransactionError.FEE_NOTE_ENOUGH;
+          }
+          if (
+            ZERO.plus(amount)
+              .plus(fee || '')
+              .times(`1e${tokenInfo.decimals}`)
+              .isGreaterThan(ZERO.plus(balance))
+          ) {
+            return TransactionError.FEE_NOTE_ENOUGH;
+          }
+        } else {
+          const elfBalance = await getEleBalance();
+          if (
+            ZERO.plus(fee || '')
+              .times(`1e${tokenInfo.decimals}`)
+              .isGreaterThan(ZERO.plus(elfBalance))
+          ) {
+            return TransactionError.FEE_NOTE_ENOUGH;
+          }
+        }
+      } else {
+        if (ZERO.plus(amount).isGreaterThan(ZERO.plus(balance))) {
+          return TransactionError.NFT_NOTE_ENOUGH;
+        }
+        const fee = await getTranslationInfo();
+        setTxFee(fee);
+        const elfBalance = await getEleBalance();
+        if (
+          ZERO.plus(fee || '')
+            .times(`1e${tokenInfo.decimals}`)
+            .isGreaterThan(ZERO.plus(elfBalance))
+        ) {
+          return TransactionError.FEE_NOTE_ENOUGH;
+        }
+      }
+      return '';
+    } catch (error: any) {
+      console.log('checkTransactionValue===', error);
+      return 'ERROR';
+    }
+  }, [type, amount, tokenInfo.decimals, balance, getTranslationInfo, symbol, getEleBalance]);
 
   const sendHandler = useCallback(async () => {
     try {
@@ -165,7 +273,6 @@ export default function Send() {
       setLoading(true);
 
       if (isCrossChain(toAccount.address, chainInfo?.chainId ?? 'AELF')) {
-        console.log('crossChainTransfer==sendHandler');
         await crossChainTransfer({
           chainInfo,
           chainType: currentNetwork.walletType,
@@ -175,7 +282,7 @@ export default function Send() {
           caHash: wallet?.caHash || '',
           amount: timesDecimals(amount, tokenInfo.decimals).toNumber(),
           toAddress: toAccount.address,
-          fee: timesDecimals(checkValue.fee, 8).toNumber(),
+          fee: timesDecimals(txFee, 8).toNumber(),
         });
       } else {
         console.log('sameChainTransfers==sendHandler');
@@ -216,7 +323,6 @@ export default function Send() {
   }, [
     amount,
     chainInfo,
-    checkValue.fee,
     currentNetwork.walletType,
     dispatch,
     navigate,
@@ -225,12 +331,12 @@ export default function Send() {
     showErrorModal,
     toAccount.address,
     tokenInfo,
+    txFee,
     wallet.AELF?.caHash,
     wallet.AESEncryptPrivateKey,
     wallet.address,
     wallet?.caHash,
   ]);
-  console.log(checkValue, 'checkValue===');
 
   const StageObj: TypeStageObj = useMemo(
     () => ({
@@ -273,15 +379,13 @@ export default function Send() {
       },
       1: {
         btnText: 'Preview',
-        handler: () => {
-          const { balance, fee, amount } = checkValue;
-          if (Number(amount) > Number(balance)) {
-            setTipMsg(type === 'nft' ? 'Insufficient quantity' : 'Insufficient funds');
-          } else if (Number(fee) > Number(balance) - Number(amount)) {
-            setTipMsg('Insufficient funds for transaction fee');
-          } else {
+        handler: async () => {
+          const res = await handleCheckPreview();
+          if (!res) {
             setTipMsg('');
             setStage(Stage.Preview);
+          } else {
+            setTipMsg(res);
           }
         },
         backFun: () => {
@@ -292,7 +396,7 @@ export default function Send() {
           <AmountInput
             type={type as any}
             fromAccount={{
-              address: wallet[DefaultChainId]?.caAddress || '',
+              address: wallet[state.chainId].caAddress,
               AESEncryptPrivateKey: wallet.AESEncryptPrivateKey,
             }}
             toAccount={{
@@ -301,13 +405,10 @@ export default function Send() {
             value={amount}
             errorMsg={tipMsg}
             token={tokenInfo as BaseToken}
-            onChange={(amount) => {
+            onChange={({ amount, balance }) => {
               setAmount(amount);
+              setBalance(balance);
             }}
-            onTxFeeChange={(fee) => {
-              setTransactionFee(fee);
-            }}
-            onCheckValue={setCheckValue}
           />
         ),
       },
@@ -321,10 +422,14 @@ export default function Send() {
         },
         element: (
           <SendPreview
+            type={type as 'token' | 'nft'}
             toAccount={toAccount}
             amount={amount}
             symbol={tokenInfo?.symbol || ''}
+            imageUrl={tokenInfo.imageUrl}
+            chainId={state.chainId}
             transactionFee={txFee || ''}
+            isCross={isCrossChain(toAccount.address, chainInfo?.chainId ?? 'AELF')}
           />
         ),
       },
@@ -332,6 +437,7 @@ export default function Send() {
     [
       type,
       wallet,
+      state.chainId,
       toAccount,
       amount,
       tipMsg,
@@ -341,7 +447,7 @@ export default function Send() {
       chainInfo?.chainId,
       t,
       navigate,
-      checkValue,
+      handleCheckPreview,
       sendHandler,
     ],
   );

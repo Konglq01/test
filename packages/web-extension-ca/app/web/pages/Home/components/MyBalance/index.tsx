@@ -26,12 +26,13 @@ let timer: any;
 export default function MyBalance() {
   const { walletName, currentNetwork, walletInfo } = useWalletInfo();
   const { t } = useTranslation();
-  const [balanceUSD, setBalanceUSD] = useState<string | number>('--');
   const [activeKey, setActiveKey] = useState<string>('assets');
   const [navTarget, setNavTarget] = useState<'send' | 'receive'>('send');
   const [tokenOpen, setTokenOpen] = useState(false);
   const {
     accountToken: { accountTokenList },
+    accountBalance,
+    accountAssets: { accountAssetsList },
   } = useAssetInfo();
   const navigate = useNavigate();
   const { passwordSeed } = useUserInfo();
@@ -41,27 +42,21 @@ export default function MyBalance() {
     () => Object.keys(walletInfo?.caInfo?.TESTNET || {}).filter((item) => item !== 'managerInfo'),
     [walletInfo?.caInfo?.TESTNET],
   );
+  const isMain = useMemo(() => currentNetwork === 'MAIN', [currentNetwork]);
+  console.log('-------accountAssetsList', accountAssetsList);
 
   useEffect(() => {
     console.log('---passwordSeed-myBalance---', passwordSeed);
-    passwordSeed &&
-      appDispatch(
-        fetchAssetAsync({
-          caAddresses,
-          keyword: '',
-        }),
-      );
-    passwordSeed && appDispatch(fetchTokenListAsync({ caAddresses }));
-    passwordSeed && appDispatch(fetchAllTokenListAsync({ keyword: '', chainIdArray }));
+    if (!passwordSeed) return;
+    // appDispatch(
+    //   fetchAssetAsync({
+    //     caAddresses,
+    //     keyword: '',
+    //   }),
+    // );
+    appDispatch(fetchTokenListAsync({ caAddresses }));
+    // appDispatch(fetchAllTokenListAsync({ keyword: '', chainIdArray }));
   }, [passwordSeed, appDispatch, caAddresses, chainIdArray]);
-
-  useEffect(() => {
-    let tmpAllBalanceUsd = 0;
-    accountTokenList.forEach((item) => {
-      tmpAllBalanceUsd += Number(item.balanceInUsd);
-    });
-    setBalanceUSD(tmpAllBalanceUsd + '');
-  }, [accountTokenList]);
 
   useEffect(() => () => clearInterval(timer), []);
 
@@ -78,7 +73,6 @@ export default function MyBalance() {
         onClose={() => setTokenOpen(false)}
         onChange={(v, type) => {
           setTokenOpen(false);
-          // navigate(`/${navTarget}/${v.token.symbol}`);
           const state = {
             chainId: v.chainId,
             decimals: type === 'nft' ? 0 : v.tokenInfo?.decimals,
@@ -86,12 +80,10 @@ export default function MyBalance() {
             symbol: v.symbol,
             name: v.symbol,
             imageUrl: type === 'nft' ? v.nftInfo?.imageUrl : '',
+            alias: type === 'nft' ? v.nftInfo?.alias : '',
+            tokenId: type === 'nft' ? v.nftInfo?.tokenId : '',
           };
-          if (navTarget === 'receive') {
-            navigate(`/${navTarget}/${type}/${v.symbol}/${v.chainId}`, { state });
-          } else {
-            navigate(`/${navTarget}/${type}/${v.symbol}/${v.chainId}`, { state });
-          }
+          navigate(`/${navTarget}/${type}/${v.symbol}/${v.chainId}`, { state });
         }}
       />
     );
@@ -105,14 +97,14 @@ export default function MyBalance() {
     <div className="balance">
       <div className="wallet-name">{walletName}</div>
       <div className="balance-amount">
-        {currentNetwork === 'MAIN' ? (
-          <span className="amount">$ {unitConverter(balanceUSD)}</span>
+        {isMain ? (
+          <span className="amount">$ {unitConverter(accountBalance)}</span>
         ) : (
           <span className="dev-mode amount">Dev Mode</span>
         )}
       </div>
       <BalanceCard
-        amount={balanceUSD}
+        amount={accountBalance}
         onSend={() => {
           // if (tokenList.length > 1) {
           setNavTarget('send');

@@ -15,30 +15,15 @@ export enum TokenTransferStatus {
 
 function TokenDetail() {
   const navigate = useNavigate();
-  const [currentToken, setCurrentToken] = useState<TokenItemShowType>();
-  const { symbol } = useParams();
+  // const [currentToken, setCurrentToken] = useState<TokenItemShowType>();
+  // const { symbol } = useParams();
   const { currentNetwork } = useWalletInfo();
-  const { state } = useLocation();
+  const { state: currentToken } = useLocation();
   const isMain = useMemo(() => currentNetwork === 'MAIN', [currentNetwork]);
   const currentChain = useMemo(
     () => (currentToken?.chainId.toLocaleLowerCase() === 'aelf' ? 'MainChain' : 'SideChain'),
     [currentToken],
   );
-  const transValue = useMemo(
-    () => ({
-      chainId: currentToken?.chainId,
-      decimals: currentToken?.decimals,
-      address: currentToken?.tokenContractAddress,
-      symbol: currentToken?.symbol,
-      name: currentToken?.symbol,
-    }),
-    [currentToken?.chainId, currentToken?.decimals, currentToken?.symbol, currentToken?.tokenContractAddress],
-  );
-
-  useEffect(() => {
-    const { tokenInfo } = state;
-    tokenInfo && setCurrentToken(tokenInfo);
-  }, [state, symbol]);
 
   console.log(currentToken, 'currentToken===');
 
@@ -59,20 +44,24 @@ function TokenDetail() {
         <div className="balance">
           <div className="balance-amount">
             <span className="amount">
-              {unitConverter(divDecimals(currentToken?.balance, currentToken?.decimals || 8))} {currentToken?.symbol}
+              {unitConverter(divDecimals(currentToken.balance, currentToken.decimals || 8))} {currentToken.symbol}
             </span>
-            {isMain && <span className="convert">$ {unitConverter(currentToken?.balanceInUsd)}</span>}
+            {isMain && (
+              <span className="convert">
+                $ {unitConverter(divDecimals(currentToken.balanceInUsd, currentToken.decimals || 8))}
+              </span>
+            )}
           </div>
           <BalanceCard
             amount={currentToken?.balanceInUsd}
             onSend={() => {
-              navigate(`/send/token/${currentToken?.symbol}/${currentToken?.id ?? ''}`, {
+              navigate(`/send/token/${currentToken?.symbol}/${currentToken?.chainId}`, {
                 state: { ...currentToken, address: currentToken?.tokenContractAddress },
               });
             }}
             onReceive={() =>
               navigate(`/receive/token/${currentToken?.symbol}/${currentToken?.chainId}`, {
-                state: transValue,
+                state: { ...currentToken, address: currentToken.tokenContractAddress },
               })
             }
           />

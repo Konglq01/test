@@ -1,6 +1,6 @@
 import { ZERO } from '@portkey/constants/misc';
 import { TokenItemShowType } from '@portkey/types/types-ca/token';
-import { unitConverter } from '@portkey/utils/converter';
+import { divDecimals, unitConverter } from '@portkey/utils/converter';
 import CustomSvg from 'components/CustomSvg';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -16,7 +16,7 @@ export default function TokenList({ tokenList }: { tokenList: TokenItemShowType[
 
   const onNavigate = useCallback(
     (tokenInfo: TokenItemShowType) => {
-      navigate('/token-detail', { state: { tokenInfo } });
+      navigate('/token-detail', { state: tokenInfo });
     },
     [navigate],
   );
@@ -43,11 +43,9 @@ export default function TokenList({ tokenList }: { tokenList: TokenItemShowType[
               </span>
             </div>
             <div className="amount">
-              <p>{unitConverter(ZERO.plus(item?.balance || '').div(`1e${item?.decimals}`))}</p>
+              <p>{unitConverter(divDecimals(item.balance, item.decimals || 8))}</p>
               {!isTestNet && (
-                <p className="convert">
-                  {`$ ${unitConverter(ZERO.plus(item?.balanceInUsd || '').div(`1e${item?.decimals}`))}`}
-                </p>
+                <p className="convert">{`$ ${unitConverter(divDecimals(item.balanceInUsd, item.decimals || 8))}`}</p>
               )}
             </div>
           </li>

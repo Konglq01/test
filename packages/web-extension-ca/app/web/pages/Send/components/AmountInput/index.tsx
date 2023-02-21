@@ -10,8 +10,6 @@ export default function AmountInput({
   token,
   errorMsg,
   onChange,
-  onTxFeeChange,
-  onCheckValue,
 }: {
   fromAccount: { address: string; AESEncryptPrivateKey: string };
   type: 'token' | 'nft';
@@ -19,9 +17,7 @@ export default function AmountInput({
   value: string;
   token: BaseToken;
   errorMsg: string;
-  onChange: (amount: string) => void;
-  onTxFeeChange?: (fee: string) => void;
-  onCheckValue?: (params: { balance: string; fee: string; amount: string }) => void;
+  onChange: (params: { amount: string; balance: string }) => void;
 }) {
   return type === 'token' ? (
     <TokenInput
@@ -31,8 +27,6 @@ export default function AmountInput({
       token={token}
       errorMsg={errorMsg}
       onChange={onChange}
-      onTxFeeChange={onTxFeeChange}
-      onCheckValue={onCheckValue}
     />
   ) : (
     <NftInput
@@ -42,8 +36,6 @@ export default function AmountInput({
       token={token}
       errorMsg={errorMsg}
       onChange={onChange}
-      onTxFeeChange={onTxFeeChange}
-      onCheckValue={onCheckValue}
     />
   );
 }

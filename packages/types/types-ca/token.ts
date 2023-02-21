@@ -9,6 +9,8 @@ export interface BaseToken {
   symbol: string; // "ELF"   the name showed
   name: string;
   imageUrl?: string;
+  alias?: string;
+  tokenId?: string; // nft tokenId
 }
 
 export interface TokenItemType extends BaseToken {

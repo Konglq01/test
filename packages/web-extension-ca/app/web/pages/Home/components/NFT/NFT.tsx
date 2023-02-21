@@ -28,18 +28,19 @@ export default function NFT() {
   );
 
   const handleChange = useCallback(
-    (arr: any) => {
+    (arr: string[] | string) => {
+      const openArr = typeof arr === 'string' ? [arr] : arr;
       openPanel.forEach((prev: string) => {
-        if (!arr.some((cur: string) => cur === prev)) {
+        if (!openArr.some((cur: string) => cur === prev)) {
           dispatch(clearNftItem(prev));
         }
       });
-      arr.forEach((cur: string) => {
+      openArr.forEach((cur: string) => {
         if (!openPanel.some((prev: string) => cur === prev)) {
           dispatch(fetchNFTAsync({ symbol: cur, caAddresses }));
         }
       });
-      setOpenPanel(arr);
+      setOpenPanel(openArr);
     },
     [caAddresses, dispatch, openPanel],
   );
