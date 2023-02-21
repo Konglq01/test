@@ -20,7 +20,13 @@ export default function NFTInfo({ nftItem = { alias: '', balance: 0 } }: AmountN
 
   return (
     <View style={styles.wrap}>
-      <CommonAvatar shapeType="square" title={nftItem?.alias || ''} avatarSize={pTd(56)} style={styles.avatar} />
+      <CommonAvatar
+        shapeType="square"
+        imageUrl={nftItem.imageUrl}
+        title={nftItem?.alias || ''}
+        avatarSize={pTd(56)}
+        style={styles.avatar}
+      />
       <View>
         <TextL>{`${nftItem?.alias || 'alias'}`}</TextL>
         <TextS style={styles.balance}>{`Balance: ${nftItem?.balance}`}</TextS>
