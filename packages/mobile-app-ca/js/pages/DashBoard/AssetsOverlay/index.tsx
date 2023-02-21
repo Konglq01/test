@@ -145,13 +145,14 @@ const AssetList = ({ onFinishSelectToken, account }: TokenListProps) => {
     getList(debounceKeyword, true);
   }, [getList, debounceKeyword]);
 
-  // useEffect(() => {
-  //   onKeywordChange();
-  // }, [debounceKeyword, onKeywordChange]);
-
-  useEffectOnce(() => {
+  useEffect(() => {
     onKeywordChange();
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debounceKeyword]);
+
+  // useEffectOnce(() => {
+  //   onKeywordChange();
+  // });
 
   const renderItem = useCallback(({ item }: { item: IAssetItemType }) => {
     return (

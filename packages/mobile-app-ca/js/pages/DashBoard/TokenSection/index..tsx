@@ -60,6 +60,12 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
     getAccountTokenList();
   });
 
+  useEffectOnce(() => {
+    setInterval(() => {
+      getAccountTokenList();
+    }, 5 * 60 * 1000);
+  });
+
   return (
     <View style={styles.tokenListPageWrap}>
       <FlatList

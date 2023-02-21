@@ -45,7 +45,8 @@ export interface SendHomeProps {
 enum ErrorMessage {
   RecipientAddressIsInvalid = 'Recipient address is invalid',
   NoCorrespondingNetwork = 'No corresponding network',
-  InsufficientFunds = 'Insufficient funds',
+  InsufficientFunds = 'Insufficient quantity',
+  InsufficientQuantity = 'Insufficient funds for transaction fee',
   InsufficientFundsForTransactionFee = 'Insufficient funds for transaction fee',
 }
 
@@ -288,6 +289,59 @@ const SendHome: React.FC<SendHomeProps> = props => {
       }
     }
 
+    // TODO: get balance dynamic
+    // peijuan code start
+    // if (sendType === 'token') {
+    //   // token
+    //   if (ZERO.plus(sendNumber).times(`1e${assetInfo.decimals}`).isGreaterThan(ZERO.plus(assetInfo.balance))) {
+    //     setErrorMessage([ErrorMessage.InsufficientFunds]);
+    //   }
+    //   if (assetInfo.symbol === 'ELF') {
+    //     if (ZERO.plus(assetInfo.balance).times(`1e${elf.decimals}`).isEqualTo(ZERO.plus(balance))) {
+    //       return ErrorMessage.InsufficientFunds;
+    //     }
+    //   }
+    //   const fee = await getTranslationInfo();
+    //   setTxFee(fee);
+    //   if (symbol === 'ELF') {
+    //     if (
+    //       ZERO.plus(amount)
+    //         .plus(fee || '')
+    //         .times(`1e${tokenInfo.decimals}`)
+    //         .isGreaterThan(ZERO.plus(balance))
+    //     ) {
+    //       return ErrorMessage.InsufficientFunds;
+    //     }
+    //   } else {
+    //     const elfBalance = await getEleBalance();
+    //     if (
+    //       ZERO.plus(fee || '')
+    //         .times(`1e${tokenInfo.decimals}`)
+    //         .isGreaterThan(ZERO.plus(elfBalance))
+    //     ) {
+    //       return ErrorMessage.InsufficientFunds;
+    //     }
+    //   }
+    // } else {
+    //   // nft
+
+    //   if (ZERO.plus(amount).isGreaterThan(ZERO.plus(balance))) {
+    //     return ErrorMessage.InsufficientQuantity;
+    //   }
+    //   const fee = await getTranslationInfo();
+    //   setTxFee(fee);
+    //   const elfBalance = await getEleBalance();
+    //   if (
+    //     ZERO.plus(fee || '')
+    //       .times(`1e${tokenInfo.decimals}`)
+    //       .isGreaterThan(ZERO.plus(elfBalance))
+    //   ) {
+    //     return ErrorMessage.InsufficientFunds;
+    //   }
+    // }
+
+    // peijuan code end
+
     return true;
   };
 
@@ -387,6 +441,10 @@ const SendHome: React.FC<SendHomeProps> = props => {
         <Text style={[styles.errorMessage, GStyles.textAlignCenter]}>
           {t(ErrorMessage.InsufficientFundsForTransactionFee)}
         </Text>
+      )}
+
+      {errorMessage.includes(ErrorMessage.InsufficientQuantity) && (
+        <Text style={[styles.errorMessage, GStyles.textAlignCenter]}>{t(ErrorMessage.InsufficientQuantity)}</Text>
       )}
 
       {/* total fee */}
