@@ -47,13 +47,15 @@ const QrScanner: React.FC<QrScannerProps> = ({ route }) => {
     <View style={PageStyle.wrapper}>
       <BarCodeScanner style={PageStyle.barCodeScanner} onBarCodeScanned={handleBarCodeScanned}>
         <SafeAreaView style={PageStyle.innerView}>
-          <TouchableOpacity
-            style={PageStyle.iconWrap}
-            onPress={() => {
-              navigationService.goBack();
-            }}>
-            <Svg icon="close1" size={pTd(14)} iconStyle={PageStyle.icon} />
-          </TouchableOpacity>
+          <View style={PageStyle.iconWrap}>
+            <Text style={PageStyle.leftBlock} />
+            <TouchableOpacity
+              onPress={() => {
+                navigationService.goBack();
+              }}>
+              <Svg icon="close1" size={pTd(14)} iconStyle={PageStyle.icon} />
+            </TouchableOpacity>
+          </View>
           {/* <Svg icon="scan-frame" size={pTd(240)} iconStyle={PageStyle.scan} /> */}
           {/* <Text style={PageStyle.title}>{t('Scan QR code')}</Text> */}
           <Text style={PageStyle.tips}>{t('Receive code / Login code')}</Text>
@@ -90,6 +92,7 @@ export const PageStyle = StyleSheet.create({
     alignItems: 'flex-end',
   },
   icon: {
+    width: pTd(40),
     marginRight: pTd(25),
   },
   scan: {
@@ -111,5 +114,8 @@ export const PageStyle = StyleSheet.create({
     textAlign: 'center',
     width: ScreenWidth,
     lineHeight: pTd(16),
+  },
+  leftBlock: {
+    flex: 1,
   },
 });

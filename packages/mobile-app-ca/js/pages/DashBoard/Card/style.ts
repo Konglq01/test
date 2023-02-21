@@ -21,6 +21,9 @@ export const styles = StyleSheet.create({
     paddingRight: pTd(16),
     justifyContent: 'flex-end',
   },
+  block: {
+    flex: 1,
+  },
   usdtBalance: {
     marginTop: pTd(14),
     fontSize: pTd(30),

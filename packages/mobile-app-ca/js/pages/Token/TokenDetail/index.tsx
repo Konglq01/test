@@ -21,27 +21,11 @@ import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { ActivityItemType } from '@portkey/types/types-ca/activity';
 import { unitConverter } from '@portkey/utils/converter';
 import { ZERO } from '@portkey/constants/misc';
+import { transactionTypesForActivityList as transactionList } from '@portkey/constants/constants-ca/activity';
 
 interface RouterParams {
   tokenInfo: TokenItemShowType;
 }
-
-enum TransactionTypes {
-  'Transfer' = 'Transfer',
-  'CrossChainTransfer' = 'CrossChainTransfer',
-  'CrossChainReceiveToken' = 'CrossChainReceiveToken',
-  'SocialRecovery' = 'SocialRecovery',
-  'RemoveManager' = 'RemoveManager',
-  'AddManager' = 'AddManager',
-}
-const transactionList: TransactionTypes[] = [
-  TransactionTypes.AddManager,
-  TransactionTypes.CrossChainReceiveToken,
-  TransactionTypes.CrossChainTransfer,
-  TransactionTypes.RemoveManager,
-  TransactionTypes.SocialRecovery,
-  TransactionTypes.Transfer,
-];
 
 const MAX_RESULT_COUNT = 10;
 const INIT_PAGE_INFO = {

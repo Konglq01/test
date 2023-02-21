@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { StyleSheet, FlatList } from 'react-native';
 import navigationService from 'utils/navigationService';
 import Svg from 'components/Svg';
 import PageContainer from 'components/PageContainer';
@@ -29,28 +29,34 @@ const ActivityListPage = () => {
   const { chainId, symbol } = useRouterParams<RouterParams>();
   const { t } = useLanguage();
   const dispatch = useAppCommonDispatch();
-  const { data: activityList } = useAppCASelector(state => state.activity);
+  const { data: activityList, skipCount } = useAppCASelector(state => state.activity);
   const currentWallet = useCurrentWallet();
 
-  const getActivityList = useCallback(async () => {
-    setRefreshing(true);
-    dispatch(clearState());
+  const getActivityList = useCallback(
+    async (isInit: boolean) => {
+      setRefreshing(true);
 
-    const params: IActivitysApiParams = {
-      maxResultCount: MAX_RESULT_COUNT,
-      skipCount: 0,
-      caAddresses: currentWallet.walletInfo.caAddressList,
-      // managerAddresses: address,
-      chainId: chainId,
-      symbol: symbol,
-      transactionTypes: transactionTypesForActivityList,
-    };
-    await dispatch(getActivityListAsync(params));
-    setRefreshing(false);
-  }, [chainId, currentWallet.walletInfo.caAddressList, dispatch, symbol]);
+      if (isInit) {
+        dispatch(clearState());
+      }
+
+      const params: IActivitysApiParams = {
+        maxResultCount: MAX_RESULT_COUNT,
+        skipCount: skipCount,
+        caAddresses: currentWallet.walletInfo.caAddressList,
+        // managerAddresses: address,
+        chainId: chainId,
+        symbol: symbol,
+        transactionTypes: transactionTypesForActivityList,
+      };
+      await dispatch(getActivityListAsync(params));
+      setRefreshing(false);
+    },
+    [chainId, currentWallet.walletInfo.caAddressList, dispatch, skipCount, symbol],
+  );
 
   useEffectOnce(() => {
-    getActivityList();
+    getActivityList(true);
   });
 
   const renderItem = useCallback(({ item }: { item: ActivityItemType }) => {
@@ -81,7 +87,8 @@ const ActivityListPage = () => {
           data={activityList || []}
           keyExtractor={(_item: ActivityItemType, index: number) => `${index}`}
           renderItem={renderItem}
-          onRefresh={getActivityList}
+          onRefresh={() => getActivityList(true)}
+          onEndReached={() => getActivityList(false)}
         />
       )}
     </PageContainer>
