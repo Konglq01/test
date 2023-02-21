@@ -10,7 +10,7 @@ import { defaultColors } from 'assets/theme';
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import { FlatList } from 'react-native';
 import CommonToast from 'components/CommonToast';
-import { TextL, TextM } from 'components/CommonText';
+import { TextL, TextM, TextS } from 'components/CommonText';
 import { pTd } from 'utils/unit';
 import Svg from 'components/Svg';
 import CommonSwitch from 'components/CommonSwitch';
@@ -22,15 +22,18 @@ import useDebounce from 'hooks/useDebounce';
 import { useAppCommonDispatch } from '@portkey/hooks';
 import { request } from '@portkey/api/api-did';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { useCaAddresses, useChainIdList } from '@portkey/hooks/hooks-ca/wallet';
+import { useCaAddresses, useChainIdList, useWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
 import Loading from 'components/Loading';
+import { formatChainInfo } from 'utils';
+import { FontStyles } from 'assets/theme/styles';
 
 interface ManageTokenListProps {
   route?: any;
 }
 
 type ItemProps = {
+  isTestnet: boolean;
   item: TokenItemShowType;
   onHandleToken: (item: TokenItemShowType, type: 'add' | 'delete') => void;
 };
@@ -38,7 +41,7 @@ function areEqual(prevProps: ItemProps, nextProps: ItemProps) {
   return nextProps.item.isAdded === prevProps.item.isAdded;
 }
 
-const Item = memo(({ item, onHandleToken }: ItemProps) => {
+const Item = memo(({ isTestnet, item, onHandleToken }: ItemProps) => {
   return (
     <TouchableOpacity style={itemStyle.wrap} key={`${item.symbol}${item.address}${item.chainId}}`}>
       {item.symbol === 'ELF' ? (
@@ -54,9 +57,14 @@ const Item = memo(({ item, onHandleToken }: ItemProps) => {
       )}
 
       <View style={itemStyle.right}>
-        <TextL numberOfLines={1} ellipsizeMode={'tail'}>
-          {item.symbol}
-        </TextL>
+        <View>
+          <TextL numberOfLines={1} ellipsizeMode={'tail'}>
+            {item.symbol}
+          </TextL>
+          <TextS numberOfLines={1} ellipsizeMode={'tail'} style={[FontStyles.font3]}>
+            {`${formatChainInfo(item.chainId)} ${isTestnet && 'Testnet'}`}
+          </TextS>
+        </View>
 
         {item.isDefault ? (
           <Svg icon="lock" size={pTd(20)} iconStyle={itemStyle.addedStyle} />
@@ -74,6 +82,8 @@ const ManageTokenList: React.FC<ManageTokenListProps> = () => {
 
   const isLoading = useIsFetchingTokenList();
   const currentNetworkInfo = useCurrentNetworkInfo();
+  const { currentNetwork } = useWallet();
+
   const chainList = useChainIdList();
 
   const dispatch = useAppCommonDispatch();
@@ -152,7 +162,11 @@ const ManageTokenList: React.FC<ManageTokenListProps> = () => {
         style={pageStyles.list}
         data={tokenDataShowInMarket || []}
         renderItem={({ item }: { item: TokenItemShowType }) => (
-          <Item item={item} onHandleToken={() => onHandleTokenItem(item, !item?.isAdded)} />
+          <Item
+            isTestnet={currentNetwork === 'TESTNET'}
+            item={item}
+            onHandleToken={() => onHandleTokenItem(item, !item?.isAdded)}
+          />
         )}
         keyExtractor={(item: TokenItemShowType) => item?.id || item?.symbol}
       />

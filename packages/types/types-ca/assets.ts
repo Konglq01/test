@@ -1,6 +1,8 @@
+import { ChainId } from '..';
+
 // nft collection types
 export type NFTCollectionItemBaseType = {
-  chainId: string;
+  chainId: ChainId;
   collectionName: string;
   imageUrl: string;
   itemCount: number;
@@ -18,7 +20,7 @@ export interface NFTCollectionItemShowType extends NFTCollectionItemBaseType {
 
 // nft item types
 export type NFTItemBaseType = {
-  chainId: string;
+  chainId: ChainId;
   symbol: string;
   tokenId: string;
   alias: string;
@@ -29,7 +31,7 @@ export type NFTItemBaseType = {
 
 // assets types
 export type AssetsItemType = {
-  chainId: string;
+  chainId: ChainId;
   symbol: string;
   address: string;
   nftInfo: {

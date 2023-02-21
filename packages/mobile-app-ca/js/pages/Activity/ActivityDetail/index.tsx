@@ -169,6 +169,7 @@ const ActivityDetail = () => {
       ) : (
         <>
           <Text style={styles.tokenCount}>
+            {activityItem?.isReceived ? '+' : '-'}
             {`${unitConverter(
               ZERO.plus(activityItem?.amount || 0).div(`1e${activityItem?.decimals || DEFAULT_DECIMAL}`),
             )} ${activityItem?.symbol || ''}`}

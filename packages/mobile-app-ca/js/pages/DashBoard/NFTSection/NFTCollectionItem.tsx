@@ -13,6 +13,7 @@ import { TextM, TextS, TextXL } from 'components/CommonText';
 import { FontStyles } from 'assets/theme/styles';
 import { useWallet } from 'hooks/store';
 import { NFTCollectionItemShowType } from '@portkey/types/types-ca/assets';
+import { chain } from 'lodash';
 
 export enum NoDataMessage {
   CustomNetWorkNoData = 'No transaction records accessible from the current custom network',
@@ -21,8 +22,9 @@ export enum NoDataMessage {
 
 export type NFTItemPropsType = NFTCollectionItemShowType & {
   collapsed?: boolean;
-  currentNFT?: any;
-  setCurrentNFT?: any;
+  openCollectionArr: string[];
+  setOpenCollectionArr: any;
+  clearItem: () => void;
   loadMoreItem?: () => void;
 };
 
@@ -35,8 +37,9 @@ export default function NFTItem(props: NFTItemPropsType) {
     children,
     symbol,
     collapsed = false,
-    currentNFT,
-    setCurrentNFT,
+    openCollectionArr,
+    setOpenCollectionArr,
+    clearItem,
     loadMoreItem,
   } = props;
   const { currentNetwork } = useWallet();
@@ -48,8 +51,19 @@ export default function NFTItem(props: NFTItemPropsType) {
       <TouchableOpacity
         style={styles.topSeries}
         onPress={() => {
-          setCurrentNFT(symbol === currentNFT ? '' : symbol);
-          loadMoreItem?.();
+          if (collapsed) {
+            openCollectionArr.push(`${symbol}${chainId}`);
+            setOpenCollectionArr([...openCollectionArr]);
+            loadMoreItem?.();
+            setTimeout(() => {
+              clearItem();
+            }, 0);
+          } else {
+            // opened
+            const newArr = openCollectionArr.filter(ele => ele !== `${symbol}${chainId}`);
+            setOpenCollectionArr(newArr);
+            clearItem();
+          }
         }}>
         <Svg
           icon={collapsed ? 'right-arrow' : 'down-arrow'}
@@ -82,7 +96,7 @@ export default function NFTItem(props: NFTItemPropsType) {
             />
           ))}
         </View>
-        {children.length === 0 && (
+        {children.length !== 0 && children.length < itemCount && (
           <TouchableOpacity style={styles.loadMore} onPress={() => loadMoreItem?.()}>
             <TextM style={FontStyles.font4}>More</TextM>
             <Svg icon="down-arrow" size={pTd(16)} color={defaultColors.primaryColor} iconStyle={styles.downArrow} />
