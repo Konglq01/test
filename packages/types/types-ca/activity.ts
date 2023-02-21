@@ -1,6 +1,6 @@
 import { TransactionTypes } from '@portkey/constants/constants-ca/activity';
 import { ChainItemType } from '@portkey/store/store-ca/wallet/type';
-import { ChainType } from '..';
+import { ChainId, ChainType } from '..';
 import { BaseToken } from './token';
 
 export type ActivityItemType = {
@@ -10,8 +10,8 @@ export type ActivityItemType = {
   to: string; // to user nick name
   fromAddress: string;
   toAddress: string;
-  fromChainId: string;
-  toChainId: string;
+  fromChainId: ChainId;
+  toChainId: ChainId;
   status: string;
   transactionId: string;
   blockHash: string; // The chain may have forks, use transactionId and blockHash to uniquely determine the transaction

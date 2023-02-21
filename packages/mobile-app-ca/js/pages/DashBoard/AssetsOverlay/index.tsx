@@ -20,6 +20,7 @@ import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { fetchAssetList } from '@portkey/store/store-ca/assets/api';
 import { IAssetItemType } from '@portkey/store/store-ca/assets/type';
 import navigationService from 'utils/navigationService';
+import { IToSendAssetParamsType, IToSendHomeParamsType } from '@portkey/types/types-ca/routeParams';
 
 type onFinishSelectTokenType = (tokenItem: any) => void;
 type TokenListProps = {
@@ -48,6 +49,9 @@ const AssetItem = (props: { symbol: string; onPress: (item: any) => void; item: 
     );
 
   if (item.nftInfo) {
+    const {
+      nftInfo: { tokenId },
+    } = item;
     return (
       <TouchableOpacity style={itemStyle.wrap} onPress={() => onPress?.(item)}>
         {item.nftInfo.imageUrl ? (
@@ -58,13 +62,13 @@ const AssetItem = (props: { symbol: string; onPress: (item: any) => void; item: 
         <View style={itemStyle.right}>
           <View>
             <TextL numberOfLines={1} ellipsizeMode={'tail'} style={[FontStyles.font5]}>
-              {`${symbol || 'Name'} #${item.nftInfo.tokenId}`}
+              {`${symbol || 'Name'} #${tokenId}`}
             </TextL>
 
             {/* TODO: why use currentNetwork   */}
             {currentNetwork ? (
               <TextS numberOfLines={1} style={[FontStyles.font7, itemStyle.nftItemInfo]}>
-                {item?.chainId === ' AELF' ? 'MainChain' : 'SideChain'} {item.chainId}
+                {item.chainId === 'AELF' ? 'MainChain' : 'SideChain'} {item.chainId}
               </TextS>
             ) : (
               // TODO: price use witch one
@@ -74,7 +78,7 @@ const AssetItem = (props: { symbol: string; onPress: (item: any) => void; item: 
 
           {/* TODO: num of nft use witch one */}
           <View style={itemStyle.balanceWrap}>
-            <TextXL style={[itemStyle.token, FontStyles.font5]}>{`2`}</TextXL>
+            <TextXL style={[itemStyle.token, FontStyles.font5]}>{item.nftInfo.balance}</TextXL>
             <TextS style={itemStyle.dollar} />
           </View>
         </View>
@@ -94,7 +98,7 @@ const AssetList = ({ onFinishSelectToken, account }: TokenListProps) => {
   const { t } = useLanguage();
   const caAddresses = useCaAddresses();
   const currentNetworkInfo = useCurrentNetworkInfo();
-  const [keyword, setKeywork] = useState('');
+  const [keyword, setKeyword] = useState('');
 
   const debounceKeyword = useDebounce(keyword, 800);
 
@@ -132,16 +136,16 @@ const AssetList = ({ onFinishSelectToken, account }: TokenListProps) => {
     [caAddresses, listShow.length],
   );
 
-  useEffect(() => {
-    onKeywordChange();
-  }, [debounceKeyword]);
-
   const onKeywordChange = useCallback(() => {
     pageInfoRef.current = {
       ...INIT_PAGE_INFO,
     };
     getList(keyword, true);
   }, [getList, keyword]);
+
+  useEffect(() => {
+    onKeywordChange();
+  }, [debounceKeyword, onKeywordChange]);
 
   const renderItem = useCallback(({ item }: { item: IAssetItemType }) => {
     return (
@@ -152,18 +156,21 @@ const AssetList = ({ onFinishSelectToken, account }: TokenListProps) => {
         onPress={() => {
           OverlayModal.hide();
           // onFinishSelectToken?.(item);
-          navigationService.navigate('SendHome', {
+          const routeParams = {
             sendType: item?.nftInfo ? 'nft' : 'token',
-            tokenItem: { ...item?.tokenInfo, symbol: item.symbol },
-            nftInfo: { ...item?.nftInfo, symbol: item.symbol },
-            addresses: '',
-          });
+            assetInfo: item?.nftInfo
+              ? { ...item?.nftInfo, chainId: item.chainId, symbol: item.symbol }
+              : { ...item?.tokenInfo, chainId: item.chainId, symbol: item.symbol },
+            toInfo: {
+              address: '',
+              name: '',
+            },
+          };
+          navigationService.navigate('SendHome', routeParams as unknown as IToSendHomeParamsType);
         }}
       />
     );
   }, []);
-
-  console.log('listShowlistShowlistShow', listShow);
 
   return (
     <ModalBody modalBodyType="bottom" style={styles.modalStyle}>
@@ -178,7 +185,7 @@ const AssetList = ({ onFinishSelectToken, account }: TokenListProps) => {
         inputStyle={styles.inputStyle}
         value={keyword}
         onChangeText={v => {
-          setKeywork(v.trim());
+          setKeyword(v.trim());
         }}
       />
 
@@ -202,6 +209,7 @@ const AssetList = ({ onFinishSelectToken, account }: TokenListProps) => {
 export const showAssetList = (props: TokenListProps) => {
   OverlayModal.show(<AssetList {...props} />, {
     position: 'bottom',
+    autoKeyboardInsets: false,
   });
 };
 

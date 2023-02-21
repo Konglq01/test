@@ -13,8 +13,6 @@ import CommonAvatar from 'components/CommonAvatar';
 
 interface AmountNFT {
   nftItem: any;
-  selectedToken: TokenItemShowType;
-  setSelectedToken: any;
 }
 
 export default function NFTInfo({ nftItem = { alias: '', balance: 0 } }: AmountNFT) {

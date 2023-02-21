@@ -41,40 +41,6 @@ const DashBoard: React.FC<DashBoardTypes> = () => {
   // });
   const dispatch = useAppCommonDispatch();
 
-  // // get account balance
-  // const getAccountBalance = useCallback(async () => {
-  //   //TODO fetchBalance
-  //   const fetchBalance = (): Promise<number | string> =>
-  //     new Promise(resolve => {
-  //       setTimeout(() => {
-  //         return resolve('100.00');
-  //       }, 1000);
-  //     });
-  //   const result = await fetchBalance();
-  //   setBalanceUSD(result);
-  // }, []);
-
-  // // if testTing ,show tips
-  // useEffectOnce(() => {
-  //   const isTesting = true;
-  //   setClosed(!isTesting);
-  // });
-
-  // // get account Balance
-  // const initAccountBalance = useCallback(() => {
-  //   if (timer) clearInterval(timer);
-  //   getAccountBalance();
-  //   timer = setInterval(() => {
-  //     getAccountBalance();
-  //   }, 6 * MINUTE);
-  // }, [getAccountBalance]);
-
-  // useEffectOnce(() => {
-  //   initAccountBalance();
-  // });
-
-  // useEffect(() => () => clearInterval(timer), []);
-
   useEffectOnce(() => {
     dispatch(fetchTokenListAsync({ caAddresses: [] }));
     dispatch(getWalletNameAsync());

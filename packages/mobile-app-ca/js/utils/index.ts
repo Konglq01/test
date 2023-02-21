@@ -40,9 +40,18 @@ export const formatTransferTime = (time: string | number) => {
  * @param address
  * @returns
  */
-export const formatAddress2NoPrefix = (address: string) => {
+export const formatAddress2NoPrefix = (address: string): string => {
   if (address.match(/^aelf:.+/)) {
     return address.split(':')[1];
   }
   return address;
+};
+
+/**
+ * format information like "MainChain AELF"
+ * @param chainId
+ * @returns
+ */
+export const formatChainInfo = (chainId: 'AELF' | 'tDVV' | 'tDVW' = 'AELF'): string => {
+  return `${chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${chainId}`;
 };

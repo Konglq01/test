@@ -6,7 +6,7 @@ import { pTd } from 'utils/unit';
 import { TextM, TextS, TextL } from 'components/CommonText';
 import CommonButton from 'components/CommonButton';
 import ActionSheet from 'components/ActionSheet';
-import { formatAddress2NoPrefix, formatStr2EllipsisStr } from 'utils';
+import { formatAddress2NoPrefix, formatChainInfo, formatStr2EllipsisStr } from 'utils';
 import { addRecentContact } from '@portkey/store/store-ca/recent/slice';
 import { isAelfAddress, isCrossChain } from '@portkey/utils/aelf';
 import { updateBalance } from '@portkey/store/tokenBalance/slice';
@@ -19,7 +19,6 @@ import { getContractBasic } from '@portkey/contracts/utils';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { getDefaultWallet } from 'utils/aelfUtils';
 import { usePin } from 'hooks/store';
-import aes from '@portkey/utils/aes';
 import { getManagerAccount } from 'utils/redux';
 import crossChainTransfer, {
   CrossChainTransferIntervalParams,
@@ -32,11 +31,12 @@ import { timesDecimals } from '@portkey/utils/converter';
 import sameChainTransfer from 'utils/transfer/sameChainTransfer';
 import { addFailedActivity, removeFailedActivity } from '@portkey/store/store-ca/activity/slice';
 import useRouterParams from '@portkey/hooks/useRouterParams';
-import { TokenItemShowType } from '@portkey/types/types-ca/token';
 import CommonToast from 'components/CommonToast';
 import navigationService from 'utils/navigationService';
 import Loading from 'components/Loading';
-import { retry } from '@reduxjs/toolkit/dist/query';
+import { IToSendPreviewParamsType } from '@portkey/types/types-ca/routeParams';
+import { BaseToken } from '@portkey/types/types-ca/token';
+
 export interface SendHomeProps {
   route?: any;
 }
@@ -44,24 +44,27 @@ export interface SendHomeProps {
 const SendHome: React.FC<SendHomeProps> = props => {
   const { t } = useLanguage();
 
-  const {
-    sendInfo: { selectedToContact, tokenItem, nftItem, sendNumber, transactionFee, isCrossChainTransfer },
-    sendType,
-  } = useRouterParams<{
-    sendInfo: {
-      tokenItem: TokenItemShowType;
-      nftItem: any;
-      sendNumber: string | number;
-      transactionFee: string | number;
-      isCrossChainTransfer: boolean;
-    };
-    sendType: 'nft' | 'token';
-  }>();
+  // const {
+  //   sendInfo: { selectedToContact, tokenItem, nftItem, sendNumber, transactionFee, isCrossChainTransfer },
+  //   sendType,
+  // } = useRouterParams<{
+  //   sendInfo: {
+  //     tokenItem: TokenItemShowType;
+  //     nftItem: any;
+  //     sendNumber: string | number;
+  //     transactionFee: string | number;
+  //     isCrossChainTransfer: boolean;
+  //   };
+  //   sendType: 'nft' | 'token';
+  // }>();
+
+  const { sendType, assetInfo, toInfo, transactionFee, sendNumber } = useRouterParams<IToSendPreviewParamsType>();
 
   const dispatch = useAppCommonDispatch();
 
   const pin = usePin();
-  const chainInfo = useCurrentChain();
+  const chainInfo = useCurrentChain(assetInfo.chainId);
+
   const [isLoading] = useState(false);
   const currentNetwork = useCurrentNetwork();
   const wallet = useCurrentWalletInfo();
@@ -138,9 +141,9 @@ const SendHome: React.FC<SendHomeProps> = props => {
 
   const transfer = async () => {
     const tokenInfo = {
-      symbol: sendType === 'token' ? tokenItem?.symbol : nftItem.symbol,
-      decimals: sendType === 'token' ? tokenItem?.decimals : 0,
-      address: sendType === 'token' ? tokenItem.tokenContractAddress : nftItem.tokenContractAddress,
+      symbol: assetInfo.symbol,
+      decimals: assetInfo.decimals ?? 0,
+      address: assetInfo.tokenContractAddress,
     };
 
     try {
@@ -162,16 +165,10 @@ const SendHome: React.FC<SendHomeProps> = props => {
       // TODO
       const amount = timesDecimals(sendNumber, tokenInfo.decimals).toNumber();
       // setLoading(true);
+
+      const isCrossChainTransfer = isCrossChain(toInfo.address, assetInfo.chainId);
+
       if (isCrossChainTransfer) {
-        console.log('-=-=-=-=-=', {
-          contract,
-          chainType: currentNetwork.chainType ?? 'aelf',
-          managerAddress: wallet.address,
-          tokenInfo,
-          caHash: wallet?.caHash || '',
-          amount,
-          toAddress: selectedToContact.address,
-        });
         const tokenContract = await getContractBasic({
           contractAddress: tokenInfo.address,
           rpcUrl: chainInfo.endPoint,
@@ -183,34 +180,34 @@ const SendHome: React.FC<SendHomeProps> = props => {
           contract,
           chainType: currentNetwork.chainType ?? 'aelf',
           managerAddress: wallet.address,
-          tokenInfo,
+          tokenInfo: { ...assetInfo, address: assetInfo.tokenContractAddress } as unknown as BaseToken,
           caHash: wallet.caHash || '',
           amount,
-          toAddress: selectedToContact.address,
+          toAddress: toInfo.address,
         });
 
         console.log('crossChainTransferResult', crossChainTransferResult);
 
-        navigationService.navigate('DashBoard');
+        navigationService.navigate('Tab');
         CommonToast.success('success');
       } else {
         console.log('sameChainTransfers==sendHandler', tokenInfo);
 
         const sameTransferResult = await sameChainTransfer({
           contract,
-          tokenInfo,
+          tokenInfo: { ...assetInfo, address: assetInfo.tokenContractAddress } as unknown as BaseToken,
           caHash: wallet.caHash || '',
           amount,
-          toAddress: selectedToContact.address,
+          toAddress: toInfo.address,
         });
 
         if (sameTransferResult.error) {
           Loading.hide();
-          return CommonToast.fail(sameTransferResult.error.message);
+          return CommonToast.fail(sameTransferResult?.error?.message || '');
         }
 
         console.log('sameTransferResult', sameTransferResult);
-        navigationService.navigate('DashBoard');
+        navigationService.navigate('Tab');
         CommonToast.success('success');
       }
     } catch (error: any) {
@@ -241,7 +238,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
     Loading.hide();
   };
 
-  const networkShow = (address: string) => {
+  const networkInfoShow = (address: string) => {
     const chainId = address.split('_')[2];
     return chainId === 'AELF' ? 'MainChain AELF' : `SideChain ${chainId} `;
   };
@@ -254,19 +251,19 @@ const SendHome: React.FC<SendHomeProps> = props => {
       scrollViewProps={{ disabled: true }}>
       {sendType === 'nft' ? (
         <View style={styles.topWrap}>
-          {nftItem?.imageUrl ? (
+          {assetInfo?.imageUrl ? (
             <Text style={styles.noImg}>A</Text>
           ) : (
-            <Image style={styles.img} source={{ uri: nftItem.imageUrl }} />
+            <Image style={styles.img} source={{ uri: assetInfo?.imageUrl }} />
           )}
           <View style={styles.topLeft}>
-            <TextL style={styles.nftTitle}>{`${nftItem.alias} #${nftItem.tokenId}`} </TextL>
+            <TextL style={styles.nftTitle}>{`${assetInfo.alias} #${assetInfo?.tokenId}`} </TextL>
             <TextS>{`Amount：${sendNumber}`}</TextS>
           </View>
         </View>
       ) : (
         <>
-          <Text style={styles.tokenCount}>{`- ${sendNumber} ${tokenItem.symbol}`} </Text>
+          <Text style={styles.tokenCount}>{`- ${sendNumber} ${assetInfo?.symbol}`} </Text>
           {/* <TextM style={styles.tokenUSD}>-$ -</TextM> */}
         </>
       )}
@@ -288,11 +285,11 @@ const SendHome: React.FC<SendHomeProps> = props => {
         <View style={styles.section}>
           <View style={[styles.flexSpaceBetween]}>
             <TextM style={[styles.blackFontColor]}>{t('To')}</TextM>
-            <TextM style={[styles.blackFontColor, styles.fontBold]}>{selectedToContact?.name || '-'}</TextM>
+            <TextM style={[styles.blackFontColor, styles.fontBold]}>{toInfo?.name || '-'}</TextM>
           </View>
           <View style={[styles.flexSpaceBetween]}>
             <Text />
-            <TextS style={styles.lightGrayFontColor}>{formatStr2EllipsisStr(selectedToContact?.address)}</TextS>
+            <TextS style={styles.lightGrayFontColor}>{formatStr2EllipsisStr(toInfo?.address)}</TextS>
           </View>
         </View>
         <Text style={[styles.divider, styles.marginTop0]} />
@@ -300,9 +297,9 @@ const SendHome: React.FC<SendHomeProps> = props => {
         <View style={styles.section}>
           <View style={[styles.flexSpaceBetween]}>
             <TextM style={[styles.blackFontColor]}>{t('Network')}</TextM>
-            <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${'MainChain AELF'} → ${networkShow(
-              selectedToContact.address,
-            )} `}</TextM>
+            <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${formatChainInfo(
+              assetInfo.chainId,
+            )} → ${networkInfoShow(toInfo?.address)} `}</TextM>
           </View>
         </View>
         <Text style={[styles.divider, styles.marginTop0]} />
