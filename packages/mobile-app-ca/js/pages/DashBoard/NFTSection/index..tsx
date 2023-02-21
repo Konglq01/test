@@ -8,10 +8,12 @@ import { pTd } from 'utils/unit';
 import NFTCollectionItem from './NFTCollectionItem';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { useCaAddresses, useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
-import { fetchNFTAsync, fetchNFTCollectionsAsync } from '@portkey/store/store-ca/assets/slice';
+import { fetchNFTAsync, fetchNFTCollectionsAsync, clearNftItem } from '@portkey/store/store-ca/assets/slice';
 import { useAppCommonDispatch } from '@portkey/hooks';
 import { useAppCASelector } from '@portkey/hooks';
 import { NFTCollectionItemShowType } from '@portkey/types/types-ca/assets';
+import { useWallet } from 'hooks/store';
+import { NetworkType } from '@portkey/types';
 
 type NFTSectionPropsType = {
   getAccountBalance?: () => void;
@@ -19,8 +21,9 @@ type NFTSectionPropsType = {
 
 type NFTCollectionProps = NFTCollectionItemShowType & {
   isCollapsed: boolean;
-  currentNFT: string;
-  setCurrentNFT: any;
+  openCollectionArr: string[];
+  setOpenCollectionArr: any;
+  clearItem: () => void;
   loadMoreItem: () => void;
 };
 
@@ -42,8 +45,9 @@ NFTCollection.displayName = 'NFTCollection';
 export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
   const { t } = useLanguage();
 
-  const [currentNFT, setCurrentNFT] = useState('');
+  const [openCollectionArr, setOpenCollectionArr] = useState<string[]>([]);
   const currentNetworkInfo = useCurrentNetworkInfo();
+  const { currentNetwork, walletInfo } = useWallet();
 
   const [reFreshing, setReFreshing] = useState(false);
 
@@ -55,13 +59,10 @@ export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
   } = useAppCASelector(state => state.assets);
 
   const [refreshing, setRefreshing] = useState(false);
-  const [NFTList, setNFTList] = useState<any[]>([]);
 
   const fetchNFTList = useCallback(() => {
     const timer: any = setTimeout(() => {
       dispatch(fetchNFTCollectionsAsync({ caAddresses }));
-      // setNFTList(result?.items ?? []);
-      // setNFTNum(result.totalCount ?? 0);
       // setRefreshing(false);
       return clearTimeout(timer);
     }, 1000);
@@ -81,12 +82,27 @@ export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
         renderItem={({ item }: { item: NFTCollectionItemShowType }) => (
           <NFTCollection
             key={item.symbol}
-            isCollapsed={item.symbol !== currentNFT}
-            currentNFT={currentNFT}
-            setCurrentNFT={setCurrentNFT}
+            isCollapsed={!openCollectionArr.find(ele => ele === `${item.symbol}${item.chainId}`)}
+            openCollectionArr={openCollectionArr}
+            setOpenCollectionArr={setOpenCollectionArr}
+            clearItem={() => {
+              dispatch(
+                clearNftItem({
+                  chainId: item.chainId,
+                  symbol: item.symbol,
+                }),
+              );
+            }}
             loadMoreItem={() => {
               console.log('item symbol', item.symbol);
-              dispatch(fetchNFTAsync({ caAddresses, symbol: item.symbol }));
+              const currentCaAddress = walletInfo?.caInfo?.[currentNetwork]?.[item?.chainId]?.caAddress;
+              dispatch(
+                fetchNFTAsync({
+                  chainId: item.chainId,
+                  symbol: item.symbol,
+                  caAddresses: [currentCaAddress || ''],
+                }),
+              );
             }}
             {...item}
           />

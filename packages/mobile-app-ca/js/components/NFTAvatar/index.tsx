@@ -23,7 +23,7 @@ export type NoDataPropsType = {
 const NFTAvatar: React.FC<NoDataPropsType> = props => {
   const {
     style = {},
-    data: { imageUrl, symbol },
+    data: { imageUrl, symbol, tokenId },
     onPress,
   } = props;
 
@@ -45,7 +45,7 @@ const NFTAvatar: React.FC<NoDataPropsType> = props => {
         style={[styles.title, !!imageUrl && styles.titleNoPic]}>
         {symbol}
       </TextL>
-      <TextM style={[styles.id, !!imageUrl && styles.idNoPic]}>{'#2001'}</TextM>
+      <TextM style={[styles.id, !!imageUrl && styles.idNoPic]}>{`# ${tokenId}`}</TextM>
       {imageUrl && <View style={styles.mask} />}
     </TouchableOpacity>
   );

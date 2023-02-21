@@ -1,9 +1,10 @@
+import { ChainId } from '..';
 import { ChainItemType } from '../chain';
 import { AccountType } from '../wallet';
 
 export interface BaseToken {
   id?: string; // id
-  chainId: string;
+  chainId: ChainId;
   decimals: number; // 8
   address: string; // "ArPnUb5FtxG2oXTaWX2DxNZowDEruJLs2TEkhRCzDdrRDfg8B",        token address  contract address
   symbol: string; // "ELF"   the name showed
@@ -14,7 +15,7 @@ export interface BaseToken {
 export interface TokenItemType extends BaseToken {
   isDefault?: boolean; // boolean,
   tokenName?: string; //  "ELF"
-  chainId: string; // string "AELF"
+  chainId: ChainId; // string "AELF"
 }
 export interface TokenItemShowType extends TokenItemType {
   isAdded?: boolean; // boolean
@@ -66,7 +67,7 @@ export interface NftInfo {
 }
 
 export interface AccountAssetItem {
-  chainId: string;
+  chainId: ChainId;
   symbol: string;
   address: string;
   tokenInfo?: TokenInfo;
