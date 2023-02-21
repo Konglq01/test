@@ -1,4 +1,4 @@
-import { ChainType, NetworkType } from '@portkey/types';
+import { ChainId, ChainType, NetworkType } from '@portkey/types';
 import { CAWalletInfoType } from '@portkey/types/types-ca/wallet';
 import { PinErrorMessage } from '@portkey/utils/wallet/types';
 
@@ -15,7 +15,7 @@ export enum BaseWalletError {
 export const WalletError = Object.assign({}, BaseWalletError, PinErrorMessage);
 
 export interface ChainItemType {
-  chainId: string;
+  chainId: ChainId;
   chainName: string;
   endPoint: string;
   explorerUrl: string;
