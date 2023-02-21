@@ -47,15 +47,16 @@ const Card: React.FC<CardProps> = () => {
 
   return (
     <View style={styles.cardWrap}>
-      <TouchableOpacity
-        style={styles.refreshWrap}
-        onPress={async () => {
-          if (!(await requestQrPermission())) return showDialog();
-
-          navigationService.navigate('QrScanner');
-        }}>
-        <Svg icon="scan" size={22} color={defaultColors.font2} />
-      </TouchableOpacity>
+      <View style={styles.refreshWrap}>
+        <Text style={styles.block} />
+        <TouchableOpacity
+          onPress={async () => {
+            if (!(await requestQrPermission())) return showDialog();
+            navigationService.navigate('QrScanner');
+          }}>
+          <Svg icon="scan" size={22} color={defaultColors.font2} />
+        </TouchableOpacity>
+      </View>
       <Text style={styles.usdtBalance}>{currentNetwork === 'MAIN' ? `$${accountBalance}` : 'Dev Mode'}</Text>
       <TextM style={styles.accountName}>{walletName}</TextM>
       <View style={styles.buttonGroupWrap}>
