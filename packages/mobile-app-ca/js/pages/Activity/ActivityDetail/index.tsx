@@ -32,6 +32,7 @@ interface RouterParams {
 }
 
 const DEFAULT_DECIMAL = 8;
+const hiddenArr = [TransactionTypes.SOCIAL_RECOVERY, TransactionTypes.ADD_MANAGER, TransactionTypes.REMOVE_MANAGER];
 
 const ActivityDetail = () => {
   const { t } = useLanguage();
@@ -74,7 +75,6 @@ const ActivityDetail = () => {
     const { transactionType, fromChainId, toChainId, transactionId: _transactionId = '' } = activityItem || {};
     const from = fromChainId === 'AELF' ? 'MainChain AELF' : `SideChain ${fromChainId}`;
     const to = toChainId === 'AELF' ? 'MainChain AELF' : `SideChain ${toChainId}`;
-    const hiddenArr = [TransactionTypes.SOCIAL_RECOVERY, TransactionTypes.ADD_MANAGER, TransactionTypes.REMOVE_MANAGER];
 
     return (
       transactionType &&
@@ -169,7 +169,8 @@ const ActivityDetail = () => {
       ) : (
         <>
           <Text style={styles.tokenCount}>
-            {activityItem?.isReceived ? '+' : '-'}
+            {!hiddenArr.includes(activityItem?.transactionType as TransactionTypes) &&
+              (activityItem?.isReceived ? '+' : '-')}
             {`${unitConverter(
               ZERO.plus(activityItem?.amount || 0).div(`1e${activityItem?.decimals || DEFAULT_DECIMAL}`),
             )} ${activityItem?.symbol || ''}`}
