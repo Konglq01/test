@@ -163,7 +163,7 @@ export default function Transaction() {
           {feeInfo?.map((item, idx) => {
             return (
               <div key={'transactionFee' + idx} className="right-item">
-                <span>{`${formatAmount({ amount: item.fee, decimals: activityItem.decimals })} ${
+                <span>{`${formatAmount({ amount: item.fee, decimals: isNft ? 8 : activityItem.decimals })} ${
                   item.symbol ?? ''
                 }`}</span>
                 {!isTestNet && (
@@ -177,7 +177,7 @@ export default function Transaction() {
         </span>
       </p>
     );
-  }, [activityItem?.decimals, feeInfo, isTestNet, t]);
+  }, [activityItem.decimals, feeInfo, isNft, isTestNet, t]);
 
   const transactionUI = useCallback(() => {
     return (

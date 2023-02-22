@@ -27,6 +27,11 @@ export const activitySlice = createSlice({
     removeFailedActivity: (state, { payload }: { payload: string }) => {
       delete state.failedActivityMap[payload];
     },
+    clearActivity: state =>
+      (state = {
+        ...initialState,
+        failedActivityMap: state.failedActivityMap,
+      }),
     clearState: state => (state = initialState),
   },
   extraReducers: builder => {
@@ -40,6 +45,6 @@ export const activitySlice = createSlice({
   },
 });
 
-export const { addPage, addFailedActivity, removeFailedActivity, clearState } = activitySlice.actions;
+export const { addPage, addFailedActivity, removeFailedActivity, clearState, clearActivity } = activitySlice.actions;
 
 export default activitySlice;

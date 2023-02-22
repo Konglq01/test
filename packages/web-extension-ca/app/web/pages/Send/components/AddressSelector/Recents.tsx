@@ -7,6 +7,7 @@ import { useContact } from '@portkey/hooks/hooks-ca/contact';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import LoadingMore from 'components/LoadingMore/LoadingMore';
 import RecentItem from './RecentItem';
+import { ChainId } from '@portkey/types';
 
 interface ApiRecentAddressItemType {
   caAddress: string;
@@ -21,12 +22,16 @@ const MAX_RESULT_ACCOUNT = 10;
 const RECENT_COUNT_LIMIT = 100;
 const NO_RECENT_TEXT = 'There is no recents.';
 
-export default function Recents({ onChange }: { onChange: (account: IClickAddressProps) => void }) {
+export default function Recents({
+  onChange,
+  chainId,
+}: {
+  onChange: (account: IClickAddressProps) => void;
+  chainId: ChainId;
+}) {
   const { t } = useTranslation();
   const currentWallet = useCurrentWallet();
-  const {
-    walletInfo: { caAddressList },
-  } = currentWallet;
+  const { walletInfo } = currentWallet;
   const { contactMap } = useContact();
   const [loading, setLoading] = useState<boolean>(false);
   const [skipCount, setSkipCount] = useState(0);
@@ -37,12 +42,12 @@ export default function Recents({ onChange }: { onChange: (account: IClickAddres
     setLoading(true);
     return request.recent.fetchRecentTransactionUsers({
       params: {
-        caAddresses: caAddressList,
+        caAddresses: [walletInfo[chainId]?.caAddress],
         skipCount,
         maxResultCount: MAX_RESULT_ACCOUNT,
       },
     });
-  }, [caAddressList, skipCount]);
+  }, [chainId, skipCount, walletInfo]);
 
   // Convert data so that the formats of Recents and Contacts are consistent, and get contactName for Recents.
   const parseRecentsListToContactMap = useCallback(

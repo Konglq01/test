@@ -129,8 +129,9 @@ export default function ActivityList({ data, hasMore, loadMore }: IActivityListP
         setLoading(true);
         await intervalCrossChainTransfer(data);
         dispatch(removeFailedActivity(managerTransferTxId));
+        message.success('success');
       } catch (error) {
-        showErrorModal(error);
+        showErrorModal({ managerTransferTxId, data });
       } finally {
         setLoading(false);
       }
@@ -140,10 +141,10 @@ export default function ActivityList({ data, hasMore, loadMore }: IActivityListP
   );
 
   const handleResend = useCallback(
-    async (resendId: string) => {
+    async (e: any, resendId: string) => {
+      e?.stopPropagation();
       const { params } = activity.failedActivityMap[resendId];
       await retryCrossChain({ managerTransferTxId: resendId, data: params });
-      message.success('success');
     },
     [activity.failedActivityMap, retryCrossChain],
   );
@@ -154,7 +155,7 @@ export default function ActivityList({ data, hasMore, loadMore }: IActivityListP
 
       return (
         <div className="row-4">
-          <Button type="primary" className="resend-btn" onClick={() => handleResend(item.transactionId)}>
+          <Button type="primary" className="resend-btn" onClick={(e) => handleResend(e, item.transactionId)}>
             Resend
           </Button>
         </div>

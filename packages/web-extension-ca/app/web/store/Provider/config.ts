@@ -41,7 +41,7 @@ export const assetPersistConfig = {
 export const activityPersistConfig = {
   key: activitySlice.name,
   storage: localStorage,
-  whitelist: ['failedActivityMap'],
+  // whitelist: ['failedActivityMap'],
 };
 
 export const walletPersistConfig = {

@@ -56,7 +56,7 @@ export default function SendPreview({
       {type !== 'nft' ? (
         <div className="amount-preview">
           <p className="amount">
-            -{amount} {symbol}
+            -{unitConverter(amount)} {symbol}
           </p>
           <p className="convert">{isTestNet ? '' : `$ ${amount}`}</p>
         </div>
@@ -69,7 +69,7 @@ export default function SendPreview({
               {/* <span className="token-id">#0004</span> */}
             </p>
             <p className="quantity">
-              Balance: <span>{amount}</span>
+              Balance: <span>{unitConverter(amount)}</span>
             </p>
           </div>
         </div>
@@ -107,7 +107,7 @@ export default function SendPreview({
       <div className="fee-preview">
         <span className="label">Transaction fee</span>
         <p className="value">
-          <span className="symbol">{`${txFee} ELF`}</span>
+          <span className="symbol">{`${unitConverter(txFee)} ELF`}</span>
           {/* <span className="usd">{`$ ${ZERO.plus(ElfPrice[0]).times(txFee).toFixed(2)}`}</span> */}
         </p>
       </div>

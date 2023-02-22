@@ -1,5 +1,6 @@
 import { useAppCommonDispatch } from '@portkey/hooks';
 import { fetchContactListAsync } from '@portkey/store/store-ca/contact/actions';
+import { ChainId } from '@portkey/types';
 import { IClickAddressProps } from '@portkey/types/types-ca/contact';
 import { Tabs } from 'antd';
 
@@ -9,7 +10,13 @@ import Contacts from './Contacts';
 import './index.less';
 import Recents from './Recents';
 
-export default function AddressSelector({ onClick }: { onClick: (account: IClickAddressProps) => void }) {
+export default function AddressSelector({
+  onClick,
+  chainId,
+}: {
+  onClick: (account: IClickAddressProps) => void;
+  chainId: ChainId;
+}) {
   const dispatch = useAppCommonDispatch();
 
   const { t } = useTranslation();
@@ -25,7 +32,7 @@ export default function AddressSelector({ onClick }: { onClick: (account: IClick
         {
           label: t('Recents'),
           key: 'recents',
-          children: <Recents onChange={onClick} />,
+          children: <Recents onChange={onClick} chainId={chainId} />,
         },
         {
           label: t('Contacts'),
