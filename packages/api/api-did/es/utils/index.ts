@@ -3,12 +3,11 @@ import { GetContractListApiType } from '@portkey/types/types-ca/contact';
 
 export const getContactList = (
   baseURL: string,
-  { userId, page, size, modificationTime }: { userId?: string; page: number; size: number; modificationTime: string },
+  { page, size, modificationTime }: { page: number; size: number; modificationTime: string },
 ): Promise<GetContractListApiType> => {
   return request.es.getContactList({
     baseURL,
     params: {
-      userId,
       filter: `modificationTime: [* TO ${modificationTime}] AND isDeleted: false`,
       sort: 'modificationTime',
       sortType: 0,
@@ -20,12 +19,11 @@ export const getContactList = (
 
 export const getContactEventList = (
   baseURL: string,
-  { userId, modificationTime, fetchTime }: { userId?: string; modificationTime: string; fetchTime: string },
+  { modificationTime, fetchTime }: { modificationTime: string; fetchTime: string },
 ): Promise<GetContractListApiType> => {
   return request.es.getContactList({
     baseURL,
     params: {
-      userId,
       filter: `modificationTime: [${modificationTime} TO ${fetchTime}]`,
       sort: 'modificationTime',
       sortType: 0,
