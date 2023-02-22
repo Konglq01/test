@@ -22,8 +22,7 @@ export const fetchContactListAsync = createAsyncThunk<FetchContractListAsyncPayl
       wallet: WalletState;
     };
     const baseUrl = NetworkList.find(item => item.networkType === currentNetwork)?.apiUrl;
-    const userId = walletInfo?.caInfo[currentNetwork].AELF?.caHash;
-    if (!userId || !baseUrl)
+    if (!baseUrl)
       return {
         isInit: true,
         contactIndexList: [],
@@ -42,7 +41,6 @@ export const fetchContactListAsync = createAsyncThunk<FetchContractListAsyncPayl
         try {
           console.log('getContactList', page, errorTimes);
           const response = await getContactListEs(baseUrl, {
-            userId,
             page,
             size: CONTACT_API_FETCH_SIZE,
             modificationTime: new Date(modificationTime).toISOString(),
@@ -82,7 +80,6 @@ export const fetchContactListAsync = createAsyncThunk<FetchContractListAsyncPayl
       try {
         console.log('getContactEventList', errorTimes);
         const response = await getContactEventListEs(baseUrl, {
-          userId,
           modificationTime: new Date(lastModified).toISOString(),
           fetchTime: new Date(fetchTime).toISOString(),
         });
