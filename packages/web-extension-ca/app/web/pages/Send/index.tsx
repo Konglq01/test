@@ -449,11 +449,12 @@ export default function Send() {
       tipMsg,
       tokenInfo,
       txFee,
-      validateToAddress,
       chainInfo?.chainId,
+      validateToAddress,
       t,
       navigate,
       handleCheckPreview,
+      getTranslationInfo,
       sendHandler,
     ],
   );

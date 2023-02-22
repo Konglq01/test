@@ -196,12 +196,10 @@ export const assetsSlice = createSlice({
   initialState,
   reducers: {
     clearState: state => (state = initialState),
+    clearAssets: state => (state = initialState),
     addTokenInCurrentAccount: (state, action: PayloadAction<{}>) => {},
     deleteTokenInCurrentAccount: (state, action: PayloadAction<{}>) => {},
     clearMarketToken: (state, action: PayloadAction<any>) => {},
-    clearAssets: (state, action: PayloadAction<any>) => {
-      state = initialState;
-    },
     clearNftItem: (state, action: PayloadAction<any>) => {
       const { symbol, chainId } = action.payload;
 
@@ -335,6 +333,6 @@ export const assetsSlice = createSlice({
   },
 });
 
-export const { addTokenInCurrentAccount, clearNftItem } = assetsSlice.actions;
+export const { addTokenInCurrentAccount, clearNftItem, clearAssets } = assetsSlice.actions;
 
 export default assetsSlice;

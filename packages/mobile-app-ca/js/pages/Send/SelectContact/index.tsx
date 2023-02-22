@@ -12,16 +12,13 @@ import { ContactItemType, RecentContactItemType } from '@portkey/types/types-ca/
 // import RecentList from '../components/RecentList';
 import ContactsList from 'components/ContactList';
 import NoData from 'components/NoData';
-import { Text } from 'react-native-svg';
 import { TextS } from 'components/CommonText';
-import { useAppCASelector, useAppCommonDispatch, useAppCommonSelector } from '@portkey/hooks';
+import { useAppCommonDispatch } from '@portkey/hooks';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { fetchContactListAsync } from '@portkey/store/store-ca/contact/actions';
 import { request } from '@portkey/api/api-did';
 import { useContact } from '@portkey/hooks/hooks-ca/contact';
-import { useWallet } from 'hooks/store';
 import { ChainId } from '@portkey/types';
-import { useCurrentNetwork } from '@portkey/hooks/network';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 
 interface ApiRecentAddressItemType {
@@ -68,7 +65,6 @@ export default function SelectContact(props: SelectContactProps) {
 
   const fetchRecents = useCallback(() => {
     setLoading(true);
-    if (!walletInfo) return;
 
     return request.recent.fetchRecentTransactionUsers({
       params: {

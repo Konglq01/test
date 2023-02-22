@@ -1,6 +1,7 @@
 import { ChainId, ChainType } from '..';
 
 export interface IToSendHomeAssetParamsBaseType {
+  symbol: string;
   chainId: ChainId;
   balance: string;
   imageUrl: string;
