@@ -12,15 +12,14 @@ import { ContactItemType, RecentContactItemType } from '@portkey/types/types-ca/
 // import RecentList from '../components/RecentList';
 import ContactsList from 'components/ContactList';
 import NoData from 'components/NoData';
-import { Text } from 'react-native-svg';
 import { TextS } from 'components/CommonText';
-import { useAppCASelector, useAppCommonDispatch, useAppCommonSelector } from '@portkey/hooks';
+import { useAppCommonDispatch } from '@portkey/hooks';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { fetchContactListAsync } from '@portkey/store/store-ca/contact/actions';
 import { request } from '@portkey/api/api-did';
 import { useContact } from '@portkey/hooks/hooks-ca/contact';
-import { isLoading } from 'expo-font';
-import { useCaAddresses } from '@portkey/hooks/hooks-ca/wallet';
+import { ChainId } from '@portkey/types';
+import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 
 interface ApiRecentAddressItemType {
   caAddress: string;
@@ -32,19 +31,19 @@ interface ApiRecentAddressItemType {
 }
 
 interface SelectContactProps {
-  currentNetType?: string;
+  chainId: ChainId;
   onPress?: (contact: any) => void;
 }
 
 const MAX_RESULT_ACCOUNT = 10;
 
 export default function SelectContact(props: SelectContactProps) {
-  const { onPress } = props;
+  const { chainId, onPress } = props;
   const { t } = useLanguage();
   const dispatch = useAppCommonDispatch();
   const { contactMap } = useContact();
 
-  const caAddresses = useCaAddresses();
+  const { walletInfo } = useCurrentWallet();
 
   const [loading, setLoading] = useState<boolean>(false);
   const [skipCount, setSkipCount] = useState(0);
@@ -66,14 +65,15 @@ export default function SelectContact(props: SelectContactProps) {
 
   const fetchRecents = useCallback(() => {
     setLoading(true);
+
     return request.recent.fetchRecentTransactionUsers({
       params: {
-        caAddresses: caAddresses,
+        caAddresses: [walletInfo?.[chainId]?.caAddress] || [],
         skipCount,
         maxResultCount: MAX_RESULT_ACCOUNT,
       },
     });
-  }, [caAddresses, skipCount]);
+  }, [chainId, skipCount, walletInfo]);
 
   const transFormData = useCallback(
     (data: ApiRecentAddressItemType[]): any[] =>
