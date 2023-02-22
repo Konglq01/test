@@ -17,6 +17,7 @@ import GStyles from 'assets/theme/GStyles';
 import { TokenItemShowType } from '@portkey/types/types-ca/token';
 import useRouterParams from '@portkey/hooks/useRouterParams';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import { SendTokenQRDataType } from '@portkey/types/types-ca/qrcode';
 
 export default function Receive() {
   const { t } = useLanguage();
