@@ -76,11 +76,11 @@ const ActivityDetail = () => {
     const from = fromChainId === 'AELF' ? 'MainChain AELF' : `SideChain ${fromChainId}`;
     const to = toChainId === 'AELF' ? 'MainChain AELF' : `SideChain ${toChainId}`;
 
+    const isNetworkShow = transactionType && !hiddenArr.includes(transactionType);
     return (
-      transactionType &&
-      !hiddenArr.includes(transactionType) && (
-        <>
-          <View style={styles.section}>
+      <>
+        <View style={styles.section}>
+          {isNetworkShow && (
             <View style={[styles.flexSpaceBetween]}>
               <TextM style={[styles.lightGrayFontColor]}>{t('Network')}</TextM>
               <View style={styles.networkInfoContent}>
@@ -91,24 +91,24 @@ const ActivityDetail = () => {
                 </View>
               </View>
             </View>
-            <View style={[styles.flexSpaceBetween, styles.marginTop16]}>
-              <TextM style={[styles.lightGrayFontColor]}>{t('Transaction ID')}</TextM>
-              <View style={[GStyles.flexRow, styles.alignItemsCenter]}>
-                <TextM style={{}}>{formatStr2EllipsisStr(_transactionId, 10, 'tail')}</TextM>
-                <TouchableOpacity
-                  style={styles.marginLeft8}
-                  onPress={async () => {
-                    const isCopy = await Clipboard.setStringAsync(_transactionId);
-                    isCopy && CommonToast.success(t('Copy Success'));
-                  }}>
-                  <Svg icon="copy" size={pTd(13)} />
-                </TouchableOpacity>
-              </View>
+          )}
+          <View style={[styles.flexSpaceBetween, isNetworkShow && styles.marginTop16]}>
+            <TextM style={[styles.lightGrayFontColor]}>{t('Transaction ID')}</TextM>
+            <View style={[GStyles.flexRow, styles.alignItemsCenter]}>
+              <TextM style={{}}>{formatStr2EllipsisStr(_transactionId, 10, 'tail')}</TextM>
+              <TouchableOpacity
+                style={styles.marginLeft8}
+                onPress={async () => {
+                  const isCopy = await Clipboard.setStringAsync(_transactionId);
+                  isCopy && CommonToast.success(t('Copy Success'));
+                }}>
+                <Svg icon="copy" size={pTd(13)} />
+              </TouchableOpacity>
             </View>
           </View>
-          <Text style={[styles.divider, styles.marginTop0]} />
-        </>
-      )
+        </View>
+        <Text style={[styles.divider, styles.marginTop0]} />
+      </>
     );
   }, [activityItem, isTestNet, t]);
 

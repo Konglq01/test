@@ -335,14 +335,16 @@ const ContactEdit: React.FC = () => {
         </TouchableWithoutFeedback>
       </KeyboardAwareScrollView>
 
-      <CommonButton style={GStyles.marginTop(16)} onPress={onFinish} disabled={isSaveDisable} type="solid">
-        {isEdit ? t('Save') : t('Add')}
-      </CommonButton>
-      {isEdit && (
-        <CommonButton style={GStyles.marginTop(8)} onPress={onDelete} titleStyle={FontStyles.font12} type="clear">
-          {t('Delete')}
+      <View style={GStyles.paddingTop(16)}>
+        <CommonButton onPress={onFinish} disabled={isSaveDisable} type="solid">
+          {isEdit ? t('Save') : t('Add')}
         </CommonButton>
-      )}
+        {isEdit && (
+          <CommonButton style={GStyles.marginTop(8)} onPress={onDelete} titleStyle={FontStyles.font12} type="clear">
+            {t('Delete')}
+          </CommonButton>
+        )}
+      </View>
     </PageContainer>
   );
 };

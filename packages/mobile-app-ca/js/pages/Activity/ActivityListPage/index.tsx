@@ -1,7 +1,6 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { StyleSheet, FlatList } from 'react-native';
 import navigationService from 'utils/navigationService';
-import Svg from 'components/Svg';
 import PageContainer from 'components/PageContainer';
 import { pTd } from 'utils/unit';
 import useEffectOnce from 'hooks/useEffectOnce';
@@ -23,17 +22,19 @@ interface RouterParams {
   symbol?: string;
 }
 
-const MAX_RESULT_COUNT = 10;
-
 const ActivityListPage = () => {
   const { chainId, symbol } = useRouterParams<RouterParams>();
   const { t } = useLanguage();
   const dispatch = useAppCommonDispatch();
-  const { data: activityList, skipCount } = useAppCASelector(state => state.activity);
+  const { data: activityList, skipCount, totalRecordCount, maxResultCount } = useAppCASelector(state => state.activity);
   const currentWallet = useCurrentWallet();
+  const isLoadingRef = useRef(false);
 
   const getActivityList = useCallback(
     async (isInit: boolean) => {
+      if (!isInit && activityList.length >= totalRecordCount) return;
+      if (isLoadingRef.current) return;
+      isLoadingRef.current = true;
       setRefreshing(true);
 
       if (isInit) {
@@ -41,8 +42,8 @@ const ActivityListPage = () => {
       }
 
       const params: IActivitysApiParams = {
-        maxResultCount: MAX_RESULT_COUNT,
-        skipCount: skipCount,
+        maxResultCount: maxResultCount,
+        skipCount: isInit ? 0 : skipCount + maxResultCount,
         caAddresses: currentWallet.walletInfo.caAddressList,
         // managerAddresses: address,
         chainId: chainId,
@@ -51,8 +52,18 @@ const ActivityListPage = () => {
       };
       await dispatch(getActivityListAsync(params));
       setRefreshing(false);
+      isLoadingRef.current = false;
     },
-    [chainId, currentWallet.walletInfo.caAddressList, dispatch, skipCount, symbol],
+    [
+      activityList.length,
+      chainId,
+      currentWallet.walletInfo.caAddressList,
+      dispatch,
+      maxResultCount,
+      skipCount,
+      symbol,
+      totalRecordCount,
+    ],
   );
 
   useEffectOnce(() => {
