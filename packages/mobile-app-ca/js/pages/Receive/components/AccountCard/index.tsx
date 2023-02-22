@@ -4,17 +4,14 @@ import { addressFormat } from '@portkey/utils';
 import { ScreenWidth } from '@rneui/base';
 import { defaultColors } from 'assets/theme';
 import { TextM } from 'components/CommonText';
-import CommonToast from 'components/CommonToast';
 import Svg from 'components/Svg';
-import { setStringAsync } from 'expo-clipboard';
-import i18n from 'i18n';
 import React from 'react';
 import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { pTd } from 'utils/unit';
-import { SendTokenQRDataType } from '@portkey/types/types-ca/qrcode';
 import { TokenItemShowType } from '@portkey/types/types-ca/token';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
+import { SendTokenQRDataType } from '@portkey/types/types-ca/qrcode';
 
 const cardWidth = ScreenWidth * 0.63;
 
@@ -44,8 +41,13 @@ export default function AccountCard({
     netWorkType: currentNetWork.networkType,
     chainType,
     type: 'send',
-    tokenInfo,
-    toCaAddress,
+    toInfo: {
+      name: '',
+      address: toCaAddress,
+    },
+    assetInfo: {
+      ...tokenInfo,
+    },
   };
 
   return (
