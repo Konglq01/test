@@ -32,7 +32,7 @@ export const fetchContactListAsync = createAsyncThunk<FetchContractListAsyncPayl
 
     // init
     let contactList: ContactItemType[] = [];
-    if (isInit || contactState.contactIndexList.length === 0) {
+    if (isInit || contactState.lastModified === 0) {
       let page = 1,
         errorTimes = 0,
         totalCount = 0;

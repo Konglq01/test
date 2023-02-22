@@ -9,7 +9,7 @@ export const getContactList = (
     baseURL,
     params: {
       userId,
-      filter: `modificationTime: [0 TO ${modificationTime}] AND isDeleted: false`,
+      filter: `modificationTime: [* TO ${modificationTime}] AND isDeleted: false`,
       sort: 'modificationTime',
       sortType: 0,
       skipCount: (page - 1) * size,
