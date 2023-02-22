@@ -224,7 +224,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
   return (
     <PageContainer
       safeAreaColor={['blue', 'white']}
-      titleDom={t('Send')}
+      titleDom={`${t('Send')}${sendType === 'token' ? ' ' + assetInfo.symbol : ''}`}
       containerStyles={styles.pageWrap}
       scrollViewProps={{ disabled: true }}>
       {sendType === 'nft' ? (

@@ -75,7 +75,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
   //   address: string;
   // }>();
 
-  const { sendType, toInfo, assetInfo } = useRouterParams<IToSendHomeParamsType>();
+  const { sendType = 'token', toInfo, assetInfo } = useRouterParams<IToSendHomeParamsType>();
 
   const wallet = useCurrentWalletInfo();
   const chainInfo = useCurrentChain(assetInfo?.chainId);
@@ -350,7 +350,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
   // get the target token balance
   useEffectOnce(() => {
     (async () => {
-      const balance = await getAssetBalance(assetInfo.tokenContractAddress, assetInfo.symbol);
+      const balance = await getAssetBalance(assetInfo.tokenContractAddress || assetInfo.address, assetInfo.symbol);
       setSelectedAssets({ ...selectedAssets, balance });
     })();
   });
