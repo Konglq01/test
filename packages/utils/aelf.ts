@@ -142,7 +142,7 @@ export const isCrossChain = (toAddress: string, fromChainId: ChainId): boolean =
   const addressChainId = arr[arr.length - 1];
   // no suffix
   if (isAelfAddress(addressChainId)) {
-    return 'AELF' !== fromChainId;
+    return false;
   }
   return addressChainId !== fromChainId;
 };

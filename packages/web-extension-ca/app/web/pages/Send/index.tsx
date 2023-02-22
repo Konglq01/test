@@ -7,7 +7,7 @@ import { addFailedActivity, removeFailedActivity } from '@portkey/store/store-ca
 import { AddressItem, ContactItemType, IClickAddressProps } from '@portkey/types/types-ca/contact';
 import { BaseToken } from '@portkey/types/types-ca/token';
 import { isDIDAddress } from '@portkey/utils';
-import { getAelfAddress, getWallet, isCrossChain } from '@portkey/utils/aelf';
+import { getAelfAddress, getWallet, isAelfAddress, isCrossChain } from '@portkey/utils/aelf';
 import aes from '@portkey/utils/aes';
 import { timesDecimals } from '@portkey/utils/converter';
 import { Button, message, Modal } from 'antd';
@@ -102,16 +102,31 @@ export default function Send() {
     return false;
   }, [toAccount.address]);
 
+  const getToAddressChainId = useCallback(
+    (toAddress: string) => {
+      if (!toAddress.includes('_')) return chainInfo?.chainId;
+      const arr = toAddress.split('_');
+      const addressChainId = arr[arr.length - 1];
+      // no suffix
+      if (isAelfAddress(addressChainId)) {
+        return chainInfo?.chainId;
+      }
+      return addressChainId;
+    },
+    [chainInfo?.chainId],
+  );
+
   useDebounce(
     () => {
       const value = getAelfAddress(toAccount.address);
+      const toAdsChainId = getToAddressChainId(toAccount.address);
       const searchResult: ContactItemType[] = [];
       contactIndexList.forEach(({ contacts }) => {
         searchResult.push(
           ...contacts.filter(
             (contact) =>
               contact.name.toLowerCase() === value.toLowerCase() ||
-              contact.addresses.some((ads) => ads.address === value),
+              contact.addresses.some((ads) => ads.address === value && ads.chainId === toAdsChainId),
           ),
         );
       });
@@ -411,7 +426,6 @@ export default function Send() {
       t,
       navigate,
       handleCheckPreview,
-      getTranslationInfo,
       sendHandler,
     ],
   );
