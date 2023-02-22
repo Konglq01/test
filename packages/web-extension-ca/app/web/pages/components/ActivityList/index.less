@@ -65,3 +65,39 @@
     }
   }
 }
+
+.transaction-modal {
+  border-radius: 8px;
+  overflow: hidden;
+  .@{app-prefix}-modal-body {
+    padding: 0;
+    .@{app-prefix}-modal-confirm-title {
+      .warnred-icon {
+        width: 42px;
+        height: 42px;
+        margin-bottom: 24px;
+      }
+      
+      padding: 24px;
+      margin: 0;
+      border-bottom: 1px solid @border-2;
+      text-align: center;
+      line-height: 22px;
+      font-size: 18px;
+      color: @font-13;
+    }
+    .@{app-prefix}-modal-confirm-btns {
+      padding: 15px 16px 17px;
+      margin: 0;
+      button {
+        width: 288px;
+        height: 48px;
+        border-radius: 24px;
+        margin: 0 !important;
+        line-height: 22px;
+        font-size: 16px;
+      }
+    }
+  }
+}
+

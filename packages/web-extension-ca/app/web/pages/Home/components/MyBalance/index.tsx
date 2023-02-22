@@ -15,6 +15,7 @@ import { useCaAddresses, useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet
 import { fetchAssetAsync, fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
 import { fetchAllTokenListAsync } from '@portkey/store/store-ca/tokenManagement/action';
 import { TokenItemShowType } from '@portkey/types/types-eoa/token';
+import { getWalletNameAsync } from '@portkey/store/store-ca/wallet/actions';
 
 export interface TransactionResult {
   total: number;
@@ -56,6 +57,7 @@ export default function MyBalance() {
     // );
     appDispatch(fetchTokenListAsync({ caAddresses }));
     appDispatch(fetchAllTokenListAsync({ keyword: '', chainIdArray }));
+    appDispatch(getWalletNameAsync());
   }, [passwordSeed, appDispatch, caAddresses, chainIdArray]);
 
   useEffect(() => () => clearInterval(timer), []);

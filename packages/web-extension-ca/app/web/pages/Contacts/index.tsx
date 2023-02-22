@@ -52,7 +52,7 @@ export default function Contacts() {
           index,
           contacts: contacts.filter(
             (contact) =>
-              contact.name.toLowerCase() === value.toLowerCase() ||
+              contact.name.trim().toLowerCase() === value.trim().toLowerCase() ||
               contact.addresses.some((ads) => ads.address === value),
           ),
         });
@@ -124,7 +124,7 @@ export default function Contacts() {
         ) : (
           <IndexBar>
             {curList.map(({ index, contacts }) => {
-              return contacts.length ? (
+              return (
                 <IndexBar.Panel
                   className={!contacts.length && isSearch ? 'contact-empty' : ''}
                   index={index}
@@ -145,8 +145,6 @@ export default function Contacts() {
                     ))}
                   </List>
                 </IndexBar.Panel>
-              ) : (
-                <></>
               );
             })}
           </IndexBar>

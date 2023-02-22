@@ -1,30 +1,25 @@
-import { useRoutes } from 'react-router-dom';
+import { useRoutes } from 'react-router';
 import Home from 'pages/Home';
 import Wallet from 'pages/Wallet';
-import VerifierAccount from 'pages/VerifierAccount';
 import Contacts from 'pages/Contacts';
 import GuardianApproval from 'pages/GuardianApproval';
-import Guardians from 'pages/Guardians';
-import GuardiansEdit from 'pages/Guardians/GuardiansEdit';
-import GuardiansView from 'pages/Guardians/GuardiansView';
 import AddToken from 'pages/Token/Manage';
 import Receive from 'pages/Receive';
-import AddGuardian from 'pages/Guardians/GuardiansAdd';
 import TokenDetail from 'pages/Token/Detail';
 import AccountSetting from 'pages/AccountSetting';
-import Contact from 'pages/Contacts/ContactDetail';
 import My from 'pages/My';
 import Send from 'pages/Send';
-import Transaction from 'pages/Transaction';
 import NFT from 'pages/NFT';
+import Transaction from 'pages/Transaction';
+import Guardians from 'pages/Guardians';
+import AddGuardian from 'pages/Guardians/GuardiansAdd';
+import GuardiansEdit from 'pages/Guardians/GuardiansEdit';
+import GuardiansView from 'pages/Guardians/GuardiansView';
+import VerifierAccount from 'pages/VerifierAccount';
 import Unlock from 'pages/Unlock';
-import QueryPage from 'pages/QueryPage';
-import TestSocket from 'pages/TestSocket';
+import Contact from 'pages/Contacts/ContactDetail';
 import Device from 'pages/AccountSetting/Devices';
 import SetPin from 'pages/AccountSetting/SetPin';
-import NotFound from 'pages/NotFound';
-import Example from 'pages/Example';
-import SignUpUI from 'pages/Example/SignUpUI';
 
 export const PageRouter = () =>
   useRoutes([
@@ -117,23 +112,7 @@ export const PageRouter = () =>
       element: <Unlock />,
     },
     {
-      path: 'query-page',
-      element: <QueryPage />,
-    },
-    {
-      path: '/test/example-ui',
-      element: <Example />,
-    },
-    {
-      path: '/test/example-SignUpUI',
-      element: <SignUpUI />,
-    },
-    {
-      path: '/test/socket',
-      element: <TestSocket />,
-    },
-    {
       path: '*',
-      element: <NotFound />,
+      element: <Home />,
     },
   ]);

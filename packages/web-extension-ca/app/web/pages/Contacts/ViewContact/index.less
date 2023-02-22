@@ -51,9 +51,13 @@
       line-height: 16px;
 
       .address {
-        max-width: 290px;
+        max-width: 276px;
         overflow: hidden;
         color: @font-11;
+        /* stylelint-disable-next-line value-no-vendor-prefix */
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 1;
       }
       .chain {
         color: @font-13;

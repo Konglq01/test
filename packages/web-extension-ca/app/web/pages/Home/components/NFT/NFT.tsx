@@ -1,11 +1,13 @@
 import { useCaAddresses, useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { clearNftItem, fetchNFTAsync, fetchNFTCollectionsAsync } from '@portkey/store/store-ca/assets/slice';
+import { ChainId } from '@portkey/types';
 import { NFTCollectionItemShowType, NFTItemBaseType } from '@portkey/types/types-ca/assets';
 import { Collapse } from 'antd';
 import { List } from 'antd-mobile';
 import CustomSvg from 'components/CustomSvg';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
+import clsx from 'clsx';
 import { useAppDispatch, useAssetInfo, useWalletInfo } from 'store/Provider/hooks';
 import './index.less';
 
@@ -23,7 +25,7 @@ export default function NFT() {
 
   const getMore = useCallback(
     (symbol: string, chainId: string) => {
-      dispatch(fetchNFTAsync({ symbol, caAddresses: [wallet[chainId].caAddress] }));
+      dispatch(fetchNFTAsync({ symbol, chainId: chainId as ChainId, caAddresses: [wallet[chainId].caAddress] }));
     },
     [dispatch, wallet],
   );
@@ -33,13 +35,19 @@ export default function NFT() {
       const openArr = typeof arr === 'string' ? [arr] : arr;
       openPanel.forEach((prev: string) => {
         if (!openArr.some((cur: string) => cur === prev)) {
-          dispatch(clearNftItem(prev.split('_')[0]));
+          dispatch(clearNftItem({ symbol: prev.split('_')[0], chainId: prev.split('_')[1] }));
         }
       });
       openArr.forEach((cur: string) => {
         if (!openPanel.some((prev: string) => cur === prev)) {
           const curTmp = cur.split('_');
-          dispatch(fetchNFTAsync({ symbol: curTmp[0], caAddresses: [wallet[curTmp[1]].caAddress] }));
+          dispatch(
+            fetchNFTAsync({
+              symbol: curTmp[0],
+              chainId: curTmp[1] as ChainId,
+              caAddresses: [wallet[curTmp[1]].caAddress],
+            }),
+          );
         }
       });
       setOpenPanel(openArr);
@@ -79,13 +87,13 @@ export default function NFT() {
                     style={{
                       backgroundImage: `url('${nftItem.imageUrl}')`,
                     }}
-                    className="item"
+                    className={clsx(['item', nftItem.imageUrl ? 'item-img' : ''])}
                     onClick={() => {
-                      nav('/nft', { state: { ...nftItem, address: nftItem.tokenContractAddress } });
+                      nav('/nft', { state: { ...nftItem, address: nftItem.tokenContractAddress, decimals: 0 } });
                     }}>
                     <div className="mask">
                       <p className="alias">{nftItem.alias}</p>
-                      <p className="token-id">{nftItem.tokenId}</p>
+                      <p className="token-id">#{nftItem.tokenId}</p>
                     </div>
                   </div>
                 );
