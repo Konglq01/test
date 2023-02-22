@@ -19,7 +19,12 @@ export const getContactList = (
 
 export const getContactEventList = (
   baseURL: string,
-  { modificationTime, fetchTime }: { modificationTime: string; fetchTime: string },
+  {
+    page,
+    size,
+    modificationTime,
+    fetchTime,
+  }: { page: number; size: number; modificationTime: string; fetchTime: string },
 ): Promise<GetContractListApiType> => {
   return request.es.getContactList({
     baseURL,
@@ -27,6 +32,8 @@ export const getContactEventList = (
       filter: `modificationTime: [${modificationTime} TO ${fetchTime}]`,
       sort: 'modificationTime',
       sortType: 0,
+      skipCount: (page - 1) * size,
+      maxResultCount: size,
     },
   });
 };
