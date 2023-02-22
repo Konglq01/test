@@ -19,8 +19,10 @@ import useEffectOnce from 'hooks/useEffectOnce';
 import { fetchContactListAsync } from '@portkey/store/store-ca/contact/actions';
 import { request } from '@portkey/api/api-did';
 import { useContact } from '@portkey/hooks/hooks-ca/contact';
-import { isLoading } from 'expo-font';
-import { useCaAddresses } from '@portkey/hooks/hooks-ca/wallet';
+import { useWallet } from 'hooks/store';
+import { ChainId } from '@portkey/types';
+import { useCurrentNetwork } from '@portkey/hooks/network';
+import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 
 interface ApiRecentAddressItemType {
   caAddress: string;
@@ -32,19 +34,19 @@ interface ApiRecentAddressItemType {
 }
 
 interface SelectContactProps {
-  currentNetType?: string;
+  chainId: ChainId;
   onPress?: (contact: any) => void;
 }
 
 const MAX_RESULT_ACCOUNT = 10;
 
 export default function SelectContact(props: SelectContactProps) {
-  const { onPress } = props;
+  const { chainId, onPress } = props;
   const { t } = useLanguage();
   const dispatch = useAppCommonDispatch();
   const { contactMap } = useContact();
 
-  const caAddresses = useCaAddresses();
+  const { walletInfo } = useCurrentWallet();
 
   const [loading, setLoading] = useState<boolean>(false);
   const [skipCount, setSkipCount] = useState(0);
@@ -66,14 +68,16 @@ export default function SelectContact(props: SelectContactProps) {
 
   const fetchRecents = useCallback(() => {
     setLoading(true);
+    if (!walletInfo) return;
+
     return request.recent.fetchRecentTransactionUsers({
       params: {
-        caAddresses: caAddresses,
+        caAddresses: [walletInfo?.[chainId]?.caAddress] || [],
         skipCount,
         maxResultCount: MAX_RESULT_ACCOUNT,
       },
     });
-  }, [caAddresses, skipCount]);
+  }, [chainId, skipCount, walletInfo]);
 
   const transFormData = useCallback(
     (data: ApiRecentAddressItemType[]): any[] =>
