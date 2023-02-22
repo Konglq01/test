@@ -9,6 +9,7 @@ import { getBalance } from './getBalance';
 import token from '@portkey/api/api-did/token';
 import { ZERO } from '@portkey/constants/misc';
 import { CROSS_FEE } from '@portkey/constants/constants-ca/wallet';
+import { timesDecimals } from '@portkey/utils/converter';
 
 const nativeToken = {
   symbol: 'ELF',
@@ -117,12 +118,16 @@ const crossChainTransfer = async ({
 
   // return;
   // TODO Only support chainType: aelf
+  let _amount = amount;
+  if (tokenInfo.symbol === 'ELF') {
+    _amount = ZERO.plus(amount).minus(timesDecimals(CROSS_FEE, 8)).toNumber();
+  }
   const CrossChainTransferParams = {
     chainInfo,
     chainType,
     privateKey,
     managerAddress,
-    amount,
+    amount: _amount,
     tokenInfo,
     memo,
     toAddress,

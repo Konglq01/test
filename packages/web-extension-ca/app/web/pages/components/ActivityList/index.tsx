@@ -9,9 +9,13 @@ import './index.less';
 import LoadingMore from 'components/LoadingMore/LoadingMore';
 import { useIsTestnet } from 'hooks/useActivity';
 import { AmountSign, formatAmount, transNetworkText } from '@portkey/utils/activity';
-import { Button } from 'antd';
+import { Button, message, Modal } from 'antd';
 import { useAppCASelector } from '@portkey/hooks/hooks-ca';
 import { dateFormat } from 'utils';
+import { useTranslation } from 'react-i18next';
+import { CrossChainTransferIntervalParams, intervalCrossChainTransfer } from 'utils/sandboxUtil/crossChainTransfer';
+import { useAppDispatch, useLoading } from 'store/Provider/hooks';
+import { removeFailedActivity } from '@portkey/store/store-ca/activity/slice';
 
 export interface IActivityListProps {
   data?: ActivityItemType[];
@@ -22,6 +26,9 @@ export interface IActivityListProps {
 export default function ActivityList({ data, hasMore, loadMore }: IActivityListProps) {
   const activity = useAppCASelector((state) => state.activity);
   const isTestNet = useIsTestnet();
+  const { t } = useTranslation();
+  const { setLoading } = useLoading();
+  const dispatch = useAppDispatch();
 
   const activityListLeftIcon = (type: TransactionTypes) => {
     const loginRelatedTypeArr = [
@@ -92,10 +99,54 @@ export default function ActivityList({ data, hasMore, loadMore }: IActivityListP
     [isTestNet],
   );
 
-  function handleResend(e: any) {
-    e?.stopPropagation();
-    console.log('🌈 TODO: resend');
-  }
+  const showErrorModal = useCallback(
+    (error: any) => {
+      Modal.error({
+        width: 320,
+        className: 'transaction-modal',
+        okText: t('Resend'),
+        icon: null,
+        closable: false,
+        centered: true,
+        title: (
+          <div className="flex-column-center transaction-msg">
+            <CustomSvg type="warnRed" />
+            {t('Transaction failed ！')}
+          </div>
+        ),
+        onOk: () => {
+          retryCrossChain(error);
+        },
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [t],
+  );
+
+  const retryCrossChain = useCallback(
+    async ({ managerTransferTxId, data }: { managerTransferTxId: string; data: CrossChainTransferIntervalParams }) => {
+      try {
+        setLoading(true);
+        await intervalCrossChainTransfer(data);
+        dispatch(removeFailedActivity(managerTransferTxId));
+      } catch (error) {
+        showErrorModal(error);
+      } finally {
+        setLoading(false);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [dispatch, setLoading],
+  );
+
+  const handleResend = useCallback(
+    async (resendId: string) => {
+      const { params } = activity.failedActivityMap[resendId];
+      await retryCrossChain({ managerTransferTxId: resendId, data: params });
+      message.success('success');
+    },
+    [activity.failedActivityMap, retryCrossChain],
+  );
 
   const resendUI = useCallback(
     (item: ActivityItemType) => {
@@ -103,13 +154,13 @@ export default function ActivityList({ data, hasMore, loadMore }: IActivityListP
 
       return (
         <div className="row-4">
-          <Button type="primary" className="resend-btn" onClick={(e) => handleResend(e)}>
+          <Button type="primary" className="resend-btn" onClick={() => handleResend(item.transactionId)}>
             Resend
           </Button>
         </div>
       );
     },
-    [activity.failedActivityMap],
+    [activity.failedActivityMap, handleResend],
   );
 
   return (

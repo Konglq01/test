@@ -34,6 +34,7 @@ import { contractErrorHandler } from '@portkey/did-ui-react/src/utils/errorHandl
 import { ZERO } from '@portkey/constants/misc';
 import { TransactionError } from '@portkey/constants/constants-ca/assets';
 import './index.less';
+import { useAppCASelector } from '@portkey/hooks';
 
 export type Account = { address: string; name?: string };
 
@@ -137,7 +138,7 @@ export default function Send() {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [dispatch],
+    [dispatch, setLoading],
   );
   const showErrorModal = useCallback(
     (error: any) => {
@@ -150,7 +151,7 @@ export default function Send() {
         centered: true,
         title: (
           <div className="flex-column-center transaction-msg">
-            <CustomSvg type="Warning" />
+            <CustomSvg type="warnRed" />
             {t('Transaction failed ！')}
           </div>
         ),
@@ -159,8 +160,7 @@ export default function Send() {
         },
       });
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    [retryCrossChain, t],
   );
 
   const getTranslationInfo = useCallback(async () => {
@@ -222,10 +222,8 @@ export default function Send() {
           if (ZERO.plus(amount).times(`1e${tokenInfo.decimals}`).isEqualTo(ZERO.plus(balance))) {
             return TransactionError.FEE_NOTE_ENOUGH;
           }
-        }
-        const fee = await getTranslationInfo();
-        setTxFee(fee);
-        if (symbol === 'ELF') {
+          const fee = await getTranslationInfo();
+          setTxFee(fee);
           if (
             ZERO.plus(amount)
               .plus(fee || '')
@@ -235,6 +233,8 @@ export default function Send() {
             return TransactionError.FEE_NOTE_ENOUGH;
           }
         } else {
+          const fee = await getTranslationInfo();
+          setTxFee(fee);
           const elfBalance = await getEleBalance();
           if (
             ZERO.plus(fee || '')
@@ -244,7 +244,7 @@ export default function Send() {
             return TransactionError.FEE_NOTE_ENOUGH;
           }
         }
-      } else {
+      } else if (type === 'nft') {
         if (ZERO.plus(amount).isGreaterThan(ZERO.plus(balance))) {
           return TransactionError.NFT_NOTE_ENOUGH;
         }
@@ -258,13 +258,15 @@ export default function Send() {
         ) {
           return TransactionError.FEE_NOTE_ENOUGH;
         }
+      } else {
+        return 'input error';
       }
       return '';
     } catch (error: any) {
       console.log('checkTransactionValue===', error);
       return TransactionError.FEE_NOTE_ENOUGH;
     }
-  }, [type, amount, tokenInfo.decimals, tokenInfo.symbol, balance, getTranslationInfo, symbol, getEleBalance]);
+  }, [type, amount, tokenInfo.decimals, tokenInfo.symbol, balance, getTranslationInfo, getEleBalance]);
 
   const sendHandler = useCallback(async () => {
     try {
