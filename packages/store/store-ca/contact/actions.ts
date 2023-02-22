@@ -22,8 +22,7 @@ export const fetchContactListAsync = createAsyncThunk<FetchContractListAsyncPayl
       wallet: WalletState;
     };
     const baseUrl = NetworkList.find(item => item.networkType === currentNetwork)?.apiUrl;
-    const userId = walletInfo?.caInfo[currentNetwork].AELF?.caHash;
-    if (!userId || !baseUrl)
+    if (!baseUrl)
       return {
         isInit: true,
         contactIndexList: [],
@@ -32,7 +31,7 @@ export const fetchContactListAsync = createAsyncThunk<FetchContractListAsyncPayl
 
     // init
     let contactList: ContactItemType[] = [];
-    if (isInit || contactState.contactIndexList.length === 0) {
+    if (isInit || contactState.lastModified === 0) {
       let page = 1,
         errorTimes = 0,
         totalCount = 0;
@@ -42,7 +41,6 @@ export const fetchContactListAsync = createAsyncThunk<FetchContractListAsyncPayl
         try {
           console.log('getContactList', page, errorTimes);
           const response = await getContactListEs(baseUrl, {
-            userId,
             page,
             size: CONTACT_API_FETCH_SIZE,
             modificationTime: new Date(modificationTime).toISOString(),
@@ -74,21 +72,28 @@ export const fetchContactListAsync = createAsyncThunk<FetchContractListAsyncPayl
     }
 
     // update getContactEventList
+    let eventList: ContactItemType[] = [];
+    let page = 1,
+      errorTimes = 0,
+      totalCount = 0;
     const lastModified = contactState.lastModified;
     const fetchTime = Date.now();
-    let eventList: ContactItemType[] | undefined = undefined;
-    let errorTimes = 0;
-    while (eventList === undefined) {
+
+    while (page === 1 || eventList.length < totalCount) {
       try {
-        console.log('getContactEventList', errorTimes);
+        console.log('getContactEventList', page, errorTimes);
         const response = await getContactEventListEs(baseUrl, {
-          userId,
           modificationTime: new Date(lastModified).toISOString(),
           fetchTime: new Date(fetchTime).toISOString(),
+          page,
+          size: CONTACT_API_FETCH_SIZE,
         });
         console.log('getContactEventList: response', response);
-        eventList = response.items;
-        eventList.forEach(item => (item.modificationTime = new Date(item.modificationTime).getTime()));
+        response.items.forEach(item => (item.modificationTime = new Date(item.modificationTime).getTime()));
+        eventList = eventList.concat(response.items);
+        totalCount = response.totalCount;
+        errorTimes = 0;
+        page++;
       } catch (err) {
         errorTimes++;
         if (errorTimes >= CONTACT_API_RETRY_LIMIT) {
