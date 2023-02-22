@@ -66,6 +66,7 @@ export default function AmountToken({
             }}
             keyboardType="numeric"
             value={sendTokenNumber}
+            maxLength={18}
             containerStyle={styles.containerStyle}
             inputContainerStyle={styles.inputContainerStyle}
             inputStyle={styles.inputStyle}

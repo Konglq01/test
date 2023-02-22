@@ -83,6 +83,7 @@ const ActivityItem: React.FC<ActivityItemPropsType> = ({ item, onPress }) => {
           )} */}
         </View>
       </View>
+      {/* <CommonButton title={'aa'} /> */}
     </TouchableOpacity>
   );
 };
@@ -92,7 +93,6 @@ export default memo(ActivityItem);
 const itemStyle = StyleSheet.create({
   itemWrap: {
     ...GStyles.paddingArg(12, 20),
-    height: pTd(100),
     width: '100%',
     borderBottomWidth: pTd(0.5),
     borderBottomColor: defaultColors.bg7,

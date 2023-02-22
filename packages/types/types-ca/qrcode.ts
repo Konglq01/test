@@ -1,4 +1,5 @@
-import { ChainType, NetworkType } from '..';
+import { ChainId, ChainType, NetworkType } from '..';
+import { IToSendAssetParamsType } from './routeParams';
 import { TokenItemShowType } from './token';
 import { DeviceType } from './wallet';
 
@@ -16,6 +17,12 @@ export interface LoginQRData extends QRData {
 
 export interface SendTokenQRDataType extends QRData {
   type: 'send';
-  tokenInfo: TokenItemShowType;
-  toCaAddress: string;
+  sendType: 'nft' | 'token';
+  toInfo: {
+    address: string;
+    name: string;
+    chainId?: ChainId;
+    chainType?: ChainType;
+  };
+  assetInfo: IToSendAssetParamsType;
 }

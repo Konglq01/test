@@ -1,4 +1,4 @@
-import { LoginQRData, QRData, SendTokenQRData } from '@portkey/types/types-ca/qrcode';
+import { LoginQRData, QRData, SendTokenQRDataType } from '@portkey/types/types-ca/qrcode';
 import { isAddress } from '@portkey/utils';
 import CommonToast from 'components/CommonToast';
 import navigationService from './navigationService';
@@ -15,7 +15,7 @@ export function handleQRCodeData(data: QRData) {
   if (type !== 'login') {
     // send event
     // not current network
-    navigationService.navigate('SendHome', { sendInfo: data as SendTokenQRData });
+    navigationService.navigate('SendHome', { ...data } as SendTokenQRDataType);
   } else {
     navigationService.navigate('ScanLogin', { data: data as LoginQRData });
   }
