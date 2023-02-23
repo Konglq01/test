@@ -10,6 +10,7 @@ import token from '@portkey/api/api-did/token';
 import { ZERO } from '@portkey/constants/misc';
 import { CROSS_FEE } from '@portkey/constants/constants-ca/wallet';
 import { timesDecimals } from '@portkey/utils/converter';
+import { the2ThFailedActivityItemType } from '@portkey/types/types-ca/activity';
 
 const nativeToken = {
   symbol: 'ELF',
@@ -122,7 +123,7 @@ const crossChainTransfer = async ({
   if (tokenInfo.symbol === nativeToken.symbol) {
     _amount = ZERO.plus(amount).minus(timesDecimals(CROSS_FEE, 8)).toNumber();
   }
-  const CrossChainTransferParams = {
+  const crossChainTransferParams = {
     chainInfo,
     chainType,
     privateKey,
@@ -133,13 +134,24 @@ const crossChainTransfer = async ({
     toAddress,
   };
   try {
-    const crossResult = await intervalCrossChainTransfer(CrossChainTransferParams);
+    const crossResult = await intervalCrossChainTransfer(crossChainTransferParams);
   } catch (error) {
+    const returnData: the2ThFailedActivityItemType = {
+      transactionId: managerTransferResult.result.message.TransactionId,
+      params: {
+        tokenInfo,
+        chainType,
+        managerAddress,
+        amount: _amount,
+        memo,
+        toAddress,
+      },
+    };
     throw {
       type: 'crossChainTransfer',
       error: error,
       managerTransferTxId: managerTransferResult.result.message.TransactionId,
-      data: CrossChainTransferParams,
+      data: returnData,
     };
   }
 };
