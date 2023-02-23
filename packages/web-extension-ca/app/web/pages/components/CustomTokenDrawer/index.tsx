@@ -29,7 +29,7 @@ export default function CustomTokenDrawer({
   const { t } = useTranslation();
   const { currentNetwork, walletInfo } = useWalletInfo();
   const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'Testnet' : ''), [currentNetwork]);
-  const { accountAssets, accountToken } = useAssetInfo();
+  const { accountAssets } = useAssetInfo();
   const { tokenDataShowInMarket } = useTokenInfo();
   const [openDrop, setOpenDrop] = useState<boolean>(false);
   const [filterWord, setFilterWord] = useState<string>('');
@@ -48,7 +48,7 @@ export default function CustomTokenDrawer({
     } else {
       setAssetList(tokenDataShowInMarket);
     }
-  }, [accountAssets.accountAssetsList, accountToken.accountTokenList, drawerType, tokenDataShowInMarket]);
+  }, [accountAssets.accountAssetsList, drawerType, tokenDataShowInMarket]);
 
   useEffect(() => {
     if (!passwordSeed) return;
@@ -59,7 +59,7 @@ export default function CustomTokenDrawer({
     }
   }, [passwordSeed, filterWord, drawerType, caAddresses, appDispatch]);
 
-  const renderToken = useCallback(
+  const renderSendToken = useCallback(
     (token: AccountAssetItem) => {
       return (
         <div
@@ -79,22 +79,58 @@ export default function CustomTokenDrawer({
               {`${token.chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${token.chainId} ${isTestNet}`}
             </p>
           </div>
-          {drawerType === 'send' && (
-            <div className="amount">
-              <p className="quantity">
-                {unitConverter(divDecimals(token?.tokenInfo?.balance, token.tokenInfo?.decimals))}
-              </p>
-              <p className="convert">
-                {isTestNet
-                  ? ''
-                  : `$ ${unitConverter(divDecimals(token.tokenInfo?.balanceInUsd, token.tokenInfo?.decimals))}`}
-              </p>
-            </div>
-          )}
+          <div className="amount">
+            <p className="quantity">
+              {unitConverter(divDecimals(token.tokenInfo?.balance, token.tokenInfo?.decimals))}
+            </p>
+            <p className="convert">
+              {isTestNet
+                ? ''
+                : `$ ${unitConverter(divDecimals(token.tokenInfo?.balanceInUsd, token.tokenInfo?.decimals))}`}
+            </p>
+          </div>
         </div>
       );
     },
-    [drawerType, isTestNet, onChange],
+    [isTestNet, onChange],
+  );
+
+  const renderReceiveToken = useCallback(
+    (token: TokenItemShowType) => {
+      const tokenTmp: AccountAssetItem = {
+        chainId: token.chainId,
+        symbol: token.symbol,
+        address: token.address,
+        tokenInfo: {
+          id: token.id || '',
+          balance: token.balance,
+          decimals: token.decimals + '' || '8',
+          balanceInUsd: token.balanceInUsd,
+          tokenContractAddress: token.address,
+        },
+      };
+      return (
+        <div
+          className="item"
+          key={`${token.symbol}_${token.chainId}`}
+          onClick={onChange?.bind(undefined, tokenTmp, 'token')}>
+          <div className="icon">
+            {token.symbol === 'ELF' ? (
+              <CustomSvg type="Aelf" />
+            ) : (
+              <div className="custom">{token?.symbol?.slice(0, 1)}</div>
+            )}
+          </div>
+          <div className="info">
+            <p className="symbol">{`${token.symbol}`}</p>
+            <p className="network">
+              {`${token.chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${token.chainId} ${isTestNet}`}
+            </p>
+          </div>
+        </div>
+      );
+    },
+    [isTestNet, onChange],
   );
 
   const renderNft = useCallback(
@@ -156,8 +192,12 @@ export default function CustomTokenDrawer({
             </p>
           </div>
         ) : (
-          assetList.map((token: AccountAssetItem) => {
-            return token.nftInfo?.tokenId ? renderNft(token) : renderToken(token);
+          assetList.map((token: TokenItemShowType | AccountAssetItem) => {
+            if (drawerType === 'send') {
+              return (token as AccountAssetItem).nftInfo?.tokenId ? renderNft(token) : renderSendToken(token);
+            } else {
+              return renderReceiveToken(token as TokenItemShowType);
+            }
           })
         )}
       </div>
