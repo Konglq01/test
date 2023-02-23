@@ -136,7 +136,10 @@ export default function CustomTokenDrawer({
   const renderNft = useCallback(
     (token: AccountAssetItem) => {
       return (
-        <div className="item protocol" onClick={onChange?.bind(undefined, token, 'nft')}>
+        <div
+          key={`${token.nftInfo?.alias}_${token.nftInfo?.tokenId}`}
+          className="item protocol"
+          onClick={onChange?.bind(undefined, token, 'nft')}>
           <div className="avatar">
             {token.nftInfo?.imageUrl ? <img src={token.nftInfo.imageUrl} /> : token.nftInfo?.alias?.slice(0, 1)}
           </div>
