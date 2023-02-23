@@ -41,9 +41,7 @@ export type TransactionFees = {
 export type the2ThFailedActivityItemType = {
   transactionId: string;
   params: {
-    chainInfo: ChainItemType;
     chainType: ChainType;
-    privateKey: string;
     managerAddress: string;
     tokenInfo: BaseToken;
     amount: number;
