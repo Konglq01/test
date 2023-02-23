@@ -146,7 +146,8 @@ export default function Send() {
         await intervalCrossChainTransfer(data);
         dispatch(removeFailedActivity(managerTransferTxId));
       } catch (error) {
-        showErrorModal(error);
+        console.log('retry addFailedActivity', error);
+        showErrorModal({ managerTransferTxId, data });
       } finally {
         setLoading(false);
       }
@@ -170,6 +171,7 @@ export default function Send() {
           </div>
         ),
         onOk: () => {
+          console.log('retry modal addFailedActivity', error);
           retryCrossChain(error);
         },
       });
@@ -286,7 +288,7 @@ export default function Send() {
             params: error.data,
           }),
         );
-        console.log('addFailedActivity', error.data);
+        console.log('addFailedActivity', error);
 
         showErrorModal(error);
         return;
@@ -357,7 +359,9 @@ export default function Send() {
       1: {
         btnText: 'Preview',
         handler: async () => {
+          if (!validateToAddress(toAccount)) return;
           const res = await handleCheckPreview();
+          console.log('handleCheckPreview res', res);
           if (!res) {
             setTipMsg('');
             setStage(Stage.Preview);

@@ -119,7 +119,7 @@ const crossChainTransfer = async ({
   // return;
   // TODO Only support chainType: aelf
   let _amount = amount;
-  if (tokenInfo.symbol === 'ELF') {
+  if (tokenInfo.symbol === nativeToken.symbol) {
     _amount = ZERO.plus(amount).minus(timesDecimals(CROSS_FEE, 8)).toNumber();
   }
   const CrossChainTransferParams = {
