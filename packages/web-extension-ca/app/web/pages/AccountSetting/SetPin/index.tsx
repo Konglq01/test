@@ -101,6 +101,7 @@ export default function SetPin() {
         </Button>
       </div>
       <BaseDrawer
+        destroyOnClose
         open={open}
         placement="right"
         className="setting-set-pin-drawer"

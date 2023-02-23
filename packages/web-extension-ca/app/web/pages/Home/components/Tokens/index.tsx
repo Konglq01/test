@@ -6,7 +6,6 @@ import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useWalletInfo } from 'store/Provider/hooks';
-import './index.less';
 
 export default function TokenList({ tokenList }: { tokenList: TokenItemShowType[] }) {
   const { t } = useTranslation();
