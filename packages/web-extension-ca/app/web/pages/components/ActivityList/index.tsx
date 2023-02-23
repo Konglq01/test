@@ -109,7 +109,7 @@ export default function ActivityList({ data, hasMore, loadMore }: IActivityListP
         title: (
           <div className="flex-column-center transaction-msg">
             <CustomSvg type="warnRed" />
-            {t('Transaction failed ！')}
+            {t('Transaction failed !')}
           </div>
         ),
         onOk: () => {

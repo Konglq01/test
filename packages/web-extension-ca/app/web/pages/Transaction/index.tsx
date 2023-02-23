@@ -1,4 +1,4 @@
-import { TransactionTypes, transactionTypesMap, VIEW_ON_EXPLORER } from '@portkey/constants/constants-ca/activity';
+import { TransactionTypes, transactionTypesMap } from '@portkey/constants/constants-ca/activity';
 import { TransactionStatus } from '@portkey/graphql/contract/__generated__/types';
 import { useCaAddresses } from '@portkey/hooks/hooks-ca/wallet';
 import { fetchActivity } from '@portkey/store/store-ca/activity/api';
@@ -210,7 +210,7 @@ export default function Transaction() {
   const viewOnExplorerUI = useCallback(() => {
     return (
       <a className="link" target="blank" href={openOnExplorer()}>
-        {t(VIEW_ON_EXPLORER)}
+        {t('View on Explorer')}
       </a>
     );
   }, [openOnExplorer, t]);
