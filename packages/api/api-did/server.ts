@@ -20,9 +20,15 @@ export class DidService extends ServiceInit {
       return;
     }
   };
-  setRefreshTokenConfig = (config: RefreshTokenConfig) => {
-    console.log(config, '====config');
 
+  setRefreshTokenConfig = (config: RefreshTokenConfig) => {
+    // make sure clean Authorization
+    if (this.refreshTokenConfig?.ca_hash !== config.ca_hash) {
+      this.defaultConfig.headers = {
+        ...this.defaultConfig.headers,
+        Authorization: '',
+      };
+    }
     this.refreshTokenConfig = config;
   };
   send = async (base: BaseConfig, config?: RequestConfig, reCount = 0): Promise<any> => {
