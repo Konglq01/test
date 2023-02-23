@@ -20,6 +20,7 @@ export default function SendPreview({
   imageUrl,
   chainId,
   isCross,
+  tokenId,
 }: {
   amount: string;
   symbol: string;
@@ -29,6 +30,7 @@ export default function SendPreview({
   type: 'nft' | 'token';
   chainId: string;
   isCross: boolean;
+  tokenId: string;
 }) {
   const { walletName, currentNetwork, walletInfo } = useWalletInfo();
   const wallet = useCurrentWalletInfo();
@@ -66,7 +68,7 @@ export default function SendPreview({
           <div className="info">
             <p className="index">
               <span>{symbol}</span>
-              {/* <span className="token-id">#0004</span> */}
+              <span className="token-id">{`#${tokenId}`}</span>
             </p>
             <p className="quantity">
               Balance: <span>{unitConverter(amount)}</span>

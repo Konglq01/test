@@ -411,6 +411,7 @@ export default function Send() {
             chainId={state.chainId}
             transactionFee={txFee || ''}
             isCross={isCrossChain(toAccount.address, chainInfo?.chainId ?? 'AELF')}
+            tokenId={tokenInfo.tokenId || ''}
           />
         ),
       },
