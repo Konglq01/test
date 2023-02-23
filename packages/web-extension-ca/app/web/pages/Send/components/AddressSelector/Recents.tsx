@@ -20,7 +20,6 @@ interface ApiRecentAddressItemType {
 
 const MAX_RESULT_ACCOUNT = 10;
 const RECENT_COUNT_LIMIT = 100;
-const NO_RECENT_TEXT = 'There is no recents.';
 
 export default function Recents({
   onChange,
@@ -94,15 +93,17 @@ export default function Recents({
     } catch (error) {
       throw Error(JSON.stringify(error));
     }
-  }, [loading, recentTotalNumber, fetchRecents, skipCount, recentList, parseRecentsListToContactMap]);
+  }, [fetchRecents, loading, parseRecentsListToContactMap, recentList, recentTotalNumber, skipCount]);
 
   return (
     <div className="recents">
       {recentList.map((item, index) => (
         <RecentItem item={item} key={index} onClick={onChange} />
       ))}
-      <LoadingMore hasMore={recentList.length < recentTotalNumber} loadMore={fetchMoreRecent} />
-      {recentList.length === 0 && <p className="no-data">{t(NO_RECENT_TEXT)}</p>}
+      {recentList.length > 0 && (
+        <LoadingMore hasMore={recentList.length < recentTotalNumber} loadMore={fetchMoreRecent} />
+      )}
+      {recentList.length === 0 && <p className="no-data">{t('There is no recents')}</p>}
     </div>
   );
 }

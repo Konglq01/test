@@ -1,4 +1,4 @@
-import { TransactionTypes, VIEW_ON_EXPLORER } from '@portkey/constants/constants-ca/activity';
+import { TransactionTypes, transactionTypesMap } from '@portkey/constants/constants-ca/activity';
 import { TransactionStatus } from '@portkey/graphql/contract/__generated__/types';
 import { useCaAddresses } from '@portkey/hooks/hooks-ca/wallet';
 import { fetchActivity } from '@portkey/store/store-ca/activity/api';
@@ -71,7 +71,11 @@ export default function Transaction() {
     const { nftInfo, amount } = activityItem;
     return (
       <div className="nft-amount">
-        <div className="avatar" style={{ backgroundImage: nftInfo?.imageUrl }}>
+        <div
+          className="assets"
+          style={{
+            backgroundImage: `url(${nftInfo?.imageUrl})`,
+          }}>
           <p>{!nftInfo?.imageUrl ? nftInfo?.alias?.slice(0, 1) : ''}</p>
         </div>
         <div className="info">
@@ -206,7 +210,7 @@ export default function Transaction() {
   const viewOnExplorerUI = useCallback(() => {
     return (
       <a className="link" target="blank" href={openOnExplorer()}>
-        {t(VIEW_ON_EXPLORER)}
+        {t('View on Explorer')}
       </a>
     );
   }, [openOnExplorer, t]);
@@ -218,7 +222,9 @@ export default function Transaction() {
       </div>
       <div className="transaction-info">
         <div className="method-wrap">
-          <p className="method-name">{activityItem.transactionType}</p>
+          <p className="method-name">
+            {transactionTypesMap(activityItem.transactionType, activityItem.nftInfo?.nftId)}
+          </p>
           {isNft ? nftHeaderUI() : tokenHeaderUI()}
         </div>
         {statusAndDateUI()}

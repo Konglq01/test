@@ -7,8 +7,6 @@ import { useContact } from '@portkey/hooks/hooks-ca/contact';
 import ContactCard from './ContactCard';
 import { useTranslation } from 'react-i18next';
 
-const NO_CONTANCET_TEXT = 'There is no contacts.';
-
 export default function Contacts({ onChange }: { onChange: (account: AddressItem) => void }) {
   const { t } = useTranslation();
   const { contactIndexList } = useContact();
@@ -27,7 +25,7 @@ export default function Contacts({ onChange }: { onChange: (account: AddressItem
     <div className="contacts">
       <div className={clsx(['contacts-body', 'index-bar-hidden'])}>
         {curTotalContactsNum === 0 ? (
-          <p className="no-data">{t(NO_CONTANCET_TEXT)}</p>
+          <p className="no-data">{t('There is no contacts')}</p>
         ) : (
           <IndexBar>
             {curList.map(({ index, contacts }) => {
