@@ -20,7 +20,7 @@ interface ApiRecentAddressItemType {
 
 const MAX_RESULT_ACCOUNT = 10;
 const RECENT_COUNT_LIMIT = 100;
-const NO_RECENT_TEXT = 'There is no recents.';
+const NO_RECENT_TEXT = 'There is no recents';
 
 export default function Recents({
   onChange,

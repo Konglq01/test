@@ -7,7 +7,7 @@ import { useContact } from '@portkey/hooks/hooks-ca/contact';
 import ContactCard from './ContactCard';
 import { useTranslation } from 'react-i18next';
 
-const NO_CONTACT_TEXT = 'There is no contacts.';
+const NO_CONTACT_TEXT = 'There is no contacts';
 
 export default function Contacts({ onChange }: { onChange: (account: AddressItem) => void }) {
   const { t } = useTranslation();
