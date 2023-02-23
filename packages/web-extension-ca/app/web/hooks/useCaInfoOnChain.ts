@@ -87,7 +87,7 @@ export const useCaInfoOnChain = () => {
         fetch();
       }
     },
-    1000,
+    1000000000,
     [],
   );
 };
