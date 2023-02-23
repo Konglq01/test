@@ -36,7 +36,7 @@ import { timesDecimals, unitConverter } from '@portkey/utils/converter';
 import { IToSendHomeParamsType, IToSendPreviewParamsType } from '@portkey/types/types-ca/routeParams';
 
 import { getELFChainBalance } from '@portkey/utils/balance';
-import { BgStyles } from 'assets/theme/styles';
+import { BGStyles } from 'assets/theme/styles';
 
 export interface SendHomeProps {
   route?: any;
@@ -438,7 +438,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
         />
       )}
 
-      <View style={[styles.buttonWrapStyle, step === 1 && BgStyles.bg1]}>
+      <View style={[styles.buttonWrapStyle, step === 1 && BGStyles.bg1]}>
         {step === 2 && (
           <CommonButton
             disabled={previewDisable}
