@@ -17,7 +17,7 @@ export default function LoadingMore({
   const { t } = useTranslation();
 
   return (
-    <InfiniteScroll loadMore={loadMore} hasMore={hasMore}>
+    <InfiniteScroll loadMore={loadMore} hasMore={hasMore} threshold={100}>
       {hasMore ? (
         <>
           <span>{t(loadingText)}</span>

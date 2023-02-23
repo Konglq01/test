@@ -66,12 +66,10 @@ export default function ActivityList({ data, hasMore, loadMore }: IActivityListP
 
   const fromAndUsdUI = useCallback(
     (item: ActivityItemType) => {
-      const { isReceived, fromAddress, toAddress, priceInUsd, nftInfo } = item;
-      const from = isReceived ? toAddress : fromAddress;
-
+      const { fromAddress, priceInUsd, nftInfo } = item;
       return (
         <p className="row-2">
-          <span>From: {formatStr2EllipsisStr(from, [7, 4])}</span>
+          <span>From: {formatStr2EllipsisStr(fromAddress, [7, 4])}</span>
           {nftInfo?.nftId && <span>{nftInfo.alias}</span>}
           {!isTestNet && !nftInfo?.nftId && (
             <span>$ {formatAmount({ amount: priceInUsd, decimals: 0, digits: 2 })}</span>
@@ -111,7 +109,7 @@ export default function ActivityList({ data, hasMore, loadMore }: IActivityListP
         title: (
           <div className="flex-column-center transaction-msg">
             <CustomSvg type="warnRed" />
-            {t('Transaction failed ！')}
+            {t('Transaction failed !')}
           </div>
         ),
         onOk: () => {
@@ -172,7 +170,16 @@ export default function ActivityList({ data, hasMore, loadMore }: IActivityListP
             <div className="activity-item" onClick={() => navToDetail(item)}>
               <div className="time">{dateFormat(Number(item.timestamp))}</div>
               <div className="info">
-                <CustomSvg type={activityListLeftIcon(item.transactionType)} />
+                {!!item.listIcon && (
+                  <div
+                    className="custom-list-icon"
+                    style={{
+                      backgroundImage: `url(${item.listIcon})`,
+                    }}
+                  />
+                )}
+                {!item.listIcon && <CustomSvg type={activityListLeftIcon(item.transactionType)} />}
+
                 <div className="right">
                   {amountOrIdUI(item)}
                   {fromAndUsdUI(item)}

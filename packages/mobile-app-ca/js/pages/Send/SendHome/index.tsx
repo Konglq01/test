@@ -2,7 +2,6 @@ import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import PageContainer from 'components/PageContainer';
 import navigationService from 'utils/navigationService';
-import { useFocusEffect } from '@react-navigation/native';
 import { addressFormat, isAddress } from '@portkey/utils';
 import Svg from 'components/Svg';
 import From from '../From';
@@ -15,7 +14,6 @@ import { pTd } from 'utils/unit';
 import ActionSheet from 'components/ActionSheet';
 import useQrScanPermission from 'hooks/useQrScanPermission';
 import { ZERO } from '@portkey/constants/misc';
-import { useGetELFRateQuery } from '@portkey/store/rate/api';
 import { customFetch } from '@portkey/utils/fetch';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { isCrossChain } from '@portkey/utils/aelf';
@@ -36,9 +34,9 @@ import { getManagerAccount } from 'utils/redux';
 import { usePin } from 'hooks/store';
 import { timesDecimals, unitConverter } from '@portkey/utils/converter';
 import { IToSendHomeParamsType, IToSendPreviewParamsType } from '@portkey/types/types-ca/routeParams';
-import CommonToast from 'components/CommonToast';
+
 import { getELFChainBalance } from '@portkey/utils/balance';
-import finalPropsSelectorFactory from 'react-redux/es/connect/selectorFactory';
+import { BGStyles } from 'assets/theme/styles';
 
 export interface SendHomeProps {
   route?: any;
@@ -75,7 +73,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
   //   address: string;
   // }>();
 
-  const { sendType, toInfo, assetInfo } = useRouterParams<IToSendHomeParamsType>();
+  const { sendType = 'token', toInfo, assetInfo } = useRouterParams<IToSendHomeParamsType>();
 
   const wallet = useCurrentWalletInfo();
   const chainInfo = useCurrentChain(assetInfo?.chainId);
@@ -98,7 +96,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
 
   // useFocusEffect(
   //   useCallback(() => {
-  //     const tmpAddress = formatAddress2NoPrefix(address || '');
+
   //     setSelectedToContact({ name, address: tmpAddress });
   //   }, [address, name]),
   // );
@@ -350,7 +348,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
   // get the target token balance
   useEffectOnce(() => {
     (async () => {
-      const balance = await getAssetBalance(assetInfo.tokenContractAddress, assetInfo.symbol);
+      const balance = await getAssetBalance(assetInfo.tokenContractAddress || assetInfo.address, assetInfo.symbol);
       setSelectedAssets({ ...selectedAssets, balance });
     })();
   });
@@ -440,7 +438,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
         />
       )}
 
-      <View style={styles.buttonWrapStyle}>
+      <View style={[styles.buttonWrapStyle, step === 1 && BGStyles.bg1]}>
         {step === 2 && (
           <CommonButton
             disabled={previewDisable}

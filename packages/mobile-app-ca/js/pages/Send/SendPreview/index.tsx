@@ -173,7 +173,10 @@ const SendHome: React.FC<SendHomeProps> = props => {
 
         const sameTransferResult = await sameChainTransfer({
           contract,
-          tokenInfo: { ...assetInfo, address: assetInfo.tokenContractAddress } as unknown as BaseToken,
+          tokenInfo: {
+            ...assetInfo,
+            address: assetInfo?.tokenContractAddress || assetInfo?.address,
+          } as unknown as BaseToken,
           caHash: wallet.caHash || '',
           amount,
           toAddress: toInfo.address,
@@ -224,7 +227,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
   return (
     <PageContainer
       safeAreaColor={['blue', 'white']}
-      titleDom={t('Send')}
+      titleDom={`${t('Send')}${sendType === 'token' ? ' ' + assetInfo.symbol : ''}`}
       containerStyles={styles.pageWrap}
       scrollViewProps={{ disabled: true }}>
       {sendType === 'nft' ? (
