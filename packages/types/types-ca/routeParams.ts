@@ -19,7 +19,7 @@ export interface IToSendNftParamsType extends IToSendHomeAssetParamsBaseType {
   tokenId: string;
 }
 
-export type IToSendAssetParamsType = IToSendTokenParamsType & IToSendNftParamsType;
+export type IToSendAssetParamsType = IToSendTokenParamsType | IToSendNftParamsType;
 
 export interface IToSendHomeParamsType {
   sendType: 'nft' | 'token';

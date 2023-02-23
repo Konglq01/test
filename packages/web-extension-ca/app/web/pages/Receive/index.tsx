@@ -1,4 +1,5 @@
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import { ChainId } from '@portkey/types';
 import { SendTokenQRDataType } from '@portkey/types/types-ca/qrcode';
 import clsx from 'clsx';
 import Copy from 'components/Copy';
@@ -15,10 +16,11 @@ export default function Receive() {
   const { symbol, chainId } = useParams();
   const wallet = useCurrentWalletInfo();
   const { currentNetwork } = useWalletInfo();
-  const isMainChain = useMemo(() => chainId?.toLowerCase() === 'aelf', [chainId]);
+  const isMainChain = useMemo(() => chainId === 'AELF', [chainId]);
   const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'Testnet' : ''), [currentNetwork]);
   const { state } = useLocation();
   const caAddress = useMemo(() => `ELF_${wallet?.[chainId || 'AELF'].caAddress}_${chainId}`, [chainId, wallet]);
+  console.log('---receive', state);
 
   const rightElement = useMemo(() => {
     return (
@@ -31,16 +33,27 @@ export default function Receive() {
   const value: SendTokenQRDataType = useMemo(
     () => ({
       type: 'send',
-      toCaAddress: caAddress,
+      sendType: 'token',
       netWorkType: currentNetwork,
       chainType: 'aelf',
-      address: state?.address,
-      tokenInfo: {
-        ...state,
+      toInfo: {
+        address: caAddress,
+        name: '',
       },
+      assetInfo: {
+        symbol: state.symbol as string,
+        chainId: chainId as ChainId,
+        balance: state.balance as string,
+        imageUrl: state.imageUrl as string,
+        tokenContractAddress: state.address,
+        balanceInUsd: state.balanceInUsd,
+        decimals: state.decimals,
+      },
+      address: caAddress,
     }),
-    [caAddress, currentNetwork, state],
+    [caAddress, chainId, currentNetwork, state],
   );
+  console.log('-----qr', value);
 
   return (
     <div className="receive-wrapper">
@@ -55,10 +68,10 @@ export default function Receive() {
           <p className="network">{`${isMainChain ? 'MainChain' : 'SideChain'} ${chainId} ${isTestNet}`}</p>
         </div>
         <QRCode
-          imageSettings={{ src: 'assets/svgIcon/PortkeyQR.svg', height: 48, width: 48, excavate: true }}
+          imageSettings={{ src: 'assets/svgIcon/PortkeyQR.svg', height: 20, width: 20, excavate: true }}
           value={JSON.stringify(value)}
           // eslint-disable-next-line no-inline-styles/no-inline-styles
-          style={{ width: 140, height: 140 }}
+          style={{ width: 200, height: 200 }}
         />
         <div className="receive-address">
           <div className="address">{caAddress}</div>
