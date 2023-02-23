@@ -1,5 +1,4 @@
 import { useAppCASelector, useAppCommonDispatch } from '@portkey/hooks';
-import { clearState } from '@portkey/store/store-ca/activity/slice';
 import ActivityList from 'pages/components/ActivityList';
 import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +7,7 @@ import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { useUserInfo } from 'store/Provider/hooks';
 import { transactionTypesForActivityList } from '@portkey/constants/constants-ca/activity';
 import { IActivitysApiParams } from '@portkey/store/store-ca/activity/type';
+import { clearActivity } from '@portkey/store/store-ca/activity/slice';
 
 export interface ActivityProps {
   appendData?: Function;
@@ -39,7 +39,7 @@ export default function Activity({ appendData, clearData, chainId, symbol }: Act
     if (passwordSeed) {
       // We need to get the activities of the current network
       // If you want to get the latest data, please dispatch(clearState()) first
-      dispatch(clearState());
+      dispatch(clearActivity());
 
       const params: IActivitysApiParams = {
         maxResultCount: AMX_RESULT_COUNT,

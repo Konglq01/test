@@ -9,7 +9,7 @@ import BaseDrawer from '../BaseDrawer';
 import { fetchAssetAsync, fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
 import './index.less';
 import { ZERO } from '@portkey/constants/misc';
-import { unitConverter } from '@portkey/utils/converter';
+import { divDecimals, unitConverter } from '@portkey/utils/converter';
 import { useCaAddresses } from '@portkey/hooks/hooks-ca/wallet';
 interface CustomSelectProps extends DrawerProps {
   onChange?: (v: AccountAssetItem, type: 'token' | 'nft') => void;
@@ -76,22 +76,18 @@ export default function CustomTokenDrawer({
           <div className="info">
             <p className="symbol">{`${token.symbol}`}</p>
             <p className="network">
-              {`${token.chainId.toLocaleLowerCase() === 'aelf' ? 'MainChain' : 'SideChain'} ${
-                token.chainId
-              } ${isTestNet}`}
+              {`${token.chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${token.chainId} ${isTestNet}`}
             </p>
           </div>
           {drawerType === 'send' && (
             <div className="amount">
               <p className="quantity">
-                {unitConverter(ZERO.plus(token?.tokenInfo?.balance || '').div(`1e${token?.tokenInfo?.decimals}`))}
+                {unitConverter(divDecimals(token?.tokenInfo?.balance, token.tokenInfo?.decimals))}
               </p>
               <p className="convert">
                 {isTestNet
                   ? ''
-                  : `$ ${unitConverter(
-                      ZERO.plus(token.tokenInfo?.balanceInUsd || '').div(`1e${token.tokenInfo?.decimals}`),
-                    )}`}
+                  : `$ ${unitConverter(divDecimals(token.tokenInfo?.balanceInUsd, token.tokenInfo?.decimals))}`}
               </p>
             </div>
           )}

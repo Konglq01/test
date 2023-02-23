@@ -33,12 +33,12 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
   const currentNetworkInfo = useCurrentNetworkInfo();
 
   const {
-    walletInfo: { caAddressList, address },
+    walletInfo: { caAddressList },
   } = useCurrentWallet();
+
   const { walletInfo } = useCurrentWallet();
 
   const [isFetching] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
   const { accountToken } = useAppCASelector(state => state.assets);
 
   const onNavigate = useCallback((tokenItem: TokenItemShowType) => {
@@ -53,6 +53,10 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
   );
 
   const getAccountTokenList = useCallback(() => {
+    console.log('getAccountTokenList>>>');
+
+    if (caAddressList?.length === 0) return;
+
     dispatch(fetchTokenListAsync({ caAddresses: caAddressList || [] }));
   }, [caAddressList, dispatch]);
 

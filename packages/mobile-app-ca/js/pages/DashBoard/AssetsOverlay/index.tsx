@@ -197,7 +197,11 @@ const AssetList = ({ onFinishSelectToken, account }: TokenListProps) => {
       />
 
       {listShow.length === 0 ? (
-        <NoData noPic message={t('There are currently no assets to send.')} />
+        debounceKeyword ? (
+          <NoData noPic message={t('No results found')} />
+        ) : (
+          <NoData noPic message={t('There are currently no assets to send.')} />
+        )
       ) : (
         <FlatList
           style={styles.flatList}

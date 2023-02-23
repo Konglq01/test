@@ -29,52 +29,52 @@ const getTransferFee = async ({
   memo?: string;
 }) => {
   //
-  if (isCrossChain(toAddress, chainInfo?.chainId ?? 'AELF')) {
-    // TODO
-    // first
-    const firstTxResult = await getTransactionFee({
-      contractAddress: chainInfo.caContractAddress,
-      rpcUrl: chainInfo?.endPoint || '',
-      chainType,
-      methodName: 'ManagerTransfer',
-      privateKey,
-      paramsOption: {
-        caHash,
+  // if (isCrossChain(toAddress, chainInfo?.chainId ?? 'AELF')) {
+  //   // TODO
+  //   // first
+  //   const firstTxResult = await getTransactionFee({
+  //     contractAddress: chainInfo.caContractAddress,
+  //     rpcUrl: chainInfo?.endPoint || '',
+  //     chainType,
+  //     methodName: 'ManagerTransfer',
+  //     privateKey,
+  //     paramsOption: {
+  //       caHash,
+  //       symbol: token.symbol,
+  //       to: managerAddress,
+  //       amount,
+  //       memo,
+  //     },
+  //   });
+  //   const _firstFee = firstTxResult.result['ELF'];
+  //   const firstFee = divDecimalsStr(ZERO.plus(_firstFee), 8);
+  //   console.log(firstFee, 'transactionRes===');
+
+  //   return CROSS_FEE;
+  // } else {
+  //
+  const transactionRes = await getTransactionFee({
+    contractAddress: chainInfo.caContractAddress,
+    rpcUrl: chainInfo?.endPoint || '',
+    chainType,
+    methodName: 'ManagerForwardCall',
+    privateKey,
+    paramsOption: {
+      caHash,
+      contractAddress: token.address,
+      methodName: 'Transfer',
+      args: {
         symbol: token.symbol,
-        to: managerAddress,
+        to: toAddress,
         amount,
         memo,
       },
-    });
-    const _firstFee = firstTxResult.result['ELF'];
-    const firstFee = divDecimalsStr(ZERO.plus(_firstFee), 8);
-    console.log(firstFee, 'transactionRes===');
-
-    return CROSS_FEE;
-  } else {
-    //
-    const transactionRes = await getTransactionFee({
-      contractAddress: chainInfo.caContractAddress,
-      rpcUrl: chainInfo?.endPoint || '',
-      chainType,
-      methodName: 'ManagerForwardCall',
-      privateKey,
-      paramsOption: {
-        caHash,
-        contractAddress: token.address,
-        methodName: 'Transfer',
-        args: {
-          symbol: token.symbol,
-          to: toAddress,
-          amount,
-          memo,
-        },
-      },
-    });
-    console.log(transactionRes, 'transactionRes===');
-    const feeRes = transactionRes.result['ELF'];
-    return divDecimalsStr(ZERO.plus(feeRes), 8);
-  }
+    },
+  });
+  console.log(transactionRes, 'transactionRes===');
+  const feeRes = transactionRes.result['ELF'];
+  return divDecimalsStr(ZERO.plus(feeRes), 8);
 };
+// };
 
 export default getTransferFee;

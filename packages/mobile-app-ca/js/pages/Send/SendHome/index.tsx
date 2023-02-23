@@ -18,8 +18,6 @@ import { ZERO } from '@portkey/constants/misc';
 import { useGetELFRateQuery } from '@portkey/store/rate/api';
 import { customFetch } from '@portkey/utils/fetch';
 import useEffectOnce from 'hooks/useEffectOnce';
-import { formatAddress2NoPrefix } from 'utils';
-import { addRecentContact } from '@portkey/store/trade/slice';
 import { isCrossChain } from '@portkey/utils/aelf';
 import useDebounce from 'hooks/useDebounce';
 import { useLanguage } from 'i18n/hooks';
@@ -36,8 +34,11 @@ import { useCurrentWalletInfo, useWallet } from '@portkey/hooks/hooks-ca/wallet'
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { getManagerAccount } from 'utils/redux';
 import { usePin } from 'hooks/store';
-import { unitConverter } from '@portkey/utils/converter';
+import { timesDecimals, unitConverter } from '@portkey/utils/converter';
 import { IToSendHomeParamsType, IToSendPreviewParamsType } from '@portkey/types/types-ca/routeParams';
+import CommonToast from 'components/CommonToast';
+import { getELFChainBalance } from '@portkey/utils/balance';
+import finalPropsSelectorFactory from 'react-redux/es/connect/selectorFactory';
 
 export interface SendHomeProps {
   route?: any;
@@ -45,8 +46,8 @@ export interface SendHomeProps {
 enum ErrorMessage {
   RecipientAddressIsInvalid = 'Recipient address is invalid',
   NoCorrespondingNetwork = 'No corresponding network',
-  InsufficientFunds = 'Insufficient quantity',
-  InsufficientQuantity = 'Insufficient funds for transaction fee',
+  InsufficientFunds = 'Insufficient funds',
+  InsufficientQuantity = 'Insufficient Quantity',
   InsufficientFundsForTransactionFee = 'Insufficient funds for transaction fee',
 }
 
@@ -74,10 +75,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
   //   address: string;
   // }>();
 
-  const { sendType, toInfo, assetInfo } = useRouterParams<IToSendHomeParamsType>();
-
-  // tokenItem, address, name,
-  const { data, refetch } = useGetELFRateQuery({});
+  const { sendType = 'token', toInfo, assetInfo } = useRouterParams<IToSendHomeParamsType>();
 
   const wallet = useCurrentWalletInfo();
   const chainInfo = useCurrentChain(assetInfo?.chainId);
@@ -98,10 +96,6 @@ const SendHome: React.FC<SendHomeProps> = props => {
   const [isLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<any[]>([]);
 
-  useEffectOnce(() => {
-    refetch();
-  });
-
   // useFocusEffect(
   //   useCallback(() => {
   //     const tmpAddress = formatAddress2NoPrefix(address || '');
@@ -110,64 +104,67 @@ const SendHome: React.FC<SendHomeProps> = props => {
   // );
 
   // get transfer fee
-  useEffect(() => {
-    (async () => {
-      if (debounceSendNumber === '' || debounceSendNumber === '0') return;
+  const getTransactionFee = useCallback(async () => {
+    if (!chainInfo || !pin) return;
+    const account = getManagerAccount(pin);
+    if (!account) return;
 
-      if (!chainInfo || !pin) return;
-      const account = getManagerAccount(pin);
-      if (!account) return;
+    const contract = await getContractBasic({
+      contractAddress: chainInfo.caContractAddress,
+      rpcUrl: chainInfo?.endPoint,
+      account: account,
+    });
 
-      const contract = await getContractBasic({
-        contractAddress: chainInfo.caContractAddress,
-        rpcUrl: chainInfo?.endPoint,
-        account: account,
-      });
+    const raw = await contract.encodedTx('ManagerForwardCall', {
+      caHash: wallet.caHash,
+      contractAddress: selectedAssets.tokenContractAddress,
+      methodName: 'Transfer',
+      args: {
+        symbol: selectedAssets.symbol,
+        to: selectedToContact.address,
+        amount: timesDecimals(debounceSendNumber, selectedAssets.decimals || '0').toNumber(),
+        memo: '',
+      },
+    });
 
-      const raw = await contract.encodedTx('ManagerForwardCall', {
-        caHash: wallet.caHash,
-        contractAddress: selectedAssets.tokenContractAddress,
-        methodName: 'Transfer',
-        args: {
-          symbol: selectedAssets.symbol,
-          to: selectedToContact.address,
-          amount: debounceSendNumber,
-          memo: '',
-        },
-      });
+    const { TransactionFee } = await customFetch(`${chainInfo?.endPoint}/api/blockChain/calculateTransactionFee`, {
+      method: 'POST',
+      params: {
+        RawTransaction: raw,
+      },
+    });
 
-      const { TransactionFee } = await customFetch(`${chainInfo?.endPoint}/api/blockChain/calculateTransactionFee`, {
-        method: 'POST',
-        params: {
-          RawTransaction: raw,
-        },
-      });
+    console.log('====TransactionFee======', TransactionFee);
 
-      console.log('====TransactionFee======', TransactionFee);
+    if (!TransactionFee) throw { code: 500, message: 'no enough fee' };
 
-      setTransactionFee(unitConverter(ZERO.plus(TransactionFee.ELF).div('1e8')));
-
-      // const tmpTransactionFee = divDecimals(ZERO.plus(TransactionFee[selectedToken.symbol]), selectedToken.decimals);
-    })();
+    return unitConverter(ZERO.plus(TransactionFee.ELF).div('1e8'));
   }, [
     chainInfo,
-    pin,
-    selectedToContact.address,
     debounceSendNumber,
-    wallet,
-    wallet.caHash,
-    selectedAssets.tokenContractAddress,
+    pin,
+    selectedAssets.decimals,
     selectedAssets.symbol,
+    selectedAssets.tokenContractAddress,
+    selectedToContact.address,
+    wallet.caHash,
   ]);
 
-  const totalPay = useMemo(() => {
-    // TODO: TransferNumber + Transaction Fee
-    const totalTransactionFee = ZERO.plus(transactionFee).times(data?.USDT || 0);
-    const totalTransferNumber = assetInfo.symbol === 'ELF' ? ZERO.plus(sendNumber).times(data?.USDT || 0) : ZERO;
-    console.log(totalTransactionFee.valueOf(), totalTransferNumber.valueOf());
+  const getAssetBalance = async (tokenContractAddress: string, symbol: string) => {
+    if (!chainInfo || !pin) return;
+    const account = getManagerAccount(pin);
+    if (!account) return;
 
-    return totalTransactionFee.plus(totalTransferNumber);
-  }, [assetInfo.symbol, data?.USDT, sendNumber, transactionFee]);
+    const contract = await getContractBasic({
+      contractAddress: tokenContractAddress,
+      rpcUrl: chainInfo?.endPoint,
+      account: account,
+    });
+
+    const balance = await getELFChainBalance(contract, symbol, wallet?.[assetInfo?.chainId]?.caAddress || '');
+
+    return balance;
+  };
 
   const buttonDisabled = useMemo(() => {
     console.log(!selectedToContact.address, Number(sendNumber));
@@ -245,7 +242,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
           break;
       }
     },
-    [t],
+    [nextStep, t],
   );
 
   // const showCrossChainTips = () => {
@@ -254,109 +251,87 @@ const SendHome: React.FC<SendHomeProps> = props => {
 
   //when finish send  upDate balance
 
-  const checkCanNext = () => {
+  const checkCanNext = useCallback(() => {
     const errorArr = [];
     if (!isAddress(selectedToContact.address)) errorArr.push(ErrorMessage.RecipientAddressIsInvalid);
     setErrorMessage(errorArr);
     if (errorArr.length) return false;
 
     // TODO: check if  cross chain
-    if (isCrossChain(selectedToContact.address, assetInfo.chainId)) return showDialog('crossChain');
+    if (isCrossChain(selectedToContact.address, assetInfo.chainId)) {
+      showDialog('crossChain');
+      return true;
+    }
 
     return true;
-  };
+  }, [assetInfo.chainId, selectedToContact.address, showDialog]);
 
-  const checkCanPreview = () => {
-    if (transactionFee === '0' || transactionFee === '') return;
+  /**
+   * elf:   elf balance \  elf sendNumber \elf fee
+   * not elf：  not elf balance \  not elf sendNumber \ elf balance \ elf fee
+   */
 
-    const tokenBalanceBigNumber = ZERO.plus(selectedAssets?.balance || 0).div(`1e${selectedAssets?.decimals}`);
+  const checkCanPreview = async () => {
+    setErrorMessage([]);
 
-    if (sendType === 'nft') {
-      if (ZERO.plus(sendNumber).isGreaterThan(selectedAssets.balance)) {
-        setErrorMessage([ErrorMessage.InsufficientFunds]);
-        return false;
+    const sendBigNumber = timesDecimals(sendNumber, selectedAssets.decimals || '0');
+    const assetBalanceBigNumber = ZERO.plus(selectedAssets.balance);
+
+    // input check
+    if (sendType === 'token') {
+      // token
+      if (assetInfo.symbol === 'ELF') {
+        // ELF
+        if (sendBigNumber.isGreaterThanOrEqualTo(assetBalanceBigNumber)) {
+          setErrorMessage([ErrorMessage.InsufficientFunds]);
+          return false;
+        }
+      } else {
+        //Other Token
+        if (sendBigNumber.isGreaterThan(assetBalanceBigNumber)) {
+          setErrorMessage([ErrorMessage.InsufficientFunds]);
+          return false;
+        }
       }
     } else {
-      // Insufficient funds
-      if (ZERO.plus(sendNumber).isGreaterThan(tokenBalanceBigNumber)) {
-        setErrorMessage([ErrorMessage.InsufficientFunds]);
+      // nft
+      if (sendBigNumber.isGreaterThan(assetBalanceBigNumber)) {
+        setErrorMessage([ErrorMessage.InsufficientQuantity]);
         return false;
       }
-      // InsufficientFundsForTransactionFee
-      if (ZERO.plus(sendNumber).plus(transactionFee).isGreaterThan(tokenBalanceBigNumber)) {
+    }
+
+    // transaction fee check
+    try {
+      const fee = await getTransactionFee();
+      setTransactionFee(fee || '0');
+    } catch (err: { code: number }) {
+      if (err?.code === 500) {
         setErrorMessage([ErrorMessage.InsufficientFundsForTransactionFee]);
         return false;
       }
     }
 
-    // TODO: get balance dynamic
-    // peijuan code start
-    // if (sendType === 'token') {
-    //   // token
-    //   if (ZERO.plus(sendNumber).times(`1e${assetInfo.decimals}`).isGreaterThan(ZERO.plus(assetInfo.balance))) {
-    //     setErrorMessage([ErrorMessage.InsufficientFunds]);
-    //   }
-    //   if (assetInfo.symbol === 'ELF') {
-    //     if (ZERO.plus(assetInfo.balance).times(`1e${elf.decimals}`).isEqualTo(ZERO.plus(balance))) {
-    //       return ErrorMessage.InsufficientFunds;
-    //     }
-    //   }
-    //   const fee = await getTranslationInfo();
-    //   setTxFee(fee);
-    //   if (symbol === 'ELF') {
-    //     if (
-    //       ZERO.plus(amount)
-    //         .plus(fee || '')
-    //         .times(`1e${tokenInfo.decimals}`)
-    //         .isGreaterThan(ZERO.plus(balance))
-    //     ) {
-    //       return ErrorMessage.InsufficientFunds;
-    //     }
-    //   } else {
-    //     const elfBalance = await getEleBalance();
-    //     if (
-    //       ZERO.plus(fee || '')
-    //         .times(`1e${tokenInfo.decimals}`)
-    //         .isGreaterThan(ZERO.plus(elfBalance))
-    //     ) {
-    //       return ErrorMessage.InsufficientFunds;
-    //     }
-    //   }
-    // } else {
-    //   // nft
-
-    //   if (ZERO.plus(amount).isGreaterThan(ZERO.plus(balance))) {
-    //     return ErrorMessage.InsufficientQuantity;
-    //   }
-    //   const fee = await getTranslationInfo();
-    //   setTxFee(fee);
-    //   const elfBalance = await getEleBalance();
-    //   if (
-    //     ZERO.plus(fee || '')
-    //       .times(`1e${tokenInfo.decimals}`)
-    //       .isGreaterThan(ZERO.plus(elfBalance))
-    //   ) {
-    //     return ErrorMessage.InsufficientFunds;
-    //   }
-    // }
-
-    // peijuan code end
-
     return true;
   };
 
-  const nextStep = (directNext?: boolean) => {
-    // directNext true , is cross chain and has finished check
-    if (directNext) {
-      return setStep(2);
-    }
+  const nextStep = useCallback(
+    (directNext?: boolean) => {
+      // directNext true , is cross chain and has finished check
+      if (directNext) {
+        return setStep(2);
+      }
 
-    if (!checkCanNext()) return;
-    setStep(2);
-  };
+      if (!checkCanNext()) return;
+      setStep(2);
+    },
+    [checkCanNext],
+  );
 
-  const preview = () => {
+  const preview = async () => {
     // TODO : getTransactionFee and check the balance
+
+    if (!(await checkCanPreview())) return;
 
     let tmpAddress = selectedToContact.address;
     if (!selectedToContact.address.includes('_')) {
@@ -372,10 +347,18 @@ const SendHome: React.FC<SendHomeProps> = props => {
     } as IToSendPreviewParamsType);
   };
 
+  // get the target token balance
+  useEffectOnce(() => {
+    (async () => {
+      const balance = await getAssetBalance(assetInfo.tokenContractAddress || assetInfo.address, assetInfo.symbol);
+      setSelectedAssets({ ...selectedAssets, balance });
+    })();
+  });
+
   return (
     <PageContainer
       safeAreaColor={['blue', step === 1 ? 'white' : 'gray']}
-      titleDom={t('Send')}
+      titleDom={`${t('Send')}${sendType === 'token' ? ' ' + assetInfo.symbol : ''}`}
       rightDom={
         sendType === 'token' ? (
           <TouchableOpacity
@@ -409,8 +392,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
       {sendType === 'token' && step === 2 && (
         <View style={styles.group}>
           <AmountToken
-            rate={data ?? { USDT: 0 }}
-            balanceShow={assetInfo.balance}
+            balanceShow={selectedAssets.balance}
             sendTokenNumber={sendNumber}
             setSendTokenNumber={setSendNumber}
             selectedToken={assetInfo}
@@ -447,56 +429,11 @@ const SendHome: React.FC<SendHomeProps> = props => {
         <Text style={[styles.errorMessage, GStyles.textAlignCenter]}>{t(ErrorMessage.InsufficientQuantity)}</Text>
       )}
 
-      {/* total fee */}
-      {/* <View style={styles.group}>
-        <View style={thirdGroupStyle.wrap}>
-          <TextM style={thirdGroupStyle.title}>{t('Transaction Fee')}</TextM>
-          <TextM style={thirdGroupStyle.tokenNum}>{`${
-            transactionFee === '0' ? '--' : unitConverter(transactionFee)
-          } ELF`}</TextM>
-          <TextS style={thirdGroupStyle.usdtNum}>
-            $
-            {transactionFee === '0'
-              ? '--'
-              : ZERO.plus(transactionFee || 0)
-                  .times(data?.USDT || 0)
-                  .toFixed(2)}
-          </TextS>
-        </View>
-
-        {selectedToken.symbol === 'ELF' && ZERO.plus(sendTokenNumber).gt(ZERO) && (
-          <View style={[thirdGroupStyle.wrap, thirdGroupStyle.borderTop]}>
-            <TextM style={thirdGroupStyle.title}>{t('Total')}</TextM>
-            <TextM style={thirdGroupStyle.tokenNum}>
-              {unitConverter(ZERO.plus(transactionFee).plus(ZERO.plus(sendTokenNumber)))}
-              {selectedToken?.symbol}
-            </TextM>
-            <TextS style={thirdGroupStyle.usdtNum}>${unitConverter(totalPay.toFixed(2))}</TextS>
-          </View>
-        )}
-
-        {selectedToken.symbol !== 'ELF' && ZERO.plus(sendTokenNumber).gt(ZERO) && (
-          <View style={[thirdGroupStyle.wrap, thirdGroupStyle.borderTop, thirdGroupStyle.notELFWrap]}>
-            <TextM style={thirdGroupStyle.title}>{t('Total')}</TextM>
-            <View>
-              <TextM style={thirdGroupStyle.tokenNum}>
-                {unitConverter(sendTokenNumber, selectedToken.decimal)} {selectedToken?.symbol}
-              </TextM>
-              <View style={thirdGroupStyle.totalWithUSD}>
-                <TextM style={thirdGroupStyle.tokenNum}>{`${transactionFee === '0' ? '--' : transactionFee} ${
-                  'ELF' ?? '--'
-                }`}</TextM>
-                <TextS style={thirdGroupStyle.usdtNum}>${unitConverter(totalPay.toFixed(2))}</TextS>
-              </View>
-            </View>
-          </View>
-        )}
-      </View> */}
-
       {/* Group 3 contact */}
       <View style={styles.space} />
       {step === 1 && (
         <SelectContact
+          chainId={assetInfo.chainId}
           onPress={(item: { address: string; name: string }) => {
             setSelectedToContact(item);
           }}

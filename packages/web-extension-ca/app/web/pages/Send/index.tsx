@@ -137,7 +137,7 @@ export default function Send() {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [dispatch],
+    [dispatch, setLoading],
   );
   const showErrorModal = useCallback(
     (error: any) => {
@@ -150,7 +150,7 @@ export default function Send() {
         centered: true,
         title: (
           <div className="flex-column-center transaction-msg">
-            <CustomSvg type="Warning" />
+            <CustomSvg type="warnRed" />
             {t('Transaction failed ！')}
           </div>
         ),
@@ -159,8 +159,7 @@ export default function Send() {
         },
       });
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    [retryCrossChain, t],
   );
 
   const getTranslationInfo = useCallback(async () => {
@@ -197,20 +196,6 @@ export default function Send() {
     wallet.caHash,
   ]);
 
-  const getEleBalance = useCallback(async () => {
-    if (!currentChain) return;
-    const result = await getBalance({
-      rpcUrl: currentChain.endPoint,
-      address: state.address,
-      chainType: currentNetwork.walletType,
-      paramsOption: {
-        owner: wallet[state.chainId].caAddress,
-        symbol: 'ELF',
-      },
-    });
-    return result.result.balance;
-  }, [currentChain, currentNetwork.walletType, state.address, state.chainId, wallet]);
-
   const handleCheckPreview = useCallback(async () => {
     try {
       if (!ZERO.plus(amount).toNumber()) return 'Please input amount';
@@ -218,53 +203,26 @@ export default function Send() {
         if (ZERO.plus(amount).times(`1e${tokenInfo.decimals}`).isGreaterThan(ZERO.plus(balance))) {
           return TransactionError.TOKEN_NOTE_ENOUGH;
         }
-        if (tokenInfo.symbol === 'ELF') {
-          if (ZERO.plus(amount).times(`1e${tokenInfo.decimals}`).isEqualTo(ZERO.plus(balance))) {
-            return TransactionError.FEE_NOTE_ENOUGH;
-          }
-        }
-        const fee = await getTranslationInfo();
-        setTxFee(fee);
-        if (symbol === 'ELF') {
-          if (
-            ZERO.plus(amount)
-              .plus(fee || '')
-              .times(`1e${tokenInfo.decimals}`)
-              .isGreaterThan(ZERO.plus(balance))
-          ) {
-            return TransactionError.FEE_NOTE_ENOUGH;
-          }
-        } else {
-          const elfBalance = await getEleBalance();
-          if (
-            ZERO.plus(fee || '')
-              .times(`1e${tokenInfo.decimals}`)
-              .isGreaterThan(ZERO.plus(elfBalance))
-          ) {
-            return TransactionError.FEE_NOTE_ENOUGH;
-          }
-        }
-      } else {
+      } else if (type === 'nft') {
         if (ZERO.plus(amount).isGreaterThan(ZERO.plus(balance))) {
           return TransactionError.NFT_NOTE_ENOUGH;
         }
-        const fee = await getTranslationInfo();
+      } else {
+        return 'input error';
+      }
+      const fee = await getTranslationInfo();
+      console.log('---getTranslationInfo', fee);
+      if (fee) {
         setTxFee(fee);
-        const elfBalance = await getEleBalance();
-        if (
-          ZERO.plus(fee || '')
-            .times(`1e${tokenInfo.decimals}`)
-            .isGreaterThan(ZERO.plus(elfBalance))
-        ) {
-          return TransactionError.FEE_NOTE_ENOUGH;
-        }
+      } else {
+        return TransactionError.FEE_NOTE_ENOUGH;
       }
       return '';
     } catch (error: any) {
       console.log('checkTransactionValue===', error);
       return TransactionError.FEE_NOTE_ENOUGH;
     }
-  }, [type, amount, tokenInfo.decimals, tokenInfo.symbol, balance, getTranslationInfo, symbol, getEleBalance]);
+  }, [type, amount, tokenInfo.decimals, balance, getTranslationInfo]);
 
   const sendHandler = useCallback(async () => {
     try {
@@ -377,6 +335,7 @@ export default function Send() {
               setToAccount(value);
               // validateToAddress(value);
             }}
+            chainId={tokenInfo.chainId}
           />
         ),
       },
@@ -386,8 +345,6 @@ export default function Send() {
           const res = await handleCheckPreview();
           if (!res) {
             setTipMsg('');
-            const fee = await getTranslationInfo();
-            setTxFee(fee);
             setStage(Stage.Preview);
           } else {
             setTipMsg(res);
@@ -449,11 +406,12 @@ export default function Send() {
       tipMsg,
       tokenInfo,
       txFee,
-      validateToAddress,
       chainInfo?.chainId,
+      validateToAddress,
       t,
       navigate,
       handleCheckPreview,
+      getTranslationInfo,
       sendHandler,
     ],
   );

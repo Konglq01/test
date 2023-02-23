@@ -13,7 +13,6 @@ import CommonAvatar from 'components/CommonAvatar';
 import { IToSendAssetParamsType } from '@portkey/types/types-ca/routeParams';
 
 interface AmountTokenProps {
-  rate: { USDT: string | number };
   balanceShow: number | string;
   sendTokenNumber: string;
   setSendTokenNumber: any;
@@ -67,6 +66,7 @@ export default function AmountToken({
             }}
             keyboardType="numeric"
             value={sendTokenNumber}
+            maxLength={18}
             containerStyle={styles.containerStyle}
             inputContainerStyle={styles.inputContainerStyle}
             inputStyle={styles.inputStyle}

@@ -87,7 +87,7 @@ export default function LockPage({ header, onUnLockHandler, ...props }: LockPage
               label={t('Enter Pin')}
               name="password"
               validateStatus={isPassword === 0 ? 'error' : undefined}
-              help={isPassword === 0 ? t('Invalid Password') : undefined}
+              help={isPassword === 0 ? t('Incorrect pin') : undefined}
               validateTrigger={false}>
               <CustomPassword className="custom-password" placeholder={t('Enter Pin')} />
             </FormItem>

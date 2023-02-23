@@ -72,58 +72,23 @@ const SendHome: React.FC<SendHomeProps> = props => {
 
   const caAddresses = useCaAddresses();
 
-  const showRetry = (retryFunc: any) => {
-    ActionSheet.alert({
-      title: t('Transaction failed ！'),
-      buttons: [
-        {
-          title: t('Resend'),
-          type: 'solid',
-          onPress: () => {
-            retryFunc?.();
+  const showRetry = useCallback(
+    (retryFunc: () => void) => {
+      ActionSheet.alert({
+        title: t('Transaction failed ！'),
+        buttons: [
+          {
+            title: t('Resend'),
+            type: 'solid',
+            onPress: () => {
+              retryFunc?.();
+            },
           },
-        },
-      ],
-    });
-  };
-
-  // TODO
-  // const totalPay = useMemo(() => {
-  //   // TODO: TransferNumber + Transaction Fee
-  //   const totalTransactionFee = ZERO.plus(transactionFee).times(data?.USDT || 0);
-  //   const totalTransferNumber =
-  //     selectedToken.symbol === 'ELF' ? ZERO.plus(sendTokenNumber).times(data?.USDT || 0) : ZERO;
-  //   console.log(totalTransactionFee.valueOf(), totalTransferNumber.valueOf());
-
-  //   return totalTransactionFee.plus(totalTransferNumber);
-  // }, [data?.USDT, selectedToken, sendTokenNumber, transactionFee]);
-
-  // const showCrossChainTips = () => {
-  //   CrossChainTransferModal.alert({});
-  // };
-
-  // const tokenInfo: any = useMemo(
-  //   () => ({
-  //     symbol: 'ELF',
-  //     decimals: 8,
-  //     address: 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE',
-  //   }),
-  //   // ({
-  //   //   symbol: 'BTX-2',
-  //   //   decimals: 0,
-  //   //   tokenName: '1155-BTX2',
-  //   //   address: 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE',
-  //   //   supply: '1000',
-  //   //   totalSupply: '1000',
-  //   //   issuer: '2KQWh5v6Y24VcGgsx2KHpQvRyyU5DnCZ4eAUPqGQbnuZgExKaV',
-  //   //   isBurnable: true,
-  //   //   issueChainId: 9992731,
-  //   //   issued: '1000',
-  //   //   externalInfo: { value: { __nft_image_url: 'nft_image_url', __nft_is_burned: 'true' } },
-  //   // }),
-
-  //   [],
-  // );
+        ],
+      });
+    },
+    [t],
+  );
 
   const retryCrossChain = useCallback(
     async ({ managerTransferTxId, data }: { managerTransferTxId: string; data: CrossChainTransferIntervalParams }) => {
@@ -134,13 +99,24 @@ const SendHome: React.FC<SendHomeProps> = props => {
       } catch (error) {
         // tip retryCrossChain()
         // Modal.confirm
+
+        // console.log('errorerrorerrorerror', error);
+        showRetry(() => {
+          retryCrossChain({ managerTransferTxId, data });
+        });
+        // TODO tip retry
+        dispatch(
+          addFailedActivity({
+            transactionId: managerTransferTxId,
+            params: data,
+          }),
+        );
       }
     },
-    [dispatch],
+    [dispatch, showRetry],
   );
 
   //  TODO: when finish send upDate balance
-
   const transfer = async () => {
     const tokenInfo = {
       symbol: assetInfo.symbol,
@@ -248,13 +224,13 @@ const SendHome: React.FC<SendHomeProps> = props => {
   return (
     <PageContainer
       safeAreaColor={['blue', 'white']}
-      titleDom={t('Send')}
+      titleDom={`${t('Send')}${sendType === 'token' ? ' ' + assetInfo.symbol : ''}`}
       containerStyles={styles.pageWrap}
       scrollViewProps={{ disabled: true }}>
       {sendType === 'nft' ? (
         <View style={styles.topWrap}>
-          {assetInfo?.imageUrl ? (
-            <Text style={styles.noImg}>A</Text>
+          {!assetInfo?.imageUrl ? (
+            <Text style={styles.noImg}>{assetInfo?.alias[0]}</Text>
           ) : (
             <Image style={styles.img} source={{ uri: assetInfo?.imageUrl }} />
           )}

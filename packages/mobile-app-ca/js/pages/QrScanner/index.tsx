@@ -8,7 +8,9 @@ import { defaultColors } from 'assets/theme';
 import { ScreenWidth } from '@rneui/base';
 import { useLanguage } from 'i18n/hooks';
 import { useWallet } from 'hooks/store';
-import { handleQRCodeData, invalidQRCode } from 'utils/qrcode';
+import { handleQRCodeData, invalidQRCode, RouteInfoType } from 'utils/qrcode';
+import { useNavigation } from '@react-navigation/native';
+
 // import { useAppCASelector } from '@portkey/hooks';
 
 interface QrScannerProps {
@@ -19,9 +21,9 @@ interface QrScannerProps {
 const QrScanner: React.FC<QrScannerProps> = ({ route }) => {
   const { t } = useLanguage();
   const { currentNetwork } = useWallet();
-
-  const { params } = route;
-  const fromSendPage = !!params?.fromSendPage;
+  const navigation = useNavigation();
+  const routesArr: RouteInfoType[] = navigation.getState().routes;
+  const previousRouteInfo = routesArr[routesArr.length - 2];
 
   // TODO:  getNetWorkType
   // const {} =useAppCASelector(state=>state.settings)
@@ -32,14 +34,15 @@ const QrScanner: React.FC<QrScannerProps> = ({ route }) => {
         if (typeof data === 'string') {
           const qrCodeData = JSON.parse(data);
           // if not currentNetwork
+
           if (currentNetwork !== qrCodeData.netWorkType) return invalidQRCode();
-          handleQRCodeData(qrCodeData);
+          handleQRCodeData(qrCodeData, previousRouteInfo);
         }
       } catch (error) {
         console.log(error);
       }
     },
-    [currentNetwork],
+    [currentNetwork, previousRouteInfo],
   );
 
   // TODO: test ui in Mason's Phone
