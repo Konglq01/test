@@ -4,9 +4,11 @@ import CommonToast from 'components/CommonToast';
 import navigationService from './navigationService';
 
 export interface RouteInfoType {
-  name: string;
+  name: 'SendHome' | 'Tab';
   params: {
-    symbol: string;
+    assetInfo: {
+      symbol: string;
+    };
   };
 }
 
@@ -24,7 +26,7 @@ export function handleQRCodeData(data: QRData, previousRouteInfo: RouteInfoType)
 
     const newData: SendTokenQRDataType = { ...data } as SendTokenQRDataType;
 
-    if (previousRouteInfo.name === 'SendHome' && previousRouteInfo.params.symbol !== newData.assetInfo.symbol)
+    if (previousRouteInfo.name === 'SendHome' && previousRouteInfo.params.assetInfo.symbol !== newData.assetInfo.symbol)
       return invalidQRCode();
 
     navigationService.navigate('SendHome', newData);
