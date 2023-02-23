@@ -25,18 +25,12 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
   const { t } = useLanguage();
   const dispatch = useAppCommonDispatch();
   const {
-    accountToken: { accountTokenList, skipCount, maxResultCount, totalRecordCount },
+    accountToken: { accountTokenList },
   } = useAppCASelector(state => state.assets);
-
-  console.log('accountTokenListaccountTokenListaccountTokenList', accountTokenList);
-
-  const currentNetworkInfo = useCurrentNetworkInfo();
 
   const {
     walletInfo: { caAddressList },
   } = useCurrentWallet();
-
-  const { walletInfo } = useCurrentWallet();
 
   const [isFetching] = useState(false);
   const { accountToken } = useAppCASelector(state => state.assets);
@@ -53,16 +47,12 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
   );
 
   const getAccountTokenList = useCallback(() => {
-    console.log('getAccountTokenList>>>');
-
-    if (caAddressList?.length === 0) return;
-
     dispatch(fetchTokenListAsync({ caAddresses: caAddressList || [] }));
   }, [caAddressList, dispatch]);
 
-  useEffectOnce(() => {
+  useEffect(() => {
     getAccountTokenList();
-  });
+  }, [caAddressList, getAccountTokenList]);
 
   useEffectOnce(() => {
     setInterval(() => {

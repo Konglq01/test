@@ -41,7 +41,7 @@ export default function SelectContact(props: SelectContactProps) {
   const { chainId, onPress } = props;
   const { t } = useLanguage();
   const dispatch = useAppCommonDispatch();
-  const { contactMap } = useContact();
+  const { contactMap, contactIndexList } = useContact();
 
   const { walletInfo } = useCurrentWallet();
 
@@ -127,8 +127,6 @@ export default function SelectContact(props: SelectContactProps) {
                   if (recentTotalNumber <= recentList.length) return;
                   if (loading) return;
 
-                  console.log('recentTotalNumberrecentTotalNumberrecentTotalNumber', recentTotalNumber, loading);
-
                   fetchMoreRecent();
                 }}
               />
@@ -137,21 +135,24 @@ export default function SelectContact(props: SelectContactProps) {
       },
       {
         name: t('Contacts'),
-        tabItemDom: (
-          <ContactsList
-            style={styles.contactWrap}
-            isReadOnly
-            isIndexBarShow={false}
-            isSearchShow={false}
-            renderContactItem={(item: ContactItemType) => (
-              <RecentContactItem contact={item as RecentContactItemType} onPress={onPress} />
-            )}
-            ListFooterComponent={<View style={styles.footer} />}
-          />
-        ),
+        tabItemDom:
+          contactIndexList.length === 0 ? (
+            <NoData noPic message={t('There is no contacts.')} />
+          ) : (
+            <ContactsList
+              style={styles.contactWrap}
+              isReadOnly
+              isIndexBarShow={false}
+              isSearchShow={false}
+              renderContactItem={(item: ContactItemType) => (
+                <RecentContactItem contact={item as RecentContactItemType} onPress={onPress} />
+              )}
+              ListFooterComponent={<View style={styles.footer} />}
+            />
+          ),
       },
     ];
-  }, [fetchMoreRecent, loading, onPress, recentList, recentTotalNumber, renderItem, t]);
+  }, [contactIndexList.length, fetchMoreRecent, loading, onPress, recentList, recentTotalNumber, renderItem, t]);
 
   return <CommonTopTab tabList={tabList} />;
 }
