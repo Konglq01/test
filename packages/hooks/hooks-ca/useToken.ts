@@ -45,9 +45,9 @@ export const useToken = (): [TokenState, TokenFuncsType] => {
           isDisplay: !tokenItem.isAdded,
         },
       });
-      // setTimeout(() => {
-      dispatch(fetchAllTokenListAsync({ keyword, chainIdArray }));
-      // }, 1000);
+      setTimeout(() => {
+        dispatch(fetchAllTokenListAsync({ keyword, chainIdArray }));
+      }, 1000);
     },
     [],
   );
