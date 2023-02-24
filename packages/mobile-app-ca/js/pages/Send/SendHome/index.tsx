@@ -111,7 +111,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
         },
       });
 
-      console.log('====TransactionFee======', TransactionFee);
+      console.log('====TransactionFee======', TransactionFee, unitConverter(ZERO.plus(TransactionFee.ELF).div('1e8')));
 
       if (!TransactionFee) throw { code: 500, message: 'no enough fee' };
 
@@ -277,6 +277,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
     // transaction fee check
     try {
       const fee = await getTransactionFee(isCross);
+
       setTransactionFee(fee || '0');
     } catch (err: any) {
       if (err?.code === 500) {

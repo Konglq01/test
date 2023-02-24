@@ -214,6 +214,8 @@ const SendHome: React.FC<SendHomeProps> = props => {
     return chainId === 'AELF' ? 'MainChain AELF' : `SideChain ${chainId} `;
   };
 
+  console.log('transactionFeetransactionFeetransactionFee', transactionFee);
+
   return (
     <PageContainer
       safeAreaColor={['blue', 'white']}
