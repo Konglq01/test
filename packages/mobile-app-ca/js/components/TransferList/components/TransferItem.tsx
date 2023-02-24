@@ -7,7 +7,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { formatChainInfo, formatStr2EllipsisStr, formatTransferTime } from 'utils';
 import { pTd } from 'utils/unit';
 import { ActivityItemType } from '@portkey/types/types-ca/activity';
-import { transactionTypesMap } from '@portkey/constants/constants-ca/activity';
+import { TransactionTypes, transactionTypesMap } from '@portkey/constants/constants-ca/activity';
 import { unitConverter } from '@portkey/utils/converter';
 import { ZERO } from '@portkey/constants/misc';
 import { SvgUri } from 'react-native-svg';
@@ -29,6 +29,8 @@ interface ActivityItemPropsType {
   item?: ActivityItemType;
   onPress?: (item: any) => void;
 }
+
+const hiddenArr = [TransactionTypes.SOCIAL_RECOVERY, TransactionTypes.ADD_MANAGER, TransactionTypes.REMOVE_MANAGER];
 
 const ActivityItem: React.FC<ActivityItemPropsType> = ({ item, onPress }) => {
   const { t } = useLanguage();
@@ -115,11 +117,14 @@ const ActivityItem: React.FC<ActivityItemPropsType> = ({ item, onPress }) => {
             {':  '}
             {formatStr2EllipsisStr(item?.fromAddress, 10)}
           </Text>
-          <Text style={[itemStyle.centerStatus, FontStyles.font3]}>
-            {formatChainInfo(item?.fromChainId)}
-            {'-->'}
-            {formatChainInfo(item?.toChainId)}
-          </Text>
+
+          {item?.transactionType && !hiddenArr.includes(item?.transactionType) && (
+            <Text style={[itemStyle.centerStatus, FontStyles.font3]}>
+              {formatChainInfo(item?.fromChainId)}
+              {'-->'}
+              {formatChainInfo(item?.toChainId)}
+            </Text>
+          )}
         </View>
         <View style={itemStyle.right}>
           <Text style={[itemStyle.tokenBalance]}>
