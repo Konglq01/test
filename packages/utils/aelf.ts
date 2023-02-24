@@ -43,6 +43,16 @@ export function isDIDAelfAddress(value?: string) {
   }
 }
 
+export function getEntireDIDAelfAddress(value: string, defaultPrefix = 'ELF', defaultSuffix = 'AELF') {
+  const arr = value.split('_');
+  if (arr.length > 3 || arr.length === 0) return '';
+  if (arr.length === 3) return value;
+  if (arr.length === 1) return `${defaultPrefix}_${value}_${defaultSuffix}`;
+  // arr.length === 2
+  if (isAelfAddress(arr[0])) return `${defaultPrefix}_${value}`;
+  return `${value}_${defaultSuffix}`;
+}
+
 export function isAllowAelfAddress(value: string) {
   const arr = value.split('_');
   if (arr.length > 3 || arr.length === 0) return false;
