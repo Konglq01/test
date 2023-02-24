@@ -16,7 +16,7 @@ import useQrScanPermission from 'hooks/useQrScanPermission';
 import { ZERO } from '@portkey/constants/misc';
 import { customFetch } from '@portkey/utils/fetch';
 import useEffectOnce from 'hooks/useEffectOnce';
-import { isAllowAelfAddress, isCrossChain } from '@portkey/utils/aelf';
+import { getEntireDIDAelfAddress, isAllowAelfAddress, isCrossChain } from '@portkey/utils/aelf';
 import useDebounce from 'hooks/useDebounce';
 import { useLanguage } from 'i18n/hooks';
 import SelectContact from '../SelectContact';
@@ -225,7 +225,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
     // TODO: check if  cross chain
     if (isCrossChain(selectedToContact.address, assetInfo.chainId)) {
       showDialog('crossChain', () => setStep(2));
-      return true;
+      return false;
     }
 
     return true;
@@ -292,15 +292,10 @@ const SendHome: React.FC<SendHomeProps> = props => {
     // TODO : getTransactionFee and check the balance
     if (!(await checkCanPreview())) return;
 
-    // let tmpAddress = selectedToContact.address;
-    // if (!selectedToContact.address.includes('_')) {
-    //   tmpAddress = `ELF_${tmpAddress}_AELF`;
-    // }
-
     navigationService.navigate('SendPreview', {
       sendType,
       assetInfo: selectedAssets,
-      toInfo: { ...selectedToContact, address: selectedToContact.address },
+      toInfo: { ...selectedToContact, address: getEntireDIDAelfAddress(selectedToContact.address) },
       transactionFee,
       sendNumber,
     } as IToSendPreviewParamsType);
