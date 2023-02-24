@@ -83,7 +83,7 @@ export default function NFTItem(props: NFTItemPropsType) {
           <TextM style={styles.nftSeriesChainInfo} />
         </View>
       </TouchableOpacity>
-      <Collapsible collapsed={collapsed}>
+      <Collapsible collapsed={collapsed && children}>
         <View style={styles.listWrap}>
           {children?.map((ele: any, index: number) => (
             <NFTAvatar
