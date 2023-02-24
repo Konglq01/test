@@ -58,26 +58,25 @@ export default function VerifierAccount() {
             privateKey,
             paramsOption: {
               method: GuardianMth.SetGuardianTypeForLogin,
-              params: [
-                {
-                  caHash: walletInfo?.AELF?.caHash,
-                  guardianAccount: {
-                    guardian: {
-                      type: currentGuardian?.guardianType,
-                      verifier: {
-                        id: currentGuardian?.verifier?.id,
-                      },
+              params: {
+                caHash: walletInfo?.AELF?.caHash,
+                guardianAccount: {
+                  guardian: {
+                    type: currentGuardian?.guardianType,
+                    verifier: {
+                      id: currentGuardian?.verifier?.id,
                     },
-                    value: currentGuardian?.guardianAccount,
                   },
+                  value: currentGuardian?.guardianAccount,
                 },
-              ],
+              },
             },
           });
-          const { TransactionId } = result.result.message || result;
-          await sleep(1000);
-          const aelfInstance = getAelfInstance(currentChain.endPoint);
-          await getTxResult(aelfInstance, TransactionId);
+          console.log('setLoginAccount', result);
+          // const { TransactionId } = result.result.message || result;
+          // await sleep(1000);
+          // const aelfInstance = getAelfInstance(currentChain.endPoint);
+          // await getTxResult(aelfInstance, TransactionId);
           opGuardian &&
             dispatch(
               setOpGuardianAction({

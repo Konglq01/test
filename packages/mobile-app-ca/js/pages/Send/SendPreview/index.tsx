@@ -258,11 +258,10 @@ const SendHome: React.FC<SendHomeProps> = props => {
         <View style={styles.section}>
           <View style={[styles.flexSpaceBetween]}>
             <TextM style={[styles.blackFontColor]}>{t('To')}</TextM>
-            <TextM style={[styles.blackFontColor, styles.fontBold]}>{toInfo?.name || '-'}</TextM>
-          </View>
-          <View style={[styles.flexSpaceBetween]}>
-            <Text />
-            <TextS style={styles.lightGrayFontColor}>{formatStr2EllipsisStr(toInfo?.address)}</TextS>
+            <View style={styles.alignItemsEnd}>
+              {toInfo?.name && <TextM style={[styles.blackFontColor, styles.fontBold]}>{toInfo?.name}</TextM>}
+              <TextS style={styles.lightGrayFontColor}>{formatStr2EllipsisStr(toInfo?.address)}</TextS>
+            </View>
           </View>
         </View>
         <Text style={[styles.divider, styles.marginTop0]} />
@@ -470,5 +469,8 @@ export const styles = StyleSheet.create({
   },
   alignItemsCenter: {
     alignItems: 'center',
+  },
+  alignItemsEnd: {
+    alignItems: 'flex-end',
   },
 });

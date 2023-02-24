@@ -51,11 +51,11 @@ export default function ExitWallet({ open, onCancel }: ExitWalletProps) {
           },
         },
       });
-      console.log('removeManager', 'removeManager==result');
-      const { TransactionId } = result.result.message || result;
-      await sleep(1000);
-      const aelfInstance = getAelfInstance(currentChain.endPoint);
-      await getTxResult(aelfInstance, TransactionId);
+      console.log('removeManager', 'removeManager==result', result);
+      // const { TransactionId } = result.result.message || result;
+      // await sleep(1000);
+      // const aelfInstance = getAelfInstance(currentChain.endPoint);
+      // await getTxResult(aelfInstance, TransactionId);
       logout();
       clearLocalStorage();
       setLoading(false);
@@ -81,11 +81,11 @@ export default function ExitWallet({ open, onCancel }: ExitWalletProps) {
       closable={false}
       width={320}
       open={open}
-      title={t('Are you sure you want to exit your wallet?')}
+      title={t('Are you sure you want to exit your account?')}
       footer={
         <div className="">
           <Button type="primary" onClick={onConfirm}>
-            {t('I Understand，Confirm Exit')}
+            {t('Exit Anyway')}
           </Button>
           <Button type="default" className="exist-wallet-btn-cancel" onClick={onCancel}>
             {t('Cancel')}
@@ -93,10 +93,10 @@ export default function ExitWallet({ open, onCancel }: ExitWalletProps) {
         </div>
       }>
       <div className="text-center modal-content">
-        <div className="tip-title">
-          {t('Your current wallet and assets will be removed from this app permanently. This action cannot be undone.')}
+        {/* <div className="tip-title">{t('Are you sure you want to exit your account?')}</div> */}
+        <div>
+          {t('After you exit, your assets remain in your account and you can access them through social recovery.')}
         </div>
-        <div>{t('You can ONLY recover this wallet with your guardians.')}</div>
       </div>
     </CommonModal>
   );

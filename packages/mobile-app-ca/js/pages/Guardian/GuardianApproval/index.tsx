@@ -293,14 +293,7 @@ export default function GuardianApproval() {
           </View>
         </View>
       </View>
-      {!isExpired && (
-        <CommonButton
-          onPress={onFinish}
-          disabled={!isSuccess}
-          type="primary"
-          title={isGuardianOpt ? 'Confirm' : 'Recover wallet'}
-        />
-      )}
+      {!isExpired && <CommonButton onPress={onFinish} disabled={!isSuccess} type="primary" title={'Confirm'} />}
     </PageContainer>
   );
 }

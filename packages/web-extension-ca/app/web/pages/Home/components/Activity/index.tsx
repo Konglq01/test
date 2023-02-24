@@ -80,6 +80,7 @@ export default function Activity({ appendData, clearData, chainId, symbol }: Act
       {activity.totalRecordCount ? (
         <ActivityList
           data={activity.data}
+          chainId={chainId}
           hasMore={activity.data.length < activity.totalRecordCount}
           loadMore={loadMoreActivities}
         />

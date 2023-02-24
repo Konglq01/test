@@ -11,7 +11,7 @@ import {
 } from '@portkey/store/store-ca/contact/actions';
 import { useAppCommonDispatch, useAppCommonSelector } from '../index';
 
-const REFRESH_DELAY_TIME = 3 * 1000;
+const REFRESH_DELAY_TIME = 1 * 1000;
 
 export const useAddContact = () => {
   const dispatch = useAppCommonDispatch();
