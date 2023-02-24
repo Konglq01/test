@@ -34,6 +34,7 @@ import { contractErrorHandler } from '@portkey/did-ui-react/src/utils/errorHandl
 import { ZERO } from '@portkey/constants/misc';
 import { TransactionError } from '@portkey/constants/constants-ca/assets';
 import './index.less';
+import { the2ThFailedActivityItemType } from '@portkey/types/types-ca/activity';
 
 export type Account = { address: string; name?: string };
 
@@ -139,14 +140,18 @@ export default function Send() {
   );
 
   const retryCrossChain = useCallback(
-    async ({ managerTransferTxId, data }: { managerTransferTxId: string; data: CrossChainTransferIntervalParams }) => {
+    async ({ transactionId, params }: the2ThFailedActivityItemType) => {
       try {
         //
+        if (!chainInfo) return;
+        const privateKey = aes.decrypt(wallet.AESEncryptPrivateKey, passwordSeed);
+        if (!privateKey) return;
         setLoading(true);
-        await intervalCrossChainTransfer(data);
-        dispatch(removeFailedActivity(managerTransferTxId));
+        await intervalCrossChainTransfer({ ...params, chainInfo, privateKey });
+        dispatch(removeFailedActivity(transactionId));
       } catch (error) {
-        showErrorModal(error);
+        console.log('retry addFailedActivity', error);
+        showErrorModal({ transactionId, params });
       } finally {
         setLoading(false);
       }
@@ -155,7 +160,7 @@ export default function Send() {
     [dispatch, setLoading],
   );
   const showErrorModal = useCallback(
-    (error: any) => {
+    (error: the2ThFailedActivityItemType) => {
       Modal.error({
         width: 320,
         className: 'transaction-modal',
@@ -170,6 +175,7 @@ export default function Send() {
           </div>
         ),
         onOk: () => {
+          console.log('retry modal addFailedActivity', error);
           retryCrossChain(error);
         },
       });
@@ -280,15 +286,10 @@ export default function Send() {
       if (error.type === 'managerTransfer') {
         return message.error(error);
       } else if (error.type === 'crossChainTransfer') {
-        dispatch(
-          addFailedActivity({
-            transactionId: error.managerTransferTxId,
-            params: error.data,
-          }),
-        );
-        console.log('addFailedActivity', error.data);
+        dispatch(addFailedActivity(error.data));
+        console.log('addFailedActivity', error);
 
-        showErrorModal(error);
+        showErrorModal(error.data);
         return;
       } else {
         message.error(error);
@@ -357,7 +358,9 @@ export default function Send() {
       1: {
         btnText: 'Preview',
         handler: async () => {
+          if (!validateToAddress(toAccount)) return;
           const res = await handleCheckPreview();
+          console.log('handleCheckPreview res', res);
           if (!res) {
             setTipMsg('');
             setStage(Stage.Preview);
@@ -408,6 +411,7 @@ export default function Send() {
             chainId={state.chainId}
             transactionFee={txFee || ''}
             isCross={isCrossChain(toAccount.address, chainInfo?.chainId ?? 'AELF')}
+            tokenId={tokenInfo.tokenId || ''}
           />
         ),
       },

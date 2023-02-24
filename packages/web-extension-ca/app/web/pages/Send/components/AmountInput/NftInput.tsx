@@ -89,7 +89,7 @@ export default function NftInput({
         <div className="info">
           <p className="index">
             <span>{token.alias}</span>
-            <span className="token-id"># {token.tokenId}</span>
+            <span className="token-id">#{token.tokenId}</span>
           </p>
           <p className="quantity">
             Balance: <span>{`${unitConverter(divDecimals(balance, token.decimals))}`}</span>

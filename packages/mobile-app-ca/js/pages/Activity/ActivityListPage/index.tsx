@@ -75,7 +75,11 @@ const ActivityListPage = () => {
       <TransferItem
         item={item}
         onPress={() =>
-          navigationService.navigate('ActivityDetail', { transactionId: item.transactionId, blockHash: item.blockHash })
+          navigationService.navigate('ActivityDetail', {
+            transactionId: item.transactionId,
+            blockHash: item.blockHash,
+            isReceived: item.isReceived,
+          })
         }
       />
     );

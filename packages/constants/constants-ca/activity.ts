@@ -59,4 +59,9 @@ export const transactionTypesMap = (type?: TransactionTypes, nftId?: string): st
 export const DEFAULT_AMOUNT = 0;
 export const DEFAULT_DECIMAL = 8;
 export const DEFAULT_DIGITS = 4;
-export const VIEW_ON_EXPLORER = 'View on Explorer';
+
+export const MAIN_CHAIN_ID = 'AELF';
+export const MAIN_CHAIN = 'MainChain';
+export const SIDE_CHAIN = 'SideChain';
+export const TESTNET = 'TESTNET';
+export const TEST_NET = 'Testnet';

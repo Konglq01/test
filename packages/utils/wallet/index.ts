@@ -11,7 +11,7 @@ import {
   PinErrorMessage,
   WalletNameErrorMessage,
 } from './types';
-import { isValidPassword, isValidWalletName } from '@portkey/utils/reg';
+import { isValidPassword, isValidPin, isValidWalletName } from '@portkey/utils/reg';
 import { AccountType, Password, WalletInfoType } from '@portkey/types/wallet';
 import { PIN_SIZE, ZERO } from '@portkey/constants/misc';
 import { isExtension } from '@portkey/utils';
@@ -141,6 +141,9 @@ export function checkAccountNameInput(accountName?: string) {
 }
 
 export function checkPinInput(pin?: string) {
-  if (isExtension()) return checkPasswordInput(pin);
+  if (isExtension()) {
+    if (!pin || pin.length < 6) return PinErrorMessage.PinNotLong;
+    if (!isValidPin(pin)) return PinErrorMessage.invalidPin;
+  }
   if (!pin || pin.length !== PIN_SIZE || ZERO.plus(pin).isNaN()) return PinErrorMessage.invalidPin;
 }

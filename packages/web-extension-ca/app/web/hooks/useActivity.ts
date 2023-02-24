@@ -1,4 +1,4 @@
-import { TESTNET } from '@portkey/constants/constants-ca/network';
+import { TESTNET } from '@portkey/constants/constants-ca/activity';
 import { useMemo } from 'react';
 import { useWalletInfo } from 'store/Provider/hooks';
 

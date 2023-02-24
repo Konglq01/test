@@ -1,16 +1,29 @@
 import { defaultColors } from 'assets/theme';
 import { FontStyles } from 'assets/theme/styles';
 import GStyles from 'assets/theme/GStyles';
-import CommonAvatar from 'components/CommonAvatar';
 import { useLanguage } from 'i18n/hooks';
-import React, { memo, useMemo } from 'react';
+import React, { memo, useCallback, useMemo, useRef } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { formatChainInfo, formatStr2EllipsisStr, formatTransferTime } from 'utils';
 import { pTd } from 'utils/unit';
 import { ActivityItemType } from '@portkey/types/types-ca/activity';
-import { TransactionTypes, transactionTypesMap } from '@portkey/constants/constants-ca/activity';
+import { transactionTypesMap } from '@portkey/constants/constants-ca/activity';
 import { unitConverter } from '@portkey/utils/converter';
 import { ZERO } from '@portkey/constants/misc';
+import { SvgUri } from 'react-native-svg';
+import CommonButton from 'components/CommonButton';
+import { useAppCASelector } from '@portkey/hooks/hooks-ca';
+import Loading from 'components/Loading';
+import { CrossChainTransferParamsType, intervalCrossChainTransfer } from 'utils/transfer/crossChainTransfer';
+import { useAppDispatch } from 'store/hooks';
+import { removeFailedActivity } from '@portkey/store/store-ca/activity/slice';
+import { getContractBasic } from '@portkey/contracts/utils';
+import { ContractBasic } from '@portkey/contracts/utils/ContractBasic';
+import { useCurrentChainList } from '@portkey/hooks/hooks-ca/chainList';
+import { getManagerAccount } from 'utils/redux';
+import { usePin } from 'hooks/store';
+import ActionSheet from 'components/ActionSheet';
+import CommonToast from 'components/CommonToast';
 
 interface ActivityItemPropsType {
   item?: ActivityItemType;
@@ -19,6 +32,11 @@ interface ActivityItemPropsType {
 
 const ActivityItem: React.FC<ActivityItemPropsType> = ({ item, onPress }) => {
   const { t } = useLanguage();
+  const activity = useAppCASelector(state => state.activity);
+  const tokenContractRef = useRef<ContractBasic>();
+  const currentChainList = useCurrentChainList();
+  const pin = usePin();
+  const dispatch = useAppDispatch();
 
   const amountString = useMemo(() => {
     const { amount = '', isReceived, decimals = '', symbol } = item || {};
@@ -29,39 +47,73 @@ const ActivityItem: React.FC<ActivityItemPropsType> = ({ item, onPress }) => {
     return _amountString;
   }, [item]);
 
-  const activityListLeftIcon = (type?: TransactionTypes) => {
-    if (!type) return 'transfer';
-    const loginRelatedTypeArr = [
-      TransactionTypes.ADD_MANAGER,
-      TransactionTypes.REMOVE_MANAGER,
-      TransactionTypes.SOCIAL_RECOVERY,
-    ];
-    return loginRelatedTypeArr.includes(type) ? 'social-recovery' : 'transfer';
-  };
+  const showRetry = useCallback(
+    (retryFunc: () => void) => {
+      ActionSheet.alert({
+        title: t('Transaction failed ！'),
+        buttons: [
+          {
+            title: t('Resend'),
+            type: 'solid',
+            onPress: () => {
+              retryFunc();
+            },
+          },
+        ],
+      });
+    },
+    [t],
+  );
+
+  const retryCrossChain = useCallback(
+    async (managerTransferTxId: string, data: CrossChainTransferParamsType) => {
+      const chainInfo = currentChainList?.find(chain => chain.chainId === data.tokenInfo.chainId);
+      if (!chainInfo || !pin) return;
+      const account = getManagerAccount(pin);
+      if (!account) return;
+
+      Loading.show();
+      try {
+        if (!tokenContractRef.current) {
+          tokenContractRef.current = await getContractBasic({
+            contractAddress: data.tokenInfo.address,
+            rpcUrl: chainInfo.endPoint,
+            account,
+          });
+        }
+        const tokenContract = tokenContractRef.current;
+        await intervalCrossChainTransfer(tokenContract, data);
+        dispatch(removeFailedActivity(managerTransferTxId));
+        CommonToast.success('success');
+      } catch (error) {
+        showRetry(() => {
+          retryCrossChain(managerTransferTxId, data);
+        });
+      }
+      Loading.hide();
+    },
+    [currentChainList, dispatch, pin, showRetry],
+  );
+
+  const onResend = useCallback(() => {
+    const { params } = activity.failedActivityMap[item?.transactionId || ''];
+    retryCrossChain(item?.transactionId || '', params);
+  }, [activity.failedActivityMap, item?.transactionId, retryCrossChain]);
 
   return (
     <TouchableOpacity style={itemStyle.itemWrap} onPress={() => onPress?.(item)}>
       <Text style={itemStyle.time}>{formatTransferTime(Number(item?.timestamp) * 1000)}</Text>
       <View style={itemStyle.contentWrap}>
-        <CommonAvatar
-          style={itemStyle.left}
-          title={item?.symbol || ''}
-          // svgName="transfer"
-          // TODO: dynamic icon
-          svgName={activityListLeftIcon(item?.transactionType)}
-          avatarSize={pTd(32)}
-          color={defaultColors.primaryColor}
-        />
+        {<SvgUri style={itemStyle.left} width={pTd(32)} height={pTd(32)} uri={item?.listIcon || ''} />}
 
         <View style={itemStyle.center}>
-          {/* TODO:  sent and received not send */}
           <Text style={itemStyle.centerType}>
             {item?.transactionType ? transactionTypesMap(item.transactionType, item.nftInfo?.nftId) : ''}
           </Text>
           <Text style={[itemStyle.centerStatus, FontStyles.font3]}>
             {t('From')}
             {':  '}
-            {formatStr2EllipsisStr(item?.isReceived ? item?.toAddress : item?.fromAddress, 10)}
+            {formatStr2EllipsisStr(item?.fromAddress, 10)}
           </Text>
           <Text style={[itemStyle.centerStatus, FontStyles.font3]}>
             {formatChainInfo(item?.fromChainId)}
@@ -69,7 +121,6 @@ const ActivityItem: React.FC<ActivityItemPropsType> = ({ item, onPress }) => {
             {formatChainInfo(item?.toChainId)}
           </Text>
         </View>
-
         <View style={itemStyle.right}>
           <Text style={[itemStyle.tokenBalance]}>
             {item?.nftInfo?.nftId ? `#${item?.nftInfo?.nftId}` : ''}
@@ -83,7 +134,17 @@ const ActivityItem: React.FC<ActivityItemPropsType> = ({ item, onPress }) => {
           )} */}
         </View>
       </View>
-      {/* <CommonButton title={'aa'} /> */}
+      {activity.failedActivityMap[item?.transactionId || ''] && (
+        <View style={itemStyle.btnWrap}>
+          <CommonButton
+            title="Resend"
+            type="primary"
+            buttonStyle={itemStyle.resendWrap}
+            titleStyle={itemStyle.resendTitle}
+            onPress={onResend}
+          />
+        </View>
+      )}
     </TouchableOpacity>
   );
 };
@@ -147,5 +208,16 @@ const itemStyle = StyleSheet.create({
   },
   tokenName: {
     flex: 1,
+  },
+  btnWrap: {
+    alignItems: 'flex-end',
+  },
+  resendWrap: {
+    height: pTd(24),
+    width: pTd(65),
+    padding: 0,
+  },
+  resendTitle: {
+    fontSize: pTd(12),
   },
 });
