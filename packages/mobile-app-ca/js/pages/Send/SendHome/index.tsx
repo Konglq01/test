@@ -225,7 +225,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
     // TODO: check if  cross chain
     if (isCrossChain(selectedToContact.address, assetInfo.chainId)) {
       showDialog('crossChain', () => setStep(2));
-      return true;
+      return false;
     }
 
     return true;
