@@ -18,7 +18,8 @@ import { useChainIdList, useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet
 import { fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
 import { REFRESH_TIME } from '@portkey/constants/constants-ca/assets';
 
-let timer: string | number | NodeJS.Timer | undefined;
+let timer1: string | number | NodeJS.Timer | undefined;
+let timer2: string | number | NodeJS.Timer | undefined;
 
 export interface TokenSectionProps {
   getAccountBalance?: () => void;
@@ -60,10 +61,21 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
   }, [caAddressList, getAccountTokenList]);
 
   useEffect(() => {
-    if (timer) clearInterval(timer);
-    timer = setInterval(() => {
+    if (accountTokenList?.length > 0) {
+      if (timer1) clearInterval(timer1);
+      timer2 = setInterval(() => {
+        getAccountTokenList();
+      }, REFRESH_TIME);
+    }
+    return () => clearInterval(timer2);
+  }, [accountTokenList?.length, getAccountTokenList]);
+
+  useEffect(() => {
+    if (timer1) clearInterval(timer1);
+    timer1 = setInterval(() => {
       getAccountTokenList();
-    }, REFRESH_TIME);
+    }, 4 * 1000);
+    return () => clearInterval(timer1);
   }, [getAccountTokenList]);
 
   return (
