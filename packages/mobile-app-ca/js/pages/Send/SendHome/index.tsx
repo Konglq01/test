@@ -299,7 +299,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
       sendType,
       assetInfo: selectedAssets,
       toInfo: { ...selectedToContact, address: getEntireDIDAelfAddress(selectedToContact.address) },
-      transactionFee,
+      transactionFee: result?.fee || '0',
       sendNumber,
     } as IToSendPreviewParamsType);
   };
