@@ -52,28 +52,6 @@ enum ErrorMessage {
 const SendHome: React.FC<SendHomeProps> = props => {
   const { t } = useLanguage();
 
-  // const {
-  //   tokenItem = {
-  //     symbol: 'ELF',
-  //     decimals: 8,
-  //     address: 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE',
-  //     tokenContractAddress: 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE',
-  //   },
-  //   nftItem,
-  //   name,
-  //   sendType,
-  //   chainId,
-  //   address,
-  // } = useRouterParams<{
-  //   tokenItem: TokenItemShowType;
-  //   nftItem: any;
-  //   name: string;
-  //   sendType: 'nft' | 'token';
-  //   chainId: string;
-  //   address: string;
-  // }>();
-
-  // const { sendType = 'token', toInfo, assetInfo } = useRouterParams<IToSendHomeParamsType>();
   const {
     params: { sendType = 'token', toInfo, assetInfo },
   } = useRoute<RouteProp<{ params: IToSendHomeParamsType }>>();
@@ -102,51 +80,55 @@ const SendHome: React.FC<SendHomeProps> = props => {
   }, [toInfo]);
 
   // get transfer fee
-  const getTransactionFee = useCallback(async () => {
-    if (!chainInfo || !pin) return;
-    const account = getManagerAccount(pin);
-    if (!account) return;
+  const getTransactionFee = useCallback(
+    async (isCross: boolean) => {
+      if (!chainInfo || !pin) return;
+      const account = getManagerAccount(pin);
+      if (!account) return;
 
-    const contract = await getContractBasic({
-      contractAddress: chainInfo.caContractAddress,
-      rpcUrl: chainInfo?.endPoint,
-      account: account,
-    });
+      const contract = await getContractBasic({
+        contractAddress: chainInfo.caContractAddress,
+        rpcUrl: chainInfo?.endPoint,
+        account: account,
+      });
 
-    const raw = await contract.encodedTx('ManagerForwardCall', {
-      caHash: wallet.caHash,
-      contractAddress: selectedAssets.tokenContractAddress,
-      methodName: 'Transfer',
-      args: {
-        symbol: selectedAssets.symbol,
-        to: selectedToContact.address,
-        amount: timesDecimals(debounceSendNumber, selectedAssets.decimals || '0').toNumber(),
-        memo: '',
-      },
-    });
+      const raw = await contract.encodedTx('ManagerForwardCall', {
+        caHash: wallet.caHash,
+        contractAddress: selectedAssets.tokenContractAddress,
+        methodName: 'Transfer',
+        args: {
+          symbol: selectedAssets.symbol,
+          to: isCross ? wallet.address : selectedToContact.address,
+          amount: timesDecimals(debounceSendNumber, selectedAssets.decimals || '0').toNumber(),
+          memo: '',
+        },
+      });
 
-    const { TransactionFee } = await customFetch(`${chainInfo?.endPoint}/api/blockChain/calculateTransactionFee`, {
-      method: 'POST',
-      params: {
-        RawTransaction: raw,
-      },
-    });
+      const { TransactionFee } = await customFetch(`${chainInfo?.endPoint}/api/blockChain/calculateTransactionFee`, {
+        method: 'POST',
+        params: {
+          RawTransaction: raw,
+        },
+      });
 
-    console.log('====TransactionFee======', TransactionFee);
+      console.log('====TransactionFee======', TransactionFee);
 
-    if (!TransactionFee) throw { code: 500, message: 'no enough fee' };
+      if (!TransactionFee) throw { code: 500, message: 'no enough fee' };
 
-    return unitConverter(ZERO.plus(TransactionFee.ELF).div('1e8'));
-  }, [
-    chainInfo,
-    debounceSendNumber,
-    pin,
-    selectedAssets.decimals,
-    selectedAssets.symbol,
-    selectedAssets.tokenContractAddress,
-    selectedToContact.address,
-    wallet.caHash,
-  ]);
+      return unitConverter(ZERO.plus(TransactionFee.ELF).div('1e8'));
+    },
+    [
+      chainInfo,
+      debounceSendNumber,
+      pin,
+      selectedAssets.decimals,
+      selectedAssets.symbol,
+      selectedAssets.tokenContractAddress,
+      selectedToContact.address,
+      wallet.address,
+      wallet.caHash,
+    ],
+  );
 
   const getAssetBalance = async (tokenContractAddress: string, symbol: string) => {
     if (!chainInfo || !pin) return;
@@ -164,29 +146,9 @@ const SendHome: React.FC<SendHomeProps> = props => {
     return balance;
   };
 
-  const buttonDisabled = useMemo(() => {
-    console.log(!selectedToContact.address, Number(sendNumber));
-
-    if (!selectedToContact.address) return true;
-    if (Number(sendNumber) <= 0) return true;
-    // if (transactionFee[0] === '-') return true;
-    return false;
-  }, [selectedToContact.address, sendNumber]);
-
-  const nextDisable = useMemo(() => {
-    if (!selectedToContact?.address) return true;
-    return false;
-  }, [selectedToContact.address]);
-
-  const previewDisable = useMemo(() => {
-    if (!selectedToContact?.address) return true;
-    if (sendNumber === '0' || !sendNumber) return true;
-    return false;
-  }, [selectedToContact?.address, sendNumber]);
-
   // warning dialog
   const showDialog = useCallback(
-    (type: 'no-authority' | 'clearAddress' | 'crossChain') => {
+    (type: 'no-authority' | 'clearAddress' | 'crossChain', confirmCallBack?: () => void) => {
       switch (type) {
         case 'no-authority':
           ActionSheet.alert({
@@ -229,7 +191,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
                 title: t('Confirm'),
                 type: 'primary',
                 onPress: () => {
-                  nextStep(true);
+                  confirmCallBack?.();
                 },
               },
             ],
@@ -240,29 +202,40 @@ const SendHome: React.FC<SendHomeProps> = props => {
           break;
       }
     },
-    [nextStep, t],
+    [t],
   );
 
-  // const showCrossChainTips = () => {
-  //   CrossChainTransferModal.alert({});
-  // };
+  const nextDisable = useMemo(() => {
+    if (!selectedToContact?.address) return true;
+    return false;
+  }, [selectedToContact.address]);
 
-  //when finish send  upDate balance
+  const previewDisable = useMemo(() => {
+    if (!selectedToContact?.address) return true;
+    if (sendNumber === '0' || !sendNumber) return true;
+    return false;
+  }, [selectedToContact?.address, sendNumber]);
 
   const checkCanNext = useCallback(() => {
-    const errorArr = [];
-    if (!isAddress(selectedToContact.address)) errorArr.push(ErrorMessage.RecipientAddressIsInvalid);
-    setErrorMessage(errorArr);
-    if (errorArr.length) return false;
+    if (!isAddress(selectedToContact.address)) {
+      setErrorMessage([ErrorMessage.RecipientAddressIsInvalid]);
+      return false;
+    }
 
     // TODO: check if  cross chain
     if (isCrossChain(selectedToContact.address, assetInfo.chainId)) {
-      showDialog('crossChain');
+      showDialog('crossChain', () => setStep(2));
       return true;
     }
 
     return true;
   }, [assetInfo.chainId, selectedToContact.address, showDialog]);
+
+  const nextStep = useCallback(() => {
+    if (checkCanNext()) return setStep(2);
+  }, [checkCanNext]);
+
+  //when finish send  upDate balance
 
   /**
    * elf:   elf balance \  elf sendNumber \elf fee
@@ -299,11 +272,13 @@ const SendHome: React.FC<SendHomeProps> = props => {
       }
     }
 
+    const isCross = isCrossChain(selectedToContact.address, assetInfo.chainId);
+
     // transaction fee check
     try {
-      const fee = await getTransactionFee();
+      const fee = await getTransactionFee(isCross);
       setTransactionFee(fee || '0');
-    } catch (err: { code: number }) {
+    } catch (err: any) {
       if (err?.code === 500) {
         setErrorMessage([ErrorMessage.InsufficientFundsForTransactionFee]);
         return false;
@@ -313,20 +288,8 @@ const SendHome: React.FC<SendHomeProps> = props => {
     return true;
   };
 
-  const nextStep = useCallback(
-    (directNext?: boolean) => {
-      if (directNext) {
-        return setStep(2);
-      }
-      if (!checkCanNext()) return;
-      setStep(2);
-    },
-    [checkCanNext],
-  );
-
   const preview = async () => {
     // TODO : getTransactionFee and check the balance
-
     if (!(await checkCanPreview())) return;
 
     let tmpAddress = selectedToContact.address;
