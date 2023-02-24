@@ -61,7 +61,7 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
   }, [caAddressList, getAccountTokenList]);
 
   useEffect(() => {
-    if (accountTokenList?.length > 0) {
+    if (accountTokenList?.length >= 2) {
       if (timer1) clearInterval(timer1);
       timer2 = setInterval(() => {
         getAccountTokenList();
