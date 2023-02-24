@@ -144,6 +144,7 @@ export function checkPinInput(pin?: string) {
   if (isExtension()) {
     if (!pin || pin.length < 6) return PinErrorMessage.PinNotLong;
     if (!isValidPin(pin)) return PinErrorMessage.invalidPin;
+    return;
   }
   if (!pin || pin.length !== PIN_SIZE || ZERO.plus(pin).isNaN()) return PinErrorMessage.invalidPin;
 }

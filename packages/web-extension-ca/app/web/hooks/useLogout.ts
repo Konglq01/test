@@ -23,6 +23,9 @@ export default function useLogOut() {
       dispatch(clearAssets());
       dispatch(resetContactAction());
       request.initService();
+      setTimeout(() => {
+        request.initService();
+      }, 2000);
     } catch (error) {
       console.log(error, '====error');
     }
