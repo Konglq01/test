@@ -110,6 +110,11 @@ export default function SelectContact(props: SelectContactProps) {
     });
   }, [skipCount, fetchRecents, recentList, transFormData]);
 
+  const isExistContact = useMemo<boolean>(
+    () => contactIndexList.reduce((pv, cv) => pv + cv.contacts.length, 0) > 0,
+    [contactIndexList],
+  );
+
   const tabList = useMemo(() => {
     return [
       {
@@ -135,21 +140,20 @@ export default function SelectContact(props: SelectContactProps) {
       },
       {
         name: t('Contacts'),
-        tabItemDom:
-          contactIndexList.length === 0 ? (
-            <NoData noPic message={t('There is no contacts.')} />
-          ) : (
-            <ContactsList
-              style={styles.contactWrap}
-              isReadOnly
-              isIndexBarShow={false}
-              isSearchShow={false}
-              renderContactItem={(item: ContactItemType) => (
-                <RecentContactItem contact={item as RecentContactItemType} onPress={onPress} />
-              )}
-              ListFooterComponent={<View style={styles.footer} />}
-            />
-          ),
+        tabItemDom: !isExistContact ? (
+          <NoData noPic message={t('There is no contacts.')} />
+        ) : (
+          <ContactsList
+            style={styles.contactWrap}
+            isReadOnly
+            isIndexBarShow={false}
+            isSearchShow={false}
+            renderContactItem={(item: ContactItemType) => (
+              <RecentContactItem contact={item as RecentContactItemType} onPress={onPress} />
+            )}
+            ListFooterComponent={<View style={styles.footer} />}
+          />
+        ),
       },
     ];
   }, [contactIndexList.length, fetchMoreRecent, loading, onPress, recentList, recentTotalNumber, renderItem, t]);

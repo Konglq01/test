@@ -111,7 +111,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
         },
       });
 
-      console.log('====TransactionFee======', TransactionFee);
+      console.log('====TransactionFee======', TransactionFee, unitConverter(ZERO.plus(TransactionFee.ELF).div('1e8')));
 
       if (!TransactionFee) throw { code: 500, message: 'no enough fee' };
 
@@ -243,6 +243,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
    */
 
   const checkCanPreview = async () => {
+    let fee;
     setErrorMessage([]);
 
     const sendBigNumber = timesDecimals(sendNumber, selectedAssets.decimals || '0');
@@ -255,20 +256,20 @@ const SendHome: React.FC<SendHomeProps> = props => {
         // ELF
         if (sendBigNumber.isGreaterThanOrEqualTo(assetBalanceBigNumber)) {
           setErrorMessage([ErrorMessage.InsufficientFunds]);
-          return false;
+          return { status: false };
         }
       } else {
         //Other Token
         if (sendBigNumber.isGreaterThan(assetBalanceBigNumber)) {
           setErrorMessage([ErrorMessage.InsufficientFunds]);
-          return false;
+          return { status: false };
         }
       }
     } else {
       // nft
       if (sendBigNumber.isGreaterThan(assetBalanceBigNumber)) {
         setErrorMessage([ErrorMessage.InsufficientQuantity]);
-        return false;
+        return { status: false };
       }
     }
 
@@ -276,21 +277,23 @@ const SendHome: React.FC<SendHomeProps> = props => {
 
     // transaction fee check
     try {
-      const fee = await getTransactionFee(isCross);
+      fee = await getTransactionFee(isCross);
+
       setTransactionFee(fee || '0');
     } catch (err: any) {
       if (err?.code === 500) {
         setErrorMessage([ErrorMessage.InsufficientFundsForTransactionFee]);
-        return false;
+        return { status: false };
       }
     }
 
-    return true;
+    return { status: true, fee };
   };
 
   const preview = async () => {
     // TODO : getTransactionFee and check the balance
-    if (!(await checkCanPreview())) return;
+    const result = await checkCanPreview();
+    if (!result?.status) return;
 
     navigationService.navigate('SendPreview', {
       sendType,

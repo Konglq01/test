@@ -27,7 +27,7 @@ import crossChainTransfer, {
 import { useCurrentNetwork } from '@portkey/hooks/network';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { useCaAddresses, useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
-import { timesDecimals } from '@portkey/utils/converter';
+import { timesDecimals, unitConverter } from '@portkey/utils/converter';
 import sameChainTransfer from 'utils/transfer/sameChainTransfer';
 import { addFailedActivity, removeFailedActivity } from '@portkey/store/store-ca/activity/slice';
 import useRouterParams from '@portkey/hooks/useRouterParams';
@@ -37,6 +37,8 @@ import Loading from 'components/Loading';
 import { IToSendPreviewParamsType } from '@portkey/types/types-ca/routeParams';
 import { BaseToken } from '@portkey/types/types-ca/token';
 import { ContractBasic } from '@portkey/contracts/utils/ContractBasic';
+import { ZERO } from '@portkey/constants/misc';
+import { CROSS_FEE } from '@portkey/constants/constants-ca/wallet';
 
 export interface SendHomeProps {
   route?: any;
@@ -59,6 +61,8 @@ const SendHome: React.FC<SendHomeProps> = props => {
   const caAddresses = useCaAddresses();
   const contractRef = useRef<ContractBasic>();
   const tokenContractRef = useRef<ContractBasic>();
+
+  const isCrossChainTransfer = isCrossChain(toInfo.address, assetInfo.chainId);
 
   const showRetry = useCallback(
     (retryFunc: () => void) => {
@@ -99,7 +103,6 @@ const SendHome: React.FC<SendHomeProps> = props => {
 
     const contract = contractRef.current;
     const amount = timesDecimals(sendNumber, tokenInfo.decimals).toNumber();
-    const isCrossChainTransfer = isCrossChain(toInfo.address, assetInfo.chainId);
 
     if (isCrossChainTransfer) {
       if (!tokenContractRef.current) {
@@ -143,7 +146,17 @@ const SendHome: React.FC<SendHomeProps> = props => {
     }
     navigationService.navigate('Tab');
     CommonToast.success('success');
-  }, [assetInfo, chainInfo, currentNetwork.chainType, pin, sendNumber, toInfo.address, wallet.address, wallet.caHash]);
+  }, [
+    assetInfo,
+    chainInfo,
+    currentNetwork.chainType,
+    isCrossChainTransfer,
+    pin,
+    sendNumber,
+    toInfo.address,
+    wallet.address,
+    wallet.caHash,
+  ]);
 
   const retryCrossChain = useCallback(
     async (managerTransferTxId: string, data: CrossChainTransferParamsType) => {
@@ -214,6 +227,8 @@ const SendHome: React.FC<SendHomeProps> = props => {
     return chainId === 'AELF' ? 'MainChain AELF' : `SideChain ${chainId} `;
   };
 
+  console.log('transactionFeetransactionFeetransactionFee', transactionFee);
+
   return (
     <PageContainer
       safeAreaColor={['blue', 'white']}
@@ -281,11 +296,26 @@ const SendHome: React.FC<SendHomeProps> = props => {
             <TextM style={[styles.blackFontColor, styles.fontBold]}>{t('Transaction Fee')}</TextM>
             <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${transactionFee} ${'ELF'} `}</TextM>
           </View>
-          <View style={[styles.flexSpaceBetween, styles.marginTop4]}>
+          {/* <View style={[styles.flexSpaceBetween, styles.marginTop4]}>
             <Text />
             <TextS style={styles.lightGrayFontColor}>{`$ ${'-'}`}</TextS>
-          </View>
+          </View> */}
         </View>
+
+        {isCrossChainTransfer && assetInfo.symbol === 'ELF' && <Text style={[styles.divider, styles.marginTop0]} />}
+        {isCrossChainTransfer && assetInfo.symbol === 'ELF' && (
+          <View style={styles.section}>
+            <View style={[styles.flexSpaceBetween]}>
+              <TextM style={[styles.blackFontColor]}>{t('Estimated Amount Received')}</TextM>
+              <TextM style={[styles.blackFontColor, styles.fontBold]}>
+                {ZERO.plus(sendNumber).isLessThanOrEqualTo(ZERO.plus(CROSS_FEE))
+                  ? '0'
+                  : unitConverter(ZERO.plus(sendNumber).minus(ZERO.plus(CROSS_FEE)))}{' '}
+                {'ELF'}
+              </TextM>
+            </View>
+          </View>
+        )}
       </View>
 
       <View style={styles.buttonWrapStyle}>
