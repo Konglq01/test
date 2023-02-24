@@ -159,7 +159,11 @@ const ActivityDetail = () => {
       {isNft ? (
         <>
           <View style={styles.topWrap}>
-            <Image style={styles.img} source={{ uri: activityItem?.nftInfo?.imageUrl || '' }} />
+            {activityItem?.nftInfo?.imageUrl ? (
+              <Image style={styles.img} source={{ uri: activityItem?.nftInfo?.imageUrl || '' }} />
+            ) : (
+              <Text style={styles.noImg}>{activityItem?.nftInfo?.alias?.slice(0, 1)}</Text>
+            )}
             <View style={styles.space}>
               <TextL style={styles.nftTitle}>{`${activityItem?.nftInfo?.alias || ''} #${
                 activityItem?.nftInfo?.nftId || ''
