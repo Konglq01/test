@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useState } from 'react';
+import React, { memo, useCallback, useRef, useState } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import PageContainer from 'components/PageContainer';
 import { defaultColors } from 'assets/theme';
@@ -21,7 +21,7 @@ import { getDefaultWallet } from 'utils/aelfUtils';
 import { usePin, useWallet } from 'hooks/store';
 import { getManagerAccount } from 'utils/redux';
 import crossChainTransfer, {
-  CrossChainTransferIntervalParams,
+  CrossChainTransferParamsType,
   intervalCrossChainTransfer,
 } from 'utils/transfer/crossChainTransfer';
 import { useCurrentNetwork } from '@portkey/hooks/network';
@@ -36,6 +36,7 @@ import navigationService from 'utils/navigationService';
 import Loading from 'components/Loading';
 import { IToSendPreviewParamsType } from '@portkey/types/types-ca/routeParams';
 import { BaseToken } from '@portkey/types/types-ca/token';
+import { ContractBasic } from '@portkey/contracts/utils/ContractBasic';
 
 export interface SendHomeProps {
   route?: any;
@@ -43,20 +44,6 @@ export interface SendHomeProps {
 
 const SendHome: React.FC<SendHomeProps> = props => {
   const { t } = useLanguage();
-
-  // const {
-  //   sendInfo: { selectedToContact, tokenItem, nftItem, sendNumber, transactionFee, isCrossChainTransfer },
-  //   sendType,
-  // } = useRouterParams<{
-  //   sendInfo: {
-  //     tokenItem: TokenItemShowType;
-  //     nftItem: any;
-  //     sendNumber: string | number;
-  //     transactionFee: string | number;
-  //     isCrossChainTransfer: boolean;
-  //   };
-  //   sendType: 'nft' | 'token';
-  // }>();
 
   const { sendType, assetInfo, toInfo, transactionFee, sendNumber } = useRouterParams<IToSendPreviewParamsType>();
 
@@ -69,8 +56,9 @@ const SendHome: React.FC<SendHomeProps> = props => {
   const currentNetwork = useCurrentNetwork();
   const wallet = useCurrentWalletInfo();
   const { walletName } = useWallet();
-
   const caAddresses = useCaAddresses();
+  const contractRef = useRef<ContractBasic>();
+  const tokenContractRef = useRef<ContractBasic>();
 
   const showRetry = useCallback(
     (retryFunc: () => void) => {
@@ -81,7 +69,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
             title: t('Resend'),
             type: 'solid',
             onPress: () => {
-              retryFunc?.();
+              retryFunc();
             },
           },
         ],
@@ -90,132 +78,134 @@ const SendHome: React.FC<SendHomeProps> = props => {
     [t],
   );
 
-  const retryCrossChain = useCallback(
-    async ({ managerTransferTxId, data }: { managerTransferTxId: string; data: CrossChainTransferIntervalParams }) => {
-      try {
-        //
-        await intervalCrossChainTransfer(data);
-        dispatch(removeFailedActivity(managerTransferTxId));
-      } catch (error) {
-        // tip retryCrossChain()
-        // Modal.confirm
-
-        // console.log('errorerrorerrorerror', error);
-        showRetry(() => {
-          retryCrossChain({ managerTransferTxId, data });
-        });
-        // TODO tip retry
-        dispatch(
-          addFailedActivity({
-            transactionId: managerTransferTxId,
-            params: data,
-          }),
-        );
-      }
-    },
-    [dispatch, showRetry],
-  );
-
-  //  TODO: when finish send upDate balance
-  const transfer = async () => {
+  const transfer = useCallback(async () => {
     const tokenInfo = {
       symbol: assetInfo.symbol,
       decimals: assetInfo.decimals ?? 0,
       address: assetInfo.tokenContractAddress,
     };
 
-    try {
-      // TODO
-      // CommonToast.success(t('Transfer Successful'));
-      // navigationService.navigate('DashBoard');
+    if (!chainInfo || !pin) return;
+    const account = getManagerAccount(pin);
+    if (!account) return;
+
+    if (!contractRef.current) {
+      contractRef.current = await getContractBasic({
+        contractAddress: chainInfo.caContractAddress,
+        rpcUrl: chainInfo.endPoint,
+        account,
+      });
+    }
+
+    const contract = contractRef.current;
+    const amount = timesDecimals(sendNumber, tokenInfo.decimals).toNumber();
+    const isCrossChainTransfer = isCrossChain(toInfo.address, assetInfo.chainId);
+
+    if (isCrossChainTransfer) {
+      if (!tokenContractRef.current) {
+        tokenContractRef.current = await getContractBasic({
+          contractAddress: tokenInfo.address,
+          rpcUrl: chainInfo.endPoint,
+          account,
+        });
+      }
+      const tokenContract = tokenContractRef.current;
+
+      const crossChainTransferResult = await crossChainTransfer({
+        tokenContract,
+        contract,
+        chainType: currentNetwork.chainType ?? 'aelf',
+        managerAddress: wallet.address,
+        tokenInfo: { ...assetInfo, address: assetInfo.tokenContractAddress } as unknown as BaseToken,
+        caHash: wallet.caHash || '',
+        amount,
+        toAddress: toInfo.address,
+      });
+
+      console.log('crossChainTransferResult', crossChainTransferResult);
+    } else {
+      console.log('sameChainTransfers==sendHandler', tokenInfo);
+      const sameTransferResult = await sameChainTransfer({
+        contract,
+        tokenInfo: {
+          ...assetInfo,
+          address: assetInfo?.tokenContractAddress || assetInfo?.address,
+        } as unknown as BaseToken,
+        caHash: wallet.caHash || '',
+        amount,
+        toAddress: toInfo.address,
+      });
+
+      if (sameTransferResult.error) {
+        return CommonToast.fail(sameTransferResult?.error?.message || '');
+      }
+      console.log('sameTransferResult', sameTransferResult);
+    }
+    navigationService.navigate('Tab');
+    CommonToast.success('success');
+  }, [assetInfo, chainInfo, currentNetwork.chainType, pin, sendNumber, toInfo.address, wallet.address, wallet.caHash]);
+
+  const retryCrossChain = useCallback(
+    async (managerTransferTxId: string, data: CrossChainTransferParamsType) => {
+      const tokenInfo = {
+        symbol: assetInfo.symbol,
+        decimals: assetInfo.decimals ?? 0,
+        address: assetInfo.tokenContractAddress,
+      };
       if (!chainInfo || !pin) return;
       const account = getManagerAccount(pin);
       if (!account) return;
 
       Loading.show();
-
-      const contract = await getContractBasic({
-        contractAddress: chainInfo.caContractAddress,
-        rpcUrl: chainInfo.endPoint,
-        account,
-      });
-
-      // TODO
-      const amount = timesDecimals(sendNumber, tokenInfo.decimals).toNumber();
-      // setLoading(true);
-
-      const isCrossChainTransfer = isCrossChain(toInfo.address, assetInfo.chainId);
-
-      if (isCrossChainTransfer) {
-        const tokenContract = await getContractBasic({
-          contractAddress: tokenInfo.address,
-          rpcUrl: chainInfo.endPoint,
-          account,
-        });
-
-        const crossChainTransferResult = await crossChainTransfer({
-          tokenContract,
-          contract,
-          chainType: currentNetwork.chainType ?? 'aelf',
-          managerAddress: wallet.address,
-          tokenInfo: { ...assetInfo, address: assetInfo.tokenContractAddress } as unknown as BaseToken,
-          caHash: wallet.caHash || '',
-          amount,
-          toAddress: toInfo.address,
-        });
-
-        console.log('crossChainTransferResult', crossChainTransferResult);
-
-        navigationService.navigate('Tab');
-        CommonToast.success('success');
-      } else {
-        console.log('sameChainTransfers==sendHandler', tokenInfo);
-
-        const sameTransferResult = await sameChainTransfer({
-          contract,
-          tokenInfo: {
-            ...assetInfo,
-            address: assetInfo?.tokenContractAddress || assetInfo?.address,
-          } as unknown as BaseToken,
-          caHash: wallet.caHash || '',
-          amount,
-          toAddress: toInfo.address,
-        });
-
-        if (sameTransferResult.error) {
-          Loading.hide();
-          return CommonToast.fail(sameTransferResult?.error?.message || '');
+      try {
+        if (!tokenContractRef.current) {
+          tokenContractRef.current = await getContractBasic({
+            contractAddress: tokenInfo.address,
+            rpcUrl: chainInfo.endPoint,
+            account,
+          });
         }
-
-        console.log('sameTransferResult', sameTransferResult);
+        const tokenContract = tokenContractRef.current;
+        await intervalCrossChainTransfer(tokenContract, data);
+        dispatch(removeFailedActivity(managerTransferTxId));
         navigationService.navigate('Tab');
         CommonToast.success('success');
-      }
-    } catch (error: any) {
-      console.log('sendHandler==error', error);
-      // if (!error?.type) return message.error(error);
-      if (error.type === 'managerTransfer') {
-        return CommonToast.fail(error);
-      } else if (error.type === 'crossChainTransfer') {
+      } catch (error) {
         showRetry(() => {
-          retryCrossChain(error);
+          retryCrossChain(managerTransferTxId, data);
         });
-        // TODO tip retry
+      }
+      Loading.hide();
+    },
+    [assetInfo.decimals, assetInfo.symbol, assetInfo.tokenContractAddress, chainInfo, dispatch, pin, showRetry],
+  );
+
+  const onSend = async () => {
+    Loading.show();
+    try {
+      await transfer();
+    } catch (error: any) {
+      console.log('sendHandler==error2222', error);
+      if (error.type === 'managerTransfer') {
+        console.log(error);
+        CommonToast.failError(error.error);
+        console.log('????');
+        return;
+      } else if (error.type === 'crossChainTransfer') {
         dispatch(
           addFailedActivity({
             transactionId: error.managerTransferTxId,
             params: error.data,
           }),
         );
-
+        showRetry(() => {
+          retryCrossChain(error.managerTransferTxId, error.data);
+        });
         return;
       } else {
-        CommonToast.fail(error);
+        CommonToast.failError(error);
       }
-    } finally {
-      // setLoading(false);
     }
-
     Loading.hide();
   };
 
@@ -300,7 +290,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
       </View>
 
       <View style={styles.buttonWrapStyle}>
-        <CommonButton loading={isLoading} title={t('Send')} type="primary" onPress={transfer} />
+        <CommonButton loading={isLoading} title={t('Send')} type="primary" onPress={onSend} />
       </View>
     </PageContainer>
   );
