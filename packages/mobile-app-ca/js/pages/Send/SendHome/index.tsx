@@ -25,7 +25,6 @@ import AmountNFT from '../AmountNFT';
 import NFTInfo from '../NFTInfo';
 import GStyles from 'assets/theme/GStyles';
 import CommonButton from 'components/CommonButton';
-import useRouterParams from '@portkey/hooks/useRouterParams';
 import { TokenItemShowType } from '@portkey/types/types-ca/token';
 import { getContractBasic } from '@portkey/contracts/utils';
 import { useCurrentWalletInfo, useWallet } from '@portkey/hooks/hooks-ca/wallet';

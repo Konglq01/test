@@ -22,6 +22,7 @@ export class DidService extends ServiceInit {
   };
 
   initService = () => {
+    this.refreshTokenConfig = undefined;
     this.defaultConfig.headers = {
       ...this.defaultConfig.headers,
       Authorization: '',
