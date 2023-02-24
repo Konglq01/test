@@ -39,6 +39,8 @@ export function isValidNumber(n: string) {
 
 const PASSWORD_REG = /^[a-zA-Z\d! ~@#_^*%/.+:;=\\|,'~{}\[\]]{8,16}$/;
 
+const PIN_REG = /^[a-zA-Z\d! ~@#_^*%/.+:;=\\|,'~{}\[\]]{6,16}$/;
+
 const WALLET_REG = /^[a-zA-Z\d! ~@#_^*%/.+:;=\\|,'~{}[\]]{1,30}$/;
 
 const CA_WALLET_REG = /^[a-zA-Z\d _]{1,16}$/;
@@ -46,6 +48,11 @@ const CA_WALLET_REG = /^[a-zA-Z\d _]{1,16}$/;
 export function isValidPassword(password?: string) {
   if (!password) return false;
   return PASSWORD_REG.test(password);
+}
+
+export function isValidPin(password?: string) {
+  if (!password) return false;
+  return PIN_REG.test(password);
 }
 
 export function isValidWalletName(walletName?: string) {
