@@ -9,7 +9,7 @@ import CustomSvg from 'components/CustomSvg';
 import { useContact } from '@portkey/hooks/hooks-ca/contact';
 import { useAppDispatch } from 'store/Provider/hooks';
 import { fetchContactListAsync } from '@portkey/store/store-ca/contact/actions';
-import { getAelfAddress } from '@portkey/utils/aelf';
+import { getAelfAddress, isAelfAddress } from '@portkey/utils/aelf';
 import { ContactIndexType, ContactItemType } from '@portkey/types/types-ca/contact';
 import { useEffectOnce } from 'react-use';
 import './index.less';
@@ -45,19 +45,35 @@ export default function Contacts() {
         setIsSearch(false);
         return;
       }
-      value = getAelfAddress(value);
       const contactIndexFilterList: ContactIndexType[] = [];
-      contactIndexList.forEach(({ index, contacts }) => {
-        contactIndexFilterList.push({
-          index,
-          contacts: contacts.filter(
-            (contact) =>
-              contact.name.trim().toLowerCase() === value.trim().toLowerCase() ||
-              contact.addresses.some((ads) => ads.address === value),
-          ),
-        });
-      });
 
+      if (value.length <= 16) {
+        // Name search
+        contactIndexList.forEach(({ index, contacts }) => {
+          contactIndexFilterList.push({
+            index,
+            contacts: contacts.filter((contact) => contact.name.trim().toLowerCase() === value.trim().toLowerCase()),
+          });
+        });
+      } else {
+        // Address search
+        let suffix = '';
+        if (value.includes('_')) {
+          const arr = value.split('_');
+          if (!isAelfAddress(arr[arr.length - 1])) {
+            suffix = arr[arr.length - 1];
+          }
+        }
+        value = getAelfAddress(value);
+        contactIndexList.forEach(({ index, contacts }) => {
+          contactIndexFilterList.push({
+            index,
+            contacts: contacts.filter((contact) =>
+              contact.addresses.some((ads) => ads.address === value && (!suffix || suffix === ads.chainId)),
+            ),
+          });
+        });
+      }
       setCurList(contactIndexFilterList);
       setIsSearch(true);
     },

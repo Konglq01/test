@@ -47,6 +47,8 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
   );
 
   const getAccountTokenList = useCallback(() => {
+    if (caAddressList?.length === 0) return;
+
     dispatch(fetchTokenListAsync({ caAddresses: caAddressList || [] }));
   }, [caAddressList, dispatch]);
 
