@@ -16,6 +16,7 @@ import { request } from '@portkey/api/api-did';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { useChainIdList, useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
+import { REFRESH_TIME } from '@portkey/constants/constants-ca/assets';
 
 let timer: string | number | NodeJS.Timer | undefined;
 
@@ -62,7 +63,7 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
     if (timer) clearInterval(timer);
     timer = setInterval(() => {
       getAccountTokenList();
-    }, 5 * 60 * 1000);
+    }, REFRESH_TIME);
   }, [getAccountTokenList]);
 
   return (
