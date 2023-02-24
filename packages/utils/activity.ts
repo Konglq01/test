@@ -26,7 +26,10 @@ export function formatAmount({
   digits = DEFAULT_DIGITS,
   sign = AmountSign.EMPTY,
 }: IFormatAmountProps): string {
-  let amountTrans = `${unitConverter(ZERO.plus(amount).div(`1e${decimals}`), digits)}`;
+  let amountTrans = `${unitConverter(
+    ZERO.plus(amount).div(`1e${decimals || DEFAULT_DECIMAL}`),
+    digits || DEFAULT_DIGITS,
+  )}`;
   if (sign && amountTrans !== '0') {
     return `${sign}${amountTrans}`;
   }
