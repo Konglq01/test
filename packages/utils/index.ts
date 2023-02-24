@@ -22,7 +22,7 @@ export function isDIDAddress(address: string, chainType: ChainType = 'aelf') {
 }
 
 export const getChainIdByAddress = (address: string, chainType: ChainType = 'aelf') => {
-  if (!isAddress(address)) throw Error(`${address} is not address`);
+  // if (!isAddress(address)) throw Error(`${address} is not address`);
 
   if (chainType === 'aelf') {
     if (address.includes('_')) {
