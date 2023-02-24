@@ -78,7 +78,6 @@ const SendHome: React.FC<SendHomeProps> = props => {
   const {
     params: { sendType = 'token', toInfo, assetInfo },
   } = useRoute<RouteProp<{ params: IToSendHomeParamsType }>>();
-  console.log('toInfo');
 
   const wallet = useCurrentWalletInfo();
   const chainInfo = useCurrentChain(assetInfo?.chainId);
