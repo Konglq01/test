@@ -11,6 +11,7 @@ import { clearAssets } from '@portkey/store/store-ca/assets/slice';
 
 import { resetGuardiansState } from '@portkey/store/store-ca/guardians/actions';
 import { resetContactAction } from '@portkey/store/store-ca/contact/actions';
+import { request } from '@portkey/api/api-did';
 
 export default function useLogOut() {
   const dispatch = useAppDispatch();
@@ -23,6 +24,7 @@ export default function useLogOut() {
       dispatch(resetNetwork());
       dispatch(resetGuardiansState());
       dispatch(resetContactAction());
+      request.initService();
       navigationService.reset('Referral');
     } catch (error) {
       console.log(error, '====error');

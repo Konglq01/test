@@ -37,6 +37,7 @@ import { IToSendHomeParamsType, IToSendPreviewParamsType } from '@portkey/types/
 
 import { getELFChainBalance } from '@portkey/utils/balance';
 import { BGStyles } from 'assets/theme/styles';
+import { RouteProp, useRoute } from '@react-navigation/native';
 
 export interface SendHomeProps {
   route?: any;
@@ -73,7 +74,10 @@ const SendHome: React.FC<SendHomeProps> = props => {
   //   address: string;
   // }>();
 
-  const { sendType = 'token', toInfo, assetInfo } = useRouterParams<IToSendHomeParamsType>();
+  // const { sendType = 'token', toInfo, assetInfo } = useRouterParams<IToSendHomeParamsType>();
+  const {
+    params: { sendType = 'token', toInfo, assetInfo },
+  } = useRoute<RouteProp<{ params: IToSendHomeParamsType }>>();
 
   const wallet = useCurrentWalletInfo();
   const chainInfo = useCurrentChain(assetInfo?.chainId);
@@ -94,12 +98,9 @@ const SendHome: React.FC<SendHomeProps> = props => {
   const [isLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<any[]>([]);
 
-  // useFocusEffect(
-  //   useCallback(() => {
-
-  //     setSelectedToContact({ name, address: tmpAddress });
-  //   }, [address, name]),
-  // );
+  useEffect(() => {
+    setSelectedToContact(toInfo);
+  }, [toInfo]);
 
   // get transfer fee
   const getTransactionFee = useCallback(async () => {
@@ -315,11 +316,9 @@ const SendHome: React.FC<SendHomeProps> = props => {
 
   const nextStep = useCallback(
     (directNext?: boolean) => {
-      // directNext true , is cross chain and has finished check
       if (directNext) {
         return setStep(2);
       }
-
       if (!checkCanNext()) return;
       setStep(2);
     },

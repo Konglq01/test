@@ -21,6 +21,13 @@ export class DidService extends ServiceInit {
     }
   };
 
+  initService = () => {
+    this.defaultConfig.headers = {
+      ...this.defaultConfig.headers,
+      Authorization: '',
+    };
+  };
+
   setRefreshTokenConfig = (config: RefreshTokenConfig) => {
     // make sure clean Authorization
     if (this.refreshTokenConfig?.ca_hash !== config.ca_hash) {
