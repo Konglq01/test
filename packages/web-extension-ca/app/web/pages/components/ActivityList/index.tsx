@@ -9,24 +9,25 @@ import './index.less';
 import LoadingMore from 'components/LoadingMore/LoadingMore';
 import { useIsTestnet } from 'hooks/useActivity';
 import { AmountSign, formatAmount, transNetworkText } from '@portkey/utils/activity';
-import { Button, message, Modal } from 'antd';
+import { Button, Modal } from 'antd';
 import { useAppCASelector } from '@portkey/hooks/hooks-ca';
 import { dateFormat } from 'utils';
 import { useTranslation } from 'react-i18next';
-import { CrossChainTransferIntervalParams, intervalCrossChainTransfer } from 'utils/sandboxUtil/crossChainTransfer';
+import { intervalCrossChainTransfer } from 'utils/sandboxUtil/crossChainTransfer';
 import { useAppDispatch, useLoading, useUserInfo } from 'store/Provider/hooks';
 import { removeFailedActivity } from '@portkey/store/store-ca/activity/slice';
-import { useCurrentChain, useCurrentChainList } from '@portkey/hooks/hooks-ca/chainList';
-import { useChainIdList, useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentChainList } from '@portkey/hooks/hooks-ca/chainList';
+import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import aes from '@portkey/utils/aes';
 
 export interface IActivityListProps {
   data?: ActivityItemType[];
+  chainId?: string;
   hasMore: boolean;
   loadMore: (isRetry?: boolean) => Promise<void>;
 }
 
-export default function ActivityList({ data, hasMore, loadMore }: IActivityListProps) {
+export default function ActivityList({ data, chainId, hasMore, loadMore }: IActivityListProps) {
   const activity = useAppCASelector((state) => state.activity);
   const isTestNet = useIsTestnet();
   const { t } = useTranslation();
@@ -51,9 +52,9 @@ export default function ActivityList({ data, hasMore, loadMore }: IActivityListP
 
   const navToDetail = useCallback(
     (item: ActivityItemType) => {
-      nav('/transaction', { state: item });
+      nav('/transaction', { state: { item, chainId } });
     },
-    [nav],
+    [chainId, nav],
   );
 
   const amountOrIdUI = (item: ActivityItemType) => {
