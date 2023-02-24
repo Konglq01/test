@@ -29,6 +29,7 @@ import { pTd } from 'utils/unit';
 interface RouterParams {
   transactionId?: string;
   blockHash?: string;
+  isReceived?: boolean;
 }
 
 const DEFAULT_DECIMAL = 8;
@@ -36,7 +37,7 @@ const hiddenArr = [TransactionTypes.SOCIAL_RECOVERY, TransactionTypes.ADD_MANAGE
 
 const ActivityDetail = () => {
   const { t } = useLanguage();
-  const { transactionId = '', blockHash = '' } = useRouterParams<RouterParams>();
+  const { transactionId = '', blockHash = '', isReceived: isReceivedParams } = useRouterParams<RouterParams>();
   const caAddresses = useCaAddresses();
   const { currentNetwork } = useCurrentWallet();
   const { blockExplorerURL } = useCurrentNetwork();
@@ -51,6 +52,9 @@ const ActivityDetail = () => {
     };
     fetchActivity(params)
       .then(res => {
+        if (isReceivedParams !== undefined) {
+          res.isReceived = isReceivedParams;
+        }
         setActivityItem(res);
       })
       .catch(error => {
@@ -155,9 +159,8 @@ const ActivityDetail = () => {
       {isNft ? (
         <>
           <View style={styles.topWrap}>
-            {/* <Text style={styles.noImg}>A</Text> */}
             <Image style={styles.img} source={{ uri: activityItem?.nftInfo?.imageUrl || '' }} />
-            <View style={styles.topLeft}>
+            <View style={styles.space}>
               <TextL style={styles.nftTitle}>{`${activityItem?.nftInfo?.alias || ''} #${
                 activityItem?.nftInfo?.nftId || ''
               }`}</TextL>
@@ -280,7 +283,9 @@ export const styles = StyleSheet.create({
   topWrap: {
     width: '100%',
     marginTop: pTd(40),
-    ...GStyles.flexRow,
+    display: 'flex',
+    flexDirection: 'row',
+    minWidth: '100%',
   },
   img: {
     width: pTd(64),
@@ -307,6 +312,9 @@ export const styles = StyleSheet.create({
   nftTitle: {
     color: defaultColors.font5,
     marginBottom: pTd(4),
+    flexDirection: 'row',
+    display: 'flex',
+    flexWrap: 'wrap',
   },
   flexSpaceBetween: {
     display: 'flex',

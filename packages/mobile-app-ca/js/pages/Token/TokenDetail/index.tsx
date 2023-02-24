@@ -139,6 +139,7 @@ const TokenDetail: React.FC = () => {
                 navigationService.navigate('ActivityDetail', {
                   transactionId: item.transactionId,
                   blockHash: item.blockHash,
+                  isReceived: item.isReceived,
                 })
               }
             />
