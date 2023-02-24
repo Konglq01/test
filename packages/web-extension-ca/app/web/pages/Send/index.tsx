@@ -407,6 +407,7 @@ export default function Send() {
             toAccount={toAccount}
             amount={amount}
             symbol={tokenInfo?.symbol || ''}
+            alias={tokenInfo.alias || ''}
             imageUrl={tokenInfo.imageUrl}
             chainId={state.chainId}
             transactionFee={txFee || ''}
