@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { defaultColors } from 'assets/theme';
 import navigationService from 'utils/navigationService';
@@ -36,7 +36,6 @@ export default function NFTItem(props: NFTItemPropsType) {
     itemCount,
     children,
     symbol,
-    collapsed = false,
     openCollectionArr,
     setOpenCollectionArr,
     clearItem,
@@ -44,8 +43,14 @@ export default function NFTItem(props: NFTItemPropsType) {
   } = props;
   const { currentNetwork } = useWallet();
 
-  const { t } = useLanguage();
-
+  const [collapsed, setCollapsed] = useState<boolean>();
+  useEffect(() => {
+    if (children.length) {
+      setCollapsed(false);
+    } else {
+      setCollapsed(true);
+    }
+  }, [children]);
   return (
     <View style={styles.wrap}>
       <TouchableOpacity
@@ -83,7 +88,7 @@ export default function NFTItem(props: NFTItemPropsType) {
           <TextM style={styles.nftSeriesChainInfo} />
         </View>
       </TouchableOpacity>
-      <Collapsible collapsed={collapsed && children}>
+      <Collapsible collapsed={collapsed}>
         <View style={styles.listWrap}>
           {children?.map((ele: any, index: number) => (
             <NFTAvatar
