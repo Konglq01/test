@@ -65,18 +65,17 @@ export const useRecovery = () => {
         privateKey,
         paramsOption: {
           method: MethodType[state],
-          params: [
-            {
-              caHash: walletInfo?.AELF?.caHash,
-              ...value,
-            },
-          ],
+          params: {
+            caHash: walletInfo?.AELF?.caHash,
+            ...value,
+          },
         },
       });
-      const { TransactionId } = result.result.message || result;
-      await sleep(1000);
-      const aelfInstance = getAelfInstance(currentChain.endPoint);
-      await getTxResult(aelfInstance, TransactionId);
+      console.log('handleGuardian', result);
+      // const { TransactionId } = result.result.message || result;
+      // await sleep(1000);
+      // const aelfInstance = getAelfInstance(currentChain.endPoint);
+      // await getTxResult(aelfInstance, TransactionId);
       dispatch(resetLoginInfoAction());
       dispatch(resetUserGuardianStatus());
       dispatch(setPreGuardianAction());

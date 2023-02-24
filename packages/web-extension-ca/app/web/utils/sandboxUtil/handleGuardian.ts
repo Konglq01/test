@@ -15,7 +15,7 @@ export const handleGuardian = async ({
   address: string;
   chainType: ChainType;
   privateKey: string;
-  paramsOption: { method: string; params: any[] };
+  paramsOption: { method: string; params: any };
   sendOptions?: SendOptions;
 }) => {
   const resMessage = await SandboxEventService.dispatchAndReceive(SandboxEventTypes.callSendMethod, {
