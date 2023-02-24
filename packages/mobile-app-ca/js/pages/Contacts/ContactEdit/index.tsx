@@ -297,7 +297,11 @@ const ContactEdit: React.FC = () => {
         onChangeText={onNameChange}
         errorMessage={editContact.error.isError ? editContact.error.errorMsg : ''}
       />
-      <KeyboardAwareScrollView extraHeight={pTd(300)} keyboardShouldPersistTaps="handled" keyboardOpeningTime={0}>
+      <KeyboardAwareScrollView
+        extraHeight={pTd(300)}
+        keyboardShouldPersistTaps="handled"
+        keyboardOpeningTime={0}
+        enableOnAndroid={true}>
         <TouchableWithoutFeedback>
           <View style={GStyles.paddingArg(0, 4)}>
             {editContact.addresses.map((addressItem, addressIdx) => (

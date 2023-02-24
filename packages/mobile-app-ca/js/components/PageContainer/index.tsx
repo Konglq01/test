@@ -66,6 +66,7 @@ export default function PageContainer({
             // alwaysBounceVertical={false}
             keyboardShouldPersistTaps="handled"
             // enableAutomaticScroll={false}
+            enableOnAndroid={true}
             {...scrollViewProps}>
             <View style={[gStyles.container, containerStyles]}>{children}</View>
           </KeyboardAwareScrollView>
