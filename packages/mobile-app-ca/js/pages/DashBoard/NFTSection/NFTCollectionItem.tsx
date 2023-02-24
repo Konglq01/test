@@ -45,7 +45,7 @@ export default function NFTItem(props: NFTItemPropsType) {
 
   const [collapsed, setCollapsed] = useState<boolean>();
   useEffect(() => {
-    if (children.length) {
+    if (children?.length) {
       setCollapsed(false);
     } else {
       setCollapsed(true);
