@@ -58,12 +58,6 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
     getAccountTokenList();
   }, [caAddressList, getAccountTokenList]);
 
-  useEffectOnce(() => {
-    setInterval(() => {
-      getAccountTokenList();
-    }, 5 * 60 * 1000);
-  });
-
   useEffect(() => {
     if (timer) clearInterval(timer);
     timer = setInterval(() => {
