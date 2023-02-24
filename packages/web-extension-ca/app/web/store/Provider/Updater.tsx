@@ -22,7 +22,8 @@ export default function Updater() {
 
   const navigate = useNavigate();
   useEffect(() => {
-    keepAliveOnPages({ onError: () => navigate('/unlock') });
+    keepAliveOnPages({});
+    // keepAliveOnPages({ onError: () => navigate('/unlock') });
   }, [navigate]);
 
   const apiUrl = useCurrentApiUrl();
