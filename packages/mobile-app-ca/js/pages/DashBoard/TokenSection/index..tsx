@@ -10,11 +10,7 @@ import { defaultColors } from 'assets/theme';
 import { pTd } from 'utils/unit';
 import TokenListItem from 'components/TokenListItem';
 import { useLanguage } from 'i18n/hooks';
-import useEffectOnce from 'hooks/useEffectOnce';
-import { fetchTokenList } from '@portkey/store/store-ca/assets/api';
-import { request } from '@portkey/api/api-did';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { useChainIdList, useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
 import { REFRESH_TIME } from '@portkey/constants/constants-ca/assets';
 
@@ -37,7 +33,6 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
   } = useCurrentWallet();
 
   const [isFetching] = useState(false);
-  const { accountToken } = useAppCASelector(state => state.assets);
 
   const onNavigate = useCallback((tokenItem: TokenItemShowType) => {
     navigationService.navigate('TokenDetail', { tokenInfo: tokenItem });
