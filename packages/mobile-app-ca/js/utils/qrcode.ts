@@ -26,8 +26,12 @@ export function handleQRCodeData(data: QRData, previousRouteInfo: RouteInfoType)
 
     const newData: SendTokenQRDataType = { ...data } as SendTokenQRDataType;
 
-    if (previousRouteInfo.name === 'SendHome' && previousRouteInfo.params.assetInfo.symbol !== newData.assetInfo.symbol)
+    if (
+      previousRouteInfo.name === 'SendHome' &&
+      previousRouteInfo.params.assetInfo.symbol !== newData.assetInfo.symbol
+    ) {
       return invalidQRCode();
+    }
 
     navigationService.navigate('SendHome', newData);
   } else {

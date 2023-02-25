@@ -11,7 +11,7 @@ import { getActivityListAsync } from '@portkey/store/store-ca/activity/action';
 import { useAppCASelector, useAppCommonDispatch } from '@portkey/hooks';
 import NoData from 'components/NoData';
 import { IActivitysApiParams } from '@portkey/store/store-ca/activity/type';
-import { clearState } from '@portkey/store/store-ca/activity/slice';
+import { clearActivity } from '@portkey/store/store-ca/activity/slice';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import useRouterParams from '@portkey/hooks/useRouterParams';
 import { transactionTypesForActivityList } from '@portkey/constants/constants-ca/activity';
@@ -38,7 +38,7 @@ const ActivityListPage = () => {
       setRefreshing(true);
 
       if (isInit) {
-        dispatch(clearState());
+        dispatch(clearActivity());
       }
 
       const params: IActivitysApiParams = {
@@ -75,7 +75,11 @@ const ActivityListPage = () => {
       <TransferItem
         item={item}
         onPress={() =>
-          navigationService.navigate('ActivityDetail', { transactionId: item.transactionId, blockHash: item.blockHash })
+          navigationService.navigate('ActivityDetail', {
+            transactionId: item.transactionId,
+            blockHash: item.blockHash,
+            isReceived: item.isReceived,
+          })
         }
       />
     );

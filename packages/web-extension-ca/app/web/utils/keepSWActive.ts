@@ -74,7 +74,7 @@ export const keepAliveOnPages = ({ onError }: { onError?: () => void }) => {
         clearInterval(keepAliveInterval);
         if (!isHasMessage) {
           isHasMessage = true;
-          message.error(errorToReload, 0, () => (isHasMessage = false));
+          // message.error(errorToReload, 0, () => (isHasMessage = false));
           onError?.();
         }
         console.log('somethingIsWrong', new Error("Something's gone wrong. Try reloading the page."));

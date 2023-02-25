@@ -9,8 +9,10 @@ export default function CustomPassword({ maxLength, placeholder, iconRender, ...
   const defaultIconRender = useCallback(
     (visible: boolean) =>
       visible ? (
+        // eslint-disable-next-line no-inline-styles/no-inline-styles
         <CustomSvg style={{ cursor: 'pointer' }} type="EyeOutlined" />
       ) : (
+        // eslint-disable-next-line no-inline-styles/no-inline-styles
         <CustomSvg style={{ cursor: 'pointer' }} type="EyeInvisibleOutlined" />
       ),
     [],
@@ -20,7 +22,7 @@ export default function CustomPassword({ maxLength, placeholder, iconRender, ...
     <Password
       {...props}
       maxLength={maxLength ?? 16}
-      placeholder={placeholder ?? 'Must be at least 8 characters'}
+      placeholder={placeholder ?? 'Must be at least 6 characters'}
       iconRender={iconRender ?? defaultIconRender}
     />
   );

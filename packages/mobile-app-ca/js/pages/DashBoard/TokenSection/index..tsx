@@ -16,6 +16,10 @@ import { request } from '@portkey/api/api-did';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { useChainIdList, useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
+import { REFRESH_TIME } from '@portkey/constants/constants-ca/assets';
+
+let timer1: string | number | NodeJS.Timer | undefined;
+let timer2: string | number | NodeJS.Timer | undefined;
 
 export interface TokenSectionProps {
   getAccountBalance?: () => void;
@@ -47,6 +51,8 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
   );
 
   const getAccountTokenList = useCallback(() => {
+    if (caAddressList?.length === 0) return;
+
     dispatch(fetchTokenListAsync({ caAddresses: caAddressList || [] }));
   }, [caAddressList, dispatch]);
 
@@ -54,11 +60,23 @@ export default function TokenSection({ getAccountBalance }: TokenSectionProps) {
     getAccountTokenList();
   }, [caAddressList, getAccountTokenList]);
 
-  useEffectOnce(() => {
-    setInterval(() => {
+  useEffect(() => {
+    if (accountTokenList?.length >= 2) {
+      if (timer1) clearInterval(timer1);
+      timer2 = setInterval(() => {
+        getAccountTokenList();
+      }, REFRESH_TIME);
+    }
+    return () => clearInterval(timer2);
+  }, [accountTokenList?.length, getAccountTokenList]);
+
+  useEffect(() => {
+    if (timer1) clearInterval(timer1);
+    timer1 = setInterval(() => {
       getAccountTokenList();
-    }, 5 * 60 * 1000);
-  });
+    }, 4 * 1000);
+    return () => clearInterval(timer1);
+  }, [getAccountTokenList]);
 
   return (
     <View style={styles.tokenListPageWrap}>

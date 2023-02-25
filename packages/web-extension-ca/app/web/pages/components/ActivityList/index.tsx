@@ -1,5 +1,5 @@
 import { TransactionTypes, transactionTypesMap } from '@portkey/constants/constants-ca/activity';
-import { ActivityItemType } from '@portkey/types/types-ca/activity';
+import { ActivityItemType, the2ThFailedActivityItemType } from '@portkey/types/types-ca/activity';
 import { formatStr2EllipsisStr } from '@portkey/utils/converter';
 import { List } from 'antd-mobile';
 import CustomSvg from 'components/CustomSvg';
@@ -9,26 +9,33 @@ import './index.less';
 import LoadingMore from 'components/LoadingMore/LoadingMore';
 import { useIsTestnet } from 'hooks/useActivity';
 import { AmountSign, formatAmount, transNetworkText } from '@portkey/utils/activity';
-import { Button, message, Modal } from 'antd';
+import { Button, Modal } from 'antd';
 import { useAppCASelector } from '@portkey/hooks/hooks-ca';
 import { dateFormat } from 'utils';
 import { useTranslation } from 'react-i18next';
-import { CrossChainTransferIntervalParams, intervalCrossChainTransfer } from 'utils/sandboxUtil/crossChainTransfer';
-import { useAppDispatch, useLoading } from 'store/Provider/hooks';
+import { intervalCrossChainTransfer } from 'utils/sandboxUtil/crossChainTransfer';
+import { useAppDispatch, useLoading, useUserInfo } from 'store/Provider/hooks';
 import { removeFailedActivity } from '@portkey/store/store-ca/activity/slice';
+import { useCurrentChainList } from '@portkey/hooks/hooks-ca/chainList';
+import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import aes from '@portkey/utils/aes';
 
 export interface IActivityListProps {
   data?: ActivityItemType[];
+  chainId?: string;
   hasMore: boolean;
   loadMore: (isRetry?: boolean) => Promise<void>;
 }
 
-export default function ActivityList({ data, hasMore, loadMore }: IActivityListProps) {
+export default function ActivityList({ data, chainId, hasMore, loadMore }: IActivityListProps) {
   const activity = useAppCASelector((state) => state.activity);
   const isTestNet = useIsTestnet();
   const { t } = useTranslation();
   const { setLoading } = useLoading();
   const dispatch = useAppDispatch();
+  const { passwordSeed } = useUserInfo();
+  const wallet = useCurrentWalletInfo();
+  const chainList = useCurrentChainList();
 
   const activityListLeftIcon = (type: TransactionTypes) => {
     const loginRelatedTypeArr = [
@@ -40,12 +47,14 @@ export default function ActivityList({ data, hasMore, loadMore }: IActivityListP
   };
 
   const nav = useNavigate();
+  console.log('activity', activity);
+  console.log('activity chainList', chainList);
 
   const navToDetail = useCallback(
     (item: ActivityItemType) => {
-      nav('/transaction', { state: item });
+      nav('/transaction', { state: { item, chainId } });
     },
-    [nav],
+    [chainId, nav],
   );
 
   const amountOrIdUI = (item: ActivityItemType) => {
@@ -98,7 +107,7 @@ export default function ActivityList({ data, hasMore, loadMore }: IActivityListP
   );
 
   const showErrorModal = useCallback(
-    (error: any) => {
+    (error: the2ThFailedActivityItemType) => {
       Modal.error({
         width: 320,
         className: 'transaction-modal',
@@ -113,6 +122,7 @@ export default function ActivityList({ data, hasMore, loadMore }: IActivityListP
           </div>
         ),
         onOk: () => {
+          console.log('retry modal addFailedActivity', error);
           retryCrossChain(error);
         },
       });
@@ -122,27 +132,32 @@ export default function ActivityList({ data, hasMore, loadMore }: IActivityListP
   );
 
   const retryCrossChain = useCallback(
-    async ({ managerTransferTxId, data }: { managerTransferTxId: string; data: CrossChainTransferIntervalParams }) => {
+    async ({ transactionId, params }: the2ThFailedActivityItemType) => {
       try {
+        //
+        const chainId = params.tokenInfo.chainId;
+        const chainInfo = chainList?.filter((chain) => chain.chainId === chainId)?.[0];
+        if (!chainInfo) return;
+        const privateKey = aes.decrypt(wallet.AESEncryptPrivateKey, passwordSeed);
+        if (!privateKey) return;
         setLoading(true);
-        await intervalCrossChainTransfer(data);
-        dispatch(removeFailedActivity(managerTransferTxId));
-        message.success('success');
+        await intervalCrossChainTransfer({ ...params, chainInfo, privateKey });
+        dispatch(removeFailedActivity(transactionId));
       } catch (error) {
-        showErrorModal({ managerTransferTxId, data });
+        console.log('retry addFailedActivity', error);
+        showErrorModal({ transactionId, params });
       } finally {
         setLoading(false);
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [dispatch, setLoading],
+    [chainList, dispatch, passwordSeed, setLoading, showErrorModal, wallet.AESEncryptPrivateKey],
   );
 
   const handleResend = useCallback(
     async (e: any, resendId: string) => {
       e?.stopPropagation();
-      const { params } = activity.failedActivityMap[resendId];
-      await retryCrossChain({ managerTransferTxId: resendId, data: params });
+      const data = activity.failedActivityMap[resendId];
+      await retryCrossChain(data);
     },
     [activity.failedActivityMap, retryCrossChain],
   );

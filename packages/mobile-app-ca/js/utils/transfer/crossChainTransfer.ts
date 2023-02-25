@@ -8,14 +8,23 @@ import { ContractBasic } from '@portkey/contracts/utils/ContractBasic';
 import { ZERO } from '@portkey/constants/misc';
 import { timesDecimals } from '@portkey/utils/converter';
 
-export type CrossChainTransferIntervalParams = Omit<CrossChainTransferParams, 'caHash'>;
+export interface CrossChainTransferParamsType {
+  tokenInfo: BaseToken;
+  chainType: ChainType;
+  managerAddress: string;
+  amount: number | string;
+  memo?: string;
+  toAddress: string;
+}
 
-export const intervalCrossChainTransfer = async (params: CrossChainTransferIntervalParams, count = 0) => {
-  const { tokenContract, managerAddress, chainType, amount, tokenInfo, memo = '', toAddress } = params;
+export const intervalCrossChainTransfer = async (
+  tokenContract: ContractBasic,
+  params: CrossChainTransferParamsType,
+) => {
+  const { managerAddress, chainType, amount, tokenInfo, memo = '', toAddress } = params;
   const issueChainId = getChainIdByAddress(managerAddress, chainType);
   const toChainId = getChainIdByAddress(toAddress, chainType);
 
-  console.log('intervalCrossChainTransferAmount', amount);
   const paramsOption: any = {
     issueChainId: getChainNumber(issueChainId),
     toChainId: getChainNumber(toChainId),
@@ -24,52 +33,55 @@ export const intervalCrossChainTransfer = async (params: CrossChainTransferInter
     amount,
   };
   if (memo) paramsOption.memo = memo;
+  console.log('intervalCrossChainTransfer:paramsOption', paramsOption);
 
-  try {
-    const crossChainResult = await crossChainTransferToCa({
-      contract: tokenContract,
-      paramsOption,
-    });
+  let isError = true,
+    count = 0;
+  while (isError) {
+    try {
+      const crossChainResult = await crossChainTransferToCa({
+        contract: tokenContract,
+        paramsOption,
+      });
 
-    console.log('intervalCrossChainTransferResult', crossChainResult);
-
-    if (crossChainResult.error) throw crossChainResult.error;
-  } catch (error) {
-    console.log(error, 'error===sendHandler--intervalCrossChainTransfer');
-    count++;
-    if (count > 5) throw error;
-    await intervalCrossChainTransfer(params, count);
+      console.log('intervalCrossChainTransferResult', crossChainResult);
+      if (crossChainResult.error) throw crossChainResult.error;
+      isError = false;
+    } catch (error) {
+      isError = true;
+      console.log(error, 'error===sendHandler--intervalCrossChainTransfer');
+      count++;
+      if (count >= 5) {
+        throw {
+          type: 'crossChainTransfer',
+          error: error,
+          data: params,
+        };
+      }
+    }
   }
 };
 
-interface CrossChainTransferParams {
+interface CrossChainTransferParams extends CrossChainTransferParamsType {
   tokenContract: ContractBasic;
   contract: ContractBasic;
-  chainType: ChainType;
-  managerAddress: string;
-  tokenInfo: BaseToken;
   caHash: string;
-  amount: number;
-  toAddress: string;
-  memo?: string;
 }
 const crossChainTransfer = async ({
-  chainType,
-  contract,
-  managerAddress,
-  caHash,
-  amount,
   tokenInfo,
+  chainType,
+  managerAddress,
+  amount,
   memo = '',
   toAddress,
   tokenContract,
+  contract,
+  caHash,
 }: CrossChainTransferParams) => {
   let managerTransferResult;
   try {
     // first transaction:transfer to manager itself
-
     console.log('first transaction:transfer to manager itself Amount', amount);
-
     managerTransferResult = await managerTransfer({
       contract,
       paramsOption: {
@@ -93,26 +105,21 @@ const crossChainTransfer = async ({
   // second transaction:crossChain transfer to toAddress
 
   // TODO Only support chainType: aelf
-  const CrossChainTransferParams = {
-    tokenContract,
-    contract,
+  const crossChainTransferParams = {
+    tokenInfo,
     chainType,
     managerAddress,
-    // FIXME: delete logic
     amount: tokenInfo.symbol === 'ELF' ? ZERO.plus(amount).minus(timesDecimals(0.35, 8)).toFixed() : amount,
-    tokenInfo,
     memo,
     toAddress,
   };
 
   try {
-    await intervalCrossChainTransfer(CrossChainTransferParams);
-  } catch (error) {
+    await intervalCrossChainTransfer(tokenContract, crossChainTransferParams);
+  } catch (error: any) {
     throw {
-      type: 'crossChainTransfer',
-      error: error,
+      ...error,
       managerTransferTxId: managerTransferResult.transactionId,
-      data: CrossChainTransferParams,
     };
   }
 };

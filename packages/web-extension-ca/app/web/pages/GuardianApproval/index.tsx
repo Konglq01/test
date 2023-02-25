@@ -115,7 +115,7 @@ export default function GuardianApproval() {
               className="recovery-wallet-btn"
               disabled={alreadyApprovalLength <= 0 || alreadyApprovalLength !== approvalLength}
               onClick={recoveryWallet}>
-              {state && state.indexOf('guardians') !== -1 ? 'Confirm' : 'Recover Wallet'}
+              {t('Confirm')}
             </Button>
           </div>
         )}

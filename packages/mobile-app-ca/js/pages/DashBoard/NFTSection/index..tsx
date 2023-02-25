@@ -110,6 +110,7 @@ export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
         keyExtractor={(item: NFTCollectionItemShowType) => item?.symbol + item.chainId}
         onRefresh={() => {
           setRefreshing(true);
+          setOpenCollectionArr([]);
           getAccountBalance?.();
           fetchNFTList();
         }}

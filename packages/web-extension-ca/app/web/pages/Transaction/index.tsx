@@ -1,6 +1,6 @@
-import { TransactionTypes, transactionTypesMap, VIEW_ON_EXPLORER } from '@portkey/constants/constants-ca/activity';
+import { TransactionTypes, transactionTypesMap } from '@portkey/constants/constants-ca/activity';
 import { TransactionStatus } from '@portkey/graphql/contract/__generated__/types';
-import { useCaAddresses } from '@portkey/hooks/hooks-ca/wallet';
+import { useCaAddresses, useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { fetchActivity } from '@portkey/store/store-ca/activity/api';
 import { ActivityItemType } from '@portkey/types/types-ca/activity';
 import { Transaction } from '@portkey/types/types-ca/trade';
@@ -20,24 +20,33 @@ import './index.less';
 import { useIsTestnet } from 'hooks/useActivity';
 import { dateFormat } from 'utils';
 
+export interface ITransactionQuery {
+  item: ActivityItemType;
+  chainId?: string;
+}
+
 export default function Transaction() {
   const { t } = useTranslation();
-  const { state }: { state: ActivityItemType } = useLocation();
+  const { state }: { state: ITransactionQuery } = useLocation();
+  const chainId = state.chainId;
+  const currentWallet = useCurrentWallet();
+  const { walletInfo } = currentWallet;
   const caAddresses = useCaAddresses();
+  const caAddress = chainId ? [walletInfo[chainId]?.caAddress] : '';
   const { blockExplorerURL } = useCurrentNetwork();
   const isTestNet = useIsTestnet();
 
   // Obtain data through routing to ensure that the page must have data and prevent Null Data Errors.
-  const [activityItem, setActivityItem] = useState<ActivityItemType>(state);
+  const [activityItem, setActivityItem] = useState<ActivityItemType>(state.item);
   const feeInfo = useMemo(() => activityItem.transactionFees, [activityItem.transactionFees]);
 
   // Obtain data through api to ensure data integrity.
   // Because some data is not returned in the Activities API. Such as from, to.
   useEffectOnce(() => {
     const params = {
-      caAddresses,
-      transactionId: state.transactionId,
-      blockHash: state.blockHash,
+      caAddresses: caAddress || caAddresses,
+      transactionId: activityItem.transactionId,
+      blockHash: activityItem.blockHash,
     };
     fetchActivity(params)
       .then((res) => {
@@ -210,7 +219,7 @@ export default function Transaction() {
   const viewOnExplorerUI = useCallback(() => {
     return (
       <a className="link" target="blank" href={openOnExplorer()}>
-        {t(VIEW_ON_EXPLORER)}
+        {t('View on Explorer')}
       </a>
     );
   }, [openOnExplorer, t]);

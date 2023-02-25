@@ -29,6 +29,7 @@ import { pTd } from 'utils/unit';
 interface RouterParams {
   transactionId?: string;
   blockHash?: string;
+  isReceived?: boolean;
 }
 
 const DEFAULT_DECIMAL = 8;
@@ -36,7 +37,7 @@ const hiddenArr = [TransactionTypes.SOCIAL_RECOVERY, TransactionTypes.ADD_MANAGE
 
 const ActivityDetail = () => {
   const { t } = useLanguage();
-  const { transactionId = '', blockHash = '' } = useRouterParams<RouterParams>();
+  const { transactionId = '', blockHash = '', isReceived: isReceivedParams } = useRouterParams<RouterParams>();
   const caAddresses = useCaAddresses();
   const { currentNetwork } = useCurrentWallet();
   const { blockExplorerURL } = useCurrentNetwork();
@@ -51,6 +52,9 @@ const ActivityDetail = () => {
     };
     fetchActivity(params)
       .then(res => {
+        if (isReceivedParams !== undefined) {
+          res.isReceived = isReceivedParams;
+        }
         setActivityItem(res);
       })
       .catch(error => {
@@ -122,11 +126,11 @@ const ActivityDetail = () => {
             {transactionFees.map((item, index) => (
               <View key={index} style={[styles.transactionFeeItemWrap, index > 0 && styles.marginTop8]}>
                 <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${unitConverter(
-                  ZERO.plus(item.fee || 0).div(`1e${activityItem?.decimals || DEFAULT_DECIMAL}`),
+                  ZERO.plus(item.fee || 0).div(`1e${DEFAULT_DECIMAL}`),
                 )} ${item.symbol}`}</TextM>
                 {!isTestNet && (
                   <TextS style={[styles.lightGrayFontColor, styles.marginTop4]}>{`$ ${unitConverter(
-                    ZERO.plus(item.feeInUsd ?? 0).div(`1e${activityItem?.decimals || DEFAULT_DECIMAL}`),
+                    ZERO.plus(item.feeInUsd ?? 0).div(`1e${DEFAULT_DECIMAL}`),
                     2,
                   )}`}</TextS>
                 )}
@@ -136,7 +140,7 @@ const ActivityDetail = () => {
         </View>
       </View>
     );
-  }, [activityItem?.decimals, activityItem?.transactionFees, isTestNet, t]);
+  }, [activityItem?.transactionFees, isTestNet, t]);
 
   return (
     <PageContainer
@@ -155,9 +159,12 @@ const ActivityDetail = () => {
       {isNft ? (
         <>
           <View style={styles.topWrap}>
-            {/* <Text style={styles.noImg}>A</Text> */}
-            <Image style={styles.img} source={{ uri: activityItem?.nftInfo?.imageUrl || '' }} />
-            <View style={styles.topLeft}>
+            {activityItem?.nftInfo?.imageUrl ? (
+              <Image style={styles.img} source={{ uri: activityItem?.nftInfo?.imageUrl || '' }} />
+            ) : (
+              <Text style={styles.noImg}>{activityItem?.nftInfo?.alias?.slice(0, 1)}</Text>
+            )}
+            <View style={styles.space}>
               <TextL style={styles.nftTitle}>{`${activityItem?.nftInfo?.alias || ''} #${
                 activityItem?.nftInfo?.nftId || ''
               }`}</TextL>
@@ -280,7 +287,9 @@ export const styles = StyleSheet.create({
   topWrap: {
     width: '100%',
     marginTop: pTd(40),
-    ...GStyles.flexRow,
+    display: 'flex',
+    flexDirection: 'row',
+    minWidth: '100%',
   },
   img: {
     width: pTd(64),
@@ -307,6 +316,9 @@ export const styles = StyleSheet.create({
   nftTitle: {
     color: defaultColors.font5,
     marginBottom: pTd(4),
+    flexDirection: 'row',
+    display: 'flex',
+    flexWrap: 'wrap',
   },
   flexSpaceBetween: {
     display: 'flex',
