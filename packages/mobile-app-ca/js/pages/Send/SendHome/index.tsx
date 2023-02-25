@@ -33,6 +33,7 @@ import { IToSendHomeParamsType, IToSendPreviewParamsType } from '@portkey/types/
 import { getELFChainBalance } from '@portkey/utils/balance';
 import { BGStyles } from 'assets/theme/styles';
 import { RouteProp, useRoute } from '@react-navigation/native';
+import Loading from 'components/Loading';
 
 export interface SendHomeProps {
   route?: any;
@@ -272,6 +273,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
     const isCross = isCrossChain(selectedToContact.address, assetInfo.chainId);
 
     // transaction fee check
+    Loading.show();
     try {
       fee = await getTransactionFee(isCross);
 
@@ -279,9 +281,12 @@ const SendHome: React.FC<SendHomeProps> = props => {
     } catch (err: any) {
       if (err?.code === 500) {
         setErrorMessage([ErrorMessage.InsufficientFundsForTransactionFee]);
+        Loading.hide();
+
         return { status: false };
       }
     }
+    Loading.hide();
 
     return { status: true, fee };
   };
