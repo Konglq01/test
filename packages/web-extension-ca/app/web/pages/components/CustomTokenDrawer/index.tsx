@@ -11,6 +11,7 @@ import './index.less';
 import { ZERO } from '@portkey/constants/misc';
 import { divDecimals, unitConverter } from '@portkey/utils/converter';
 import { useCaAddresses } from '@portkey/hooks/hooks-ca/wallet';
+import { fetchAllTokenListAsync } from '@portkey/store/store-ca/tokenManagement/action';
 interface CustomSelectProps extends DrawerProps {
   onChange?: (v: AccountAssetItem, type: 'token' | 'nft') => void;
   onClose?: () => void;
@@ -55,9 +56,9 @@ export default function CustomTokenDrawer({
     if (drawerType === 'send') {
       appDispatch(fetchAssetAsync({ caAddresses, keyword: filterWord }));
     } else {
-      appDispatch(fetchTokenListAsync({ caAddresses }));
+      appDispatch(fetchAllTokenListAsync({ chainIdArray, keyword: filterWord }));
     }
-  }, [passwordSeed, filterWord, drawerType, caAddresses, appDispatch]);
+  }, [passwordSeed, filterWord, drawerType, caAddresses, appDispatch, chainIdArray]);
 
   const renderSendToken = useCallback(
     (token: AccountAssetItem) => {
