@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { defaultColors } from 'assets/theme';
 import navigationService from 'utils/navigationService';
-import { useLanguage } from 'i18n/hooks';
 import { pTd } from 'utils/unit';
 import Collapsible from 'components/Collapsible';
 import NFTAvatar from 'components/NFTAvatar';
@@ -13,7 +12,6 @@ import { TextM, TextS, TextXL } from 'components/CommonText';
 import { FontStyles } from 'assets/theme/styles';
 import { useWallet } from 'hooks/store';
 import { NFTCollectionItemShowType } from '@portkey/types/types-ca/assets';
-import { chain } from 'lodash';
 
 export enum NoDataMessage {
   CustomNetWorkNoData = 'No transaction records accessible from the current custom network',

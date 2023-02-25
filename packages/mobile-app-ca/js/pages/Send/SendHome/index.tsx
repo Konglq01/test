@@ -2,12 +2,9 @@ import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import PageContainer from 'components/PageContainer';
 import navigationService from 'utils/navigationService';
-import { addressFormat, isAddress } from '@portkey/utils';
 import Svg from 'components/Svg';
 import From from '../From';
 import To from '../To';
-// import CommonToast from 'components/CommonToast';
-// import { divDecimals, timesDecimals } from '@portkey/utils/converter';
 import { styles } from './style';
 import { defaultColors } from 'assets/theme';
 import { pTd } from 'utils/unit';
@@ -25,9 +22,8 @@ import AmountNFT from '../AmountNFT';
 import NFTInfo from '../NFTInfo';
 import GStyles from 'assets/theme/GStyles';
 import CommonButton from 'components/CommonButton';
-import { TokenItemShowType } from '@portkey/types/types-ca/token';
 import { getContractBasic } from '@portkey/contracts/utils';
-import { useCurrentWalletInfo, useWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { getManagerAccount } from 'utils/redux';
 import { usePin } from 'hooks/store';
@@ -37,6 +33,7 @@ import { IToSendHomeParamsType, IToSendPreviewParamsType } from '@portkey/types/
 import { getELFChainBalance } from '@portkey/utils/balance';
 import { BGStyles } from 'assets/theme/styles';
 import { RouteProp, useRoute } from '@react-navigation/native';
+import Loading from 'components/Loading';
 
 export interface SendHomeProps {
   route?: any;
@@ -69,7 +66,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
   const [selectedAssets, setSelectedAssets] = useState(assetInfo); // token or nft
   const [sendNumber, setSendNumber] = useState<string>('0'); // tokenNumber  like 100
   const debounceSendNumber = useDebounce(sendNumber, 500);
-  const [transactionFee, setTransactionFee] = useState<string>('0'); // like 1.2ELF
+  const [, setTransactionFee] = useState<string>('0'); // like 1.2ELF
 
   const [step, setStep] = useState<1 | 2>(1);
   const [isLoading] = useState(false);
@@ -276,6 +273,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
     const isCross = isCrossChain(selectedToContact.address, assetInfo.chainId);
 
     // transaction fee check
+    Loading.show();
     try {
       fee = await getTransactionFee(isCross);
 
@@ -283,9 +281,12 @@ const SendHome: React.FC<SendHomeProps> = props => {
     } catch (err: any) {
       if (err?.code === 500) {
         setErrorMessage([ErrorMessage.InsufficientFundsForTransactionFee]);
+        Loading.hide();
+
         return { status: false };
       }
     }
+    Loading.hide();
 
     return { status: true, fee };
   };
