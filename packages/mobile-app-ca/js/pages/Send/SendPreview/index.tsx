@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useRef, useState } from 'react';
+import React, { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import PageContainer from 'components/PageContainer';
 import { defaultColors } from 'assets/theme';
@@ -8,8 +8,7 @@ import CommonButton from 'components/CommonButton';
 import ActionSheet from 'components/ActionSheet';
 import { formatAddress2NoPrefix, formatChainInfo, formatStr2EllipsisStr } from 'utils';
 import { addRecentContact } from '@portkey/store/store-ca/recent/slice';
-import { isAelfAddress, isCrossChain } from '@portkey/utils/aelf';
-import { updateBalance } from '@portkey/store/tokenBalance/slice';
+import { isCrossChain } from '@portkey/utils/aelf';
 import { useLanguage } from 'i18n/hooks';
 import { useAppCommonDispatch } from '@portkey/hooks';
 import GStyles from 'assets/theme/GStyles';
@@ -17,7 +16,6 @@ import fonts from 'assets/theme/fonts';
 import { Image, ScreenHeight } from '@rneui/base';
 import { getContractBasic } from '@portkey/contracts/utils';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
-import { getDefaultWallet } from 'utils/aelfUtils';
 import { usePin, useWallet } from 'hooks/store';
 import { getManagerAccount } from 'utils/redux';
 import crossChainTransfer, {
@@ -25,7 +23,6 @@ import crossChainTransfer, {
   intervalCrossChainTransfer,
 } from 'utils/transfer/crossChainTransfer';
 import { useCurrentNetwork } from '@portkey/hooks/network';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { useCaAddresses, useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { timesDecimals, unitConverter } from '@portkey/utils/converter';
 import sameChainTransfer from 'utils/transfer/sameChainTransfer';
@@ -63,6 +60,14 @@ const SendHome: React.FC<SendHomeProps> = props => {
   const tokenContractRef = useRef<ContractBasic>();
 
   const isCrossChainTransfer = isCrossChain(toInfo.address, assetInfo.chainId);
+
+  const txFeeShow = useMemo(() => {
+    if (isCrossChainTransfer && assetInfo.symbol === 'ELF') {
+      return unitConverter(ZERO.plus(CROSS_FEE).plus(transactionFee).toNumber());
+    } else {
+      return transactionFee;
+    }
+  }, [isCrossChainTransfer, assetInfo.symbol, transactionFee]);
 
   const showRetry = useCallback(
     (retryFunc: () => void) => {
@@ -227,8 +232,6 @@ const SendHome: React.FC<SendHomeProps> = props => {
     return chainId === 'AELF' ? 'MainChain AELF' : `SideChain ${chainId} `;
   };
 
-  console.log('transactionFeetransactionFeetransactionFee', transactionFee);
-
   return (
     <PageContainer
       safeAreaColor={['blue', 'white']}
@@ -294,7 +297,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
         <View style={styles.section}>
           <View style={[styles.flexSpaceBetween]}>
             <TextM style={[styles.blackFontColor, styles.fontBold]}>{t('Transaction Fee')}</TextM>
-            <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${transactionFee} ${'ELF'} `}</TextM>
+            <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${txFeeShow} ${'ELF'} `}</TextM>
           </View>
           {/* <View style={[styles.flexSpaceBetween, styles.marginTop4]}>
             <Text />
