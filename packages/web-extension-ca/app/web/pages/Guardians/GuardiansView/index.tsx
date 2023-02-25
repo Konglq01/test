@@ -171,10 +171,11 @@ export default function GuardiansView() {
           });
           setSwitchFail(SwitchFail.openFail);
         } catch (error: any) {
-          if (error?.Error?.Details && error?.Error?.Details?.indexOf('Not found ca_hash')) {
+          const _error = contractErrorHandler(error);
+          if (_error.indexOf('Not found ca_hash')) {
             setTipOpen(true);
           } else {
-            message.error(contractErrorHandler(error));
+            message.error(_error);
             throw error;
           }
         }
