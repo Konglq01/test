@@ -14,6 +14,7 @@ import { isAelfAddress } from '@portkey/utils/aelf';
 export default function SendPreview({
   amount,
   symbol,
+  alias,
   toAccount,
   transactionFee,
   type,
@@ -24,6 +25,7 @@ export default function SendPreview({
 }: {
   amount: string;
   symbol: string;
+  alias: string;
   imageUrl: string;
   toAccount: { name?: string; address: string };
   transactionFee: string | number;
@@ -66,9 +68,9 @@ export default function SendPreview({
         <div className="amount-preview nft">
           <div className="avatar">{imageUrl ? <img src={imageUrl} /> : <p>{symbol?.slice(0, 1)}</p>}</div>
           <div className="info">
-            <p className="index">
-              <span>{symbol}</span>
-              <span className="token-id">{`#${tokenId}`}</span>
+            <p className="index flex">
+              <p className="alias">{alias}</p>
+              <p className="token-id">{`#${tokenId}`}</p>
             </p>
             <p className="quantity">
               Balance: <span>{unitConverter(amount)}</span>

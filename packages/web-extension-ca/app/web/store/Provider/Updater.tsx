@@ -10,6 +10,7 @@ import { useUserInfo } from './hooks';
 import { request } from '@portkey/api/api-did';
 import useLocking from 'hooks/useLocking';
 import { useNavigate } from 'react-router';
+keepAliveOnPages({});
 
 export default function Updater() {
   const onLocking = useLocking();
@@ -21,10 +22,10 @@ export default function Updater() {
   useRefreshTokenConfig(passwordSeed);
 
   const navigate = useNavigate();
-  useEffect(() => {
-    keepAliveOnPages({});
-    // keepAliveOnPages({ onError: () => navigate('/unlock') });
-  }, [navigate]);
+  // useEffect(() => {
+  //   keepAliveOnPages({});
+  //   // keepAliveOnPages({ onError: () => navigate('/unlock') });
+  // }, [navigate]);
 
   const apiUrl = useCurrentApiUrl();
 
