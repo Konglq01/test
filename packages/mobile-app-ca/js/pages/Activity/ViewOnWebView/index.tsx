@@ -22,7 +22,7 @@ const ViewOnWebView: React.FC<ViewOnWebViewPropsType> = ({ route }) => {
       safeAreaColor={['blue', 'white']}
       containerStyles={pageStyles.pageWrap}
       scrollViewProps={{ disabled: true }}>
-      <WebView style={pageStyles.webView} source={{ uri: params.url ?? 'https://www.baidu.com' }} />
+      <WebView style={pageStyles.webView} source={{ uri: params.url ?? '' }} />
     </PageContainer>
   );
 };

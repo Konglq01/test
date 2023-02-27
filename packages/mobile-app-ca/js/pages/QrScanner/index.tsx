@@ -32,6 +32,7 @@ const QrScanner: React.FC<QrScannerProps> = () => {
       setRefresh(false);
     }, []),
   );
+
   const handleBarCodeScanned = useCallback(
     ({ data = '' }) => {
       try {
