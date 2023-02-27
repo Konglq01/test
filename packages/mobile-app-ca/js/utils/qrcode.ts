@@ -17,7 +17,7 @@ export function invalidQRCode() {
   navigationService.goBack();
 }
 
-export function handleQRCodeData(data: QRData, previousRouteInfo: RouteInfoType) {
+export function handleQRCodeData(data: QRData, previousRouteInfo: RouteInfoType, setRefresh: (v: boolean) => void) {
   const { type, address, chainType } = data;
   if (!isAddress(address, chainType)) return invalidQRCode();
 
@@ -44,4 +44,5 @@ export function handleQRCodeData(data: QRData, previousRouteInfo: RouteInfoType)
   } else {
     navigationService.navigate('ScanLogin', { data: data as LoginQRData });
   }
+  setRefresh(true);
 }

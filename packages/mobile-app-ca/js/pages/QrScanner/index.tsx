@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { View, Text, SafeAreaView, StyleSheet, TouchableOpacity } from 'react-native';
 import navigationService from 'utils/navigationService';
@@ -9,7 +9,7 @@ import { ScreenWidth } from '@rneui/base';
 import { useLanguage } from 'i18n/hooks';
 import { useWallet } from 'hooks/store';
 import { handleQRCodeData, invalidQRCode, RouteInfoType } from 'utils/qrcode';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 // import { useAppCASelector } from '@portkey/hooks';
 
@@ -18,16 +18,20 @@ interface QrScannerProps {
   type?: 'login' | 'send';
 }
 
-const QrScanner: React.FC<QrScannerProps> = ({ route }) => {
+const QrScanner: React.FC<QrScannerProps> = () => {
   const { t } = useLanguage();
   const { currentNetwork } = useWallet();
   const navigation = useNavigation();
   const routesArr: RouteInfoType[] = navigation.getState().routes;
   const previousRouteInfo = routesArr[routesArr.length - 2];
+  console.log(previousRouteInfo, '=====previousRouteInfo');
 
-  // TODO:  getNetWorkType
-  // const {} =useAppCASelector(state=>state.settings)
-
+  const [refresh, setRefresh] = useState<boolean>();
+  useFocusEffect(
+    useCallback(() => {
+      setRefresh(false);
+    }, []),
+  );
   const handleBarCodeScanned = useCallback(
     ({ data = '' }) => {
       try {
@@ -36,7 +40,7 @@ const QrScanner: React.FC<QrScannerProps> = ({ route }) => {
           // if not currentNetwork
 
           if (currentNetwork !== qrCodeData.netWorkType) return invalidQRCode();
-          handleQRCodeData(qrCodeData, previousRouteInfo);
+          handleQRCodeData(qrCodeData, previousRouteInfo, setRefresh);
         }
       } catch (error) {
         console.log(error);
@@ -48,22 +52,24 @@ const QrScanner: React.FC<QrScannerProps> = ({ route }) => {
   // TODO: test ui in Mason's Phone
   return (
     <View style={PageStyle.wrapper}>
-      <BarCodeScanner style={PageStyle.barCodeScanner} onBarCodeScanned={handleBarCodeScanned}>
-        <SafeAreaView style={PageStyle.innerView}>
-          <View style={PageStyle.iconWrap}>
-            <Text style={PageStyle.leftBlock} />
-            <TouchableOpacity
-              onPress={() => {
-                navigationService.goBack();
-              }}>
-              <Svg icon="close1" size={pTd(14)} iconStyle={PageStyle.icon} />
-            </TouchableOpacity>
-          </View>
-          {/* <Svg icon="scan-frame" size={pTd(240)} iconStyle={PageStyle.scan} /> */}
-          {/* <Text style={PageStyle.title}>{t('Scan QR code')}</Text> */}
-          <Text style={PageStyle.tips}>{t('Receive code / Login code')}</Text>
-        </SafeAreaView>
-      </BarCodeScanner>
+      {refresh ? null : (
+        <BarCodeScanner style={PageStyle.barCodeScanner} onBarCodeScanned={handleBarCodeScanned}>
+          <SafeAreaView style={PageStyle.innerView}>
+            <View style={PageStyle.iconWrap}>
+              <Text style={PageStyle.leftBlock} />
+              <TouchableOpacity
+                onPress={() => {
+                  navigationService.goBack();
+                }}>
+                <Svg icon="close1" size={pTd(14)} iconStyle={PageStyle.icon} />
+              </TouchableOpacity>
+            </View>
+            {/* <Svg icon="scan-frame" size={pTd(240)} iconStyle={PageStyle.scan} /> */}
+            {/* <Text style={PageStyle.title}>{t('Scan QR code')}</Text> */}
+            <Text style={PageStyle.tips}>{t('Receive code / Login code')}</Text>
+          </SafeAreaView>
+        </BarCodeScanner>
+      )}
     </View>
   );
 };
