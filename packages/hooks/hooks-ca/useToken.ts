@@ -78,4 +78,9 @@ export const useIsFetchingTokenList = (): Boolean => {
   return useMemo(() => isFetching, [isFetching]);
 };
 
+export const useSymbolImages = () => {
+  const { symbolImages } = useAppCASelector(state => state.tokenManagement);
+  return useMemo(() => symbolImages, [symbolImages]);
+};
+
 export default useToken;
