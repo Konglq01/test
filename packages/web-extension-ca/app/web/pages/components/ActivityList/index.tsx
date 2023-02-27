@@ -79,7 +79,7 @@ export default function ActivityList({ data, chainId, hasMore, loadMore }: IActi
       return (
         <p className="row-2">
           <span>From: {formatStr2EllipsisStr(fromAddress, [7, 4])}</span>
-          {nftInfo?.nftId && <span>{formatStr2EllipsisStr(nftInfo.alias)}</span>}
+          {nftInfo?.nftId && <span className="nft-name">{formatStr2EllipsisStr(nftInfo.alias)}</span>}
           {!isTestNet && !nftInfo?.nftId && (
             <span>$ {formatAmount({ amount: priceInUsd, decimals: 0, digits: 2 })}</span>
           )}

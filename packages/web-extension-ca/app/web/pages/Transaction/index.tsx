@@ -39,7 +39,7 @@ export default function Transaction() {
   // Obtain data through routing to ensure that the page must have data and prevent Null Data Errors.
   const [activityItem, setActivityItem] = useState<ActivityItemType>(state.item);
   const feeInfo = useMemo(() => activityItem.transactionFees, [activityItem.transactionFees]);
-  const { explorerUrl } = useCurrentChain(activityItem.fromChainId);
+  const chainInfo = useCurrentChain(activityItem.fromChainId);
 
   // Obtain data through api to ensure data integrity.
   // Because some data is not returned in the Activities API. Such as from, to.
@@ -216,8 +216,8 @@ export default function Transaction() {
   }, [activityItem.transactionId, feeUI, t]);
 
   const openOnExplorer = useCallback(() => {
-    return getExploreLink(explorerUrl || '', activityItem.transactionId || '', 'transaction');
-  }, [activityItem.transactionId, explorerUrl]);
+    return getExploreLink(chainInfo?.explorerUrl || '', activityItem.transactionId || '', 'transaction');
+  }, [activityItem.transactionId, chainInfo?.explorerUrl]);
 
   const viewOnExplorerUI = useCallback(() => {
     return (
