@@ -18,6 +18,7 @@ import { useGetCurrentCAViewContract } from 'hooks/contract';
 import PageContainer from 'components/PageContainer';
 import { useAppDispatch } from 'store/hooks';
 import { getWalletNameAsync } from '@portkey/store/store-ca/wallet/actions';
+import { getSymbolImagesAsync } from '@portkey/store/store-ca/tokenManagement/action';
 
 interface DashBoardTypes {
   navigation: any;
@@ -44,6 +45,7 @@ const DashBoard: React.FC<DashBoardTypes> = () => {
   useEffectOnce(() => {
     dispatch(fetchTokenListAsync({ caAddresses: [] }));
     dispatch(getWalletNameAsync());
+    dispatch(getSymbolImagesAsync());
   });
 
   return (

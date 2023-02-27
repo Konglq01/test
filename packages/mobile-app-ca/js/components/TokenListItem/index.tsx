@@ -1,4 +1,5 @@
 import { ZERO } from '@portkey/constants/misc';
+import { useSymbolImages } from '@portkey/hooks/hooks-ca/useToken';
 import { unitConverter } from '@portkey/utils/converter';
 import { defaultColors } from 'assets/theme';
 import { FontStyles } from 'assets/theme/styles';
@@ -21,15 +22,15 @@ interface TokenListItemType {
 const TokenListItem: React.FC<TokenListItemType> = props => {
   const { icon = 'aelf-avatar', symbol = 'ELF', noBalanceShow = false, onPress, item } = props;
   const { currentNetwork } = useWallet();
+  const symbolImages = useSymbolImages();
 
   return (
     <TouchableOpacity style={itemStyle.wrap} onPress={() => onPress?.(item)}>
       <CommonAvatar
         style={itemStyle.left}
         title={item?.symbol}
-        svgName={item?.token?.symbol === 'ELF' ? icon : undefined}
         avatarSize={pTd(48)}
-        imageUrl={item?.imageUrl}
+        imageUrl={symbolImages[item?.symbol]}
       />
       <View style={itemStyle.right}>
         <View style={itemStyle.infoWrap}>

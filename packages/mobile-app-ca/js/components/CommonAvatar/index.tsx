@@ -1,7 +1,7 @@
 import React from 'react';
 import Svg, { IconName } from 'components/Svg';
 import { pTd } from 'utils/unit';
-import { Text, View } from 'react-native';
+import { Text } from 'react-native';
 import { StyleSheet } from 'react-native';
 import { defaultColors } from 'assets/theme';
 import { Image } from 'react-native';

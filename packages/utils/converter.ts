@@ -17,14 +17,16 @@ const zhList = [
 export const fixedDecimal = (count?: number | BigNumber | string, num = 4) => {
   const bigCount = BigNumber.isBigNumber(count) ? count : new BigNumber(count || '');
   if (bigCount.isNaN()) return '0';
-  return bigCount.dp(num, BigNumber.ROUND_DOWN).toFixed(num);
+  return bigCount.dp(num, BigNumber.ROUND_DOWN).toFixed();
 };
 
 export const unitConverter = (num?: number | BigNumber | string, decimal = 4, defaultVal = '0') => {
   const bigNum = BigNumber.isBigNumber(num) ? num : new BigNumber(num || '');
   if (bigNum.isNaN() || bigNum.eq(0)) return defaultVal;
   const abs = bigNum.abs();
-  const list = i18n.language === 'zh' ? zhList : enList;
+  // const list = i18n.language === 'zh' ? zhList : enList;
+  // TODO：EN ZH
+  const list = enList;
   for (let i = 0; i < list.length; i++) {
     const { value, symbol } = list[i];
     if (abs.gte(value)) return fixedDecimal(bigNum.div(value), decimal) + symbol;

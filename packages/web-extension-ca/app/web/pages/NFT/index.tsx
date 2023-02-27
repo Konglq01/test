@@ -14,7 +14,7 @@ export default function NFT() {
       <div className="picture">{state.imageUrl ? <img src={state.imageUrl} /> : state.symbol?.slice(0, 1)}</div>
       <div className="info">
         <p className="title flex">
-          <p className="title-alias">{state.alias}</p>
+          <p className="title-alias">{state.alias}&nbsp;</p>
           <p>#{state.tokenId}</p>
         </p>
         <p className="amount">Amount: {state.balance}</p>
