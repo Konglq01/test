@@ -48,7 +48,7 @@ export default function AccountCard({
     assetInfo: {
       symbol: tokenInfo?.symbol,
       tokenContractAddress: tokenInfo?.tokenContractAddress || tokenInfo?.address,
-      address: tokenInfo?.tokenContractAddress || tokenInfo?.address,
+      chainId: tokenInfo?.chainId,
       decimals: tokenInfo?.decimals || 0,
     },
   };
