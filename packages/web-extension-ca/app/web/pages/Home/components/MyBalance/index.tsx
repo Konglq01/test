@@ -13,7 +13,7 @@ import { unitConverter } from '@portkey/utils/converter';
 import { useAppDispatch, useUserInfo, useWalletInfo, useAssetInfo, useTokenInfo } from 'store/Provider/hooks';
 import { useCaAddresses, useChainIdList, useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { fetchAssetAsync, fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
-import { fetchAllTokenListAsync } from '@portkey/store/store-ca/tokenManagement/action';
+import { fetchAllTokenListAsync, getSymbolImagesAsync } from '@portkey/store/store-ca/tokenManagement/action';
 import { TokenItemShowType } from '@portkey/types/types-eoa/token';
 import { getWalletNameAsync } from '@portkey/store/store-ca/wallet/actions';
 
@@ -54,6 +54,7 @@ export default function MyBalance() {
     appDispatch(fetchTokenListAsync({ caAddresses }));
     appDispatch(fetchAllTokenListAsync({ keyword: '', chainIdArray }));
     appDispatch(getWalletNameAsync());
+    appDispatch(getSymbolImagesAsync());
   }, [passwordSeed, appDispatch, caAddresses, chainIdArray]);
 
   useEffect(() => () => clearInterval(timer), []);
