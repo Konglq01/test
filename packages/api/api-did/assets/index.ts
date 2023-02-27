@@ -8,4 +8,8 @@ export default {
     target: '/api/app/tokens/prices',
     config: { method: 'GET' },
   },
+  getSymbolImages: {
+    target: '/api/app/user/assets/symbolImages',
+    config: { method: 'GET' },
+  },
 } as const;
