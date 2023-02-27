@@ -9,6 +9,7 @@ import DropdownSearch from 'components/DropdownSearch';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useTokenInfo, useUserInfo, useWalletInfo } from 'store/Provider/hooks';
 import { fetchAllTokenListAsync } from '@portkey/store/store-ca/tokenManagement/action';
+import { useChainIdList } from '@portkey/hooks/hooks-ca/wallet';
 import './index.less';
 
 export default function AddToken() {
@@ -22,10 +23,7 @@ export default function AddToken() {
   const { passwordSeed } = useUserInfo();
   const appDispatch = useAppDispatch();
   const { currentNetwork, walletInfo } = useWalletInfo();
-  const chainIdArray = useMemo(
-    () => Object.keys(walletInfo?.caInfo?.TESTNET || {}).filter((item) => item !== 'managerInfo'),
-    [walletInfo?.caInfo?.TESTNET],
-  );
+  const chainIdArray = useChainIdList();
   const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'Testnet' : ''), [currentNetwork]);
 
   useEffect(() => {
