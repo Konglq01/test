@@ -61,7 +61,6 @@ export default function Send() {
   console.log(wallet, 'wallet===');
   const { setLoading } = useLoading();
   const dispatch = useAppDispatch();
-
   const { contactIndexList } = useContact();
   const { t } = useTranslation();
   const [errorMsg, setErrorMsg] = useState('');

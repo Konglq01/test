@@ -3,12 +3,13 @@ import { useNavigate } from 'react-router';
 import { Button, message } from 'antd';
 import SettingHeader from 'pages/components/SettingHeader';
 import CustomSvg from 'components/CustomSvg';
-import { useToken } from '@portkey/hooks/hooks-ca/useToken';
+import { useSymbolImages, useToken } from '@portkey/hooks/hooks-ca/useToken';
 import { TokenItemShowType } from '@portkey/types/types-ca/token';
 import DropdownSearch from 'components/DropdownSearch';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useTokenInfo, useUserInfo, useWalletInfo } from 'store/Provider/hooks';
 import { fetchAllTokenListAsync } from '@portkey/store/store-ca/tokenManagement/action';
+import { useChainIdList } from '@portkey/hooks/hooks-ca/wallet';
 import './index.less';
 
 export default function AddToken() {
@@ -22,11 +23,9 @@ export default function AddToken() {
   const { passwordSeed } = useUserInfo();
   const appDispatch = useAppDispatch();
   const { currentNetwork, walletInfo } = useWalletInfo();
-  const chainIdArray = useMemo(
-    () => Object.keys(walletInfo?.caInfo?.TESTNET || {}).filter((item) => item !== 'managerInfo'),
-    [walletInfo?.caInfo?.TESTNET],
-  );
+  const chainIdArray = useChainIdList();
   const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'Testnet' : ''), [currentNetwork]);
+  const symbolImages = useSymbolImages();
 
   useEffect(() => {
     passwordSeed && appDispatch(fetchAllTokenListAsync({ keyword: filterWord, chainIdArray }));
@@ -80,8 +79,8 @@ export default function AddToken() {
     (item: TokenItemShowType) => (
       <div className="token-item" key={`${item.symbol}-${item.chainId}`}>
         <div className="token-item-content">
-          {item.symbol === 'ELF' ? (
-            <CustomSvg className="token-logo" type="Aelf" />
+          {symbolImages[item.symbol] ? (
+            <img className="token-logo" src={symbolImages[item.symbol]} />
           ) : (
             <div className="token-logo custom-word-logo">{item.symbol?.[0] || ''}</div>
           )}
@@ -95,7 +94,7 @@ export default function AddToken() {
         <div className="token-item-action">{renderTokenItem(item)}</div>
       </div>
     ),
-    [isTestNet, renderTokenItem],
+    [isTestNet, renderTokenItem, symbolImages],
   );
 
   return (

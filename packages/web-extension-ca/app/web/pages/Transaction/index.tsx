@@ -19,6 +19,7 @@ import { shortenCharacters } from 'utils/reg';
 import './index.less';
 import { useIsTestnet } from 'hooks/useActivity';
 import { dateFormat } from 'utils';
+import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 
 export interface ITransactionQuery {
   item: ActivityItemType;
@@ -33,12 +34,12 @@ export default function Transaction() {
   const { walletInfo } = currentWallet;
   const caAddresses = useCaAddresses();
   const caAddress = chainId ? [walletInfo[chainId]?.caAddress] : '';
-  const { blockExplorerURL } = useCurrentNetwork();
   const isTestNet = useIsTestnet();
 
   // Obtain data through routing to ensure that the page must have data and prevent Null Data Errors.
   const [activityItem, setActivityItem] = useState<ActivityItemType>(state.item);
   const feeInfo = useMemo(() => activityItem.transactionFees, [activityItem.transactionFees]);
+  const { explorerUrl } = useCurrentChain(activityItem.fromChainId);
 
   // Obtain data through api to ensure data integrity.
   // Because some data is not returned in the Activities API. Such as from, to.
@@ -173,20 +174,22 @@ export default function Transaction() {
       <p className="value">
         <span className="left">{t('Transaction Fee')}</span>
         <span className="right">
-          {feeInfo?.map((item, idx) => {
-            return (
-              <div key={'transactionFee' + idx} className="right-item">
-                <span>{`${formatAmount({ amount: item.fee, decimals: isNft ? 8 : activityItem.decimals })} ${
-                  item.symbol ?? ''
-                }`}</span>
-                {!isTestNet && (
-                  <span className="right-usd">
-                    $ {formatAmount({ amount: item.feeInUsd, decimals: activityItem.decimals, digits: 2 })}
-                  </span>
-                )}
-              </div>
-            );
-          })}
+          {(!feeInfo || feeInfo?.length === 0) && <div className="right-item">0 ELF</div>}
+          {feeInfo?.length > 0 &&
+            feeInfo.map((item, idx) => {
+              return (
+                <div key={'transactionFee' + idx} className="right-item">
+                  <span>{`${formatAmount({ amount: item.fee, decimals: isNft ? 8 : activityItem.decimals })} ${
+                    item.symbol ?? ''
+                  }`}</span>
+                  {!isTestNet && (
+                    <span className="right-usd">
+                      $ {formatAmount({ amount: item.feeInUsd, decimals: activityItem.decimals, digits: 2 })}
+                    </span>
+                  )}
+                </div>
+              );
+            })}
         </span>
       </p>
     );
@@ -213,8 +216,8 @@ export default function Transaction() {
   }, [activityItem.transactionId, feeUI, t]);
 
   const openOnExplorer = useCallback(() => {
-    return getExploreLink(blockExplorerURL || '', activityItem.transactionId || '', 'transaction');
-  }, [activityItem.transactionId, blockExplorerURL]);
+    return getExploreLink(explorerUrl || '', activityItem.transactionId || '', 'transaction');
+  }, [activityItem.transactionId, explorerUrl]);
 
   const viewOnExplorerUI = useCallback(() => {
     return (

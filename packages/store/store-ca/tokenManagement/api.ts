@@ -18,8 +18,8 @@ export function fetchAllTokenList({
 
   return request.es.getUserTokenList({
     params: {
-      // filter: `${filterKeywords} AND (${chainIdSearchLanguage})`,
-      filter: `${filterKeywords}`,
+      filter: `${filterKeywords} AND (${chainIdSearchLanguage})`,
+      // filter: `${filterKeywords}`,
 
       sort: 'sortWeight desc,token.symbol acs,token.chainId acs',
       skipCount: 0,
