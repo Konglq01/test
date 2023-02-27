@@ -32,8 +32,15 @@ export function handleQRCodeData(data: QRData, previousRouteInfo: RouteInfoType)
     ) {
       return invalidQRCode();
     }
-
-    navigationService.navigate('SendHome', newData);
+    if (previousRouteInfo.name !== 'Tab') {
+      const previousAssetsInfo = { ...previousRouteInfo.params.assetInfo };
+      navigationService.navigate('SendHome', {
+        ...newData,
+        assetInfo: { ...newData.assetInfo, ...previousAssetsInfo },
+      });
+    } else {
+      navigationService.navigate('SendHome', newData);
+    }
   } else {
     navigationService.navigate('ScanLogin', { data: data as LoginQRData });
   }
