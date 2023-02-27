@@ -126,11 +126,11 @@ const ActivityDetail = () => {
             {transactionFees.map((item, index) => (
               <View key={index} style={[styles.transactionFeeItemWrap, index > 0 && styles.marginTop8]}>
                 <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${unitConverter(
-                  ZERO.plus(item.fee || 0).div(`1e${activityItem?.decimals || DEFAULT_DECIMAL}`),
+                  ZERO.plus(item.fee || 0).div(`1e${DEFAULT_DECIMAL}`),
                 )} ${item.symbol}`}</TextM>
                 {!isTestNet && (
                   <TextS style={[styles.lightGrayFontColor, styles.marginTop4]}>{`$ ${unitConverter(
-                    ZERO.plus(item.feeInUsd ?? 0).div(`1e${activityItem?.decimals || DEFAULT_DECIMAL}`),
+                    ZERO.plus(item.feeInUsd ?? 0).div(`1e${DEFAULT_DECIMAL}`),
                     2,
                   )}`}</TextS>
                 )}
@@ -140,7 +140,7 @@ const ActivityDetail = () => {
         </View>
       </View>
     );
-  }, [activityItem?.decimals, activityItem?.transactionFees, isTestNet, t]);
+  }, [activityItem?.transactionFees, isTestNet, t]);
 
   return (
     <PageContainer

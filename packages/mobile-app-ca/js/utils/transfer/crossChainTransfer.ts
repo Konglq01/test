@@ -25,7 +25,6 @@ export const intervalCrossChainTransfer = async (
   const issueChainId = getChainIdByAddress(managerAddress, chainType);
   const toChainId = getChainIdByAddress(toAddress, chainType);
 
-  console.log('intervalCrossChainTransferAmount', amount);
   const paramsOption: any = {
     issueChainId: getChainNumber(issueChainId),
     toChainId: getChainNumber(toChainId),
@@ -34,6 +33,7 @@ export const intervalCrossChainTransfer = async (
     amount,
   };
   if (memo) paramsOption.memo = memo;
+  console.log('intervalCrossChainTransfer:paramsOption', paramsOption);
 
   let isError = true,
     count = 0;

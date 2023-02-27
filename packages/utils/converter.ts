@@ -24,7 +24,9 @@ export const unitConverter = (num?: number | BigNumber | string, decimal = 4, de
   const bigNum = BigNumber.isBigNumber(num) ? num : new BigNumber(num || '');
   if (bigNum.isNaN() || bigNum.eq(0)) return defaultVal;
   const abs = bigNum.abs();
-  const list = i18n.language === 'zh' ? zhList : enList;
+  // const list = i18n.language === 'zh' ? zhList : enList;
+  // TODO：EN ZH
+  const list = enList;
   for (let i = 0; i < list.length; i++) {
     const { value, symbol } = list[i];
     if (abs.gte(value)) return fixedDecimal(bigNum.div(value), decimal) + symbol;

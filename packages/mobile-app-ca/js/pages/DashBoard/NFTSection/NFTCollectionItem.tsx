@@ -1,8 +1,7 @@
-import React, { useEffect } from 'react';
-import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 import { defaultColors } from 'assets/theme';
 import navigationService from 'utils/navigationService';
-import { useLanguage } from 'i18n/hooks';
 import { pTd } from 'utils/unit';
 import Collapsible from 'components/Collapsible';
 import NFTAvatar from 'components/NFTAvatar';
@@ -13,7 +12,7 @@ import { TextM, TextS, TextXL } from 'components/CommonText';
 import { FontStyles } from 'assets/theme/styles';
 import { useWallet } from 'hooks/store';
 import { NFTCollectionItemShowType } from '@portkey/types/types-ca/assets';
-import { chain } from 'lodash';
+import Touchable from 'components/Touchable';
 
 export enum NoDataMessage {
   CustomNetWorkNoData = 'No transaction records accessible from the current custom network',
@@ -36,7 +35,6 @@ export default function NFTItem(props: NFTItemPropsType) {
     itemCount,
     children,
     symbol,
-    collapsed = false,
     openCollectionArr,
     setOpenCollectionArr,
     clearItem,
@@ -44,11 +42,14 @@ export default function NFTItem(props: NFTItemPropsType) {
   } = props;
   const { currentNetwork } = useWallet();
 
-  const { t } = useLanguage();
-
+  const [collapsed, setCollapsed] = useState<boolean>();
+  useEffect(() => {
+    setCollapsed(!children?.length);
+  }, [children]);
   return (
     <View style={styles.wrap}>
-      <TouchableOpacity
+      <Touchable
+        onPressWithSecond={1000}
         style={styles.topSeries}
         onPress={() => {
           if (collapsed) {
@@ -82,8 +83,8 @@ export default function NFTItem(props: NFTItemPropsType) {
           <TextXL style={styles.nftSeriesName}>{itemCount}</TextXL>
           <TextM style={styles.nftSeriesChainInfo} />
         </View>
-      </TouchableOpacity>
-      <Collapsible collapsed={collapsed && children}>
+      </Touchable>
+      <Collapsible collapsed={collapsed}>
         <View style={styles.listWrap}>
           {children?.map((ele: any, index: number) => (
             <NFTAvatar
@@ -97,10 +98,10 @@ export default function NFTItem(props: NFTItemPropsType) {
           ))}
         </View>
         {children.length !== 0 && children.length < itemCount && (
-          <TouchableOpacity style={styles.loadMore} onPress={() => loadMoreItem?.()}>
+          <Touchable style={styles.loadMore} onPress={() => loadMoreItem?.()}>
             <TextM style={FontStyles.font4}>More</TextM>
             <Svg icon="down-arrow" size={pTd(16)} color={defaultColors.primaryColor} iconStyle={styles.downArrow} />
-          </TouchableOpacity>
+          </Touchable>
         )}
       </Collapsible>
       <View style={styles.divider} />

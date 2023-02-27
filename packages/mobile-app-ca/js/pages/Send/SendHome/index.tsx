@@ -2,12 +2,9 @@ import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import PageContainer from 'components/PageContainer';
 import navigationService from 'utils/navigationService';
-import { addressFormat, isAddress } from '@portkey/utils';
 import Svg from 'components/Svg';
 import From from '../From';
 import To from '../To';
-// import CommonToast from 'components/CommonToast';
-// import { divDecimals, timesDecimals } from '@portkey/utils/converter';
 import { styles } from './style';
 import { defaultColors } from 'assets/theme';
 import { pTd } from 'utils/unit';
@@ -16,7 +13,7 @@ import useQrScanPermission from 'hooks/useQrScanPermission';
 import { ZERO } from '@portkey/constants/misc';
 import { customFetch } from '@portkey/utils/fetch';
 import useEffectOnce from 'hooks/useEffectOnce';
-import { isCrossChain } from '@portkey/utils/aelf';
+import { getEntireDIDAelfAddress, isAllowAelfAddress, isCrossChain } from '@portkey/utils/aelf';
 import useDebounce from 'hooks/useDebounce';
 import { useLanguage } from 'i18n/hooks';
 import SelectContact from '../SelectContact';
@@ -25,9 +22,8 @@ import AmountNFT from '../AmountNFT';
 import NFTInfo from '../NFTInfo';
 import GStyles from 'assets/theme/GStyles';
 import CommonButton from 'components/CommonButton';
-import { TokenItemShowType } from '@portkey/types/types-ca/token';
 import { getContractBasic } from '@portkey/contracts/utils';
-import { useCurrentWalletInfo, useWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { getManagerAccount } from 'utils/redux';
 import { usePin } from 'hooks/store';
@@ -37,6 +33,7 @@ import { IToSendHomeParamsType, IToSendPreviewParamsType } from '@portkey/types/
 import { getELFChainBalance } from '@portkey/utils/balance';
 import { BGStyles } from 'assets/theme/styles';
 import { RouteProp, useRoute } from '@react-navigation/native';
+import Loading from 'components/Loading';
 
 export interface SendHomeProps {
   route?: any;
@@ -69,7 +66,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
   const [selectedAssets, setSelectedAssets] = useState(assetInfo); // token or nft
   const [sendNumber, setSendNumber] = useState<string>('0'); // tokenNumber  like 100
   const debounceSendNumber = useDebounce(sendNumber, 500);
-  const [transactionFee, setTransactionFee] = useState<string>('0'); // like 1.2ELF
+  const [, setTransactionFee] = useState<string>('0'); // like 1.2ELF
 
   const [step, setStep] = useState<1 | 2>(1);
   const [isLoading] = useState(false);
@@ -111,7 +108,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
         },
       });
 
-      console.log('====TransactionFee======', TransactionFee);
+      console.log('====TransactionFee======', TransactionFee, unitConverter(ZERO.plus(TransactionFee.ELF).div('1e8')));
 
       if (!TransactionFee) throw { code: 500, message: 'no enough fee' };
 
@@ -217,7 +214,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
   }, [selectedToContact?.address, sendNumber]);
 
   const checkCanNext = useCallback(() => {
-    if (!isAddress(selectedToContact.address)) {
+    if (!isAllowAelfAddress(selectedToContact.address)) {
       setErrorMessage([ErrorMessage.RecipientAddressIsInvalid]);
       return false;
     }
@@ -225,7 +222,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
     // TODO: check if  cross chain
     if (isCrossChain(selectedToContact.address, assetInfo.chainId)) {
       showDialog('crossChain', () => setStep(2));
-      return true;
+      return false;
     }
 
     return true;
@@ -243,6 +240,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
    */
 
   const checkCanPreview = async () => {
+    let fee;
     setErrorMessage([]);
 
     const sendBigNumber = timesDecimals(sendNumber, selectedAssets.decimals || '0');
@@ -255,53 +253,54 @@ const SendHome: React.FC<SendHomeProps> = props => {
         // ELF
         if (sendBigNumber.isGreaterThanOrEqualTo(assetBalanceBigNumber)) {
           setErrorMessage([ErrorMessage.InsufficientFunds]);
-          return false;
+          return { status: false };
         }
       } else {
         //Other Token
         if (sendBigNumber.isGreaterThan(assetBalanceBigNumber)) {
           setErrorMessage([ErrorMessage.InsufficientFunds]);
-          return false;
+          return { status: false };
         }
       }
     } else {
       // nft
       if (sendBigNumber.isGreaterThan(assetBalanceBigNumber)) {
         setErrorMessage([ErrorMessage.InsufficientQuantity]);
-        return false;
+        return { status: false };
       }
     }
 
     const isCross = isCrossChain(selectedToContact.address, assetInfo.chainId);
 
     // transaction fee check
+    Loading.show();
     try {
-      const fee = await getTransactionFee(isCross);
+      fee = await getTransactionFee(isCross);
+
       setTransactionFee(fee || '0');
     } catch (err: any) {
       if (err?.code === 500) {
         setErrorMessage([ErrorMessage.InsufficientFundsForTransactionFee]);
-        return false;
+        Loading.hide();
+
+        return { status: false };
       }
     }
+    Loading.hide();
 
-    return true;
+    return { status: true, fee };
   };
 
   const preview = async () => {
     // TODO : getTransactionFee and check the balance
-    if (!(await checkCanPreview())) return;
-
-    let tmpAddress = selectedToContact.address;
-    if (!selectedToContact.address.includes('_')) {
-      tmpAddress = `ELF_${tmpAddress}_AELF`;
-    }
+    const result = await checkCanPreview();
+    if (!result?.status) return;
 
     navigationService.navigate('SendPreview', {
       sendType,
       assetInfo: selectedAssets,
-      toInfo: { ...selectedToContact, address: tmpAddress },
-      transactionFee,
+      toInfo: { ...selectedToContact, address: getEntireDIDAelfAddress(selectedToContact.address) },
+      transactionFee: result?.fee || '0',
       sendNumber,
     } as IToSendPreviewParamsType);
   };

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, memo } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import NoData from 'components/NoData';
 import { StyleSheet, View, FlatList } from 'react-native';
 import { defaultColors } from 'assets/theme';
@@ -6,14 +6,12 @@ import { useLanguage } from 'i18n/hooks';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { pTd } from 'utils/unit';
 import NFTCollectionItem from './NFTCollectionItem';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { useCaAddresses, useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { useCaAddresses } from '@portkey/hooks/hooks-ca/wallet';
 import { fetchNFTAsync, fetchNFTCollectionsAsync, clearNftItem } from '@portkey/store/store-ca/assets/slice';
 import { useAppCommonDispatch } from '@portkey/hooks';
 import { useAppCASelector } from '@portkey/hooks';
 import { NFTCollectionItemShowType } from '@portkey/types/types-ca/assets';
 import { useWallet } from 'hooks/store';
-import { NetworkType } from '@portkey/types';
 
 type NFTSectionPropsType = {
   getAccountBalance?: () => void;
@@ -35,7 +33,7 @@ function areEqual(prevProps: NFTCollectionProps, nextProps: NFTCollectionProps) 
 
 const NFTCollection: React.FC<NFTCollectionProps> = memo((props: NFTCollectionProps) => {
   const { symbol, isCollapsed } = props;
-  const dispatch = useAppCommonDispatch();
+  // const dispatch = useAppCommonDispatch();
 
   return <NFTCollectionItem key={symbol} collapsed={isCollapsed} {...props} />;
 }, areEqual);
@@ -46,19 +44,16 @@ export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
   const { t } = useLanguage();
 
   const [openCollectionArr, setOpenCollectionArr] = useState<string[]>([]);
-  const currentNetworkInfo = useCurrentNetworkInfo();
   const { currentNetwork, walletInfo } = useWallet();
 
-  const [reFreshing, setReFreshing] = useState(false);
+  const [reFreshing] = useState(false);
 
   const caAddresses = useCaAddresses();
 
   const dispatch = useAppCommonDispatch();
   const {
-    accountNFT: { accountNFTList, skipCount, totalRecordCount },
+    accountNFT: { accountNFTList, totalRecordCount },
   } = useAppCASelector(state => state.assets);
-
-  const [refreshing, setRefreshing] = useState(false);
 
   const fetchNFTList = useCallback(() => {
     const timer: any = setTimeout(() => {
@@ -109,7 +104,6 @@ export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
         )}
         keyExtractor={(item: NFTCollectionItemShowType) => item?.symbol + item.chainId}
         onRefresh={() => {
-          setRefreshing(true);
           setOpenCollectionArr([]);
           getAccountBalance?.();
           fetchNFTList();

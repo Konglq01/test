@@ -25,6 +25,9 @@ export default function useLogOut() {
       dispatch(resetGuardiansState());
       dispatch(resetContactAction());
       request.initService();
+      setTimeout(() => {
+        request.initService();
+      }, 2000);
       navigationService.reset('Referral');
     } catch (error) {
       console.log(error, '====error');

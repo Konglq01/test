@@ -16,7 +16,6 @@ import Home from 'pages/Home';
 
 import Referral from 'pages/Referral';
 import SecurityLock from 'pages/SecurityLock';
-import DashBoard from 'pages/DashBoard/index';
 import Receive from 'pages/Receive';
 import NFTDetail from 'pages/NFT/NFTDetail';
 import QrScanner from 'pages/QrScanner';
@@ -26,7 +25,6 @@ export const stackNav = [
   { name: 'Referral', component: Referral },
   { name: 'Tab', component: Tab },
   { name: 'SecurityLock', component: SecurityLock, option: { gestureEnabled: false } },
-  { name: 'DashBoard', component: DashBoard },
   { name: 'Receive', component: Receive },
   { name: 'NFTDetail', component: NFTDetail },
   { name: 'QrScanner', component: QrScanner },
