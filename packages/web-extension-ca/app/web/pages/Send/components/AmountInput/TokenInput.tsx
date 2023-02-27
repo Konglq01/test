@@ -20,6 +20,7 @@ import getTransactionFee from 'utils/sandboxUtil/getTransactionFee';
 import getTransferFee from 'pages/Send/utils/getTransferFee';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { contractErrorHandler } from '@portkey/did-ui-react/src/utils/errorHandler';
+import { useSymbolImages } from '@portkey/hooks/hooks-ca/useToken';
 
 export default function TokenInput({
   fromAccount,
@@ -44,6 +45,7 @@ export default function TokenInput({
   const [balance, setBalance] = useState<string>('');
   const { passwordSeed } = useUserInfo();
   const wallet = useCurrentWalletInfo();
+  const symbolImages = useSymbolImages();
 
   const getTokenBalance = useCallback(async () => {
     if (!currentChain) return;
@@ -92,7 +94,11 @@ export default function TokenInput({
         <div className="control">
           <div className="asset-selector">
             <div className="icon">
-              {token?.symbol === 'ELF' ? <CustomSvg type="Aelf" /> : <div className="custom">{token?.symbol[0]}</div>}
+              {symbolImages[token.symbol] ? (
+                <img src={symbolImages[token.symbol]} />
+              ) : (
+                <div className="custom">{token?.symbol[0]}</div>
+              )}
             </div>
             <div className="center">
               <p className="symbol">{token?.symbol}</p>

@@ -1,4 +1,5 @@
 import { ZERO } from '@portkey/constants/misc';
+import { useSymbolImages } from '@portkey/hooks/hooks-ca/useToken';
 import { TokenItemShowType } from '@portkey/types/types-ca/token';
 import { divDecimals, unitConverter } from '@portkey/utils/converter';
 import CustomSvg from 'components/CustomSvg';
@@ -12,6 +13,7 @@ export default function TokenList({ tokenList }: { tokenList: TokenItemShowType[
   const navigate = useNavigate();
   const { currentNetwork } = useWalletInfo();
   const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'Testnet' : ''), [currentNetwork]);
+  const symbolImages = useSymbolImages();
 
   const onNavigate = useCallback(
     (tokenInfo: TokenItemShowType) => {
@@ -30,8 +32,8 @@ export default function TokenList({ tokenList }: { tokenList: TokenItemShowType[
       <ul className="token-list">
         {tokenList.map((item) => (
           <li className="token-list-item" key={`${item.chainId}_${item.symbol}`} onClick={() => onNavigate(item)}>
-            {item.imageUrl ? (
-              <img className="token-logo" src={item.imageUrl} />
+            {symbolImages[item.symbol] ? (
+              <img className="token-logo" src={symbolImages[item.symbol]} />
             ) : (
               <div className="token-logo custom-word-logo">{item.symbol?.slice(0, 1)}</div>
             )}

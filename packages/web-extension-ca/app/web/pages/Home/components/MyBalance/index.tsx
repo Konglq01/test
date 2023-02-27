@@ -11,9 +11,9 @@ import { Transaction } from '@portkey/types/types-ca/trade';
 import NFT from '../NFT/NFT';
 import { unitConverter } from '@portkey/utils/converter';
 import { useAppDispatch, useUserInfo, useWalletInfo, useAssetInfo, useTokenInfo } from 'store/Provider/hooks';
-import { useCaAddresses, useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { useCaAddresses, useChainIdList, useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { fetchAssetAsync, fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
-import { fetchAllTokenListAsync } from '@portkey/store/store-ca/tokenManagement/action';
+import { fetchAllTokenListAsync, getSymbolImagesAsync } from '@portkey/store/store-ca/tokenManagement/action';
 import { TokenItemShowType } from '@portkey/types/types-eoa/token';
 import { getWalletNameAsync } from '@portkey/store/store-ca/wallet/actions';
 
@@ -39,12 +39,8 @@ export default function MyBalance() {
   const { passwordSeed } = useUserInfo();
   const appDispatch = useAppDispatch();
   const caAddresses = useCaAddresses();
-  const chainIdArray = useMemo(
-    () => Object.keys(walletInfo?.caInfo?.TESTNET || {}).filter((item) => item !== 'managerInfo'),
-    [walletInfo?.caInfo?.TESTNET],
-  );
+  const chainIdArray = useChainIdList();
   const isMain = useMemo(() => currentNetwork === 'MAIN', [currentNetwork]);
-  console.log('-------accountAssetsList', accountAssetsList);
 
   useEffect(() => {
     console.log('---passwordSeed-myBalance---', passwordSeed);
@@ -58,6 +54,7 @@ export default function MyBalance() {
     appDispatch(fetchTokenListAsync({ caAddresses }));
     appDispatch(fetchAllTokenListAsync({ keyword: '', chainIdArray }));
     appDispatch(getWalletNameAsync());
+    appDispatch(getSymbolImagesAsync());
   }, [passwordSeed, appDispatch, caAddresses, chainIdArray]);
 
   useEffect(() => () => clearInterval(timer), []);
