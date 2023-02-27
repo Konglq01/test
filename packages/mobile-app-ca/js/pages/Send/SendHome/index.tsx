@@ -127,21 +127,24 @@ const SendHome: React.FC<SendHomeProps> = props => {
     ],
   );
 
-  const getAssetBalance = async (tokenContractAddress: string, symbol: string) => {
-    if (!chainInfo || !pin) return;
-    const account = getManagerAccount(pin);
-    if (!account) return;
+  const getAssetBalance = useCallback(
+    async (tokenContractAddress: string, symbol: string) => {
+      if (!chainInfo || !pin) return;
+      const account = getManagerAccount(pin);
+      if (!account) return;
 
-    const contract = await getContractBasic({
-      contractAddress: tokenContractAddress,
-      rpcUrl: chainInfo?.endPoint,
-      account: account,
-    });
+      const contract = await getContractBasic({
+        contractAddress: tokenContractAddress,
+        rpcUrl: chainInfo?.endPoint,
+        account: account,
+      });
 
-    const balance = await getELFChainBalance(contract, symbol, wallet?.[assetInfo?.chainId]?.caAddress || '');
+      const balance = await getELFChainBalance(contract, symbol, wallet?.[assetInfo?.chainId]?.caAddress || '');
 
-    return balance;
-  };
+      return balance;
+    },
+    [assetInfo?.chainId, chainInfo, pin, wallet],
+  );
 
   // warning dialog
   const showDialog = useCallback(
@@ -306,12 +309,16 @@ const SendHome: React.FC<SendHomeProps> = props => {
   };
 
   // get the target token balance
-  useEffectOnce(() => {
+  // useEffectOnce(() => {
+
+  // });
+
+  useEffect(() => {
     (async () => {
       const balance = await getAssetBalance(assetInfo.tokenContractAddress || assetInfo.address, assetInfo.symbol);
       setSelectedAssets({ ...selectedAssets, balance });
     })();
-  });
+  }, [assetInfo.address, assetInfo.symbol, assetInfo.tokenContractAddress, getAssetBalance, selectedAssets]);
 
   return (
     <PageContainer

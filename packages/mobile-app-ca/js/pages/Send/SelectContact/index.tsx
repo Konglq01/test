@@ -156,7 +156,7 @@ export default function SelectContact(props: SelectContactProps) {
         ),
       },
     ];
-  }, [contactIndexList.length, fetchMoreRecent, loading, onPress, recentList, recentTotalNumber, renderItem, t]);
+  }, [fetchMoreRecent, isExistContact, loading, onPress, recentList, recentTotalNumber, renderItem, t]);
 
   return <CommonTopTab tabList={tabList} />;
 }
@@ -192,6 +192,6 @@ const styles = StyleSheet.create({
     width: '100%',
     textAlign: 'center',
     color: defaultColors.font7,
-    marginBottom: pTd(50),
+    marginBottom: pTd(100),
   },
 });
