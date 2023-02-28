@@ -185,7 +185,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
         case 'crossChain':
           ActionSheet.alert({
             title: t(''),
-            message: t('The receiving address is a cross-chain transfer transaction'),
+            message: t('This is a cross-chain transaction'),
             buttons: [
               {
                 title: t('Cancel'),
