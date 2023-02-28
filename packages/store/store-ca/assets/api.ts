@@ -71,8 +71,6 @@ export function fetchNFTSeriesList({
   maxResultCount: number;
 }): Promise<{ data: any[]; totalRecordCount: number }> {
   // return new Promise(resolve => setTimeout(() => resolve({ data: mockData, totalRecordCount: 2 }), 500));
-  console.log('-----------test');
-
   return request.assets.fetchAccountNftProtocolList({
     params: {
       caAddresses,
