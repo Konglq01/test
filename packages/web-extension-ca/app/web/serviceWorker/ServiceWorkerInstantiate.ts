@@ -121,7 +121,7 @@ export default class ServiceWorkerInstantiate {
         // reset lockout timer
         console.log('onMessage===watch==', message);
         await ServiceWorkerInstantiate.checkTimingLock(sendResponse);
-        if (message.type === InternalMessageTypes.ACTIVE_LOCK_STATUS) return sendResponse();
+        if (message.type === InternalMessageTypes.ACTIVE_LOCK_STATUS) return sendResponse(errorHandler(0));
         const registerRes = await this.permissionController.checkIsRegisterOtherwiseRegister(message.type);
         if (registerRes.error !== 0) return sendResponse(registerRes);
         const isLocked = await this.permissionController.checkIsLockOtherwiseUnlock(message.type);
