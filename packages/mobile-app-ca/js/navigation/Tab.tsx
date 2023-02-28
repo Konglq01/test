@@ -29,6 +29,7 @@ export default function TabRoot() {
     <Tab.Navigator
       initialRouteName="Wallet"
       screenOptions={({ route }) => ({
+        tabBarAllowFontScaling: false,
         header: () => null,
         tabBarIcon: ({ focused }) => {
           const iconName: tabMenuIcon = tabMenuList.find(tab => tab.name === route.name)?.icon ?? 'logo-icon';

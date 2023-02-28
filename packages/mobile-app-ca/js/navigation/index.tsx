@@ -57,7 +57,12 @@ export default function NavigationRoot() {
     <NavigationContainer ref={navigationService.setTopLevelNavigator}>
       <Stack.Navigator
         initialRouteName="Referral"
-        screenOptions={{ cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS, headerShown: false }}>
+        screenOptions={{
+          headerBackAllowFontScaling: false,
+          headerTitleAllowFontScaling: false,
+          cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+          headerShown: false,
+        }}>
         {stackNav.map((item, index) => (
           <Stack.Screen options={(item as any).option} key={index} {...item} />
         ))}
