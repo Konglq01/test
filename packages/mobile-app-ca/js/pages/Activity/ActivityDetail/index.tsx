@@ -239,6 +239,8 @@ const ActivityDetail = () => {
         <CommonButton
           containerStyle={[GStyles.marginTop(pTd(8)), styles.bottomButton]}
           onPress={() => {
+            if (!explorerUrl) return;
+
             navigationService.navigate('ViewOnWebView', {
               url: getExploreLink(explorerUrl, activityItem?.transactionId || '', 'transaction'),
             });
