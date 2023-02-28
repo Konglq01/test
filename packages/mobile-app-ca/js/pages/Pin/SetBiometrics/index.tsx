@@ -11,8 +11,7 @@ import { BGStyles } from 'assets/theme/styles';
 import navigationService from 'utils/navigationService';
 import Touchable from 'components/Touchable';
 import { useAppDispatch } from 'store/hooks';
-import { setBiometrics } from 'store/user/actions';
-import { usePreventHardwareBack } from '@portkey/hooks/mobile';
+import { usePreventHardwareBack, useSetBiometrics } from '@portkey/hooks/mobile';
 import biometric from 'assets/image/pngs/biometric.png';
 import { pTd } from 'utils/unit';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
@@ -35,7 +34,7 @@ export default function SetBiometrics() {
   const [errorMessage, setErrorMessage] = useState<string>();
   const { address, managerInfo, caHash } = useCurrentWalletInfo();
   const [caInfo, setStateCAInfo] = useState<CAInfo | undefined>(paramsCAInfo);
-
+  const setBiometrics = useSetBiometrics();
   const isSyncCAInfo = useMemo(() => address && managerInfo && !caHash, [address, caHash, managerInfo]);
   const onIntervalGetResult = useIntervalGetResult();
 
@@ -96,20 +95,20 @@ export default function SetBiometrics() {
     if (!pin) return;
     try {
       await setSecureStoreItem('Pin', pin);
-      dispatch(setBiometrics(true));
+      await setBiometrics(true);
       await getResult();
     } catch (error) {
       setErrorMessage(handleError(error, 'Failed To Verify'));
     }
-  }, [dispatch, getResult, pin]);
+  }, [getResult, pin, setBiometrics]);
   const onSkip = useCallback(async () => {
     try {
-      dispatch(setBiometrics(false));
+      await setBiometrics(false);
       await getResult();
     } catch (error) {
       CommonToast.failError(error);
     }
-  }, [dispatch, getResult]);
+  }, [setBiometrics, getResult]);
   useEffectOnce(() => {
     setTimeout(() => {
       openBiometrics();

@@ -42,7 +42,7 @@ export default function SendPreview({
   const isMain = useMemo(() => (chainId === 'AELF' ? 'MainChain' : 'SideChain'), [chainId]);
   const txFee = useMemo(() => {
     if (isCross && symbol === 'ELF') {
-      return unitConverter(ZERO.plus(CROSS_FEE).plus(transactionFee).toNumber());
+      return ZERO.plus(CROSS_FEE).plus(transactionFee).toNumber();
     } else {
       return transactionFee;
     }
