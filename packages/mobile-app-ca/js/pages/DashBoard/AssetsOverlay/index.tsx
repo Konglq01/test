@@ -69,7 +69,8 @@ const AssetItem = (props: { symbol: string; onPress: (item: any) => void; item: 
             {/* TODO: why use currentNetwork   */}
             {currentNetwork ? (
               <TextS numberOfLines={1} style={[FontStyles.font7, itemStyle.nftItemInfo]}>
-                {item.chainId === 'AELF' ? 'MainChain' : 'SideChain'} {item.chainId}
+                {item.chainId === 'AELF' ? 'MainChain' : 'SideChain'} {item.chainId}{' '}
+                {currentNetwork === 'TESTNET' && 'Testnet'}
               </TextS>
             ) : (
               // TODO: price use witch one

@@ -12,6 +12,7 @@ import { useAppCommonDispatch } from '@portkey/hooks';
 import { useAppCASelector } from '@portkey/hooks';
 import { NFTCollectionItemShowType } from '@portkey/types/types-ca/assets';
 import { useWallet } from 'hooks/store';
+import Touchable from 'components/Touchable';
 
 type NFTSectionPropsType = {
   getAccountBalance?: () => void;
@@ -67,13 +68,16 @@ export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
     fetchNFTList();
   });
 
-  if (totalRecordCount === 0) return <NoData type="top" message={t('No NFTs yet ')} />;
-
   return (
     <View style={styles.wrap}>
       <FlatList
         refreshing={reFreshing}
-        data={accountNFTList || []}
+        data={totalRecordCount === 0 ? [] : accountNFTList || []}
+        ListEmptyComponent={() => (
+          <Touchable>
+            <NoData type="top" message={t('No NFTs yet ')} />
+          </Touchable>
+        )}
         renderItem={({ item }: { item: NFTCollectionItemShowType }) => (
           <NFTCollection
             key={item.symbol}

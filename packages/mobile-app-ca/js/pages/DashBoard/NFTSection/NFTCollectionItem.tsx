@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { defaultColors } from 'assets/theme';
 import navigationService from 'utils/navigationService';
 import { pTd } from 'utils/unit';
@@ -12,6 +12,7 @@ import { TextM, TextS, TextXL } from 'components/CommonText';
 import { FontStyles } from 'assets/theme/styles';
 import { useWallet } from 'hooks/store';
 import { NFTCollectionItemShowType } from '@portkey/types/types-ca/assets';
+import Touchable from 'components/Touchable';
 
 export enum NoDataMessage {
   CustomNetWorkNoData = 'No transaction records accessible from the current custom network',
@@ -43,15 +44,12 @@ export default function NFTItem(props: NFTItemPropsType) {
 
   const [collapsed, setCollapsed] = useState<boolean>();
   useEffect(() => {
-    if (children?.length) {
-      setCollapsed(false);
-    } else {
-      setCollapsed(true);
-    }
+    setCollapsed(!children?.length);
   }, [children]);
   return (
     <View style={styles.wrap}>
-      <TouchableOpacity
+      <Touchable
+        onPressWithSecond={1000}
         style={styles.topSeries}
         onPress={() => {
           if (collapsed) {
@@ -85,7 +83,7 @@ export default function NFTItem(props: NFTItemPropsType) {
           <TextXL style={styles.nftSeriesName}>{itemCount}</TextXL>
           <TextM style={styles.nftSeriesChainInfo} />
         </View>
-      </TouchableOpacity>
+      </Touchable>
       <Collapsible collapsed={collapsed}>
         <View style={styles.listWrap}>
           {children?.map((ele: any, index: number) => (
@@ -100,10 +98,10 @@ export default function NFTItem(props: NFTItemPropsType) {
           ))}
         </View>
         {children.length !== 0 && children.length < itemCount && (
-          <TouchableOpacity style={styles.loadMore} onPress={() => loadMoreItem?.()}>
+          <Touchable style={styles.loadMore} onPress={() => loadMoreItem?.()}>
             <TextM style={FontStyles.font4}>More</TextM>
             <Svg icon="down-arrow" size={pTd(16)} color={defaultColors.primaryColor} iconStyle={styles.downArrow} />
-          </TouchableOpacity>
+          </Touchable>
         )}
       </Collapsible>
       <View style={styles.divider} />

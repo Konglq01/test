@@ -19,7 +19,7 @@ export default function Receive() {
   const isMainChain = useMemo(() => chainId === 'AELF', [chainId]);
   const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'Testnet' : ''), [currentNetwork]);
   const { state } = useLocation();
-  const caAddress = useMemo(() => `ELF_${wallet?.[chainId || 'AELF'].caAddress}_${chainId}`, [chainId, wallet]);
+  const caAddress = useMemo(() => `ELF_${wallet?.[chainId || 'AELF']?.caAddress}_${chainId}`, [chainId, wallet]);
   console.log('---receive', state);
 
   const rightElement = useMemo(() => {
