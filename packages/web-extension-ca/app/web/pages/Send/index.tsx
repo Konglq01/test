@@ -7,7 +7,7 @@ import { addFailedActivity, removeFailedActivity } from '@portkey/store/store-ca
 import { AddressItem, ContactItemType, IClickAddressProps } from '@portkey/types/types-ca/contact';
 import { BaseToken } from '@portkey/types/types-ca/token';
 import { isDIDAddress } from '@portkey/utils';
-import { getAelfAddress, getWallet, isAelfAddress, isCrossChain } from '@portkey/utils/aelf';
+import { getAelfAddress, getEntireDIDAelfAddress, getWallet, isAelfAddress, isCrossChain } from '@portkey/utils/aelf';
 import aes from '@portkey/utils/aes';
 import { timesDecimals } from '@portkey/utils/converter';
 import { Button, message, Modal } from 'antd';
@@ -403,7 +403,10 @@ export default function Send() {
         element: (
           <SendPreview
             type={type as 'token' | 'nft'}
-            toAccount={toAccount}
+            toAccount={{
+              ...toAccount,
+              address: getEntireDIDAelfAddress(toAccount.address, undefined, chainInfo?.chainId ?? 'AELF'),
+            }}
             amount={amount}
             symbol={tokenInfo?.symbol || ''}
             alias={tokenInfo.alias || ''}
