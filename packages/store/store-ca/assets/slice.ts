@@ -3,6 +3,7 @@ import { RateBaseType, NFTCollectionItemShowType } from '@portkey/types/types-ca
 import { fetchAssetList, fetchNFTSeriesList, fetchNFTList, fetchTokenList, fetchTokenPrices } from './api';
 import { AccountAssets, TokenItemShowType } from '@portkey/types/types-ca/token';
 import { ChainId } from '@portkey/types';
+import { NEW_CLIENT_MOCK_ELF_LIST } from '@portkey/constants/constants-ca/assets';
 
 // asset = token + nft
 export type AssetsStateType = {
@@ -83,10 +84,13 @@ export const fetchTokenListAsync = createAsyncThunk(
 
     // if (totalRecordCount === 0 || totalRecordCount > accountTokenList.length) {
     const response = await fetchTokenList({ caAddresses, skipCount, maxResultCount });
-    return { list: response.data, totalRecordCount: response.totalRecordCount };
-    // }
 
-    // return { list: [], totalRecordCount };
+    // mock data fro new account
+    if (response.data.length === 0) {
+      return { list: NEW_CLIENT_MOCK_ELF_LIST, totalRecordCount: NEW_CLIENT_MOCK_ELF_LIST.length };
+    }
+
+    return { list: response.data, totalRecordCount: response.totalRecordCount };
   },
 );
 

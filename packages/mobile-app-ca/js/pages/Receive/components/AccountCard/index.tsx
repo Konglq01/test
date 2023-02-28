@@ -46,7 +46,10 @@ export default function AccountCard({
       address: toCaAddress,
     },
     assetInfo: {
-      ...tokenInfo,
+      symbol: tokenInfo?.symbol,
+      tokenContractAddress: tokenInfo?.tokenContractAddress || tokenInfo?.address,
+      chainId: tokenInfo?.chainId,
+      decimals: tokenInfo?.decimals || 0,
     },
   };
 
