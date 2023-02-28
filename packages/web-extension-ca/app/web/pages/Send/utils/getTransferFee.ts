@@ -46,8 +46,12 @@ const getTransferFee = async ({
     });
     const _firstFee = firstTxResult.result['ELF'];
     const firstFee = divDecimalsStr(ZERO.plus(_firstFee), 8);
-    console.log(firstFee, 'transactionRes===cross');
-    return firstFee;
+    console.log(firstTxResult, 'transactionRes===cross');
+    if (Number.isNaN(ZERO.plus(firstFee).toNumber())) {
+      return '0';
+    } else {
+      return firstFee;
+    }
   } else {
     //
     const transactionRes = await getTransactionFee({

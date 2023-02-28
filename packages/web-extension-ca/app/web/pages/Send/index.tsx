@@ -326,7 +326,7 @@ export default function Send() {
           if (isCrossChain(toAccount.address, chainInfo?.chainId ?? 'AELF')) {
             return Modal.confirm({
               width: 320,
-              content: t('The receiving address is a cross-chain transfer transaction'),
+              content: t('This is a cross-chain transaction.'),
               className: 'cross-modal delete-modal',
               icon: null,
               centered: true,
