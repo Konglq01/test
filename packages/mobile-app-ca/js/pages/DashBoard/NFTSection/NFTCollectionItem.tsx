@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { defaultColors } from 'assets/theme';
 import navigationService from 'utils/navigationService';
@@ -13,6 +13,9 @@ import { FontStyles } from 'assets/theme/styles';
 import { useWallet } from 'hooks/store';
 import { NFTCollectionItemShowType } from '@portkey/types/types-ca/assets';
 import Touchable from 'components/Touchable';
+import { OpenCollectionObjType } from './index.';
+import { ChainId } from '@portkey/types';
+import { chain } from 'lodash';
 
 export enum NoDataMessage {
   CustomNetWorkNoData = 'No transaction records accessible from the current custom network',
@@ -21,10 +24,11 @@ export enum NoDataMessage {
 
 export type NFTItemPropsType = NFTCollectionItemShowType & {
   collapsed?: boolean;
-  openCollectionArr: string[];
-  setOpenCollectionArr: any;
-  clearItem: () => void;
-  loadMoreItem?: () => void;
+  openCollectionObj: OpenCollectionObjType;
+  setOpenCollectionObj: any;
+  openItem: (symbol: string, chainId: ChainId, itemCount: number) => void;
+  closeItem: (symbol: string, chainId: ChainId) => void;
+  loadMoreItem: (symbol: string, chainId: ChainId, pageNum: number) => void;
 };
 
 export default function NFTItem(props: NFTItemPropsType) {
@@ -35,35 +39,41 @@ export default function NFTItem(props: NFTItemPropsType) {
     itemCount,
     children,
     symbol,
-    openCollectionArr,
-    setOpenCollectionArr,
-    clearItem,
+    collapsed,
+    openCollectionObj,
+    openItem,
+    closeItem,
     loadMoreItem,
   } = props;
   const { currentNetwork } = useWallet();
 
-  const [collapsed, setCollapsed] = useState<boolean>();
+  const [open, setOpen] = useState<boolean>(false);
+
+  const openCollectionInfo = useMemo(
+    () => openCollectionObj?.[`${symbol}${chainId}`],
+    [chainId, openCollectionObj, symbol],
+  );
+
   useEffect(() => {
-    setCollapsed(!children?.length);
-  }, [children]);
+    // console.log('xxxx', children?.length, collapsed, !children?.length && !collapsed);
+    setOpen(!!children?.length && !collapsed);
+  }, [children, collapsed, openCollectionInfo]);
+
+  const showChildren = useMemo(
+    () => (children.length > 9 ? children.slice(0, (openCollectionInfo?.pageNum ?? 0 + 1) * 9) : children),
+    [children, openCollectionInfo?.pageNum],
+  );
+
   return (
     <View style={styles.wrap}>
       <Touchable
-        onPressWithSecond={1000}
+        onPressWithSecond={500}
         style={styles.topSeries}
         onPress={() => {
-          if (collapsed) {
-            openCollectionArr.push(`${symbol}${chainId}`);
-            setOpenCollectionArr([...openCollectionArr]);
-            loadMoreItem?.();
-            setTimeout(() => {
-              clearItem();
-            }, 0);
+          if (openCollectionObj?.[`${symbol}${chainId}`]) {
+            closeItem(symbol, chainId);
           } else {
-            // opened
-            const newArr = openCollectionArr.filter(ele => ele !== `${symbol}${chainId}`);
-            setOpenCollectionArr(newArr);
-            clearItem();
+            openItem(symbol, chainId, itemCount);
           }
         }}>
         <Svg
@@ -84,9 +94,9 @@ export default function NFTItem(props: NFTItemPropsType) {
           <TextM style={styles.nftSeriesChainInfo} />
         </View>
       </Touchable>
-      <Collapsible collapsed={collapsed}>
+      <Collapsible collapsed={!open}>
         <View style={styles.listWrap}>
-          {children?.map((ele: any, index: number) => (
+          {showChildren?.map((ele: any, index: number) => (
             <NFTAvatar
               style={[styles.itemAvatarStyle, index % 3 === 2 ? styles.noMarginRight : {}]}
               key={ele.symbol}
@@ -97,8 +107,10 @@ export default function NFTItem(props: NFTItemPropsType) {
             />
           ))}
         </View>
-        {children.length !== 0 && children.length < itemCount && (
-          <Touchable style={styles.loadMore} onPress={() => loadMoreItem?.()}>
+        {showChildren?.length !== 0 && showChildren?.length < itemCount && (
+          <Touchable
+            style={styles.loadMore}
+            onPress={() => loadMoreItem?.(symbol, chainId, openCollectionInfo?.pageNum)}>
             <TextM style={FontStyles.font4}>More</TextM>
             <Svg icon="down-arrow" size={pTd(16)} color={defaultColors.primaryColor} iconStyle={styles.downArrow} />
           </Touchable>

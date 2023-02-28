@@ -36,7 +36,12 @@ import { BaseToken } from '@portkey/types/types-ca/token';
 import { ContractBasic } from '@portkey/contracts/utils/ContractBasic';
 import { ZERO } from '@portkey/constants/misc';
 import { CROSS_FEE } from '@portkey/constants/constants-ca/wallet';
-import { fetchNFTCollectionsAsync, fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
+import {
+  clearNftCollection,
+  fetchNFTCollectionsAsync,
+  fetchTokenListAsync,
+} from '@portkey/store/store-ca/assets/slice';
+import { sleep } from '@portkey/utils';
 
 export interface SendHomeProps {
   route?: any;
@@ -150,15 +155,27 @@ const SendHome: React.FC<SendHomeProps> = props => {
       }
       console.log('sameTransferResult', sameTransferResult);
     }
-    navigationService.navigate('Tab');
+
+    if (sendType === 'nft') {
+      dispatch(clearNftCollection({}));
+      dispatch(fetchNFTCollectionsAsync({ caAddresses: caAddresses }));
+    } else {
+      dispatch(fetchTokenListAsync({ caAddresses: caAddresses }));
+    }
+    await sleep(1);
+
+    navigationService.navigate('Tab', { clearType: sendType + Math.random() });
     CommonToast.success('success');
   }, [
     assetInfo,
+    caAddresses,
     chainInfo,
     currentNetwork.chainType,
+    dispatch,
     isCrossChainTransfer,
     pin,
     sendNumber,
+    sendType,
     toInfo.address,
     wallet.address,
     wallet.caHash,
@@ -203,12 +220,6 @@ const SendHome: React.FC<SendHomeProps> = props => {
     Loading.show();
     try {
       await transfer();
-
-      if (sendType === 'nft') {
-        dispatch(fetchNFTCollectionsAsync({ caAddresses: caAddresses }));
-      } else {
-        dispatch(fetchTokenListAsync({ caAddresses: caAddresses }));
-      }
     } catch (error: any) {
       console.log('sendHandler==error2222', error);
       if (error.type === 'managerTransfer') {

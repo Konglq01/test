@@ -16,6 +16,8 @@ const data = [0, 1, 2, 3, 4, 5, 6, 7].map((ele, index) => {
   };
 });
 
+type ITokenItemResponse = Omit<TokenItemShowType, 'name' | 'address'>;
+
 export function fetchTokenList({
   // todo maybe remote tokenList change
   skipCount = 0,
@@ -26,7 +28,7 @@ export function fetchTokenList({
   maxResultCount?: number;
   caAddresses: string[];
 }): Promise<{
-  data: TokenItemShowType[];
+  data: ITokenItemResponse[];
   totalRecordCount: number;
 }> {
   console.log('fetching....list', skipCount, maxResultCount);
@@ -62,18 +64,15 @@ export function fetchAssetList({
 }
 
 export function fetchNFTSeriesList({
-  caAddresses = ['TxXSwp2P9mxeFnGA9DARi2qW1p3PskLFXyBix1GDerQFL7VD5'],
+  caAddresses = [],
   skipCount = 0,
-  maxResultCount = 100,
+  maxResultCount = 1000,
 }: {
   caAddresses: string[];
   skipCount: number;
   maxResultCount: number;
 }): Promise<{ data: any[]; totalRecordCount: number }> {
-  // return new Promise(resolve => setTimeout(() => resolve({ data: mockData, totalRecordCount: 2 }), 500));
-  console.log('-----------test');
-
-  return request.assets.fetchAccountNftProtocolList({
+  return request.assets.fetchAccountNftCollectionList({
     params: {
       caAddresses,
       skipCount,
@@ -83,19 +82,19 @@ export function fetchNFTSeriesList({
 }
 
 export function fetchNFTList({
-  // todo maybe remote tokenList change
   symbol,
   caAddresses,
-  skipCount,
-  maxResultCount,
+  skipCount = 0,
+  maxResultCount = 1000,
 }: {
   symbol: string;
   caAddresses: string[];
   skipCount: number;
   maxResultCount: number;
 }): Promise<{ data: any[]; totalRecordCount: number }> {
-  return request.assets.fetchAccountNftProtocolItemList({ params: { symbol, caAddresses, skipCount, maxResultCount } });
-  // return new Promise(resolve => setTimeout(() => resolve({ data: mockNftItem, totalRecordCount: 18 }), 500));
+  return request.assets.fetchAccountNftCollectionItemList({
+    params: { caAddresses, symbol, skipCount, maxResultCount },
+  });
 }
 
 export function fetchTokenPrices({
