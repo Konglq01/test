@@ -24,7 +24,7 @@ const Stack = createStackNavigator();
 export const stackNav = [
   { name: 'Referral', component: Referral },
   { name: 'Tab', component: Tab },
-  { name: 'SecurityLock', component: SecurityLock, option: { gestureEnabled: false } },
+  { name: 'SecurityLock', component: SecurityLock, options: { gestureEnabled: false } },
   { name: 'Receive', component: Receive },
   { name: 'NFTDetail', component: NFTDetail },
   { name: 'QrScanner', component: QrScanner },
@@ -57,9 +57,14 @@ export default function NavigationRoot() {
     <NavigationContainer ref={navigationService.setTopLevelNavigator}>
       <Stack.Navigator
         initialRouteName="Referral"
-        screenOptions={{ cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS, headerShown: false }}>
+        screenOptions={{
+          headerBackAllowFontScaling: false,
+          headerTitleAllowFontScaling: false,
+          cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+          headerShown: false,
+        }}>
         {stackNav.map((item, index) => (
-          <Stack.Screen options={(item as any).option} key={index} {...item} />
+          <Stack.Screen options={(item as any).options} key={index} {...(item as any)} />
         ))}
       </Stack.Navigator>
     </NavigationContainer>

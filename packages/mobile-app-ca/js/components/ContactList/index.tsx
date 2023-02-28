@@ -15,7 +15,7 @@ import { defaultColors } from 'assets/theme';
 import { BGStyles, FontStyles } from 'assets/theme/styles';
 import GStyles from 'assets/theme/GStyles';
 import { ViewStyleType } from 'types/styles';
-import { getAelfAddress } from '@portkey/utils/aelf';
+import { getAddressInfo, getAelfAddress } from '@portkey/utils/aelf';
 import { transContactsToIndexes } from '@portkey/store/store-ca/contact/utils';
 import { useContact } from '@portkey/hooks/hooks-ca/contact';
 
@@ -46,6 +46,7 @@ const ContactsList: React.FC<ContactsListProps> = ({
   const flashListData = useMemo<FlashItemType[]>(() => {
     let _flashListData: FlashItemType[] = [];
     list.forEach(contactIndex => {
+      if (!contactIndex.contacts.length) return;
       _flashListData.push({
         ...contactIndex,
       });
@@ -65,7 +66,7 @@ const ContactsList: React.FC<ContactsListProps> = ({
   const onChangeKeywords = useCallback(
     (value: string) => {
       setKeyWord(value);
-      let _value = value.trim();
+      const _value = value.trim();
       if (_value === '') {
         setList(contactIndexList);
         return;
@@ -80,13 +81,22 @@ const ContactsList: React.FC<ContactsListProps> = ({
         }));
       } else {
         // Address Search
-        _value = getAelfAddress(_value);
-        const result = contactMap[_value];
+        const addressInfo = getAddressInfo(_value);
+        let result: ContactItemType[] | undefined;
+        if (addressInfo.address) {
+          if (!addressInfo.suffix) {
+            // no suffix
+            result = contactMap[addressInfo.address];
+          } else {
+            result = contactMap[addressInfo.address].filter(item =>
+              item.addresses.find(address => address.chainId === addressInfo.suffix),
+            );
+          }
+        }
         if (result === undefined) filterList = [];
         else filterList = transContactsToIndexes(result);
       }
 
-      filterList = filterList.filter(({ contacts }) => contacts.length !== 0);
       setList(filterList);
     },
     [contactIndexList, contactMap],

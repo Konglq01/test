@@ -306,7 +306,10 @@ const SendHome: React.FC<SendHomeProps> = props => {
     navigationService.navigate('SendPreview', {
       sendType,
       assetInfo: selectedAssets,
-      toInfo: { ...selectedToContact, address: getEntireDIDAelfAddress(selectedToContact.address) },
+      toInfo: {
+        ...selectedToContact,
+        address: getEntireDIDAelfAddress(selectedToContact.address, undefined, assetInfo.chainId),
+      },
       transactionFee: result?.fee || '0',
       sendNumber,
     } as IToSendPreviewParamsType);

@@ -72,6 +72,7 @@ const ContactsList: React.FC<ContactsListProps> = ({
       onStartShouldSetResponder: () => true,
       onMoveShouldSetResponder: () => true,
       onResponderStart: async (evt: GestureResponderEvent) => {
+        const eventPageY = evt.nativeEvent.pageY;
         if (indexInfoRef.current) {
           indexInfoRef.current.currentIndex = 0;
         } else {
@@ -97,7 +98,7 @@ const ContactsList: React.FC<ContactsListProps> = ({
             currentIndex: 0,
           };
         }
-        setCurrentIndex(evt.nativeEvent.pageY);
+        setCurrentIndex(eventPageY);
       },
       onResponderMove: (evt: GestureResponderEvent) => {
         setCurrentIndex(evt.nativeEvent.pageY);
@@ -129,12 +130,6 @@ const ContactsList: React.FC<ContactsListProps> = ({
       {isIndexBarShow && (
         <View ref={indexRef} style={contactListStyles.indexBarWrap} {...panResponder}>
           {contactIndexList.map(item => (
-            // <TouchableOpacity
-            //   key={item.index}
-            //   onPressIn={() => onSectionSelect(index)}
-            //   style={contactListStyles.indexItemWrap}>
-            //   <Text style={[contactListStyles.indexItem, FontStyles.font3, fonts.mediumFont]}>{item.index}</Text>
-            // </TouchableOpacity>
             <View key={item.index} style={contactListStyles.indexItemWrap}>
               <Text style={[contactListStyles.indexItem, FontStyles.font3, fonts.mediumFont]}>{item.index}</Text>
             </View>

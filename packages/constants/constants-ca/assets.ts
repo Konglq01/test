@@ -1,3 +1,5 @@
+import { TokenItemShowType } from '@portkey/types/types-ca/token';
+
 export enum TransactionError {
   TOKEN_NOTE_ENOUGH = 'Insufficient funds',
   NFT_NOTE_ENOUGH = 'Insufficient quantity',
@@ -6,8 +8,10 @@ export enum TransactionError {
 
 export const REFRESH_TIME = 5 * 60 * 1000; // 5min refresh
 
-export const NEW_CLIENT_MOCK_ELF_LIST = [
+export const NEW_CLIENT_MOCK_ELF_LIST: TokenItemShowType[] = [
   {
+    name: 'AELF',
+    address: 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE',
     balance: '0',
     balanceInUsd: '0.000000',
     chainId: 'AELF',

@@ -35,7 +35,7 @@ export const stackNav = [
   { name: 'Element', component: Element },
   { name: 'I18n', component: I18n },
   { name: 'Authentication', component: Authentication },
-  { name: 'SecurityLock', component: SecurityLock, option: { gestureEnabled: false } },
+  { name: 'SecurityLock', component: SecurityLock, options: { gestureEnabled: false } },
   { name: 'WebView', component: WebView },
   { name: 'Echarts', component: Echarts },
   { name: 'DashBoard', component: DashBoard },
@@ -67,7 +67,7 @@ export default function NavigationRoot() {
         initialRouteName="Referral"
         screenOptions={{ cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS, headerShown: false }}>
         {stackNav.map((item, index) => (
-          <Stack.Screen options={item.name === 'SecurityLock' ? item.option : undefined} key={index} {...item} />
+          <Stack.Screen options={item.name === 'SecurityLock' ? item.options : undefined} key={index} {...item} />
         ))}
       </Stack.Navigator>
     </NavigationContainer>
