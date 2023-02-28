@@ -27,6 +27,7 @@ export default function LoginPortkey() {
   const { t } = useLanguage();
   const currentNetworkInfo = useCurrentNetworkInfo();
   const route = useRoute();
+
   return (
     <ImageBackground style={styles.backgroundContainer} resizeMode="cover" source={background}>
       <PageContainer

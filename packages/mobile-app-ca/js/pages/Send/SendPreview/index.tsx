@@ -36,6 +36,7 @@ import { BaseToken } from '@portkey/types/types-ca/token';
 import { ContractBasic } from '@portkey/contracts/utils/ContractBasic';
 import { ZERO } from '@portkey/constants/misc';
 import { CROSS_FEE } from '@portkey/constants/constants-ca/wallet';
+import { fetchNFTCollectionsAsync, fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
 
 export interface SendHomeProps {
   route?: any;
@@ -50,12 +51,12 @@ const SendHome: React.FC<SendHomeProps> = props => {
 
   const pin = usePin();
   const chainInfo = useCurrentChain(assetInfo.chainId);
+  const caAddresses = useCaAddresses();
 
   const [isLoading] = useState(false);
   const currentNetwork = useCurrentNetwork();
   const wallet = useCurrentWalletInfo();
   const { walletName } = useWallet();
-  const caAddresses = useCaAddresses();
   const contractRef = useRef<ContractBasic>();
   const tokenContractRef = useRef<ContractBasic>();
 
@@ -202,6 +203,12 @@ const SendHome: React.FC<SendHomeProps> = props => {
     Loading.show();
     try {
       await transfer();
+
+      if (sendType === 'nft') {
+        dispatch(fetchNFTCollectionsAsync({ caAddresses: caAddresses }));
+      } else {
+        dispatch(fetchTokenListAsync({ caAddresses: caAddresses }));
+      }
     } catch (error: any) {
       console.log('sendHandler==error2222', error);
       if (error.type === 'managerTransfer') {
