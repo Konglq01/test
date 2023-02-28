@@ -9,7 +9,7 @@ import ApprovalController from 'controllers/approval/ApprovalController';
 import { getStoreState } from 'store/utils/getStore';
 import { InternalMessageData, IPageState } from 'types/SW';
 import AELFMethodController from 'controllers/methodController/AELFMethodController';
-import {
+import InternalMessageTypes, {
   AelfMessageTypes,
   MethodMessageTypes,
   PortkeyMessageTypes,
@@ -45,6 +45,7 @@ const allowedMethod = [
   PortkeyMessageTypes.CHECK_WALLET_STATUS,
   PortkeyMessageTypes.EXPAND_FULL_SCREEN,
   PortkeyMessageTypes.OPEN_RECAPTCHA_PAGE,
+  PortkeyMessageTypes.ACTIVE_LOCK_STATUS,
   WalletMessageTypes.REQUEST_ACCOUNTS,
   MethodMessageTypes.GET_WALLET_STATE,
   // TODO SET_RECAPTCHA_CODE
@@ -120,6 +121,7 @@ export default class ServiceWorkerInstantiate {
         // reset lockout timer
         console.log('onMessage===watch==', message);
         await ServiceWorkerInstantiate.checkTimingLock(sendResponse);
+        if (message.type === InternalMessageTypes.ACTIVE_LOCK_STATUS) return;
         const registerRes = await this.permissionController.checkIsRegisterOtherwiseRegister(message.type);
         if (registerRes.error !== 0) return sendResponse(registerRes);
         const isLocked = await this.permissionController.checkIsLockOtherwiseUnlock(message.type);

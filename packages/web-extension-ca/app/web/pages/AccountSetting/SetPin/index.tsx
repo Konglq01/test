@@ -128,7 +128,7 @@ export default function SetPin() {
           <div className="form-content">
             <ConfirmPassword
               label={{
-                password: 'Please choose a new pin',
+                password: 'Please enter a new pin',
                 confirmPassword: <div className="new-pin-label">{t('Confirm new pin')}</div>,
               }}
               validateFields={form.validateFields}
