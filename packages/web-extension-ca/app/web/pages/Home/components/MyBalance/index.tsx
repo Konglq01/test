@@ -57,23 +57,16 @@ export default function MyBalance() {
     appDispatch(getSymbolImagesAsync());
   }, [passwordSeed, appDispatch, caAddresses, chainIdArray]);
 
-  useEffect(() => {
-    if (accountAssetsList.length > 0) return;
-    console.log('passwordSeed', passwordSeed);
-    if (timer) clearInterval(timer);
-    timer = setInterval(() => {
-      // if (!passwordSeed) return;
-      // if (!caAddresses.length) return;
-      appDispatch(fetchTokenListAsync({ caAddresses }));
-    }, 3000);
-    return () => clearInterval(timer);
-  }, [accountAssetsList.length, appDispatch, caAddresses, passwordSeed]);
-
-  useEffect(() => {
-    if (accountAssetsList.length > 0) {
-      clearInterval(timer);
-    }
-  }, [accountAssetsList]);
+  // useEffect(() => {
+  //   console.log('accountTokenList', accountTokenList, timer);
+  //   if (accountTokenList.length > 0) return clearInterval(timer);
+  //   if (timer) clearInterval(timer);
+  //   timer = setInterval(() => {
+  //     if (accountTokenList.length > 0) return clearInterval(timer);
+  //     appDispatch(fetchTokenListAsync({ caAddresses }));
+  //   }, 1000);
+  //   return () => clearInterval(timer);
+  // }, [accountTokenList, appDispatch, caAddresses, passwordSeed]);
 
   const SelectTokenELe = useMemo(() => {
     return (
