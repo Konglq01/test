@@ -46,6 +46,7 @@ const ContactsList: React.FC<ContactsListProps> = ({
   const flashListData = useMemo<FlashItemType[]>(() => {
     let _flashListData: FlashItemType[] = [];
     list.forEach(contactIndex => {
+      if (!contactIndex.contacts.length) return;
       _flashListData.push({
         ...contactIndex,
       });
@@ -86,7 +87,6 @@ const ContactsList: React.FC<ContactsListProps> = ({
         else filterList = transContactsToIndexes(result);
       }
 
-      filterList = filterList.filter(({ contacts }) => contacts.length !== 0);
       setList(filterList);
     },
     [contactIndexList, contactMap],
