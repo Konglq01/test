@@ -87,7 +87,6 @@ export const customFetch: CustomFetchFun = (url, _config) => {
             reject('timeout');
           } else {
             const _result = result as Response;
-            console.log(result, 'customFetch===');
             if (_result.status === 401) {
               resolve({ message: 'unauthorized', status: 401 });
             } else {

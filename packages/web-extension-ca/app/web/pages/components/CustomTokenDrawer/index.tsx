@@ -10,7 +10,9 @@ import { fetchAssetAsync, fetchTokenListAsync } from '@portkey/store/store-ca/as
 import './index.less';
 import { ZERO } from '@portkey/constants/misc';
 import { divDecimals, unitConverter } from '@portkey/utils/converter';
-import { useCaAddresses } from '@portkey/hooks/hooks-ca/wallet';
+import { useCaAddresses, useChainIdList } from '@portkey/hooks/hooks-ca/wallet';
+import { fetchAllTokenListAsync } from '@portkey/store/store-ca/tokenManagement/action';
+import { useSymbolImages } from '@portkey/hooks/hooks-ca/useToken';
 interface CustomSelectProps extends DrawerProps {
   onChange?: (v: AccountAssetItem, type: 'token' | 'nft') => void;
   onClose?: () => void;
@@ -37,10 +39,8 @@ export default function CustomTokenDrawer({
   const appDispatch = useAppDispatch();
   const { passwordSeed } = useUserInfo();
   const caAddresses = useCaAddresses();
-  const chainIdArray = useMemo(
-    () => Object.keys(walletInfo?.caInfo?.TESTNET || {}).filter((item) => item !== 'managerInfo'),
-    [walletInfo?.caInfo?.TESTNET],
-  );
+  const chainIdArray = useChainIdList();
+  const symbolImages = useSymbolImages();
 
   useEffect(() => {
     if (drawerType === 'send') {
@@ -55,9 +55,9 @@ export default function CustomTokenDrawer({
     if (drawerType === 'send') {
       appDispatch(fetchAssetAsync({ caAddresses, keyword: filterWord }));
     } else {
-      appDispatch(fetchTokenListAsync({ caAddresses }));
+      appDispatch(fetchAllTokenListAsync({ chainIdArray, keyword: filterWord }));
     }
-  }, [passwordSeed, filterWord, drawerType, caAddresses, appDispatch]);
+  }, [passwordSeed, filterWord, drawerType, caAddresses, appDispatch, chainIdArray]);
 
   const renderSendToken = useCallback(
     (token: AccountAssetItem) => {
@@ -67,11 +67,9 @@ export default function CustomTokenDrawer({
           key={`${token.symbol}_${token.chainId}`}
           onClick={onChange?.bind(undefined, token, 'token')}>
           <div className="icon">
-            {token.symbol === 'ELF' ? (
-              <CustomSvg type="Aelf" />
-            ) : (
-              <div className="custom">{token?.symbol?.slice(0, 1)}</div>
-            )}
+            <div className="custom">
+              {symbolImages[token.symbol] ? <img src={symbolImages[token.symbol]} /> : token?.symbol?.slice(0, 1)}
+            </div>
           </div>
           <div className="info">
             <p className="symbol">{`${token.symbol}`}</p>
@@ -92,7 +90,7 @@ export default function CustomTokenDrawer({
         </div>
       );
     },
-    [isTestNet, onChange],
+    [isTestNet, onChange, symbolImages],
   );
 
   const renderReceiveToken = useCallback(
@@ -115,11 +113,9 @@ export default function CustomTokenDrawer({
           key={`${token.symbol}_${token.chainId}`}
           onClick={onChange?.bind(undefined, tokenTmp, 'token')}>
           <div className="icon">
-            {token.symbol === 'ELF' ? (
-              <CustomSvg type="Aelf" />
-            ) : (
-              <div className="custom">{token?.symbol?.slice(0, 1)}</div>
-            )}
+            <div className="custom">
+              {symbolImages[token.symbol] ? <img src={symbolImages[token.symbol]} /> : token?.symbol?.slice(0, 1)}
+            </div>
           </div>
           <div className="info">
             <p className="symbol">{`${token.symbol}`}</p>
@@ -130,7 +126,7 @@ export default function CustomTokenDrawer({
         </div>
       );
     },
-    [isTestNet, onChange],
+    [isTestNet, onChange, symbolImages],
   );
 
   const renderNft = useCallback(
@@ -156,8 +152,13 @@ export default function CustomTokenDrawer({
     [isTestNet, onChange],
   );
 
+  const handleClose = useCallback(() => {
+    setFilterWord('');
+    onClose?.();
+  }, [onClose]);
+
   return (
-    <BaseDrawer {...props} onClose={onClose} className="change-token-drawer">
+    <BaseDrawer {...props} onClose={handleClose} className="change-token-drawer">
       <div className="header">
         <p>{title || 'Select Assets'}</p>
         <CustomSvg

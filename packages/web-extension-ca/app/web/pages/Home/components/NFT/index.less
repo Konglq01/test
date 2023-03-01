@@ -2,7 +2,7 @@
 
 .tab-nft {
   .empty-text {
-    padding-top: 32px;
+    padding: 32px 0;
     line-height: 20px;
     color: @font-12;
     font-size: 14px;
@@ -10,13 +10,15 @@
     text-align: center;
   }
   .nft-list {
-    border-bottom: none;
-    .adm-list-item {
-      padding: 0;
-      .adm-list-item-content {
+    .adm-list-body {
+      border-bottom: none;
+      .adm-list-item {
         padding: 0;
-        .adm-list-item-content-main {
-          padding: 0 0 12px;
+        .adm-list-item-content {
+          padding: 0;
+          .adm-list-item-content-main {
+            padding: 0 0 12px;
+          }
         }
       }
     }
@@ -78,11 +80,10 @@
           font-size: 16px;
           color: @font-11;
           overflow: hidden;
-          /* stylelint-disable-next-line value-no-vendor-prefix */
-          display: -webkit-box;
           -webkit-box-orient: vertical;
           -webkit-line-clamp: 1;
-          width: 217px;
+          text-overflow: ellipsis;
+          max-width: 217px;
         }
         .network {
           line-height: 20px;
@@ -113,11 +114,10 @@
           padding: 9px 8px 12px;
           height: 100%;
           .alias {
-            /* stylelint-disable-next-line value-no-vendor-prefix */
-            display: -webkit-box;
+            overflow: hidden;
             -webkit-box-orient: vertical;
             -webkit-line-clamp: 2;
-            overflow: hidden;
+            text-overflow: ellipsis;
             height: 40px;
             line-height: 20px;
             font-size: 14px;

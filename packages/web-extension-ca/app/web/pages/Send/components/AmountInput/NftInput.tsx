@@ -88,8 +88,8 @@ export default function NftInput({
         <div className="avatar">{token.imageUrl ? <img src={token.imageUrl} /> : <p>{token.symbol[0]}</p>}</div>
         <div className="info">
           <p className="index">
-            <span>{token.alias}</span>
-            <span className="token-id">#{token.tokenId}</span>
+            <p className="alias">{token.alias}</p>
+            <p className="token-id">#{token.tokenId}</p>
           </p>
           <p className="quantity">
             Balance: <span>{`${unitConverter(divDecimals(balance, token.decimals))}`}</span>

@@ -3,7 +3,7 @@ import { ChainItemType } from '@portkey/types/chain';
 import { AccountAssets, TokenItemType, TokenState } from '@portkey/types/types-ca/token';
 import { AccountType } from '@portkey/types/wallet';
 // import { isSameTypeToken } from '@portkey/utils/token';
-import { fetchAllTokenListAsync } from './action';
+import { fetchAllTokenListAsync, getSymbolImagesAsync } from './action';
 import { TokenItemShowType } from '@portkey/types/types-eoa/token';
 
 const initialState: TokenState = {
@@ -13,6 +13,7 @@ const initialState: TokenState = {
   skipCount: 0,
   maxResultCount: 1000,
   totalRecordCount: 0,
+  symbolImages: {},
 };
 
 //it automatically uses the immer library to let you write simpler immutable updates with normal mutative code
@@ -96,6 +97,12 @@ export const tokenManagementSlice = createSlice({
       .addCase(fetchAllTokenListAsync.rejected, state => {
         state.isFetching = false;
         // state.status = 'failed';
+      })
+      .addCase(getSymbolImagesAsync.fulfilled, (state, action) => {
+        state.symbolImages = action.payload;
+      })
+      .addCase(getSymbolImagesAsync.rejected, (_state, action) => {
+        console.log('getSymbolImagesAsync:rejected', action);
       });
   },
 });

@@ -70,26 +70,25 @@ export default function GuardiansView() {
           privateKey: privateKey,
           paramsOption: {
             method: GuardianMth.UnsetGuardianTypeForLogin,
-            params: [
-              {
-                caHash: walletInfo?.AELF?.caHash,
-                guardianAccount: {
-                  guardian: {
-                    type: currentGuardian?.guardianType,
-                    verifier: {
-                      id: currentGuardian?.verifier?.id,
-                    },
+            params: {
+              caHash: walletInfo?.AELF?.caHash,
+              guardianAccount: {
+                guardian: {
+                  type: currentGuardian?.guardianType,
+                  verifier: {
+                    id: currentGuardian?.verifier?.id,
                   },
-                  value: currentGuardian?.guardianAccount,
                 },
+                value: currentGuardian?.guardianAccount,
               },
-            ],
+            },
           },
         });
-        const { TransactionId } = result.result.message || result;
-        await sleep(1000);
-        const aelfInstance = getAelfInstance(currentChain.endPoint);
-        await getTxResult(aelfInstance, TransactionId);
+        console.log('unSetLoginAccount', result);
+        // const { TransactionId } = result.result.message || result;
+        // await sleep(1000);
+        // const aelfInstance = getAelfInstance(currentChain.endPoint);
+        // await getTxResult(aelfInstance, TransactionId);
         dispatch(
           setOpGuardianAction({
             ...opGuardian,
@@ -172,10 +171,11 @@ export default function GuardiansView() {
           });
           setSwitchFail(SwitchFail.openFail);
         } catch (error: any) {
-          if (error?.Error?.Details && error?.Error?.Details?.indexOf('Not found ca_hash')) {
+          const _error = contractErrorHandler(error);
+          if (_error.indexOf('Not found ca_hash')) {
             setTipOpen(true);
           } else {
-            message.error(contractErrorHandler(error));
+            message.error(_error);
             throw error;
           }
         }

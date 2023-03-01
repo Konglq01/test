@@ -7,13 +7,11 @@ import { useLanguage } from 'i18n/hooks';
 import MyMenu from 'pages/MyMenu';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import useLogOut from 'hooks/useLogOut';
-import Home from 'pages/Home';
 
 const Tab = createBottomTabNavigator();
 
 export const tabMenuList = [
   { name: 'Wallet', label: 'Wallet', index: 0, icon: 'logo-icon', component: DashBoard },
-  { name: 'Home', label: 'Home', index: 1, icon: 'logo-icon', component: Home },
   { name: 'Settings', label: 'My', index: 2, icon: 'my', component: MyMenu },
 ] as const;
 
@@ -31,8 +29,8 @@ export default function TabRoot() {
     <Tab.Navigator
       initialRouteName="Wallet"
       screenOptions={({ route }) => ({
+        tabBarAllowFontScaling: false,
         header: () => null,
-        // tabBarIcon: tabBarIconProps => BottomTabBar({ ...tabBarIconProps, route }),
         tabBarIcon: ({ focused }) => {
           const iconName: tabMenuIcon = tabMenuList.find(tab => tab.name === route.name)?.icon ?? 'logo-icon';
           return <Svg icon={iconName} size={20} color={focused ? defaultColors.font4 : defaultColors.font7} />;

@@ -1,5 +1,5 @@
 import { useAppCASelector, useAppCommonDispatch } from '../index';
-import { fetchAllTokenListAsync } from '@portkey/store/store-ca/tokenManagement/action';
+import { fetchAllTokenListAsync, getSymbolImagesAsync } from '@portkey/store/store-ca/tokenManagement/action';
 import { TokenState, TokenItemShowType } from '@portkey/types/types-ca/token';
 import { useMemo, useCallback } from 'react';
 import { useCurrentNetworkInfo } from './network';
@@ -45,9 +45,9 @@ export const useToken = (): [TokenState, TokenFuncsType] => {
           isDisplay: !tokenItem.isAdded,
         },
       });
-      // setTimeout(() => {
-      dispatch(fetchAllTokenListAsync({ keyword, chainIdArray }));
-      // }, 1000);
+      setTimeout(() => {
+        dispatch(fetchAllTokenListAsync({ keyword, chainIdArray }));
+      }, 1000);
     },
     [],
   );
@@ -76,6 +76,16 @@ export const useIsFetchingTokenList = (): Boolean => {
   const { isFetching } = useAppCASelector(state => state.tokenManagement);
 
   return useMemo(() => isFetching, [isFetching]);
+};
+
+export const useFetchSymbolImages = () => {
+  const dispatch = useAppCommonDispatch();
+  dispatch(getSymbolImagesAsync());
+};
+
+export const useSymbolImages = () => {
+  const { symbolImages } = useAppCASelector(state => state.tokenManagement);
+  return useMemo(() => symbolImages, [symbolImages]);
 };
 
 export default useToken;

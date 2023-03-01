@@ -14,7 +14,7 @@ export default function RecentItem({
   const isTestNet = useIsTestnet();
 
   return item.name ? (
-    <ContactCard user={item} onChange={onClick} />
+    <ContactCard user={item} onChange={onClick} className="contact-card-in-recent" />
   ) : (
     // In order to keep the format of Recents and Contacts consistent, this can use like {item.addresses[0]}
     <div

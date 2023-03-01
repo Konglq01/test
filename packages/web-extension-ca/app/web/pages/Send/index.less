@@ -143,6 +143,7 @@
       padding: 7px 15px;
       .icon {
         margin-right: 8px;
+        img,
         .custom-svg,
         .custom {
           width: 36px;
@@ -218,6 +219,14 @@
           font-size: 16px;
           font-weight: 500;
           color: @font-11;
+          .alias {
+            overflow: hidden;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 1;
+            text-overflow: ellipsis;
+            max-width: 217px;
+            white-space: nowrap;
+          }
           .token-id {
             font-weight: 400;
           }

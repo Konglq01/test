@@ -50,6 +50,11 @@ const activityPersistConfig = {
   whitelist: ['failedActivityMap'],
 };
 
+const assetsPersistConfig = {
+  key: assetsSlice.name,
+  storage: AsyncStorage,
+};
+
 const guardiansPersistConfig = {
   key: guardiansSlice.name,
   storage: AsyncStorage,
@@ -61,6 +66,7 @@ export const tokenBalanceReducer = persistReducer(tokenBalancePersistConfig, tok
 export const settingsReducer = persistReducer(settingsPersistConfig, settingsSlice.reducer);
 export const recentReducer = persistReducer(recentPersistConfig, recentSlice.reducer);
 export const activityReducer = persistReducer(activityPersistConfig, activitySlice.reducer);
+export const assetsReducer = persistReducer(assetsPersistConfig, assetsSlice.reducer);
 export const guardiansReducer = persistReducer(guardiansPersistConfig, guardiansSlice.reducer);
 
 const rootReducer = combineReducers({
@@ -74,7 +80,7 @@ const rootReducer = combineReducers({
   [settingsSlice.name]: settingsReducer,
   [recentSlice.name]: recentReducer,
   [rateApi.reducerPath]: rateApi.reducer,
-  [assetsSlice.name]: assetsSlice.reducer,
+  [assetsSlice.name]: assetsReducer,
   [activitySlice.name]: activityReducer,
   [tokenManagementSlice.name]: tokenManagementSlice.reducer,
 });

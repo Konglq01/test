@@ -1,6 +1,6 @@
 import { TransactionTypes, transactionTypesMap } from '@portkey/constants/constants-ca/activity';
 import { TransactionStatus } from '@portkey/graphql/contract/__generated__/types';
-import { useCaAddresses } from '@portkey/hooks/hooks-ca/wallet';
+import { useCaAddresses, useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { fetchActivity } from '@portkey/store/store-ca/activity/api';
 import { ActivityItemType } from '@portkey/types/types-ca/activity';
 import { Transaction } from '@portkey/types/types-ca/trade';
@@ -19,25 +19,35 @@ import { shortenCharacters } from 'utils/reg';
 import './index.less';
 import { useIsTestnet } from 'hooks/useActivity';
 import { dateFormat } from 'utils';
+import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+
+export interface ITransactionQuery {
+  item: ActivityItemType;
+  chainId?: string;
+}
 
 export default function Transaction() {
   const { t } = useTranslation();
-  const { state }: { state: ActivityItemType } = useLocation();
+  const { state }: { state: ITransactionQuery } = useLocation();
+  const chainId = state.chainId;
+  const currentWallet = useCurrentWallet();
+  const { walletInfo } = currentWallet;
   const caAddresses = useCaAddresses();
-  const { blockExplorerURL } = useCurrentNetwork();
+  const caAddress = chainId ? [walletInfo[chainId]?.caAddress] : '';
   const isTestNet = useIsTestnet();
 
   // Obtain data through routing to ensure that the page must have data and prevent Null Data Errors.
-  const [activityItem, setActivityItem] = useState<ActivityItemType>(state);
+  const [activityItem, setActivityItem] = useState<ActivityItemType>(state.item);
   const feeInfo = useMemo(() => activityItem.transactionFees, [activityItem.transactionFees]);
+  const chainInfo = useCurrentChain(activityItem.fromChainId);
 
   // Obtain data through api to ensure data integrity.
   // Because some data is not returned in the Activities API. Such as from, to.
   useEffectOnce(() => {
     const params = {
-      caAddresses,
-      transactionId: state.transactionId,
-      blockHash: state.blockHash,
+      caAddresses: caAddress || caAddresses,
+      transactionId: activityItem.transactionId,
+      blockHash: activityItem.blockHash,
     };
     fetchActivity(params)
       .then((res) => {
@@ -164,20 +174,22 @@ export default function Transaction() {
       <p className="value">
         <span className="left">{t('Transaction Fee')}</span>
         <span className="right">
-          {feeInfo?.map((item, idx) => {
-            return (
-              <div key={'transactionFee' + idx} className="right-item">
-                <span>{`${formatAmount({ amount: item.fee, decimals: isNft ? 8 : activityItem.decimals })} ${
-                  item.symbol ?? ''
-                }`}</span>
-                {!isTestNet && (
-                  <span className="right-usd">
-                    $ {formatAmount({ amount: item.feeInUsd, decimals: activityItem.decimals, digits: 2 })}
-                  </span>
-                )}
-              </div>
-            );
-          })}
+          {(!feeInfo || feeInfo?.length === 0) && <div className="right-item">0 ELF</div>}
+          {feeInfo?.length > 0 &&
+            feeInfo.map((item, idx) => {
+              return (
+                <div key={'transactionFee' + idx} className="right-item">
+                  <span>{`${formatAmount({ amount: item.fee, decimals: isNft ? 8 : activityItem.decimals })} ${
+                    item.symbol ?? ''
+                  }`}</span>
+                  {!isTestNet && (
+                    <span className="right-usd">
+                      $ {formatAmount({ amount: item.feeInUsd, decimals: activityItem.decimals, digits: 2 })}
+                    </span>
+                  )}
+                </div>
+              );
+            })}
         </span>
       </p>
     );
@@ -204,8 +216,8 @@ export default function Transaction() {
   }, [activityItem.transactionId, feeUI, t]);
 
   const openOnExplorer = useCallback(() => {
-    return getExploreLink(blockExplorerURL || '', activityItem.transactionId || '', 'transaction');
-  }, [activityItem.transactionId, blockExplorerURL]);
+    return getExploreLink(chainInfo?.explorerUrl || '', activityItem.transactionId || '', 'transaction');
+  }, [activityItem.transactionId, chainInfo?.explorerUrl]);
 
   const viewOnExplorerUI = useCallback(() => {
     return (

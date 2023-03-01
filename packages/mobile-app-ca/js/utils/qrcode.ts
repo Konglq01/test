@@ -17,7 +17,7 @@ export function invalidQRCode() {
   navigationService.goBack();
 }
 
-export function handleQRCodeData(data: QRData, previousRouteInfo: RouteInfoType) {
+export function handleQRCodeData(data: QRData, previousRouteInfo: RouteInfoType, setRefresh: (v: boolean) => void) {
   const { type, address, chainType } = data;
   if (!isAddress(address, chainType)) return invalidQRCode();
 
@@ -32,9 +32,17 @@ export function handleQRCodeData(data: QRData, previousRouteInfo: RouteInfoType)
     ) {
       return invalidQRCode();
     }
-
-    navigationService.navigate('SendHome', newData);
+    if (previousRouteInfo.name !== 'Tab') {
+      const previousAssetsInfo = { ...previousRouteInfo.params.assetInfo };
+      navigationService.navigate('SendHome', {
+        ...newData,
+        assetInfo: { ...newData.assetInfo, ...previousAssetsInfo },
+      });
+    } else {
+      navigationService.navigate('SendHome', newData);
+    }
   } else {
     navigationService.navigate('ScanLogin', { data: data as LoginQRData });
   }
+  setRefresh(true);
 }

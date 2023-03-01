@@ -1,9 +1,10 @@
 import { DrawerProps } from 'antd';
 import CustomSvg from 'components/CustomSvg';
 import DropdownSearch from 'components/DropdownSearch';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import BaseDrawer from 'components/BaseDrawer';
+import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import './index.less';
 
 interface CustomSelectProps extends DrawerProps {
@@ -15,21 +16,24 @@ export default function NetworkDrawer({ onChange, onClose, ...props }: CustomSel
   const { t } = useTranslation();
   const [filterWord, setFilterWord] = useState<string>('');
   const [showNetworkLists, setShowNetworkLists] = useState<any[]>([]);
+  const { chainList } = useCurrentWallet();
+  const isMain = useCallback((chain: string) => (chain === 'AELF' ? 'MainChain' : 'SideChain'), []);
 
-  // TODO: get networkLists
   const networkLists = useMemo(
-    () => [
-      { networkType: 'TESTNET', chainId: 'AELF', networkName: 'MainChain AELF Testnet' },
-      { networkType: 'TESTNET', chainId: 'tDVV', networkName: 'SideChain tDVV Testnet' },
-    ],
-    [],
+    () =>
+      chainList?.map((chain) => ({
+        networkType: 'TESTNET',
+        chainId: chain.chainId,
+        networkName: `${isMain(chain.chainId)} ${chain.chainId} Testnet`,
+      })),
+    [chainList, isMain],
   );
 
   useEffect(() => {
     if (!filterWord) {
-      setShowNetworkLists(networkLists);
+      setShowNetworkLists(networkLists || []);
     } else {
-      const filter = networkLists.filter((l) => l.networkName.toLowerCase() === filterWord.toLowerCase());
+      const filter = (networkLists || []).filter((l) => l.networkName.toLowerCase() === filterWord.toLowerCase());
       setShowNetworkLists(filter);
     }
   }, [filterWord, networkLists]);

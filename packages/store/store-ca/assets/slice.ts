@@ -3,6 +3,7 @@ import { RateBaseType, NFTCollectionItemShowType } from '@portkey/types/types-ca
 import { fetchAssetList, fetchNFTSeriesList, fetchNFTList, fetchTokenList, fetchTokenPrices } from './api';
 import { AccountAssets, TokenItemShowType } from '@portkey/types/types-ca/token';
 import { ChainId } from '@portkey/types';
+import { NEW_CLIENT_MOCK_ELF_LIST, PAGE_SIZE_IN_NFT_ITEM } from '@portkey/constants/constants-ca/assets';
 
 // asset = token + nft
 export type AssetsStateType = {
@@ -83,10 +84,13 @@ export const fetchTokenListAsync = createAsyncThunk(
 
     // if (totalRecordCount === 0 || totalRecordCount > accountTokenList.length) {
     const response = await fetchTokenList({ caAddresses, skipCount, maxResultCount });
-    return { list: response.data, totalRecordCount: response.totalRecordCount };
-    // }
 
-    // return { list: [], totalRecordCount };
+    // mock data fro new account
+    if (response.data.length === 0) {
+      return { list: NEW_CLIENT_MOCK_ELF_LIST, totalRecordCount: NEW_CLIENT_MOCK_ELF_LIST.length };
+    }
+
+    return { list: response.data, totalRecordCount: response.totalRecordCount };
   },
 );
 
@@ -127,10 +131,12 @@ export const fetchNFTAsync = createAsyncThunk(
       symbol,
       caAddresses,
       chainId,
+      pageNum = 0,
     }: {
       symbol: string;
       caAddresses: string[];
       chainId: ChainId;
+      pageNum: number;
     },
     { getState, dispatch },
   ) => {
@@ -142,6 +148,9 @@ export const fetchNFTAsync = createAsyncThunk(
     if (!targetNFTCollection) return;
 
     const { skipCount, maxResultCount, totalRecordCount, children } = targetNFTCollection;
+
+    if ((pageNum + 1) * PAGE_SIZE_IN_NFT_ITEM <= children.length) return;
+
     if (totalRecordCount === 0 || totalRecordCount > children.length) {
       const response = await fetchNFTList({ symbol, caAddresses, skipCount, maxResultCount });
       return { symbol, chainId, list: response.data, totalRecordCount: response.totalRecordCount };
@@ -218,16 +227,10 @@ export const assetsSlice = createSlice({
 
         state.accountNFT.accountNFTList = newAccountNFTList;
       }
-      //  else {
-      //   const newAccountNFTList = state.accountNFT.accountNFTList.map(item => ({
-      //     ...item,
-      //     skipCount: 0,
-      //     maxResultCount: 9,
-      //     totalRecordCount: 0,
-      //     children: [],
-      //   }));
-      //   state.accountNFT.accountNFTList = newAccountNFTList;
-      // }
+    },
+    // about handle the NFT
+    clearNftCollection: (state, action: PayloadAction<any>) => {
+      state.accountNFT = initialState.accountNFT;
     },
   },
   extraReducers: builder => {
@@ -248,7 +251,7 @@ export const assetsSlice = createSlice({
         state.accountBalance = totalBalance;
 
         // state.accountToken.accountTokenList = [...state.accountToken.accountTokenList, ...list];
-        state.accountToken.accountTokenList = list;
+        state.accountToken.accountTokenList = list as [];
         state.accountToken.skipCount = state.accountToken.accountTokenList.length;
         state.accountToken.totalRecordCount = totalRecordCount;
         state.accountToken.isFetching = false;
@@ -333,6 +336,6 @@ export const assetsSlice = createSlice({
   },
 });
 
-export const { addTokenInCurrentAccount, clearNftItem, clearAssets } = assetsSlice.actions;
+export const { addTokenInCurrentAccount, clearNftItem, clearAssets, clearNftCollection } = assetsSlice.actions;
 
 export default assetsSlice;

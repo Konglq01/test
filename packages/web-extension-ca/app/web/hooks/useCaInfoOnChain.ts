@@ -75,7 +75,7 @@ export const useCaInfoOnChain = () => {
   }, [chainList, currentNetwork.walletType, getHolderInfoByChainId, walletInfo]);
 
   const check = useCallback(
-    () => chainList?.every((chain) => walletInfo[chain.chainId as ChainId] || !isAddress(chain.caContractAddress)),
+    () => chainList?.every((chain) => walletInfo[chain.chainId as ChainId]),
     [chainList, walletInfo],
   );
 
