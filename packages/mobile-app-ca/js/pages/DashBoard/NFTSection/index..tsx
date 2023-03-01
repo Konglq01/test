@@ -76,17 +76,18 @@ export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
   //   }, REFRESH_TIME);
   // }, [caAddresses, dispatch]);
 
-  const fetchNFTList = () => {
+  const fetchNFTList = useCallback(() => {
+    if (caAddresses.length === 0) return;
     dispatch(fetchNFTCollectionsAsync({ caAddresses }));
-  };
+  }, [caAddresses, dispatch]);
+
+  useEffect(() => {
+    fetchNFTList();
+  }, [fetchNFTList]);
 
   useEffect(() => {
     if (clearType) setOpenCollectionObj({});
   }, [clearType]);
-
-  useEffectOnce(() => {
-    fetchNFTList();
-  });
 
   const closeItem = useCallback(
     (symbol: string, chainId: string) => {
