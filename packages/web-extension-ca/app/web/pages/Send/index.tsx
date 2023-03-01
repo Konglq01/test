@@ -218,6 +218,7 @@ export default function Send() {
 
   const handleCheckPreview = useCallback(async () => {
     try {
+      setLoading(true);
       if (!ZERO.plus(amount).toNumber()) return 'Please input amount';
       if (type === 'token') {
         if (ZERO.plus(amount).times(`1e${tokenInfo.decimals}`).isGreaterThan(ZERO.plus(balance))) {
@@ -241,8 +242,10 @@ export default function Send() {
     } catch (error: any) {
       console.log('checkTransactionValue===', error);
       return TransactionError.FEE_NOTE_ENOUGH;
+    } finally {
+      setLoading(false);
     }
-  }, [type, amount, tokenInfo.decimals, balance, getTranslationInfo]);
+  }, [setLoading, amount, type, getTranslationInfo, tokenInfo.decimals, balance]);
 
   const sendHandler = useCallback(async () => {
     try {
@@ -357,7 +360,7 @@ export default function Send() {
       1: {
         btnText: 'Preview',
         handler: async () => {
-          if (!validateToAddress(toAccount)) return;
+          // if (!validateToAddress(toAccount)) return;
           const res = await handleCheckPreview();
           console.log('handleCheckPreview res', res);
           if (!res) {
@@ -461,6 +464,7 @@ export default function Send() {
               <ToAccount
                 value={toAccount}
                 onChange={(v) => setToAccount(v)}
+                focus={stage !== Stage.Amount}
                 // onBlur={() => validateToAddress(toAccount)}
               />
               {stage === Stage.Amount && (

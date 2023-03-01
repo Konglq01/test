@@ -73,7 +73,7 @@ export default function SendPreview({
               <p className="token-id">{`#${tokenId}`}</p>
             </p>
             <p className="quantity">
-              Balance: <span>{unitConverter(amount)}</span>
+              Amount: <span>{unitConverter(amount)}</span>
             </p>
           </div>
         </div>
