@@ -6,7 +6,7 @@ import { pTd } from 'utils/unit';
 import { TextM, TextS, TextL } from 'components/CommonText';
 import CommonButton from 'components/CommonButton';
 import ActionSheet from 'components/ActionSheet';
-import { formatAddress2NoPrefix, formatChainInfo, formatStr2EllipsisStr } from 'utils';
+import { formatChainInfo, formatStr2EllipsisStr } from 'utils';
 import { addRecentContact } from '@portkey/store/store-ca/recent/slice';
 import { isCrossChain } from '@portkey/utils/aelf';
 import { useLanguage } from 'i18n/hooks';
