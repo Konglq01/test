@@ -135,7 +135,7 @@ const ActivityDetail = () => {
                 )} ${item.symbol}`}</TextM>
                 {!isTestNet && (
                   <TextS style={[styles.lightGrayFontColor, styles.marginTop4]}>{`$ ${unitConverter(
-                    ZERO.plus(item.feeInUsd ?? 0).div(`1e${DEFAULT_DECIMAL}`),
+                    ZERO.plus(item?.feeInUsd ?? 0).div(`1e${DEFAULT_DECIMAL}`),
                     2,
                   )}`}</TextS>
                 )}
