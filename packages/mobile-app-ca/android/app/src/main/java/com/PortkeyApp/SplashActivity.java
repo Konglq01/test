@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.PortkeyApp.MainActivity;
+import com.portkey.did.MainActivity;
 
 public class SplashActivity extends AppCompatActivity {
 	@Override
