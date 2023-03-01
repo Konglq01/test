@@ -1,9 +1,8 @@
-import { useState, useEffect, useMemo } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router';
+import { useMemo } from 'react';
+import { useLocation, useNavigate } from 'react-router';
 import './index.less';
 import SettingHeader from 'pages/components/SettingHeader';
 import BalanceCard from 'pages/components/BalanceCard';
-import { TokenItemShowType } from '@portkey/types/types-ca/token';
 import { divDecimals, unitConverter } from '@portkey/utils/converter';
 import { useWalletInfo } from 'store/Provider/hooks';
 import Activity from 'pages/Home/components/Activity';
@@ -15,8 +14,6 @@ export enum TokenTransferStatus {
 
 function TokenDetail() {
   const navigate = useNavigate();
-  // const [currentToken, setCurrentToken] = useState<TokenItemShowType>();
-  // const { symbol } = useParams();
   const { currentNetwork } = useWalletInfo();
   const { state: currentToken } = useLocation();
   const isMain = useMemo(() => currentNetwork === 'MAIN', [currentNetwork]);
