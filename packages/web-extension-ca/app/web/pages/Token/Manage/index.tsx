@@ -15,14 +15,14 @@ import './index.less';
 export default function AddToken() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [_, tokenActions] = useToken();
+  const [, tokenActions] = useToken();
   const { tokenDataShowInMarket } = useTokenInfo();
   const { displayUserToken } = tokenActions;
   const [filterWord, setFilterWord] = useState<string>('');
   const [openDrop, setOpenDrop] = useState<boolean>(false);
   const { passwordSeed } = useUserInfo();
   const appDispatch = useAppDispatch();
-  const { currentNetwork, walletInfo } = useWalletInfo();
+  const { currentNetwork } = useWalletInfo();
   const chainIdArray = useChainIdList();
   const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'Testnet' : ''), [currentNetwork]);
   const symbolImages = useSymbolImages();

@@ -6,9 +6,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAssetInfo, useTokenInfo, useUserInfo, useWalletInfo } from 'store/Provider/hooks';
 import BaseDrawer from '../BaseDrawer';
-import { fetchAssetAsync, fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
+import { fetchAssetAsync } from '@portkey/store/store-ca/assets/slice';
 import './index.less';
-import { ZERO } from '@portkey/constants/misc';
 import { divDecimals, unitConverter } from '@portkey/utils/converter';
 import { useCaAddresses, useChainIdList } from '@portkey/hooks/hooks-ca/wallet';
 import { fetchAllTokenListAsync } from '@portkey/store/store-ca/tokenManagement/action';
@@ -29,7 +28,7 @@ export default function CustomTokenDrawer({
   ...props
 }: CustomSelectProps) {
   const { t } = useTranslation();
-  const { currentNetwork, walletInfo } = useWalletInfo();
+  const { currentNetwork } = useWalletInfo();
   const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'Testnet' : ''), [currentNetwork]);
   const { accountAssets } = useAssetInfo();
   const { tokenDataShowInMarket } = useTokenInfo();
