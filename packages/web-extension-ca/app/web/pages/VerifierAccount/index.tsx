@@ -23,9 +23,6 @@ import { GuardianMth } from 'types/guardians';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { setRegisterVerifierAction } from 'store/reducers/loginCache/actions';
-import { sleep } from '@portkey/utils';
-import { getAelfInstance } from '@portkey/utils/aelf';
-import { getTxResult } from 'utils/aelfUtils';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
 import aes from '@portkey/utils/aes';
 

@@ -7,9 +7,6 @@ import { useCurrentWallet, useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/
 import { useLoading, useUserInfo } from 'store/Provider/hooks';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { removeManager } from 'utils/sandboxUtil/removeManager';
-import { getAelfInstance } from '@portkey/utils/aelf';
-import { getTxResult } from 'utils/aelfUtils';
-import { sleep } from '@portkey/utils';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { clearLocalStorage } from 'utils/storage/chromeStorage';
 import { contractErrorHandler } from 'utils/tryErrorHandler';

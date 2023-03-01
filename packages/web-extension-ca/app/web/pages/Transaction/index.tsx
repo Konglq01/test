@@ -10,7 +10,6 @@ import { formatStr2EllipsisStr } from '@portkey/utils/converter';
 import clsx from 'clsx';
 import Copy from 'components/Copy';
 import CustomSvg from 'components/CustomSvg';
-import { useCurrentNetwork } from '@portkey/hooks/network';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
