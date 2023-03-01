@@ -27,21 +27,22 @@ export default function Contacts() {
   const { contactIndexList } = useContact();
   const [curList, setCurList] = useState<ContactIndexType[]>(contactIndexList);
   const [isSearch, setIsSearch] = useState<boolean>(false);
+  const filterContact = useMemo(() => contactIndexList.filter((c) => c.contacts.length > 0), [contactIndexList]);
 
   useEffectOnce(() => {
     appDispatch(fetchContactListAsync());
   });
 
   useEffect(() => {
-    setCurList(contactIndexList);
+    setCurList(filterContact);
     setIsSearch(false);
-  }, [contactIndexList]);
+  }, [filterContact]);
 
   const searchContacts = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       let value = e.target.value;
       if (!value) {
-        setCurList(contactIndexList);
+        setCurList(filterContact);
         setIsSearch(false);
         return;
       }
@@ -49,7 +50,7 @@ export default function Contacts() {
 
       if (value.length <= 16) {
         // Name search
-        contactIndexList.forEach(({ index, contacts }) => {
+        filterContact.forEach(({ index, contacts }) => {
           contactIndexFilterList.push({
             index,
             contacts: contacts.filter((contact) => contact.name.trim().toLowerCase() === value.trim().toLowerCase()),
@@ -65,7 +66,7 @@ export default function Contacts() {
           }
         }
         value = getAelfAddress(value);
-        contactIndexList.forEach(({ index, contacts }) => {
+        filterContact.forEach(({ index, contacts }) => {
           contactIndexFilterList.push({
             index,
             contacts: contacts.filter((contact) =>
@@ -77,7 +78,7 @@ export default function Contacts() {
       setCurList(contactIndexFilterList);
       setIsSearch(true);
     },
-    [contactIndexList],
+    [filterContact],
   );
 
   const curTotalContactsNum = useMemo(() => {

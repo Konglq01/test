@@ -71,6 +71,7 @@ function SignupEmail() {
       listener.remove();
     };
   });
+
   return (
     <View style={[BGStyles.bg1, styles.card]}>
       <CommonInput

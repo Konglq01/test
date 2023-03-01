@@ -11,6 +11,7 @@ import { unitConverter } from '@portkey/utils/converter';
 import { useLanguage } from 'i18n/hooks';
 import CommonAvatar from 'components/CommonAvatar';
 import { IToSendAssetParamsType } from '@portkey/types/types-ca/routeParams';
+import { useSymbolImages } from '@portkey/hooks/hooks-ca/useToken';
 
 interface AmountTokenProps {
   balanceShow: number | string;
@@ -26,14 +27,10 @@ export default function AmountToken({
   sendTokenNumber,
   setSendTokenNumber,
   selectedToken,
-  setSelectedToken,
 }: AmountTokenProps) {
   const { t } = useLanguage();
 
-  const onFinishSelectToken = (tokenItem: TokenItemShowType) => {
-    setSelectedToken(tokenItem);
-    setSendTokenNumber('0');
-  };
+  const symbolImages = useSymbolImages();
 
   const formatTokenNameToSuffix = (str: string) => {
     return `${str.slice(0, 5)}...`;
@@ -50,8 +47,13 @@ export default function AmountToken({
       <View style={styles.bottom}>
         <View style={styles.bottomLeft}>
           {/* <Svg icon="aelf-avatar" size={pTd(28)} /> */}
-          {selectedToken?.imageUrl ? (
-            <CommonAvatar shapeType="circular" imageUrl={selectedToken?.imageUrl || ''} avatarSize={28} title={''} />
+          {symbolImages[selectedToken?.symbol] ? (
+            <CommonAvatar
+              shapeType="circular"
+              imageUrl={symbolImages[selectedToken.symbol] || ''}
+              avatarSize={28}
+              title={''}
+            />
           ) : (
             <Text style={styles.imgStyle}>{selectedToken?.symbol?.[0]}</Text>
           )}

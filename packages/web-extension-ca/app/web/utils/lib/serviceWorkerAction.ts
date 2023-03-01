@@ -19,6 +19,16 @@ export const useLockWallet = () => {
   }, []);
 };
 
+export const useActiveLockStatusAction = () => {
+  return useCallback(async () => {
+    try {
+      await InternalMessage.payload(PortkeyMessageTypes.ACTIVE_LOCK_STATUS).send();
+    } catch (error) {
+      message.error('Active lock error');
+    }
+  }, []);
+};
+
 export const setPinAction = async (pin: string) => {
   console.log('setPinAction===');
   await InternalMessage.payload(PortkeyMessageTypes.SET_SEED, pin).send();

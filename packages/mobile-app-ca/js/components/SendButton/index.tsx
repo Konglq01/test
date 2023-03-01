@@ -5,7 +5,6 @@ import navigationService from 'utils/navigationService';
 import { TokenItemShowType } from '@portkey/types/types-ca/token';
 import { IToSendHomeParamsType } from '@portkey/types/types-ca/routeParams';
 
-import { isSameTypeToken } from '@portkey/utils/token';
 import { View, TouchableOpacity } from 'react-native';
 import { TextM } from 'components/CommonText';
 import { useLanguage } from 'i18n/hooks';
@@ -13,7 +12,6 @@ import { useLanguage } from 'i18n/hooks';
 import { pTd } from 'utils/unit';
 import AssetsOverlay from 'pages/DashBoard/AssetsOverlay';
 import { useGetCurrentCAContract } from 'hooks/contract';
-import assets from '@portkey/api/api-did/assets';
 interface SendButtonType {
   themeType?: 'dashBoard' | 'innerPage';
   sentToken?: TokenItemShowType;

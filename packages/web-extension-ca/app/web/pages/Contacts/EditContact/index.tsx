@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import BackHeader from 'components/BackHeader';
 import { ContactItemType, AddressItem } from '@portkey/types/types-ca/contact';
 import { fetchContactListAsync } from '@portkey/store/store-ca/contact/actions';
-import { useAppDispatch } from 'store/Provider/hooks';
+import { useAppDispatch, useLoading } from 'store/Provider/hooks';
 import CustomSvg from 'components/CustomSvg';
 import NetworkDrawer from '../NetworkDrawer';
 import DeleteContact from '../DeleteContact';
@@ -56,6 +56,7 @@ export default function EditContact() {
   const editContactApi = useEditContact();
   const deleteContactApi = useDeleteContact();
   const checkExistNameApi = useCheckContactName();
+  const { setLoading } = useLoading();
 
   useEffect(() => {
     const { addresses } = state;
@@ -193,6 +194,7 @@ export default function EditContact() {
       const { name, addresses } = values;
 
       try {
+        setLoading(true);
         const checkName = await handleCheckName(name.trim());
         const checkAddress = handleCheckAddress(addresses);
         if (checkName && checkAddress) {
@@ -206,8 +208,10 @@ export default function EditContact() {
           message.success(isEdit ? 'Edit Contact successful' : 'Add Contact successful');
         }
       } catch (e: any) {
-        console.log((e.errorMessage || {}).message || e.message || 'Please input the required form field', 'onFinish');
-        message.error(t((e.errorMessage || {}).message || e.message || 'Please input the required form field'));
+        console.log('onFinish==contact error', e);
+        message.error(t((e.error || {}).message || e.message || 'handle contact error'));
+      } finally {
+        setLoading(false);
       }
     },
     [
@@ -218,6 +222,7 @@ export default function EditContact() {
       handleCheckName,
       isEdit,
       navigate,
+      setLoading,
       state.id,
       state.index,
       t,
