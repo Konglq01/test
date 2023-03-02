@@ -93,9 +93,9 @@ export default function Send() {
   }, []);
 
   const btnDisabled = useMemo(() => {
-    if (toAccount.address === '') return true;
+    if (toAccount.address === '' || (stage === Stage.Amount && amount === '')) return true;
     return false;
-  }, [toAccount.address]);
+  }, [amount, stage, toAccount.address]);
 
   const getToAddressChainId = useCallback(
     (toAddress: string) => {

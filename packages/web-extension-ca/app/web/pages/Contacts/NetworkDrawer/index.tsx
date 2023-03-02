@@ -5,6 +5,7 @@ import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import BaseDrawer from 'components/BaseDrawer';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { useSymbolImages } from '@portkey/hooks/hooks-ca/useToken';
 import './index.less';
 
 interface CustomSelectProps extends DrawerProps {
@@ -18,6 +19,7 @@ export default function NetworkDrawer({ onChange, onClose, ...props }: CustomSel
   const [showNetworkLists, setShowNetworkLists] = useState<any[]>([]);
   const { chainList } = useCurrentWallet();
   const isMain = useCallback((chain: string) => (chain === 'AELF' ? 'MainChain' : 'SideChain'), []);
+  const symbolImages = useSymbolImages();
 
   const networkLists = useMemo(
     () =>
@@ -64,7 +66,7 @@ export default function NetworkDrawer({ onChange, onClose, ...props }: CustomSel
             onClick={() => {
               onChange(net);
             }}>
-            <CustomSvg type="Aelf" className="aelf-svg" />
+            <img src={symbolImages['ELF']} />
             <div className="info">{net?.networkName}</div>
           </div>
         ))}

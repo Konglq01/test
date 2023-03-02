@@ -101,7 +101,9 @@ export default function SendPreview({
         <div className="item network">
           <span>Network</span>
           <div>
-            <p>{`${isMain} ${chainId}->${toChain === 'AELF' ? 'MainChain' : 'SideChain'} ${toChain}`}</p>
+            <p className="chain">{`${isMain} ${chainId}->${
+              toChain === 'AELF' ? 'MainChain' : 'SideChain'
+            } ${toChain}`}</p>
           </div>
         </div>
       </div>

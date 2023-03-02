@@ -13,6 +13,7 @@ import { getAelfAddress, isAelfAddress } from '@portkey/utils/aelf';
 import { isValidCAWalletName } from '@portkey/utils/reg';
 import './index.less';
 import { useAddContact, useDeleteContact, useEditContact, useCheckContactName } from '@portkey/hooks/hooks-ca/contact';
+import { useSymbolImages } from '@portkey/hooks/hooks-ca/useToken';
 
 const { Item: FormItem } = Form;
 export enum ContactInfoError {
@@ -57,6 +58,7 @@ export default function EditContact() {
   const deleteContactApi = useDeleteContact();
   const checkExistNameApi = useCheckContactName();
   const { setLoading } = useLoading();
+  const symbolImages = useSymbolImages();
 
   useEffect(() => {
     const { addresses } = state;
@@ -288,7 +290,7 @@ export default function EditContact() {
                       <FormItem {...restField} name={[name, 'networkName']} noStyle>
                         <Input
                           placeholder="Select Network"
-                          prefix={<CustomSvg type="Aelf" className="select-svg" />}
+                          prefix={<img className="select-svg" src={symbolImages['ELF']} />}
                           suffix={
                             <CustomSvg
                               type="Down"

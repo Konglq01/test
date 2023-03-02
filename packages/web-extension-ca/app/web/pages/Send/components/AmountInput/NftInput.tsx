@@ -74,10 +74,10 @@ export default function NftInput({
       <div className="item asset nft">
         <div className="avatar">{token.imageUrl ? <img src={token.imageUrl} /> : <p>{token.symbol[0]}</p>}</div>
         <div className="info">
-          <p className="index">
+          <div className="index">
             <p className="alias">{token.alias}</p>
             <p className="token-id">#{token.tokenId}</p>
-          </p>
+          </div>
           <p className="quantity">
             Balance: <span>{`${unitConverter(divDecimals(balance, token.decimals))}`}</span>
           </p>
@@ -96,6 +96,7 @@ export default function NftInput({
               onBlur={handleAmountBlur}
               onChange={(e) => {
                 setAmount(e.target.value);
+                onChange({ amount: e.target.value, balance });
               }}
             />
           </div>

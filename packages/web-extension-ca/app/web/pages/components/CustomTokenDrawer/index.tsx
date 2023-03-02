@@ -66,9 +66,11 @@ export default function CustomTokenDrawer({
           key={`${token.symbol}_${token.chainId}`}
           onClick={onChange?.bind(undefined, token, 'token')}>
           <div className="icon">
-            <div className="custom">
-              {symbolImages[token.symbol] ? <img src={symbolImages[token.symbol]} /> : token?.symbol?.slice(0, 1)}
-            </div>
+            {symbolImages[token.symbol] ? (
+              <img src={symbolImages[token.symbol]} />
+            ) : (
+              <div className="custom">{token?.symbol?.slice(0, 1)}</div>
+            )}
           </div>
           <div className="info">
             <p className="symbol">{`${token.symbol}`}</p>
