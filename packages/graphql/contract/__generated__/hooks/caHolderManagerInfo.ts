@@ -1,4 +1,4 @@
-import * as Types from '../__generated__/types';
+import * as Types from '../types';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
@@ -15,11 +15,7 @@ export type CaHolderManagerInfoQuery = {
     chainId?: string | null;
     caHash?: string | null;
     caAddress?: string | null;
-    managers?: Array<{
-      __typename?: 'ManagerInfo';
-      manager?: string | null;
-      deviceString?: string | null;
-    } | null> | null;
+    managers?: Array<{ __typename?: 'ManagerInfo'; manager?: string | null; extraData?: string | null } | null> | null;
   } | null> | null;
 };
 
@@ -32,7 +28,7 @@ export const CaHolderManagerInfoDocument = gql`
       caAddress
       managers {
         manager
-        deviceString
+        extraData
       }
     }
   }

@@ -1,4 +1,4 @@
-import * as Types from '../__generated__/types';
+import * as Types from '../types';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
@@ -9,24 +9,31 @@ export type CaHolderTransactionAddressInfoQueryVariables = Types.Exact<{
 
 export type CaHolderTransactionAddressInfoQuery = {
   __typename?: 'Query';
-  caHolderTransactionAddressInfo?: Array<{
-    __typename?: 'CAHolderTransactionAddressDto';
-    chainId?: string | null;
-    caAddress?: string | null;
-    address?: string | null;
-    addressChainId?: string | null;
-    transactionTime: number;
-  } | null> | null;
+  caHolderTransactionAddressInfo?: {
+    __typename?: 'CAHolderTransactionAddressPageResultDto';
+    totalRecordCount: number;
+    data?: Array<{
+      __typename?: 'CAHolderTransactionAddressDto';
+      chainId?: string | null;
+      caAddress?: string | null;
+      address?: string | null;
+      addressChainId?: string | null;
+      transactionTime: number;
+    } | null> | null;
+  } | null;
 };
 
 export const CaHolderTransactionAddressInfoDocument = gql`
   query caHolderTransactionAddressInfo($dto: GetCAHolderTransactionAddressDto) {
     caHolderTransactionAddressInfo(dto: $dto) {
-      chainId
-      caAddress
-      address
-      addressChainId
-      transactionTime
+      totalRecordCount
+      data {
+        chainId
+        caAddress
+        address
+        addressChainId
+        transactionTime
+      }
     }
   }
 `;

@@ -6,7 +6,7 @@
   "version": "0.0.1",
   "type": "commonjs",
   "scripts": {
-    "generate": "node gqlg.js && graphql-codegen --config codegen.config.ts"
+    "generate": "rm -rf ./**/*/__generated__ && node gqlg.js && graphql-codegen --config codegen.config.ts"
   },
   "dependencies": {
     "@apollo/client": "^3.7.3",
