@@ -7,9 +7,10 @@ interface ToAccountProps {
   value?: { name?: string; address: string };
   onChange?: (value: { name?: string; address: string }) => void;
   onBlur?: FocusEventHandler<HTMLInputElement> | undefined;
+  focus: boolean;
 }
 
-export default function ToAccount({ value, onChange, onBlur }: ToAccountProps) {
+export default function ToAccount({ value, onChange, onBlur, focus }: ToAccountProps) {
   const [isFocus, setIsFocus] = useState(false);
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const address = e.target.value;
@@ -19,7 +20,7 @@ export default function ToAccount({ value, onChange, onBlur }: ToAccountProps) {
     });
   };
   return (
-    <div className="to-account" onClick={() => setIsFocus(true)}>
+    <div className="to-account" onClick={() => focus && setIsFocus(true)}>
       {isFocus || !value?.address ? (
         <Input
           className={value?.name && 'with-name'}

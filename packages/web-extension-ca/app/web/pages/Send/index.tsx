@@ -1,10 +1,9 @@
-import { DefaultChainId } from '@portkey/constants/constants-ca/network';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { useCurrentWallet, useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { AddressBookError } from '@portkey/store/addressBook/types';
 import { addFailedActivity, removeFailedActivity } from '@portkey/store/store-ca/activity/slice';
-import { AddressItem, ContactItemType, IClickAddressProps } from '@portkey/types/types-ca/contact';
+import { ContactItemType, IClickAddressProps } from '@portkey/types/types-ca/contact';
 import { BaseToken } from '@portkey/types/types-ca/token';
 import { isDIDAddress } from '@portkey/utils';
 import { getAelfAddress, getEntireDIDAelfAddress, getWallet, isAelfAddress, isCrossChain } from '@portkey/utils/aelf';
@@ -18,16 +17,12 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import { useDebounce } from 'react-use';
 import { useAppDispatch, useContact, useLoading, useUserInfo, useWalletInfo } from 'store/Provider/hooks';
-import crossChainTransfer, {
-  CrossChainTransferIntervalParams,
-  intervalCrossChainTransfer,
-} from 'utils/sandboxUtil/crossChainTransfer';
+import crossChainTransfer, { intervalCrossChainTransfer } from 'utils/sandboxUtil/crossChainTransfer';
 import sameChainTransfer from 'utils/sandboxUtil/sameChainTransfer';
 import AddressSelector from './components/AddressSelector';
 import AmountInput from './components/AmountInput';
 import SendPreview from './components/SendPreview';
 import ToAccount from './components/ToAccount';
-import { getBalance } from 'utils/sandboxUtil/getBalance';
 import { WalletError } from '@portkey/store/wallet/type';
 import getTransferFee from './utils/getTransferFee';
 import { contractErrorHandler } from '@portkey/did-ui-react/src/utils/errorHandler';
@@ -218,6 +213,7 @@ export default function Send() {
 
   const handleCheckPreview = useCallback(async () => {
     try {
+      setLoading(true);
       if (!ZERO.plus(amount).toNumber()) return 'Please input amount';
       if (type === 'token') {
         if (ZERO.plus(amount).times(`1e${tokenInfo.decimals}`).isGreaterThan(ZERO.plus(balance))) {
@@ -241,8 +237,10 @@ export default function Send() {
     } catch (error: any) {
       console.log('checkTransactionValue===', error);
       return TransactionError.FEE_NOTE_ENOUGH;
+    } finally {
+      setLoading(false);
     }
-  }, [type, amount, tokenInfo.decimals, balance, getTranslationInfo]);
+  }, [setLoading, amount, type, getTranslationInfo, tokenInfo.decimals, balance]);
 
   const sendHandler = useCallback(async () => {
     try {
@@ -357,7 +355,7 @@ export default function Send() {
       1: {
         btnText: 'Preview',
         handler: async () => {
-          if (!validateToAddress(toAccount)) return;
+          // if (!validateToAddress(toAccount)) return;
           const res = await handleCheckPreview();
           console.log('handleCheckPreview res', res);
           if (!res) {
@@ -461,6 +459,7 @@ export default function Send() {
               <ToAccount
                 value={toAccount}
                 onChange={(v) => setToAccount(v)}
+                focus={stage !== Stage.Amount}
                 // onBlur={() => validateToAddress(toAccount)}
               />
               {stage === Stage.Amount && (

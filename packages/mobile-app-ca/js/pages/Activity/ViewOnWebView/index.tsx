@@ -1,17 +1,10 @@
-import React, { useMemo, useState } from 'react';
-import { TouchableOpacity, StyleSheet } from 'react-native';
-import navigationService from 'utils/navigationService';
-import Svg from 'components/Svg';
-import PageContainer from 'components/PageContainer';
+import React from 'react';
+import { StyleSheet } from 'react-native';
 import { defaultColors } from 'assets/theme';
-import { pTd } from 'utils/unit';
 import { useLanguage } from 'i18n/hooks';
 import WebView from 'react-native-webview';
 import CustomHeader from 'components/CustomHeader';
 import SafeAreaBox from 'components/SafeAreaBox';
-import { useGStyles } from 'assets/theme/useGStyles';
-import { text } from 'stream/consumers';
-import { Text } from 'react-native-svg';
 
 const safeAreaColorMap = {
   white: defaultColors.bg1,
