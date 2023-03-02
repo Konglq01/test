@@ -2,6 +2,8 @@ PODS:
   - boost (1.76.0)
   - CocoaAsyncSocket (7.6.5)
   - DoubleConversion (1.1.6)
+  - EXAppleAuthentication (4.3.0):
+    - ExpoModulesCore
   - EXApplication (4.2.2):
     - ExpoModulesCore
   - EXBarCodeScanner (11.4.0):
@@ -30,6 +32,8 @@ PODS:
     - ExpoModulesCore
   - ExpoClipboard (3.1.0):
     - ExpoModulesCore
+  - ExpoCrypto (11.0.0):
+    - ExpoModulesCore
   - ExpoImagePicker (13.3.1):
     - ExpoModulesCore
   - ExpoKeepAwake (10.2.0):
@@ -37,6 +41,10 @@ PODS:
   - ExpoModulesCore (0.11.7):
     - React-Core
     - ReactCommon/turbomodule/core
+  - ExpoRandom (12.3.0):
+    - ExpoModulesCore
+  - ExpoWebBrowser (11.0.0):
+    - ExpoModulesCore
   - EXScreenCapture (4.3.0):
     - ExpoModulesCore
   - EXScreenOrientation (4.3.0):
@@ -659,6 +667,7 @@ PODS:
 DEPENDENCIES:
   - boost (from `../node_modules/react-native/third-party-podspecs/boost.podspec`)
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
+  - EXAppleAuthentication (from `../node_modules/expo-apple-authentication/ios`)
   - EXApplication (from `../node_modules/expo-application/ios`)
   - EXBarCodeScanner (from `../node_modules/expo-barcode-scanner/ios`)
   - EXBattery (from `../node_modules/expo-battery/ios`)
@@ -671,9 +680,12 @@ DEPENDENCIES:
   - EXLocalAuthentication (from `../node_modules/expo-local-authentication/ios`)
   - Expo (from `../node_modules/expo`)
   - ExpoClipboard (from `../node_modules/expo-clipboard/ios`)
+  - ExpoCrypto (from `../node_modules/expo-crypto/ios`)
   - ExpoImagePicker (from `../node_modules/expo-image-picker/ios`)
   - ExpoKeepAwake (from `../node_modules/expo-keep-awake/ios`)
   - ExpoModulesCore (from `../node_modules/expo-modules-core/ios`)
+  - ExpoRandom (from `../node_modules/expo-random/ios`)
+  - ExpoWebBrowser (from `../node_modules/expo-web-browser/ios`)
   - EXScreenCapture (from `../node_modules/expo-screen-capture/ios`)
   - EXScreenOrientation (from `../node_modules/expo-screen-orientation/ios`)
   - EXSecureStore (from `../node_modules/expo-secure-store/ios`)
@@ -817,6 +829,8 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/react-native/third-party-podspecs/boost.podspec"
   DoubleConversion:
     :podspec: "../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec"
+  EXAppleAuthentication:
+    :path: "../node_modules/expo-apple-authentication/ios"
   EXApplication:
     :path: "../node_modules/expo-application/ios"
   EXBarCodeScanner:
@@ -841,12 +855,18 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo"
   ExpoClipboard:
     :path: "../node_modules/expo-clipboard/ios"
+  ExpoCrypto:
+    :path: "../node_modules/expo-crypto/ios"
   ExpoImagePicker:
     :path: "../node_modules/expo-image-picker/ios"
   ExpoKeepAwake:
     :path: "../node_modules/expo-keep-awake/ios"
   ExpoModulesCore:
     :path: "../node_modules/expo-modules-core/ios"
+  ExpoRandom:
+    :path: "../node_modules/expo-random/ios"
+  ExpoWebBrowser:
+    :path: "../node_modules/expo-web-browser/ios"
   EXScreenCapture:
     :path: "../node_modules/expo-screen-capture/ios"
   EXScreenOrientation:
@@ -972,6 +992,7 @@ SPEC CHECKSUMS:
   boost: a7c83b31436843459a1961bfd74b96033dc77234
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
   DoubleConversion: 5189b271737e1565bdce30deb4a08d647e3f5f54
+  EXAppleAuthentication: b9e9d8fa9b0cc5277b2121eb809cf0f57c2496a7
   EXApplication: e418d737a036e788510f2c4ad6c10a7d54d18586
   EXBarCodeScanner: 8e13bad5d197b4b9a58d16af41f8690875a5f736
   EXBattery: 282a943ee063a035c3dcbb8c4081193a6f02be44
@@ -984,9 +1005,12 @@ SPEC CHECKSUMS:
   EXLocalAuthentication: a714f4e7370c4efba4ed4345a55110f22ac3d85f
   Expo: 7e821e708a35d2720ef6baa658e224dd91c4821e
   ExpoClipboard: 7a5a26a3119bd1d0337ee065db3bf5d8a40e23a1
+  ExpoCrypto: e534314db0e1a17ae12b5140d529bd0c5efcbc6a
   ExpoImagePicker: ca4207f2952a78e6dac2d7852d7e170dd2eaf1d0
   ExpoKeepAwake: 0e8f18142e71bbf2c7f6aa66ebed249ba1420320
   ExpoModulesCore: 2d60ec04c49641afb55fee3faac86fb108c68fe0
+  ExpoRandom: f9f1faa299a40733867f344d6b7bfa2d1f4ab04d
+  ExpoWebBrowser: 5804ac42a8269d0e534bc4461993005f72535649
   EXScreenCapture: 23de056fdb02edd1fb8f147b0fd198c6d5cada3d
   EXScreenOrientation: c309fed5399e482c6adebe14f41a7fd9001d7bde
   EXSecureStore: ac4b3c89dd5810528074d9422d5fed5a9e684467
