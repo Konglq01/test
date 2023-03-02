@@ -91,10 +91,11 @@ export const useDeviceList = () => {
     const managers = caHolderManagerInfo?.managers || [];
     return managers
       .map(item => {
-        const deviceStringArray = (item?.deviceString || '').split(',').map(item => Number(item));
+        // TODO: check ALL deviceString
+        const extraDataArray = (item?.extraData || '').split(',').map(item => Number(item));
         let deviceType: DeviceType = 0,
           loginTime = undefined;
-        const firstNum = deviceStringArray[0];
+        const firstNum = extraDataArray[0];
         if (firstNum !== undefined && !isNaN(firstNum)) {
           if (DeviceType[firstNum] !== undefined) {
             deviceType = firstNum;
@@ -102,7 +103,7 @@ export const useDeviceList = () => {
             loginTime = firstNum;
           }
         }
-        const secondNum = deviceStringArray[1];
+        const secondNum = extraDataArray[1];
         if (
           loginTime === undefined &&
           secondNum !== undefined &&
