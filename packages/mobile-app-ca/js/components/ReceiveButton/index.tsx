@@ -8,6 +8,7 @@ import { useLanguage } from 'i18n/hooks';
 import TokenOverlay from 'components/TokenOverlay';
 import { TokenItemShowType } from '@portkey/types/types-ca/token';
 import { pTd } from 'utils/unit';
+import GStyles from 'assets/theme/GStyles';
 
 interface SendButtonType {
   currentTokenInfo?: TokenItemShowType;
@@ -23,6 +24,7 @@ export default function ReceiveButton(props: SendButtonType) {
   return (
     <View style={styles.buttonWrap}>
       <TouchableOpacity
+        style={[styles.iconWrapStyle, GStyles.alignCenter]}
         onPress={() => {
           if (themeType === 'innerPage') return navigationService.navigate('Receive', currentTokenInfo);
 
