@@ -1,5 +1,5 @@
 import PageContainer from 'components/PageContainer';
-import { useIsFetchingTokenList, useToken } from '@portkey/hooks/hooks-ca/useToken';
+import { useIsFetchingTokenList, useSymbolImages, useToken } from '@portkey/hooks/hooks-ca/useToken';
 import { TokenItemShowType } from '@portkey/types/types-ca/token';
 import CommonInput from 'components/CommonInput';
 import { useAppCASelector } from '@portkey/hooks/hooks-ca';
@@ -37,24 +37,18 @@ type ItemProps = {
   item: TokenItemShowType;
   onHandleToken: (item: TokenItemShowType, type: 'add' | 'delete') => void;
 };
-function areEqual(prevProps: ItemProps, nextProps: ItemProps) {
-  return nextProps.item.isAdded === prevProps.item.isAdded;
-}
 
-const Item = memo(({ isTestnet, item, onHandleToken }: ItemProps) => {
+const Item = ({ isTestnet, item, onHandleToken }: ItemProps) => {
+  const symbolImages = useSymbolImages();
   return (
     <TouchableOpacity style={itemStyle.wrap} key={`${item.symbol}${item.address}${item.chainId}}`}>
-      {item.symbol === 'ELF' ? (
-        <CommonAvatar
-          shapeType="circular"
-          title={item.symbol}
-          svgName="aelf-avatar"
-          avatarSize={pTd(48)}
-          style={itemStyle.left}
-        />
-      ) : (
-        <CommonAvatar shapeType="circular" title={item.symbol} avatarSize={pTd(48)} style={itemStyle.left} />
-      )}
+      <CommonAvatar
+        shapeType="circular"
+        title={item.symbol}
+        imageUrl={symbolImages[item.symbol]}
+        avatarSize={pTd(48)}
+        style={itemStyle.left}
+      />
 
       <View style={itemStyle.right}>
         <View>
@@ -74,7 +68,7 @@ const Item = memo(({ isTestnet, item, onHandleToken }: ItemProps) => {
       </View>
     </TouchableOpacity>
   );
-}, areEqual);
+};
 Item.displayName = 'Item';
 
 const ManageTokenList: React.FC<ManageTokenListProps> = () => {

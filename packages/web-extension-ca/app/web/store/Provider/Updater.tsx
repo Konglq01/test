@@ -10,6 +10,8 @@ import { useUserInfo } from './hooks';
 import { request } from '@portkey/api/api-did';
 import useLocking from 'hooks/useLocking';
 import { useNavigate } from 'react-router';
+import { useActiveLockStatus } from 'hooks/useActiveLockStatus';
+
 keepAliveOnPages({});
 
 export default function Updater() {
@@ -35,7 +37,7 @@ export default function Updater() {
   // TODO
   // Query the caAddress of each chain by Contract
   useCaInfoOnChain();
-
+  useActiveLockStatus();
   useMemo(() => {
     request.setLockCallBack(onLocking);
   }, [onLocking]);

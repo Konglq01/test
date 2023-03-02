@@ -9,6 +9,8 @@ import { useRefreshTokenConfig } from '@portkey/hooks/hooks-ca/api';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import useLocking from 'hooks/useLocking';
 import { useCaInfoOnChain } from 'hooks/useCaInfoOnChain';
+import { useFetchSymbolImages } from '@portkey/hooks/hooks-ca/useToken';
+
 export default function Updater() {
   // FIXME: delete language
   const { changeLanguage } = useLanguage();
@@ -21,6 +23,7 @@ export default function Updater() {
   const onLocking = useLocking();
   useRefreshTokenConfig(pin);
   useCaInfoOnChain();
+  useFetchSymbolImages();
   useMemo(() => {
     request.set('baseURL', apiUrl);
     if (service.defaults.baseURL !== apiUrl) {

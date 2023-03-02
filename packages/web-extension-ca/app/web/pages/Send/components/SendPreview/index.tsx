@@ -1,10 +1,8 @@
 import { ZERO } from '@portkey/constants/misc';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { getChainIdByAddress } from '@portkey/utils';
 import clsx from 'clsx';
 import { useMemo } from 'react';
 import { useWalletInfo } from 'store/Provider/hooks';
-import { useTokenPrice } from '@portkey/hooks/hooks-ca/useTokensPrice';
+// import { useTokenPrice } from '@portkey/hooks/hooks-ca/useTokensPrice';
 import './index.less';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { CROSS_FEE } from '@portkey/constants/constants-ca/wallet';
@@ -34,15 +32,14 @@ export default function SendPreview({
   isCross: boolean;
   tokenId: string;
 }) {
-  const { walletName, currentNetwork, walletInfo } = useWalletInfo();
+  const { walletName, currentNetwork } = useWalletInfo();
   const wallet = useCurrentWalletInfo();
-  const networkInfo = useCurrentNetworkInfo();
   const isTestNet = useMemo(() => currentNetwork === 'TESTNET', [currentNetwork]);
-  const ElfPrice = useTokenPrice(['ELF']);
+  // const ElfPrice = useTokenPrice(['ELF']);
   const isMain = useMemo(() => (chainId === 'AELF' ? 'MainChain' : 'SideChain'), [chainId]);
   const txFee = useMemo(() => {
     if (isCross && symbol === 'ELF') {
-      return unitConverter(ZERO.plus(CROSS_FEE).plus(transactionFee).toNumber());
+      return ZERO.plus(CROSS_FEE).plus(transactionFee).toNumber();
     } else {
       return transactionFee;
     }
@@ -73,7 +70,7 @@ export default function SendPreview({
               <p className="token-id">{`#${tokenId}`}</p>
             </p>
             <p className="quantity">
-              Balance: <span>{unitConverter(amount)}</span>
+              Amount: <span>{unitConverter(amount)}</span>
             </p>
           </div>
         </div>

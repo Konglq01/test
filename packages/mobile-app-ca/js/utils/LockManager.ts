@@ -1,3 +1,4 @@
+import OverlayModal from 'components/OverlayModal';
 import { AppState, AppStateStatus, NativeEventSubscription } from 'react-native';
 import BackgroundTimer from 'react-native-background-timer';
 import navigationService from './navigationService';
@@ -51,6 +52,7 @@ export default class LockManager {
   };
 
   gotoLockScreen = () => {
+    OverlayModal.destroy();
     if (!getWalletAddress()) navigationService.reset('Referral');
     else navigationService.navigate('SecurityLock');
     this.locked = true;

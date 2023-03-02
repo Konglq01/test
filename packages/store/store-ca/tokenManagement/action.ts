@@ -2,6 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { createAction } from '@reduxjs/toolkit';
 import { HandleTokenArgTypes, TokenState } from '@portkey/types/types-ca/token';
 import { fetchAllTokenList } from './api';
+import { request } from '@portkey/api/api-did';
 
 export const addTokenInCurrentAccount = createAction<HandleTokenArgTypes>('token/addTokenInCurrentAccount');
 
@@ -20,3 +21,8 @@ export const fetchAllTokenListAsync = createAsyncThunk(
   // return { list: [], totalRecordCount };
   // },
 );
+
+export const getSymbolImagesAsync = createAsyncThunk('tokenManagement/getSymbolImagesAsync', async () => {
+  const response = await request.assets.getSymbolImages({});
+  return response.symbolImages;
+});

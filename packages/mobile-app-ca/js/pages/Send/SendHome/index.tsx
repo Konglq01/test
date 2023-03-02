@@ -108,7 +108,11 @@ const SendHome: React.FC<SendHomeProps> = props => {
         },
       });
 
-      console.log('====TransactionFee======', TransactionFee, unitConverter(ZERO.plus(TransactionFee.ELF).div('1e8')));
+      console.log(
+        '====TransactionFee======',
+        TransactionFee,
+        unitConverter(ZERO.plus(TransactionFee?.ELF || '0').div('1e8')),
+      );
 
       if (!TransactionFee) throw { code: 500, message: 'no enough fee' };
 
@@ -127,21 +131,24 @@ const SendHome: React.FC<SendHomeProps> = props => {
     ],
   );
 
-  const getAssetBalance = async (tokenContractAddress: string, symbol: string) => {
-    if (!chainInfo || !pin) return;
-    const account = getManagerAccount(pin);
-    if (!account) return;
+  const getAssetBalance = useCallback(
+    async (tokenContractAddress: string, symbol: string) => {
+      if (!chainInfo || !pin) return;
+      const account = getManagerAccount(pin);
+      if (!account) return;
 
-    const contract = await getContractBasic({
-      contractAddress: tokenContractAddress,
-      rpcUrl: chainInfo?.endPoint,
-      account: account,
-    });
+      const contract = await getContractBasic({
+        contractAddress: tokenContractAddress,
+        rpcUrl: chainInfo?.endPoint,
+        account: account,
+      });
 
-    const balance = await getELFChainBalance(contract, symbol, wallet?.[assetInfo?.chainId]?.caAddress || '');
+      const balance = await getELFChainBalance(contract, symbol, wallet?.[assetInfo?.chainId]?.caAddress || '');
 
-    return balance;
-  };
+      return balance;
+    },
+    [assetInfo?.chainId, chainInfo, pin, wallet],
+  );
 
   // warning dialog
   const showDialog = useCallback(
@@ -178,7 +185,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
         case 'crossChain':
           ActionSheet.alert({
             title: t(''),
-            message: t('The receiving address is a cross-chain transfer transaction'),
+            message: t('This is a cross-chain transaction'),
             buttons: [
               {
                 title: t('Cancel'),
@@ -299,19 +306,26 @@ const SendHome: React.FC<SendHomeProps> = props => {
     navigationService.navigate('SendPreview', {
       sendType,
       assetInfo: selectedAssets,
-      toInfo: { ...selectedToContact, address: getEntireDIDAelfAddress(selectedToContact.address) },
+      toInfo: {
+        ...selectedToContact,
+        address: getEntireDIDAelfAddress(selectedToContact.address, undefined, assetInfo.chainId),
+      },
       transactionFee: result?.fee || '0',
       sendNumber,
     } as IToSendPreviewParamsType);
   };
 
   // get the target token balance
-  useEffectOnce(() => {
+  // useEffectOnce(() => {
+
+  // });
+
+  useEffect(() => {
     (async () => {
       const balance = await getAssetBalance(assetInfo.tokenContractAddress || assetInfo.address, assetInfo.symbol);
       setSelectedAssets({ ...selectedAssets, balance });
     })();
-  });
+  }, [assetInfo.address, assetInfo.symbol, assetInfo.tokenContractAddress, getAssetBalance, selectedAssets]);
 
   return (
     <PageContainer

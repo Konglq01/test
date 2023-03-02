@@ -1,8 +1,8 @@
 import { TransactionTypes, transactionTypesMap } from '@portkey/constants/constants-ca/activity';
 import { ZERO } from '@portkey/constants/misc';
 import { TransactionStatus } from '@portkey/graphql/contract/__generated__/types';
+import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { useCaAddresses, useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
-import { useCurrentNetwork } from '@portkey/hooks/network';
 import useRouterParams from '@portkey/hooks/useRouterParams';
 import { fetchActivity } from '@portkey/store/store-ca/activity/api';
 import { ActivityItemType } from '@portkey/types/types-ca/activity';
@@ -40,10 +40,13 @@ const ActivityDetail = () => {
   const { transactionId = '', blockHash = '', isReceived: isReceivedParams } = useRouterParams<RouterParams>();
   const caAddresses = useCaAddresses();
   const { currentNetwork } = useCurrentWallet();
-  const { blockExplorerURL } = useCurrentNetwork();
+
   const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'TESTNET' : ''), [currentNetwork]);
 
   const [activityItem, setActivityItem] = useState<ActivityItemType>();
+
+  const { explorerUrl } = useCurrentChain(activityItem?.fromChainId) as { explorerUrl: string };
+
   useEffectOnce(() => {
     const params = {
       caAddresses,
@@ -64,6 +67,8 @@ const ActivityDetail = () => {
 
   const isNft = useMemo(() => !!activityItem?.nftInfo?.nftId, [activityItem?.nftInfo?.nftId]);
   const status = useMemo(() => {
+    if (!activityItem?.status) return { text: '', style: 'confirmed' };
+
     if (activityItem?.status === TransactionStatus.Mined)
       return {
         text: 'Confirmed',
@@ -130,7 +135,7 @@ const ActivityDetail = () => {
                 )} ${item.symbol}`}</TextM>
                 {!isTestNet && (
                   <TextS style={[styles.lightGrayFontColor, styles.marginTop4]}>{`$ ${unitConverter(
-                    ZERO.plus(item.feeInUsd ?? 0).div(`1e${DEFAULT_DECIMAL}`),
+                    ZERO.plus(item?.feeInUsd ?? 0).div(`1e${DEFAULT_DECIMAL}`),
                     2,
                   )}`}</TextS>
                 )}
@@ -232,12 +237,15 @@ const ActivityDetail = () => {
 
       <View style={styles.space} />
 
-      {blockExplorerURL ? (
+      {explorerUrl && (
         <CommonButton
           containerStyle={[GStyles.marginTop(pTd(8)), styles.bottomButton]}
           onPress={() => {
+            if (!explorerUrl) return;
+            if (!activityItem?.transactionId) return;
+
             navigationService.navigate('ViewOnWebView', {
-              url: getExploreLink(blockExplorerURL, activityItem?.transactionId || '', 'transaction'),
+              url: getExploreLink(explorerUrl, activityItem?.transactionId || '', 'transaction'),
             });
           }}
           title={t('View on Explorer')}
@@ -245,7 +253,7 @@ const ActivityDetail = () => {
           style={styles.button}
           buttonStyle={styles.bottomButton}
         />
-      ) : null}
+      )}
     </PageContainer>
   );
 };

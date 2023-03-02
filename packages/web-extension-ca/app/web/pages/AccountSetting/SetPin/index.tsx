@@ -3,7 +3,7 @@ import { Form, message, Button } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { setPinAction } from 'utils/lib/serviceWorkerAction';
 import { changePin } from '@portkey/store/store-ca/wallet/actions';
-import { useUserInfo, useAppDispatch } from 'store/Provider/hooks';
+import { useAppDispatch } from 'store/Provider/hooks';
 import CustomPassword from 'components/CustomPassword';
 import ConfirmPassword from 'components/ConfirmPassword';
 import BackHeader from 'components/BackHeader';
@@ -11,6 +11,8 @@ import CustomSvg from 'components/CustomSvg';
 import { useNavigate } from 'react-router';
 import BaseDrawer from 'components/BaseDrawer';
 import { setPasswordSeed } from 'store/reducers/user/slice';
+import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import aes from '@portkey/utils/aes';
 import './index.less';
 
 const FormItem = Form.Item;
@@ -20,14 +22,15 @@ export default function SetPin() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { passwordSeed } = useUserInfo();
   const [disable, setDisable] = useState<boolean>(true);
   const [pin, setPin] = useState('');
   const [open, setOpen] = useState(false);
   const [errMsg, setErrMsg] = useState('');
+  const walletInfo = useCurrentWalletInfo();
 
   const handleNext = useCallback(async () => {
-    if (passwordSeed === pin) {
+    const privateKey = aes.decrypt(walletInfo.AESEncryptPrivateKey, pin);
+    if (privateKey) {
       setErrMsg('');
       setDisable(false);
       setOpen(true);
@@ -36,7 +39,7 @@ export default function SetPin() {
       setErrMsg('Incorrect Pin');
       setDisable(true);
     }
-  }, [passwordSeed, pin]);
+  }, [pin, walletInfo.AESEncryptPrivateKey]);
 
   const handleSave = useCallback(async () => {
     const newPin = form.getFieldValue('confirmPassword');
@@ -125,7 +128,7 @@ export default function SetPin() {
           <div className="form-content">
             <ConfirmPassword
               label={{
-                password: 'Please choose a new pin',
+                password: 'Please enter a new pin',
                 confirmPassword: <div className="new-pin-label">{t('Confirm new pin')}</div>,
               }}
               validateFields={form.validateFields}

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { message, Tabs } from 'antd';
+import { Tabs } from 'antd';
 import { useNavigate } from 'react-router';
 import './index.less';
 import BalanceCard from 'pages/components/BalanceCard';
@@ -10,11 +10,10 @@ import Activity from '../Activity/index';
 import { Transaction } from '@portkey/types/types-ca/trade';
 import NFT from '../NFT/NFT';
 import { unitConverter } from '@portkey/utils/converter';
-import { useAppDispatch, useUserInfo, useWalletInfo, useAssetInfo, useTokenInfo } from 'store/Provider/hooks';
-import { useCaAddresses, useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
-import { fetchAssetAsync, fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
-import { fetchAllTokenListAsync } from '@portkey/store/store-ca/tokenManagement/action';
-import { TokenItemShowType } from '@portkey/types/types-eoa/token';
+import { useAppDispatch, useUserInfo, useWalletInfo, useAssetInfo } from 'store/Provider/hooks';
+import { useCaAddresses, useChainIdList } from '@portkey/hooks/hooks-ca/wallet';
+import { fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
+import { fetchAllTokenListAsync, getSymbolImagesAsync } from '@portkey/store/store-ca/tokenManagement/action';
 import { getWalletNameAsync } from '@portkey/store/store-ca/wallet/actions';
 
 export interface TransactionResult {
@@ -22,10 +21,10 @@ export interface TransactionResult {
   items: Transaction[];
 }
 
-let timer: any;
+// let timer: any;
 
 export default function MyBalance() {
-  const { walletName, currentNetwork, walletInfo } = useWalletInfo();
+  const { walletName, currentNetwork } = useWalletInfo();
   const { t } = useTranslation();
   const [activeKey, setActiveKey] = useState<string>('assets');
   const [navTarget, setNavTarget] = useState<'send' | 'receive'>('send');
@@ -33,34 +32,33 @@ export default function MyBalance() {
   const {
     accountToken: { accountTokenList },
     accountBalance,
-    accountAssets: { accountAssetsList },
   } = useAssetInfo();
   const navigate = useNavigate();
   const { passwordSeed } = useUserInfo();
   const appDispatch = useAppDispatch();
   const caAddresses = useCaAddresses();
-  const chainIdArray = useMemo(
-    () => Object.keys(walletInfo?.caInfo?.TESTNET || {}).filter((item) => item !== 'managerInfo'),
-    [walletInfo?.caInfo?.TESTNET],
-  );
+  const chainIdArray = useChainIdList();
   const isMain = useMemo(() => currentNetwork === 'MAIN', [currentNetwork]);
-  console.log('-------accountAssetsList', accountAssetsList);
 
   useEffect(() => {
     console.log('---passwordSeed-myBalance---', passwordSeed);
     if (!passwordSeed) return;
-    // appDispatch(
-    //   fetchAssetAsync({
-    //     caAddresses,
-    //     keyword: '',
-    //   }),
-    // );
     appDispatch(fetchTokenListAsync({ caAddresses }));
     appDispatch(fetchAllTokenListAsync({ keyword: '', chainIdArray }));
     appDispatch(getWalletNameAsync());
+    appDispatch(getSymbolImagesAsync());
   }, [passwordSeed, appDispatch, caAddresses, chainIdArray]);
 
-  useEffect(() => () => clearInterval(timer), []);
+  // useEffect(() => {
+  //   console.log('accountTokenList', accountTokenList, timer);
+  //   if (accountTokenList.length > 0) return clearInterval(timer);
+  //   if (timer) clearInterval(timer);
+  //   timer = setInterval(() => {
+  //     if (accountTokenList.length > 0) return clearInterval(timer);
+  //     appDispatch(fetchTokenListAsync({ caAddresses }));
+  //   }, 1000);
+  //   return () => clearInterval(timer);
+  // }, [accountTokenList, appDispatch, caAddresses, passwordSeed]);
 
   const SelectTokenELe = useMemo(() => {
     return (
@@ -108,18 +106,12 @@ export default function MyBalance() {
       <BalanceCard
         amount={accountBalance}
         onSend={() => {
-          // if (tokenList.length > 1) {
           setNavTarget('send');
           return setTokenOpen(true);
-          // }
-          // navigate(`/send/${'ELF'}`);
         }}
         onReceive={() => {
-          // if (tokenList.length > 1) {
           setNavTarget('receive');
           return setTokenOpen(true);
-          // }
-          // navigate('/receive');
         }}
       />
       {SelectTokenELe}

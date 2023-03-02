@@ -43,6 +43,21 @@ export function isDIDAelfAddress(value?: string) {
   }
 }
 
+const initAddressInfo = {
+  prefix: '',
+  address: '',
+  suffix: '',
+};
+export const getAddressInfo = (value: string): { prefix: string; address: string; suffix: string } => {
+  const arr = value.split('_');
+  if (arr.length > 3 || arr.length === 0) return initAddressInfo;
+  if (arr.length === 3) return { prefix: arr[0], address: arr[1], suffix: arr[2] };
+  if (arr.length === 1) return { ...initAddressInfo, address: value };
+  // arr.length === 2
+  if (isAelfAddress(arr[0])) return { ...initAddressInfo, address: arr[0], suffix: arr[1] };
+  return { ...initAddressInfo, prefix: arr[0], address: arr[1] };
+};
+
 export function getEntireDIDAelfAddress(value: string, defaultPrefix = 'ELF', defaultSuffix = 'AELF') {
   const arr = value.split('_');
   if (arr.length > 3 || arr.length === 0) return '';

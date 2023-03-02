@@ -97,6 +97,7 @@ export interface TokenState {
   skipCount: number;
   maxResultCount: number;
   totalRecordCount: number;
+  symbolImages: Record<string, string>;
 }
 
 export interface AccountItemType {

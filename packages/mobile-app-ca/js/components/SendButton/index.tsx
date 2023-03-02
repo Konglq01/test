@@ -5,7 +5,6 @@ import navigationService from 'utils/navigationService';
 import { TokenItemShowType } from '@portkey/types/types-ca/token';
 import { IToSendHomeParamsType } from '@portkey/types/types-ca/routeParams';
 
-import { isSameTypeToken } from '@portkey/utils/token';
 import { View, TouchableOpacity } from 'react-native';
 import { TextM } from 'components/CommonText';
 import { useLanguage } from 'i18n/hooks';
@@ -13,7 +12,6 @@ import { useLanguage } from 'i18n/hooks';
 import { pTd } from 'utils/unit';
 import AssetsOverlay from 'pages/DashBoard/AssetsOverlay';
 import { useGetCurrentCAContract } from 'hooks/contract';
-import assets from '@portkey/api/api-did/assets';
 interface SendButtonType {
   themeType?: 'dashBoard' | 'innerPage';
   sentToken?: TokenItemShowType;
@@ -24,33 +22,6 @@ const SendButton = (props: SendButtonType) => {
   const styles = themeType === 'dashBoard' ? dashBoardBtnStyle : innerPageStyles;
 
   const { t } = useLanguage();
-  // const addedTokenData = useAllAccountTokenList();
-  // const { currentChain } = useAppCASelector(state => state.chain);
-  // const { currentAccount } = useAppCASelector(state => state.wallet);
-
-  // const currentTokenList = useMemo(() => {
-  //   if (!currentAccount) return [];
-  //   // return addedTokenData?.[currentChain?.rpcUrl]?.[currentAccount?.address] ?? [];
-  // }, [currentAccount]);
-
-  // const onFinishSelectToken = (tokenItem: TokenItemShowType) => {
-  //   if (!!tokenItem && currentTokenList.find(ele => isSameTypeToken(ele, tokenItem))) {
-  //     navigationService.navigate('SendHome', { tokenItem });
-  //   } else {
-  //     throw new Error('this toke is not added');
-  //   }
-  // };
-
-  // const onFinishSelectToken = (item: TokenItemShowType) => {
-  //   navigationService.navigate('SendHome', {
-  //     type: item.type,
-  //     tokenItem: {
-  //       symbol: 'ELF',
-  //       decimal: 8,
-  //     },
-  //   });
-  //   console.log('navigate');
-  // };
 
   const getCurrentCAContract = useGetCurrentCAContract();
 
