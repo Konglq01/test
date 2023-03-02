@@ -12,6 +12,7 @@ import { Image } from '@rneui/base';
 import { defaultColors } from 'assets/theme';
 import fonts from 'assets/theme/fonts';
 import GStyles from 'assets/theme/GStyles';
+import { FontStyles } from 'assets/theme/styles';
 import CommonButton from 'components/CommonButton';
 import { TextL, TextM, TextS } from 'components/CommonText';
 import CommonToast from 'components/CommonToast';
@@ -169,11 +170,11 @@ const ActivityDetail = () => {
             ) : (
               <Text style={styles.noImg}>{activityItem?.nftInfo?.alias?.slice(0, 1)}</Text>
             )}
-            <View style={styles.space}>
+            <View style={styles.nftInfo}>
               <TextL style={styles.nftTitle}>{`${activityItem?.nftInfo?.alias || ''} #${
                 activityItem?.nftInfo?.nftId || ''
               }`}</TextL>
-              <TextS>Amount: {activityItem?.amount || ''}</TextS>
+              <TextS style={[FontStyles.font3, styles.marginTop4]}>Amount: {activityItem?.amount || ''}</TextS>
             </View>
           </View>
           <View style={styles.divider} />
@@ -322,7 +323,12 @@ export const styles = StyleSheet.create({
     ...GStyles.flexCol,
     justifyContent: 'center',
   },
+  nftInfo: {
+    display: 'flex',
+    justifyContent: 'center',
+  },
   nftTitle: {
+    ...fonts.mediumFont,
     color: defaultColors.font5,
     marginBottom: pTd(4),
     flexDirection: 'row',
