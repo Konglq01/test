@@ -74,7 +74,6 @@ Item.displayName = 'Item';
 const ManageTokenList: React.FC<ManageTokenListProps> = () => {
   const { t } = useLanguage();
 
-  const isLoading = useIsFetchingTokenList();
   const currentNetworkInfo = useCurrentNetworkInfo();
   const { currentNetwork } = useWallet();
 
@@ -85,10 +84,7 @@ const ManageTokenList: React.FC<ManageTokenListProps> = () => {
 
   const { tokenDataShowInMarket } = useAppCASelector(state => state.tokenManagement);
 
-  const [tokenList, setTokenList] = useState([]);
-
   const [keyword, setKeyword] = useState<string>('');
-  // const [tokenList, setTokenList] = useState(tokenDataShowInMarket);
 
   const debounceWord = useDebounce(keyword, 500);
 

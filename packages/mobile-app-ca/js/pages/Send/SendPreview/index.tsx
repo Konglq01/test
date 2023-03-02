@@ -7,7 +7,6 @@ import { TextM, TextS, TextL } from 'components/CommonText';
 import CommonButton from 'components/CommonButton';
 import ActionSheet from 'components/ActionSheet';
 import { formatChainInfo, formatStr2EllipsisStr } from 'utils';
-import { addRecentContact } from '@portkey/store/store-ca/recent/slice';
 import { isCrossChain } from '@portkey/utils/aelf';
 import { useLanguage } from 'i18n/hooks';
 import { useAppCommonDispatch } from '@portkey/hooks';
@@ -42,6 +41,7 @@ import {
   fetchTokenListAsync,
 } from '@portkey/store/store-ca/assets/slice';
 import { sleep } from '@portkey/utils';
+import { FontStyles } from 'assets/theme/styles';
 
 export interface SendHomeProps {
   route?: any;
@@ -225,7 +225,6 @@ const SendHome: React.FC<SendHomeProps> = props => {
       if (error.type === 'managerTransfer') {
         console.log(error);
         CommonToast.failError(error.error);
-        console.log('????');
         return;
       } else if (error.type === 'crossChainTransfer') {
         dispatch(
@@ -264,13 +263,15 @@ const SendHome: React.FC<SendHomeProps> = props => {
             <Image style={styles.img} source={{ uri: assetInfo?.imageUrl }} />
           )}
           <View style={styles.topLeft}>
-            <TextL style={styles.nftTitle}>{`${assetInfo.alias} #${assetInfo?.tokenId}`} </TextL>
+            <TextL style={[styles.nftTitle, fonts.mediumFont]}>{`${assetInfo.alias} #${assetInfo?.tokenId}`} </TextL>
             <TextS>{`Amount：${sendNumber}`}</TextS>
           </View>
         </View>
       ) : (
         <>
-          <Text style={styles.tokenCount}>{`- ${sendNumber} ${assetInfo?.symbol}`} </Text>
+          <Text style={[styles.tokenCount, FontStyles.font3, fonts.mediumFont]}>
+            {`- ${sendNumber} ${assetInfo?.symbol}`}{' '}
+          </Text>
           {/* <TextM style={styles.tokenUSD}>-$ -</TextM> */}
         </>
       )}
@@ -317,10 +318,6 @@ const SendHome: React.FC<SendHomeProps> = props => {
             <TextM style={[styles.blackFontColor, styles.fontBold]}>{t('Transaction Fee')}</TextM>
             <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${txFeeShow} ${'ELF'} `}</TextM>
           </View>
-          {/* <View style={[styles.flexSpaceBetween, styles.marginTop4]}>
-            <Text />
-            <TextS style={styles.lightGrayFontColor}>{`$ ${'-'}`}</TextS>
-          </View> */}
         </View>
 
         {isCrossChainTransfer && assetInfo.symbol === 'ELF' && <Text style={[styles.divider, styles.marginTop0]} />}
@@ -345,8 +342,6 @@ const SendHome: React.FC<SendHomeProps> = props => {
     </PageContainer>
   );
 };
-
-addRecentContact;
 
 export default memo(SendHome);
 
@@ -408,6 +403,8 @@ export const styles = StyleSheet.create({
   buttonWrapStyle: {
     flex: 1,
     justifyContent: 'flex-end',
+    paddingBottom: pTd(12),
+    paddingTop: pTd(12),
   },
   errorMessage: {
     lineHeight: pTd(16),
