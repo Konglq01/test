@@ -13,13 +13,13 @@ import Svg, { IconName } from 'components/Svg';
 import WalletMenuItem from './components/WalletMenuItem';
 import ExistOverlay from './components/ExistOverlay';
 import Loading from 'components/Loading';
-import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import CommonToast from 'components/CommonToast';
 import useLogOut from 'hooks/useLogOut';
 import { removeManager } from 'utils/guardian';
 import { useGetCurrentCAContract } from 'hooks/contract';
 import { useAppDispatch } from 'store/hooks';
-import { getWalletNameAsync } from '@portkey/store/store-ca/wallet/actions';
+import { getWalletNameAsync } from '@portkey-wallet/store/store-ca/wallet/actions';
 
 interface WalletHomeProps {
   name?: string;

@@ -2,12 +2,17 @@ import { message } from 'antd';
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector, useCommonState, useLoading } from 'store/Provider/hooks';
 import ManageNetwork, { ManageNetworkInstance } from '../ManageNetwork';
-import { setCurrentChain, fetchChainListAsync, CustomChain, CommonListAction } from '@portkey/store/network/actions';
-import { BasicContracts, UpdateChainListType } from '@portkey/types/chain';
+import {
+  setCurrentChain,
+  fetchChainListAsync,
+  CustomChain,
+  CommonListAction,
+} from '@portkey-wallet/store/network/actions';
+import { BasicContracts, UpdateChainListType } from '@portkey-wallet/types/chain';
 import ChainSelect from 'components/ChainSelect';
 import SandboxEventService, { SandboxErrorCode } from 'service/SandboxEventService';
 import SandboxEventTypes from 'messages/SandboxEventTypes';
-import { checkRpcUrlFormat } from '@portkey/store/network/utils';
+import { checkRpcUrlFormat } from '@portkey-wallet/store/network/utils';
 import CustomSvg from 'components/CustomSvg';
 import AElf from 'aelf-sdk';
 import './index.less';

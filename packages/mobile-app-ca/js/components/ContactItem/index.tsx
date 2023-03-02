@@ -1,4 +1,4 @@
-import { ContactItemType } from '@portkey/types/types-ca/contact';
+import { ContactItemType } from '@portkey-wallet/types/types-ca/contact';
 import { defaultColors } from 'assets/theme';
 import GStyles from 'assets/theme/GStyles';
 import { BGStyles, BorderStyles, FontStyles } from 'assets/theme/styles';

@@ -1,5 +1,5 @@
-import { ChainState } from '@portkey/store/network/types';
-import { WalletState } from '@portkey/store/wallet/type';
+import { ChainState } from '@portkey-wallet/store/network/types';
+import { WalletState } from '@portkey-wallet/store/wallet/type';
 import { AutoLockDataType } from 'constants/lock';
 import { RegisterStatus } from 'types';
 

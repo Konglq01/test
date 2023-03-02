@@ -1,5 +1,5 @@
-import { AElfInterface } from '@portkey/types/aelf';
-import { getAelfInstance } from '@portkey/utils/aelf';
+import { AElfInterface } from '@portkey-wallet/types/aelf';
+import { getAelfInstance } from '@portkey-wallet/utils/aelf';
 import { ContractBasic } from 'utils/contract';
 
 export function basicActions<T extends string>(type: T, payload?: any) {

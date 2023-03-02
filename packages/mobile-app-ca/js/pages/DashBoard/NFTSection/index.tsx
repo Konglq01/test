@@ -5,14 +5,14 @@ import { defaultColors } from 'assets/theme';
 import { useLanguage } from 'i18n/hooks';
 import { pTd } from 'utils/unit';
 import NFTCollectionItem from './NFTCollectionItem';
-import { useCaAddresses } from '@portkey/hooks/hooks-ca/wallet';
-import { fetchNFTAsync, fetchNFTCollectionsAsync } from '@portkey/store/store-ca/assets/slice';
-import { useAppCommonDispatch } from '@portkey/hooks';
-import { useAppCASelector } from '@portkey/hooks';
-import { NFTCollectionItemShowType } from '@portkey/types/types-ca/assets';
+import { useCaAddresses } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { fetchNFTAsync, fetchNFTCollectionsAsync } from '@portkey-wallet/store/store-ca/assets/slice';
+import { useAppCommonDispatch } from '@portkey-wallet/hooks';
+import { useAppCASelector } from '@portkey-wallet/hooks';
+import { NFTCollectionItemShowType } from '@portkey-wallet/types/types-ca/assets';
 import { useWallet } from 'hooks/store';
 import Touchable from 'components/Touchable';
-import { ChainId } from '@portkey/types';
+import { ChainId } from '@portkey-wallet/types';
 import { useRoute } from '@react-navigation/native';
 
 export interface OpenCollectionObjType {

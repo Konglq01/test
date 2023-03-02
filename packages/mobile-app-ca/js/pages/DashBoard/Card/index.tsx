@@ -3,7 +3,7 @@ import { View, Text } from 'react-native';
 import Svg from 'components/Svg';
 import { styles } from './style';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { useAppCASelector } from '@portkey/hooks/index';
+import { useAppCASelector } from '@portkey-wallet/hooks/index';
 import SendButton from 'components/SendButton';
 import ReceiveButton from 'components/ReceiveButton';
 import ActivityButton from 'pages/DashBoard/ActivityButton';

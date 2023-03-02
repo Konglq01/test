@@ -1,4 +1,4 @@
-import { windowHeight } from '@portkey/utils/mobile/device';
+import { windowHeight } from '@portkey-wallet/utils/mobile/device';
 import { defaultColors } from 'assets/theme';
 import { TextL, TextXXXL } from 'components/CommonText';
 import Svg from 'components/Svg';

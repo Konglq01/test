@@ -1,7 +1,7 @@
-import { useAppCommonDispatch } from '@portkey/hooks';
-import { fetchContactListAsync } from '@portkey/store/store-ca/contact/actions';
-import { ChainId } from '@portkey/types';
-import { IClickAddressProps } from '@portkey/types/types-ca/contact';
+import { useAppCommonDispatch } from '@portkey-wallet/hooks';
+import { fetchContactListAsync } from '@portkey-wallet/store/store-ca/contact/actions';
+import { ChainId } from '@portkey-wallet/types';
+import { IClickAddressProps } from '@portkey-wallet/types/types-ca/contact';
 import { Tabs } from 'antd';
 
 import { useTranslation } from 'react-i18next';

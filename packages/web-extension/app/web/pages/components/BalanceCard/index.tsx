@@ -1,8 +1,8 @@
-import { useGetELFRateQuery } from '@portkey/store/rate/api';
+import { useGetELFRateQuery } from '@portkey-wallet/store/rate/api';
 import CustomSvg from 'components/CustomSvg';
 import BigNumber from 'bignumber.js';
 import './index.less';
-import { unitConverter } from '@portkey/utils/converter';
+import { unitConverter } from '@portkey-wallet/utils/converter';
 import { useAppSelector } from 'store/Provider/hooks';
 import checkMain from 'utils/util.isMain';
 import { useTranslation } from 'react-i18next';

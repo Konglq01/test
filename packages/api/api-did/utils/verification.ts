@@ -1,4 +1,4 @@
-import { TLoginStrType } from '@portkey/types/types-ca/wallet';
+import { TLoginStrType } from '@portkey-wallet/types/types-ca/wallet';
 import { request } from '..';
 
 interface CheckVerificationCodeProps {

@@ -9,7 +9,7 @@ import { useUser, useWallet } from 'hooks/store';
 import secureStore from 'utils/secureStore';
 import useLogOut from 'hooks/useLogOut';
 import GStyles from 'assets/theme/GStyles';
-import { sleep } from '@portkey/utils';
+import { sleep } from '@portkey-wallet/utils';
 import VerifyPasswordInput, { VerifyPasswordInputInterface } from 'components/VerifyPasswordInput';
 import CommonButton from 'components/CommonButton';
 import { defaultColors } from 'assets/theme';

@@ -10,10 +10,9 @@ import { defaultColors } from 'assets/theme';
 import { pTd } from 'utils/unit';
 import ActionSheet from 'components/ActionSheet';
 import useQrScanPermission from 'hooks/useQrScanPermission';
-import { ZERO } from '@portkey/constants/misc';
-import { customFetch } from '@portkey/utils/fetch';
-
-import { getEntireDIDAelfAddress, isAllowAelfAddress, isCrossChain } from '@portkey/utils/aelf';
+import { ZERO } from '@portkey-wallet/constants/misc';
+import { customFetch } from '@portkey-wallet/utils/fetch';
+import { getEntireDIDAelfAddress, isAllowAelfAddress, isCrossChain } from '@portkey-wallet/utils/aelf';
 import useDebounce from 'hooks/useDebounce';
 import { useLanguage } from 'i18n/hooks';
 import SelectContact from '../SelectContact';
@@ -22,15 +21,15 @@ import AmountNFT from '../AmountNFT';
 import NFTInfo from '../NFTInfo';
 import GStyles from 'assets/theme/GStyles';
 import CommonButton from 'components/CommonButton';
-import { getContractBasic } from '@portkey/contracts/utils';
-import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
-import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+import { getContractBasic } from '@portkey-wallet/contracts/utils';
+import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { getManagerAccount } from 'utils/redux';
 import { usePin } from 'hooks/store';
-import { timesDecimals, unitConverter } from '@portkey/utils/converter';
-import { IToSendHomeParamsType, IToSendPreviewParamsType } from '@portkey/types/types-ca/routeParams';
+import { timesDecimals, unitConverter } from '@portkey-wallet/utils/converter';
+import { IToSendHomeParamsType, IToSendPreviewParamsType } from '@portkey-wallet/types/types-ca/routeParams';
 
-import { getELFChainBalance } from '@portkey/utils/balance';
+import { getELFChainBalance } from '@portkey-wallet/utils/balance';
 import { BGStyles } from 'assets/theme/styles';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import Loading from 'components/Loading';
@@ -376,7 +375,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
       scrollViewProps={{ disabled: true }}>
       {/* Group 1 */}
       <View style={styles.group}>
-        <From selectedFromAccount={selectedFromAccount} />
+        <From />
         <To
           step={step}
           setStep={setStep}

@@ -14,14 +14,14 @@ import { FlashList } from '@shopify/flash-list';
 import GStyles from 'assets/theme/GStyles';
 import { FontStyles } from 'assets/theme/styles';
 import { TextXL } from 'components/CommonText';
-import { TokenItemShowType } from '@portkey/types/types-ca/token';
-import useRouterParams from '@portkey/hooks/useRouterParams';
-import { request } from '@portkey/api/api-did';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
-import { ActivityItemType } from '@portkey/types/types-ca/activity';
-import { unitConverter } from '@portkey/utils/converter';
-import { ZERO } from '@portkey/constants/misc';
-import { transactionTypesForActivityList as transactionList } from '@portkey/constants/constants-ca/activity';
+import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
+import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
+import { request } from '@portkey-wallet/api/api-did';
+import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { ActivityItemType } from '@portkey-wallet/types/types-ca/activity';
+import { unitConverter } from '@portkey-wallet/utils/converter';
+import { ZERO } from '@portkey-wallet/constants/misc';
+import { transactionTypesForActivityList as transactionList } from '@portkey-wallet/constants/constants-ca/activity';
 import fonts from 'assets/theme/fonts';
 
 interface RouterParams {

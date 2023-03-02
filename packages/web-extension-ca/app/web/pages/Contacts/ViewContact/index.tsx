@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import BackHeader from 'components/BackHeader';
 import CustomSvg from 'components/CustomSvg';
-import { AddressItem } from '@portkey/types/types-ca/contact';
+import { AddressItem } from '@portkey-wallet/types/types-ca/contact';
 import { useCopyToClipboard } from 'react-use';
 import './index.less';
 import { useCallback } from 'react';

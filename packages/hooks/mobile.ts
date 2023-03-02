@@ -1,4 +1,4 @@
-import { authenticationReady } from '@portkey/utils/mobile/authentication';
+import { authenticationReady } from '@portkey-wallet/utils/mobile/authentication';
 import { useEffect, useRef, useCallback } from 'react';
 import { BackHandler } from 'react-native';
 import { setBiometrics } from 'store/user/actions';

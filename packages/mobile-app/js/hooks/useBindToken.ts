@@ -1,9 +1,9 @@
-import { useCurrentNetwork } from '@portkey/hooks/network';
+import { useCurrentNetwork } from '@portkey-wallet/hooks/network';
 import { request } from 'api';
 import { useMemo, useState, useCallback, useEffect } from 'react';
 import { getApiBaseData } from 'utils/wallet';
 import { useCredentials, useWallet } from './store';
-import MockTokenList from '@portkey/store/token/data.json';
+import MockTokenList from '@portkey-wallet/store/token/data.json';
 import { PUB_KEY } from 'constants/api';
 import { rsaEncryptObj } from 'utils/rsaEncrypt';
 

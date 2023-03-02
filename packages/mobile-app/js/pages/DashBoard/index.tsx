@@ -1,18 +1,18 @@
 import React, { useEffect, useMemo } from 'react';
-import { unitConverter } from '@portkey/utils/converter';
-import { ZERO } from '@portkey/constants/misc';
+import { unitConverter } from '@portkey-wallet/utils/converter';
+import { ZERO } from '@portkey-wallet/constants/misc';
 import Card from './Card';
 // import navigationService from 'utils/navigationService';
 // import { TouchableOpacity } from 'react-native-gesture-handler';
-// import { TokenItemShowType } from '@portkey/types/types-eoa/token';
+// import { TokenItemShowType } from '@portkey-wallet/types/types-eoa/token';
 // import Svg from 'components/Svg';
-// import { clearBalance, updateBalance } from '@portkey/store/tokenBalance/slice';
-import { useAppEOASelector } from '@portkey/hooks/index';
+// import { clearBalance, updateBalance } from '@portkey-wallet/store/tokenBalance/slice';
+import { useAppEOASelector } from '@portkey-wallet/hooks/index';
 import DashBoardTab from './DashBoardTab';
 import SafeAreaBox from 'components/SafeAreaBox';
 import { defaultColors } from 'assets/theme';
 
-import { useGetELFRateQuery } from '@portkey/store/rate/api';
+import { useGetELFRateQuery } from '@portkey-wallet/store/rate/api';
 import PageContainer from 'components/PageContainer';
 
 interface DashBoardTypes {

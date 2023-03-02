@@ -1,13 +1,13 @@
-import { useAppCASelector, useAppCommonDispatch } from '@portkey/hooks';
+import { useAppCASelector, useAppCommonDispatch } from '@portkey-wallet/hooks';
 import ActivityList from 'pages/components/ActivityList';
 import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getActivityListAsync } from '@portkey/store/store-ca/activity/action';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { getActivityListAsync } from '@portkey-wallet/store/store-ca/activity/action';
+import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { useUserInfo } from 'store/Provider/hooks';
-import { transactionTypesForActivityList } from '@portkey/constants/constants-ca/activity';
-import { IActivitysApiParams } from '@portkey/store/store-ca/activity/type';
-import { clearActivity } from '@portkey/store/store-ca/activity/slice';
+import { transactionTypesForActivityList } from '@portkey-wallet/constants/constants-ca/activity';
+import { IActivitysApiParams } from '@portkey-wallet/store/store-ca/activity/type';
+import { clearActivity } from '@portkey-wallet/store/store-ca/activity/slice';
 
 export interface ActivityProps {
   appendData?: Function;

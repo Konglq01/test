@@ -1,11 +1,11 @@
 import { useCallback } from 'react';
 import { useAppDispatch } from 'store/hooks';
 import { useGetCurrentCAViewContract } from './contract';
-import { setGuardiansAction, setVerifierListAction } from '@portkey/store/store-ca/guardians/actions';
+import { setGuardiansAction, setVerifierListAction } from '@portkey-wallet/store/store-ca/guardians/actions';
 import { LoginInfo } from 'types/wallet';
-import { checkHolderError } from '@portkey/utils/check';
-import { VerifierItem } from '@portkey/types/verifier';
-import { ChainItemType } from '@portkey/store/store-ca/wallet/type';
+import { checkHolderError } from '@portkey-wallet/utils/check';
+import { VerifierItem } from '@portkey-wallet/types/verifier';
+import { ChainItemType } from '@portkey-wallet/store/store-ca/wallet/type';
 
 export const useGetHolderInfo = () => {
   const getCurrentCAViewContract = useGetCurrentCAViewContract();

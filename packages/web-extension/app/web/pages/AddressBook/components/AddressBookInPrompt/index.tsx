@@ -1,5 +1,5 @@
-import { addressBookUpdate } from '@portkey/store/addressBook/actions';
-import { AddressBookItem } from '@portkey/types/addressBook';
+import { addressBookUpdate } from '@portkey-wallet/store/addressBook/actions';
+import { AddressBookItem } from '@portkey-wallet/types/addressBook';
 import { Button, message } from 'antd';
 import clsx from 'clsx';
 import CustomSvg from 'components/CustomSvg';

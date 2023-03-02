@@ -1,26 +1,23 @@
-import { ZERO } from '@portkey/constants/misc';
-import { useSymbolImages } from '@portkey/hooks/hooks-ca/useToken';
-import { unitConverter } from '@portkey/utils/converter';
+import { ZERO } from '@portkey-wallet/constants/misc';
+import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
+import { unitConverter } from '@portkey-wallet/utils/converter';
 import { defaultColors } from 'assets/theme';
 import { FontStyles } from 'assets/theme/styles';
 import CommonAvatar from 'components/CommonAvatar';
 import { TextL, TextS } from 'components/CommonText';
-import { IconName } from 'components/Svg';
 import { useWallet } from 'hooks/store';
 import React, { memo } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { pTd } from 'utils/unit';
 
 interface TokenListItemType {
-  icon?: IconName;
-  symbol?: string;
   noBalanceShow?: boolean;
   item?: any;
   onPress?: (item: any) => void;
 }
 
 const TokenListItem: React.FC<TokenListItemType> = props => {
-  const { icon = 'aelf-avatar', symbol = 'ELF', noBalanceShow = false, onPress, item } = props;
+  const { noBalanceShow = false, onPress, item } = props;
   const { currentNetwork } = useWallet();
   const symbolImages = useSymbolImages();
 

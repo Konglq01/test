@@ -1,7 +1,7 @@
 const schemaPath = [
   {
     name: 'contract',
-    path: './contract/schema.graphql',
+    path: './schema/contract_schema.graphql',
   },
 ];
 

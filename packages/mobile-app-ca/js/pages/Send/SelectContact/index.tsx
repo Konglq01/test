@@ -7,19 +7,19 @@ import { pTd } from 'utils/unit';
 import { useLanguage } from 'i18n/hooks';
 import { FlashList } from '@shopify/flash-list';
 import RecentContactItem from 'pages/Send/components/RecentContactItem';
-import { ContactItemType, RecentContactItemType } from '@portkey/types/types-ca/contact';
+import { ContactItemType, RecentContactItemType } from '@portkey-wallet/types/types-ca/contact';
 
 // import RecentList from '../components/RecentList';
 import ContactsList from 'components/ContactList';
 import NoData from 'components/NoData';
 import { TextS } from 'components/CommonText';
-import { useAppCommonDispatch } from '@portkey/hooks';
+import { useAppCommonDispatch } from '@portkey-wallet/hooks';
 import useEffectOnce from 'hooks/useEffectOnce';
-import { fetchContactListAsync } from '@portkey/store/store-ca/contact/actions';
-import { request } from '@portkey/api/api-did';
-import { useContact } from '@portkey/hooks/hooks-ca/contact';
-import { ChainId } from '@portkey/types';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { fetchContactListAsync } from '@portkey-wallet/store/store-ca/contact/actions';
+import { request } from '@portkey-wallet/api/api-did';
+import { useContact } from '@portkey-wallet/hooks/hooks-ca/contact';
+import { ChainId } from '@portkey-wallet/types';
+import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 
 interface ApiRecentAddressItemType {
   caAddress: string;

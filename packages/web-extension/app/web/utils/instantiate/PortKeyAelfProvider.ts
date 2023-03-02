@@ -3,10 +3,10 @@ import { AelfMessageTypes, MethodMessageTypes, WalletMessageTypes } from '../../
 import extractArgumentsIntoObject from '../extractArgumentsIntoObject';
 import BaseProvider from './BaseProvider';
 import AElf from 'aelf-sdk';
-import { BaseChainType } from '@portkey/types/chain';
+import { BaseChainType } from '@portkey-wallet/types/chain';
 import errorHandler from 'utils/errorHandler';
 import { AElfInstance } from 'types/ChainAPI';
-import { getWallet } from '@portkey/utils/aelf';
+import { getWallet } from '@portkey-wallet/utils/aelf';
 
 interface PortKeyAelfProviderProps {
   httpProvider: string[];

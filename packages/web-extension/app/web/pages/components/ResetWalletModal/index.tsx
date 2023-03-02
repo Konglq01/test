@@ -1,4 +1,4 @@
-import { resetWallet } from '@portkey/store/wallet/actions';
+import { resetWallet } from '@portkey-wallet/store/wallet/actions';
 import { Button, Col, Row } from 'antd';
 import CommonModal, { CommonModalProps } from 'components/CommonModal';
 import { useCallback } from 'react';

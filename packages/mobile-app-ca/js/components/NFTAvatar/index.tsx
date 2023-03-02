@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import { StyleSheet, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { pTd } from 'utils/unit';
-import { TextL, TextM, TextS } from 'components/CommonText';
+import { TextM, TextS } from 'components/CommonText';
 import { defaultColors } from 'assets/theme';
 import { Image } from '@rneui/themed';
 import GStyles from 'assets/theme/GStyles';

@@ -2,7 +2,7 @@ import React from 'react';
 import OverlayModal from 'components/OverlayModal';
 import { View, ViewProps } from 'react-native';
 import { StyleSheet, ViewStyle } from 'react-native';
-import { screenWidth } from '@portkey/utils/mobile/device';
+import { screenWidth } from '@portkey-wallet/utils/mobile/device';
 import { pTd } from 'utils/unit';
 
 import Touchable from 'components/Touchable';

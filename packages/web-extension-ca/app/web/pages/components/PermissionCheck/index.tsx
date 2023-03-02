@@ -7,10 +7,10 @@ import { useLocation, useNavigate } from 'react-router';
 import { useAppDispatch } from 'store/Provider/hooks';
 import { setIsPrompt } from 'store/reducers/common/slice';
 import { useStorage } from 'hooks/useStorage';
-import { fetchContactListAsync } from '@portkey/store/store-ca/contact/actions';
+import { fetchContactListAsync } from '@portkey-wallet/store/store-ca/contact/actions';
 import { getLocalStorage } from 'utils/storage/chromeStorage';
 import { useEffectOnce } from 'react-use';
-import { sleep } from '@portkey/utils';
+import { sleep } from '@portkey-wallet/utils';
 
 export default function PermissionCheck({
   children,

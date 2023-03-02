@@ -1,5 +1,5 @@
 import memoize from 'lodash/memoize';
-import { SECOND } from '@portkey/constants';
+import { SECOND } from '@portkey-wallet/constants';
 // How to use
 // const fetchWithTimeout = getFetchWithTimeout();
 // const response = await (

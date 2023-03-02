@@ -1,4 +1,4 @@
-import { DeviceType, DeviceTypeInfo } from '@portkey/types/types-ca/wallet';
+import { DeviceType, DeviceTypeInfo } from '@portkey-wallet/types/types-ca/wallet';
 
 export const CROSS_FEE = '0.35';
 

@@ -1,7 +1,7 @@
-import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
-import { VerifierInfo } from '@portkey/types/verifier';
+import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type';
+import { VerifierInfo } from '@portkey-wallet/types/verifier';
 import { GuardiansStatus } from 'pages/Guardian/types';
-import { ContractBasic } from '@portkey/contracts/utils/ContractBasic';
+import { ContractBasic } from '@portkey-wallet/contracts/utils/ContractBasic';
 
 const getGuardiansApproved = (userGuardiansList: UserGuardianItem[], guardiansStatus: GuardiansStatus) => {
   return userGuardiansList

@@ -1,9 +1,9 @@
 import { useWallet } from 'hooks/store';
 import { useMemo } from 'react';
 import { useInterface } from '.';
-import useInterval from '@portkey/hooks/useInterval';
+import useInterval from '@portkey-wallet/hooks/useInterval';
 import { useAppDispatch } from 'store/hooks';
-import { updateAccountListBalance } from '@portkey/store/tokenBalance/slice';
+import { updateAccountListBalance } from '@portkey-wallet/store/tokenBalance/slice';
 
 export function useViewContracts() {
   const [{ viewContracts }] = useInterface();

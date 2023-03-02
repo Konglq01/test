@@ -1,6 +1,6 @@
-import { ZERO } from '@portkey/constants/misc';
-import { useCurrentNetwork } from '@portkey/hooks/network';
-import { unitConverter } from '@portkey/utils/converter';
+import { ZERO } from '@portkey-wallet/constants/misc';
+import { useCurrentNetwork } from '@portkey-wallet/hooks/network';
+import { unitConverter } from '@portkey-wallet/utils/converter';
 import CustomSvg from 'components/CustomSvg';
 import moment from 'moment';
 import { useTranslation } from 'react-i18next';

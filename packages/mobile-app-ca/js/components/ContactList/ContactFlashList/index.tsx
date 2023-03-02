@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useRef } from 'react';
 import { Text, View, GestureResponderEvent } from 'react-native';
 
 import { styles as contactListStyles } from './style';
-import { ContactIndexType, ContactItemType } from '@portkey/types/types-ca/contact';
+import { ContactIndexType, ContactItemType } from '@portkey-wallet/types/types-ca/contact';
 import { FlashList } from '@shopify/flash-list';
 import { FontStyles } from 'assets/theme/styles';
 import fonts from 'assets/theme/fonts';

@@ -1,18 +1,18 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import navigationService from 'utils/navigationService';
-import { useAppCASelector, useAppCommonDispatch } from '@portkey/hooks/index';
+import { useAppCASelector, useAppCommonDispatch } from '@portkey-wallet/hooks/index';
 import { View, TouchableOpacity, FlatList } from 'react-native';
 import Svg from 'components/Svg';
-import { TokenItemShowType } from '@portkey/types/types-ca/token';
+import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
 import { TextM } from 'components/CommonText';
 import { defaultColors } from 'assets/theme';
 import { pTd } from 'utils/unit';
 import TokenListItem from 'components/TokenListItem';
 import { useLanguage } from 'i18n/hooks';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
-import { fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
-import { REFRESH_TIME } from '@portkey/constants/constants-ca/assets';
+import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { fetchTokenListAsync } from '@portkey-wallet/store/store-ca/assets/slice';
+import { REFRESH_TIME } from '@portkey-wallet/constants/constants-ca/assets';
 
 let timer2: string | number | NodeJS.Timer | undefined;
 
