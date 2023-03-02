@@ -1,4 +1,4 @@
-import { changePassword } from '@portkey/store/wallet/actions';
+import { changePassword } from '@portkey-wallet/store/wallet/actions';
 import { Button, Form, message } from 'antd';
 import { FormItem } from 'components/BaseAntd';
 import ConfirmPassword from 'components/ConfirmPassword';

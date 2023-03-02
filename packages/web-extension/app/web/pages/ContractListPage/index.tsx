@@ -1,6 +1,6 @@
-import { useNetwork } from '@portkey/hooks/network';
-import { addressBookUpdate } from '@portkey/store/addressBook/actions';
-import { AddressBookItem } from '@portkey/types/addressBook';
+import { useNetwork } from '@portkey-wallet/hooks/network';
+import { addressBookUpdate } from '@portkey-wallet/store/addressBook/actions';
+import { AddressBookItem } from '@portkey-wallet/types/addressBook';
 import { Input, Tabs, Button, List, message } from 'antd';
 import CustomSvg from 'components/CustomSvg';
 import AddressBookInfoDrawer from 'pages/components/AddressBookInfoDrawer';

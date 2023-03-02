@@ -1,10 +1,10 @@
-import { DefaultChainId } from '@portkey/constants/constants-ca/network';
-import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { useFetchWalletCAAddress } from '@portkey/hooks/hooks-ca/wallet-result';
-import { resetWallet, setCAInfo } from '@portkey/store/store-ca/wallet/actions';
-import { VerificationType } from '@portkey/types/verifier';
-import { PinErrorMessage } from '@portkey/utils/wallet/types';
+import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
+import { useFetchWalletCAAddress } from '@portkey-wallet/hooks/hooks-ca/wallet-result';
+import { resetWallet, setCAInfo } from '@portkey-wallet/store/store-ca/wallet/actions';
+import { VerificationType } from '@portkey-wallet/types/verifier';
+import { PinErrorMessage } from '@portkey-wallet/utils/wallet/types';
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import { useAppDispatch } from 'store/Provider/hooks';

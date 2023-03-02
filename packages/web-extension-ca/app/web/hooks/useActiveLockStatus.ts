@@ -1,4 +1,4 @@
-import useInterval from '@portkey/hooks/useInterval';
+import useInterval from '@portkey-wallet/hooks/useInterval';
 import { useCommonState } from 'store/Provider/hooks';
 import { useActiveLockStatusAction } from 'utils/lib/serviceWorkerAction';
 

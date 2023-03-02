@@ -1,17 +1,17 @@
 import { useCallback } from 'react';
 import { useAppDispatch } from 'store/hooks';
-import { resetSettings } from '@portkey/store/settings/slice';
+import { resetSettings } from '@portkey-wallet/store/settings/slice';
 
 import navigationService from 'utils/navigationService';
-import { resetNetwork } from '@portkey/store/network/actions';
+import { resetNetwork } from '@portkey-wallet/store/network/actions';
 
-import { resetWallet } from '@portkey/store/store-ca/wallet/actions';
+import { resetWallet } from '@portkey-wallet/store/store-ca/wallet/actions';
 import { resetUser } from 'store/user/actions';
-import { clearAssets } from '@portkey/store/store-ca/assets/slice';
+import { clearAssets } from '@portkey-wallet/store/store-ca/assets/slice';
 
-import { resetGuardiansState } from '@portkey/store/store-ca/guardians/actions';
-import { resetContactAction } from '@portkey/store/store-ca/contact/actions';
-import { request } from '@portkey/api/api-did';
+import { resetGuardiansState } from '@portkey-wallet/store/store-ca/guardians/actions';
+import { resetContactAction } from '@portkey-wallet/store/store-ca/contact/actions';
+import { request } from '@portkey-wallet/api/api-did';
 
 export default function useLogOut() {
   const dispatch = useAppDispatch();

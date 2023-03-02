@@ -6,10 +6,10 @@ import errorHandler from 'utils/errorHandler';
 import querystring from 'query-string';
 import './index.less';
 import { useNetwork } from 'store/Provider/hooks';
-import { ChainItemType } from '@portkey/types/chain';
+import { ChainItemType } from '@portkey-wallet/types/chain';
 import { Button } from 'antd';
 import { useDispatch } from 'react-redux';
-import { setCurrentChain } from '@portkey/store/network/actions';
+import { setCurrentChain } from '@portkey-wallet/store/network/actions';
 import CustomSvg from 'components/CustomSvg';
 import { useTranslation } from 'react-i18next';
 

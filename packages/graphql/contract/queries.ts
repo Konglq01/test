@@ -1,4 +1,4 @@
-import { NetworkType } from '@portkey/types';
+import { NetworkType } from '@portkey-wallet/types';
 import { getApolloClient } from './apollo';
 import { GetCAHolderByManagerParamsType, CaHolderWithGuardian } from './types';
 

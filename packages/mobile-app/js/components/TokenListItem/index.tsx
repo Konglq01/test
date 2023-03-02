@@ -1,5 +1,5 @@
-import { ZERO } from '@portkey/constants/misc';
-import { unitConverter } from '@portkey/utils/converter';
+import { ZERO } from '@portkey-wallet/constants/misc';
+import { unitConverter } from '@portkey-wallet/utils/converter';
 import { defaultColors } from 'assets/theme';
 import CommonAvatar from 'components/CommonAvatar';
 import { TextL, TextS } from 'components/CommonText';

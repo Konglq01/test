@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useAppDispatch } from 'store/hooks';
-import { fetchGuardianListAsync } from '@portkey/store/store-ca/guardians/actions';
+import { fetchGuardianListAsync } from '@portkey-wallet/store/store-ca/guardians/actions';
 
 export const useGuardianList = () => {
   const dispatch = useAppDispatch();

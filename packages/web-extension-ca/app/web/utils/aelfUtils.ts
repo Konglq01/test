@@ -1,4 +1,4 @@
-import { sleep } from '@portkey/utils';
+import { sleep } from '@portkey-wallet/utils';
 import AElf from 'aelf-sdk';
 
 const Wallet = AElf.wallet;

@@ -5,13 +5,13 @@ import {
 import { createTransform, FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE } from 'redux-persist';
 import { localStorage } from 'redux-persist-webextension-storage';
 import { reduxStorageRoot } from 'constants/index';
-import { walletSlice } from '@portkey/store/wallet/slice';
-import chainSlice from '@portkey/store/network/slice';
-import addressBook from '@portkey/store/addressBook/slice';
-import tokenBalanceSlice from '@portkey/store/tokenBalance/slice';
-import tradeSlice from '@portkey/store/trade/slice';
-import tokenSlice from '@portkey/store/token/slice';
-import { TokenState } from '@portkey/types/types-eoa/token';
+import { walletSlice } from '@portkey-wallet/store/wallet/slice';
+import chainSlice from '@portkey-wallet/store/network/slice';
+import addressBook from '@portkey-wallet/store/addressBook/slice';
+import tokenBalanceSlice from '@portkey-wallet/store/tokenBalance/slice';
+import tradeSlice from '@portkey-wallet/store/trade/slice';
+import tokenSlice from '@portkey-wallet/store/token/slice';
+import { TokenState } from '@portkey-wallet/types/types-eoa/token';
 
 interface ThunkOptions<E = any> {
   extraArgument: E;

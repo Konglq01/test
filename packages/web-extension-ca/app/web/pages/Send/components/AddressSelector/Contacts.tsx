@@ -2,8 +2,8 @@ import { IndexBar, List } from 'antd-mobile';
 import clsx from 'clsx';
 import { useEffect, useMemo, useState } from 'react';
 import './index.less';
-import { AddressItem, ContactIndexType } from '@portkey/types/types-ca/contact';
-import { useContact } from '@portkey/hooks/hooks-ca/contact';
+import { AddressItem, ContactIndexType } from '@portkey-wallet/types/types-ca/contact';
+import { useContact } from '@portkey-wallet/hooks/hooks-ca/contact';
 import ContactCard from './ContactCard';
 import { useTranslation } from 'react-i18next';
 

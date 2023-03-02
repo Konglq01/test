@@ -1,4 +1,4 @@
-// import { CustomSvg, SignIn } from '@portkey/did-ui-react';
+// import { CustomSvg, SignIn } from '@portkey-wallet/did-ui-react';
 // import { useState } from 'react';
 
 // export default function SignUpUI() {

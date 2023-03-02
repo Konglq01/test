@@ -1,9 +1,9 @@
 import SandboxEventTypes from 'messages/SandboxEventTypes';
-import { encodedTx, getAelfInstance, getELFContract } from '@portkey/utils/aelf';
+import { encodedTx, getAelfInstance, getELFContract } from '@portkey-wallet/utils/aelf';
 import SandboxEventService, { SandboxErrorCode } from 'service/SandboxEventService';
-import { ChainType } from '@portkey/types';
-import { TokenItemType } from '@portkey/types/types-eoa/token';
-import { customFetch } from '@portkey/utils/fetch';
+import { ChainType } from '@portkey-wallet/types';
+import { TokenItemType } from '@portkey-wallet/types/types-eoa/token';
+import { customFetch } from '@portkey-wallet/utils/fetch';
 
 interface useBalancesProps {
   tokens: TokenItemType | TokenItemType[];

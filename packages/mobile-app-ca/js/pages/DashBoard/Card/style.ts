@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 import { defaultColors } from 'assets/theme';
 import { pTd } from 'utils/unit';
-import { screenWidth } from '@portkey/utils/mobile/device';
+import { screenWidth } from '@portkey-wallet/utils/mobile/device';
 
 const { bg5, font2 } = defaultColors;
 

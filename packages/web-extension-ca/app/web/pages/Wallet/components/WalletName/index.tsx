@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Form, Input, message } from 'antd';
 import { FormItem } from 'components/BaseAntd';
-import { isValidCAWalletName } from '@portkey/utils/reg';
+import { isValidCAWalletName } from '@portkey-wallet/utils/reg';
 import './index.less';
 
 interface AccountNameProps {

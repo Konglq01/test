@@ -11,7 +11,7 @@ import { useWallet } from 'hooks/store';
 import { handleQRCodeData, invalidQRCode, RouteInfoType } from 'utils/qrcode';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
-// import { useAppCASelector } from '@portkey/hooks';
+// import { useAppCASelector } from '@portkey-wallet/hooks';
 
 interface QrScannerProps {
   route?: any;

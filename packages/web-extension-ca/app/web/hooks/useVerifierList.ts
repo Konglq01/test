@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 import { useAppDispatch } from 'store/Provider/hooks';
-import { setVerifierListAction } from '@portkey/store/store-ca/guardians/actions';
+import { setVerifierListAction } from '@portkey-wallet/store/store-ca/guardians/actions';
 import { getVerifierList } from 'utils/sandboxUtil/getVerifierList';
-import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 
 const useVerifierList = () => {
   const dispatch = useAppDispatch();

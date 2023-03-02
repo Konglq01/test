@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { NetworkType } from '@portkey/types/index';
-import { the2ThFailedActivityItemType } from '@portkey/types/types-ca/activity';
+import { NetworkType } from '@portkey-wallet/types/index';
+import { the2ThFailedActivityItemType } from '@portkey-wallet/types/types-ca/activity';
 import { getActivityListAsync } from './action';
 import { ActivityStateType } from './type';
 

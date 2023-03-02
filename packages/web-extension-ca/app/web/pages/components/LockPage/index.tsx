@@ -1,4 +1,4 @@
-import { WalletError } from '@portkey/store/wallet/type';
+import { WalletError } from '@portkey-wallet/store/wallet/type';
 import { Button, Form, FormProps, message } from 'antd';
 import { FormItem } from 'components/BaseAntd';
 import CustomPassword from 'components/CustomPassword';
@@ -11,8 +11,8 @@ import { setPasswordSeed } from 'store/reducers/user/slice';
 import { useDispatch } from 'react-redux';
 import './index.less';
 import { useTranslation } from 'react-i18next';
-import aes from '@portkey/utils/aes';
-import { sleep } from '@portkey/utils';
+import aes from '@portkey-wallet/utils/aes';
+import { sleep } from '@portkey-wallet/utils';
 
 interface LockPageProps extends FormProps {
   onUnLockHandler?: (pwd: string) => void;

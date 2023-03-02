@@ -5,16 +5,16 @@ import {
 import { FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE } from 'redux-persist';
 import { localStorage } from 'redux-persist-webextension-storage';
 import { reduxStorageRoot } from 'constants/index';
-import { walletSlice } from '@portkey/store/store-ca/wallet/slice';
-import chainSlice from '@portkey/store/network/slice';
-import tokenBalanceSlice from '@portkey/store/tokenBalance/slice';
-import tradeSlice from '@portkey/store/trade/slice';
-import tokenSlice from '@portkey/store/token/slice';
-import assetsSlice from '@portkey/store/store-ca/assets/slice';
+import { walletSlice } from '@portkey-wallet/store/store-ca/wallet/slice';
+import chainSlice from '@portkey-wallet/store/network/slice';
+import tokenBalanceSlice from '@portkey-wallet/store/tokenBalance/slice';
+import tradeSlice from '@portkey-wallet/store/trade/slice';
+import tokenSlice from '@portkey-wallet/store/token/slice';
+import assetsSlice from '@portkey-wallet/store/store-ca/assets/slice';
 import { loginSlice } from 'store/reducers/loginCache/slice';
-import { contactSlice } from '@portkey/store/store-ca/contact/slice';
-import { guardiansSlice } from '@portkey/store/store-ca/guardians/slice';
-import activitySlice from '@portkey/store/store-ca/activity/slice';
+import { contactSlice } from '@portkey-wallet/store/store-ca/contact/slice';
+import { guardiansSlice } from '@portkey-wallet/store/store-ca/guardians/slice';
+import activitySlice from '@portkey-wallet/store/store-ca/activity/slice';
 
 interface ThunkOptions<E = any> {
   extraArgument: E;

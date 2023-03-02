@@ -1,6 +1,6 @@
-import { ZERO } from '@portkey/constants/misc';
-import { useCurrentNetwork } from '@portkey/hooks/network';
-import { unitConverter } from '@portkey/utils/converter';
+import { ZERO } from '@portkey-wallet/constants/misc';
+import { useCurrentNetwork } from '@portkey-wallet/hooks/network';
+import { unitConverter } from '@portkey-wallet/utils/converter';
 import { List } from 'antd';
 import CustomSvg from 'components/CustomSvg';
 import { useCallback, useEffect, useState } from 'react';

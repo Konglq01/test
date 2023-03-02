@@ -1,8 +1,8 @@
-import { sleep } from '@portkey/utils';
-import { AElfInterface } from '@portkey/types/aelf';
+import { sleep } from '@portkey-wallet/utils';
+import { AElfInterface } from '@portkey-wallet/types/aelf';
 import { getTxResult } from './aelfUtils';
-import { ChainType } from '@portkey/types';
-import { encodedTx } from '@portkey/utils/aelf';
+import { ChainType } from '@portkey-wallet/types';
+import { encodedTx } from '@portkey-wallet/utils/aelf';
 type SendOptions = {
   from?: string;
   gasPrice?: string;

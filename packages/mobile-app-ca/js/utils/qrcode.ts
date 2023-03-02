@@ -1,5 +1,5 @@
-import { LoginQRData, QRData, SendTokenQRDataType } from '@portkey/types/types-ca/qrcode';
-import { isAddress } from '@portkey/utils';
+import { LoginQRData, QRData, SendTokenQRDataType } from '@portkey-wallet/types/types-ca/qrcode';
+import { isAddress } from '@portkey-wallet/utils';
 import CommonToast from 'components/CommonToast';
 import navigationService from './navigationService';
 

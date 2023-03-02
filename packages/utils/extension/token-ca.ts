@@ -1,4 +1,4 @@
-import { TokenItemShowType, UserTokenItemType } from '@portkey/types/types-ca/token';
+import { TokenItemShowType, UserTokenItemType } from '@portkey-wallet/types/types-ca/token';
 
 export const filterTokenList = (tokenList: UserTokenItemType[], keyword: string): UserTokenItemType[] => {
   return tokenList.filter(ele => {

@@ -11,7 +11,7 @@ import ActionSheet from 'components/ActionSheet';
 import { TextM } from 'components/CommonText';
 import AccountOverlay from 'components/AccountOverlay';
 import useLogOut from 'hooks/useLogOut';
-import { useCurrentNetwork } from '@portkey/hooks/network';
+import { useCurrentNetwork } from '@portkey-wallet/hooks/network';
 import { useTokenContract } from 'contexts/useInterface/hooks';
 import { getCurrentAccount } from 'utils/redux';
 import { useCredentials } from 'hooks/store';

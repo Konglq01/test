@@ -1,5 +1,5 @@
 import { createAction } from '@reduxjs/toolkit';
-import { HandleTokenArgTypes } from '@portkey/types/types-eoa/token';
+import { HandleTokenArgTypes } from '@portkey-wallet/types/types-eoa/token';
 
 export const addTokenInCurrentAccount = createAction<HandleTokenArgTypes>('token/addTokenInCurrentAccount');
 

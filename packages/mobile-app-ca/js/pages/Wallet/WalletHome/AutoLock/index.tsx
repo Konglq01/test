@@ -1,8 +1,8 @@
 import * as React from 'react';
 import PageContainer from 'components/PageContainer';
 import { useLanguage } from 'i18n/hooks';
-import { useAppCommonDispatch, useAppCASelector } from '@portkey/hooks';
-import { changeLockingTime } from '@portkey/store/settings/action';
+import { useAppCommonDispatch, useAppCASelector } from '@portkey-wallet/hooks';
+import { changeLockingTime } from '@portkey-wallet/store/settings/action';
 import { pTd } from 'utils/unit';
 import ListItem from 'components/ListItem';
 import Svg from 'components/Svg';

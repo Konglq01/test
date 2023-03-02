@@ -1,4 +1,4 @@
-import { useAppCASelector } from '@portkey/hooks/hooks-ca';
+import { useAppCASelector } from '@portkey-wallet/hooks/hooks-ca';
 import { defaultColors } from 'assets/theme';
 import GStyles from 'assets/theme/GStyles';
 import { TextM } from 'components/CommonText';

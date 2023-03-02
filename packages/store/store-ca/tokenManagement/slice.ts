@@ -1,10 +1,10 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
-import { ChainItemType } from '@portkey/types/chain';
-import { AccountAssets, TokenItemType, TokenState } from '@portkey/types/types-ca/token';
-import { AccountType } from '@portkey/types/wallet';
-// import { isSameTypeToken } from '@portkey/utils/token';
+import { ChainItemType } from '@portkey-wallet/types/chain';
+import { AccountAssets, TokenItemType, TokenState } from '@portkey-wallet/types/types-ca/token';
+import { AccountType } from '@portkey-wallet/types/wallet';
+// import { isSameTypeToken } from '@portkey-wallet/utils/token';
 import { fetchAllTokenListAsync, getSymbolImagesAsync } from './action';
-import { TokenItemShowType } from '@portkey/types/types-eoa/token';
+import { TokenItemShowType } from '@portkey-wallet/types/types-eoa/token';
 
 const initialState: TokenState = {
   // addedTokenData: {},

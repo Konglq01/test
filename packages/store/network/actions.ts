@@ -1,10 +1,10 @@
-import type { ChainItemType, BasicContracts, UpdateChainListType } from '@portkey/types/chain';
+import type { ChainItemType, BasicContracts, UpdateChainListType } from '@portkey-wallet/types/chain';
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { fetchChainList } from './api';
 import { checkRpcUrlFormat } from './utils';
-import { getELFTokenAddress } from '@portkey/contracts/index';
-import type { BaseToken } from '@portkey/types/types-eoa/token';
-import { PlatformType } from '@portkey/types';
+import { getELFTokenAddress } from '@portkey-wallet/contracts/index';
+import type { BaseToken } from '@portkey-wallet/types/types-eoa/token';
+import { PlatformType } from '@portkey-wallet/types';
 import { ChainActionError } from './types';
 
 export const setCurrentChain = createAction<{ rpcUrl: string }>('chain/setCurrentChain');

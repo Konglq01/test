@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import PageContainer from 'components/PageContainer';
-import { sleep } from '@portkey/utils';
+import { sleep } from '@portkey-wallet/utils';
 import VerifyPasswordInput, { VerifyPasswordInputInterface } from 'components/VerifyPasswordInput';
 import navigationService from 'utils/navigationService';
 import CommonButton from 'components/CommonButton';
