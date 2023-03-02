@@ -157,7 +157,7 @@ const ActivityDetail = () => {
       <TouchableOpacity style={styles.closeWrap} onPress={() => navigationService.goBack()}>
         <Svg icon="close" size={pTd(16)} />
       </TouchableOpacity>
-      <Text style={styles.typeTitle}>
+      <Text style={[styles.typeTitle]}>
         {transactionTypesMap(activityItem?.transactionType, activityItem?.nftInfo?.nftId)}
       </Text>
 
@@ -180,7 +180,7 @@ const ActivityDetail = () => {
         </>
       ) : (
         <>
-          <Text style={styles.tokenCount}>
+          <Text style={[styles.tokenCount, styles.fontBold]}>
             {!hiddenArr.includes(activityItem?.transactionType as TransactionTypes) &&
               (activityItem?.isReceived ? '+' : '-')}
             {`${unitConverter(
@@ -222,7 +222,7 @@ const ActivityDetail = () => {
           <View style={[styles.flexSpaceBetween]}>
             <TextM style={[styles.lightGrayFontColor]}>{t('To')}</TextM>
             <View style={styles.alignItemsEnd}>
-              {activityItem?.to && <TextM style={[styles.blackFontColor, styles.fontBold]}>{activityItem.to}</TextM>}
+              {activityItem?.to && <TextM style={[styles.blackFontColor]}>{activityItem.to}</TextM>}
               <TextS style={styles.lightGrayFontColor}>{formatStr2EllipsisStr(activityItem?.toAddress)}</TextS>
             </View>
           </View>
@@ -264,6 +264,7 @@ export const styles = StyleSheet.create({
   containerStyle: {
     paddingLeft: pTd(20),
     paddingRight: pTd(20),
+    paddingTop: pTd(16),
     display: 'flex',
     alignItems: 'center',
   },
@@ -344,8 +345,8 @@ export const styles = StyleSheet.create({
   divider: {
     marginTop: pTd(24),
     width: '100%',
-    height: pTd(0.5),
-    backgroundColor: defaultColors.border6,
+    height: pTd(1),
+    backgroundColor: defaultColors.border1,
   },
   titles2: {
     marginTop: pTd(25),
