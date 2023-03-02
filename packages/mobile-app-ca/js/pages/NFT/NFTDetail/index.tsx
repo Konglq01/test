@@ -1,19 +1,19 @@
 import React from 'react';
-import { Text, StyleSheet } from 'react-native';
+import { Text, StyleSheet, TouchableOpacity, StatusBar } from 'react-native';
 import { Image } from '@rneui/base';
-import PageContainer from 'components/PageContainer';
-import { useNavigation } from '@react-navigation/native';
 import { useLanguage } from 'i18n/hooks';
 import CommonButton from 'components/CommonButton';
 import GStyles from 'assets/theme/GStyles';
 import { pTd } from 'utils/unit';
 import { defaultColors } from 'assets/theme';
-import { TextL, TextXL, TextXXXL } from 'components/CommonText';
+import { TextL, TextM, TextXL, TextXXL } from 'components/CommonText';
 import { FontStyles } from 'assets/theme/styles';
 import fonts from 'assets/theme/fonts';
 import navigationService from 'utils/navigationService';
 import useRouterParams from '@portkey/hooks/useRouterParams';
 import { IToSendHomeParamsType } from '@portkey/types/types-ca/routeParams';
+import SafeAreaBox from 'components/SafeAreaBox';
+import Svg from 'components/Svg';
 
 export interface TokenDetailProps {
   route?: any;
@@ -34,21 +34,16 @@ const NFTDetail: React.FC<TokenDetailProps> = props => {
 
   const nftItem = useRouterParams<NftItemType>();
 
-  const { alias, balance, chainId, imageUrl, symbol, tokenContractAddress, tokenId } = nftItem;
-
-  const navigation = useNavigation();
+  const { alias, balance, imageUrl, symbol, tokenId } = nftItem;
 
   return (
-    <PageContainer
-      type="leftBack"
-      backTitle={t('Back')}
-      titleDom={''}
-      safeAreaColor={['white', 'white']}
-      leftCallback={() => navigation.goBack()}
-      containerStyles={styles.pageWrap}
-      scrollViewProps={{ disabled: true }}>
-      <TextXXXL style={styles.title}>{`${alias} #${tokenId}`}</TextXXXL>
-      <TextL style={[FontStyles.font3]}>{`Balance ${balance}`}</TextL>
+    <SafeAreaBox style={styles.pageWrap}>
+      <StatusBar barStyle={'default'} />
+      <TouchableOpacity style={styles.iconWrap} onPress={() => navigationService.goBack()}>
+        <Svg icon="left-arrow" size={20} />
+      </TouchableOpacity>
+      <TextXXL style={styles.title}>{`${alias} #${tokenId}`}</TextXXL>
+      <TextM style={[FontStyles.font3, styles.balance]}>{`Balance ${balance}`}</TextM>
 
       {!imageUrl ? (
         <Text style={styles.image}>{alias[0]}</Text>
@@ -71,11 +66,11 @@ const NFTDetail: React.FC<TokenDetailProps> = props => {
             toInfo: { name: '', address: '' },
           } as unknown as IToSendHomeParamsType);
         }}>
-        Send
+        {t('Send')}
       </CommonButton>
-      <TextXL style={styles.symbolDescribeTitle}>{symbol}</TextXL>
+      <TextL style={styles.symbolDescribeTitle}>{symbol}</TextL>
       <TextXL style={[styles.symbolContent, FontStyles.font3]} />
-    </PageContainer>
+    </SafeAreaBox>
   );
 };
 
@@ -84,10 +79,21 @@ export default NFTDetail;
 export const styles = StyleSheet.create({
   pageWrap: {
     backgroundColor: defaultColors.bg1,
-    ...GStyles.paddingArg(20),
+    ...GStyles.paddingArg(0, 20, 0),
+  },
+  iconWrap: {
+    width: pTd(20),
+    marginBottom: pTd(16),
+    marginTop: pTd(16),
   },
   title: {
     ...fonts.mediumFont,
+    lineHeight: pTd(24),
+    marginTop: pTd(8),
+  },
+  balance: {
+    lineHeight: pTd(20),
+    marginTop: pTd(8),
   },
   amount: {
     marginTop: pTd(8),

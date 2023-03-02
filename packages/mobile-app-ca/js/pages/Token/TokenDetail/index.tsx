@@ -22,6 +22,7 @@ import { ActivityItemType } from '@portkey/types/types-ca/activity';
 import { unitConverter } from '@portkey/utils/converter';
 import { ZERO } from '@portkey/constants/misc';
 import { transactionTypesForActivityList as transactionList } from '@portkey/constants/constants-ca/activity';
+import fonts from 'assets/theme/fonts';
 
 interface RouterParams {
   tokenInfo: TokenItemShowType;
@@ -102,7 +103,7 @@ const TokenDetail: React.FC = () => {
       backTitle={t('')}
       titleDom={
         <View>
-          <TextXL style={[GStyles.textAlignCenter, FontStyles.font2]}>{tokenInfo.symbol}</TextXL>
+          <TextXL style={[GStyles.textAlignCenter, FontStyles.font2, fonts.mediumFont]}>{tokenInfo.symbol}</TextXL>
           <Text style={[GStyles.textAlignCenter, FontStyles.font2, styles.subTitle]}>{`${
             tokenInfo.chainId === 'AELF' ? 'MainChain' : 'SideChain'
           } ${tokenInfo.chainId}`}</Text>
