@@ -43,7 +43,6 @@ export class DidService extends ServiceInit {
     const { method = 'POST', url, baseURL, ...fetchConfig } = getRequestConfig(base, config, this.defaultConfig) || {};
     const _url = url || (typeof base === 'string' ? base : base.target);
     const URL = spliceUrl(baseURL || '', _url);
-    console.log('====fetchResult------config', this.refreshTokenConfig);
     const fetchResult = await customFetch(URL, {
       ...fetchConfig,
       method,
