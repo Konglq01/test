@@ -25,9 +25,17 @@ export default function NFT() {
 
   const getMore = useCallback(
     (symbol: string, chainId: string) => {
-      dispatch(fetchNFTAsync({ symbol, chainId: chainId as ChainId, caAddresses: [wallet[chainId].caAddress] }));
+      let pageNum = 0;
+      accountNFTList.forEach((nft) => {
+        if (nft.symbol === symbol) {
+          pageNum = nft.children.length;
+        }
+      });
+      dispatch(
+        fetchNFTAsync({ symbol, chainId: chainId as ChainId, caAddresses: [wallet[chainId].caAddress], pageNum }),
+      );
     },
-    [dispatch, wallet],
+    [accountNFTList, dispatch, wallet],
   );
 
   const handleChange = useCallback(
@@ -46,6 +54,7 @@ export default function NFT() {
               symbol: curTmp[0],
               chainId: curTmp[1] as ChainId,
               caAddresses: [wallet[curTmp[1]].caAddress],
+              pageNum: 0,
             }),
           );
         }

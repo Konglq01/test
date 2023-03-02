@@ -48,7 +48,7 @@ const NFTDetail: React.FC<TokenDetailProps> = props => {
       containerStyles={styles.pageWrap}
       scrollViewProps={{ disabled: true }}>
       <TextXXXL style={styles.title}>{`${alias} #${tokenId}`}</TextXXXL>
-      <TextL style={[FontStyles.font3]}>{`Amount ${balance}`}</TextL>
+      <TextL style={[FontStyles.font3]}>{`Balance ${balance}`}</TextL>
 
       {!imageUrl ? (
         <Text style={styles.image}>{alias[0]}</Text>

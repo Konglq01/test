@@ -1,8 +1,7 @@
 import { ZERO } from '@portkey/constants/misc';
 import { BaseToken } from '@portkey/types/types-ca/token';
-import { divDecimals, divDecimalsStr, timesDecimals, unitConverter } from '@portkey/utils/converter';
-import { Input, message } from 'antd';
-import { parseInputChange } from '@portkey/utils/input';
+import { divDecimals, unitConverter } from '@portkey/utils/converter';
+import { Input } from 'antd';
 import clsx from 'clsx';
 import { handleKeyDown } from 'pages/Send/utils/util.keyDown';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -11,8 +10,6 @@ import { getBalance } from 'utils/sandboxUtil/getBalance';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { ChainId } from '@portkey/types';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { useUserInfo } from 'store/Provider/hooks';
-import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
 import { useSymbolImages } from '@portkey/hooks/hooks-ca/useToken';
 
 export default function TokenInput({
@@ -35,8 +32,6 @@ export default function TokenInput({
   const { t } = useTranslation();
   const [amount, setAmount] = useState<string>(value ? `${value} ${token.symbol}` : '');
   const [balance, setBalance] = useState<string>('');
-  const { passwordSeed } = useUserInfo();
-  const wallet = useCurrentWalletInfo();
   const symbolImages = useSymbolImages();
 
   const getTokenBalance = useCallback(async () => {

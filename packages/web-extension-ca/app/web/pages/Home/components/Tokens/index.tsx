@@ -1,4 +1,3 @@
-import { ZERO } from '@portkey/constants/misc';
 import { useSymbolImages } from '@portkey/hooks/hooks-ca/useToken';
 import { TokenItemShowType } from '@portkey/types/types-ca/token';
 import { divDecimals, unitConverter } from '@portkey/utils/converter';

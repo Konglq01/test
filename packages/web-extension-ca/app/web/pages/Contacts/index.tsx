@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { useNavigate } from 'react-router';
-import { Button, Input, message } from 'antd';
+import { Button, Input } from 'antd';
 import { IndexBar, List } from 'antd-mobile';
 import { useTranslation } from 'react-i18next';
 import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';

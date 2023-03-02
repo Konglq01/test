@@ -17,7 +17,7 @@ export default function NFT() {
           <p className="title-alias">{state.alias}&nbsp;</p>
           <p>#{state.tokenId}</p>
         </p>
-        <p className="amount">Amount: {state.balance}</p>
+        <p className="amount">Balance: {state.balance}</p>
         <p className="label">{state.symbol}</p>
         {/* <p className="information">Symbol information Symbol information Symbol information</p> */}
       </div>

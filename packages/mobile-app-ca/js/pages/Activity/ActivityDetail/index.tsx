@@ -67,6 +67,8 @@ const ActivityDetail = () => {
 
   const isNft = useMemo(() => !!activityItem?.nftInfo?.nftId, [activityItem?.nftInfo?.nftId]);
   const status = useMemo(() => {
+    if (!activityItem?.status) return { text: '', style: 'confirmed' };
+
     if (activityItem?.status === TransactionStatus.Mined)
       return {
         text: 'Confirmed',
@@ -133,7 +135,7 @@ const ActivityDetail = () => {
                 )} ${item.symbol}`}</TextM>
                 {!isTestNet && (
                   <TextS style={[styles.lightGrayFontColor, styles.marginTop4]}>{`$ ${unitConverter(
-                    ZERO.plus(item.feeInUsd ?? 0).div(`1e${DEFAULT_DECIMAL}`),
+                    ZERO.plus(item?.feeInUsd ?? 0).div(`1e${DEFAULT_DECIMAL}`),
                     2,
                   )}`}</TextS>
                 )}
@@ -240,6 +242,7 @@ const ActivityDetail = () => {
           containerStyle={[GStyles.marginTop(pTd(8)), styles.bottomButton]}
           onPress={() => {
             if (!explorerUrl) return;
+            if (!activityItem?.transactionId) return;
 
             navigationService.navigate('ViewOnWebView', {
               url: getExploreLink(explorerUrl, activityItem?.transactionId || '', 'transaction'),

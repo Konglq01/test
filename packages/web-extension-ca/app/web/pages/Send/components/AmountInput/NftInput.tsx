@@ -1,7 +1,5 @@
-import { ZERO } from '@portkey/constants/misc';
 import { BaseToken } from '@portkey/types/types-ca/token';
-import { Input, message } from 'antd';
-import { parseInputChange } from '@portkey/utils/input';
+import { Input } from 'antd';
 import { handleKeyDownInt } from 'pages/Send/utils/util.keyDown';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -9,16 +7,7 @@ import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { ChainId } from '@portkey/types';
 import { getBalance } from 'utils/sandboxUtil/getBalance';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { divDecimals, divDecimalsStr, timesDecimals, unitConverter } from '@portkey/utils/converter';
-import getTransactionFee from 'utils/sandboxUtil/getTransactionFee';
-import { WalletError } from '@portkey/store/wallet/type';
-import { useUserInfo } from 'store/Provider/hooks';
-import aes from '@portkey/utils/aes';
-import { SandboxErrorCode } from '@portkey/utils/sandboxService';
-import getTransferFee from 'pages/Send/utils/getTransferFee';
-import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
-import { contractErrorHandler } from '@portkey/did-ui-react/src/utils/errorHandler';
-import { isCrossChain } from '@portkey/utils/aelf';
+import { divDecimals, unitConverter } from '@portkey/utils/converter';
 
 export default function NftInput({
   toAccount,
@@ -38,11 +27,9 @@ export default function NftInput({
   const { t } = useTranslation();
   // const [errorMsg, setErrorMsg] = useState('Insufficient funds');
   const [amount, setAmount] = useState<string>(value);
-  const { passwordSeed } = useUserInfo();
   const currentChain = useCurrentChain(token.chainId as ChainId);
   const currentNetwork = useCurrentNetworkInfo();
-  const wallet = useCurrentWalletInfo();
-  const isMain = useMemo(() => currentNetwork.networkType === 'MAIN', [currentNetwork]);
+  // const isMain = useMemo(() => currentNetwork.networkType === 'MAIN', [currentNetwork]);
   const [balance, setBalance] = useState<string>('');
 
   const handleAmountBlur = useCallback(() => {

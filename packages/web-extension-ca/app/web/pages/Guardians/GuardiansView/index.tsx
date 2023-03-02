@@ -20,9 +20,6 @@ import {
 } from '@portkey/store/store-ca/guardians/actions';
 import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { GuardianMth } from 'types/guardians';
-import { sleep } from '@portkey/utils';
-import { getAelfInstance } from '@portkey/utils/aelf';
-import { getTxResult } from 'utils/aelfUtils';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
