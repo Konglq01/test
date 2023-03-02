@@ -1,30 +1,19 @@
 import { useWallet } from 'hooks/store';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { defaultColors } from 'assets/theme';
 import { pTd } from 'utils/unit';
 import { TextM } from 'components/CommonText';
-import Svg from 'components/Svg';
 import { useLanguage } from 'i18n/hooks';
 
-interface FromProps {
-  selectedFromAccount: any;
-}
-
-export default function From({ selectedFromAccount }: FromProps) {
+export default function From() {
   const { t } = useLanguage();
-  const { walletName, currentNetwork } = useWallet();
-
-  // const changeFromAccount = () => {
-  //   if (accountList?.length === 1) return;
-  //   AccountOverlay.showAccountList('innerPage', account => setSelectedFromAccount?.(account));
-  // };
+  const { walletName } = useWallet();
 
   return (
     <View style={styles.fromWrap}>
       <TextM style={styles.leftTitle}>{t('From')}</TextM>
-      {/* TODO: change account name */}
-      <Text style={styles.middle}>{walletName}</Text>
+      <TextM style={styles.middle}>{walletName}</TextM>
     </View>
   );
 }

@@ -35,7 +35,7 @@ const WalletHome: React.FC<WalletHomeProps> = () => {
 
   useEffect(() => {
     appDispatch(getWalletNameAsync());
-  }, []);
+  }, [appDispatch]);
 
   const onExitClick = useCallback(
     async (isConfirm: boolean) => {

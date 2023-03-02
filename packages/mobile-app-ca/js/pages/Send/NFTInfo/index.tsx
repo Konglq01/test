@@ -1,15 +1,14 @@
-import { TokenItemShowType } from '@portkey/types/types-eoa/token';
 import React from 'react';
-import { View, Text, StyleSheet, TextInput } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { pTd } from 'utils/unit';
-import { parseInputChange } from '@portkey/utils/input';
+// import { parseInputChange } from '@portkey/utils/input';
 import { defaultColors } from 'assets/theme';
 import GStyles from 'assets/theme/GStyles';
 
 import { useLanguage } from 'i18n/hooks';
-import NFTAvatar from 'components/NFTAvatar';
 import { TextL, TextS } from 'components/CommonText';
 import CommonAvatar from 'components/CommonAvatar';
+import { FontStyles } from 'assets/theme/styles';
 
 interface AmountNFT {
   nftItem: any;
@@ -28,8 +27,8 @@ export default function NFTInfo({ nftItem = { alias: '', balance: 0 } }: AmountN
         style={styles.avatar}
       />
       <View>
-        <TextL>{`${nftItem?.alias || 'alias'}`}</TextL>
-        <TextS style={styles.balance}>{`Balance: ${nftItem?.balance}`}</TextS>
+        <TextL>{`${nftItem?.alias || 'alias'}  #${nftItem?.tokenId}`}</TextL>
+        <TextS style={[styles.balance, FontStyles.font3]}>{`Balance: ${nftItem?.balance}`}</TextS>
       </View>
     </View>
   );
