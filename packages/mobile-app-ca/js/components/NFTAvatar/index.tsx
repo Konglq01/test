@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import { StyleSheet, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { pTd } from 'utils/unit';
-import { TextL, TextM } from 'components/CommonText';
+import { TextL, TextM, TextS } from 'components/CommonText';
 import { defaultColors } from 'assets/theme';
 import { Image } from '@rneui/themed';
 import GStyles from 'assets/theme/GStyles';
@@ -23,7 +23,7 @@ export type NoDataPropsType = {
 const NFTAvatar: React.FC<NoDataPropsType> = props => {
   const {
     style = {},
-    data: { imageUrl, symbol, tokenId, alias },
+    data: { imageUrl, tokenId, alias },
     onPress,
   } = props;
 
@@ -39,13 +39,13 @@ const NFTAvatar: React.FC<NoDataPropsType> = props => {
           containerStyle={styles.img}
         />
       )}
-      <TextL
+      <TextM
         numberOfLines={imageUrl ? 1 : 2}
         ellipsizeMode="tail"
         style={[styles.title, !!imageUrl && styles.titleNoPic]}>
         {alias}
-      </TextL>
-      <TextM style={[styles.id, !!imageUrl && styles.idNoPic]}>{`# ${tokenId}`}</TextM>
+      </TextM>
+      <TextS style={[styles.id, !!imageUrl && styles.idNoPic]}>{`# ${tokenId}`}</TextS>
       {imageUrl && <View style={styles.mask} />}
     </TouchableOpacity>
   );
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   idNoPic: {
     zIndex: 100,
     position: 'absolute',
-    bottom: 0,
+    bottom: pTd(4),
     color: defaultColors.font2,
   },
   message: {
