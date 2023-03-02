@@ -23,14 +23,15 @@ export function useIntervalQueryCAInfoByAddress(network: NetworkType, address?: 
           manager: address,
         });
         if (caHolderManagerInfo.length === 0) return;
-        const { caAddress, caHash, loginGuardianAccountInfo } = caHolderManagerInfo[0];
-        if (caAddress && caHash && loginGuardianAccountInfo.length > 0 && loginGuardianAccountInfo[0])
+        const { caAddress, caHash, loginGuardianInfo } = caHolderManagerInfo[0];
+        if (caAddress && caHash && loginGuardianInfo.length > 0 && loginGuardianInfo[0])
           setInfo({
             [address + network]: {
               managerInfo: {
-                managerUniqueId: loginGuardianAccountInfo[0].id,
-                loginAccount: loginGuardianAccountInfo[0].loginGuardianAccount?.value,
-                type: loginGuardianAccountInfo[0].loginGuardianAccount?.guardian?.type,
+                managerUniqueId: loginGuardianInfo[0].id,
+                // TODO: identifierHash is loginAccount?
+                loginAccount: loginGuardianInfo[0].loginGuardian?.identifierHash,
+                type: loginGuardianInfo[0].loginGuardian?.type,
                 verificationType: VerificationType.addManager,
               } as ManagerInfo,
               [DefaultChainId]: { caAddress, caHash },

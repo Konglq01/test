@@ -69,6 +69,7 @@ const ActivityDetail = () => {
   const status = useMemo(() => {
     if (!activityItem?.status) return { text: '', style: 'confirmed' };
 
+    // TODO: do not use GraphQL TransactionStatus
     if (activityItem?.status === TransactionStatus.Mined)
       return {
         text: 'Confirmed',

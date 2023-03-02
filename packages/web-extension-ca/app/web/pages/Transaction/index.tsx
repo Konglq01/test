@@ -58,6 +58,7 @@ export default function Transaction() {
   });
 
   const status = useMemo(() => {
+    // TODO: do not use GraphQL TransactionStatus
     if (activityItem?.status === TransactionStatus.Mined)
       return {
         text: 'Confirmed',

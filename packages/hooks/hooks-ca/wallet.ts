@@ -16,7 +16,7 @@ import { fetchCreateWalletResult, requestCreateWallet } from '@portkey/api/api-d
 import { sleep } from '@portkey/utils';
 import { useCurrentNetworkInfo } from './network';
 import { useCurrentChain } from './chainList';
-import { useCaHolderManagerInfoQuery } from '@portkey/graphql/contract/hooks/caHolderManagerInfo';
+import { useCaHolderManagerInfoQuery } from '@portkey/graphql/contract/__generated__/hooks/caHolderManagerInfo';
 import { getApolloClient } from '@portkey/graphql/contract/apollo';
 import { DEVICE_TYPE_INFO } from '@portkey/constants/constants-ca/wallet';
 import { request } from '@portkey/api/api-did';
