@@ -5,7 +5,7 @@ import DashBoard from 'pages/DashBoard';
 import SettingsPage from 'pages/SettingsPage';
 import Svg from 'components/Svg';
 import { defaultColors } from 'assets/theme';
-import { useNetworkInitialization } from '@portkey/hooks/network';
+import { useNetworkInitialization } from '@portkey-wallet/hooks/network';
 import { useAccountListBalanceTimer } from 'contexts/useInterface/hooks';
 import { useLanguage } from 'i18n/hooks';
 

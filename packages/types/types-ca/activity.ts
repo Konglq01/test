@@ -1,5 +1,5 @@
-import { TransactionTypes } from '@portkey/constants/constants-ca/activity';
-import { ChainItemType } from '@portkey/store/store-ca/wallet/type';
+import { TransactionTypes } from '@portkey-wallet/constants/constants-ca/activity';
+import { ChainItemType } from '@portkey-wallet/store/store-ca/wallet/type';
 import { ChainId, ChainType } from '..';
 import { BaseToken } from './token';
 

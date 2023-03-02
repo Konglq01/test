@@ -11,15 +11,15 @@ import SandboxEventService, { SandboxErrorCode } from 'service/SandboxEventServi
 import SandboxEventTypes from 'messages/SandboxEventTypes';
 import getPrivateKeyAndMnemonic from 'utils/Wallet/getPrivateKeyAndMnemonic';
 import { Button, message } from 'antd';
-import { AccountType } from '@portkey/types/wallet';
-import { ChainItemType } from '@portkey/types/chain';
-import { WalletError } from '@portkey/store/wallet/type';
+import { AccountType } from '@portkey-wallet/types/wallet';
+import { ChainItemType } from '@portkey-wallet/types/chain';
+import { WalletError } from '@portkey-wallet/store/wallet/type';
 import getTransactionFee from 'utils/sandboxUtil/getTransactionFee';
-import { divDecimalsStr } from '@portkey/utils/converter';
-import { ZERO } from '@portkey/constants/misc';
+import { divDecimalsStr } from '@portkey-wallet/utils/converter';
+import { ZERO } from '@portkey-wallet/constants/misc';
 import clsx from 'clsx';
 import checkMain from 'utils/util.isMain';
-import { useGetELFRateQuery } from '@portkey/store/rate/api';
+import { useGetELFRateQuery } from '@portkey-wallet/store/rate/api';
 import { useTranslation } from 'react-i18next';
 
 interface AppInfoType {

@@ -1,5 +1,5 @@
-import { SendOptions } from '@portkey/contracts/types';
-import { ChainType } from '@portkey/types';
+import { SendOptions } from '@portkey-wallet/contracts/types';
+import { ChainType } from '@portkey-wallet/types';
 import SandboxEventTypes from 'messages/SandboxEventTypes';
 import SandboxEventService, { SandboxErrorCode } from 'service/SandboxEventService';
 

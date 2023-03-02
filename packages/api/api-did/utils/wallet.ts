@@ -1,6 +1,6 @@
-import { GuardiansApprovedType } from '@portkey/types/guardian';
-import { TLoginStrType } from '@portkey/types/types-ca/wallet';
-import { VerificationType } from '@portkey/types/verifier';
+import { GuardiansApprovedType } from '@portkey-wallet/types/guardian';
+import { TLoginStrType } from '@portkey-wallet/types/types-ca/wallet';
+import { VerificationType } from '@portkey-wallet/types/verifier';
 import { request } from '..';
 import { IContext } from '../types';
 

@@ -1,5 +1,5 @@
 {
-  "name": "@portkey/contracts",
+  "name": "@portkey-wallet/contracts",
   "publishConfig": {
     "access": "public"
   },
@@ -11,8 +11,8 @@
     "start": "tsc --watch"
   },
   "dependencies": {
-    "@portkey/constants": "^0.0.1",
-    "@portkey/types": "^0.0.1",
+    "@portkey-wallet/constants": "^0.0.1",
+    "@portkey-wallet/types": "^0.0.1",
     "query-string": "^7.1.1"
   }
 }

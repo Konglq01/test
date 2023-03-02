@@ -7,41 +7,41 @@ import { TextM, TextS, TextL } from 'components/CommonText';
 import CommonButton from 'components/CommonButton';
 import ActionSheet from 'components/ActionSheet';
 import { formatChainInfo, formatStr2EllipsisStr } from 'utils';
-import { addRecentContact } from '@portkey/store/store-ca/recent/slice';
-import { isCrossChain } from '@portkey/utils/aelf';
+import { addRecentContact } from '@portkey-wallet/store/store-ca/recent/slice';
+import { isCrossChain } from '@portkey-wallet/utils/aelf';
 import { useLanguage } from 'i18n/hooks';
-import { useAppCommonDispatch } from '@portkey/hooks';
+import { useAppCommonDispatch } from '@portkey-wallet/hooks';
 import GStyles from 'assets/theme/GStyles';
 import fonts from 'assets/theme/fonts';
 import { Image, ScreenHeight } from '@rneui/base';
-import { getContractBasic } from '@portkey/contracts/utils';
-import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+import { getContractBasic } from '@portkey-wallet/contracts/utils';
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { usePin, useWallet } from 'hooks/store';
 import { getManagerAccount } from 'utils/redux';
 import crossChainTransfer, {
   CrossChainTransferParamsType,
   intervalCrossChainTransfer,
 } from 'utils/transfer/crossChainTransfer';
-import { useCurrentNetwork } from '@portkey/hooks/network';
-import { useCaAddresses, useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
-import { timesDecimals, unitConverter } from '@portkey/utils/converter';
+import { useCurrentNetwork } from '@portkey-wallet/hooks/network';
+import { useCaAddresses, useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { timesDecimals, unitConverter } from '@portkey-wallet/utils/converter';
 import sameChainTransfer from 'utils/transfer/sameChainTransfer';
-import { addFailedActivity, removeFailedActivity } from '@portkey/store/store-ca/activity/slice';
-import useRouterParams from '@portkey/hooks/useRouterParams';
+import { addFailedActivity, removeFailedActivity } from '@portkey-wallet/store/store-ca/activity/slice';
+import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
 import CommonToast from 'components/CommonToast';
 import navigationService from 'utils/navigationService';
 import Loading from 'components/Loading';
-import { IToSendPreviewParamsType } from '@portkey/types/types-ca/routeParams';
-import { BaseToken } from '@portkey/types/types-ca/token';
-import { ContractBasic } from '@portkey/contracts/utils/ContractBasic';
-import { ZERO } from '@portkey/constants/misc';
-import { CROSS_FEE } from '@portkey/constants/constants-ca/wallet';
+import { IToSendPreviewParamsType } from '@portkey-wallet/types/types-ca/routeParams';
+import { BaseToken } from '@portkey-wallet/types/types-ca/token';
+import { ContractBasic } from '@portkey-wallet/contracts/utils/ContractBasic';
+import { ZERO } from '@portkey-wallet/constants/misc';
+import { CROSS_FEE } from '@portkey-wallet/constants/constants-ca/wallet';
 import {
   clearNftCollection,
   fetchNFTCollectionsAsync,
   fetchTokenListAsync,
-} from '@portkey/store/store-ca/assets/slice';
-import { sleep } from '@portkey/utils';
+} from '@portkey-wallet/store/store-ca/assets/slice';
+import { sleep } from '@portkey-wallet/utils';
 
 export interface SendHomeProps {
   route?: any;

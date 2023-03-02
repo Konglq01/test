@@ -7,13 +7,13 @@ import SafeAreaBox from 'components/SafeAreaBox';
 import { useCredentials } from 'hooks/store';
 import CommonButton from 'components/CommonButton';
 import { useLanguage } from 'i18n/hooks';
-import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import Welcome from './components/Welcome';
 import { ImageBackground, StyleSheet } from 'react-native';
-import { isIos, screenHeight } from '@portkey/utils/mobile/device';
+import { isIos, screenHeight } from '@portkey-wallet/utils/mobile/device';
 import background from '../Login/img/background.png';
 import { BGStyles, FontStyles } from 'assets/theme/styles';
-import { sleep } from '@portkey/utils';
+import { sleep } from '@portkey-wallet/utils';
 
 export default function Referral() {
   const credentials = useCredentials();

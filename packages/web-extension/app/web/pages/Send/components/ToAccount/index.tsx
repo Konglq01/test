@@ -1,4 +1,4 @@
-import { AddressBookItem } from '@portkey/types/addressBook';
+import { AddressBookItem } from '@portkey-wallet/types/addressBook';
 import { Input } from 'antd';
 import CustomSvg from 'components/CustomSvg';
 import { FocusEventHandler } from 'react';

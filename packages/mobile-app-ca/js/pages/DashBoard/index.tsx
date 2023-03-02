@@ -3,22 +3,22 @@ import Card from './Card';
 import { StyleSheet } from 'react-native';
 // import navigationService from 'utils/navigationService';
 // import { TouchableOpacity } from 'react-native-gesture-handler';
-// import { TokenItemShowType } from '@portkey/types/types-eoa/token';
+// import { TokenItemShowType } from '@portkey-wallet/types/types-eoa/token';
 // import Svg from 'components/Svg';
-// import { clearBalance, updateBalance } from '@portkey/store/tokenBalance/slice';
-import { useAppCommonDispatch } from '@portkey/hooks/index';
+// import { clearBalance, updateBalance } from '@portkey-wallet/store/tokenBalance/slice';
+import { useAppCommonDispatch } from '@portkey-wallet/hooks/index';
 import DashBoardTab from './DashBoardTab';
 import SafeAreaBox from 'components/SafeAreaBox';
 import { defaultColors } from 'assets/theme';
 
 import useEffectOnce from 'hooks/useEffectOnce';
-import { MINUTE } from '@portkey/constants';
-import { fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
+import { MINUTE } from '@portkey-wallet/constants';
+import { fetchTokenListAsync } from '@portkey-wallet/store/store-ca/assets/slice';
 import { useGetCurrentCAViewContract } from 'hooks/contract';
 import PageContainer from 'components/PageContainer';
 import { useAppDispatch } from 'store/hooks';
-import { getWalletNameAsync } from '@portkey/store/store-ca/wallet/actions';
-import { getSymbolImagesAsync } from '@portkey/store/store-ca/tokenManagement/action';
+import { getWalletNameAsync } from '@portkey-wallet/store/store-ca/wallet/actions';
+import { getSymbolImagesAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
 
 interface DashBoardTypes {
   navigation: any;

@@ -6,7 +6,7 @@ import ButtonRow, { ButtonRowProps } from 'components/ButtonRow';
 import { StyleSheet } from 'react-native';
 import { defaultColors } from 'assets/theme';
 import { pTd } from 'utils/unit';
-import { screenWidth } from '@portkey/utils/mobile/device';
+import { screenWidth } from '@portkey-wallet/utils/mobile/device';
 import GStyles from 'assets/theme/GStyles';
 
 export type CrossChainTransferModalProps = {

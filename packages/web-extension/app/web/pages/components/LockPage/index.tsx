@@ -1,4 +1,4 @@
-import { WalletError } from '@portkey/store/wallet/type';
+import { WalletError } from '@portkey-wallet/store/wallet/type';
 import { Button, Form, FormProps, message } from 'antd';
 import { FormItem } from 'components/BaseAntd';
 import CustomPassword from 'components/CustomPassword';

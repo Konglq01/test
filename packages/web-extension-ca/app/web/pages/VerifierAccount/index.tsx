@@ -10,21 +10,21 @@ import {
 } from 'store/Provider/hooks';
 import { useCallback, useMemo } from 'react';
 import { message } from 'antd';
-import { setOpGuardianAction, setUserGuardianItemStatus } from '@portkey/store/store-ca/guardians/actions';
-import { VerifierInfo, VerifyStatus } from '@portkey/types/verifier';
+import { setOpGuardianAction, setUserGuardianItemStatus } from '@portkey-wallet/store/store-ca/guardians/actions';
+import { VerifierInfo, VerifyStatus } from '@portkey-wallet/types/verifier';
 import './index.less';
 import PortKeyTitle from 'pages/components/PortKeyTitle';
 import clsx from 'clsx';
 import SettingHeader from 'pages/components/SettingHeader';
 import useLocationState from 'hooks/useLocationState';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { handleGuardian } from 'utils/sandboxUtil/handleGuardian';
 import { GuardianMth } from 'types/guardians';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { setRegisterVerifierAction } from 'store/reducers/loginCache/actions';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
-import aes from '@portkey/utils/aes';
+import aes from '@portkey-wallet/utils/aes';
 
 export default function VerifierAccount() {
   const { loginAccount } = useLoginInfo();

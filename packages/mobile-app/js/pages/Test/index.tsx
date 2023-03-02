@@ -1,7 +1,7 @@
 import { Button } from '@rneui/base';
 import React from 'react';
 import { useCredentials, useWallet } from 'hooks/store';
-import { useCurrentNetwork } from '@portkey/hooks/network';
+import { useCurrentNetwork } from '@portkey-wallet/hooks/network';
 import { rsaEncryptObj } from 'utils/rsaEncrypt';
 import PageContainer from 'components/PageContainer';
 import { request } from 'api';

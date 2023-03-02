@@ -1,12 +1,12 @@
-import { ChainType } from '@portkey/types';
-import { BaseToken } from '@portkey/types/types-ca/token';
-import { getChainIdByAddress } from '@portkey/utils';
+import { ChainType } from '@portkey-wallet/types';
+import { BaseToken } from '@portkey-wallet/types/types-ca/token';
+import { getChainIdByAddress } from '@portkey-wallet/utils';
 import { crossChainTransferToCa } from './crossChainTransferToCa';
 import { managerTransfer } from './managerTransfer';
-import { getChainNumber } from '@portkey/utils/aelf';
-import { ContractBasic } from '@portkey/contracts/utils/ContractBasic';
-import { ZERO } from '@portkey/constants/misc';
-import { timesDecimals } from '@portkey/utils/converter';
+import { getChainNumber } from '@portkey-wallet/utils/aelf';
+import { ContractBasic } from '@portkey-wallet/contracts/utils/ContractBasic';
+import { ZERO } from '@portkey-wallet/constants/misc';
+import { timesDecimals } from '@portkey-wallet/utils/converter';
 
 export interface CrossChainTransferParamsType {
   tokenInfo: BaseToken;

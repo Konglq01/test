@@ -6,15 +6,15 @@ import { useLanguage } from 'i18n/hooks';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { pTd } from 'utils/unit';
 import NFTCollectionItem from './NFTCollectionItem';
-import { useCaAddresses } from '@portkey/hooks/hooks-ca/wallet';
-import { fetchNFTAsync, fetchNFTCollectionsAsync, clearNftItem } from '@portkey/store/store-ca/assets/slice';
-import { useAppCommonDispatch } from '@portkey/hooks';
-import { useAppCASelector } from '@portkey/hooks';
-import { NFTCollectionItemShowType } from '@portkey/types/types-ca/assets';
+import { useCaAddresses } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { fetchNFTAsync, fetchNFTCollectionsAsync, clearNftItem } from '@portkey-wallet/store/store-ca/assets/slice';
+import { useAppCommonDispatch } from '@portkey-wallet/hooks';
+import { useAppCASelector } from '@portkey-wallet/hooks';
+import { NFTCollectionItemShowType } from '@portkey-wallet/types/types-ca/assets';
 import { useWallet } from 'hooks/store';
 import Touchable from 'components/Touchable';
-import { REFRESH_TIME } from '@portkey/constants/constants-ca/assets';
-import { ChainId } from '@portkey/types';
+import { REFRESH_TIME } from '@portkey-wallet/constants/constants-ca/assets';
+import { ChainId } from '@portkey-wallet/types';
 import { useRoute } from '@react-navigation/native';
 
 export interface OpenCollectionObjType {

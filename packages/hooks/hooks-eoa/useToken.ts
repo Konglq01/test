@@ -1,7 +1,12 @@
 import { useAppEOASelector, useAppCommonDispatch } from '../index';
-import { addTokenInCurrentAccount, deleteTokenInCurrentAccount } from '@portkey/store/token/action';
-import { fetchTokenListAsync } from '@portkey/store/token/slice';
-import { TokenItemType, TokenState, AddedTokenData, TokenListShowInMarketType } from '@portkey/types/types-eoa/token';
+import { addTokenInCurrentAccount, deleteTokenInCurrentAccount } from '@portkey-wallet/store/token/action';
+import { fetchTokenListAsync } from '@portkey-wallet/store/token/slice';
+import {
+  TokenItemType,
+  TokenState,
+  AddedTokenData,
+  TokenListShowInMarketType,
+} from '@portkey-wallet/types/types-eoa/token';
 import { useMemo } from 'react';
 
 export interface TokenFuncsType {

@@ -1,4 +1,4 @@
-import { ChainItemType } from '@portkey/types/chain';
+import { ChainItemType } from '@portkey-wallet/types/chain';
 import { isIOS } from '@rneui/base';
 import { defaultColors } from 'assets/theme';
 import CommonButton from 'components/CommonButton';

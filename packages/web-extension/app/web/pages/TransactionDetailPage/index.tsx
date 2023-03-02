@@ -1,4 +1,4 @@
-import { useGetELFRateQuery } from '@portkey/store/rate/api';
+import { useGetELFRateQuery } from '@portkey-wallet/store/rate/api';
 import PromptCommonPage from 'pages/components/PromptCommonPage';
 import { Transaction } from 'pages/Home/components/MyBalance';
 import TransactionDetail from 'pages/Home/components/TransactionDetail';

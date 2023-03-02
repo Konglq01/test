@@ -1,5 +1,5 @@
 import { ServiceInit } from '../server/config';
-import { customFetch } from '@portkey/utils/fetch';
+import { customFetch } from '@portkey-wallet/utils/fetch';
 import { BaseConfig, RequestConfig } from '../types';
 import { getRequestConfig, spliceUrl } from '../utils';
 import { isValidRefreshTokenConfig, queryAuthorization, RefreshTokenConfig } from './utils/index';

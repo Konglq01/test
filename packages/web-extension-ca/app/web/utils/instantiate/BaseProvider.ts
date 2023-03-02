@@ -1,5 +1,5 @@
-import { ConsoleLike } from '@portkey/types';
-import { BaseChainType } from '@portkey/types/chain';
+import { ConsoleLike } from '@portkey-wallet/types';
+import { BaseChainType } from '@portkey-wallet/types/chain';
 import EncryptedStream from 'utils/EncryptedStream';
 import errorHandler from 'utils/errorHandler';
 import IdGenerator from 'utils/IdGenerator';

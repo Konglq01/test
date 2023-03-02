@@ -1,6 +1,6 @@
 import aes from '../aes';
 import AElf from 'aelf-sdk';
-import { DefaultBIP44Path } from '@portkey/constants/wallet';
+import { DefaultBIP44Path } from '@portkey-wallet/constants/wallet';
 import {
   AccountNameErrorMessage,
   FormatAccountInfo,
@@ -11,10 +11,10 @@ import {
   PinErrorMessage,
   WalletNameErrorMessage,
 } from './types';
-import { isValidPassword, isValidPin, isValidWalletName } from '@portkey/utils/reg';
-import { AccountType, Password, WalletInfoType } from '@portkey/types/wallet';
-import { PIN_SIZE, ZERO } from '@portkey/constants/misc';
-import { isExtension } from '@portkey/utils';
+import { isValidPassword, isValidPin, isValidWalletName } from '@portkey-wallet/utils/reg';
+import { AccountType, Password, WalletInfoType } from '@portkey-wallet/types/wallet';
+import { PIN_SIZE, ZERO } from '@portkey-wallet/constants/misc';
+import { isExtension } from '@portkey-wallet/utils';
 
 export const handleWalletInfo = (walletInfo: any) => {
   const tmpWallet = { ...walletInfo };

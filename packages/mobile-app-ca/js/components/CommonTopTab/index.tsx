@@ -1,7 +1,7 @@
 import React, { memo, ReactElement } from 'react';
 import { StyleSheet } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import { screenWidth } from '@portkey/utils/mobile/device';
+import { screenWidth } from '@portkey-wallet/utils/mobile/device';
 import { pTd } from 'utils/unit';
 import { defaultColors } from 'assets/theme';
 

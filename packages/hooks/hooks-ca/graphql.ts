@@ -1,13 +1,13 @@
 import useInterval from '../useInterval';
-import { DefaultChainId } from '@portkey/constants/constants-ca/network';
-import { contractQueries } from '@portkey/graphql/index';
-import { NetworkType } from '@portkey/types';
+import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
+import { contractQueries } from '@portkey-wallet/graphql/index';
+import { NetworkType } from '@portkey-wallet/types';
 import { useState, useMemo } from 'react';
-import { CAInfoType, ManagerInfo } from '@portkey/types/types-ca/wallet';
-import { VerificationType } from '@portkey/types/verifier';
+import { CAInfoType, ManagerInfo } from '@portkey-wallet/types/types-ca/wallet';
+import { VerificationType } from '@portkey-wallet/types/verifier';
 import { useAppCommonDispatch } from '../index';
 import { useCurrentChain } from './chainList';
-import { getChainListAsync } from '@portkey/store/store-ca/wallet/actions';
+import { getChainListAsync } from '@portkey-wallet/store/store-ca/wallet/actions';
 export function useIntervalQueryCAInfoByAddress(network: NetworkType, address?: string) {
   const [info, setInfo] = useState<{ [address: string]: CAInfoType }>();
   const dispatch = useAppCommonDispatch();

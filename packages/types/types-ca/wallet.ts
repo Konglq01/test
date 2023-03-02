@@ -1,5 +1,5 @@
 import { WalletInfoType } from '../wallet';
-import { ChainId, NetworkType } from '@portkey/types';
+import { ChainId, NetworkType } from '@portkey-wallet/types';
 import { VerificationType } from '../verifier';
 
 export type ManagerInfo = {

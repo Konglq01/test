@@ -10,7 +10,7 @@ import { TextL } from 'components/CommonText';
 import type { SafeAreaColorMapKeyUnit } from 'components/PageContainer';
 import { useLanguage } from 'i18n/hooks';
 import { ViewStyleType } from 'types/styles';
-import { useHardwareBackPress } from '@portkey/hooks/mobile';
+import { useHardwareBackPress } from '@portkey-wallet/hooks/mobile';
 
 export type CustomHeaderProps = {
   themeType?: SafeAreaColorMapKeyUnit;

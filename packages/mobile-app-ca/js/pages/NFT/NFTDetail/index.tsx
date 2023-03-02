@@ -12,8 +12,8 @@ import { TextL, TextXL, TextXXXL } from 'components/CommonText';
 import { FontStyles } from 'assets/theme/styles';
 import fonts from 'assets/theme/fonts';
 import navigationService from 'utils/navigationService';
-import useRouterParams from '@portkey/hooks/useRouterParams';
-import { IToSendHomeParamsType } from '@portkey/types/types-ca/routeParams';
+import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
+import { IToSendHomeParamsType } from '@portkey-wallet/types/types-ca/routeParams';
 
 export interface TokenDetailProps {
   route?: any;

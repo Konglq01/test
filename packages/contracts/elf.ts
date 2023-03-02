@@ -1,4 +1,4 @@
-import { getELFContract } from '@portkey/utils/aelf';
+import { getELFContract } from '@portkey-wallet/utils/aelf';
 import AElf from 'aelf-sdk';
 
 export const getELFContractAddress = async (rpcUrl: string, GenesisContractAddress: string, name: string) => {
