@@ -3,7 +3,7 @@ import { useAppDispatch, useCommonState, useWalletInfo } from 'store/Provider/ho
 import CustomSvg from 'components/CustomSvg';
 import svgsList from 'assets/svgs';
 import './index.less';
-import { fetchChainListAsync } from '@portkey/store/network/actions';
+import { fetchChainListAsync } from '@portkey-wallet/store/network/actions';
 
 export type WalletAvatar = keyof typeof svgsList;
 

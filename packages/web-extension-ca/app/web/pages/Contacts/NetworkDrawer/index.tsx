@@ -4,8 +4,8 @@ import DropdownSearch from 'components/DropdownSearch';
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import BaseDrawer from 'components/BaseDrawer';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
-import { useSymbolImages } from '@portkey/hooks/hooks-ca/useToken';
+import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
+import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import './index.less';
 
 interface CustomSelectProps extends DrawerProps {

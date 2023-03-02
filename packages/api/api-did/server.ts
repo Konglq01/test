@@ -1,5 +1,5 @@
 import { ServiceInit } from '../server/config';
-import { customFetch } from '@portkey/utils/fetch';
+import { customFetch } from '@portkey-wallet/utils/fetch';
 import { BaseConfig, RequestConfig } from '../types';
 import { getRequestConfig, spliceUrl } from '../utils';
 import { isValidRefreshTokenConfig, queryAuthorization, RefreshTokenConfig } from './utils/index';
@@ -43,7 +43,6 @@ export class DidService extends ServiceInit {
     const { method = 'POST', url, baseURL, ...fetchConfig } = getRequestConfig(base, config, this.defaultConfig) || {};
     const _url = url || (typeof base === 'string' ? base : base.target);
     const URL = spliceUrl(baseURL || '', _url);
-    console.log('====fetchResult------config', this.refreshTokenConfig);
     const fetchResult = await customFetch(URL, {
       ...fetchConfig,
       method,

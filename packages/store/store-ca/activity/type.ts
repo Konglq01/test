@@ -1,5 +1,5 @@
-import { ActivityItemType, the2ThFailedActivityItemType } from '@portkey/types/types-ca/activity';
-import { TransactionTypes } from '@portkey/constants/constants-ca/activity';
+import { ActivityItemType, the2ThFailedActivityItemType } from '@portkey-wallet/types/types-ca/activity';
+import { TransactionTypes } from '@portkey-wallet/constants/constants-ca/activity';
 
 export type ActivityStateType = {
   maxResultCount: number;

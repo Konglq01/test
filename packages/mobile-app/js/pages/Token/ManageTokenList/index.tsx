@@ -1,9 +1,9 @@
 import PageContainer from 'components/PageContainer';
-import { useIsFetchingTokenList, useToken } from '@portkey/hooks/hooks-eoa/useToken';
-import { TokenItemShowType } from '@portkey/types/types-eoa/token';
-import { filterTokenList } from '@portkey/utils/token';
+import { useIsFetchingTokenList, useToken } from '@portkey-wallet/hooks/hooks-eoa/useToken';
+import { TokenItemShowType } from '@portkey-wallet/types/types-eoa/token';
+import { filterTokenList } from '@portkey-wallet/utils/token';
 import CommonInput from 'components/CommonInput';
-import { useAppEOASelector } from '@portkey/hooks/index';
+import { useAppEOASelector } from '@portkey-wallet/hooks/index';
 import { Dialog } from '@rneui/themed';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import gStyles from 'assets/theme/GStyles';

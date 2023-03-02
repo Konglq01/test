@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
 import { isValidNumber } from './reg';
-import { ZERO } from '@portkey/constants/misc';
+import { ZERO } from '@portkey-wallet/constants/misc';
 
 export const formatDec = (value: string, pivot: BigNumber, min: BigNumber, maxLength = 8) => {
   if (pivot.gt(0)) {

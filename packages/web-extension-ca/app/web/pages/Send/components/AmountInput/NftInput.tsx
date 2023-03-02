@@ -1,13 +1,13 @@
-import { BaseToken } from '@portkey/types/types-ca/token';
+import { BaseToken } from '@portkey-wallet/types/types-ca/token';
 import { Input } from 'antd';
 import { handleKeyDownInt } from 'pages/Send/utils/util.keyDown';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
-import { ChainId } from '@portkey/types';
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { ChainId } from '@portkey-wallet/types';
 import { getBalance } from 'utils/sandboxUtil/getBalance';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { divDecimals, unitConverter } from '@portkey/utils/converter';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
+import { divDecimals, unitConverter } from '@portkey-wallet/utils/converter';
 
 export default function NftInput({
   toAccount,

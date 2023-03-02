@@ -22,33 +22,21 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "prepare": "husky install",
     "reset-modules": "rm -rf node_modules/ yarn.lock packages/*/node_modules",
-    "common-package:extension": "npx lerna add @portkey/utils --scope=web-extension && npx lerna add @portkey/hooks --scope=web-extension  && npx lerna add @portkey/store --scope=web-extension && npx lerna add @portkey/constants --scope=web-extension",
+    "common-package:extension": "npx lerna add @portkey-wallet/utils --scope=web-extension && npx lerna add @portkey-wallet/hooks --scope=web-extension  && npx lerna add @portkey-wallet/store --scope=web-extension && npx lerna add @portkey-wallet/constants --scope=web-extension",
     "app": "yarn workspace walletappnew run",
     "extension": "yarn workspace web-extension run",
     "app:ca": "yarn workspace mobile-ca run",
     "extension:ca": "yarn workspace web-extension-ca run",
     "extension-ca:dev": "yarn extension:ca dev:watch",
-    "graphql": "yarn workspace @portkey/graphql run",
-    "page": "yarn workspace web-page run",
-    "did-ui:build": "yarn workspace @portkey/did-ui-react run build"
+    "graphql": "yarn workspace @portkey-wallet/graphql run",
+    "page": "yarn workspace web-page run"
   },
   "devDependencies": {
-    "rollup": "3.15.0",
     "eslint": "^8.23.1",
     "eslint-plugin-react": "^7.31.8",
     "husky": "^8.0.1",
     "lerna": "^5.5.2",
-    "lint-staged": ">=13",
-    "@rollup/plugin-url": "^8.0.1",
-    "@rollup/plugin-image": "^3.0.2",
-    "rollup-plugin-copy": "^3.4.0",
-    "esbuild": "^0.17.7",
-    "postcss": "^8.4.21",
-    "rollup-plugin-css-porter": "^1.0.2",
-    "rollup-plugin-esbuild": "5.0.0",
-    "rollup-plugin-lit-css": "4.0.1",
-    "rollup-plugin-minify-html-literals": "1.2.6",
-    "rollup-plugin-postcss": "^4.0.2"
+    "lint-staged": ">=13"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": "eslint --cache --fix"

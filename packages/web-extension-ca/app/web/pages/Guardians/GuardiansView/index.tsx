@@ -9,25 +9,25 @@ import { useTranslation } from 'react-i18next';
 import { handleGuardian } from 'utils/sandboxUtil/handleGuardian';
 import './index.less';
 import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
-import { LoginType } from '@portkey/types/types-ca/wallet';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import {
   setCurrentGuardianAction,
   setOpGuardianAction,
   setPreGuardianAction,
-} from '@portkey/store/store-ca/guardians/actions';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+} from '@portkey-wallet/store/store-ca/guardians/actions';
+import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { GuardianMth } from 'types/guardians';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
-import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
-import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
-import { DefaultChainId } from '@portkey/constants/constants-ca/network';
+import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
+import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type';
+import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
 import useGuardianList from 'hooks/useGuardianList';
 import { verification } from 'utils/api';
-import aes from '@portkey/utils/aes';
+import aes from '@portkey-wallet/utils/aes';
 
 enum SwitchFail {
   default = 0,

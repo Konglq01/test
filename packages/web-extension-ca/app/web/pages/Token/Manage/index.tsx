@@ -3,13 +3,13 @@ import { useNavigate } from 'react-router';
 import { Button, message } from 'antd';
 import SettingHeader from 'pages/components/SettingHeader';
 import CustomSvg from 'components/CustomSvg';
-import { useSymbolImages, useToken } from '@portkey/hooks/hooks-ca/useToken';
-import { TokenItemShowType } from '@portkey/types/types-ca/token';
+import { useSymbolImages, useToken } from '@portkey-wallet/hooks/hooks-ca/useToken';
+import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
 import DropdownSearch from 'components/DropdownSearch';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useTokenInfo, useUserInfo, useWalletInfo } from 'store/Provider/hooks';
-import { fetchAllTokenListAsync } from '@portkey/store/store-ca/tokenManagement/action';
-import { useChainIdList } from '@portkey/hooks/hooks-ca/wallet';
+import { fetchAllTokenListAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
+import { useChainIdList } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import './index.less';
 
 export default function AddToken() {

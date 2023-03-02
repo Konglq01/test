@@ -6,10 +6,10 @@ import CommonButton from 'components/CommonButton';
 import CommonInput from 'components/CommonInput';
 import { ErrorType } from 'types/common';
 import { INIT_HAS_ERROR } from 'constants/common';
-import { isValidCAWalletName } from '@portkey/utils/reg';
+import { isValidCAWalletName } from '@portkey-wallet/utils/reg';
 import navigationService from 'utils/navigationService';
 import CommonToast from 'components/CommonToast';
-import { useSetWalletName, useWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { useSetWalletName, useWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import Loading from 'components/Loading';
 
 const WalletName: React.FC = () => {

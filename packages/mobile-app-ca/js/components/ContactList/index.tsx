@@ -7,7 +7,7 @@ import { styles as contactListStyles } from './style';
 import CommonButton from 'components/CommonButton';
 import { pTd } from 'utils/unit';
 import { useLanguage } from 'i18n/hooks';
-import { ContactIndexType, ContactItemType } from '@portkey/types/types-ca/contact';
+import { ContactIndexType, ContactItemType } from '@portkey-wallet/types/types-ca/contact';
 import ContactItem, { styles as contactItemStyles } from 'components/ContactItem';
 import ContactFlashList from './ContactFlashList';
 import { TextL } from 'components/CommonText';
@@ -15,9 +15,9 @@ import { defaultColors } from 'assets/theme';
 import { BGStyles, FontStyles } from 'assets/theme/styles';
 import GStyles from 'assets/theme/GStyles';
 import { ViewStyleType } from 'types/styles';
-import { getAddressInfo, getAelfAddress } from '@portkey/utils/aelf';
-import { transContactsToIndexes } from '@portkey/store/store-ca/contact/utils';
-import { useContact } from '@portkey/hooks/hooks-ca/contact';
+import { getAddressInfo, getAelfAddress } from '@portkey-wallet/utils/aelf';
+import { transContactsToIndexes } from '@portkey-wallet/store/store-ca/contact/utils';
+import { useContact } from '@portkey-wallet/hooks/hooks-ca/contact';
 
 interface ContactsListProps {
   isIndexBarShow?: boolean;

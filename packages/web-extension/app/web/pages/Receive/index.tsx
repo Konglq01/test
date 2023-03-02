@@ -1,4 +1,4 @@
-import { addressFormat } from '@portkey/utils';
+import { addressFormat } from '@portkey-wallet/utils';
 import clsx from 'clsx';
 import Copy from 'components/Copy';
 import CustomSvg from 'components/CustomSvg';
@@ -8,13 +8,13 @@ import QRCode from 'qrcode.react';
 import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useAppSelector, useCommonState, useNetwork, useWalletInfo } from 'store/Provider/hooks';
-import { AccountType } from '@portkey/types/wallet';
+import { AccountType } from '@portkey-wallet/types/wallet';
 import './index.less';
 import PromptCommonPage from 'pages/components/PromptCommonPage';
 import CustomSelectModal from 'pages/components/CustomSelectModal';
 import { List } from 'antd';
-import { unitConverter } from '@portkey/utils/converter';
-import { ZERO } from '@portkey/constants/misc';
+import { unitConverter } from '@portkey-wallet/utils/converter';
+import { ZERO } from '@portkey-wallet/constants/misc';
 import { useTranslation } from 'react-i18next';
 
 export default function Receive() {

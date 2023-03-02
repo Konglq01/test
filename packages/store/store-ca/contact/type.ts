@@ -1,4 +1,4 @@
-import { ContactIndexType, ContactItemType } from '@portkey/types/types-ca/contact';
+import { ContactIndexType, ContactItemType } from '@portkey-wallet/types/types-ca/contact';
 import { ContactState } from './slice';
 
 export interface FetchContractListAsyncPayloadType {

@@ -1,4 +1,4 @@
-import type { AccountType, WalletInfoType, CreateType, Password } from '@portkey/types/wallet';
+import type { AccountType, WalletInfoType, CreateType, Password } from '@portkey-wallet/types/wallet';
 
 export declare type FormatAccountInfo = (
   walletInfoInput: any,

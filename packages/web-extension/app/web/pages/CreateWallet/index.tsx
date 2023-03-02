@@ -6,7 +6,7 @@ import { SuccessPageType } from 'types/UI';
 import CreateWalletPage from '../components/CreateWalletPage';
 import InternalMessage from 'messages/InternalMessage';
 import InternalMessageTypes from 'messages/InternalMessageTypes';
-import { createWallet } from '@portkey/store/wallet/actions';
+import { createWallet } from '@portkey-wallet/store/wallet/actions';
 import { useAppDispatch, useLoading } from 'store/Provider/hooks';
 import { setLocalStorage } from 'utils/storage/chromeStorage';
 import { setPasswordSeed } from 'store/reducers/user/slice';

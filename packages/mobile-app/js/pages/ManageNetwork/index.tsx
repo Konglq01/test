@@ -1,13 +1,13 @@
 import React, { useMemo, useState } from 'react';
 import PageContainer from 'components/PageContainer';
-import { useNetworkInitialization, useNetworkList } from '@portkey/hooks/network';
+import { useNetworkInitialization, useNetworkList } from '@portkey-wallet/hooks/network';
 import CustomScreen from './components/CustomScreen';
 import AllScreen from './components/AllScreen';
 import CommonScreen from './components/CommonScreen';
 import Touchable from 'components/Touchable';
 import navigationService from 'utils/navigationService';
 import CommonInput from 'components/CommonInput';
-import { strIncludes } from '@portkey/utils';
+import { strIncludes } from '@portkey-wallet/utils';
 import { useNavigation } from '@react-navigation/native';
 import CommonTopTab from 'components/CommonTopTab';
 import Svg from 'components/Svg';

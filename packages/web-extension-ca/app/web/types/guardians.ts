@@ -1,4 +1,4 @@
-import { LoginType } from '@portkey/types/types-ca/wallet';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 
 export enum GuardianMth {
   addGuardian = 'addGuardian',

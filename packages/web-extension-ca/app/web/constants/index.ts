@@ -1,4 +1,4 @@
-import { DeviceType } from '@portkey/types/types-ca/wallet';
+import { DeviceType } from '@portkey-wallet/types/types-ca/wallet';
 
 export const prefixCls = 'portkey';
 // redux

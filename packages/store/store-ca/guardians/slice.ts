@@ -1,6 +1,6 @@
-import { GuardianAccount } from '@portkey/types/guardian';
-import { LoginType } from '@portkey/types/types-ca/wallet';
-import { VerifierItem, VerifyStatus } from '@portkey/types/verifier';
+import { GuardianAccount } from '@portkey-wallet/types/guardian';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import { VerifierItem, VerifyStatus } from '@portkey-wallet/types/verifier';
 import { createSlice } from '@reduxjs/toolkit';
 import moment from 'moment';
 import {
@@ -16,7 +16,7 @@ import {
   setOpGuardianAction,
 } from './actions';
 import { GuardiansState, UserGuardianStatus } from './type';
-import { GUARDIAN_TYPE_TYPE } from '@portkey/constants/constants-ca/guardian';
+import { GUARDIAN_TYPE_TYPE } from '@portkey-wallet/constants/constants-ca/guardian';
 
 const initialState: GuardiansState = {};
 export const guardiansSlice = createSlice({

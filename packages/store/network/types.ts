@@ -1,5 +1,5 @@
-import { NetworkType } from '@portkey/types';
-import { ChainItemType } from '@portkey/types/chain';
+import { NetworkType } from '@portkey-wallet/types';
+import { ChainItemType } from '@portkey-wallet/types/chain';
 
 export interface ChainState {
   currentChain: ChainItemType;

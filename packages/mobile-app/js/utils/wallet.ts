@@ -1,6 +1,6 @@
 import { getWalletByAccount } from './redux';
-import type { AccountType } from '@portkey/types/wallet';
-import { ChainItemType } from '@portkey/types/chain';
+import type { AccountType } from '@portkey-wallet/types/wallet';
+import { ChainItemType } from '@portkey-wallet/types/chain';
 import AElf from 'aelf-sdk';
 import { isIOS } from '@rneui/base';
 import { rsaEncryptObj } from './rsaEncrypt';

@@ -1,17 +1,17 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import { TouchableOpacity, FlatList, StyleSheet, View } from 'react-native';
-// import { RecentContactType } from '@portkey/types/trade';
-// import trades from '@portkey/store/trade/slice';
+// import { RecentContactType } from '@portkey-wallet/types/trade';
+// import trades from '@portkey-wallet/store/trade/slice';
 import navigationService from 'utils/navigationService';
 import PageContainer from 'components/PageContainer';
 import CommonInput from 'components/CommonInput';
 import CommonTopTab from 'components/CommonTopTab';
 import Svg from 'components/Svg';
-import { useCurrentNetwork } from '@portkey/hooks/network';
+import { useCurrentNetwork } from '@portkey-wallet/hooks/network';
 import { useAppSelector } from 'store/hooks';
 import { useWallet } from 'hooks/store';
 import useDebounce from 'hooks/useDebounce';
-import { filterAddressList } from '@portkey/utils/contact';
+import { filterAddressList } from '@portkey-wallet/utils/contact';
 import { useNavigation } from '@react-navigation/native';
 import { TextM } from 'components/CommonText';
 import GStyles from 'assets/theme/GStyles';
@@ -19,8 +19,8 @@ import { defaultColors } from 'assets/theme';
 import ContactListItem, { ContactListItemType as ContactItemProps } from 'components/ContactListItem';
 import { pTd } from 'utils/unit';
 import { useLanguage } from 'i18n/hooks';
-import { useAppEOASelector } from '@portkey/hooks/hooks-eoa';
-// import type { AccountType } from '@portkey/types/wallet';
+import { useAppEOASelector } from '@portkey-wallet/hooks/hooks-eoa';
+// import type { AccountType } from '@portkey-wallet/types/wallet';
 
 interface SelectContactProps {
   route?: any;

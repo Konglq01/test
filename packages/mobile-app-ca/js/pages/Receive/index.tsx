@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import PageContainer from 'components/PageContainer';
 import { TextL, TextM, TextXL, TextS } from 'components/CommonText';
-import { useAppCASelector } from '@portkey/hooks';
-import { AccountType } from '@portkey/types/wallet';
+import { useAppCASelector } from '@portkey-wallet/hooks';
+import { AccountType } from '@portkey-wallet/types/wallet';
 import { setStringAsync } from 'expo-clipboard';
 import CommonToast from 'components/CommonToast';
 import AccountCard from 'pages/Receive/components/AccountCard';
@@ -14,9 +14,9 @@ import { defaultColors } from 'assets/theme';
 import { useLanguage } from 'i18n/hooks';
 import CommonAvatar from 'components/CommonAvatar';
 import GStyles from 'assets/theme/GStyles';
-import { TokenItemShowType } from '@portkey/types/types-ca/token';
-import useRouterParams from '@portkey/hooks/useRouterParams';
-import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
+import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
+import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 
 export default function Receive() {
   const { t } = useLanguage();

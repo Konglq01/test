@@ -1,5 +1,5 @@
 {
-  "name": "@portkey/i18n",
+  "name": "@portkey-wallet/i18n",
   "publishConfig": {
     "access": "public"
   },

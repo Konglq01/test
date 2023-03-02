@@ -1,9 +1,9 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
-import { NetworkType } from '@portkey/types';
+import { NetworkType } from '@portkey-wallet/types';
 import { useAppDispatch } from 'store/Provider/hooks';
-import { changeNetworkType } from '@portkey/store/store-ca/wallet/actions';
+import { changeNetworkType } from '@portkey-wallet/store/store-ca/wallet/actions';
 import CustomSvg from 'components/CustomSvg';
 import './index.less';
 

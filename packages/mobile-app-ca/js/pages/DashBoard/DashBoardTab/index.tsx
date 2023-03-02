@@ -1,10 +1,9 @@
 import React, { useMemo } from 'react';
-import TokenSection from '../TokenSection/index.';
-import NFTSection from '../NFTSection/index.';
+import TokenSection from '../TokenSection';
+import NFTSection from '../NFTSection';
 import CommonTopTab from 'components/CommonTopTab';
 
 import { useLanguage } from 'i18n/hooks';
-// import { useCurrentELFBalances } from '@portkey/hooks/hooks-ca/balances';
 type DashBoardTabProps = {
   getAccountBalance?: () => void;
 };

@@ -2,7 +2,7 @@ import {
   resetUserGuardianStatus,
   setCurrentGuardianAction,
   setOpGuardianAction,
-} from '@portkey/store/store-ca/guardians/actions';
+} from '@portkey-wallet/store/store-ca/guardians/actions';
 import { Input, Button, message } from 'antd';
 import { useNavigate, useLocation } from 'react-router';
 import CustomSvg from 'components/CustomSvg';
@@ -10,19 +10,19 @@ import SettingHeader from 'pages/components/SettingHeader';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import CommonModal from 'components/CommonModal';
 import { useAppDispatch, useGuardiansInfo, useLoading } from 'store/Provider/hooks';
-import { EmailReg } from '@portkey/utils/reg';
-import { LoginType } from '@portkey/types/types-ca/wallet';
+import { EmailReg } from '@portkey-wallet/utils/reg';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import CustomSelect from 'pages/components/CustomSelect';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
 import useGuardianList from 'hooks/useGuardianList';
 import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
-import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
+import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type';
 import { useTranslation } from 'react-i18next';
-import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
+import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
 import './index.less';
-import { DefaultChainId } from '@portkey/constants/constants-ca/network';
+import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verification } from 'utils/api';
 
 const guardianTypeList = [{ label: 'Email', value: LoginType.email }];

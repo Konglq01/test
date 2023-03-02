@@ -1,4 +1,4 @@
-import { ChainItemType } from '@portkey/types/chain';
+import { ChainItemType } from '@portkey-wallet/types/chain';
 import { Button, List, Modal, Tabs } from 'antd';
 import CustomSvg from 'components/CustomSvg';
 import { useCallback, useMemo } from 'react';
