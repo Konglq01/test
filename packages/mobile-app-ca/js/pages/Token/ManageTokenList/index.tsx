@@ -1,16 +1,15 @@
 import PageContainer from 'components/PageContainer';
-import { useIsFetchingTokenList, useSymbolImages, useToken } from '@portkey-wallet/hooks/hooks-ca/useToken';
+import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
 import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
 import CommonInput from 'components/CommonInput';
 import { useAppCASelector } from '@portkey-wallet/hooks/hooks-ca';
-import { Dialog } from '@rneui/themed';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import gStyles from 'assets/theme/GStyles';
 import { defaultColors } from 'assets/theme';
-import React, { memo, useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList } from 'react-native';
 import CommonToast from 'components/CommonToast';
-import { TextL, TextM, TextS } from 'components/CommonText';
+import { TextL, TextS } from 'components/CommonText';
 import { pTd } from 'utils/unit';
 import Svg from 'components/Svg';
 import CommonSwitch from 'components/CommonSwitch';
@@ -74,7 +73,6 @@ Item.displayName = 'Item';
 const ManageTokenList: React.FC<ManageTokenListProps> = () => {
   const { t } = useLanguage();
 
-  const isLoading = useIsFetchingTokenList();
   const currentNetworkInfo = useCurrentNetworkInfo();
   const { currentNetwork } = useWallet();
 
@@ -85,10 +83,7 @@ const ManageTokenList: React.FC<ManageTokenListProps> = () => {
 
   const { tokenDataShowInMarket } = useAppCASelector(state => state.tokenManagement);
 
-  const [tokenList, setTokenList] = useState([]);
-
   const [keyword, setKeyword] = useState<string>('');
-  // const [tokenList, setTokenList] = useState(tokenDataShowInMarket);
 
   const debounceWord = useDebounce(keyword, 500);
 
@@ -115,6 +110,7 @@ const ManageTokenList: React.FC<ManageTokenListProps> = () => {
           },
         })
         .then(res => {
+          console.log(res);
           setTimeout(() => {
             dispatch(fetchAllTokenListAsync({ keyword: debounceWord, chainIdArray: chainList }));
             dispatch(fetchTokenListAsync({ caAddresses: caAddressArray }));
