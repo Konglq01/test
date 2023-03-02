@@ -16,9 +16,9 @@ export default function ExampleUI() {
   const [open, setOpen] = useState<boolean>();
   return (
     <>
-      <VerifierSelect serviceUrl="https://did-portkey-test.portkey.finance" guardianAccount="peijuan.yao@aelf.io" />
+      <VerifierSelect guardianAccount="peijuan.yao@aelf.io" />
       <CodeVerify
-        serviceUrl="https://did-portkey-test.portkey.finance"
+        chainId={'AELF'}
         verifier={{
           id: 'string', // aelf.Hash
           name: 'string',
@@ -47,9 +47,9 @@ export default function ExampleUI() {
           setOpen(false);
         }}
       />
-      <SetPinAndAddManager serviceUrl="" guardianAccount="" verificationType={0} guardianApprovedList={[]} />
-      <GuardianList serviceUrl="" />
-      <GuardianApproval serviceUrl="" loginType={0} />
+      <SetPinAndAddManager guardianAccount="" verificationType={0} guardianApprovedList={[]} />
+      <GuardianList />
+      <GuardianApproval chainId={'AELF'} />
       <Button
         onClick={() => {
           setOpen(true);

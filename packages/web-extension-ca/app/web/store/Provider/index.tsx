@@ -12,7 +12,6 @@ import ReduxProvider from './ReduxProvider';
 import Updater from './Updater';
 import * as Sentry from '@sentry/react';
 import { Integrations } from '@sentry/tracing';
-import { ConfigProvider as ConfigProviderUI } from '@portkey/did-ui-react';
 import '@portkey/did-ui-react/dist/assets/index.css';
 
 const bodyRootWrapper = document.body;
@@ -47,12 +46,6 @@ export default function ContextProviders({
     });
     preLanguageWrapper && bodyRootWrapper.classList.remove(preLanguageWrapper);
     bodyRootWrapper.classList.add(`${language}-language-wrapper`);
-  }, [language]);
-
-  useEffect(() => {
-    ConfigProviderUI.setGlobalConfig({
-      locale: ANTD_LOCAL[language],
-    });
   }, [language]);
 
   return (
