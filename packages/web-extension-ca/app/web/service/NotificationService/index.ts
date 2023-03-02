@@ -13,7 +13,7 @@ import { sleep } from '@portkey/utils';
 
 export interface NotificationType {
   sendResponse?: SendResponseFun;
-  message: PromptMessage & { externalLink?: string };
+  message: PromptMessage & { externalLink?: string } & { [x: string]: any };
   promptType?: CreatePromptType;
 }
 
@@ -65,8 +65,7 @@ export default class NotificationService {
       const { height, width, top, left, isFullscreen } = await getPromptConfig({
         message: notification.message,
       });
-
-      console.log(height, width, top, left, isFullscreen, 'showWindow===');
+      console.log(notification, 'showWindow===');
       let url;
       if (notification.message.externalLink) {
         url = notification.message.externalLink;
@@ -80,6 +79,7 @@ export default class NotificationService {
         this.platform.closeWindow(this.openWindow?.id);
         this.openWindow = null;
       }
+
       // create new notification popup
       const popupWindow = await this.platform.openWindow({
         url,
@@ -143,6 +143,8 @@ export default class NotificationService {
       this.openTag = null;
     }
 
+    console.log(notification, 'showWindow==open');
+
     // Could not establish connection. Receiving end does not exist.
     // InternalMessage.payload(InternalMessageTypes.SET_PROMPT, JSON.stringify(notification)).send();
     // If we need setPrompt, use callback to complement it.
@@ -173,7 +175,7 @@ export default class NotificationService {
       const promptParam = {
         sendResponse: async (response?: SendResponseParams) => {
           await sleep(500);
-          resolve(response ?? { error: 0, errorMessage: 'Nothing' });
+          resolve(response ?? { error: 0, message: 'Nothing' });
         },
         message,
         promptType,

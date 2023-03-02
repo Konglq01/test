@@ -26,7 +26,6 @@ export default function ReCaptcha() {
     });
   }, []);
 
-
   return (
     <div className={styles.body}>
       <GoogleReCaptcha

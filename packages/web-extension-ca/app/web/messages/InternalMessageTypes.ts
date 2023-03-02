@@ -49,6 +49,8 @@ export const PortkeyMessageTypes = {
   EXPAND_FULL_SCREEN: 'EXPAND_FULL_SCREEN',
 
   OPEN_RECAPTCHA_PAGE: 'OPEN_RECAPTCHA_PAGE',
+
+  THREE_WAY_LOGIN: 'THREE_WAY_LOGIN',
 } as const;
 
 /**

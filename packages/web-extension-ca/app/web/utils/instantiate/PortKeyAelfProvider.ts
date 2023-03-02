@@ -472,7 +472,7 @@ export default class PortKeyAelfProvider extends BaseProvider {
   };
 
   private _callbackWrap = (result: any, callback?: (...arg: any[]) => void) => {
-    if (result.result && 'error' in result.result && 'errorMessage' in result.result) {
+    if (result.result && 'error' in result.result && 'message' in result.result) {
       if (this.pure && result.result.result) {
         callback?.(null, result.result.result);
         return result.result.result;

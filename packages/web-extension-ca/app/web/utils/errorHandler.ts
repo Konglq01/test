@@ -1,9 +1,4 @@
 /**
- * @file utils/errorHandler.ts
- * @author huangzongzhe
- */
-
-/**
  * 1xxxxx try catch
  * 2xxxxx handle
  * 3xxxxx
@@ -68,7 +63,8 @@ const errorMap = {
   700002: 'The contract call failed, please check the contract address and contract name',
 };
 
-interface ErrorHandleInfo {
+export interface PortKeyResultType {
+  error: keyof typeof errorMap;
   name?: string;
   message?: string;
   Error?: any;
@@ -76,34 +72,32 @@ interface ErrorHandleInfo {
   data?: any;
 }
 
-export interface PortKeyResultType {
-  error: keyof typeof errorMap;
-  errorMessage: string | ErrorHandleInfo;
-}
-
 export default function errorHandler(code: keyof typeof errorMap, error?: any | string): PortKeyResultType {
   const errorMessage = errorMap[code];
-  const output: PortKeyResultType = {
+  let output: PortKeyResultType = {
     error: code,
-    errorMessage: '',
+    message: '',
   };
   if (code === 0) {
     // success
   } else if (error && typeof error !== 'string') {
     console.log(error, 'errorHandler');
-    output.errorMessage = {
+    output = {
+      ...output,
       name: error.name,
       message: error.message || error.Error?.Message || error.Error,
       stack: error.stack,
       data: error?.data,
     };
   } else if (errorMessage) {
-    output.errorMessage = {
+    output = {
+      ...output,
       name: 'errorMap',
       message: error || errorMessage,
     };
   } else {
-    output.errorMessage = {
+    output = {
+      ...output,
       name: 'customError',
       message: error,
     };

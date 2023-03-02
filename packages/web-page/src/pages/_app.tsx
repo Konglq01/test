@@ -31,6 +31,7 @@ export default function APP({ Component, pageProps }: AppProps) {
      */
     window.addEventListener('popstate', () => {
       const { href, origin } = window.location;
+      console.log(href, 'href===');
       router.replace(href.replace(origin, ''));
     });
   }, []);

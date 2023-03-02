@@ -6,8 +6,6 @@ import {
   setOpGuardianAction,
   setPreGuardianAction,
 } from '@portkey/store/store-ca/guardians/actions';
-import { sleep } from '@portkey/utils';
-import { getAelfInstance } from '@portkey/utils/aelf';
 import aes from '@portkey/utils/aes';
 import { message } from 'antd';
 import { useCallback } from 'react';
@@ -15,7 +13,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useGuardiansInfo, useLoading, useUserInfo } from 'store/Provider/hooks';
 import { resetLoginInfoAction } from 'store/reducers/loginCache/actions';
 import { GuardianMth } from 'types/guardians';
-import { getTxResult } from 'utils/aelfUtils';
 import { handleGuardian } from 'utils/sandboxUtil/handleGuardian';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
 import { formatAddGuardianValue } from '../utils/formatAddGuardianValue';

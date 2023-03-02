@@ -11,7 +11,7 @@ interface RequestsBack {
   method: string;
   data: any;
   error?: number;
-  errorMessage?: string | any;
+  message?: string | any;
 }
 
 type PromiseSend = (input: RequestArguments) => Promise<RequestsBack | undefined | null>;
