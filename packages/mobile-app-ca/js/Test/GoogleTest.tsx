@@ -13,13 +13,19 @@ export default function GoogleTest() {
   const [request, response, promptAsync] = Google.useAuthRequest({
     iosClientId: '57532195783-66mios3b9fglgub9jut5fsr39mitasqu.apps.googleusercontent.com',
     androidClientId: '57532195783-5s6hl8ac22jt8m3790ce3hohcm0bq074.apps.googleusercontent.com',
-    webClientId: '57532195783-kvl2qfsfu11o5aab35tgnauoqokv6mpv.apps.googleusercontent.com',
+    // webClientId: '57532195783-kvl2qfsfu11o5aab35tgnauoqokv6mpv.apps.googleusercontent.com',
   });
   // const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
   //   clientId: '57532195783-kvl2qfsfu11o5aab35tgnauoqokv6mpv.apps.googleusercontent.com',
   // });
   console.log(response, '=====response');
+  React.useEffect(() => {
+    WebBrowser.warmUpAsync();
 
+    return () => {
+      WebBrowser.coolDownAsync();
+    };
+  }, []);
   React.useEffect(() => {
     if (response?.type === 'success') {
       const { authentication } = response;
@@ -32,7 +38,7 @@ export default function GoogleTest() {
         disabled={!request}
         title="Login"
         onPress={() => {
-          promptAsync();
+          promptAsync({ useProxy: false, showInRecents: true });
         }}
       />
       <Button
