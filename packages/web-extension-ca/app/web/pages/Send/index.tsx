@@ -25,11 +25,11 @@ import SendPreview from './components/SendPreview';
 import ToAccount from './components/ToAccount';
 import { WalletError } from '@portkey/store/wallet/type';
 import getTransferFee from './utils/getTransferFee';
-import { contractErrorHandler } from '@portkey/did-ui-react/src/utils/errorHandler';
 import { ZERO } from '@portkey/constants/misc';
 import { TransactionError } from '@portkey/constants/constants-ca/assets';
 import './index.less';
 import { the2ThFailedActivityItemType } from '@portkey/types/types-ca/activity';
+import { contractErrorHandler } from 'utils/tryErrorHandler';
 
 export type Account = { address: string; name?: string };
 
