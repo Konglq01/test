@@ -328,6 +328,7 @@ export default function Send() {
               width: 320,
               content: t('This is a cross-chain transaction.'),
               className: 'cross-modal delete-modal',
+              autoFocusButton: null,
               icon: null,
               centered: true,
               okText: t('Continue'),

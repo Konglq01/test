@@ -21,11 +21,11 @@ export default function ContactCard({ user, className, fromRecents = true, onCha
   const header = useMemo(
     () => (
       <div className="header">
-        <div className="icon">{user.name?.[0]}</div>
+        <div className="icon">{user.index || ''}</div>
         <p>{user.name}</p>
       </div>
     ),
-    [user.name],
+    [user.index, user.name],
   );
 
   return (
