@@ -35,11 +35,6 @@ const DashBoard: React.FC<DashBoardTypes> = () => {
     getCurrentCAViewContract();
   });
 
-  // const [balances, onGetBalance] = useBalances({
-  //   tokens: localTokenList,
-  //   tokenAddress: 'ASh2Wt7nSEmYqnGxPPzp4pnVDU4uhj1XW9Se5VeZcX2UDdyjx',
-  //   rpcUrl: 'https://explorer-test-side02.aelf.io/chain',
-  // });
   const dispatch = useAppCommonDispatch();
 
   useEffectOnce(() => {
@@ -69,5 +64,6 @@ const styles = StyleSheet.create({
     paddingLeft: 0,
     paddingRight: 0,
     height: '100%',
+    backgroundColor: defaultColors.primaryColor,
   },
 });
