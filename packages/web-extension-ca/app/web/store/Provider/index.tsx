@@ -12,7 +12,7 @@ import ReduxProvider from './ReduxProvider';
 import Updater from './Updater';
 import * as Sentry from '@sentry/react';
 import { Integrations } from '@sentry/tracing';
-import '@portkey/did-ui-react/dist/assets/index.css';
+// import '@portkey/did-ui-react/dist/assets/index.css';
 
 const bodyRootWrapper = document.body;
 Sentry.init({
