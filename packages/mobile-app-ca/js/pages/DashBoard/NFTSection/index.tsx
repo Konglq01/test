@@ -3,17 +3,15 @@ import NoData from 'components/NoData';
 import { StyleSheet, View, FlatList } from 'react-native';
 import { defaultColors } from 'assets/theme';
 import { useLanguage } from 'i18n/hooks';
-import useEffectOnce from 'hooks/useEffectOnce';
 import { pTd } from 'utils/unit';
 import NFTCollectionItem from './NFTCollectionItem';
 import { useCaAddresses } from '@portkey/hooks/hooks-ca/wallet';
-import { fetchNFTAsync, fetchNFTCollectionsAsync, clearNftItem } from '@portkey/store/store-ca/assets/slice';
+import { fetchNFTAsync, fetchNFTCollectionsAsync } from '@portkey/store/store-ca/assets/slice';
 import { useAppCommonDispatch } from '@portkey/hooks';
 import { useAppCASelector } from '@portkey/hooks';
 import { NFTCollectionItemShowType } from '@portkey/types/types-ca/assets';
 import { useWallet } from 'hooks/store';
 import Touchable from 'components/Touchable';
-import { REFRESH_TIME } from '@portkey/constants/constants-ca/assets';
 import { ChainId } from '@portkey/types';
 import { useRoute } from '@react-navigation/native';
 

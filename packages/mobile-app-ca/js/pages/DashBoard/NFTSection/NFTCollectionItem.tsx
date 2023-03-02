@@ -13,9 +13,8 @@ import { FontStyles } from 'assets/theme/styles';
 import { useWallet } from 'hooks/store';
 import { NFTCollectionItemShowType } from '@portkey/types/types-ca/assets';
 import Touchable from 'components/Touchable';
-import { OpenCollectionObjType } from './index.';
+import { OpenCollectionObjType } from '.';
 import { ChainId } from '@portkey/types';
-import { chain } from 'lodash';
 
 export enum NoDataMessage {
   CustomNetWorkNoData = 'No transaction records accessible from the current custom network',
