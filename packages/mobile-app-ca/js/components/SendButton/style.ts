@@ -7,7 +7,7 @@ const { font2, font4 } = defaultColors;
 export const dashBoardBtnStyle = StyleSheet.create({
   buttonWrap: {
     marginBottom: pTd(24),
-    width: pTd(52),
+    width: pTd(54),
   },
   iconWrapStyle: {
     display: 'flex',
