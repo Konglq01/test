@@ -4,7 +4,6 @@ import { divDecimals, divDecimalsStr, timesDecimals, unitConverter } from '@port
 import { Input, message } from 'antd';
 import { parseInputChange } from '@portkey/utils/input';
 import clsx from 'clsx';
-import CustomSvg from 'components/CustomSvg';
 import { handleKeyDown } from 'pages/Send/utils/util.keyDown';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,19 +11,12 @@ import { getBalance } from 'utils/sandboxUtil/getBalance';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { ChainId } from '@portkey/types';
 import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import aes from '@portkey/utils/aes';
 import { useUserInfo } from 'store/Provider/hooks';
-import { WalletError } from '@portkey/store/store-ca/wallet/type';
-import { SandboxErrorCode } from '@portkey/utils/sandboxService';
-import getTransactionFee from 'utils/sandboxUtil/getTransactionFee';
-import getTransferFee from 'pages/Send/utils/getTransferFee';
 import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
-import { contractErrorHandler } from '@portkey/did-ui-react/src/utils/errorHandler';
 import { useSymbolImages } from '@portkey/hooks/hooks-ca/useToken';
 
 export default function TokenInput({
   fromAccount,
-  toAccount,
   token,
   value,
   errorMsg,
