@@ -14,17 +14,16 @@ import { getManagerAccount } from 'utils/redux';
 import { usePin } from 'hooks/store';
 import { getContractBasic } from '@portkey/contracts/utils';
 import AElf from 'aelf-sdk';
-import { customFetch } from '@portkey/utils/fetch';
 import { useGetCurrentCAContract } from 'hooks/contract';
 import { addManager } from 'utils/wallet';
 import { request } from '@portkey/api/api-did';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
 import { DEVICE_TYPE } from 'constants/common';
 import { useGetHolderInfo } from 'hooks/guardian';
 import { useAppCommonDispatch } from '@portkey/hooks';
-import { addFailedActivity } from '@portkey/store/store-ca/activity/slice';
 import { useAppCASelector } from '@portkey/hooks/hooks-ca';
 import { fetchTokensPriceAsync } from '@portkey/store/store-ca/assets/slice';
+import AppleTest from 'Test/AppleTest';
+import GoogleTest from 'Test/GoogleTest';
 
 export default function HomeScreen() {
   const wallet = useCurrentWalletInfo();
@@ -34,12 +33,13 @@ export default function HomeScreen() {
 
   const pin = usePin();
   const chainInfo = useCurrentChain('AELF');
-  const { connectUrl } = useCurrentNetworkInfo();
   const getHolderInfo = useGetHolderInfo();
   return (
     <SafeAreaBox>
       <ScrollView>
         <Text>Test Screen</Text>
+        <AppleTest />
+        <GoogleTest />
         <Button title="ActionSheet show" onPress={() => ActionSheet.show([{ title: '123' }, { title: '123' }])} />
         <Button
           title="loading show"
