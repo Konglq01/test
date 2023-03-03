@@ -8,6 +8,8 @@ export type ManagerInfo = {
   type: LoginType;
   verificationType: VerificationType;
   requestId?: string;
+  guardianIdentifier?: string;
+  salt?: string;
 };
 
 export enum LoginType {

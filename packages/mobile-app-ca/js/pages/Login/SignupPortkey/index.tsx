@@ -22,6 +22,7 @@ import { getChainListAsync } from '@portkey/store/store-ca/wallet/actions';
 import Loading from 'components/Loading';
 import myEvents from 'utils/deviceEvent';
 import useEffectOnce from 'hooks/useEffectOnce';
+import { request } from '@portkey/api/api-did';
 const safeAreaColor: SafeAreaColorMapKeyUnit[] = ['transparent', 'transparent'];
 
 const scrollViewProps = { extraHeight: 120 };
@@ -48,13 +49,21 @@ function SignupEmail() {
       }
       await getVerifierServers(_chainInfo);
       try {
-        const guardiansInfo = await getGuardiansInfo({ loginAccount: email }, _chainInfo);
-        if (guardiansInfo.guardianAccounts) {
+        console.log(email, request.defaultConfig, '======email');
+
+        // const guardiansInfo = await getGuardiansInfo({ loginAccount: email }, _chainInfo);
+        const req = await request.wallet.guardianIdentifiers({ params: { guardianIdentifier: email } });
+        console.log(req, '=======req');
+        if (req) {
           Loading.hide();
           return setErrorMessage(EmailError.alreadyRegistered);
         }
+        // if (guardiansInfo.guardianAccounts) {
+        //   Loading.hide();
+        //   return setErrorMessage(EmailError.alreadyRegistered);
+        // }
       } catch (error) {
-        console.debug(error, '====error');
+        console.log(error, '====error');
       }
       navigationService.navigate('SelectVerifier', { loginAccount: email });
     } catch (error) {

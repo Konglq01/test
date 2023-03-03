@@ -142,11 +142,11 @@ export function cancelLoginAccount(
 }
 
 export function removeManager(contract: ContractBasic, address: string, caHash: string) {
-  return contract?.callSendMethod('RemoveManager', address, {
+  return contract?.callSendMethod('RemoveManagerInfo', address, {
     caHash,
-    manager: {
-      managerAddress: address,
-      deviceString: new Date().getTime(),
+    managerInfo: {
+      address,
+      extraData: new Date().getTime(),
     },
   });
 }

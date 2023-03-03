@@ -19,6 +19,7 @@ import { DigitInputInterface } from 'components/DigitInput';
 import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
 import { GuardiansApproved } from 'pages/Guardian/types';
 import { DEVICE_TYPE } from 'constants/common';
+import { handleVerificationDoc } from '@portkey/utils/guardian';
 
 export function useOnManagerAddressAndQueryResult() {
   const dispatch = useAppDispatch();
@@ -52,9 +53,9 @@ export function useOnManagerAddressAndQueryResult() {
       try {
         const tmpWalletInfo = walletInfo?.address ? walletInfo : AElf.wallet.createNewWallet();
         let data: any = {
-          loginGuardianAccount: managerInfo.loginAccount,
-          managerAddress: tmpWalletInfo.address,
-          deviceString: `${DEVICE_TYPE},${Date.now()}`,
+          loginGuardianIdentifier: managerInfo.loginAccount,
+          manager: tmpWalletInfo.address,
+          extraData: `${DEVICE_TYPE},${Date.now()}`,
           context: {
             clientId: tmpWalletInfo.address,
             requestId: tmpWalletInfo.address,
@@ -75,18 +76,18 @@ export function useOnManagerAddressAndQueryResult() {
             ...data,
           };
         }
-        console.log(data, '====data');
 
         const req = await fetch({
           data,
         });
-        console.log(req, '=====req');
-
+        const { guardianIdentifier, salt } = handleVerificationDoc(data.verificationDoc);
         // whether there is wallet information
         const _managerInfo = {
           ...managerInfo,
           managerUniqueId: req.sessionId,
           requestId: tmpWalletInfo.address,
+          guardianIdentifier,
+          salt,
         } as ManagerInfo;
 
         if (walletInfo?.address) {

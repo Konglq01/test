@@ -105,7 +105,7 @@ export default function VerifierDetails() {
           params: {
             type: LoginStrType[guardianItem?.guardianType as LoginType],
             verificationCode: code,
-            guardianAccount: guardianItem.guardianAccount,
+            guardianIdentifier: guardianItem.guardianAccount,
             ...requestCodeResult,
             verifierId: guardianItem?.verifier?.id,
             chainId: DefaultChainId,
@@ -117,6 +117,8 @@ export default function VerifierDetails() {
           ...rst,
           verifierId: guardianItem?.verifier?.id,
         };
+        console.log(verifierInfo, '======verifierInfo');
+
         switch (verificationType) {
           case VerificationType.communityRecovery:
           case VerificationType.editGuardianApproval:
@@ -165,7 +167,7 @@ export default function VerifierDetails() {
       const req = await verification.sendVerificationCode({
         params: {
           type: LoginStrType[guardianItem?.guardianType as LoginType],
-          guardianAccount: guardianItem?.guardianAccount,
+          guardianIdentifier: guardianItem?.guardianAccount,
           verifierId: guardianItem?.verifier?.id,
           chainId: DefaultChainId,
         },
