@@ -10,7 +10,7 @@ export type ActivityStateType = {
   failedActivityMap: { [transactionId: string]: the2ThFailedActivityItemType };
 };
 
-export interface IActivitysApiParams {
+export interface IActivitiesApiParams {
   maxResultCount: number;
   skipCount: number;
   caAddresses?: string[];
@@ -20,7 +20,7 @@ export interface IActivitysApiParams {
   symbol?: string;
 }
 
-export interface IActivitysApiResponse {
+export interface IActivitiesApiResponse {
   data: ActivityItemType[];
   totalRecordCount: number;
 }
