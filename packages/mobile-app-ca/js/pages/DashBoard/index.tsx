@@ -4,7 +4,6 @@ import { StyleSheet } from 'react-native';
 import { useAppCommonDispatch } from '@portkey-wallet/hooks/index';
 import DashBoardTab from './DashBoardTab';
 import { defaultColors } from 'assets/theme';
-
 import useEffectOnce from 'hooks/useEffectOnce';
 import { fetchTokenListAsync } from '@portkey-wallet/store/store-ca/assets/slice';
 import { useGetCurrentCAViewContract } from 'hooks/contract';
@@ -12,20 +11,14 @@ import PageContainer from 'components/PageContainer';
 import { getWalletNameAsync } from '@portkey-wallet/store/store-ca/wallet/actions';
 import { getSymbolImagesAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
 
-interface DashBoardTypes {
-  navigation: any;
-}
+const DashBoard: React.FC = () => {
+  const dispatch = useAppCommonDispatch();
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-let timer: any;
-
-const DashBoard: React.FC<DashBoardTypes> = () => {
   const getCurrentCAViewContract = useGetCurrentCAViewContract();
+
   useEffectOnce(() => {
     getCurrentCAViewContract();
   });
-
-  const dispatch = useAppCommonDispatch();
 
   useEffectOnce(() => {
     dispatch(fetchTokenListAsync({ caAddresses: [] }));
@@ -39,12 +32,11 @@ const DashBoard: React.FC<DashBoardTypes> = () => {
       safeAreaColor={['blue', 'white']}
       containerStyles={styles.container}
       scrollViewProps={{ disabled: true }}>
+      {/* TODO: showBalance */}
       <Card balanceUSD={''} />
       <DashBoardTab />
     </PageContainer>
   );
-
-  // return <SafeAreaBox edges={['top', 'left', 'right']} style={{ backgroundColor: defaultColors.bg5 }} />;
 };
 
 export default DashBoard;
