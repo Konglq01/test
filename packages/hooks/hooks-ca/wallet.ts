@@ -88,7 +88,7 @@ export const useDeviceList = () => {
     if (error || !data || !data.caHolderManagerInfo || data.caHolderManagerInfo.length < 1) return [];
 
     const caHolderManagerInfo = data.caHolderManagerInfo[0];
-    const managers = caHolderManagerInfo?.managers || [];
+    const managers = caHolderManagerInfo?.managerInfos || [];
     return managers
       .map(item => {
         // TODO: check ALL deviceString
@@ -116,7 +116,7 @@ export const useDeviceList = () => {
           deviceType,
           loginTime,
           deviceTypeInfo: DEVICE_TYPE_INFO[deviceType],
-          managerAddress: item?.manager,
+          managerAddress: item?.address,
         };
       })
       .reverse();

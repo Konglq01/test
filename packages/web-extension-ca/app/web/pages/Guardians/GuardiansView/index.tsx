@@ -105,7 +105,7 @@ export default function GuardiansView() {
 
         const result = await verification.sendVerificationCode({
           params: {
-            guardianAccount: opGuardian?.guardianAccount as string,
+            guardianIdentifier: opGuardian?.guardianAccount as string,
             type: LoginStrType[opGuardian?.guardianType as LoginType],
             verifierId: opGuardian?.verifier?.id || '',
             chainId: DefaultChainId,

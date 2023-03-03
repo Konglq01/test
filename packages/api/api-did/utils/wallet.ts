@@ -1,4 +1,4 @@
-import { GuardiansApprovedType } from '@portkey-wallet/types/guardian';
+import { GuardiansApprovedType } from '@portkey-wallet/types/types-ca/guardian';
 import { TLoginStrType } from '@portkey-wallet/types/types-ca/wallet';
 import { VerificationType } from '@portkey-wallet/types/verifier';
 import { request } from '..';

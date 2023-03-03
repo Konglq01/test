@@ -56,7 +56,8 @@ export default function VerifierPage({ currentGuardian, guardianType, isInitStat
           setLoading(true);
 
           const res = await checkVerificationCode({
-            guardianAccount: currentGuardian.guardianAccount,
+            type: LoginStrType[currentGuardian?.guardianType as LoginType],
+            guardianIdentifier: currentGuardian.guardianAccount,
             verifierSessionId: currentGuardian.verifierInfo.sessionId,
             verificationCode: code,
             verifierId: currentGuardian.verifier?.id || '',
@@ -91,7 +92,7 @@ export default function VerifierPage({ currentGuardian, guardianType, isInitStat
       setLoading(true);
       const res = await verification.sendVerificationCode({
         params: {
-          guardianAccount: currentGuardian.guardianAccount,
+          guardianIdentifier: currentGuardian.guardianAccount,
           type: LoginStrType[guardianType],
           verifierId: currentGuardian.verifier?.id || '',
           chainId: DefaultChainId,

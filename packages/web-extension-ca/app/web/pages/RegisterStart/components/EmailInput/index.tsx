@@ -38,7 +38,7 @@ const EmailInput = forwardRef(
             address: currentChain.caContractAddress,
             chainType: currentNetwork.walletType,
             paramsOption: {
-              loginGuardianAccount: email as string,
+              guardianIdentifier: email as string,
             },
           });
           console.log(checkResult, 'checkResult===GetHolderInfo');
@@ -46,13 +46,10 @@ const EmailInput = forwardRef(
             isHasAccount = true;
           }
         } catch (error: any) {
-          console.log(error, 'validateEmail===');
-          if (error?.message?.indexOf('Not found')) {
-            isHasAccount = false;
-          } else if (error?.Error?.Message === 'Invalid signature') {
+          if (error?.error?.message?.indexOf('not exit')) {
             isHasAccount = false;
           } else {
-            throw contractErrorHandler(error);
+            throw error?.error?.message || 'GetHolderInfo error';
           }
         }
 
