@@ -48,8 +48,8 @@ export const guardiansSlice = createSlice({
         }
         const { guardianList } = action.payload;
         const userStatus = state.userGuardianStatus ?? {};
-
-        const _guardianList = guardianList.guardians.map(item => {
+        // TODO
+        const _guardianList = (guardianList.guardians ?? guardianList).map(item => {
           const key = `${item.guardianIdentifier}&${item.verifierId}`;
           const _guardian = {
             ...item,

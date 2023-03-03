@@ -35,6 +35,8 @@ export default function useFetchDidWallet() {
       managerUniqueId: string;
       verificationType: VerificationType;
     }) => {
+      console.log(currentChain, 'walletResult===currentChain');
+
       if (!currentChain) throw 'Could not find chain information';
       const walletResult = await fetchWalletResult({
         clientId,
@@ -67,10 +69,11 @@ export default function useFetchDidWallet() {
             },
           });
 
-          const managerList: any[] = result.result.managers;
+          console.log(result, 'result===');
 
-          if (!managerList.find((info) => info?.managerAddress === managerAddress))
-            throw `${managerAddress} is not a manager`;
+          const managerList: any[] = result.result.managerInfos;
+
+          if (!managerList.find((info) => info?.address === managerAddress)) throw `${managerAddress} is not a manager`;
 
           dispatch(
             setCAInfo({

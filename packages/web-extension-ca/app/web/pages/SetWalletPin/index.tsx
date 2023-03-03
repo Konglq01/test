@@ -166,7 +166,7 @@ export default function SetWalletPin() {
           type: loginAccount.loginType,
           verificationType: state === 'login' ? VerificationType.communityRecovery : VerificationType.register,
         };
-
+        console.log(managerInfo, 'managerInfo====1');
         !walletInfo.address
           ? dispatch(
               createWallet({
@@ -182,6 +182,7 @@ export default function SetWalletPin() {
                 managerInfo,
               }),
             );
+        console.log(managerInfo, 'managerInfo====');
         await setLocalStorage({
           registerStatus: 'registeredNotGetCaAddress',
         });
