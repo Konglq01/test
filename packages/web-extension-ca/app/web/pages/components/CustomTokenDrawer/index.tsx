@@ -134,7 +134,7 @@ export default function CustomTokenDrawer({
     (token: AccountAssetItem) => {
       return (
         <div
-          key={`${token.nftInfo?.alias}_${token.nftInfo?.tokenId}`}
+          key={`${token.chainId}_${token.nftInfo?.alias}_${token.nftInfo?.tokenId}`}
           className="item protocol"
           onClick={onChange?.bind(undefined, token, 'nft')}>
           <div className="avatar">
