@@ -54,7 +54,7 @@ export const guardiansSlice = createSlice({
           const _guardian = {
             ...item,
             guardianAccount: item.guardianIdentifier || item.identifierHash,
-            guardianType: LoginNumType[item.type] || (GUARDIAN_TYPE_TYPE as any)[item.type],
+            guardianType: LoginNumType[item.type] ?? (GUARDIAN_TYPE_TYPE as any)[item.type],
             key,
             verifier: verifierMap?.[item.verifierId],
             isLoginAccount: item.isLoginGuardian,
