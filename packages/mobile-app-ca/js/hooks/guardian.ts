@@ -15,14 +15,16 @@ export const useGetHolderInfo = () => {
     async (loginInfo: LoginInfo, chainInfo?: ChainItemType) => {
       if (!loginInfo) throw new Error('Could not find accountInfo');
       if (loginInfo.guardianIdentifier) {
-        return request.wallet.guardianIdentifiers({
+        const req = await request.wallet.guardianIdentifiers({
           params: { chainId: DefaultChainId, guardianIdentifier: loginInfo.guardianIdentifier },
         });
+        // TODO: response
+        return { ...req, guardianList: { guardians: req.guardianList } };
       }
       const caContract = await getCurrentCAViewContract(chainInfo);
       return caContract?.callViewMethod('GetHolderInfo', {
         caHash: loginInfo.caHash,
-        loginGuardianAccount: loginInfo.loginAccount,
+        loginGuardianIdentifierHash: loginInfo.loginAccount,
       });
     },
     [getCurrentCAViewContract],

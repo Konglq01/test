@@ -26,7 +26,7 @@ export interface Manager {
   extraData: string;
 }
 export interface GuardiansInfo {
-  guardianList: Guardian[];
+  guardianList: { guardians: Guardian[] };
   managerInfos: Manager[];
 }
 

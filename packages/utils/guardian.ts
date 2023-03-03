@@ -21,7 +21,7 @@ export function handleUserGuardiansList(
   verifierServers: VerifierItem[] | { [key: string]: VerifierItem },
 ) {
   const { guardianList } = holderInfo;
-  return guardianList.map(item => {
+  return guardianList.guardians.map(item => {
     return {
       ...item,
       guardianAccount: item.guardianIdentifier,
