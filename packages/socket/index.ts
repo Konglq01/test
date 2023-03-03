@@ -1,5 +1,5 @@
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
-import { randomId } from '@portkey/utils';
+import { randomId } from '@portkey-wallet/utils';
 import { Receive, SocketError } from './types';
 
 export interface ISignalrOption<ListenList> {

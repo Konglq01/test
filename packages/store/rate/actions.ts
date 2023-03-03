@@ -1,7 +1,7 @@
 import { createAction } from '@reduxjs/toolkit';
-import type { ChainItemType } from '@portkey/types/chain';
-import type { AddressBookItem } from '@portkey/types/addressBook';
-import type { UpdateType } from '@portkey/types';
+import type { ChainItemType } from '@portkey-wallet/types/chain';
+import type { AddressBookItem } from '@portkey-wallet/types/addressBook';
+import type { UpdateType } from '@portkey-wallet/types';
 
 export const addressBookUpdate = createAction<{
   addressBook: AddressBookItem;

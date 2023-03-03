@@ -13,7 +13,7 @@ export type NoDataPropsType = {
 };
 
 const NoData: React.FC<NoDataPropsType> = props => {
-  const { message = 'You have no transactions!', type, topDistance = pTd(89), noPic = false } = props;
+  const { message = 'You have no transactions!', type = 'top', topDistance = pTd(89), noPic = false } = props;
 
   let topStyle: ViewStyle = {};
 

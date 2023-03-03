@@ -1,16 +1,17 @@
-import { TransactionTypes, transactionTypesMap } from '@portkey/constants/constants-ca/activity';
-import { ZERO } from '@portkey/constants/misc';
-import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
-import { useCaAddresses, useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
-import useRouterParams from '@portkey/hooks/useRouterParams';
-import { fetchActivity } from '@portkey/store/store-ca/activity/api';
-import { ActivityItemType, TransactionStatus } from '@portkey/types/types-ca/activity';
-import { getExploreLink } from '@portkey/utils';
-import { unitConverter } from '@portkey/utils/converter';
+import { TransactionTypes, transactionTypesMap } from '@portkey-wallet/constants/constants-ca/activity';
+import { ZERO } from '@portkey-wallet/constants/misc';
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { useCaAddresses, useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
+import { fetchActivity } from '@portkey-wallet/store/store-ca/activity/api';
+import { ActivityItemType, TransactionStatus } from '@portkey-wallet/types/types-ca/activity';
+import { getExploreLink } from '@portkey-wallet/utils';
+import { unitConverter } from '@portkey-wallet/utils/converter';
 import { Image } from '@rneui/base';
 import { defaultColors } from 'assets/theme';
 import fonts from 'assets/theme/fonts';
 import GStyles from 'assets/theme/GStyles';
+import { FontStyles } from 'assets/theme/styles';
 import CommonButton from 'components/CommonButton';
 import { TextL, TextM, TextS } from 'components/CommonText';
 import CommonToast from 'components/CommonToast';
@@ -66,6 +67,8 @@ const ActivityDetail = () => {
 
   const isNft = useMemo(() => !!activityItem?.nftInfo?.nftId, [activityItem?.nftInfo?.nftId]);
   const status = useMemo(() => {
+    if (!activityItem?.status) return { text: '', style: 'confirmed' };
+
     if (activityItem?.status === TransactionStatus.Mined)
       return {
         text: 'Confirmed',
@@ -132,7 +135,7 @@ const ActivityDetail = () => {
                 )} ${item.symbol}`}</TextM>
                 {!isTestNet && (
                   <TextS style={[styles.lightGrayFontColor, styles.marginTop4]}>{`$ ${unitConverter(
-                    ZERO.plus(item.feeInUsd ?? 0).div(`1e${DEFAULT_DECIMAL}`),
+                    ZERO.plus(item?.feeInUsd ?? 0).div(`1e${DEFAULT_DECIMAL}`),
                     2,
                   )}`}</TextS>
                 )}
@@ -154,7 +157,7 @@ const ActivityDetail = () => {
       <TouchableOpacity style={styles.closeWrap} onPress={() => navigationService.goBack()}>
         <Svg icon="close" size={pTd(16)} />
       </TouchableOpacity>
-      <Text style={styles.typeTitle}>
+      <Text style={[styles.typeTitle]}>
         {transactionTypesMap(activityItem?.transactionType, activityItem?.nftInfo?.nftId)}
       </Text>
 
@@ -166,18 +169,18 @@ const ActivityDetail = () => {
             ) : (
               <Text style={styles.noImg}>{activityItem?.nftInfo?.alias?.slice(0, 1)}</Text>
             )}
-            <View style={styles.space}>
+            <View style={styles.nftInfo}>
               <TextL style={styles.nftTitle}>{`${activityItem?.nftInfo?.alias || ''} #${
                 activityItem?.nftInfo?.nftId || ''
               }`}</TextL>
-              <TextS>Amount: {activityItem?.amount || ''}</TextS>
+              <TextS style={[FontStyles.font3, styles.marginTop4]}>Amount: {activityItem?.amount || ''}</TextS>
             </View>
           </View>
           <View style={styles.divider} />
         </>
       ) : (
         <>
-          <Text style={styles.tokenCount}>
+          <Text style={[styles.tokenCount, styles.fontBold]}>
             {!hiddenArr.includes(activityItem?.transactionType as TransactionTypes) &&
               (activityItem?.isReceived ? '+' : '-')}
             {`${unitConverter(
@@ -219,7 +222,7 @@ const ActivityDetail = () => {
           <View style={[styles.flexSpaceBetween]}>
             <TextM style={[styles.lightGrayFontColor]}>{t('To')}</TextM>
             <View style={styles.alignItemsEnd}>
-              {activityItem?.to && <TextM style={[styles.blackFontColor, styles.fontBold]}>{activityItem.to}</TextM>}
+              {activityItem?.to && <TextM style={[styles.blackFontColor]}>{activityItem.to}</TextM>}
               <TextS style={styles.lightGrayFontColor}>{formatStr2EllipsisStr(activityItem?.toAddress)}</TextS>
             </View>
           </View>
@@ -239,6 +242,7 @@ const ActivityDetail = () => {
           containerStyle={[GStyles.marginTop(pTd(8)), styles.bottomButton]}
           onPress={() => {
             if (!explorerUrl) return;
+            if (!activityItem?.transactionId) return;
 
             navigationService.navigate('ViewOnWebView', {
               url: getExploreLink(explorerUrl, activityItem?.transactionId || '', 'transaction'),
@@ -260,6 +264,7 @@ export const styles = StyleSheet.create({
   containerStyle: {
     paddingLeft: pTd(20),
     paddingRight: pTd(20),
+    paddingTop: pTd(16),
     display: 'flex',
     alignItems: 'center',
   },
@@ -317,7 +322,12 @@ export const styles = StyleSheet.create({
     ...GStyles.flexCol,
     justifyContent: 'center',
   },
+  nftInfo: {
+    display: 'flex',
+    justifyContent: 'center',
+  },
   nftTitle: {
+    ...fonts.mediumFont,
     color: defaultColors.font5,
     marginBottom: pTd(4),
     flexDirection: 'row',
@@ -340,8 +350,8 @@ export const styles = StyleSheet.create({
   divider: {
     marginTop: pTd(24),
     width: '100%',
-    height: pTd(0.5),
-    backgroundColor: defaultColors.border6,
+    height: pTd(1),
+    backgroundColor: defaultColors.border1,
   },
   titles2: {
     marginTop: pTd(25),

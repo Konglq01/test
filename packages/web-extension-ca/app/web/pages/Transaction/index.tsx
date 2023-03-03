@@ -1,11 +1,11 @@
-import { TransactionTypes, transactionTypesMap } from '@portkey/constants/constants-ca/activity';
-import { useCaAddresses, useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
-import { fetchActivity } from '@portkey/store/store-ca/activity/api';
-import { ActivityItemType, TransactionStatus } from '@portkey/types/types-ca/activity';
-import { Transaction } from '@portkey/types/types-ca/trade';
-import { getExploreLink } from '@portkey/utils';
-import { AmountSign, formatAmount, transNetworkText } from '@portkey/utils/activity';
-import { formatStr2EllipsisStr } from '@portkey/utils/converter';
+import { TransactionTypes, transactionTypesMap } from '@portkey-wallet/constants/constants-ca/activity';
+import { useCaAddresses, useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { fetchActivity } from '@portkey-wallet/store/store-ca/activity/api';
+import { ActivityItemType, TransactionStatus } from '@portkey-wallet/types/types-ca/activity';
+import { Transaction } from '@portkey-wallet/types/types-ca/trade';
+import { getExploreLink } from '@portkey-wallet/utils';
+import { AmountSign, formatAmount, transNetworkText } from '@portkey-wallet/utils/activity';
+import { formatStr2EllipsisStr } from '@portkey-wallet/utils/converter';
 import clsx from 'clsx';
 import Copy from 'components/Copy';
 import CustomSvg from 'components/CustomSvg';
@@ -17,7 +17,7 @@ import { shortenCharacters } from 'utils/reg';
 import './index.less';
 import { useIsTestnet } from 'hooks/useActivity';
 import { dateFormat } from 'utils';
-import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 
 export interface ITransactionQuery {
   item: ActivityItemType;

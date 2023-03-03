@@ -1,15 +1,13 @@
-import { ZERO } from '@portkey/constants/misc';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { getChainIdByAddress } from '@portkey/utils';
+import { ZERO } from '@portkey-wallet/constants/misc';
 import clsx from 'clsx';
 import { useMemo } from 'react';
 import { useWalletInfo } from 'store/Provider/hooks';
-import { useTokenPrice } from '@portkey/hooks/hooks-ca/useTokensPrice';
+// import { useTokenPrice } from '@portkey-wallet/hooks/hooks-ca/useTokensPrice';
 import './index.less';
-import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
-import { CROSS_FEE } from '@portkey/constants/constants-ca/wallet';
-import { unitConverter } from '@portkey/utils/converter';
-import { isAelfAddress } from '@portkey/utils/aelf';
+import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { CROSS_FEE } from '@portkey-wallet/constants/constants-ca/wallet';
+import { unitConverter } from '@portkey-wallet/utils/converter';
+import { isAelfAddress } from '@portkey-wallet/utils/aelf';
 
 export default function SendPreview({
   amount,
@@ -34,11 +32,10 @@ export default function SendPreview({
   isCross: boolean;
   tokenId: string;
 }) {
-  const { walletName, currentNetwork, walletInfo } = useWalletInfo();
+  const { walletName, currentNetwork } = useWalletInfo();
   const wallet = useCurrentWalletInfo();
-  const networkInfo = useCurrentNetworkInfo();
   const isTestNet = useMemo(() => currentNetwork === 'TESTNET', [currentNetwork]);
-  const ElfPrice = useTokenPrice(['ELF']);
+  // const ElfPrice = useTokenPrice(['ELF']);
   const isMain = useMemo(() => (chainId === 'AELF' ? 'MainChain' : 'SideChain'), [chainId]);
   const txFee = useMemo(() => {
     if (isCross && symbol === 'ELF') {
@@ -73,7 +70,7 @@ export default function SendPreview({
               <p className="token-id">{`#${tokenId}`}</p>
             </p>
             <p className="quantity">
-              Balance: <span>{unitConverter(amount)}</span>
+              Amount: <span>{unitConverter(amount)}</span>
             </p>
           </div>
         </div>
@@ -104,7 +101,9 @@ export default function SendPreview({
         <div className="item network">
           <span>Network</span>
           <div>
-            <p>{`${isMain} ${chainId}->${toChain === 'AELF' ? 'MainChain' : 'SideChain'} ${toChain}`}</p>
+            <p className="chain">{`${isMain} ${chainId}->${
+              toChain === 'AELF' ? 'MainChain' : 'SideChain'
+            } ${toChain}`}</p>
           </div>
         </div>
       </div>

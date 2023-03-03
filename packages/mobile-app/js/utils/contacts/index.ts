@@ -1,6 +1,6 @@
 import AElf from 'aelf-sdk';
 import { isAddress as web3IsAddress } from 'web3-utils';
-import { ChainType } from '@portkey/types';
+import { ChainType } from '@portkey-wallet/types';
 
 export type ContactItemTypes = {
   id: string;

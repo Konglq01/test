@@ -14,7 +14,7 @@ import ExitWallet from './components/ExitWallet';
 import { useWalletInfo } from 'store/Provider/hooks';
 import svgsList from 'assets/svgs';
 import './index.less';
-import { useSetWalletName } from '@portkey/hooks/hooks-ca/wallet';
+import { useSetWalletName } from '@portkey-wallet/hooks/hooks-ca/wallet';
 
 export type WalletAvatar = keyof typeof svgsList;
 interface MenuItemInfo {

@@ -1,20 +1,16 @@
 import { useCallback } from 'react';
-import {
-  getCAHolderByManager,
-  getCAHolderManagerInfo,
-  getLoginGuardianAccount,
-} from '@portkey/graphql/contract/queries';
-import { sleep } from '@portkey/utils';
+import { getCAHolderByManager } from '@portkey-wallet/graphql/contract/queries';
+import { sleep } from '@portkey-wallet/utils';
 import { useCurrentWallet } from './wallet';
 import { useCurrentChain } from './chainList';
-import type { LoginGuardianAccountDto } from '@portkey/graphql/contract/__generated__/types';
+import type { LoginGuardianDto } from '@portkey-wallet/graphql/contract/__generated__/types';
 // TODO
 export const useCurrentWalletInfoByScan = () => {
   // getCAHolderManagerInfo;
   // ucxifHkQcqob3zL3c2WppfEQn46oADEmm6bJdHsfNgX8ye2tw
   const { currentNetwork } = useCurrentWallet();
   const currentChain = useCurrentChain();
-  const fetch = useCallback(async (manager: string): Promise<LoginGuardianAccountDto | null> => {
+  const fetch = useCallback(async (manager: string): Promise<LoginGuardianDto | null> => {
     // TODO
     const result = await getCAHolderByManager(currentNetwork, {
       manager: 'ucxifHkQcqob3zL3c2WppfEQn46oADEmm6bJdHsfNgX8ye2tw',
@@ -27,7 +23,7 @@ export const useCurrentWalletInfoByScan = () => {
     } else {
       const managerInfo = result.caHolderManagerInfo[0];
 
-      return managerInfo.loginGuardianAccountInfo[0];
+      return managerInfo.loginGuardianInfo[0];
       // console.log(holderInfoResult, 'holderInfo===');
       // return loginGuardianAccountInfo;
     }

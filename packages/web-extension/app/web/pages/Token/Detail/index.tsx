@@ -1,9 +1,9 @@
 import { useCallback, useState, useEffect, useMemo } from 'react';
-import { useCurrentAccountTokenList } from '@portkey/hooks/hooks-eoa/useToken';
+import { useCurrentAccountTokenList } from '@portkey-wallet/hooks/hooks-eoa/useToken';
 import { useNavigate, useParams } from 'react-router';
 import { useAppSelector } from 'store/Provider/hooks';
-import { TokenItemType } from '@portkey/types/types-eoa/token';
-import { ZERO } from '@portkey/constants/misc';
+import { TokenItemType } from '@portkey-wallet/types/types-eoa/token';
+import { ZERO } from '@portkey-wallet/constants/misc';
 import './index.less';
 import SettingHeader from 'pages/components/SettingHeader';
 import BalanceCard from 'pages/components/BalanceCard';

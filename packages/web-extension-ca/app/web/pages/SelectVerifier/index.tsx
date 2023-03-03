@@ -1,4 +1,4 @@
-import { setCurrentGuardianAction } from '@portkey/store/store-ca/guardians/actions';
+import { setCurrentGuardianAction } from '@portkey-wallet/store/store-ca/guardians/actions';
 import { Button, message } from 'antd';
 import CommonModal from 'components/CommonModal';
 import { useCallback, useMemo, useState } from 'react';
@@ -10,8 +10,8 @@ import './index.less';
 import CommonSelect from 'components/CommonSelect1';
 import { useTranslation } from 'react-i18next';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
-import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
-import { DefaultChainId } from '@portkey/constants/constants-ca/network';
+import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
+import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verification } from 'utils/api';
 
 export default function SelectVerifier() {

@@ -1,9 +1,9 @@
 import React from 'react';
-import { AccountType } from '@portkey/types/wallet';
+import { AccountType } from '@portkey-wallet/types/wallet';
 import { TextM, TextS, TextXL } from 'components/CommonText';
 import Touchable from 'components/Touchable';
 import { StyleSheet, View } from 'react-native';
-import { divDecimals, unitConverter } from '@portkey/utils/converter';
+import { divDecimals, unitConverter } from '@portkey-wallet/utils/converter';
 import { pTd } from 'utils/unit';
 import { defaultColors } from 'assets/theme';
 import Svg from 'components/Svg';

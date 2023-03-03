@@ -3,14 +3,14 @@ import PageContainer, { SafeAreaColorMapKeyUnit } from 'components/PageContainer
 import { TextM, TextXXXL } from 'components/CommonText';
 import { pTd } from 'utils/unit';
 import { ImageBackground } from 'react-native';
-import { isIos } from '@portkey/utils/mobile/device';
+import { isIos } from '@portkey-wallet/utils/mobile/device';
 import GStyles from 'assets/theme/GStyles';
 import { useLanguage } from 'i18n/hooks';
 import background from '../img/background.png';
 import Svg from 'components/Svg';
 import { FontStyles } from 'assets/theme/styles';
 import Touchable from 'components/Touchable';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import NetworkOverlay from 'components/NetworkOverlay';
 import { useRoute } from '@react-navigation/native';
 import styles from './styles';

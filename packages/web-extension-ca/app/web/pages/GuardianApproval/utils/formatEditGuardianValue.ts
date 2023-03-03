@@ -1,5 +1,5 @@
-import { UserGuardianItem, UserGuardianStatus } from '@portkey/store/store-ca/guardians/type';
-import { LoginType } from '@portkey/types/types-ca/wallet';
+import { UserGuardianItem, UserGuardianStatus } from '@portkey-wallet/store/store-ca/guardians/type';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import { GuardianItem } from 'types/guardians';
 
 export const formatEditGuardianValue = ({

@@ -1,4 +1,4 @@
-import { AElfChainMethods } from '@portkey/types/aelf';
+import { AElfChainMethods } from '@portkey-wallet/types/aelf';
 import { basicActions } from 'contexts/utils';
 import { State } from './types';
 

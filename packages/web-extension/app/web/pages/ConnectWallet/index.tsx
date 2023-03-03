@@ -10,8 +10,8 @@ import { Button, Checkbox, Divider } from 'antd';
 import type { CheckboxChangeEvent, CheckboxOptionType } from 'antd/es/checkbox';
 import type { CheckboxValueType } from 'antd/es/checkbox/Group';
 import './index.less';
-import { addressFormat } from '@portkey/utils';
-import { useNetwork } from '@portkey/hooks/network';
+import { addressFormat } from '@portkey-wallet/utils';
+import { useNetwork } from '@portkey-wallet/hooks/network';
 import { useTranslation } from 'react-i18next';
 const CheckboxGroup = Checkbox.Group;
 

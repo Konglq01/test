@@ -1,4 +1,4 @@
-import { BaseToken } from '@portkey/types/types-ca/token';
+import { BaseToken } from '@portkey-wallet/types/types-ca/token';
 import NftInput from './NftInput';
 import TokenInput from './TokenInput';
 

@@ -1,4 +1,4 @@
-import { screenHeight, screenWidth, windowHeight } from '@portkey/utils/mobile/device';
+import { screenHeight, screenWidth, windowHeight } from '@portkey-wallet/utils/mobile/device';
 import { defaultColors } from 'assets/theme';
 import { StyleSheet } from 'react-native';
 import { pTd } from 'utils/unit';

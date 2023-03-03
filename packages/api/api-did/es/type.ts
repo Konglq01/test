@@ -1,4 +1,4 @@
-import { CustomFetchConfig } from '@portkey/utils/fetch';
+import { CustomFetchConfig } from '@portkey-wallet/utils/fetch';
 import { BaseConfig, RequestConfig } from '../../types';
 
 export interface ESConfig extends CustomFetchConfig {

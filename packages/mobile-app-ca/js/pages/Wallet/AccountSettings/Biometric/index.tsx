@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import PageContainer from 'components/PageContainer';
 import ListItem from 'components/ListItem';
-import { touchAuth } from '@portkey/utils/mobile/authentication';
+import { touchAuth } from '@portkey-wallet/utils/mobile/authentication';
 import CommonToast from 'components/CommonToast';
 import useBiometricsReady from 'hooks/useBiometrics';
 import navigationService from 'utils/navigationService';
@@ -14,9 +14,9 @@ import i18n from 'i18n';
 import { useUser } from 'hooks/store';
 import { TextM } from 'components/CommonText';
 import ActionSheet from 'components/ActionSheet';
-import { setSecureStoreItem } from '@portkey/utils/mobile/biometric';
+import { setSecureStoreItem } from '@portkey-wallet/utils/mobile/biometric';
 import myEvents from 'utils/deviceEvent';
-import { useSetBiometrics } from '@portkey/hooks/mobile';
+import { useSetBiometrics } from '@portkey-wallet/hooks/mobile';
 
 export default function Biometric() {
   const { biometrics } = useUser();

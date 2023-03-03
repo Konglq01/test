@@ -1,7 +1,7 @@
-import { useCaAddresses, useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
-import { clearNftItem, fetchNFTAsync, fetchNFTCollectionsAsync } from '@portkey/store/store-ca/assets/slice';
-import { ChainId } from '@portkey/types';
-import { NFTCollectionItemShowType, NFTItemBaseType } from '@portkey/types/types-ca/assets';
+import { useCaAddresses, useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { clearNftItem, fetchNFTAsync, fetchNFTCollectionsAsync } from '@portkey-wallet/store/store-ca/assets/slice';
+import { ChainId } from '@portkey-wallet/types';
+import { NFTCollectionItemShowType, NFTItemBaseType } from '@portkey-wallet/types/types-ca/assets';
 import { Collapse } from 'antd';
 import { List } from 'antd-mobile';
 import CustomSvg from 'components/CustomSvg';
@@ -25,9 +25,17 @@ export default function NFT() {
 
   const getMore = useCallback(
     (symbol: string, chainId: string) => {
-      dispatch(fetchNFTAsync({ symbol, chainId: chainId as ChainId, caAddresses: [wallet[chainId].caAddress] }));
+      let pageNum = 0;
+      accountNFTList.forEach((nft) => {
+        if (nft.symbol === symbol) {
+          pageNum = nft.children.length;
+        }
+      });
+      dispatch(
+        fetchNFTAsync({ symbol, chainId: chainId as ChainId, caAddresses: [wallet[chainId].caAddress], pageNum }),
+      );
     },
-    [dispatch, wallet],
+    [accountNFTList, dispatch, wallet],
   );
 
   const handleChange = useCallback(
@@ -46,6 +54,7 @@ export default function NFT() {
               symbol: curTmp[0],
               chainId: curTmp[1] as ChainId,
               caAddresses: [wallet[curTmp[1]].caAddress],
+              pageNum: 0,
             }),
           );
         }

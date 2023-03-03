@@ -1,5 +1,5 @@
 {
-  "name": "@portkey/store",
+  "name": "@portkey-wallet/store",
   "publishConfig": {
     "access": "public"
   },
@@ -11,9 +11,9 @@
     "start": "tsc --watch"
   },
   "dependencies": {
-    "@portkey/api": "^0.0.1",
-    "@portkey/types": "^0.0.1",
-    "@portkey/utils": "^0.0.1",
+    "@portkey-wallet/api": "^0.0.1",
+    "@portkey-wallet/types": "^0.0.1",
+    "@portkey-wallet/utils": "^0.0.1",
     "aelf-sdk": "^3.2.40"
   }
 }

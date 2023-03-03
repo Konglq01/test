@@ -1,4 +1,4 @@
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { usePreventHardwareBack } from 'hooks/useHardwareBack';
 import { useMemo } from 'react';
 import { useParams } from 'react-router';

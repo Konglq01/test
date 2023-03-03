@@ -1,6 +1,6 @@
 import { defaultColors } from 'assets/theme';
 import { StyleSheet } from 'react-native';
-import { screenWidth, windowHeight } from '@portkey/utils/mobile/device';
+import { screenWidth, windowHeight } from '@portkey-wallet/utils/mobile/device';
 import { pTd } from 'utils/unit';
 
 const styles = StyleSheet.create({

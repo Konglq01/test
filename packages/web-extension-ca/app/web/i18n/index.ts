@@ -2,8 +2,8 @@ import i18n from 'i18next';
 import { useCallback, useMemo } from 'react';
 import { initReactI18next, useTranslation } from 'react-i18next';
 
-import commonEn from '@portkey/i18n/en';
-import commonZh from '@portkey/i18n/zh';
+import commonEn from '@portkey-wallet/i18n/en';
+import commonZh from '@portkey-wallet/i18n/zh';
 import en from './languages/en.json';
 import zh from './languages/zh.json';
 import { LANGUAGE, LOCAL_LANGUAGE_LIST, DEFAULT_LANGUAGE } from './config';

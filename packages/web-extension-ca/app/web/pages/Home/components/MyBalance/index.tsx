@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { message, Tabs } from 'antd';
+import { Tabs } from 'antd';
 import { useNavigate } from 'react-router';
 import './index.less';
 import BalanceCard from 'pages/components/BalanceCard';
@@ -7,25 +7,24 @@ import CustomTokenDrawer from 'pages/components/CustomTokenDrawer';
 import { useTranslation } from 'react-i18next';
 import TokenList from '../Tokens';
 import Activity from '../Activity/index';
-import { Transaction } from '@portkey/types/types-ca/trade';
+import { Transaction } from '@portkey-wallet/types/types-ca/trade';
 import NFT from '../NFT/NFT';
-import { unitConverter } from '@portkey/utils/converter';
-import { useAppDispatch, useUserInfo, useWalletInfo, useAssetInfo, useTokenInfo } from 'store/Provider/hooks';
-import { useCaAddresses, useChainIdList, useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
-import { fetchAssetAsync, fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
-import { fetchAllTokenListAsync, getSymbolImagesAsync } from '@portkey/store/store-ca/tokenManagement/action';
-import { TokenItemShowType } from '@portkey/types/types-eoa/token';
-import { getWalletNameAsync } from '@portkey/store/store-ca/wallet/actions';
+import { unitConverter } from '@portkey-wallet/utils/converter';
+import { useAppDispatch, useUserInfo, useWalletInfo, useAssetInfo } from 'store/Provider/hooks';
+import { useCaAddresses, useChainIdList } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { fetchTokenListAsync } from '@portkey-wallet/store/store-ca/assets/slice';
+import { fetchAllTokenListAsync, getSymbolImagesAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
+import { getWalletNameAsync } from '@portkey-wallet/store/store-ca/wallet/actions';
 
 export interface TransactionResult {
   total: number;
   items: Transaction[];
 }
 
-let timer: any;
+// let timer: any;
 
 export default function MyBalance() {
-  const { walletName, currentNetwork, walletInfo } = useWalletInfo();
+  const { walletName, currentNetwork } = useWalletInfo();
   const { t } = useTranslation();
   const [activeKey, setActiveKey] = useState<string>('assets');
   const [navTarget, setNavTarget] = useState<'send' | 'receive'>('send');
@@ -33,7 +32,6 @@ export default function MyBalance() {
   const {
     accountToken: { accountTokenList },
     accountBalance,
-    accountAssets: { accountAssetsList },
   } = useAssetInfo();
   const navigate = useNavigate();
   const { passwordSeed } = useUserInfo();
@@ -45,12 +43,6 @@ export default function MyBalance() {
   useEffect(() => {
     console.log('---passwordSeed-myBalance---', passwordSeed);
     if (!passwordSeed) return;
-    // appDispatch(
-    //   fetchAssetAsync({
-    //     caAddresses,
-    //     keyword: '',
-    //   }),
-    // );
     appDispatch(fetchTokenListAsync({ caAddresses }));
     appDispatch(fetchAllTokenListAsync({ keyword: '', chainIdArray }));
     appDispatch(getWalletNameAsync());
@@ -114,18 +106,12 @@ export default function MyBalance() {
       <BalanceCard
         amount={accountBalance}
         onSend={() => {
-          // if (tokenList.length > 1) {
           setNavTarget('send');
           return setTokenOpen(true);
-          // }
-          // navigate(`/send/${'ELF'}`);
         }}
         onReceive={() => {
-          // if (tokenList.length > 1) {
           setNavTarget('receive');
           return setTokenOpen(true);
-          // }
-          // navigate('/receive');
         }}
       />
       {SelectTokenELe}

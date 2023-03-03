@@ -1,13 +1,13 @@
-import { request } from '@portkey/api/api-did';
-import { ContactItemType, IClickAddressProps, RecentContactItemType } from '@portkey/types/types-ca/contact';
+import { request } from '@portkey-wallet/api/api-did';
+import { ContactItemType, IClickAddressProps, RecentContactItemType } from '@portkey-wallet/types/types-ca/contact';
 import { useTranslation } from 'react-i18next';
 import { useCallback, useState } from 'react';
 import { useEffectOnce } from 'react-use';
-import { useContact } from '@portkey/hooks/hooks-ca/contact';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { useContact } from '@portkey-wallet/hooks/hooks-ca/contact';
+import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import LoadingMore from 'components/LoadingMore/LoadingMore';
 import RecentItem from './RecentItem';
-import { ChainId } from '@portkey/types';
+import { ChainId } from '@portkey-wallet/types';
 
 interface ApiRecentAddressItemType {
   caAddress: string;

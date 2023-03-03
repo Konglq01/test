@@ -1,8 +1,8 @@
 import { mockAssetsData, mockNFTSeriesData, mockNFTsData, mockTokenData } from './data';
-import { request } from '@portkey/api/api-did';
-import { NetworkType } from '@portkey/types/index';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { TokenItemShowType } from '@portkey/types/types-ca/token';
+import { request } from '@portkey-wallet/api/api-did';
+import { NetworkType } from '@portkey-wallet/types/index';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
+import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
 import { IAssetItemType } from './type';
 
 const data = [0, 1, 2, 3, 4, 5, 6, 7].map((ele, index) => {

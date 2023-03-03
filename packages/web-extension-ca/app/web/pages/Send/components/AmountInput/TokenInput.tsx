@@ -1,30 +1,19 @@
-import { ZERO } from '@portkey/constants/misc';
-import { BaseToken } from '@portkey/types/types-ca/token';
-import { divDecimals, divDecimalsStr, timesDecimals, unitConverter } from '@portkey/utils/converter';
-import { Input, message } from 'antd';
-import { parseInputChange } from '@portkey/utils/input';
+import { ZERO } from '@portkey-wallet/constants/misc';
+import { BaseToken } from '@portkey-wallet/types/types-ca/token';
+import { divDecimals, unitConverter } from '@portkey-wallet/utils/converter';
+import { Input } from 'antd';
 import clsx from 'clsx';
-import CustomSvg from 'components/CustomSvg';
 import { handleKeyDown } from 'pages/Send/utils/util.keyDown';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getBalance } from 'utils/sandboxUtil/getBalance';
-import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
-import { ChainId } from '@portkey/types';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import aes from '@portkey/utils/aes';
-import { useUserInfo } from 'store/Provider/hooks';
-import { WalletError } from '@portkey/store/store-ca/wallet/type';
-import { SandboxErrorCode } from '@portkey/utils/sandboxService';
-import getTransactionFee from 'utils/sandboxUtil/getTransactionFee';
-import getTransferFee from 'pages/Send/utils/getTransferFee';
-import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
-import { contractErrorHandler } from '@portkey/did-ui-react/src/utils/errorHandler';
-import { useSymbolImages } from '@portkey/hooks/hooks-ca/useToken';
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { ChainId } from '@portkey-wallet/types';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
+import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
 
 export default function TokenInput({
   fromAccount,
-  toAccount,
   token,
   value,
   errorMsg,
@@ -43,8 +32,6 @@ export default function TokenInput({
   const { t } = useTranslation();
   const [amount, setAmount] = useState<string>(value ? `${value} ${token.symbol}` : '');
   const [balance, setBalance] = useState<string>('');
-  const { passwordSeed } = useUserInfo();
-  const wallet = useCurrentWalletInfo();
   const symbolImages = useSymbolImages();
 
   const getTokenBalance = useCallback(async () => {
@@ -126,6 +113,7 @@ export default function TokenInput({
               onBlur={handleAmountBlur}
               onChange={(e) => {
                 setAmount(e.target.value);
+                onChange({ amount: e.target.value, balance });
               }}
             />
             {isMain && (

@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { screenHeight, windowHeight } from '@portkey/utils/mobile/device';
+import { screenHeight, windowHeight } from '@portkey-wallet/utils/mobile/device';
 import GStyles from 'assets/theme/GStyles';
 import { TextL } from 'components/CommonText';
 import DigitInput, { DigitInputProps } from 'components/DigitInput';

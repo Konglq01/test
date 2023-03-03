@@ -1,6 +1,6 @@
 import Signalr from '..';
-import { CaAccountRecoverResult, CaAccountRegisterResult } from '@portkey/types/types-ca/wallet';
-import { listenList } from '@portkey/constants/constants-ca/socket';
+import { CaAccountRecoverResult, CaAccountRegisterResult } from '@portkey-wallet/types/types-ca/wallet';
+import { listenList } from '@portkey-wallet/constants/constants-ca/socket';
 
 class SignalrDid extends Signalr {
   public Ack(clientId: string, requestId: string) {

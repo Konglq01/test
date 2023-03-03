@@ -1,4 +1,4 @@
-import { NetworkType } from '@portkey/types';
+import { NetworkType } from '@portkey-wallet/types';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { checkPassword } from './utils';
 import {

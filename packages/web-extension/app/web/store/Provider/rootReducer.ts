@@ -1,11 +1,11 @@
-import { walletSlice } from '@portkey/store/wallet/slice';
-import chainSlice from '@portkey/store/network/slice';
+import { walletSlice } from '@portkey-wallet/store/wallet/slice';
+import chainSlice from '@portkey-wallet/store/network/slice';
 import userReducer, { userSlice } from 'store/reducers/user/slice';
-import addressBook from '@portkey/store/addressBook/slice';
-import tokenBalanceSlice from '@portkey/store/tokenBalance/slice';
-import tradeSlice from '@portkey/store/trade/slice';
-import tokenSlice from '@portkey/store/token/slice';
-import { rateApi } from '@portkey/store/rate/api';
+import addressBook from '@portkey-wallet/store/addressBook/slice';
+import tokenBalanceSlice from '@portkey-wallet/store/tokenBalance/slice';
+import tradeSlice from '@portkey-wallet/store/trade/slice';
+import tokenSlice from '@portkey-wallet/store/token/slice';
+import { rateApi } from '@portkey-wallet/store/rate/api';
 import ModalSlice from 'store/reducers/modal/slice';
 import CommonSlice from 'store/reducers/common/slice';
 import { customCombineReducers } from 'store/utils/customCombineReducers';

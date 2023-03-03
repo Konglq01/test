@@ -3,16 +3,22 @@ import { Button, Form, Input, message } from 'antd';
 import { useNavigate, useLocation, useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import BackHeader from 'components/BackHeader';
-import { ContactItemType, AddressItem } from '@portkey/types/types-ca/contact';
-import { fetchContactListAsync } from '@portkey/store/store-ca/contact/actions';
+import { ContactItemType, AddressItem } from '@portkey-wallet/types/types-ca/contact';
+import { fetchContactListAsync } from '@portkey-wallet/store/store-ca/contact/actions';
 import { useAppDispatch, useLoading } from 'store/Provider/hooks';
 import CustomSvg from 'components/CustomSvg';
 import NetworkDrawer from '../NetworkDrawer';
 import DeleteContact from '../DeleteContact';
-import { getAelfAddress, isAelfAddress } from '@portkey/utils/aelf';
-import { isValidCAWalletName } from '@portkey/utils/reg';
+import { getAelfAddress, isAelfAddress } from '@portkey-wallet/utils/aelf';
+import { isValidCAWalletName } from '@portkey-wallet/utils/reg';
 import './index.less';
-import { useAddContact, useDeleteContact, useEditContact, useCheckContactName } from '@portkey/hooks/hooks-ca/contact';
+import {
+  useAddContact,
+  useDeleteContact,
+  useEditContact,
+  useCheckContactName,
+} from '@portkey-wallet/hooks/hooks-ca/contact';
+import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
 
 const { Item: FormItem } = Form;
 export enum ContactInfoError {
@@ -57,6 +63,7 @@ export default function EditContact() {
   const deleteContactApi = useDeleteContact();
   const checkExistNameApi = useCheckContactName();
   const { setLoading } = useLoading();
+  const symbolImages = useSymbolImages();
 
   useEffect(() => {
     const { addresses } = state;
@@ -288,7 +295,7 @@ export default function EditContact() {
                       <FormItem {...restField} name={[name, 'networkName']} noStyle>
                         <Input
                           placeholder="Select Network"
-                          prefix={<CustomSvg type="Aelf" className="select-svg" />}
+                          prefix={<img className="select-svg" src={symbolImages['ELF']} />}
                           suffix={
                             <CustomSvg
                               type="Down"

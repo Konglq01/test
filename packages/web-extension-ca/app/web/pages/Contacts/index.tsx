@@ -1,16 +1,16 @@
 import clsx from 'clsx';
 import { useNavigate } from 'react-router';
-import { Button, Input, message } from 'antd';
+import { Button, Input } from 'antd';
 import { IndexBar, List } from 'antd-mobile';
 import { useTranslation } from 'react-i18next';
 import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import BackHeader from 'components/BackHeader';
 import CustomSvg from 'components/CustomSvg';
-import { useContact } from '@portkey/hooks/hooks-ca/contact';
+import { useContact } from '@portkey-wallet/hooks/hooks-ca/contact';
 import { useAppDispatch } from 'store/Provider/hooks';
-import { fetchContactListAsync } from '@portkey/store/store-ca/contact/actions';
-import { getAelfAddress, isAelfAddress } from '@portkey/utils/aelf';
-import { ContactIndexType, ContactItemType } from '@portkey/types/types-ca/contact';
+import { fetchContactListAsync } from '@portkey-wallet/store/store-ca/contact/actions';
+import { getAelfAddress, isAelfAddress } from '@portkey-wallet/utils/aelf';
+import { ContactIndexType, ContactItemType } from '@portkey-wallet/types/types-ca/contact';
 import { useEffectOnce } from 'react-use';
 import './index.less';
 

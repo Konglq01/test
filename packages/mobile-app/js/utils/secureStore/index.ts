@@ -1,5 +1,5 @@
 import * as SecureStore from 'expo-secure-store';
-import aes from '@portkey/utils/aes';
+import aes from '@portkey-wallet/utils/aes';
 const privates = new WeakMap();
 const secureOptions = {
   requireAuthentication: true,

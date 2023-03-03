@@ -1,4 +1,4 @@
-import { AccountAssetItem, AccountAssets, TokenItemShowType } from '@portkey/types/types-ca/token';
+import { AccountAssetItem, AccountAssets, TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
 import { DrawerProps } from 'antd';
 import CustomSvg from 'components/CustomSvg';
 import DropdownSearch from 'components/DropdownSearch';
@@ -6,13 +6,12 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAssetInfo, useTokenInfo, useUserInfo, useWalletInfo } from 'store/Provider/hooks';
 import BaseDrawer from '../BaseDrawer';
-import { fetchAssetAsync, fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
+import { fetchAssetAsync } from '@portkey-wallet/store/store-ca/assets/slice';
 import './index.less';
-import { ZERO } from '@portkey/constants/misc';
-import { divDecimals, unitConverter } from '@portkey/utils/converter';
-import { useCaAddresses, useChainIdList } from '@portkey/hooks/hooks-ca/wallet';
-import { fetchAllTokenListAsync } from '@portkey/store/store-ca/tokenManagement/action';
-import { useSymbolImages } from '@portkey/hooks/hooks-ca/useToken';
+import { divDecimals, unitConverter } from '@portkey-wallet/utils/converter';
+import { useCaAddresses, useChainIdList } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { fetchAllTokenListAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
+import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
 interface CustomSelectProps extends DrawerProps {
   onChange?: (v: AccountAssetItem, type: 'token' | 'nft') => void;
   onClose?: () => void;
@@ -29,7 +28,7 @@ export default function CustomTokenDrawer({
   ...props
 }: CustomSelectProps) {
   const { t } = useTranslation();
-  const { currentNetwork, walletInfo } = useWalletInfo();
+  const { currentNetwork } = useWalletInfo();
   const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'Testnet' : ''), [currentNetwork]);
   const { accountAssets } = useAssetInfo();
   const { tokenDataShowInMarket } = useTokenInfo();
@@ -67,9 +66,11 @@ export default function CustomTokenDrawer({
           key={`${token.symbol}_${token.chainId}`}
           onClick={onChange?.bind(undefined, token, 'token')}>
           <div className="icon">
-            <div className="custom">
-              {symbolImages[token.symbol] ? <img src={symbolImages[token.symbol]} /> : token?.symbol?.slice(0, 1)}
-            </div>
+            {symbolImages[token.symbol] ? (
+              <img src={symbolImages[token.symbol]} />
+            ) : (
+              <div className="custom">{token?.symbol?.slice(0, 1)}</div>
+            )}
           </div>
           <div className="info">
             <p className="symbol">{`${token.symbol}`}</p>

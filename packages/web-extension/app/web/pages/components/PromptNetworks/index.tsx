@@ -1,6 +1,6 @@
-import { CommonListAction, CustomChain, setCurrentChain } from '@portkey/store/network/actions';
-import { checkRpcUrlFormat } from '@portkey/store/network/utils';
-import { UpdateChainListType, ChainItemType } from '@portkey/types/chain';
+import { CommonListAction, CustomChain, setCurrentChain } from '@portkey-wallet/store/network/actions';
+import { checkRpcUrlFormat } from '@portkey-wallet/store/network/utils';
+import { UpdateChainListType, ChainItemType } from '@portkey-wallet/types/chain';
 import { Button, message } from 'antd';
 import SandboxEventTypes from 'messages/SandboxEventTypes';
 import { ReactNode, useCallback, useMemo, useState } from 'react';
@@ -15,7 +15,7 @@ import NetworkEdit from '../NetworkEdit';
 import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
 import { EditType } from 'types';
-import { RequireAllOne, UpdateType } from '@portkey/types';
+import { RequireAllOne, UpdateType } from '@portkey-wallet/types';
 
 export default function PromptNetworks() {
   const { t } = useTranslation();

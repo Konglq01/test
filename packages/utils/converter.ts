@@ -1,4 +1,4 @@
-import { isEffectiveNumber, ZERO } from '@portkey/constants/misc';
+import { isEffectiveNumber, ZERO } from '@portkey-wallet/constants/misc';
 import BigNumber from 'bignumber.js';
 import i18n from 'i18next';
 

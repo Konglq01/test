@@ -1,7 +1,6 @@
-import { ZERO } from '@portkey/constants/misc';
-import { useSymbolImages } from '@portkey/hooks/hooks-ca/useToken';
-import { TokenItemShowType } from '@portkey/types/types-ca/token';
-import { divDecimals, unitConverter } from '@portkey/utils/converter';
+import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
+import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
+import { divDecimals, unitConverter } from '@portkey-wallet/utils/converter';
 import CustomSvg from 'components/CustomSvg';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
