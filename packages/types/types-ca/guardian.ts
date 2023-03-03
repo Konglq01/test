@@ -1,4 +1,4 @@
-import { TLoginStrType } from './types-ca/wallet';
+import { TLoginStrType } from './wallet';
 
 export enum GuardianType {
   GUARDIAN_TYPE_OF_EMAIL = 0,
