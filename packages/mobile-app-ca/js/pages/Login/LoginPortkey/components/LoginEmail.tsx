@@ -48,14 +48,13 @@ export default function LoginEmail({ setLoginType }: { setLoginType: (type: Logi
       }
       const verifierServers = await getVerifierServers(_chainInfo);
       const holderInfo = await getGuardiansInfo({ guardianIdentifier: loginAccount }, _chainInfo);
-      console.log(holderInfo, '=======holderInfo');
-      console.log(handleUserGuardiansList(holderInfo, verifierServers), '=handleUserGuardiansList');
-
-      // navigationService.navigate('GuardianApproval', {
-      //   loginAccount,
-      //   userGuardiansList: handleUserGuardiansList(holderInfo, verifierServers),
-      // });
+      navigationService.navigate('GuardianApproval', {
+        loginAccount,
+        userGuardiansList: handleUserGuardiansList(holderInfo, verifierServers),
+      });
     } catch (error) {
+      console.log(error, '=====error');
+
       setErrorMessage(handleError(error));
     }
     Loading.hide();

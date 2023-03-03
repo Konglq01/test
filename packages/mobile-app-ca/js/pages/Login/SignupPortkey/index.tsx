@@ -22,7 +22,6 @@ import { getChainListAsync } from '@portkey-wallet/store/store-ca/wallet/actions
 import Loading from 'components/Loading';
 import myEvents from 'utils/deviceEvent';
 import useEffectOnce from 'hooks/useEffectOnce';
-import { request } from '@portkey-wallet/api/api-did';
 const safeAreaColor: SafeAreaColorMapKeyUnit[] = ['transparent', 'transparent'];
 
 const scrollViewProps = { extraHeight: 120 };

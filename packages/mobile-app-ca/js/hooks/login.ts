@@ -19,7 +19,6 @@ import { DigitInputInterface } from 'components/DigitInput';
 import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
 import { GuardiansApproved } from 'pages/Guardian/types';
 import { DEVICE_TYPE } from 'constants/common';
-import { handleVerificationDoc } from '@portkey/utils/guardian';
 
 export function useOnManagerAddressAndQueryResult() {
   const dispatch = useAppDispatch();
@@ -62,12 +61,11 @@ export function useOnManagerAddressAndQueryResult() {
           },
           chainId: DefaultChainId,
         };
-        console.log(data, JSON.stringify(data), '====data');
 
         let fetch = request.verify.registerRequest;
         if (isRecovery) {
           fetch = request.verify.recoveryRequest;
-          data.guardiansApproved = guardiansApproved;
+          data.guardiansApproved = guardiansApproved?.map(i => ({ identifier: i.value, ...i }));
         } else {
           data = {
             ...managerInfo,
@@ -76,18 +74,15 @@ export function useOnManagerAddressAndQueryResult() {
             ...data,
           };
         }
-
+        console.log(data, JSON.stringify(data), managerInfo, '====data');
         const req = await fetch({
           data,
         });
-        const { guardianIdentifier, salt } = handleVerificationDoc(data.verificationDoc);
         // whether there is wallet information
         const _managerInfo = {
           ...managerInfo,
           managerUniqueId: req.sessionId,
           requestId: tmpWalletInfo.address,
-          guardianIdentifier,
-          salt,
         } as ManagerInfo;
 
         if (walletInfo?.address) {

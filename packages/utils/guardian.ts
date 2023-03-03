@@ -1,6 +1,7 @@
-import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
+import { LoginNumType } from '@portkey-wallet/constants/constants-ca/guardian';
 import { ZERO } from '@portkey-wallet/constants/misc';
 import { GuardiansInfo } from '@portkey-wallet/types/guardian';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import { VerifierItem } from '@portkey-wallet/types/verifier';
 const APPROVAL_COUNT = ZERO.plus(3).div(5);
 import BigNumber from 'bignumber.js';
@@ -24,7 +25,7 @@ export function handleUserGuardiansList(
     return {
       ...item,
       guardianAccount: item.guardianIdentifier,
-      guardianType: (LoginStrType as any)[item.type],
+      guardianType: LoginNumType[item.type],
       key: `${item.guardianIdentifier}&${item.verifierId}`,
       verifier: Array.isArray(verifierServers)
         ? verifierServers.find(verifierItem => verifierItem.id === item.verifierId)
