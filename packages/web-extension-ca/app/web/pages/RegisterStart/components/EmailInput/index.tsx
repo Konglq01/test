@@ -42,7 +42,7 @@ const EmailInput = forwardRef(
             },
           });
           console.log(checkResult, 'checkResult===GetHolderInfo');
-          if (checkResult.result.guardiansInfo?.guardianAccounts?.length > 0) {
+          if (checkResult.guardianList?.length > 0) {
             isHasAccount = true;
           }
         } catch (error: any) {
