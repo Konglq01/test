@@ -21,14 +21,13 @@ export interface GuardianAccount {
   guardian: Guardian;
   value: string;
 }
-
+export interface Manager {
+  address: string; //aelf.Address
+  extraData: string;
+}
 export interface GuardiansInfo {
   guardianList: Guardian[];
-}
-
-export interface Manager {
-  managerAddress: string; //aelf.Address
-  device_string: string;
+  managerInfos: Manager[];
 }
 
 export interface GuardiansApprovedType {
