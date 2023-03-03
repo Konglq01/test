@@ -22,7 +22,7 @@ import { getChainListAsync } from '@portkey-wallet/store/store-ca/wallet/actions
 import Loading from 'components/Loading';
 import myEvents from 'utils/deviceEvent';
 import useEffectOnce from 'hooks/useEffectOnce';
-import { request } from '@portkey/api/api-did';
+import { request } from '@portkey-wallet/api/api-did';
 const safeAreaColor: SafeAreaColorMapKeyUnit[] = ['transparent', 'transparent'];
 
 const scrollViewProps = { extraHeight: 120 };
@@ -49,19 +49,11 @@ function SignupEmail() {
       }
       await getVerifierServers(_chainInfo);
       try {
-        console.log(email, request.defaultConfig, '======email');
-
-        // const guardiansInfo = await getGuardiansInfo({ loginAccount: email }, _chainInfo);
-        const req = await request.wallet.guardianIdentifiers({ params: { guardianIdentifier: email } });
-        console.log(req, '=======req');
-        if (req) {
+        const guardiansInfo = await getGuardiansInfo({ guardianIdentifier: email }, _chainInfo);
+        if (guardiansInfo?.guardianAccounts || guardiansInfo?.guardianList) {
           Loading.hide();
           return setErrorMessage(EmailError.alreadyRegistered);
         }
-        // if (guardiansInfo.guardianAccounts) {
-        //   Loading.hide();
-        //   return setErrorMessage(EmailError.alreadyRegistered);
-        // }
       } catch (error) {
         console.log(error, '====error');
       }

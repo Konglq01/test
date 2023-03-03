@@ -6,12 +6,16 @@ import { LoginInfo } from 'types/wallet';
 import { checkHolderError } from '@portkey-wallet/utils/check';
 import { VerifierItem } from '@portkey-wallet/types/verifier';
 import { ChainItemType } from '@portkey-wallet/store/store-ca/wallet/type';
+import { request } from '@portkey-wallet/api/api-did';
 
 export const useGetHolderInfo = () => {
   const getCurrentCAViewContract = useGetCurrentCAViewContract();
   return useCallback(
     async (loginInfo: LoginInfo, chainInfo?: ChainItemType) => {
       if (!loginInfo) throw new Error('Could not find accountInfo');
+      if (loginInfo.guardianIdentifier) {
+        return request.wallet.guardianIdentifiers({ params: { guardianIdentifier: loginInfo.guardianIdentifier } });
+      }
       const caContract = await getCurrentCAViewContract(chainInfo);
       return caContract?.callViewMethod('GetHolderInfo', {
         caHash: loginInfo.caHash,
@@ -27,7 +31,9 @@ export const useGetGuardiansInfo = () => {
   return useCallback(
     async (loginInfo: LoginInfo, chainInfo?: ChainItemType) => {
       const res = await getHolderInfo(loginInfo, chainInfo);
-      if (res && !res.error) return res.data.guardiansInfo;
+      console.log(res, '=======res');
+      // TODO: chainId
+      if (res && !res.error) return res?.data?.guardiansInfo || res[0];
       throw new Error(checkHolderError(res.error?.message));
     },
     [getHolderInfo],

@@ -15,4 +15,4 @@ export interface Credentials {
   password?: string;
 }
 
-export type LoginInfo = { loginAccount?: string; caHash?: string };
+export type LoginInfo = { guardianIdentifier?: string; loginAccount?: string; caHash?: string };
