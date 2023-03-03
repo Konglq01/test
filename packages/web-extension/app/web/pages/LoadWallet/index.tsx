@@ -9,7 +9,7 @@ import CreateWalletPage from '../components/CreateWalletPage';
 import InternalMessage from 'messages/InternalMessage';
 import InternalMessageTypes from 'messages/InternalMessageTypes';
 import { useAppDispatch } from 'store/Provider/hooks';
-import { createWallet, setBackup } from '@portkey/store/wallet/actions';
+import { createWallet, setBackup } from '@portkey-wallet/store/wallet/actions';
 import { setPasswordSeed } from 'store/reducers/user/slice';
 import './index.less';
 import { completeRegistration } from 'utils/lib/serviceWorkerAction';

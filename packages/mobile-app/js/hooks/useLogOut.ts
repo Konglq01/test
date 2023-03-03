@@ -1,13 +1,13 @@
-import { resetWallet } from '@portkey/store/wallet/actions';
+import { resetWallet } from '@portkey-wallet/store/wallet/actions';
 import ActionSheet from 'components/ActionSheet';
 import { useCallback } from 'react';
 import { useAppDispatch } from 'store/hooks';
 import { resetUser } from 'store/user/actions';
-import { resetToken } from '@portkey/store/token/slice';
-import { resetSettings } from '@portkey/store/settings/slice';
+import { resetToken } from '@portkey-wallet/store/token/slice';
+import { resetSettings } from '@portkey-wallet/store/settings/slice';
 
 import navigationService from 'utils/navigationService';
-import { resetNetwork } from '@portkey/store/network/actions';
+import { resetNetwork } from '@portkey-wallet/store/network/actions';
 import i18n from 'i18n';
 
 export default function useLogOut() {

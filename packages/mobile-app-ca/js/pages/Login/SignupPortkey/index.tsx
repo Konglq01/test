@@ -7,18 +7,18 @@ import { ImageBackground, StyleSheet, View } from 'react-native';
 import CommonButton from 'components/CommonButton';
 import GStyles from 'assets/theme/GStyles';
 import { useLanguage } from 'i18n/hooks';
-import { checkEmail, EmailError } from '@portkey/utils/check';
+import { checkEmail, EmailError } from '@portkey-wallet/utils/check';
 import CommonInput from 'components/CommonInput';
 import navigationService from 'utils/navigationService';
 import background from '../img/background.png';
 import Svg from 'components/Svg';
 import { BGStyles, FontStyles } from 'assets/theme/styles';
-import { isIos, screenHeight, screenWidth } from '@portkey/utils/mobile/device';
+import { isIos, screenHeight, screenWidth } from '@portkey-wallet/utils/mobile/device';
 import { useGetGuardiansInfo, useGetVerifierServers } from 'hooks/guardian';
-import { handleError } from '@portkey/utils';
-import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+import { handleError } from '@portkey-wallet/utils';
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { useAppDispatch } from 'store/hooks';
-import { getChainListAsync } from '@portkey/store/store-ca/wallet/actions';
+import { getChainListAsync } from '@portkey-wallet/store/store-ca/wallet/actions';
 import Loading from 'components/Loading';
 import myEvents from 'utils/deviceEvent';
 import useEffectOnce from 'hooks/useEffectOnce';
@@ -41,10 +41,14 @@ function SignupEmail() {
     if (message) return;
     Loading.show();
     try {
-      if (!chainInfo) await dispatch(getChainListAsync());
-      await getVerifierServers();
+      let _chainInfo;
+      if (!chainInfo) {
+        const chainList = await dispatch(getChainListAsync());
+        if (Array.isArray(chainList.payload)) _chainInfo = chainList.payload[1];
+      }
+      await getVerifierServers(_chainInfo);
       try {
-        const guardiansInfo = await getGuardiansInfo({ loginAccount: email });
+        const guardiansInfo = await getGuardiansInfo({ loginAccount: email }, _chainInfo);
         if (guardiansInfo.guardianAccounts) {
           Loading.hide();
           return setErrorMessage(EmailError.alreadyRegistered);
@@ -67,6 +71,7 @@ function SignupEmail() {
       listener.remove();
     };
   });
+
   return (
     <View style={[BGStyles.bg1, styles.card]}>
       <CommonInput

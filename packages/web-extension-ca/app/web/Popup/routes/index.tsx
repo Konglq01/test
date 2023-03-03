@@ -1,23 +1,25 @@
-import Home from '../../pages/Home';
 import { useRoutes } from 'react-router';
+import Home from 'pages/Home';
 import Wallet from 'pages/Wallet';
+import Contacts from 'pages/Contacts';
+import GuardianApproval from 'pages/GuardianApproval';
 import AddToken from 'pages/Token/Manage';
 import Receive from 'pages/Receive';
 import TokenDetail from 'pages/Token/Detail';
+import AccountSetting from 'pages/AccountSetting';
+import My from 'pages/My';
 import Send from 'pages/Send';
 import NFT from 'pages/NFT';
 import Transaction from 'pages/Transaction';
-import My from 'pages/My';
-import Contacts from 'pages/Contacts';
-import Contact from 'pages/ContactDetail';
-import AccountSetting from 'pages/AccountSetting';
 import Guardians from 'pages/Guardians';
 import AddGuardian from 'pages/Guardians/GuardiansAdd';
 import GuardiansEdit from 'pages/Guardians/GuardiansEdit';
 import GuardiansView from 'pages/Guardians/GuardiansView';
 import VerifierAccount from 'pages/VerifierAccount';
-import GuardianApproval from 'pages/GuardianApproval';
 import Unlock from 'pages/Unlock';
+import Contact from 'pages/Contacts/ContactDetail';
+import Device from 'pages/AccountSetting/Devices';
+import SetPin from 'pages/AccountSetting/SetPin';
 
 export const PageRouter = () =>
   useRoutes([
@@ -28,22 +30,6 @@ export const PageRouter = () =>
     {
       path: '/setting',
       element: <My />,
-    },
-    {
-      path: '/setting/wallet',
-      element: <Wallet />,
-    },
-    {
-      path: 'setting/contacts',
-      element: <Contacts />,
-    },
-    {
-      path: '/setting/contacts/:type',
-      element: <Contact />,
-    },
-    {
-      path: '/setting/account-setting',
-      element: <AccountSetting />,
     },
     {
       path: '/setting/guardians',
@@ -70,6 +56,10 @@ export const PageRouter = () =>
       element: <GuardianApproval />,
     },
     {
+      path: '/setting/wallet',
+      element: <Wallet />,
+    },
+    {
       path: '/add-token',
       element: <AddToken />,
     },
@@ -82,20 +72,40 @@ export const PageRouter = () =>
       element: <TokenDetail />,
     },
     {
-      path: '/send/:symbol',
+      path: '/send/:type/:symbol',
       element: <Send />,
     },
     {
-      path: '/send/:symbol/:tokenId',
+      path: '/send/:type/:symbol/:tokenId',
       element: <Send />,
     },
     {
-      path: '/receive/:symbol/:chainId',
+      path: '/receive/:type/:symbol/:chainId',
       element: <Receive />,
     },
     {
       path: '/nft',
       element: <NFT />,
+    },
+    {
+      path: 'setting/contacts',
+      element: <Contacts />,
+    },
+    {
+      path: '/setting/contacts/:type',
+      element: <Contact />,
+    },
+    {
+      path: '/setting/account-setting',
+      element: <AccountSetting />,
+    },
+    {
+      path: '/setting/account-setting/device',
+      element: <Device />,
+    },
+    {
+      path: '/setting/account-setting/set-pin',
+      element: <SetPin />,
     },
     {
       path: '/unlock',

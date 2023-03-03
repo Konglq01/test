@@ -8,4 +8,8 @@ export default {
   queryRegister: '/api/app/account/register/query',
   setWalletName: '/api/app/account/setNickname',
   getChainList: '/api/app/getChains',
+  editWalletName: {
+    target: '/api/app/account/nickname',
+    config: { method: 'PUT' },
+  },
 } as const;

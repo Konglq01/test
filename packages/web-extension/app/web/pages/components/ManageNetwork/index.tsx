@@ -1,4 +1,4 @@
-import { ChainItemType, UpdateChainListType } from '@portkey/types/chain';
+import { ChainItemType, UpdateChainListType } from '@portkey-wallet/types/chain';
 import { DrawerProps } from 'antd';
 import CustomSvg from 'components/CustomSvg';
 import { forwardRef, useCallback, useImperativeHandle, useMemo, useState } from 'react';

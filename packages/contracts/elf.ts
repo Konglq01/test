@@ -1,14 +1,5 @@
-import { getELFContract } from '@portkey/utils/aelf';
+import { getELFContract } from '@portkey-wallet/utils/aelf';
 import AElf from 'aelf-sdk';
-
-export const getELFChainBalance = async (tokenContract: any, symbol: string, owner: string) => {
-  let balance = await tokenContract.GetBalance.call({
-    symbol,
-    owner,
-  });
-
-  return balance?.balance ?? balance?.amount ?? 0;
-};
 
 export const getELFContractAddress = async (rpcUrl: string, GenesisContractAddress: string, name: string) => {
   const zeroContract = await getELFContract(rpcUrl, GenesisContractAddress);

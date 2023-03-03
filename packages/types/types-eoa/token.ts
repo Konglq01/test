@@ -1,5 +1,6 @@
-import { ChainItemType } from '@portkey/types/chain';
-import { AccountType } from '@portkey/types/wallet';
+import { ChainItemType } from '@portkey-wallet/types/chain';
+import { AccountType } from '@portkey-wallet/types/wallet';
+import { ChainId } from '..';
 
 export interface BaseToken {
   id?: string; // id
@@ -12,7 +13,7 @@ export interface BaseToken {
 export interface TokenItemType extends BaseToken {
   isDefault: boolean; // boolean,
   tokenName: string; //  "ELF"
-  chainId: string; // string "AELF"
+  chainId: ChainId; // string "AELF"
 }
 export interface TokenItemShowType extends TokenItemType {
   isAdded?: boolean; // boolean

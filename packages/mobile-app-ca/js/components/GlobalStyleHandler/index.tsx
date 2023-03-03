@@ -4,11 +4,11 @@ import { useFonts } from 'expo-font';
 import setDefaultProps from 'utils/setDefaultProps';
 import { useLanguage } from 'i18n/hooks';
 import { LanguageValue } from 'i18n/config';
-import navigationService from 'utils/navigationService';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { changeFonts } from 'assets/theme/fonts';
 import usePrevious from 'hooks/usePrevious';
-
+setDefaultProps(TextInput, { allowFontScaling: false });
+setDefaultProps(Text, { allowFontScaling: false });
 interface GlobalStyleHandlerType {
   children: ReactElement;
 }
@@ -41,7 +41,7 @@ const GlobalStyleHandler: React.FC<GlobalStyleHandlerType> = ({ children }) => {
         break;
     }
     changeFonts(language as LanguageValue);
-    navigationService.reset('Tab');
+    // navigationService.reset('Tab');
   }, [language, prevLanguage]);
 
   useEffectOnce(() => {

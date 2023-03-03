@@ -1,4 +1,5 @@
-import { ChainType } from '@portkey/types';
+import { SendOptions } from '@portkey-wallet/contracts/types';
+import { ChainType } from '@portkey-wallet/types';
 import SandboxEventTypes from 'messages/SandboxEventTypes';
 import SandboxEventService, { SandboxErrorCode } from 'service/SandboxEventService';
 
@@ -7,13 +8,15 @@ export const removeManager = async ({
   chainType,
   address, // contract address
   privateKey,
+  sendOptions,
   paramsOption,
 }: {
   rpcUrl: string;
   address: string;
   chainType: ChainType;
   privateKey: string;
-  paramsOption: { caHash: string; manager: { managerAddress: string; deviceString: number } };
+  sendOptions?: SendOptions;
+  paramsOption: { caHash: string; manager: { managerAddress: string; deviceString: string } };
 }) => {
   const resMessage = await SandboxEventService.dispatchAndReceive(SandboxEventTypes.callSendMethod, {
     rpcUrl: rpcUrl,
@@ -21,9 +24,11 @@ export const removeManager = async ({
     privateKey,
     chainType,
     methodName: 'RemoveManager',
-    paramsOption: [paramsOption],
+    sendOptions,
+    paramsOption,
   });
-  if (resMessage.code === SandboxErrorCode.error) throw resMessage.message;
+  console.log(resMessage, 'resMessage===RemoveManager');
+  if (resMessage.code === SandboxErrorCode.error) throw resMessage.error;
   const message = resMessage.message;
   return {
     code: resMessage.code,

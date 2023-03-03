@@ -1,11 +1,11 @@
-import { CurrentWalletType } from '@portkey/hooks/hooks-ca/wallet';
-import { createWallet, setCAInfo, setManagerInfo } from '@portkey/store/store-ca/wallet/actions';
-import { CAInfo, ManagerInfo } from '@portkey/types/types-ca/wallet';
-import { VerificationType, VerifierInfo } from '@portkey/types/verifier';
-import { sleep } from '@portkey/utils';
+import { CurrentWalletType } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { createWallet, setCAInfo, setManagerInfo } from '@portkey-wallet/store/store-ca/wallet/actions';
+import { CAInfo, ManagerInfo } from '@portkey-wallet/types/types-ca/wallet';
+import { VerificationType, VerifierInfo } from '@portkey-wallet/types/verifier';
+import { sleep } from '@portkey-wallet/utils';
 import Loading from 'components/Loading';
 import AElf from 'aelf-sdk';
-import { DefaultChainId } from '@portkey/constants/constants-ca/network';
+import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { request } from 'api';
 import { useCallback, useRef } from 'react';
 import { useAppDispatch } from 'store/hooks';
@@ -16,8 +16,9 @@ import CommonToast from 'components/CommonToast';
 import useEffectOnce from './useEffectOnce';
 import { setCredentials } from 'store/user/actions';
 import { DigitInputInterface } from 'components/DigitInput';
-import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
+import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
 import { GuardiansApproved } from 'pages/Guardian/types';
+import { DEVICE_TYPE } from 'constants/common';
 
 export function useOnManagerAddressAndQueryResult() {
   const dispatch = useAppDispatch();
@@ -53,7 +54,7 @@ export function useOnManagerAddressAndQueryResult() {
         let data: any = {
           loginGuardianAccount: managerInfo.loginAccount,
           managerAddress: tmpWalletInfo.address,
-          deviceString: new Date().getTime().toString(),
+          deviceString: `${DEVICE_TYPE},${Date.now()}`,
           context: {
             clientId: tmpWalletInfo.address,
             requestId: tmpWalletInfo.address,

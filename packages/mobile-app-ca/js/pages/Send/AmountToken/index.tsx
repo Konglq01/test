@@ -1,47 +1,36 @@
-import { TokenItemShowType } from '@portkey/types/types-eoa/token';
-import React, { useEffect, useMemo } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import Svg from 'components/Svg';
-import TokenOverlay from 'components/TokenOverlay';
+import { TokenItemShowType } from '@portkey-wallet/types/types-eoa/token';
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { pTd } from 'utils/unit';
-import { parseInputChange } from '@portkey/utils/input';
-import { ZERO } from '@portkey/constants/misc';
+import { parseInputChange } from '@portkey-wallet/utils/input';
+import { ZERO } from '@portkey-wallet/constants/misc';
 import { defaultColors } from 'assets/theme';
 import GStyles from 'assets/theme/GStyles';
 import { Input } from '@rneui/themed';
-import { TextS } from 'components/CommonText';
-import { unitConverter } from '@portkey/utils/converter';
+import { unitConverter } from '@portkey-wallet/utils/converter';
 import { useLanguage } from 'i18n/hooks';
+import CommonAvatar from 'components/CommonAvatar';
+import { IToSendAssetParamsType } from '@portkey-wallet/types/types-ca/routeParams';
+import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
 
 interface AmountTokenProps {
-  rate: { USDT: string | number };
   balanceShow: number | string;
   sendTokenNumber: string;
   setSendTokenNumber: any;
   selectedAccount: any;
-  selectedToken: TokenItemShowType;
+  selectedToken: IToSendAssetParamsType;
   setSelectedToken: any;
 }
 
 export default function AmountToken({
-  rate,
   balanceShow,
   sendTokenNumber,
   setSendTokenNumber,
-  selectedAccount,
   selectedToken,
-  setSelectedToken,
 }: AmountTokenProps) {
   const { t } = useLanguage();
 
-  const tokenList = useMemo(() => {
-    return [];
-  }, []);
-
-  const onFinishSelectToken = (tokenItem: TokenItemShowType) => {
-    setSelectedToken(tokenItem);
-    setSendTokenNumber('0');
-  };
+  const symbolImages = useSymbolImages();
 
   const formatTokenNameToSuffix = (str: string) => {
     return `${str.slice(0, 5)}...`;
@@ -57,12 +46,21 @@ export default function AmountToken({
       </View>
       <View style={styles.bottom}>
         <View style={styles.bottomLeft}>
-          <Svg icon="aelf-avatar" size={pTd(28)} />
+          {/* <Svg icon="aelf-avatar" size={pTd(28)} /> */}
+          {symbolImages[selectedToken?.symbol] ? (
+            <CommonAvatar
+              shapeType="circular"
+              imageUrl={symbolImages[selectedToken.symbol] || ''}
+              avatarSize={28}
+              title={''}
+            />
+          ) : (
+            <Text style={styles.imgStyle}>{selectedToken?.symbol?.[0]}</Text>
+          )}
           <Text style={styles.symbolName}>
             {selectedToken?.symbol?.length > 5 ? formatTokenNameToSuffix(selectedToken?.symbol) : selectedToken?.symbol}
           </Text>
         </View>
-        {/* TODO: search is contact?  */}
         <View style={styles.bottomRight}>
           <Input
             onFocus={() => {
@@ -70,6 +68,7 @@ export default function AmountToken({
             }}
             keyboardType="numeric"
             value={sendTokenNumber}
+            maxLength={18}
             containerStyle={styles.containerStyle}
             inputContainerStyle={styles.inputContainerStyle}
             inputStyle={styles.inputStyle}
@@ -78,14 +77,14 @@ export default function AmountToken({
               setSendTokenNumber(newAmount);
             }}
           />
-          {selectedToken.symbol === 'ELF' && (
+          {/* {selectedToken.symbol === 'ELF' && (
             <TextS style={styles.usdtNumSent}>
               ${' '}
               {sendTokenNumber === ' '
                 ? '0.00'
                 : unitConverter(ZERO.plus(sendTokenNumber ? sendTokenNumber : '0').times(rate.USDT), 2)}
             </TextS>
-          )}
+          )} */}
         </View>
       </View>
     </View>
@@ -127,6 +126,15 @@ export const styles = StyleSheet.create({
     ...GStyles.paddingArg(6, 10),
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  imgStyle: {
+    width: pTd(28),
+    height: pTd(28),
+    lineHeight: pTd(28),
+    borderColor: defaultColors.border1,
+    borderWidth: pTd(1),
+    borderRadius: pTd(14),
+    textAlign: 'center',
   },
   symbolName: {
     flex: 1,

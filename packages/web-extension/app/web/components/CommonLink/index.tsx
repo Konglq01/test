@@ -2,7 +2,7 @@ import { Button } from 'antd';
 import React from 'react';
 import clsx from 'clsx';
 import './styles.less';
-import { isUrl } from '@portkey/utils';
+import { isUrl } from '@portkey-wallet/utils';
 export default function CommonLink({
   href,
   children,

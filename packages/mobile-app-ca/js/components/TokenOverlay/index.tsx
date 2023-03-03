@@ -4,20 +4,22 @@ import { FlatList, StyleSheet } from 'react-native';
 import { TextXL } from 'components/CommonText';
 import { ModalBody } from 'components/ModalBody';
 import CommonInput from 'components/CommonInput';
-import { useAppCASelector } from '@portkey/hooks/hooks-ca';
-import { TokenItemShowType } from '@portkey/types/types-eoa/token';
-import { filterTokenList } from '@portkey/utils/token';
-import { AccountType } from '@portkey/types/wallet';
+import { useAppCASelector } from '@portkey-wallet/hooks/hooks-ca';
+import { TokenItemShowType } from '@portkey-wallet/types/types-eoa/token';
+import { filterTokenList } from '@portkey-wallet/utils/token';
+import { AccountType } from '@portkey-wallet/types/wallet';
 import TokenListItem from 'components/TokenListItem';
 import { defaultColors } from 'assets/theme';
 import fonts from 'assets/theme/fonts';
 import { pTd } from 'utils/unit';
-import { screenHeight } from '@portkey/utils/mobile/device';
+import { screenHeight } from '@portkey-wallet/utils/mobile/device';
 import { useLanguage } from 'i18n/hooks';
-import { useAppCommonDispatch } from '@portkey/hooks';
+import { useAppCommonDispatch } from '@portkey-wallet/hooks';
 import useDebounce from 'hooks/useDebounce';
 import useEffectOnce from 'hooks/useEffectOnce';
-import { fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
+import { useCaAddresses, useCurrentWalletInfo, useChainIdList } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { fetchAllTokenListAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
+import NoData from 'components/NoData';
 
 type onFinishSelectTokenType = (tokenItem: TokenItemShowType) => void;
 type TokenListProps = {
@@ -28,28 +30,19 @@ type TokenListProps = {
 const TokenList = ({ onFinishSelectToken, account }: TokenListProps) => {
   const { t } = useLanguage();
 
-  const { accountToken } = useAppCASelector(state => state.assets);
+  const { tokenDataShowInMarket } = useAppCASelector(state => state.tokenManagement);
   const dispatch = useAppCommonDispatch();
+  const chainIdList = useChainIdList();
 
-  const [listShow, setListShow] = useState<any[]>([]);
+  const [keyword, setKeyword] = useState('');
 
-  const [filterListInfo, setFilterListInfo] = useState({
-    pageSize: 10,
-    pageNum: 1,
-    keyword: '',
-    list: [],
-    total: 0,
-    isLoading: false,
-  });
-
-  const debounceKeyword = useDebounce(filterListInfo.keyword, 800);
+  const debounceKeyword = useDebounce(keyword, 800);
 
   const renderItem = useCallback(
     ({ item }: { item: TokenItemShowType }) => {
       return (
         <TokenListItem
-          symbol={item.symbol}
-          icon={'aelf-avatar'}
+          noBalanceShow
           item={item}
           onPress={() => {
             OverlayModal.hide();
@@ -62,38 +55,31 @@ const TokenList = ({ onFinishSelectToken, account }: TokenListProps) => {
   );
 
   useEffect(() => {
-    console.log('enter ' + debounceKeyword);
-  }, [debounceKeyword]);
-
-  useEffect(() => {
-    setListShow(accountToken.accountTokenList);
-  }, [accountToken.accountTokenList]);
+    dispatch(fetchAllTokenListAsync({ chainIdArray: chainIdList, keyword: debounceKeyword }));
+  }, [chainIdList, debounceKeyword, dispatch]);
 
   useEffectOnce(() => {
-    if (accountToken.accountTokenList.length !== 0) return;
-
-    dispatch(fetchTokenListAsync({ type: 'MAIN' }));
+    if (tokenDataShowInMarket.length !== 0) return;
+    dispatch(fetchAllTokenListAsync({ chainIdArray: chainIdList, keyword: debounceKeyword }));
   });
 
   return (
     <ModalBody modalBodyType="bottom" style={styles.modalStyle}>
-      <TextXL style={styles.title}>{t('Select Asset')}</TextXL>
+      <TextXL style={styles.title}>{t('Select Token')}</TextXL>
       <CommonInput
         placeholder={t('Token Name')}
         containerStyle={styles.containerStyle}
         inputContainerStyle={styles.inputContainerStyle}
         inputStyle={styles.inputStyle}
-        value={filterListInfo.keyword}
+        value={keyword}
         onChangeText={v => {
-          setFilterListInfo({
-            ...filterListInfo,
-            keyword: v.trim(),
-          });
+          setKeyword(v.trim());
         }}
       />
+      {!!debounceKeyword && !tokenDataShowInMarket.length && <NoData noPic message={t('There is no search result.')} />}
       <FlatList
         style={styles.flatList}
-        data={listShow || []}
+        data={tokenDataShowInMarket || []}
         renderItem={renderItem}
         keyExtractor={(item: any) => item.id || ''}
       />

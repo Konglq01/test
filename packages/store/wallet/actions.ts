@@ -1,7 +1,7 @@
 import AElf from 'aelf-sdk';
-import { checkPasswordInput, checkWalletNameInput, formatWalletInfo } from '@portkey/utils/wallet';
+import { checkPasswordInput, checkWalletNameInput, formatWalletInfo } from '@portkey-wallet/utils/wallet';
 import { createAction } from '@reduxjs/toolkit';
-import { AccountType, WalletInfoType } from '@portkey/types/wallet';
+import { AccountType, WalletInfoType } from '@portkey-wallet/types/wallet';
 
 export const createWallet =
   ({ walletInfo, walletName, password }: { walletInfo?: any; walletName: string; password: string }): any =>

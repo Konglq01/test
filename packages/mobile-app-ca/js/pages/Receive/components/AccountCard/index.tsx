@@ -1,30 +1,57 @@
-import { useCurrentNetwork } from '@portkey/hooks/network';
-import { AccountType } from '@portkey/types/wallet';
-import { addressFormat } from '@portkey/utils';
+import { useCurrentNetwork } from '@portkey-wallet/hooks/network';
+import { AccountType } from '@portkey-wallet/types/wallet';
+import { addressFormat } from '@portkey-wallet/utils';
 import { ScreenWidth } from '@rneui/base';
 import { defaultColors } from 'assets/theme';
 import { TextM } from 'components/CommonText';
-import CommonToast from 'components/CommonToast';
 import Svg from 'components/Svg';
-import { setStringAsync } from 'expo-clipboard';
-import i18n from 'i18n';
 import React from 'react';
 import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { pTd } from 'utils/unit';
+import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
+import { SendTokenQRDataType } from '@portkey-wallet/types/types-ca/qrcode';
 
 const cardWidth = ScreenWidth * 0.63;
 
-const info = {
-  chainId: 'ELF',
-  tokenSymbol: 'xxx',
-  caAddress: 'xxxx',
-  networkType: 'MAIN',
-};
+// const info = {
+//   chainId: 'ELF',
+//   tokenSymbol: 'xxx',
+//   caAddress: 'xxxx',
+//   networkType: 'MAIN',
+// };
 
-export default function AccountCard({ account, style }: { account: AccountType; style?: StyleProp<ViewStyle> }) {
-  const { chainType, chainId } = useCurrentNetwork();
-  const address = addressFormat(account.address, chainId, chainType);
+export default function AccountCard({
+  tokenInfo,
+  toCaAddress,
+  style,
+}: {
+  tokenInfo: TokenItemShowType;
+  toCaAddress: string;
+  style?: StyleProp<ViewStyle>;
+}) {
+  const { chainType } = useCurrentNetwork();
+  // const address = addressFormat(account.address, chainId, chainType);
+
+  const currentNetWork = useCurrentNetworkInfo();
+
+  const info: SendTokenQRDataType = {
+    address: toCaAddress,
+    netWorkType: currentNetWork.networkType,
+    chainType,
+    type: 'send',
+    toInfo: {
+      name: '',
+      address: toCaAddress,
+    },
+    assetInfo: {
+      symbol: tokenInfo?.symbol,
+      tokenContractAddress: tokenInfo?.tokenContractAddress || tokenInfo?.address,
+      chainId: tokenInfo?.chainId,
+      decimals: tokenInfo?.decimals || 0,
+    },
+  };
 
   return (
     <View style={[styles.container, style]}>
@@ -32,14 +59,7 @@ export default function AccountCard({ account, style }: { account: AccountType; 
         <Svg size={ScreenWidth * 0.13} icon="logo-icon" color={defaultColors.font9} />
       </View>
       <QRCode size={cardWidth} value={JSON.stringify(info)} />
-      <TextM
-        onPress={async () => {
-          const isCopy = await setStringAsync(account.address);
-          isCopy && CommonToast.success(i18n.t('Copy Success'));
-        }}
-        style={styles.textStyle}>
-        {address}
-      </TextM>
+      <TextM style={styles.textStyle}>{toCaAddress}</TextM>
     </View>
   );
 }

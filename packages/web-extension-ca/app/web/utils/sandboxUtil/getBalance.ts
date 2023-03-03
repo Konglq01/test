@@ -1,36 +1,37 @@
-import { ChainItemType } from '@portkey/types/chain';
-import { BaseToken } from '@portkey/types/types-ca/token';
+import { ChainType } from '@portkey-wallet/types';
 import SandboxEventTypes from 'messages/SandboxEventTypes';
 import SandboxEventService, { SandboxErrorCode } from 'service/SandboxEventService';
 
 export const getBalance = async ({
-  account,
-  currentChain,
-  tokenList,
+  rpcUrl,
+  chainType,
+  address, // contract address
+  paramsOption,
 }: {
-  account: string;
-  tokenList: BaseToken[];
-  currentChain: ChainItemType;
+  rpcUrl: string;
+  address: string;
+  chainType: ChainType;
+  paramsOption: {
+    symbol: string;
+    owner: string;
+  };
 }) => {
-  if (!account) return;
-  const balanceMessage = await SandboxEventService.dispatchAndReceive(SandboxEventTypes.getBalances, {
-    tokens: tokenList,
-    rpcUrl: currentChain.rpcUrl,
-    account,
-    chainType: currentChain.chainType,
+  const resMessage = await SandboxEventService.dispatchAndReceive(SandboxEventTypes.callViewMethod, {
+    rpcUrl,
+    chainType,
+    address,
+    methodName: 'GetBalance',
+    paramsOption,
   });
-  if (balanceMessage.code === SandboxErrorCode.error) return balanceMessage;
-  const balance = balanceMessage.message;
-  const balances = tokenList.map((item, index) => ({
-    symbol: item.symbol,
-    balance: balance[index],
-  }));
+
+  console.log(resMessage, address, 'resMessage===GetHolderInfo');
+
+  if (resMessage.code === SandboxErrorCode.error) throw resMessage.error;
   return {
-    code: balanceMessage.code,
+    code: resMessage.code,
     result: {
-      rpcUrl: currentChain.rpcUrl,
-      account,
-      balances,
+      rpcUrl,
+      ...resMessage.message,
     },
   };
 };

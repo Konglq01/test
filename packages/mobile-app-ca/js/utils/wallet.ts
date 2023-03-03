@@ -1,15 +1,21 @@
-import { CaAccountRecoverResult, CaAccountRegisterResult, CAInfo, ManagerInfo } from '@portkey/types/types-ca/wallet';
-import { VerificationType } from '@portkey/types/verifier';
-import { clearTimeoutInterval, setTimeoutInterval } from '@portkey/utils/interval';
+import {
+  CaAccountRecoverResult,
+  CaAccountRegisterResult,
+  CAInfo,
+  DeviceType,
+  ManagerInfo,
+} from '@portkey-wallet/types/types-ca/wallet';
+import { VerificationType } from '@portkey-wallet/types/verifier';
+import { clearTimeoutInterval, setTimeoutInterval } from '@portkey-wallet/utils/interval';
 import Loading from 'components/Loading';
 import CommonToast from 'components/CommonToast';
 import { queryFailAlert } from './login';
 import { AppDispatch } from 'store';
-import { ContractBasic } from './contract';
-import { request } from '@portkey/api/api-did';
-import myServer from '@portkey/api/server';
-import Signalr from '@portkey/socket';
-import { listenList } from '@portkey/constants/constants-ca/socket';
+import { ContractBasic } from '@portkey-wallet/contracts/utils/ContractBasic';
+import { request } from '@portkey-wallet/api/api-did';
+import Signalr from '@portkey-wallet/socket';
+import { listenList } from '@portkey-wallet/constants/constants-ca/socket';
+import { LoginQRData } from '@portkey-wallet/types/types-ca/qrcode';
 
 class SignalrDid extends Signalr {
   public Ack(clientId: string, requestId: string) {
@@ -93,7 +99,7 @@ export function intervalGetResult({ managerInfo, onPass, onFail }: IntervalGetRe
   const clientId = managerInfo.requestId || '';
   const requestId = managerInfo.requestId || '';
   socket.doOpen({
-    url: `${myServer.defaultConfig.baseURL}/ca`,
+    url: `${request.defaultConfig.baseURL}/ca`,
     clientId,
   });
   let fetch: any;
@@ -115,7 +121,7 @@ export function intervalGetResult({ managerInfo, onPass, onFail }: IntervalGetRe
   timer = setTimeoutInterval(async () => {
     try {
       const req = await fetch({
-        params: { filter: `id:${managerInfo.managerUniqueId}` },
+        params: { filter: `_id:${managerInfo.managerUniqueId}` },
       });
       sendResult(req.items[0]);
     } catch (error) {
@@ -136,17 +142,19 @@ export async function addManager({
   address,
   caHash,
   managerAddress,
+  deviceType,
 }: {
   contract: ContractBasic;
   address: string;
   caHash: string;
-  managerAddress?: string;
+  managerAddress?: LoginQRData['address'];
+  deviceType?: LoginQRData['deviceType'];
 }) {
   return contract.callSendMethod('AddManager', address, {
     caHash,
     manager: {
       managerAddress,
-      deviceString: new Date().getTime(),
+      deviceString: `${deviceType !== undefined ? deviceType + ',' : ''}${Date.now()}`,
     },
   });
 }

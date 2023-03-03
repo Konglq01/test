@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback } from 'react';
 import { View, Text, ScrollView, TouchableWithoutFeedback } from 'react-native';
 import { pageStyles } from './style';
 import PageContainer from 'components/PageContainer';
@@ -6,7 +6,7 @@ import { useLanguage } from 'i18n/hooks';
 import navigationService from 'utils/navigationService';
 import Svg from 'components/Svg';
 import { pTd } from 'utils/unit';
-import { AddressItem, ContactItemType } from '@portkey/types/types-ca/contact';
+import { AddressItem, ContactItemType } from '@portkey-wallet/types/types-ca/contact';
 import Touchable from 'components/Touchable';
 import { setStringAsync } from 'expo-clipboard';
 import CommonToast from 'components/CommonToast';
@@ -14,34 +14,30 @@ import { TextM, TextS, TextXXL } from 'components/CommonText';
 import CommonButton from 'components/CommonButton';
 import GStyles from 'assets/theme/GStyles';
 import { FontStyles } from 'assets/theme/styles';
-import { getChainListAsync } from '@portkey/store/store-ca/wallet/actions';
-import { useAppDispatch } from 'store/hooks';
 import { useWallet } from 'hooks/store';
+import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
 
-interface ContactDetailProps {
-  route?: any;
-}
+type RouterParams = {
+  contact?: ContactItemType;
+};
 
-const ContactDetail: React.FC<ContactDetailProps> = ({ route }) => {
+const ContactDetail: React.FC = () => {
+  const { contact } = useRouterParams<RouterParams>();
   const { t } = useLanguage();
-  const { params } = route;
-  const appDispatch = useAppDispatch();
-
-  useEffect(() => {
-    appDispatch(getChainListAsync());
-  }, [appDispatch]);
   const { currentNetwork } = useWallet();
 
-  const contact = useMemo<ContactItemType>(() => params.contact && JSON.parse(params.contact), [params]);
-
   const renderAddress = useCallback(
-    (addressItem: AddressItem) => (
-      <View key={addressItem.id} style={pageStyles.addressWrap}>
+    (addressItem: AddressItem, index: number) => (
+      <View key={index} style={pageStyles.addressWrap}>
         <View style={pageStyles.addressInfo}>
           <TextM style={pageStyles.addressLabel}>
             ELF_{addressItem.address}_{addressItem.chainId}
           </TextM>
-          <TextS style={FontStyles.font3}>AELF {currentNetwork}</TextS>
+          <TextS style={FontStyles.font3}>
+            {`${addressItem.chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${addressItem.chainId} ${
+              currentNetwork === 'TESTNET' ? 'Testnet' : ''
+            }`}
+          </TextS>
         </View>
         <Touchable
           style={GStyles.marginTop(12)}
@@ -66,15 +62,15 @@ const ContactDetail: React.FC<ContactDetailProps> = ({ route }) => {
       <TextM style={[FontStyles.font3, pageStyles.titleWrap]}>{t('Name')}</TextM>
       <View style={pageStyles.contactInfo}>
         <View style={pageStyles.contactAvatar}>
-          <TextXXL style={FontStyles.font5}>{contact.index}</TextXXL>
+          <TextXXL style={FontStyles.font5}>{contact?.index}</TextXXL>
         </View>
-        <Text>{contact.name}</Text>
+        <Text>{contact?.name}</Text>
       </View>
       <TextM style={[FontStyles.font3, pageStyles.titleWrap]}>{t('Address')}</TextM>
 
       <ScrollView alwaysBounceVertical={true}>
         <TouchableWithoutFeedback>
-          <View>{contact.addresses.map(addressItem => renderAddress(addressItem))}</View>
+          <View>{contact?.addresses.map((addressItem, addressIdx) => renderAddress(addressItem, addressIdx))}</View>
         </TouchableWithoutFeedback>
       </ScrollView>
 
@@ -82,7 +78,7 @@ const ContactDetail: React.FC<ContactDetailProps> = ({ route }) => {
         type="solid"
         containerStyle={GStyles.paddingTop(pTd(16))}
         onPress={() => {
-          navigationService.navigate('ContactEdit', { contact: JSON.stringify(contact) });
+          navigationService.navigate('ContactEdit', { contact });
         }}>
         {t('Edit')}
       </CommonButton>

@@ -2,10 +2,10 @@ import React, { useCallback, useRef, useState } from 'react';
 import PageContainer from 'components/PageContainer';
 import { DigitInputInterface } from 'components/DigitInput';
 import navigationService from 'utils/navigationService';
-import { PIN_SIZE } from '@portkey/constants/misc';
-import useRouterParams from '@portkey/hooks/useRouterParams';
+import { PIN_SIZE } from '@portkey-wallet/constants/misc';
+import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
 import { checkPin } from 'utils/redux';
-import { PinErrorMessage } from '@portkey/utils/wallet/types';
+import { PinErrorMessage } from '@portkey-wallet/utils/wallet/types';
 import myEvents from 'utils/deviceEvent';
 import { useFocusEffect } from '@react-navigation/native';
 import PinContainer from 'components/PinContainer';
@@ -40,7 +40,7 @@ export default function CheckPin() {
   );
   return (
     <PageContainer titleDom type="leftBack" backTitle={!openBiometrics ? 'Change Pin' : 'Authentication'}>
-      <PinContainer ref={pinRef} title="Enter Pin" errorMessage={errorMessage} onChangeText={onChangeText} />
+      <PinContainer showHeader ref={pinRef} title="Enter Pin" errorMessage={errorMessage} onChangeText={onChangeText} />
     </PageContainer>
   );
 }

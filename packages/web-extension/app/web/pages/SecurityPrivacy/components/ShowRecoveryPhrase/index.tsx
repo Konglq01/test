@@ -38,7 +38,7 @@ export default function ShowRecoveryPhrase({ onBack }: { onBack: () => void }) {
         setIsPassword(0);
       }
     },
-    [currentAccount?.AESEncryptPrivateKey, walletInfo],
+    [walletInfo],
   );
 
   return (

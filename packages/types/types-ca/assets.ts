@@ -1,37 +1,50 @@
-export type TokenBaseItemType = {
-  chainId: string;
-  token: {
-    id: string;
-    chainId: string;
-    symbol: string;
-    address: string;
-  };
-  amount: string | number;
-  amountUsd: string | number;
-};
+import { ChainId } from '..';
 
-export type NFTSeriesBaseItemType = {
-  id?: string;
-  chainId: string;
-  nftTokenId: string;
-  tokenHash: string;
-  amount: string;
-  isFetching: boolean;
-  SkipCount: number;
-  MaxResultCount: number;
-  totalCount: string | number;
-  children?: NFTBaseItemType[];
-};
-
-export type NFTBaseItemType = {
+// nft collection types
+export type NFTCollectionItemBaseType = {
+  chainId: ChainId;
+  collectionName: string;
+  imageUrl: string;
+  itemCount: number;
   symbol: string;
-  nftType: string;
-  totalSupply: string;
-  baseUri: string;
-  totalCount: string | number;
+  decimals: number; // 0
+};
+
+export interface NFTCollectionItemShowType extends NFTCollectionItemBaseType {
+  isFetching: boolean;
+  skipCount: number;
+  maxResultCount: number;
+  totalRecordCount: string | number;
+  children: NFTItemBaseType[];
+}
+
+// nft item types
+export type NFTItemBaseType = {
+  chainId: ChainId;
+  symbol: string;
+  tokenId: string;
+  alias: string;
+  quantity: string;
+  imageUrl: string;
+  tokenContractAddress: string;
+};
+
+// assets types
+export type AssetsItemType = {
+  chainId: ChainId;
+  symbol: string;
+  address: string;
+  nftInfo: {
+    imageUrl: string;
+    alias: string;
+    tokenId: string;
+    protocolName: string;
+    quantity: string;
+    metaData: any;
+  };
 };
 
 export type RateBaseType = {
   symbol: string;
-  usdPrice: string | number;
+  priceInUsd: string | number;
 };

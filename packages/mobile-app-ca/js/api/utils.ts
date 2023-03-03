@@ -22,8 +22,10 @@ axiosInstance.interceptors.response.use(
     return res;
   },
   error => {
-    console.log(error, '======error');
-    const _error = { ...(error?.response?.data?.error || error) };
+    let _error = error?.response?.data?.error || error;
+    if (typeof _error === 'string') {
+      _error = { message: _error };
+    }
     if (_error.details) _error.message = _error.details;
     return Promise.reject(_error);
   },

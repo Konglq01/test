@@ -1,10 +1,6 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useMemo, useRef } from 'react';
 import { View, Text } from 'react-native';
-// import { Dialog } from '@rneui/base';
 import PageContainer from 'components/PageContainer';
-import { unitConverter } from '@portkey/utils/converter';
-import { ZERO } from '@portkey/constants/misc';
-import { useAppCASelector, useAppCommonDispatch } from '@portkey/hooks/index';
 import SendButton from 'components/SendButton';
 import ReceiveButton from 'components/ReceiveButton';
 import { styles } from './style';
@@ -14,73 +10,103 @@ import navigationService from 'utils/navigationService';
 import NoData from 'components/NoData';
 import { useLanguage } from 'i18n/hooks';
 import TransferItem from 'components/TransferList/components/TransferItem';
-
 import { FlashList } from '@shopify/flash-list';
 import GStyles from 'assets/theme/GStyles';
 import { FontStyles } from 'assets/theme/styles';
 import { TextXL } from 'components/CommonText';
-import { fetchActivitiesAsync } from '@portkey/store/store-ca/activity/slice';
-import useEffectOnce from 'hooks/useEffectOnce';
-import { TokenItemShowType } from '@portkey/types/types-eoa/token';
+import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
+import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
+import { request } from '@portkey-wallet/api/api-did';
+import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { ActivityItemType } from '@portkey-wallet/types/types-ca/activity';
+import { unitConverter } from '@portkey-wallet/utils/converter';
+import { ZERO } from '@portkey-wallet/constants/misc';
+import { transactionTypesForActivityList as transactionList } from '@portkey-wallet/constants/constants-ca/activity';
+import fonts from 'assets/theme/fonts';
 
-export interface TokenDetailProps {
-  route?: any;
+interface RouterParams {
+  tokenInfo: TokenItemShowType;
 }
 
-// const originalData = {
-//   currentPageNum: 0,
-//   noMoreData: false,
-//   refreshing: false,
-//   isLoadingMore: false,
-//   list: [],
-// };
+const MAX_RESULT_COUNT = 10;
+const INIT_PAGE_INFO = {
+  curPage: 0,
+  total: 0,
+  isLoading: false,
+};
 
-const currentNetworkMode = 'MAIN';
-
-const TokenDetail: React.FC<TokenDetailProps> = props => {
+const TokenDetail: React.FC = () => {
   const { t } = useLanguage();
-  const { route } = props;
-  const {
-    params: { tokenInfo },
-  } = route;
-
+  const { tokenInfo } = useRouterParams<RouterParams>();
+  const currentWallet = useCurrentWallet();
   const navigation = useNavigation();
-
-  const dispatch = useAppCommonDispatch();
-
-  const activity = useAppCASelector(state => state.activity);
-
-  // const [list, setList] = useState<any[]>([]);
   const [listShow, setListShow] = useState<any[]>([]);
 
-  // const { balances } = useAppCASelector(state => state.tokenBalance);
-
-  const [currentToken] = useState<TokenItemShowType>(tokenInfo);
-
-  // const [isLoadingFirstTime, setIsLoadingFirstTime] = useState(true); // first time
-
-  // TODO: upDate balance
-  // const upDateBalance = async () => {
-  // };
-
-  useEffect(() => {
-    setListShow(activity.list);
-  }, [activity]);
-
-  useEffectOnce(() => {
-    dispatch(fetchActivitiesAsync({ type: 'MAIN' }));
+  const fixedParamObj = useMemo(
+    () => ({
+      caAddresses: currentWallet.walletInfo.caAddressList,
+      transactionTypes: transactionList,
+      symbol: tokenInfo.symbol,
+      chainId: tokenInfo.chainId,
+    }),
+    [currentWallet.walletInfo.caAddressList, tokenInfo.chainId, tokenInfo.symbol],
+  );
+  const pageInfoRef = useRef({
+    ...INIT_PAGE_INFO,
   });
 
-  const balanceFormat = useCallback((symbol: string, decimals = 8) => ZERO.plus('0').div(`1e${decimals}`), []);
+  const getActivityList = useCallback(
+    async (isInit = false) => {
+      if (!isInit && listShow.length > 0 && listShow.length >= pageInfoRef.current.total) return;
+      if (pageInfoRef.current.isLoading) return;
+      pageInfoRef.current.isLoading = true;
+      try {
+        const response = await request.activity.activityList({
+          params: {
+            ...fixedParamObj,
+            skipCount: pageInfoRef.current.curPage * MAX_RESULT_COUNT,
+            maxResultCount: MAX_RESULT_COUNT,
+          },
+        });
+        pageInfoRef.current.curPage = pageInfoRef.current.curPage + 1;
+        pageInfoRef.current.total = response.totalRecordCount;
+        console.log('request.activity.activityList:', response);
+        if (isInit) {
+          setListShow(response.data);
+        } else {
+          setListShow(pre => pre.concat(response.data));
+        }
+      } catch (err) {
+        console.log('request.activity.activityList: err', err);
+      }
+      pageInfoRef.current.isLoading = false;
+    },
+    [fixedParamObj, listShow.length],
+  );
+
+  const [currentToken] = useState<TokenItemShowType>(tokenInfo);
+  const [reFreshing, setFreshing] = useState(false);
+  const onRefreshList = useCallback(async () => {
+    pageInfoRef.current = {
+      ...INIT_PAGE_INFO,
+    };
+    setFreshing(true);
+    await getActivityList(true);
+    setFreshing(false);
+  }, [getActivityList]);
+
+  const balanceShow = `${unitConverter(ZERO.plus(tokenInfo?.balance || 0).div(`1e${tokenInfo.decimals}`))}`;
 
   return (
     <PageContainer
       type="leftBack"
-      backTitle={t('Back')}
+      backTitle={t('')}
       titleDom={
         <View>
-          <TextXL style={[GStyles.textAlignCenter, FontStyles.font2]}>ELF</TextXL>
-          <Text style={[GStyles.textAlignCenter, FontStyles.font2, styles.subTitle]}>MainChain AELF</Text>
+          <TextXL style={[GStyles.textAlignCenter, FontStyles.font2, fonts.mediumFont]}>{tokenInfo.symbol}</TextXL>
+          <Text style={[GStyles.textAlignCenter, FontStyles.font2, styles.subTitle]}>{`${
+            tokenInfo.chainId === 'AELF' ? 'MainChain' : 'SideChain'
+          } ${tokenInfo.chainId}`}</Text>
         </View>
       }
       safeAreaColor={['blue', 'white']}
@@ -88,31 +114,43 @@ const TokenDetail: React.FC<TokenDetailProps> = props => {
       containerStyles={styles.pageWrap}
       scrollViewProps={{ disabled: true }}>
       <View style={styles.card}>
-        <Text style={styles.tokenBalance}>
-          {`${unitConverter(balanceFormat(currentToken?.symbol, currentToken?.decimals))} ${
-            currentToken?.symbol || 'ELF'
-          }`}
-        </Text>
+        <Text style={styles.tokenBalance}>{`${balanceShow} ${tokenInfo.symbol}`}</Text>
         {/* TODO : multiply rate */}
-        {currentNetworkMode === 'MAIN' && (
-          <Text style={styles.dollarBalance}>{`$ ${unitConverter(
-            balanceFormat(currentToken?.symbol, currentToken?.decimals).multipliedBy('10'),
-            2,
-          )}`}</Text>
+        {currentWallet?.currentNetwork === 'MAIN' && (
+          <Text style={styles.dollarBalance}>{`$ ${tokenInfo?.balanceInUsd}`}</Text>
         )}
         <View style={styles.buttonGroupWrap}>
           <SendButton themeType="innerPage" sentToken={currentToken} />
           <View style={styles.space} />
-          <ReceiveButton themeType="innerPage" receiveButton={currentToken} />
+          <ReceiveButton currentTokenInfo={tokenInfo} themeType="innerPage" receiveButton={currentToken} />
         </View>
       </View>
       {/* first time loading  */}
       {/* {isLoadingFirstTime && <Dialog.Loading />} */}
       {listShow.length === 0 && <NoData noPic message="You have no transactions." />}
       <FlashList
+        refreshing={reFreshing}
         data={listShow || []}
-        renderItem={() => {
-          return <TransferItem onPress={() => navigationService.navigate('ActivityDetail')} />;
+        keyExtractor={(_item, index) => `${index}`}
+        renderItem={({ item }: { item: ActivityItemType }) => {
+          return (
+            <TransferItem
+              item={item}
+              onPress={() =>
+                navigationService.navigate('ActivityDetail', {
+                  transactionId: item.transactionId,
+                  blockHash: item.blockHash,
+                  isReceived: item.isReceived,
+                })
+              }
+            />
+          );
+        }}
+        onRefresh={() => {
+          onRefreshList();
+        }}
+        onEndReached={() => {
+          getActivityList();
         }}
       />
     </PageContainer>

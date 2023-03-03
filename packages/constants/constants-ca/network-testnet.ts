@@ -1,4 +1,4 @@
-import { NetworkItem } from '@portkey/types/types-ca/network';
+import { NetworkItem } from '@portkey-wallet/types/types-ca/network';
 
 export const NetworkList: NetworkItem[] = [
   {
@@ -6,8 +6,9 @@ export const NetworkList: NetworkItem[] = [
     walletType: 'aelf',
     networkType: 'TESTNET',
     isActive: true,
-    apiUrl: 'http://192.168.66.38:5577',
-    graphqlUrl: 'http://192.168.66.150:8083/AElfIndexer_DApp/PortKeyIndexerCASchema/graphql',
+    apiUrl: 'https://did-portkey-test.portkey.finance',
+    graphqlUrl: 'https://dapp-portkey-test.portkey.finance/Portkey_DID/PortKeyIndexerCASchema/graphql',
+    connectUrl: 'https://auth-portkey-test.portkey.finance',
   },
   {
     name: 'aelf Mainnet',
@@ -15,6 +16,7 @@ export const NetworkList: NetworkItem[] = [
     networkType: 'MAIN',
     apiUrl: '',
     graphqlUrl: '',
+    connectUrl: '',
   },
 ];
 

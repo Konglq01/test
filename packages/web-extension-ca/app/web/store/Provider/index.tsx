@@ -10,8 +10,21 @@ import { HashRouter } from 'react-router-dom';
 import { prefixCls } from '../../constants';
 import ReduxProvider from './ReduxProvider';
 import Updater from './Updater';
-const bodyRootWrapper = document.body;
+import * as Sentry from '@sentry/react';
+import { Integrations } from '@sentry/tracing';
+// import '@portkey-wallet/did-ui-react/dist/assets/index.css';
 
+const bodyRootWrapper = document.body;
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+  integrations: [new Integrations.BrowserTracing()],
+  // Set tracesSampleRate to 1.0 to capture 100%
+  // of transactions for performance monitoring.
+  // We recommend adjusting this value in production
+  tracesSampleRate: 1.0,
+  // release: 'v1.0.0',
+  // environment: process.env.NODE_ENV,
+});
 ConfigProvider.config({
   prefixCls,
 });

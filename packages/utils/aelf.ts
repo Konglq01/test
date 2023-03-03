@@ -1,6 +1,7 @@
 import AElf from 'aelf-sdk';
-import { COMMON_PRIVATE } from '@portkey/constants';
-import { AElfInterface } from '@portkey/types/aelf';
+import { COMMON_PRIVATE } from '@portkey-wallet/constants';
+import { AElfInterface } from '@portkey-wallet/types/aelf';
+import { ChainId } from '@portkey-wallet/types';
 const Wallet = AElf.wallet;
 let wallet: any = null;
 
@@ -18,6 +19,10 @@ export function isAelfAddress(value?: string) {
     return false;
   }
 }
+
+export const getChainNumber = (chainId: string) => {
+  return AElf.utils.chainIdConvertor.base58ToChainId(chainId);
+};
 
 export function isDIDAelfAddress(value?: string) {
   if (!value) return false;
@@ -38,6 +43,42 @@ export function isDIDAelfAddress(value?: string) {
   }
 }
 
+const initAddressInfo = {
+  prefix: '',
+  address: '',
+  suffix: '',
+};
+export const getAddressInfo = (value: string): { prefix: string; address: string; suffix: string } => {
+  const arr = value.split('_');
+  if (arr.length > 3 || arr.length === 0) return initAddressInfo;
+  if (arr.length === 3) return { prefix: arr[0], address: arr[1], suffix: arr[2] };
+  if (arr.length === 1) return { ...initAddressInfo, address: value };
+  // arr.length === 2
+  if (isAelfAddress(arr[0])) return { ...initAddressInfo, address: arr[0], suffix: arr[1] };
+  return { ...initAddressInfo, prefix: arr[0], address: arr[1] };
+};
+
+export function getEntireDIDAelfAddress(value: string, defaultPrefix = 'ELF', defaultSuffix = 'AELF') {
+  const arr = value.split('_');
+  if (arr.length > 3 || arr.length === 0) return '';
+  if (arr.length === 3) return value;
+  if (arr.length === 1) return `${defaultPrefix}_${value}_${defaultSuffix}`;
+  // arr.length === 2
+  if (isAelfAddress(arr[0])) return `${defaultPrefix}_${value}`;
+  return `${value}_${defaultSuffix}`;
+}
+
+export function isAllowAelfAddress(value: string) {
+  const arr = value.split('_');
+  if (arr.length > 3 || arr.length === 0) return false;
+  if (arr.length === 3 || arr.length === 1) return isAelfAddress(value);
+  // arr.length === 2
+  for (let i = 0; i < arr.length; i++) {
+    if (isAelfAddress(arr[i])) return true;
+  }
+  return false;
+}
+
 export function getAelfAddress(value: string = '') {
   const arr = value.split('_');
   if (arr.length === 3) return arr[1];
@@ -48,8 +89,7 @@ export function getAelfAddress(value: string = '') {
 }
 
 export function getWallet(privateKey = COMMON_PRIVATE) {
-  if (!wallet) wallet = Wallet.getWalletByPrivateKey(privateKey);
-  return wallet;
+  return Wallet.getWalletByPrivateKey(privateKey);
 }
 
 export const getAelfInstance = (rpcUrl: string) => {
@@ -128,14 +168,17 @@ export const encodedTx = async ({ instance, functionName, paramsOption, contract
 };
 
 /**
- *
- * @param address
- * @param currentChainId
+ * to check if the transfer is crossChain
+ * @param toAddress
+ * @param fromChainId
  */
-export const isCrossChain = (address: string, currentChainId: string) => {
-  if (!address.includes('_')) return false;
-
-  const arr = address.split('_');
+export const isCrossChain = (toAddress: string, fromChainId: ChainId): boolean => {
+  if (!toAddress.includes('_')) return false;
+  const arr = toAddress.split('_');
   const addressChainId = arr[arr.length - 1];
-  return addressChainId !== currentChainId;
+  // no suffix
+  if (isAelfAddress(addressChainId)) {
+    return false;
+  }
+  return addressChainId !== fromChainId;
 };

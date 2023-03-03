@@ -3,7 +3,7 @@ import { View, Text } from 'react-native';
 import Svg from 'components/Svg';
 import { styles } from './style';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { useAppCASelector } from '@portkey/hooks/index';
+import { useAppCASelector } from '@portkey-wallet/hooks/index';
 import SendButton from 'components/SendButton';
 import ReceiveButton from 'components/ReceiveButton';
 import ActivityButton from 'pages/DashBoard/ActivityButton';
@@ -29,7 +29,6 @@ const Card: React.FC<CardProps> = () => {
 
   const { accountBalance } = useAppCASelector(state => state.assets);
 
-  // warning dialog
   const showDialog = useCallback(
     () =>
       ActionSheet.alert({
@@ -47,23 +46,18 @@ const Card: React.FC<CardProps> = () => {
 
   return (
     <View style={styles.cardWrap}>
-      <TouchableOpacity
-        style={styles.refreshWrap}
-        onPress={async () => {
-          if (!(await requestQrPermission())) return showDialog();
-
-          navigationService.navigate('QrScanner');
-        }}>
-        <Svg icon="scan" size={22} color={defaultColors.font2} />
-      </TouchableOpacity>
+      <View style={styles.refreshWrap}>
+        <Text style={styles.block} />
+        <TouchableOpacity
+          onPress={async () => {
+            if (!(await requestQrPermission())) return showDialog();
+            navigationService.navigate('QrScanner');
+          }}>
+          <Svg icon="scan" size={22} color={defaultColors.font2} />
+        </TouchableOpacity>
+      </View>
       <Text style={styles.usdtBalance}>{currentNetwork === 'MAIN' ? `$${accountBalance}` : 'Dev Mode'}</Text>
-      <TextM
-        style={styles.accountName}
-        onPress={() => {
-          // AccountOverlay.showAccountInfo(currentAccount as AccountType);
-        }}>
-        {walletName}
-      </TextM>
+      <TextM style={styles.accountName}>{walletName}</TextM>
       <View style={styles.buttonGroupWrap}>
         <SendButton themeType="dashBoard" />
         <View style={styles.space} />

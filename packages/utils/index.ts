@@ -1,4 +1,4 @@
-import { ChainType } from '@portkey/types';
+import { ChainType } from '@portkey-wallet/types';
 import { isAddress as web3IsAddress } from 'web3-utils';
 import { isAelfAddress, isDIDAelfAddress } from './aelf';
 import * as uuid from 'uuid';
@@ -20,6 +20,20 @@ export function isDIDAddress(address: string, chainType: ChainType = 'aelf') {
   if (chainType === 'aelf') return isDIDAelfAddress(address);
   return web3IsAddress(address);
 }
+
+export const getChainIdByAddress = (address: string, chainType: ChainType = 'aelf') => {
+  // if (!isAddress(address)) throw Error(`${address} is not address`);
+
+  if (chainType === 'aelf') {
+    if (address.includes('_')) {
+      const arr = address.split('_');
+      return arr[arr.length - 1];
+    } else {
+      return 'AELF';
+    }
+  }
+  throw Error('Not support');
+};
 
 const protocolAndDomainRE = /^(?:\w+:)?\/\/(\S+)$/;
 const localhostDomainRE = /^localhost[\:?\d]*(?:[^\:?\d]\S*)?$/;
@@ -77,11 +91,11 @@ export const sleep = (time: number) => {
 };
 
 export function getExploreLink(
-  exploreUrl: string,
+  explorerUrl: string,
   data: string,
   type: 'transaction' | 'token' | 'address' | 'block' = 'address',
 ): string {
-  const prefix = exploreUrl[exploreUrl.length - 1] !== '/' ? exploreUrl + '/' : exploreUrl;
+  const prefix = explorerUrl[explorerUrl.length - 1] !== '/' ? explorerUrl + '/' : explorerUrl;
   switch (type) {
     case 'transaction': {
       return `${prefix}tx/${data}`;
@@ -114,6 +128,7 @@ export const isExtension = () => process.env.DEVICE === 'extension';
 export const randomId = () => uuid.v4().replace(/-/g, '');
 
 export const handleError = (error: any, errorText?: string) => {
+  error = error?.error || error;
   if (typeof error === 'string') return error;
   if (typeof error.message === 'string') return error.message;
   return errorText;

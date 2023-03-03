@@ -2,13 +2,13 @@ import React, { useCallback, useRef } from 'react';
 import PageContainer from 'components/PageContainer';
 import { DigitInputInterface } from 'components/DigitInput';
 import navigationService from 'utils/navigationService';
-import useRouterParams from '@portkey/hooks/useRouterParams';
+import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
 import ActionSheet from 'components/ActionSheet';
 import useEffectOnce from 'hooks/useEffectOnce';
-import { CAInfoType, ManagerInfo } from '@portkey/types/types-ca/wallet';
-import { VerificationType, VerifierInfo } from '@portkey/types/verifier';
+import { CAInfoType, ManagerInfo } from '@portkey-wallet/types/types-ca/wallet';
+import { VerificationType, VerifierInfo } from '@portkey-wallet/types/verifier';
 import myEvents from 'utils/deviceEvent';
-import { AElfWallet } from '@portkey/types/aelf';
+import { AElfWallet } from '@portkey-wallet/types/aelf';
 import PinContainer from 'components/PinContainer';
 import { GuardiansApproved } from 'pages/Guardian/types';
 
@@ -71,6 +71,7 @@ export default function SetPin() {
       backTitle={oldPin ? 'Change Pin' : undefined}
       leftCallback={leftCallback}>
       <PinContainer
+        showHeader
         ref={digitInput}
         title={oldPin ? 'Please enter a new pin' : 'Enter pin to protect your device'}
         onFinish={pin => {

@@ -4,17 +4,16 @@ import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { pTd } from 'utils/unit';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { useLanguage } from 'i18n/hooks';
-import { fetchContractListAsync } from '@portkey/store/store-ca/contact/actions';
-import { ContactIndexType, ContactItemType } from '@portkey/types/types-ca/contact';
+import { fetchContactListAsync } from '@portkey-wallet/store/store-ca/contact/actions';
+import { ContactIndexType, ContactItemType } from '@portkey-wallet/types/types-ca/contact';
 import { styles as contactItemStyles } from 'components/ContactItem';
-import { isValidWalletName } from '@portkey/utils/reg';
+import { isValidWalletName } from '@portkey-wallet/utils/reg';
 // import List from 'components/ContactList/List';
 import { StyleSheet } from 'react-native';
 import GStyles from 'assets/theme/GStyles';
 import { defaultColors } from 'assets/theme';
 import gSTyles from 'assets/theme/GStyles';
 import RecentContactItem from 'pages/Send/components/RecentContactItem';
-import { FlashList } from '@shopify/flash-list';
 
 const { font5, border6, font3, font7, font2, bg5 } = defaultColors;
 
@@ -67,7 +66,7 @@ const RecentList: React.FC<ContactsListProps> = ({ isIndexBarShow = true, render
   const { t } = useLanguage();
   useEffectOnce(() => {
     // refetch();
-    appDispatch(fetchContractListAsync());
+    appDispatch(fetchContactListAsync());
   });
   const { contactIndexList } = useAppSelector(state => state.contact);
   const [list, setList] = useState<ListItemType[]>([]);

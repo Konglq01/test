@@ -8,16 +8,16 @@ import { useCallback, useMemo, useState } from 'react';
 import { useAppDispatch, useGuardiansInfo, useLoading } from 'store/Provider/hooks';
 import './index.less';
 import CustomSelect from 'pages/components/CustomSelect';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import {
   resetUserGuardianStatus,
   setCurrentGuardianAction,
   setOpGuardianAction,
-} from '@portkey/store/store-ca/guardians/actions';
+} from '@portkey-wallet/store/store-ca/guardians/actions';
 import useGuardianList from 'hooks/useGuardianList';
-import { LoginType } from '@portkey/types/types-ca/wallet';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
-import { VerifierItem } from '@portkey/types/verifier';
+import { VerifierItem } from '@portkey-wallet/types/verifier';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
 

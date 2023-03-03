@@ -1,4 +1,5 @@
-import { ChainType } from '@portkey/types';
+import { SendOptions } from '@portkey-wallet/contracts/types';
+import { ChainType } from '@portkey-wallet/types';
 import SandboxEventTypes from 'messages/SandboxEventTypes';
 import SandboxEventService, { SandboxErrorCode } from 'service/SandboxEventService';
 
@@ -8,12 +9,14 @@ export const handleGuardian = async ({
   address, // contract address
   privateKey,
   paramsOption,
+  sendOptions,
 }: {
   rpcUrl: string;
   address: string;
   chainType: ChainType;
   privateKey: string;
-  paramsOption: { method: string; params: any[] };
+  paramsOption: { method: string; params: any };
+  sendOptions?: SendOptions;
 }) => {
   const resMessage = await SandboxEventService.dispatchAndReceive(SandboxEventTypes.callSendMethod, {
     rpcUrl: rpcUrl,
@@ -22,9 +25,10 @@ export const handleGuardian = async ({
     chainType,
     methodName: paramsOption.method,
     paramsOption: paramsOption.params,
+    sendOptions,
   });
 
-  if (resMessage.code === SandboxErrorCode.error) throw resMessage.message;
+  if (resMessage.code === SandboxErrorCode.error) throw resMessage.error;
   const message = resMessage.message;
   return {
     code: resMessage.code,

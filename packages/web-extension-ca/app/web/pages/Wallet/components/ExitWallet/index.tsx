@@ -3,18 +3,16 @@ import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import CommonModal from 'components/CommonModal';
 import './index.less';
-import { useCurrentWallet, useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
-import getPrivateKeyAndMnemonic from 'utils/Wallet/getPrivateKeyAndMnemonic';
+import { useCurrentWallet, useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { useLoading, useUserInfo } from 'store/Provider/hooks';
-import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { removeManager } from 'utils/sandboxUtil/removeManager';
-import { getAelfInstance } from '@portkey/utils/aelf';
-import { getTxResult } from 'utils/aelfUtils';
-import { sleep } from '@portkey/utils';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import { clearLocalStorage } from 'utils/storage/chromeStorage';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
 import useLogOut from 'hooks/useLogout';
+import { DEVICE_TYPE } from 'constants/index';
+import aes from '@portkey-wallet/utils/aes';
 
 interface ExitWalletProps {
   open: boolean;
@@ -33,38 +31,35 @@ export default function ExitWallet({ open, onCancel }: ExitWalletProps) {
 
   const onConfirm = useCallback(async () => {
     try {
-      const res = await getPrivateKeyAndMnemonic(
-        {
-          AESEncryptPrivateKey: walletInfo.AESEncryptPrivateKey,
-        },
-        passwordSeed,
-      );
-      if (!currentChain?.endPoint || !res?.privateKey) return message.error('error');
+      if (!passwordSeed) throw 'Missing pin';
+      const privateKey = aes.decrypt(walletInfo.AESEncryptPrivateKey, passwordSeed);
+      if (!currentChain?.endPoint || !privateKey) return message.error('error');
       setLoading(true);
       const result = await removeManager({
         rpcUrl: currentChain.endPoint,
         chainType: currentNetwork.walletType,
         address: currentChain.caContractAddress,
-        privateKey: res.privateKey,
+        privateKey,
         paramsOption: {
           caHash: wallet?.caHash as string,
           manager: {
             managerAddress: wallet.address,
-            deviceString: new Date().getTime(),
+            deviceString: `${DEVICE_TYPE},${Date.now()}`,
           },
         },
       });
-      const { TransactionId } = result.result.message || result;
-      await sleep(1000);
-      const aelfInstance = getAelfInstance(currentChain.endPoint);
-      await getTxResult(aelfInstance, TransactionId);
+      console.log('removeManager', 'removeManager==result', result);
+      // const { TransactionId } = result.result.message || result;
+      // await sleep(1000);
+      // const aelfInstance = getAelfInstance(currentChain.endPoint);
+      // await getTxResult(aelfInstance, TransactionId);
       logout();
       clearLocalStorage();
       setLoading(false);
     } catch (error: any) {
       setLoading(false);
-      message.error(contractErrorHandler(error));
-      console.log('---exist wallet error', error);
+      const _error = contractErrorHandler(error) || 'Something error';
+      message.error(_error);
     }
   }, [
     currentChain,
@@ -83,11 +78,11 @@ export default function ExitWallet({ open, onCancel }: ExitWalletProps) {
       closable={false}
       width={320}
       open={open}
-      title={t('Are you sure you want to exit your wallet?')}
+      title={t('Are you sure you want to exit your account?')}
       footer={
         <div className="">
           <Button type="primary" onClick={onConfirm}>
-            {t('I Understand，Confirm Exit')}
+            {t('Exit Anyway')}
           </Button>
           <Button type="default" className="exist-wallet-btn-cancel" onClick={onCancel}>
             {t('Cancel')}
@@ -95,10 +90,10 @@ export default function ExitWallet({ open, onCancel }: ExitWalletProps) {
         </div>
       }>
       <div className="text-center modal-content">
-        <div className="tip-title">
-          {t('Your current wallet and assets will be removed from this app permanently. This action cannot be undone.')}
+        {/* <div className="tip-title">{t('Are you sure you want to exit your account?')}</div> */}
+        <div>
+          {t('After you exit, your assets remain in your account and you can access them through social recovery.')}
         </div>
-        <div>{t('You can ONLY recover this wallet with your guardians.')}</div>
       </div>
     </CommonModal>
   );

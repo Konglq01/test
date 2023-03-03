@@ -1,1 +1,1 @@
-import { ChainItemType } from '@portkey/types/chain';
+import { ChainItemType } from '@portkey-wallet/types/chain';

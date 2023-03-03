@@ -2,10 +2,15 @@ import walletApi from './wallet';
 import verificationApi from './verification';
 import contactApi from './contact';
 import chainApi from './chain';
+import assetsApi from './assets';
+import recentApi from './recent';
+import tokenApi from './token';
+
 import esApi from './es';
-import myServer from '../server';
+import myServer, { DidService } from './server';
 import { API_REQ_FUNCTION } from '../types';
 import { ES_API_REQ_FUNCTION } from './es/type';
+import activityApi from './activity';
 
 export const DEFAULT_METHOD = 'POST';
 
@@ -30,6 +35,11 @@ export const EXPAND_APIS = {
   verify: verificationApi,
   contact: contactApi,
   chain: chainApi,
+  // token: tokenApi,
+  activity: activityApi,
+  assets: assetsApi,
+  recent: recentApi,
+  token: tokenApi,
 };
 
 export type BASE_REQ_TYPES = {
@@ -56,6 +66,6 @@ export interface IRequest extends BASE_REQ_TYPES, EXPAND_REQ_TYPES {
   es: ES_REQ_TYPES;
 }
 
-const request = myServer as unknown as IRequest;
+const request = myServer as unknown as IRequest & DidService;
 
 export { request };

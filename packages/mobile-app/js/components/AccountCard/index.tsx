@@ -1,6 +1,6 @@
-import { useCurrentNetwork } from '@portkey/hooks/network';
-import { AccountType } from '@portkey/types/wallet';
-import { addressFormat } from '@portkey/utils';
+import { useCurrentNetwork } from '@portkey-wallet/hooks/network';
+import { AccountType } from '@portkey-wallet/types/wallet';
+import { addressFormat } from '@portkey-wallet/utils';
 import { ScreenWidth } from '@rneui/base';
 import { defaultColors } from 'assets/theme';
 import { TextM } from 'components/CommonText';

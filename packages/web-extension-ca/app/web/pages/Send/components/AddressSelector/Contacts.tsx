@@ -1,13 +1,14 @@
-import { Button } from 'antd';
 import { IndexBar, List } from 'antd-mobile';
 import clsx from 'clsx';
 import { useEffect, useMemo, useState } from 'react';
 import './index.less';
-import { AddressItem, ContactIndexType } from '@portkey/types/types-ca/contact';
-import { useContact } from 'store/Provider/hooks';
-import User from './User';
+import { AddressItem, ContactIndexType } from '@portkey-wallet/types/types-ca/contact';
+import { useContact } from '@portkey-wallet/hooks/hooks-ca/contact';
+import ContactCard from './ContactCard';
+import { useTranslation } from 'react-i18next';
 
 export default function Contacts({ onChange }: { onChange: (account: AddressItem) => void }) {
+  const { t } = useTranslation();
   const { contactIndexList } = useContact();
 
   const [curList, setCurList] = useState<ContactIndexType[]>([]);
@@ -24,7 +25,7 @@ export default function Contacts({ onChange }: { onChange: (account: AddressItem
     <div className="contacts">
       <div className={clsx(['contacts-body', 'index-bar-hidden'])}>
         {curTotalContactsNum === 0 ? (
-          <p className="no-data">No Contacts</p>
+          <p className="no-data">{t('There is no contacts')}</p>
         ) : (
           <IndexBar>
             {curList.map(({ index, contacts }) => {
@@ -37,7 +38,7 @@ export default function Contacts({ onChange }: { onChange: (account: AddressItem
                   <List>
                     {contacts.map((item) => (
                       <List.Item key={item.id}>
-                        <User user={item} onChange={onChange} />
+                        <ContactCard user={item} onChange={onChange} fromRecents={false} />
                       </List.Item>
                     ))}
                   </List>

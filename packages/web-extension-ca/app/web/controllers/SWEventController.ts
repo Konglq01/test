@@ -3,8 +3,8 @@
  * The controller that handles the event
  * chainChanged, accountsChanged, lockStateChanged
  */
-import { BaseChainType } from '@portkey/types/chain';
-import { AccountType } from '@portkey/types/wallet';
+import { BaseChainType } from '@portkey-wallet/types/chain';
+import { AccountType } from '@portkey-wallet/types/wallet';
 import { NOTIFICATION_NAMES } from 'messages/InternalMessageTypes';
 import { SendResponseFun } from 'types';
 import { ConnectionsType } from 'types/storage';

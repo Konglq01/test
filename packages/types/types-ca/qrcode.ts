@@ -1,4 +1,7 @@
-import { ChainType, NetworkType } from '..';
+import { ChainId, ChainType, NetworkType } from '..';
+import { IToSendAssetParamsType } from './routeParams';
+import { TokenItemShowType } from './token';
+import { DeviceType } from './wallet';
 
 export interface QRData {
   type: 'login' | 'send';
@@ -9,14 +12,17 @@ export interface QRData {
 
 export interface LoginQRData extends QRData {
   type: 'login';
+  deviceType: DeviceType;
 }
 
-export interface SendTokenQRData extends QRData {
+export interface SendTokenQRDataType extends QRData {
   type: 'send';
-  tokenInfo?: {
-    symbol: String;
-    address: String; // token address
-    chainId: String; // AELF or tDVV
-    decimal: String; // elf is "8"
+  sendType: 'nft' | 'token';
+  toInfo: {
+    address: string;
+    name: string;
+    chainId?: ChainId;
+    chainType?: ChainType;
   };
+  assetInfo: IToSendAssetParamsType;
 }

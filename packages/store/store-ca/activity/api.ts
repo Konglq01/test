@@ -1,19 +1,15 @@
-import { ActivityItemType } from '@portkey/types/types-ca/activity';
-import response from './data.json';
+import { request } from '@portkey-wallet/api/api-did';
+import { ActivityItemType } from '@portkey-wallet/types/types-ca/activity';
+import { IActivityApiParams, IActivitiesApiParams, IActivitiesApiResponse } from './type';
 
-console.log(response);
+export function fetchActivities(params: IActivitiesApiParams): Promise<IActivitiesApiResponse> {
+  return request.activity.activityList({
+    params: params,
+  });
+}
 
-const MOCK_RESPONSE = {
-  data: { total: response.data.total, items: response.data.items },
-};
-
-export function fetchActivities({
-  start,
-  limit,
-}: {
-  start: number;
-  limit: number;
-}): Promise<{ data: { total: number; items: ActivityItemType[] } }> {
-  console.log('>>>fetching....list', start, limit, MOCK_RESPONSE);
-  return new Promise(resolve => setTimeout(() => resolve(MOCK_RESPONSE), 1000));
+export function fetchActivity(params: IActivityApiParams): Promise<ActivityItemType> {
+  return request.activity.activity({
+    params: params,
+  });
 }

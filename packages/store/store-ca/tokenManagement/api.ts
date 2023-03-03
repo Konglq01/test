@@ -1,26 +1,29 @@
-import response from './data.json';
+import { request } from '@portkey-wallet/api/api-did';
 
-console.log(response);
-
-const MOCK_RESPONSE = {
-  data: response.data.list.map(ele => {
-    return {
-      ...ele,
-      isDefault: ele.symbol === 'ELF',
-    };
-  }),
-};
-
-export function fetchTokenList({
-  // todo maybe remote tokenList change
-  chainId,
-  pageSize,
-  pageNo,
+export function fetchAllTokenList({
+  maxResultCount,
+  skipCount,
+  keyword,
+  chainIdArray,
 }: {
-  chainId: string;
-  pageSize: number;
-  pageNo: number;
-}): Promise<{ data: any[] }> {
-  console.log('fetching....list', chainId, pageSize, pageNo);
-  return new Promise(resolve => setTimeout(() => resolve(MOCK_RESPONSE), 1000));
+  maxResultCount?: number;
+  skipCount?: number;
+  keyword: string;
+  chainIdArray: string[];
+}): Promise<{ items: any[]; totalRecordCount: number }> {
+  const chainIdSearchLanguage = chainIdArray.map(chainId => `token.chainId:${chainId}`).join(' OR ');
+
+  const filterKeywords =
+    keyword?.length < 10 ? `token.symbol: *${keyword.toUpperCase().trim()}*` : `token.address:${keyword}`;
+
+  return request.es.getUserTokenList({
+    params: {
+      filter: `${filterKeywords} AND (${chainIdSearchLanguage})`,
+      // filter: `${filterKeywords}`,
+
+      sort: 'sortWeight desc,token.symbol acs,token.chainId acs',
+      skipCount: 0,
+      maxResultCount: 1000,
+    },
+  });
 }

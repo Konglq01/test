@@ -1,6 +1,6 @@
 import PageContainer from 'components/PageContainer';
 import { useLanguage } from 'i18n/hooks';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { pageStyles } from './style';
 import { pTd } from 'utils/unit';
 import { ScrollView, TouchableWithoutFeedback, View } from 'react-native';
@@ -13,11 +13,13 @@ import Svg, { IconName } from 'components/Svg';
 import WalletMenuItem from './components/WalletMenuItem';
 import ExistOverlay from './components/ExistOverlay';
 import Loading from 'components/Loading';
-import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import CommonToast from 'components/CommonToast';
 import useLogOut from 'hooks/useLogOut';
 import { removeManager } from 'utils/guardian';
 import { useGetCurrentCAContract } from 'hooks/contract';
+import { useAppDispatch } from 'store/hooks';
+import { getWalletNameAsync } from '@portkey-wallet/store/store-ca/wallet/actions';
 
 interface WalletHomeProps {
   name?: string;
@@ -25,10 +27,15 @@ interface WalletHomeProps {
 
 const WalletHome: React.FC<WalletHomeProps> = () => {
   const { t } = useLanguage();
+  const appDispatch = useAppDispatch();
   const { walletAvatar, walletName } = useWallet();
   const { caHash, address: managerAddress } = useCurrentWalletInfo();
   const getCurrentCAContract = useGetCurrentCAContract();
   const logout = useLogOut();
+
+  useEffect(() => {
+    appDispatch(getWalletNameAsync());
+  }, [appDispatch]);
 
   const onExitClick = useCallback(
     async (isConfirm: boolean) => {
@@ -41,7 +48,7 @@ const WalletHome: React.FC<WalletHomeProps> = () => {
           console.log('logout success', req);
           logout();
         } else {
-          CommonToast.fail(req?.error.message);
+          CommonToast.fail(req?.error?.message || '');
         }
       } catch (error) {
         console.log(error, '=====error');

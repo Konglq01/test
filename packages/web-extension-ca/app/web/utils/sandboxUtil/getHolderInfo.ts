@@ -1,4 +1,4 @@
-import { ChainType } from '@portkey/types';
+import { ChainType } from '@portkey-wallet/types';
 import SandboxEventTypes from 'messages/SandboxEventTypes';
 import SandboxEventService, { SandboxErrorCode } from 'service/SandboxEventService';
 
@@ -26,7 +26,7 @@ export const getHolderInfo = async ({
 
   console.log(resMessage, 'resMessage===GetHolderInfo');
 
-  if (resMessage.code === SandboxErrorCode.error) throw resMessage.message;
+  if (resMessage.code === SandboxErrorCode.error) throw resMessage.error;
   return {
     code: resMessage.code,
     result: {

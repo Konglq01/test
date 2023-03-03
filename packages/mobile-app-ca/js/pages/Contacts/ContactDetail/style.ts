@@ -22,7 +22,7 @@ export const pageStyles = StyleSheet.create({
   },
   titleWrap: {
     lineHeight: pTd(20),
-    ...GStyles.paddingArg(24, 10, 8),
+    ...GStyles.paddingArg(24, 8, 8),
   },
 
   contactAvatar: {

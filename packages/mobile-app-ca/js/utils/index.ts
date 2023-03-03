@@ -7,7 +7,9 @@ import dayjs from 'dayjs';
  * @param type
  * @returns
  */
-export const formatStr2EllipsisStr = (address: string, digit = 10, type: 'middle' | 'tail' = 'middle'): string => {
+export const formatStr2EllipsisStr = (address = '', digit = 10, type: 'middle' | 'tail' = 'middle'): string => {
+  if (!address) return '';
+
   const len = address.length;
 
   if (type === 'tail') return `${address.slice(0, digit)}...`;
@@ -38,9 +40,18 @@ export const formatTransferTime = (time: string | number) => {
  * @param address
  * @returns
  */
-export const formatAddress2NoPrefix = (address: string) => {
+export const formatAddress2NoPrefix = (address: string): string => {
   if (address.match(/^aelf:.+/)) {
     return address.split(':')[1];
   }
   return address;
+};
+
+/**
+ * format information like "MainChain AELF"
+ * @param chainId
+ * @returns
+ */
+export const formatChainInfo = (chainId: 'AELF' | 'tDVV' | 'tDVW' = 'AELF'): string => {
+  return `${chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${chainId}`;
 };

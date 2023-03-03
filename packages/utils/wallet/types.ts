@@ -1,4 +1,4 @@
-import type { AccountType, WalletInfoType, CreateType, Password } from '@portkey/types/wallet';
+import type { AccountType, WalletInfoType, CreateType, Password } from '@portkey-wallet/types/wallet';
 
 export declare type FormatAccountInfo = (
   walletInfoInput: any,
@@ -22,7 +22,7 @@ export enum PasswordErrorMessage {
 }
 export enum PinErrorMessage {
   invalidPin = 'Invalid Pin',
-  PinNotLong = 'Pin is not long enough! (Must be at least 8 characters)',
+  PinNotLong = 'Pin is not long enough! (Must be at least 6 characters)',
 }
 
 export enum WalletNameErrorMessage {

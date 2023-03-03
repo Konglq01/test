@@ -1,6 +1,6 @@
-import { useCurrentNetwork } from '@portkey/hooks/network';
-import { addCommonList, removeCommonList, setCurrentChain } from '@portkey/store/network/actions';
-import { ChainItemType } from '@portkey/types/chain';
+import { useCurrentNetwork } from '@portkey-wallet/hooks/network';
+import { addCommonList, removeCommonList, setCurrentChain } from '@portkey-wallet/store/network/actions';
+import { ChainItemType } from '@portkey-wallet/types/chain';
 import { defaultColors } from 'assets/theme';
 import CommonSwitch from 'components/CommonSwitch';
 import { TextL } from 'components/CommonText';

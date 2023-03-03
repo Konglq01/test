@@ -1,4 +1,4 @@
-import { isEffectiveNumber, ZERO } from '@portkey/constants/misc';
+import { isEffectiveNumber, ZERO } from '@portkey-wallet/constants/misc';
 import BigNumber from 'bignumber.js';
 import i18n from 'i18next';
 
@@ -24,7 +24,9 @@ export const unitConverter = (num?: number | BigNumber | string, decimal = 4, de
   const bigNum = BigNumber.isBigNumber(num) ? num : new BigNumber(num || '');
   if (bigNum.isNaN() || bigNum.eq(0)) return defaultVal;
   const abs = bigNum.abs();
-  const list = i18n.language === 'zh' ? zhList : enList;
+  // const list = i18n.language === 'zh' ? zhList : enList;
+  // TODO：EN ZH
+  const list = enList;
   for (let i = 0; i < list.length; i++) {
     const { value, symbol } = list[i];
     if (abs.gte(value)) return fixedDecimal(bigNum.div(value), decimal) + symbol;
@@ -52,3 +54,23 @@ export function timesDecimals(a?: BigNumber.Value, decimals: string | number = 1
   if (typeof decimals === 'string' && decimals.length > 10) return bigA.times(decimals);
   return bigA.times(`1e${decimals}`);
 }
+
+/**
+ * this function is to format address,just like "formatStr2EllipsisStr" ---> "for...ess"
+ * @param address
+ * @param digits [pre_count, suffix_count]
+ * @param type
+ * @returns
+ */
+export const formatStr2EllipsisStr = (address = '', digits = [10, 10], type: 'middle' | 'tail' = 'middle'): string => {
+  if (!address) return '';
+
+  const len = address.length;
+
+  if (type === 'tail') return `${address.slice(0, digits[0])}...`;
+
+  if (len < digits[0] + digits[1]) return address;
+  const pre = address.substring(0, digits[0]);
+  const suffix = address.substring(len - digits[1]);
+  return `${pre}...${suffix}`;
+};

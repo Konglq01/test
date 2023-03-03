@@ -11,7 +11,8 @@
       "**/react-native-**",
       "**/@react-native-**",
       "**/@react-native-**/**",
-      "**/expo-**"
+      "**/expo-**",
+      "**/@sentry/**"
     ]
   },
   "scripts": {
@@ -21,15 +22,16 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "prepare": "husky install",
     "reset-modules": "rm -rf node_modules/ yarn.lock packages/*/node_modules",
-    "common-package:extension": "npx lerna add @portkey/utils --scope=web-extension && npx lerna add @portkey/hooks --scope=web-extension  && npx lerna add @portkey/store --scope=web-extension && npx lerna add @portkey/constants --scope=web-extension",
+    "common-package:extension": "npx lerna add @portkey-wallet/utils --scope=web-extension && npx lerna add @portkey-wallet/hooks --scope=web-extension  && npx lerna add @portkey-wallet/store --scope=web-extension && npx lerna add @portkey-wallet/constants --scope=web-extension",
     "app": "yarn workspace walletappnew run",
     "extension": "yarn workspace web-extension run",
     "app:ca": "yarn workspace mobile-ca run",
     "extension:ca": "yarn workspace web-extension-ca run",
-    "graphql": "yarn workspace @portkey/graphql run",
-    "page": "yarn workspace web-page run",
     "test": "jest",
-    "test-cover": "jest --coverage"
+    "test-cover": "jest --coverage",
+    "extension-ca:dev": "yarn extension:ca dev:watch",
+    "graphql": "yarn workspace @portkey-wallet/graphql run",
+    "page": "yarn workspace web-page run"
   },
   "devDependencies": {
     "@babel/core": "^7.19.1",

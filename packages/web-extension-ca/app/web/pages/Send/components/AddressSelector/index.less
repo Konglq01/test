@@ -70,11 +70,15 @@
     }
   }
 
-  .user {
+  // ================ ContactCard component style ================
+  .contact-card {
     border-top: 0;
     border-left: 0;
     border-right: 0;
     background: white;
+    .@{app-prefix}-collapse-item {
+      border-bottom: none;
+    }
     .@{app-prefix}-collapse-item-active {
       .@{app-prefix}-collapse-arrow {
         margin-right: 8px !important;
@@ -137,10 +141,18 @@
           color: @font-12;
         }
       }
+      .network {
+        color: @font-13;
+      }
+      .not-recent-address {
+        color: @font-12;
+      }
     }
   }
-  .recent {
-    .item {
+
+  // ================ Recent component style ================
+  .recents {
+    .recent-item {
       display: flex;
       flex-direction: column;
       padding: 13px 24px 11px;
@@ -165,7 +177,15 @@
         color: @font-13;
       }
     }
+    .contact-card-in-recent {
+      border-bottom: 1px solid #dee2e8;
+    }
+    .loading {
+      margin-top: 14px;
+    }
   }
+
+  // ================ Contacts component style ================
   .contacts {
     width: 100%;
     height: 100%;

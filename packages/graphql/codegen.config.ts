@@ -22,7 +22,7 @@ schemaPath.forEach(({ name, path }) => {
     presetConfig: {
       baseTypesPath: `../${name}/__generated__/types.ts`,
       extension: '.ts',
-      folder: `../../../hooks`,
+      folder: `../../hooks`,
     },
     plugins: ['typescript-operations', 'typescript-react-apollo'],
     config: {

@@ -16,6 +16,14 @@
     .info {
       display: flex;
       gap: 16px;
+      .custom-list-icon {
+        width: 28px;
+        height: 28px;
+        margin-top: 7px;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: contain;
+      }
       .custom-svg {
         margin-top: 7px;
       }
@@ -32,7 +40,6 @@
           line-height: 22px;
           color: @font-11;
           font-size: 16px;
-          margin-bottom: 4px;
         }
         .row-2 {
           display: flex;
@@ -40,7 +47,19 @@
           line-height: 16px;
           font-size: 12px;
           color: @font-13;
-          margin-bottom: 2px;
+          margin-top: 4px;
+          .nft-name {
+            width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            /* stylelint-disable-next-line value-no-vendor-prefix */
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            line-clamp: 1;
+            -webkit-line-clamp: 1;
+            word-break: break-all;
+            text-align: right;
+          }
         }
         .row-3 {
           line-height: 16px;
@@ -48,8 +67,55 @@
           color: @font-13;
           left: 60px;
           width: 217px;
-          word-break: break-all;
+          word-break: break-word;
+          margin-top: 2px;
         }
+        .row-4 {
+          margin-top: 8px;
+          text-align: right;
+          .resend-btn {
+            display: inline-block;
+            width: 61px;
+            height: 24px;
+            font-size: 12px;
+            font-weight: 400;
+          }
+        }
+      }
+    }
+  }
+}
+
+.transaction-modal {
+  border-radius: 8px;
+  overflow: hidden;
+  .@{app-prefix}-modal-body {
+    padding: 0;
+    .@{app-prefix}-modal-confirm-title {
+      .warnred-icon {
+        width: 42px;
+        height: 42px;
+        margin-bottom: 24px;
+      }
+
+      padding: 24px;
+      margin: 0;
+      border-bottom: 1px solid @border-2;
+      text-align: center;
+      line-height: 22px;
+      font-size: 18px;
+      color: @font-13;
+    }
+    .@{app-prefix}-modal-confirm-btns {
+      padding: 15px 16px 17px;
+      margin: 0;
+      button {
+        width: 288px;
+        height: 48px;
+        border-radius: 24px;
+        margin: 0 !important;
+        line-height: 22px;
+        font-size: 16px;
       }
     }
   }

@@ -1,13 +1,14 @@
-import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
+import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import {
   resetUserGuardianStatus,
   setOpGuardianAction,
   setPreGuardianAction,
-} from '@portkey/store/store-ca/guardians/actions';
-import { sleep } from '@portkey/utils';
-import { getAelfInstance } from '@portkey/utils/aelf';
+} from '@portkey-wallet/store/store-ca/guardians/actions';
+import { sleep } from '@portkey-wallet/utils';
+import { getAelfInstance } from '@portkey-wallet/utils/aelf';
+import aes from '@portkey-wallet/utils/aes';
 import { message } from 'antd';
 import { useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -17,7 +18,6 @@ import { GuardianMth } from 'types/guardians';
 import { getTxResult } from 'utils/aelfUtils';
 import { handleGuardian } from 'utils/sandboxUtil/handleGuardian';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
-import getPrivateKeyAndMnemonic from 'utils/Wallet/getPrivateKeyAndMnemonic';
 import { formatAddGuardianValue } from '../utils/formatAddGuardianValue';
 import { formatDelGuardianValue } from '../utils/formatDelGuardianValue';
 import { formatEditGuardianValue } from '../utils/formatEditGuardianValue';
@@ -42,13 +42,8 @@ export const useRecovery = () => {
   return useCallback(async () => {
     try {
       setLoading(true);
-      const res = await getPrivateKeyAndMnemonic(
-        {
-          AESEncryptPrivateKey: walletInfo.AESEncryptPrivateKey,
-        },
-        passwordSeed,
-      );
-      if (!currentChain?.endPoint || !res?.privateKey) return message.error('handle guardian error');
+      const privateKey = aes.decrypt(walletInfo.AESEncryptPrivateKey, passwordSeed);
+      if (!currentChain?.endPoint || !privateKey) return message.error('handle guardian error');
       let value;
       switch (state) {
         case 'guardians/add':
@@ -67,21 +62,20 @@ export const useRecovery = () => {
         rpcUrl: currentChain.endPoint,
         chainType: currentNetwork.walletType,
         address: currentChain.caContractAddress,
-        privateKey: res.privateKey,
+        privateKey,
         paramsOption: {
           method: MethodType[state],
-          params: [
-            {
-              caHash: walletInfo?.AELF?.caHash,
-              ...value,
-            },
-          ],
+          params: {
+            caHash: walletInfo?.AELF?.caHash,
+            ...value,
+          },
         },
       });
-      const { TransactionId } = result.result.message || result;
-      await sleep(1000);
-      const aelfInstance = getAelfInstance(currentChain.endPoint);
-      await getTxResult(aelfInstance, TransactionId);
+      console.log('handleGuardian', result);
+      // const { TransactionId } = result.result.message || result;
+      // await sleep(1000);
+      // const aelfInstance = getAelfInstance(currentChain.endPoint);
+      // await getTxResult(aelfInstance, TransactionId);
       dispatch(resetLoginInfoAction());
       dispatch(resetUserGuardianStatus());
       dispatch(setPreGuardianAction());

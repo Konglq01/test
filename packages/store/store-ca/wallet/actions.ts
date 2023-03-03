@@ -1,8 +1,9 @@
-import { NetworkList } from '@portkey/constants/constants-ca/network';
-import { ChainId, NetworkType } from '@portkey/types';
-import { CAInfo, CAInfoType, ManagerInfo } from '@portkey/types/types-ca/wallet';
-import { WalletInfoType } from '@portkey/types/wallet';
-import { checkPinInput, formatWalletInfo } from '@portkey/utils/wallet';
+import { getCaHolder } from '@portkey-wallet/api/api-did/es/utils';
+import { DefaultChainId, NetworkList } from '@portkey-wallet/constants/constants-ca/network';
+import { ChainId, NetworkType } from '@portkey-wallet/types';
+import { CAInfo, CAInfoType, ManagerInfo } from '@portkey-wallet/types/types-ca/wallet';
+import { WalletInfoType } from '@portkey-wallet/types/wallet';
+import { checkPinInput, formatWalletInfo } from '@portkey-wallet/utils/wallet';
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 import AElf from 'aelf-sdk';
 import { getChainList } from './api';
@@ -62,16 +63,6 @@ export const setCAInfoType = createAction<{
 export const resetWallet = createAction('wallet/resetWallet');
 export const changePin = createAction<{ pin: string; newPin: string }>('wallet/changePin');
 
-export const updateWalletNameAsync = createAsyncThunk('wallet/updateWalletNameAsync', async (walletName: string) => {
-  // TODO: add update api
-  const response: string = await new Promise(resolve =>
-    setTimeout(() => {
-      resolve(walletName);
-    }, 500),
-  );
-  return response;
-});
-
 export const changeNetworkType = createAction<NetworkType>('wallet/changeNetworkType');
 export const setChainListAction = createAction<{ chainList: ChainItemType[]; networkType: NetworkType }>(
   'wallet/setChainListAction',
@@ -89,5 +80,36 @@ export const getChainListAsync = createAsyncThunk(
     const response = await getChainList({ baseUrl });
     if (!response?.items) throw Error('No data');
     dispatch(setChainListAction({ chainList: response.items, networkType: _networkType }));
+    return [response.items, response.items.find((item: any) => item.chainId === DefaultChainId)];
   },
 );
+
+export const getWalletNameAsync = createAsyncThunk<WalletState['walletName'] | undefined, void>(
+  'wallet/getWalletNameAsync',
+  async (_, thunkAPI) => {
+    const {
+      wallet: { currentNetwork, walletInfo },
+    } = thunkAPI.getState() as {
+      wallet: WalletState;
+    };
+    const baseUrl = NetworkList.find(item => item.networkType === currentNetwork)?.apiUrl;
+    const caHash = walletInfo?.caInfo[currentNetwork].AELF?.caHash;
+    if (!caHash || !baseUrl) return undefined;
+    let caHolder = undefined;
+    try {
+      const response = await getCaHolder(baseUrl, {
+        caHash,
+      });
+      console.log('getCaHolderEs', response);
+      if (response.items && response.items.length > 0) {
+        caHolder = response.items[0];
+      }
+    } catch (err) {
+      console.log('getCaHolderEs: err', err);
+    }
+    if (!caHolder) return undefined;
+    return caHolder.nickName;
+  },
+);
+
+export const setWalletNameAction = createAction<string>('wallet/setWalletName');

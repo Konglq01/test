@@ -8,20 +8,21 @@ import { StyleSheet, Text, View } from 'react-native';
 import { pTd } from 'utils/unit';
 import navigationService from 'utils/navigationService';
 import fonts from 'assets/theme/fonts';
-import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
+import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type';
 import Loading from 'components/Loading';
-import { request } from 'api';
 import CommonToast from 'components/CommonToast';
-import { sleep } from '@portkey/utils';
-import { ApprovalType, VerificationType, VerifyStatus } from '@portkey/types/verifier';
+import { sleep } from '@portkey-wallet/utils';
+import { ApprovalType, VerificationType, VerifyStatus } from '@portkey-wallet/types/verifier';
 import { BGStyles, FontStyles } from 'assets/theme/styles';
 import { isIOS } from '@rneui/base';
 import { LoginGuardianTypeIcon } from 'constants/misc';
-import { LoginType } from '@portkey/types/types-ca/wallet';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import { VerifierImage } from '../VerifierImage';
-import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
+import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
 import { GuardiansStatus, GuardiansStatusItem } from 'pages/Guardian/types';
-import { DefaultChainId } from '@portkey/constants/constants-ca/network-test2';
+import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network-test2';
+import useDebounceCallback from 'hooks/useDebounceCallback';
+import { verification } from 'utils/api';
 
 interface GuardianAccountItemProps {
   guardianItem: UserGuardianItem;
@@ -63,18 +64,17 @@ function GuardianItemButton({
       verificationType: _verificationType,
     };
   }, [approvalType, guardianItem]);
-
   const onSetGuardianStatus = useCallback(
     (guardianStatus: GuardiansStatusItem) => {
       setGuardianStatus?.(guardianItem.key, guardianStatus);
     },
     [guardianItem.key, setGuardianStatus],
   );
-  const onSendCode = useCallback(async () => {
+  const onSendCode = useDebounceCallback(async () => {
     Loading.show();
     try {
-      const req = await request.verify.sendCode({
-        data: {
+      const req = await verification.sendVerificationCode({
+        params: {
           type: LoginStrType[guardianInfo.guardianItem.guardianType],
           guardianAccount: guardianInfo.guardianItem.guardianAccount,
           verifierId: guardianInfo.guardianItem.verifier?.id,
@@ -102,7 +102,7 @@ function GuardianItemButton({
     }
     Loading.hide();
   }, [onSetGuardianStatus, guardianInfo]);
-  const onVerifier = useCallback(() => {
+  const onVerifier = useDebounceCallback(() => {
     navigationService.push('VerifierDetails', {
       ...guardianInfo,
       requestCodeResult,

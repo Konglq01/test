@@ -1,6 +1,6 @@
-import { NetworkItem } from '@portkey/types/types-ca/network';
-import { useWallet } from '@portkey/hooks/hooks-ca/wallet';
-import { changeNetworkType } from '@portkey/store/store-ca/wallet/actions';
+import { NetworkItem } from '@portkey-wallet/types/types-ca/network';
+import { useWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { changeNetworkType } from '@portkey-wallet/store/store-ca/wallet/actions';
 import { ParamListBase, RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from 'navigation';
 import { useCallback } from 'react';

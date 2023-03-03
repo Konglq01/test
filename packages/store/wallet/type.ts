@@ -1,6 +1,10 @@
-import { ChainType } from '@portkey/types';
-import type { AccountType, WalletInfoType } from '@portkey/types/wallet';
-import { AccountNameErrorMessage, PasswordErrorMessage, WalletNameErrorMessage } from '@portkey/utils/wallet/types';
+import { ChainType } from '@portkey-wallet/types';
+import type { AccountType, WalletInfoType } from '@portkey-wallet/types/wallet';
+import {
+  AccountNameErrorMessage,
+  PasswordErrorMessage,
+  WalletNameErrorMessage,
+} from '@portkey-wallet/utils/wallet/types';
 
 export type WalletType = ChainType;
 

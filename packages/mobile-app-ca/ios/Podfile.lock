@@ -636,12 +636,16 @@ PODS:
   - RNScreens (3.18.0):
     - React-Core
     - React-RCTImage
+  - RNSentry (4.13.0):
+    - React-Core
+    - Sentry/HybridSDK (= 7.31.5)
   - RNSpringScrollView (3.0.2):
     - React
   - RNSVG (13.3.0):
     - React-Core
   - RNVectorIcons (9.2.0):
     - React-Core
+  - Sentry/HybridSDK (7.31.5)
   - SocketRocket (0.6.0)
   - Yoga (1.14.0)
   - YogaKit (1.18.1):
@@ -760,6 +764,7 @@ DEPENDENCIES:
   - RNLocalize (from `../node_modules/react-native-localize`)
   - "RNNotifee (from `../node_modules/@notifee/react-native`)"
   - RNScreens (from `../node_modules/react-native-screens`)
+  - "RNSentry (from `../node_modules/@sentry/react-native`)"
   - RNSpringScrollView (from `../node_modules/react-native-spring-scrollview`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
@@ -802,6 +807,7 @@ SPEC REPOS:
     - nanopb
     - OpenSSL-Universal
     - PromisesObjC
+    - Sentry
     - SocketRocket
     - YogaKit
     - ZXingObjC
@@ -951,6 +957,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@notifee/react-native"
   RNScreens:
     :path: "../node_modules/react-native-screens"
+  RNSentry:
+    :path: "../node_modules/@sentry/react-native"
   RNSpringScrollView:
     :path: "../node_modules/react-native-spring-scrollview"
   RNSVG:
@@ -1068,9 +1076,11 @@ SPEC CHECKSUMS:
   RNLocalize: 0df7970cfc60389f00eb62fd7c097dc75af3fb4f
   RNNotifee: 5155e0a5e0a97d0c839030d8192783cd63053999
   RNScreens: f3230dd008a7d0ce5c0a8bc78ff12cf2315bda24
+  RNSentry: acebe4104a6f5915ae871eb59dc73f13dcc92ef7
   RNSpringScrollView: e354167d96f2c3d2f20b186990b2c3946987cb3c
   RNSVG: 1869ad9534459f24caaa0416a4764548c2aeedad
   RNVectorIcons: fcc2f6cb32f5735b586e66d14103a74ce6ad61f8
+  Sentry: 4c9babff9034785067c896fd580b1f7de44da020
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
   Yoga: 0b84a956f7393ef1f37f3bb213c516184e4a689d
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a

@@ -1,10 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import BackHeader from 'components/BackHeader';
 import CustomSvg from 'components/CustomSvg';
 import MenuItem from 'components/MenuItem';
-import SetPin from './components/SetPin';
 import './index.less';
 
 interface MenuItemInfo {
@@ -15,18 +14,23 @@ interface MenuItemInfo {
 export default function AccountSetting() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [pinOpen, setPinOpen] = useState<boolean>(false);
 
   const MenuList: MenuItemInfo[] = useMemo(
     () => [
       {
         label: t('Change Pin'),
         click: () => {
-          setPinOpen(true);
+          navigate('/setting/account-setting/set-pin');
+        },
+      },
+      {
+        label: t('Devices'),
+        click: () => {
+          navigate('/setting/account-setting/device');
         },
       },
     ],
-    [t],
+    [navigate, t],
   );
 
   return (
@@ -34,6 +38,9 @@ export default function AccountSetting() {
       <div className="account-setting-title">
         <BackHeader
           title={t('Account Setting')}
+          leftCallBack={() => {
+            navigate('/setting');
+          }}
           rightElement={
             <CustomSvg
               type="Close2"
@@ -51,12 +58,6 @@ export default function AccountSetting() {
           </MenuItem>
         ))}
       </div>
-      <SetPin
-        open={pinOpen}
-        close={() => {
-          setPinOpen(false);
-        }}
-      />
     </div>
   );
 }

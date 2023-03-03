@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, Image } from 'react-native';
 import AElf from 'aelf-sdk';
-import { setCAInfoType } from '@portkey/store/store-ca/wallet/actions';
+import { setCAInfoType } from '@portkey-wallet/store/store-ca/wallet/actions';
 import { BGStyles, FontStyles } from 'assets/theme/styles';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { useAppDispatch } from 'store/hooks';
@@ -12,24 +12,28 @@ import Touchable from 'components/Touchable';
 import GStyles from 'assets/theme/GStyles';
 import { TextL, TextM, TextXXXL } from 'components/CommonText';
 import { LoginType } from '..';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
-import { WalletInfoType } from '@portkey/types/wallet';
-import { useCredentials } from 'hooks/store';
-import { useIntervalQueryCAInfoByAddress } from '@portkey/hooks/hooks-ca/graphql';
+import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { WalletInfoType } from '@portkey-wallet/types/wallet';
+import { usePin } from 'hooks/store';
+import { useIntervalQueryCAInfoByAddress } from '@portkey-wallet/hooks/hooks-ca/graphql';
 import CommonToast from 'components/CommonToast';
-import { handleWalletInfo } from '@portkey/utils/wallet';
-import { LoginQRData } from '@portkey/types/types-ca/qrcode';
+import { handleWalletInfo } from '@portkey-wallet/utils/wallet';
+import { LoginQRData } from '@portkey-wallet/types/types-ca/qrcode';
 import phone from 'assets/image/pngs/phone.png';
 import QRCode from 'react-native-qrcode-svg';
+import { useIsFocused } from '@react-navigation/native';
+import { DEVICE_TYPE } from 'constants/common';
 
 export default function LoginQRCode({ setLoginType }: { setLoginType: (type: LoginType) => void }) {
   const { walletInfo, currentNetwork } = useCurrentWallet();
   const [newWallet, setNewWallet] = useState<WalletInfoType>();
   const dispatch = useAppDispatch();
-  const { pin } = useCredentials() || {};
+  const pin = usePin();
   const caInfo = useIntervalQueryCAInfoByAddress(currentNetwork, newWallet?.address);
+  const isFocused = useIsFocused();
   useEffect(() => {
-    if (caInfo) {
+    if (!isFocused) return;
+    if (caInfo && newWallet) {
       if (pin) {
         try {
           dispatch(setCAInfoType({ caInfo, pin }));
@@ -44,9 +48,11 @@ export default function LoginQRCode({ setLoginType }: { setLoginType: (type: Log
           managerInfo: caInfo.managerInfo,
         });
       }
+      setNewWallet(undefined);
     }
-  }, [caInfo, dispatch, newWallet, pin, walletInfo]);
-  const generateKeystore = useCallback(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [caInfo, dispatch, isFocused, newWallet]);
+  const generateWallet = useCallback(() => {
     try {
       const wallet = walletInfo?.address ? walletInfo : AElf.wallet.createNewWallet();
       setNewWallet(wallet);
@@ -56,7 +62,7 @@ export default function LoginQRCode({ setLoginType }: { setLoginType: (type: Log
   }, [walletInfo]);
   useEffectOnce(() => {
     const timer = setTimeout(() => {
-      generateKeystore();
+      generateWallet();
     }, 10);
     let timer2: any;
     myEvents.clearQRWallet.addListener(() => {
@@ -64,7 +70,7 @@ export default function LoginQRCode({ setLoginType }: { setLoginType: (type: Log
         setNewWallet(undefined);
         timer2 && clearTimeout(timer2);
         timer2 = setTimeout(() => {
-          generateKeystore();
+          generateWallet();
         }, 200);
       }, 500);
     });
@@ -81,6 +87,7 @@ export default function LoginQRCode({ setLoginType }: { setLoginType: (type: Log
       type: 'login',
       address: newWallet.address,
       netWorkType: currentNetwork,
+      deviceType: DEVICE_TYPE,
     };
     return JSON.stringify(data);
   }, [currentNetwork, newWallet]);

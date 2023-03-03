@@ -4,13 +4,13 @@ import {
   SerializableStateInvariantMiddlewareOptions,
 } from '@reduxjs/toolkit';
 import { FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE } from 'redux-persist';
-import { walletSlice } from '@portkey/store/wallet/slice';
-import { contactSlice } from '@portkey/store/store-ca/contact/slice';
-import { addressBookSlice } from '@portkey/store/addressBook/slice';
-import chainSlice from '@portkey/store/network/slice';
-import { tokenBalanceSlice } from '@portkey/store/tokenBalance/slice';
-import settingsSlice from '@portkey/store/settings/slice';
-import recentSlice from '@portkey/store/store-ca/recent/slice';
+import { walletSlice } from '@portkey-wallet/store/wallet/slice';
+import { contactSlice } from '@portkey-wallet/store/store-ca/contact/slice';
+import chainSlice from '@portkey-wallet/store/network/slice';
+import { tokenBalanceSlice } from '@portkey-wallet/store/tokenBalance/slice';
+import settingsSlice from '@portkey-wallet/store/settings/slice';
+import recentSlice from '@portkey-wallet/store/store-ca/recent/slice';
+import activitySlice from '@portkey-wallet/store/store-ca/activity/slice';
 
 interface ThunkOptions<E = any> {
   extraArgument: E;
@@ -31,13 +31,13 @@ const reduxPersistConfig = {
   // Optionally, just specify the keys you DO want stored to persistence.
   // An empty array means 'don't store any reducers' -> infinite-red/ignite#409
   whitelist: [
-    addressBookSlice.name,
     walletSlice.name,
     contactSlice.name,
     tokenBalanceSlice.name,
     settingsSlice.name,
     chainSlice.name,
     recentSlice.name,
+    activitySlice.name,
   ],
 
   // More info here:  https://shift.infinite.red/shipping-persistant-reducers-7341691232b1

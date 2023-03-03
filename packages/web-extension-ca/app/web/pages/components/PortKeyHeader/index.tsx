@@ -3,6 +3,7 @@ import { useAppDispatch, useCommonState, useWalletInfo } from 'store/Provider/ho
 import CustomSvg from 'components/CustomSvg';
 import svgsList from 'assets/svgs';
 import './index.less';
+import { fetchChainListAsync } from '@portkey-wallet/store/network/actions';
 
 export type WalletAvatar = keyof typeof svgsList;
 
@@ -19,7 +20,7 @@ const PortKeyHeader = forwardRef(({ onUserClick, customLogoShow = true }: PortKe
 
   useEffect(() => {
     try {
-      // dispatch(fetchChainListAsync());
+      dispatch(fetchChainListAsync());
     } catch (error) {
       console.log(error);
     }
