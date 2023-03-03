@@ -40,7 +40,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomColor: defaultColors.border6,
-    borderBottomWidth: pTd(1),
+    borderBottomWidth: StyleSheet.hairlineWidth,
     ...GStyles.paddingArg(0, 20),
   },
   itemAvatar: {
@@ -51,7 +51,7 @@ export const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: pTd(1),
+    borderWidth: StyleSheet.hairlineWidth,
   },
   itemNameWrap: {
     flex: 1,
