@@ -28,12 +28,10 @@ export const useGetHolderInfoByViewContract = () => {
 export const useGetHolderInfo = () => {
   return useCallback(async (loginInfo: LoginInfo, _chainInfo?: ChainItemType) => {
     if (!loginInfo) throw new Error('Could not find accountInfo');
-    if (loginInfo.guardianIdentifier) {
-      const req = await request.wallet.guardianIdentifiers({
-        params: { chainId: DefaultChainId, ...loginInfo },
-      });
-      return { ...req, guardianList: { guardians: req.guardianList } };
-    }
+    const req = await request.wallet.guardianIdentifiers({
+      params: { chainId: DefaultChainId, ...loginInfo },
+    });
+    return { ...req, guardianList: { guardians: req.guardianList } };
   }, []);
 };
 
