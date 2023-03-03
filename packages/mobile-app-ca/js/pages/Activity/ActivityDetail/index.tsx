@@ -1,11 +1,10 @@
 import { TransactionTypes, transactionTypesMap } from '@portkey/constants/constants-ca/activity';
 import { ZERO } from '@portkey/constants/misc';
-import { TransactionStatus } from '@portkey/graphql/contract/__generated__/types';
 import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
 import { useCaAddresses, useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import useRouterParams from '@portkey/hooks/useRouterParams';
 import { fetchActivity } from '@portkey/store/store-ca/activity/api';
-import { ActivityItemType } from '@portkey/types/types-ca/activity';
+import { ActivityItemType, TransactionStatus } from '@portkey/types/types-ca/activity';
 import { getExploreLink } from '@portkey/utils';
 import { unitConverter } from '@portkey/utils/converter';
 import { Image } from '@rneui/base';

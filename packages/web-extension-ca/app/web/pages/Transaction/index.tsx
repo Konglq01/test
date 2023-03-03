@@ -1,8 +1,7 @@
 import { TransactionTypes, transactionTypesMap } from '@portkey/constants/constants-ca/activity';
-import { TransactionStatus } from '@portkey/graphql/contract/__generated__/types';
 import { useCaAddresses, useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
 import { fetchActivity } from '@portkey/store/store-ca/activity/api';
-import { ActivityItemType } from '@portkey/types/types-ca/activity';
+import { ActivityItemType, TransactionStatus } from '@portkey/types/types-ca/activity';
 import { Transaction } from '@portkey/types/types-ca/trade';
 import { getExploreLink } from '@portkey/utils';
 import { AmountSign, formatAmount, transNetworkText } from '@portkey/utils/activity';
@@ -10,7 +9,6 @@ import { formatStr2EllipsisStr } from '@portkey/utils/converter';
 import clsx from 'clsx';
 import Copy from 'components/Copy';
 import CustomSvg from 'components/CustomSvg';
-import { useCurrentNetwork } from '@portkey/hooks/network';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';

@@ -49,3 +49,13 @@ export type the2ThFailedActivityItemType = {
     memo?: string;
   };
 };
+
+export enum TransactionStatus {
+  Conflict = 'CONFLICT',
+  Failed = 'FAILED',
+  Mined = 'MINED',
+  NodeValidationFailed = 'NODE_VALIDATION_FAILED',
+  NotExisted = 'NOT_EXISTED',
+  Pending = 'PENDING',
+  PendingValidation = 'PENDING_VALIDATION',
+}
