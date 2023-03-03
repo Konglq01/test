@@ -132,7 +132,7 @@ export const styles = StyleSheet.create({
     height: pTd(28),
     lineHeight: pTd(28),
     borderColor: defaultColors.border1,
-    borderWidth: pTd(1),
+    borderWidth: StyleSheet.hairlineWidth,
     borderRadius: pTd(14),
     textAlign: 'center',
   },
@@ -145,7 +145,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     position: 'relative',
     borderBottomColor: defaultColors.border6,
-    borderBottomWidth: pTd(0.5),
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   containerStyle: {
     width: '100%',

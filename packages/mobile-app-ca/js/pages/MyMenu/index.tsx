@@ -76,7 +76,7 @@ const useStyles = makeStyles(theme => {
       borderColor: theme.colors.bg6,
     },
     sortMnemonicItem: {
-      borderWidth: pTd(1),
+      borderWidth: StyleSheet.hairlineWidth,
       borderColor: theme.colors.border1,
     },
   };

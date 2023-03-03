@@ -421,7 +421,7 @@ export const styles = StyleSheet.create({
   },
   borderTop: {
     borderTopColor: defaultColors.border6,
-    borderTopWidth: pTd(0.5),
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
   title: {
     flex: 1,
@@ -466,7 +466,7 @@ export const styles = StyleSheet.create({
   divider: {
     marginTop: pTd(24),
     width: '100%',
-    height: pTd(0.5),
+    height: StyleSheet.hairlineWidth,
     backgroundColor: defaultColors.border6,
   },
   titles2: {
@@ -478,7 +478,7 @@ export const styles = StyleSheet.create({
   card: {
     marginTop: pTd(40),
     borderRadius: pTd(6),
-    borderWidth: pTd(0.5),
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: defaultColors.border1,
     width: '100%',
   },

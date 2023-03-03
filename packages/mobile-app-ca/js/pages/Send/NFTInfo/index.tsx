@@ -86,7 +86,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     position: 'relative',
     borderBottomColor: defaultColors.border6,
-    borderBottomWidth: pTd(0.5),
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   containerStyle: {
     width: '100%',

@@ -350,7 +350,7 @@ export const styles = StyleSheet.create({
   divider: {
     marginTop: pTd(24),
     width: '100%',
-    height: pTd(1),
+    height: StyleSheet.hairlineWidth,
     backgroundColor: defaultColors.border1,
   },
   titles2: {
@@ -362,7 +362,7 @@ export const styles = StyleSheet.create({
   card: {
     marginTop: pTd(24),
     borderRadius: pTd(6),
-    borderWidth: pTd(0.5),
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: defaultColors.border1,
     width: '100%',
   },

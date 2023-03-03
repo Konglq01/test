@@ -49,7 +49,7 @@ export const styles = StyleSheet.create({
     paddingTop: pTd(14),
     paddingBottom: pTd(7),
     alignItems: 'center',
-    borderBottomWidth: pTd(1),
+    borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: defaultColors.border6,
   },
   headerIcon: {
