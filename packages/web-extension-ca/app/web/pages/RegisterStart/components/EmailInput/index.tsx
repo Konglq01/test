@@ -40,8 +40,7 @@ const EmailInput = forwardRef(
               guardianIdentifier: email as string,
             },
           });
-          console.log(checkResult, 'checkResult===GetHolderInfo');
-          if (checkResult.guardianList.guardians?.length > 0) {
+          if (checkResult.guardianList?.guardians?.length > 0) {
             isHasAccount = true;
           }
         } catch (error: any) {
