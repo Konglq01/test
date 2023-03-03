@@ -21,7 +21,7 @@ export type LoginGuardianChangeRecordInfoQuery = {
     loginGuardian?: {
       __typename?: 'GuardianDto';
       type: number;
-      verifier?: string | null;
+      verifierId?: string | null;
       identifierHash?: string | null;
       salt?: string | null;
       isLoginGuardian: boolean;
@@ -41,7 +41,7 @@ export const LoginGuardianChangeRecordInfoDocument = gql`
       manager
       loginGuardian {
         type
-        verifier
+        verifierId
         identifierHash
         salt
         isLoginGuardian
