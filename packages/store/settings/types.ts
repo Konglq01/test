@@ -6,7 +6,7 @@ export enum LockingTimeType {
   '60s' = 60,
   '5min' = 300,
   '10min' = 600,
-  'never' = Infinity,
+  'never' = 86400,
 }
 
 export type SettingsState = {

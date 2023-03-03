@@ -1,21 +1,21 @@
-import { PIN_SIZE } from '@portkey/constants/misc';
+import { PIN_SIZE } from '@portkey-wallet/constants/misc';
 import PageContainer from 'components/PageContainer';
 import { DigitInputInterface } from 'components/DigitInput';
-import useRouterParams from '@portkey/hooks/useRouterParams';
+import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
 import React, { useCallback, useRef, useState } from 'react';
 import navigationService from 'utils/navigationService';
 import { useAppDispatch } from 'store/hooks';
-import { changePin, createWallet } from '@portkey/store/store-ca/wallet/actions';
+import { changePin, createWallet } from '@portkey-wallet/store/store-ca/wallet/actions';
 import CommonToast from 'components/CommonToast';
 import { setCredentials } from 'store/user/actions';
 import { useUser } from 'hooks/store';
-import { setSecureStoreItem } from '@portkey/utils/mobile/biometric';
-import { CAInfoType, ManagerInfo } from '@portkey/types/types-ca/wallet';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { setSecureStoreItem } from '@portkey-wallet/utils/mobile/biometric';
+import { CAInfoType, ManagerInfo } from '@portkey-wallet/types/types-ca/wallet';
+import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { useOnManagerAddressAndQueryResult } from 'hooks/login';
 import myEvents from 'utils/deviceEvent';
-import { AElfWallet } from '@portkey/types/aelf';
-import { VerificationType, VerifierInfo } from '@portkey/types/verifier';
+import { AElfWallet } from '@portkey-wallet/types/aelf';
+import { VerificationType, VerifierInfo } from '@portkey-wallet/types/verifier';
 import useBiometricsReady from 'hooks/useBiometrics';
 import PinContainer from 'components/PinContainer';
 import { GuardiansApproved } from 'pages/Guardian/types';
@@ -68,8 +68,8 @@ export default function ConfirmPin() {
   const onFinish = useCallback(
     async (confirmPin: string) => {
       if (managerInfo?.verificationType === VerificationType.addManager) {
-        dispatch(setCredentials({ pin: confirmPin }));
         dispatch(createWallet({ walletInfo: paramsWalletInfo, caInfo, pin: confirmPin }));
+        dispatch(setCredentials({ pin: confirmPin }));
         if (biometricsReady) {
           navigationService.navigate('SetBiometrics', { pin: confirmPin });
         } else {
@@ -125,7 +125,13 @@ export default function ConfirmPin() {
         myEvents.clearSetPin.emit('clearSetPin');
         navigationService.goBack();
       }}>
-      <PinContainer ref={pinRef} title="Confirm Pin" errorMessage={errorMessage} onChangeText={onChangeText} />
+      <PinContainer
+        showHeader
+        ref={pinRef}
+        title="Confirm Pin"
+        errorMessage={errorMessage}
+        onChangeText={onChangeText}
+      />
     </PageContainer>
   );
 }

@@ -7,118 +7,63 @@ import CustomTokenDrawer from 'pages/components/CustomTokenDrawer';
 import { useTranslation } from 'react-i18next';
 import TokenList from '../Tokens';
 import Activity from '../Activity/index';
-import { Transaction } from '@portkey/types/types-ca/trade';
-import { TokenBaseItemType } from '@portkey/types/types-ca/assets';
-import { MINUTE } from '@portkey/constants';
-import { useEffectOnce } from 'react-use';
+import { Transaction } from '@portkey-wallet/types/types-ca/trade';
 import NFT from '../NFT/NFT';
-import { unitConverter } from '@portkey/utils/converter';
-import { useWalletInfo } from 'store/Provider/hooks';
+import { unitConverter } from '@portkey-wallet/utils/converter';
+import { useAppDispatch, useUserInfo, useWalletInfo, useAssetInfo } from 'store/Provider/hooks';
+import { useCaAddresses, useChainIdList } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { fetchTokenListAsync } from '@portkey-wallet/store/store-ca/assets/slice';
+import { fetchAllTokenListAsync, getSymbolImagesAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
+import { getWalletNameAsync } from '@portkey-wallet/store/store-ca/wallet/actions';
 
 export interface TransactionResult {
   total: number;
   items: Transaction[];
 }
 
-let timer: any;
-
-const mockData: { items: TokenBaseItemType[]; totalCount: number } = {
-  items: [
-    {
-      chainId: 'AELF',
-      token: {
-        id: Math.random().toString(),
-        chainId: 'AELF',
-        symbol: 'ELF',
-        address: 'xxxxxx',
-      },
-      amount: 10,
-      amountUsd: 1000,
-    },
-    {
-      chainId: 'AELF',
-      token: {
-        id: Math.random().toString(),
-        chainId: 'AELF',
-        symbol: 'CPU',
-        address: 'xxxxxx',
-      },
-      amount: 10,
-      amountUsd: 1000,
-    },
-    {
-      chainId: 'AELF',
-      token: {
-        id: Math.random().toString(),
-        chainId: 'AELF',
-        symbol: 'RAM',
-        address: 'xxxxxx',
-      },
-      amount: 10,
-      amountUsd: 1000,
-    },
-  ],
-  totalCount: 5,
-};
+// let timer: any;
 
 export default function MyBalance() {
   const { walletName, currentNetwork } = useWalletInfo();
   const { t } = useTranslation();
-  const [balanceUSD, setBalanceUSD] = useState<string | number>('--');
   const [activeKey, setActiveKey] = useState<string>('assets');
-  const [navTarget, setNavTarget] = useState<'send' | 'receive'>();
+  const [navTarget, setNavTarget] = useState<'send' | 'receive'>('send');
   const [tokenOpen, setTokenOpen] = useState(false);
-  const [tokenList, setTokenList] = useState<any[]>([]);
+  const {
+    accountToken: { accountTokenList },
+    accountBalance,
+  } = useAssetInfo();
   const navigate = useNavigate();
+  const { passwordSeed } = useUserInfo();
+  const appDispatch = useAppDispatch();
+  const caAddresses = useCaAddresses();
+  const chainIdArray = useChainIdList();
+  const isMain = useMemo(() => currentNetwork === 'MAIN', [currentNetwork]);
 
-  const [tokenNum, setTokenNumber] = useState(0);
+  useEffect(() => {
+    console.log('---passwordSeed-myBalance---', passwordSeed);
+    if (!passwordSeed) return;
+    appDispatch(fetchTokenListAsync({ caAddresses }));
+    appDispatch(fetchAllTokenListAsync({ keyword: '', chainIdArray }));
+    appDispatch(getWalletNameAsync());
+    appDispatch(getSymbolImagesAsync());
+  }, [passwordSeed, appDispatch, caAddresses, chainIdArray]);
 
-  const [refreshing, setRefreshing] = useState(false);
-
-  // TODO Waiting for interface
-  const getAccountTokenList = useCallback(() => {
-    const timer: any = setTimeout(() => {
-      setTokenList(mockData?.items ?? []);
-      setTokenNumber(mockData?.totalCount ?? 0);
-      setRefreshing(false);
-      return clearTimeout(timer);
-    }, 1000);
-  }, []);
-
-  useEffectOnce(() => {
-    getAccountTokenList();
-  });
-  // get account balance
-  const getAccountBalance = useCallback(async () => {
-    //TODO fetchBalance
-    const fetchBalance = (): Promise<number | string> =>
-      new Promise((resolve) => {
-        setTimeout(() => {
-          return resolve('100.00');
-        }, 1000);
-      });
-    const result = await fetchBalance();
-    setBalanceUSD(result);
-  }, []);
-
-  // get account Balance
-  const initAccountBalance = useCallback(() => {
-    if (timer) clearInterval(timer);
-    getAccountBalance();
-    timer = setInterval(() => {
-      getAccountBalance();
-    }, 6 * MINUTE);
-  }, [getAccountBalance]);
-
-  useEffectOnce(() => {
-    initAccountBalance();
-  });
-
-  useEffect(() => () => clearInterval(timer), []);
+  // useEffect(() => {
+  //   console.log('accountTokenList', accountTokenList, timer);
+  //   if (accountTokenList.length > 0) return clearInterval(timer);
+  //   if (timer) clearInterval(timer);
+  //   timer = setInterval(() => {
+  //     if (accountTokenList.length > 0) return clearInterval(timer);
+  //     appDispatch(fetchTokenListAsync({ caAddresses }));
+  //   }, 1000);
+  //   return () => clearInterval(timer);
+  // }, [accountTokenList, appDispatch, caAddresses, passwordSeed]);
 
   const SelectTokenELe = useMemo(() => {
     return (
       <CustomTokenDrawer
+        drawerType={navTarget}
         open={tokenOpen}
         title={navTarget === 'receive' ? 'Select Token' : 'Select Assets'}
         searchPlaceHolder={navTarget === 'receive' ? 'Search Token' : 'Search Assets'}
@@ -126,14 +71,19 @@ export default function MyBalance() {
         maskClosable={true}
         placement="bottom"
         onClose={() => setTokenOpen(false)}
-        onChange={(v) => {
+        onChange={(v, type) => {
           setTokenOpen(false);
-          // navigate(`/${navTarget}/${v.token.symbol}`);
-          if (navTarget === 'receive') {
-            navigate(`/${navTarget}/${v.symbol}/${v.chainId}`);
-          } else {
-            navigate(`/${navTarget}/${v.symbol}`);
-          }
+          const state = {
+            chainId: v.chainId,
+            decimals: type === 'nft' ? 0 : v.tokenInfo?.decimals,
+            address: type === 'nft' ? v?.nftInfo?.tokenContractAddress : v?.tokenInfo?.tokenContractAddress,
+            symbol: v.symbol,
+            name: v.symbol,
+            imageUrl: type === 'nft' ? v.nftInfo?.imageUrl : '',
+            alias: type === 'nft' ? v.nftInfo?.alias : '',
+            tokenId: type === 'nft' ? v.nftInfo?.tokenId : '',
+          };
+          navigate(`/${navTarget}/${type}/${v.symbol}/${v.chainId}`, { state });
         }}
       />
     );
@@ -147,27 +97,21 @@ export default function MyBalance() {
     <div className="balance">
       <div className="wallet-name">{walletName}</div>
       <div className="balance-amount">
-        {currentNetwork === 'MAIN' ? (
-          <span className="amount">$ {unitConverter(balanceUSD)}</span>
+        {isMain ? (
+          <span className="amount">$ {unitConverter(accountBalance)}</span>
         ) : (
           <span className="dev-mode amount">Dev Mode</span>
         )}
       </div>
       <BalanceCard
-        amount={balanceUSD}
+        amount={accountBalance}
         onSend={() => {
-          if (tokenList.length > 1) {
-            setNavTarget('send');
-            return setTokenOpen(true);
-          }
-          navigate(`/send/${'ELF'}`);
+          setNavTarget('send');
+          return setTokenOpen(true);
         }}
         onReceive={() => {
-          if (tokenList.length > 1) {
-            setNavTarget('receive');
-            return setTokenOpen(true);
-          }
-          navigate('/receive');
+          setNavTarget('receive');
+          return setTokenOpen(true);
         }}
       />
       {SelectTokenELe}
@@ -179,7 +123,7 @@ export default function MyBalance() {
           {
             label: t('Tokens'),
             key: 'tokens',
-            children: <TokenList tokenList={tokenList} />,
+            children: <TokenList tokenList={accountTokenList} />,
           },
           {
             label: t('NFTs'),
@@ -189,7 +133,7 @@ export default function MyBalance() {
           {
             label: t('Activity'),
             key: 'activity',
-            children: <Activity rate={undefined} loading={false} />,
+            children: <Activity />,
           },
         ]}
       />

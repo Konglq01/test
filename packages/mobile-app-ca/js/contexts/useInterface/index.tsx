@@ -1,6 +1,6 @@
-import { useCurrentNetwork } from '@portkey/hooks/network';
-import { ChainId } from '@portkey/types';
-import { getAelfInstance } from '@portkey/utils/aelf';
+import { useCurrentNetwork } from '@portkey-wallet/hooks/network';
+import { ChainId } from '@portkey-wallet/types';
+import { getAelfInstance } from '@portkey-wallet/utils/aelf';
 import usePrevious from 'hooks/usePrevious';
 import React, { createContext, useContext, useEffect, useMemo, useReducer } from 'react';
 import { InterfaceActions, setCurrentInterface } from './actions';

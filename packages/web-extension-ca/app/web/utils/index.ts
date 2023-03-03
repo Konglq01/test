@@ -18,7 +18,11 @@ export const formatToAddress = (address: string) => {
 };
 
 export const dateFormat = (ipt?: moment.MomentInput) => {
-  return moment(ipt).format('MMM D , h:mm a').replace(',', 'at');
+  let time = String(ipt);
+  while (time.length < 13) {
+    time = time + '0';
+  }
+  return moment(Number(time)).format('MMM D , h:mm a').replace(',', 'at');
 };
 
 /**

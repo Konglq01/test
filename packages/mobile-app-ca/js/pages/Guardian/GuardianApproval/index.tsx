@@ -1,31 +1,31 @@
 import { TextM, TextXXXL } from 'components/CommonText';
 import PageContainer from 'components/PageContainer';
-import useRouterParams from '@portkey/hooks/useRouterParams';
+import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
 import { useLanguage } from 'i18n/hooks';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { GUARDIAN_EXPIRED_TIME, VERIFIER_EXPIRATION } from '@portkey/constants/misc';
+import { GUARDIAN_EXPIRED_TIME, VERIFIER_EXPIRATION } from '@portkey-wallet/constants/misc';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import GStyles from 'assets/theme/GStyles';
 import CommonButton from 'components/CommonButton';
 import { BorderStyles, FontStyles } from 'assets/theme/styles';
 import Svg from 'components/Svg';
 import { pTd } from 'utils/unit';
-import { getApprovalCount } from '@portkey/utils/guardian';
-import { ApprovalType, VerificationType, VerifierInfo, VerifyStatus } from '@portkey/types/verifier';
+import { getApprovalCount } from '@portkey-wallet/utils/guardian';
+import { ApprovalType, VerificationType, VerifierInfo, VerifyStatus } from '@portkey-wallet/types/verifier';
 import GuardianItem from '../components/GuardianItem';
 import useEffectOnce from 'hooks/useEffectOnce';
-import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
+import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type';
 import navigationService from 'utils/navigationService';
-import { LoginType, ManagerInfo } from '@portkey/types/types-ca/wallet';
+import { LoginType, ManagerInfo } from '@portkey-wallet/types/types-ca/wallet';
 import Touchable from 'components/Touchable';
 import ActionSheet from 'components/ActionSheet';
 import myEvents from 'utils/deviceEvent';
 import Loading from 'components/Loading';
 import { useGuardiansInfo } from 'hooks/store';
-import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import CommonToast from 'components/CommonToast';
 import { useAppDispatch } from 'store/hooks';
-import { setPreGuardianAction } from '@portkey/store/store-ca/guardians/actions';
+import { setPreGuardianAction } from '@portkey-wallet/store/store-ca/guardians/actions';
 import { addGuardian, deleteGuardian, editGuardian } from 'utils/guardian';
 import { useGetCurrentCAContract } from 'hooks/contract';
 import { GuardiansStatus, GuardiansStatusItem } from '../types';
@@ -37,6 +37,7 @@ type RouterParams = {
   approvalType: ApprovalType;
   guardianItem?: UserGuardianItem;
   verifierInfo?: VerifierInfo;
+  verifiedTime?: number;
 };
 export default function GuardianApproval() {
   const {
@@ -45,6 +46,7 @@ export default function GuardianApproval() {
     approvalType = ApprovalType.register,
     guardianItem,
     verifierInfo,
+    verifiedTime,
   } = useRouterParams<RouterParams>();
   const dispatch = useAppDispatch();
 
@@ -103,6 +105,7 @@ export default function GuardianApproval() {
     const expiredTimer = setInterval(() => {
       if (guardianExpiredTime.current && new Date().getTime() > guardianExpiredTime.current) setIsExpired(true);
     }, 1000);
+    if (verifiedTime) guardianExpiredTime.current = verifiedTime + GUARDIAN_EXPIRED_TIME;
     return () => {
       listener.remove();
       expiredTimer && clearInterval(expiredTimer);
@@ -150,7 +153,7 @@ export default function GuardianApproval() {
         myEvents.refreshGuardiansList.emit();
         navigationService.navigate('GuardianHome');
       } else {
-        CommonToast.fail(req?.error.message);
+        CommonToast.fail(req?.error?.message || '');
       }
     } catch (error) {
       CommonToast.failError(error);
@@ -175,7 +178,7 @@ export default function GuardianApproval() {
         myEvents.refreshGuardiansList.emit();
         navigationService.navigate('GuardianHome');
       } else {
-        CommonToast.fail(req?.error.message);
+        CommonToast.fail(req?.error?.message || '');
       }
     } catch (error) {
       CommonToast.failError(error);
@@ -202,7 +205,7 @@ export default function GuardianApproval() {
         myEvents.refreshGuardiansList.emit();
         navigationService.navigate('GuardianHome');
       } else {
-        CommonToast.fail(req?.error.message);
+        CommonToast.fail(req?.error?.message || '');
       }
     } catch (error) {
       CommonToast.failError(error);
@@ -290,14 +293,7 @@ export default function GuardianApproval() {
           </View>
         </View>
       </View>
-      {!isExpired && (
-        <CommonButton
-          onPress={onFinish}
-          disabled={!isSuccess}
-          type="primary"
-          title={isGuardianOpt ? 'Confirm' : 'Recover wallet'}
-        />
-      )}
+      {!isExpired && <CommonButton onPress={onFinish} disabled={!isSuccess} type="primary" title={'Confirm'} />}
     </PageContainer>
   );
 }

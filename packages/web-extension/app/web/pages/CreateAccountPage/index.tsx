@@ -1,5 +1,5 @@
-import { WalletError } from '@portkey/store/wallet/type';
-import { isWalletError } from '@portkey/store/wallet/utils';
+import { WalletError } from '@portkey-wallet/store/wallet/type';
+import { isWalletError } from '@portkey-wallet/store/wallet/utils';
 import { Button, message, Modal } from 'antd';
 import CustomSvg from 'components/CustomSvg';
 import BasicCreateAccount from 'pages/components/BasicCreateAccount';

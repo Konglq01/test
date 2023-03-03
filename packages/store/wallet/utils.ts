@@ -1,9 +1,9 @@
-import { AccountType, CreateType, WalletInfoType } from '@portkey/types/wallet';
-import aes from '@portkey/utils/aes';
-import { isEqAddress } from '@portkey/utils/aelf';
+import { AccountType, CreateType, WalletInfoType } from '@portkey-wallet/types/wallet';
+import aes from '@portkey-wallet/utils/aes';
+import { isEqAddress } from '@portkey-wallet/utils/aelf';
 import { WalletError, WalletState } from './type';
-import { enumToMap } from '@portkey/utils';
-import { formatAccountInfo, getAccountByMnemonic } from '@portkey/utils/wallet';
+import { enumToMap } from '@portkey-wallet/utils';
+import { formatAccountInfo, getAccountByMnemonic } from '@portkey-wallet/utils/wallet';
 
 export function checkAccount(accountList: AccountType[], address: string) {
   return accountList.find(item => isEqAddress(item.address, address));

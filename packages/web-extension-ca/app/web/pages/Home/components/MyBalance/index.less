@@ -31,7 +31,7 @@
     .@{app-prefix}-tabs-nav {
       margin: 0;
       box-shadow: 0 2px 6px 0 @shadow-1;
-      z-index: 10;
+      z-index: 9;
       position: sticky;
       // top: 68px;
       background: white;
@@ -80,13 +80,15 @@
       cursor: pointer;
       display: flex;
       align-items: center;
-      padding: 24px 16px;
+      padding: 25px 16px 24px;
       border-bottom: 1px solid @border-2;
 
       .token-logo {
         margin-right: 16px;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
         &.custom-word-logo {
-          border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -158,10 +160,13 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    text-align: center;
     cursor: pointer;
 
     div.custom-svg {
       margin-right: 8px;
+      width: 20px;
+      height: 20px;
     }
   }
   .activity-wrapper {

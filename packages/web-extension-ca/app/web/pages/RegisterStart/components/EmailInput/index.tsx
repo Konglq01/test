@@ -4,10 +4,10 @@ import clsx from 'clsx';
 import './index.less';
 import { useTranslation } from 'react-i18next';
 import i18n from 'i18n';
-import { NetworkItem } from '@portkey/types/types-ca/network';
+import { NetworkItem } from '@portkey-wallet/types/types-ca/network';
 import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
-import { ChainItemType } from '@portkey/store/store-ca/wallet/type';
-import { checkEmail, EmailError } from '@portkey/utils/check';
+import { ChainItemType } from '@portkey-wallet/store/store-ca/wallet/type';
+import { checkEmail, EmailError } from '@portkey-wallet/utils/check';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
 interface EmailInputProps {
   currentNetwork: NetworkItem;
@@ -47,7 +47,7 @@ const EmailInput = forwardRef(
           }
         } catch (error: any) {
           console.log(error, 'validateEmail===');
-          if (error?.Error?.Details && error?.Error?.Details?.indexOf('Not found')) {
+          if (error?.message?.indexOf('Not found')) {
             isHasAccount = false;
           } else if (error?.Error?.Message === 'Invalid signature') {
             isHasAccount = false;

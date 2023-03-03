@@ -1,99 +1,212 @@
-import { Transaction } from '@portkey/types/types-ca/trade';
-import { DotLoading, InfiniteScroll, List } from 'antd-mobile';
+import { TransactionTypes, transactionTypesMap } from '@portkey-wallet/constants/constants-ca/activity';
+import { ActivityItemType, the2ThFailedActivityItemType } from '@portkey-wallet/types/types-ca/activity';
+import { formatStr2EllipsisStr } from '@portkey-wallet/utils/converter';
+import { List } from 'antd-mobile';
 import CustomSvg from 'components/CustomSvg';
-import moment from 'moment';
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
-import { useWalletInfo } from 'store/Provider/hooks';
 import './index.less';
+import LoadingMore from 'components/LoadingMore/LoadingMore';
+import { useIsTestnet } from 'hooks/useActivity';
+import { AmountSign, formatAmount, transNetworkText } from '@portkey-wallet/utils/activity';
+import { Button, Modal } from 'antd';
+import { useAppCASelector } from '@portkey-wallet/hooks/hooks-ca';
+import { dateFormat } from 'utils';
+import { useTranslation } from 'react-i18next';
+import { intervalCrossChainTransfer } from 'utils/sandboxUtil/crossChainTransfer';
+import { useAppDispatch, useLoading, useUserInfo } from 'store/Provider/hooks';
+import { removeFailedActivity } from '@portkey-wallet/store/store-ca/activity/slice';
+import { useCurrentChainList } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import aes from '@portkey-wallet/utils/aes';
 
-export default function ActivityList({
-  hasMore,
-  loadMore,
-}: {
+export interface IActivityListProps {
+  data?: ActivityItemType[];
+  chainId?: string;
   hasMore: boolean;
-  loadMore: (isRetry: boolean) => Promise<void>;
-}) {
-  const { currentNetwork } = useWalletInfo();
-  const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'TESTNET' : ''), [currentNetwork]);
+  loadMore: (isRetry?: boolean) => Promise<void>;
+}
+
+export default function ActivityList({ data, chainId, hasMore, loadMore }: IActivityListProps) {
+  const activity = useAppCASelector((state) => state.activity);
+  const isTestNet = useIsTestnet();
+  const { t } = useTranslation();
+  const { setLoading } = useLoading();
+  const dispatch = useAppDispatch();
+  const { passwordSeed } = useUserInfo();
+  const wallet = useCurrentWalletInfo();
+  const chainList = useCurrentChainList();
+
+  const activityListLeftIcon = (type: TransactionTypes) => {
+    const loginRelatedTypeArr = [
+      TransactionTypes.ADD_MANAGER,
+      TransactionTypes.REMOVE_MANAGER,
+      TransactionTypes.SOCIAL_RECOVERY,
+    ];
+    return loginRelatedTypeArr.includes(type) ? 'socialRecovery' : 'Transfer';
+  };
+
   const nav = useNavigate();
-  const data: Transaction[] = [
-    {
-      chainId: '123123',
-      token: { symbol: 'ELF', address: 'adasdasdaqea' },
-      method: 'Transfer',
-      from: '0xawe123eeafadafdawe',
-      to: '0xawe123eeafadafdawe',
-      transactionId: 'asdasdabkhk',
-      amount: '123',
-      timestamp: '1670660449961',
-      priceInUsd: '10',
+  console.log('activity', activity);
+  console.log('activity chainList', chainList);
+
+  const navToDetail = useCallback(
+    (item: ActivityItemType) => {
+      nav('/transaction', { state: { item, chainId } });
     },
-    {
-      chainId: '123123',
-      token: { symbol: 'ELF', address: 'adasdasdaqea' },
-      method: 'Transfer',
-      from: '0xawe123eeafadafdawe',
-      to: '0xawe123eeafadafdawe',
-      transactionId: 'asdasdabkhk',
-      amount: '123',
-      timestamp: '1670660449961',
-      priceInUsd: '10',
-    },
-  ];
-  const InfiniteScrollContent = ({ hasMore }: { hasMore?: boolean }) => {
+    [chainId, nav],
+  );
+
+  const amountOrIdUI = (item: ActivityItemType) => {
+    const { transactionType, isReceived, amount, symbol, nftInfo, decimals } = item;
+    const sign = isReceived ? AmountSign.PLUS : AmountSign.MINUS;
     return (
-      <>
-        {hasMore ? (
-          <>
-            <span>Loading</span>
-            <DotLoading />
-          </>
-        ) : (
-          <span>No Data</span>
-        )}
-      </>
+      <p className="row-1">
+        <span>{transactionTypesMap(transactionType, nftInfo?.nftId)}</span>
+        <span>
+          <span>
+            {nftInfo?.nftId && <span>#{nftInfo.nftId}</span>}
+            {!nftInfo?.nftId && <span>{`${formatAmount({ sign, amount, decimals, digits: 4 })} ${symbol ?? ''}`}</span>}
+          </span>
+        </span>
+      </p>
     );
   };
 
-  const navToDetail = useCallback(
-    (item: Transaction) => {
-      nav('/transaction', { state: { info: item } });
+  const fromAndUsdUI = useCallback(
+    (item: ActivityItemType) => {
+      const { fromAddress, priceInUsd, nftInfo } = item;
+      return (
+        <p className="row-2">
+          <span>From: {formatStr2EllipsisStr(fromAddress, [7, 4])}</span>
+          {nftInfo?.nftId && <span className="nft-name">{formatStr2EllipsisStr(nftInfo.alias)}</span>}
+          {!isTestNet && !nftInfo?.nftId && (
+            <span>$ {formatAmount({ amount: priceInUsd, decimals: 0, digits: 2 })}</span>
+          )}
+        </p>
+      );
     },
-    [nav],
+    [isTestNet],
+  );
+
+  const networkUI = useCallback(
+    (item: ActivityItemType) => {
+      /* Hidden during [SocialRecovery, AddManager, RemoveManager] */
+      const { transactionType, fromChainId, toChainId } = item;
+      const from = transNetworkText(fromChainId, isTestNet);
+      const to = transNetworkText(toChainId, isTestNet);
+      const hiddenArr = [
+        TransactionTypes.SOCIAL_RECOVERY,
+        TransactionTypes.ADD_MANAGER,
+        TransactionTypes.REMOVE_MANAGER,
+      ];
+
+      return !hiddenArr.includes(transactionType) && <p className="row-3">{`${from}->${to}`}</p>;
+    },
+    [isTestNet],
+  );
+
+  const showErrorModal = useCallback(
+    (error: the2ThFailedActivityItemType) => {
+      Modal.error({
+        width: 320,
+        className: 'transaction-modal',
+        okText: t('Resend'),
+        icon: null,
+        closable: false,
+        centered: true,
+        title: (
+          <div className="flex-column-center transaction-msg">
+            <CustomSvg type="warnRed" />
+            {t('Transaction failed ！')}
+          </div>
+        ),
+        onOk: () => {
+          console.log('retry modal addFailedActivity', error);
+          retryCrossChain(error);
+        },
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [t],
+  );
+
+  const retryCrossChain = useCallback(
+    async ({ transactionId, params }: the2ThFailedActivityItemType) => {
+      try {
+        //
+        const chainId = params.tokenInfo.chainId;
+        const chainInfo = chainList?.filter((chain) => chain.chainId === chainId)?.[0];
+        if (!chainInfo) return;
+        const privateKey = aes.decrypt(wallet.AESEncryptPrivateKey, passwordSeed);
+        if (!privateKey) return;
+        setLoading(true);
+        await intervalCrossChainTransfer({ ...params, chainInfo, privateKey });
+        dispatch(removeFailedActivity(transactionId));
+      } catch (error) {
+        console.log('retry addFailedActivity', error);
+        showErrorModal({ transactionId, params });
+      } finally {
+        setLoading(false);
+      }
+    },
+    [chainList, dispatch, passwordSeed, setLoading, showErrorModal, wallet.AESEncryptPrivateKey],
+  );
+
+  const handleResend = useCallback(
+    async (e: any, resendId: string) => {
+      e?.stopPropagation();
+      const data = activity.failedActivityMap[resendId];
+      await retryCrossChain(data);
+    },
+    [activity.failedActivityMap, retryCrossChain],
+  );
+
+  const resendUI = useCallback(
+    (item: ActivityItemType) => {
+      if (!activity.failedActivityMap[item.transactionId]) return;
+
+      return (
+        <div className="row-4">
+          <Button type="primary" className="resend-btn" onClick={(e) => handleResend(e, item.transactionId)}>
+            Resend
+          </Button>
+        </div>
+      );
+    },
+    [activity.failedActivityMap, handleResend],
   );
 
   return (
     <div className="activity-list">
       <List>
-        {data.map((item, index) => (
-          <List.Item key={`${item.transactionId}_${index}`}>
+        {data?.map((item, index) => (
+          <List.Item key={`activityList_${item.transactionId}_${index}`}>
             <div className="activity-item" onClick={() => navToDetail(item)}>
-              <div className="time">{moment(Number(item.timestamp)).format('MMM D [at] h:m a')}</div>
+              <div className="time">{dateFormat(Number(item.timestamp))}</div>
               <div className="info">
-                <CustomSvg type="Transfer" />
+                {!!item.listIcon && (
+                  <div
+                    className="custom-list-icon"
+                    style={{
+                      backgroundImage: `url(${item.listIcon})`,
+                    }}
+                  />
+                )}
+                {!item.listIcon && <CustomSvg type={activityListLeftIcon(item.transactionType)} />}
+
                 <div className="right">
-                  <p className="row-1">
-                    <span>{item.method}</span>
-                    <span>
-                      +{item.amount} {item.token.symbol}
-                    </span>
-                  </p>
-                  <p className="row-2">
-                    <span>From: {item.from.replace(/(?<=^\w{7})\w*(?=\w{4}$)/, '...')}</span>
-                    <span>${item.priceInUsd}</span>
-                  </p>
-                  {/* TODO Hidden during Social Recovery  */}
-                  {<p className="row-3">{`MainChain AELF ${isTestNet} -> MainChain AELF ${isTestNet}`}</p>}
+                  {amountOrIdUI(item)}
+                  {fromAndUsdUI(item)}
+                  {networkUI(item)}
+                  {resendUI(item)}
                 </div>
               </div>
             </div>
           </List.Item>
         ))}
       </List>
-      <InfiniteScroll loadMore={loadMore} hasMore={hasMore}>
-        <InfiniteScrollContent hasMore={hasMore} />
-      </InfiniteScroll>
+      <LoadingMore hasMore={hasMore} loadMore={loadMore} />
     </div>
   );
 }

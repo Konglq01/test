@@ -6,17 +6,18 @@ import { useTranslation } from 'react-i18next';
 import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import BackHeader from 'components/BackHeader';
 import CustomSvg from 'components/CustomSvg';
-import { useContact, useAppDispatch } from 'store/Provider/hooks';
-import { fetchContractListAsync } from '@portkey/store/store-ca/contact/actions';
-import { getAelfAddress } from '@portkey/utils/aelf';
-import { ContactIndexType, ContactItemType } from '@portkey/types/types-ca/contact';
+import { useContact } from '@portkey-wallet/hooks/hooks-ca/contact';
+import { useAppDispatch } from 'store/Provider/hooks';
+import { fetchContactListAsync } from '@portkey-wallet/store/store-ca/contact/actions';
+import { getAelfAddress, isAelfAddress } from '@portkey-wallet/utils/aelf';
+import { ContactIndexType, ContactItemType } from '@portkey-wallet/types/types-ca/contact';
 import { useEffectOnce } from 'react-use';
 import './index.less';
 
 const initContactItem: Partial<ContactItemType> = {
   id: '-1',
   name: '',
-  addresses: [{ id: '-1', chainType: 'MAIN', chainId: 'AELF', address: '' }],
+  addresses: [{ chainId: 'AELF', address: '' }],
 };
 
 export default function Contacts() {
@@ -26,41 +27,58 @@ export default function Contacts() {
   const { contactIndexList } = useContact();
   const [curList, setCurList] = useState<ContactIndexType[]>(contactIndexList);
   const [isSearch, setIsSearch] = useState<boolean>(false);
+  const filterContact = useMemo(() => contactIndexList.filter((c) => c.contacts.length > 0), [contactIndexList]);
 
   useEffectOnce(() => {
-    appDispatch(fetchContractListAsync());
+    appDispatch(fetchContactListAsync());
   });
 
   useEffect(() => {
-    setCurList(contactIndexList);
+    setCurList(filterContact);
     setIsSearch(false);
-  }, [contactIndexList]);
+  }, [filterContact]);
 
   const searchContacts = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       let value = e.target.value;
       if (!value) {
-        setCurList(contactIndexList);
+        setCurList(filterContact);
         setIsSearch(false);
         return;
       }
-      value = getAelfAddress(value);
       const contactIndexFilterList: ContactIndexType[] = [];
-      contactIndexList.forEach(({ index, contacts }) => {
-        contactIndexFilterList.push({
-          index,
-          contacts: contacts.filter(
-            (contact) =>
-              contact.name.toLowerCase() === value.toLowerCase() ||
-              contact.addresses.some((ads) => ads.address === value),
-          ),
-        });
-      });
 
+      if (value.length <= 16) {
+        // Name search
+        filterContact.forEach(({ index, contacts }) => {
+          contactIndexFilterList.push({
+            index,
+            contacts: contacts.filter((contact) => contact.name.trim().toLowerCase() === value.trim().toLowerCase()),
+          });
+        });
+      } else {
+        // Address search
+        let suffix = '';
+        if (value.includes('_')) {
+          const arr = value.split('_');
+          if (!isAelfAddress(arr[arr.length - 1])) {
+            suffix = arr[arr.length - 1];
+          }
+        }
+        value = getAelfAddress(value);
+        filterContact.forEach(({ index, contacts }) => {
+          contactIndexFilterList.push({
+            index,
+            contacts: contacts.filter((contact) =>
+              contact.addresses.some((ads) => ads.address === value && (!suffix || suffix === ads.chainId)),
+            ),
+          });
+        });
+      }
       setCurList(contactIndexFilterList);
       setIsSearch(true);
     },
-    [contactIndexList],
+    [filterContact],
   );
 
   const curTotalContactsNum = useMemo(() => {
@@ -76,20 +94,22 @@ export default function Contacts() {
             navigate('/setting');
           }}
           rightElement={
-            <div className="flex-center header-right-close">
-              <Button
-                onClick={() => {
-                  navigate('/setting/contacts/add', { state: initContactItem });
-                }}>
-                {t('Add contact')}
-              </Button>
-              <CustomSvg
-                type="Close2"
-                onClick={() => {
-                  navigate('/setting');
-                }}
-              />
-            </div>
+            (curTotalContactsNum !== 0 || (curTotalContactsNum === 0 && isSearch)) && (
+              <div className="flex-center header-right-close">
+                <Button
+                  onClick={() => {
+                    navigate('/setting/contacts/add', { state: initContactItem });
+                  }}>
+                  {t('Add contact')}
+                </Button>
+                <CustomSvg
+                  type="Close2"
+                  onClick={() => {
+                    navigate('/setting');
+                  }}
+                />
+              </div>
+            )
           }
         />
         <Input

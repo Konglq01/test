@@ -143,21 +143,18 @@
       padding: 7px 15px;
       .icon {
         margin-right: 8px;
-        .custom-svg,
+        img,
         .custom {
           width: 36px;
           height: 36px;
-          svg {
-            width: 36px;
-            height: 36px;
-          }
+          border-radius: 50%;
         }
         .custom {
           display: flex;
           justify-content: center;
           align-items: center;
           border: 1px solid @border-1;
-          border-radius: 50%;
+          background-color: @bg-13;
         }
       }
       .center {
@@ -197,6 +194,12 @@
         left: 48px;
         font-size: 24px;
         color: @font-12;
+        img {
+          width: 64px;
+          height: 64px;
+          border-radius: 6px;
+          object-fit: cover;
+        }
       }
       .info {
         flex: 1;
@@ -212,6 +215,14 @@
           font-size: 16px;
           font-weight: 500;
           color: @font-11;
+          .alias {
+            overflow: hidden;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 1;
+            text-overflow: ellipsis;
+            max-width: 217px;
+            white-space: nowrap;
+          }
           .token-id {
             font-weight: 400;
           }
@@ -263,6 +274,7 @@
         transform: translateY(-8px);
         line-height: 16px;
         font-size: 12px;
+        margin-top: 2px;
       }
     }
   }
@@ -297,6 +309,41 @@
       gap: 16px;
       button {
         width: 136px;
+        height: 48px;
+        border-radius: 24px;
+        margin: 0 !important;
+        line-height: 22px;
+        font-size: 16px;
+      }
+    }
+  }
+}
+
+.transaction-modal {
+  border-radius: 8px;
+  overflow: hidden;
+  .@{app-prefix}-modal-body {
+    padding: 0;
+    .@{app-prefix}-modal-confirm-title {
+      .warnred-icon {
+        width: 42px;
+        height: 42px;
+        margin-bottom: 24px;
+      }
+
+      padding: 24px;
+      margin: 0;
+      border-bottom: 1px solid @border-2;
+      text-align: center;
+      line-height: 22px;
+      font-size: 18px;
+      color: @font-13;
+    }
+    .@{app-prefix}-modal-confirm-btns {
+      padding: 15px 16px 17px;
+      margin: 0;
+      button {
+        width: 288px;
         height: 48px;
         border-radius: 24px;
         margin: 0 !important;

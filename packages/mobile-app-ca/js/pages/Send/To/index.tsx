@@ -1,11 +1,10 @@
-import { useAppCASelector } from '@portkey/hooks/hooks-ca';
 import { defaultColors } from 'assets/theme';
 import GStyles from 'assets/theme/GStyles';
 import { TextM } from 'components/CommonText';
 import Svg from 'components/Svg';
 import { useLanguage } from 'i18n/hooks';
 import React from 'react';
-import { View, Text, StyleSheet, TextInput } from 'react-native';
+import { View, StyleSheet, TextInput } from 'react-native';
 import { TouchableOpacity } from 'react-native';
 import { formatStr2EllipsisStr } from 'utils';
 
@@ -14,15 +13,12 @@ import { pTd } from 'utils/unit';
 interface ToProps {
   selectedToContact: { name: string; address: string };
   setSelectedToContact: (contact: any) => void;
-  tokenItem: any;
   step: 1 | 2;
-  setStep: any;
+  setStep: (step: 1 | 2) => void;
 }
 
 export default function To({ selectedToContact, setSelectedToContact, step, setStep }: ToProps) {
   const { t } = useLanguage();
-
-  const { contactMap } = useAppCASelector(store => store.contact);
 
   return (
     <View style={styles.toWrap}>
@@ -30,14 +26,6 @@ export default function To({ selectedToContact, setSelectedToContact, step, setS
 
       {!selectedToContact?.name ? (
         <View style={styles.middle}>
-          {/* <Input
-          
-            containerStyle={styles.containerStyle}
-            inputContainerStyle={styles.inputContainerStyle}
-            inputStyle={styles.inputStyle}
-            value={selectedToContact?.address || ''}
-            onChangeText={v => setSelectedToContact({ name: '', address: v.trim() })}
-          /> */}
           <TextInput
             editable={step === 1}
             style={styles.inputStyle}
@@ -60,11 +48,8 @@ export default function To({ selectedToContact, setSelectedToContact, step, setS
         </View>
       ) : (
         <View style={styles.middle}>
-          <Text style={styles.middleTitle}>{selectedToContact?.name || 'xxxx'}</Text>
-          <Text style={styles.middleAddress}>
-            {formatStr2EllipsisStr(selectedToContact?.address, 15) || 'ELF_U97UqZe52baDgmgjEKLXiF34eEu3432sdfsdH5_AELF'}
-          </Text>
-
+          <TextM style={styles.middleTitle}>{selectedToContact?.name || 'xxxx'}</TextM>
+          <TextM style={styles.middleAddress}>{formatStr2EllipsisStr(selectedToContact?.address, 15)}</TextM>
           <TouchableOpacity
             style={styles.iconWrap}
             onPress={() => {

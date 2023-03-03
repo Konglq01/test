@@ -1,15 +1,16 @@
-import { NetworkType } from '@portkey/types';
+import { NetworkType } from '@portkey-wallet/types';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { checkPassword } from './utils';
 import {
   changePin,
   createWalletAction,
+  getWalletNameAsync,
   resetWallet,
   setCAInfo,
   setCAInfoType,
   setChainListAction,
   setManagerInfo,
-  updateWalletNameAsync,
+  setWalletNameAction,
 } from './actions';
 import { WalletError, WalletState } from './type';
 import { changeEncryptStr } from '../../wallet/utils';
@@ -70,13 +71,6 @@ export const walletSlice = createSlice({
         state.walletInfo.AESEncryptMnemonic = changeEncryptStr(state.walletInfo.AESEncryptMnemonic, pin, newPin);
         state.walletInfo.AESEncryptPrivateKey = changeEncryptStr(state.walletInfo.AESEncryptPrivateKey, pin, newPin);
       })
-      .addCase(updateWalletNameAsync.fulfilled, (state, action) => {
-        state.walletName = action.payload;
-        // TODO: add success tips
-      })
-      .addCase(updateWalletNameAsync.rejected, (state, action) => {
-        // TODO: add error tips
-      })
       .addCase(setChainListAction, (state, action) => {
         const { chainList, networkType } = action.payload;
         if (!state.chainInfo) state.chainInfo = { [networkType]: chainList };
@@ -89,6 +83,15 @@ export const walletSlice = createSlice({
         checkPassword(state.walletInfo?.AESEncryptMnemonic, pin);
         if (!state.walletInfo?.AESEncryptMnemonic) throw new Error(WalletError.noCreateWallet);
         state.walletInfo.caInfo = { ...state.walletInfo.caInfo, [currentNetwork]: caInfo };
+      })
+      .addCase(getWalletNameAsync.fulfilled, (state, action) => {
+        if (action.payload) state.walletName = action.payload;
+      })
+      .addCase(getWalletNameAsync.rejected, (_, action) => {
+        console.log(action.error);
+      })
+      .addCase(setWalletNameAction, (state, action) => {
+        state.walletName = action.payload;
       });
   },
 });

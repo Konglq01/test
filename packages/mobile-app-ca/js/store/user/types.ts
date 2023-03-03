@@ -1,4 +1,4 @@
-import { Password } from '@portkey/types/wallet';
+import { Password } from '@portkey-wallet/types/wallet';
 
 export type Credentials = {
   pin: Password;

@@ -1,4 +1,4 @@
-import { TokenItemShowType } from '@portkey/types/types-eoa/token';
+import { TokenItemShowType } from '@portkey-wallet/types/types-eoa/token';
 
 export const filterTokenList = (tokenList: TokenItemShowType[], keyword: string): TokenItemShowType[] => {
   return tokenList.filter(ele => {

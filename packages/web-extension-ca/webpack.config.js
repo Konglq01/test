@@ -1,17 +1,10 @@
-/**
- * @file
- * @author huangzongzhe
- */
 /* eslint-disable */
-const webpack = require('webpack'); // 用于访问内置插件
+const webpack = require('webpack');
 const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin'); // 通过 npm 安装
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
-
-// TODO ^1.1.9 MV3 is not supported yet
-// const ExtReloader = require('webpack-ext-reloader');
 
 const ROOT = path.resolve(__dirname, './');
 const { version } = require(path.resolve(ROOT, 'package.json'));
@@ -83,6 +76,12 @@ let config = {
         ],
       },
       {
+        test: /\.m?js$/,
+        resolve: {
+          fullySpecified: false,
+        },
+      },
+      {
         test: /\.css$/,
         use: ['style-loader', 'css-loader'],
       },
@@ -110,7 +109,7 @@ let config = {
         ],
       },
       {
-        test: /\.(png|svg|jpg|gif|ico)$/,
+        test: /\.(png|svg|jpg|gif|ico|ttf)$/,
         use: [
           {
             loader: 'file-loader',
@@ -152,6 +151,11 @@ let config = {
       chunks: [''],
       template: './app/web/sandbox.html',
       filename: `./${outputDir}/sandbox.html`,
+    }),
+    new HtmlWebpackPlugin({
+      chunks: [''],
+      template: './app/web/sandbox/index.html',
+      filename: `./${outputDir}/sandbox-index.html`,
     }),
     new CopyWebpackPlugin({
       patterns: [
@@ -197,6 +201,9 @@ module.exports = (env, argv) => {
       'process.env.NODE_ENV': JSON.stringify(argv.mode),
       'process.env.NODE_DEBUG': JSON.stringify(argv.mode),
       'process.env.DEVICE': JSON.stringify('extension'),
+      'process.env.SENTRY_DSN': JSON.stringify(
+        'https://f439a3f5052f4a578f87a09ac11a246d@o4504399844999168.ingest.sentry.io/4504647744421888',
+      ),
     }),
   );
 

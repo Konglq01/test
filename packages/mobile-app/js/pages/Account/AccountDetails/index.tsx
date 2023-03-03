@@ -1,8 +1,8 @@
-import { useCurrentNetwork } from '@portkey/hooks/network';
-import { removeAccount, updateAccountName } from '@portkey/store/wallet/actions';
-import { isWalletError } from '@portkey/store/wallet/utils';
-import { AccountType } from '@portkey/types/wallet';
-import { getExploreLink } from '@portkey/utils';
+import { useCurrentNetwork } from '@portkey-wallet/hooks/network';
+import { removeAccount, updateAccountName } from '@portkey-wallet/store/wallet/actions';
+import { isWalletError } from '@portkey-wallet/store/wallet/utils';
+import { AccountType } from '@portkey-wallet/types/wallet';
+import { getExploreLink } from '@portkey-wallet/utils';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import GStyles from 'assets/theme/GStyles';
 import AccountCard from 'components/AccountCard';

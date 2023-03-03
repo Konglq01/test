@@ -1,64 +1,91 @@
 import { useAppCASelector, useAppCommonDispatch } from '../index';
-import { addTokenInCurrentAccount, deleteTokenInCurrentAccount } from '@portkey/store/store-ca/tokenManagement/action';
-import { fetchTokenListAsync } from '@portkey/store/store-ca/tokenManagement/slice';
-import { TokenItemType, TokenState, AddedTokenData, TokenListShowInMarketType } from '@portkey/types/types-ca/token';
-import { useMemo } from 'react';
+import { fetchAllTokenListAsync, getSymbolImagesAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
+import { TokenState, TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
+import { useMemo, useCallback } from 'react';
+import { useCurrentNetworkInfo } from './network';
+import { request } from '@portkey-wallet/api/api-did';
 
 export interface TokenFuncsType {
-  addToken: (tokenItem: TokenItemType) => void;
-  deleteToken: (tokenItem: TokenItemType) => void;
-  fetchTokenList: (params: { pageSize: number; pageNo: number }) => void;
+  fetchTokenList: (params: { keyword: string; chainIdArray: string[] }) => void;
+  displayUserToken: (params: {
+    tokenItem: TokenItemShowType;
+    keyword: string;
+    chainIdArray: string[];
+  }) => Promise<void>;
 }
 
 export const useToken = (): [TokenState, TokenFuncsType] => {
   const dispatch = useAppCommonDispatch();
-  // const { currentAccount } = useAppCASelector(state => state.wallet);
+  const currentNetworkInfo = useCurrentNetworkInfo();
 
   const tokenState = useAppCASelector(state => state.tokenManagement);
 
-  const addToken = (tokenItem: TokenItemType) => {
-    // if (!currentAccount) return;
-    // dispatch(addTokenInCurrentAccount({ tokenItem, currentAccount }));
-  };
-
-  const deleteToken = (tokenItem: TokenItemType) => {
-    // if (!currentAccount) return;
-    // dispatch(deleteTokenInCurrentAccount({ tokenItem, currentAccount }));
-  };
-
-  const fetchTokenList = (params: { pageSize: number; pageNo: number }) => {
+  const fetchTokenList = useCallback((params: { keyword: string; chainIdArray: string[] }) => {
     dispatch(
-      fetchTokenListAsync({
+      fetchAllTokenListAsync({
         ...params,
       }),
     );
-  };
+  }, []);
+
+  const displayUserToken = useCallback(
+    async ({
+      tokenItem,
+      keyword,
+      chainIdArray,
+    }: {
+      tokenItem: TokenItemShowType;
+      keyword: string;
+      chainIdArray: string[];
+    }) => {
+      await request.token.displayUserToken({
+        baseURL: currentNetworkInfo.apiUrl,
+        resourceUrl: `${tokenItem.userTokenId}/display`,
+        params: {
+          isDisplay: !tokenItem.isAdded,
+        },
+      });
+      setTimeout(() => {
+        dispatch(fetchAllTokenListAsync({ keyword, chainIdArray }));
+      }, 1000);
+    },
+    [],
+  );
 
   const tokenStoreFuncs = {
-    addToken,
-    deleteToken,
     fetchTokenList,
+    displayUserToken,
   };
 
   return [tokenState, tokenStoreFuncs];
 };
 
-export const useAllAccountTokenList = (): AddedTokenData => {
-  const { addedTokenData } = useAppCASelector(state => state.tokenManagement);
+// export const useAllAccountTokenList = (): AddedTokenData => {
+//   const { addedTokenData } = useAppCASelector(state => state.tokenManagement);
 
-  return useMemo(() => addedTokenData, [addedTokenData]);
-};
+//   return useMemo(() => addedTokenData, [addedTokenData]);
+// };
 
-export const useMarketTokenListInCurrentChain = (): TokenListShowInMarketType => {
+export const useMarketTokenListInCurrentChain = (): TokenItemShowType[] => {
   const { tokenDataShowInMarket } = useAppCASelector(state => state.tokenManagement);
 
   return useMemo(() => tokenDataShowInMarket, [tokenDataShowInMarket]);
 };
 
 export const useIsFetchingTokenList = (): Boolean => {
-  const { isFetchingTokenList } = useAppCASelector(state => state.tokenManagement);
+  const { isFetching } = useAppCASelector(state => state.tokenManagement);
 
-  return useMemo(() => isFetchingTokenList, [isFetchingTokenList]);
+  return useMemo(() => isFetching, [isFetching]);
+};
+
+export const useFetchSymbolImages = () => {
+  const dispatch = useAppCommonDispatch();
+  dispatch(getSymbolImagesAsync());
+};
+
+export const useSymbolImages = () => {
+  const { symbolImages } = useAppCASelector(state => state.tokenManagement);
+  return useMemo(() => symbolImages, [symbolImages]);
 };
 
 export default useToken;

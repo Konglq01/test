@@ -18,14 +18,10 @@ const ExistOverlay = ({ callBack }: ExistOverlayProps) => {
   const { t } = useLanguage();
   return (
     <ModalBody modalBodyType="center" style={styles.modalStyle}>
-      <TextXL style={styles.title}>{t('Are you sure you want to exit your wallet?')}</TextXL>
+      <TextXL style={styles.title}>{t('Are you sure you want to exit your account?')}</TextXL>
       <TextM style={[FontStyles.font3, styles.label]}>
-        {t('Your current wallet and assets will be removed from this app permanently. This action cannot be undone.')}
+        {t('After you exit, your assets remain in your account and you can access them through social recovery.')}
       </TextM>
-      <TextM style={[FontStyles.font3, styles.label]}>
-        {t('You can ONLY recover this wallet with the help of your guardians.')}
-      </TextM>
-
       <CommonButton
         type="solid"
         containerStyle={[styles.btnContainer, GStyles.marginTop(20)]}
@@ -35,7 +31,7 @@ const ExistOverlay = ({ callBack }: ExistOverlayProps) => {
           OverlayModal.hide();
           callBack(true);
         }}>
-        {t('I Understand, Confirm Exit')}
+        {t('Exit Anyway')}
       </CommonButton>
       <CommonButton
         type="outline"

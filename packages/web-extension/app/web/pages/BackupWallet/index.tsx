@@ -1,4 +1,4 @@
-import { setBackup } from '@portkey/store/wallet/actions';
+import { setBackup } from '@portkey-wallet/store/wallet/actions';
 import { message } from 'antd';
 import InternalMessage from 'messages/InternalMessage';
 import InternalMessageTypes from 'messages/InternalMessageTypes';

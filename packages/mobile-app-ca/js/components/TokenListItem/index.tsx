@@ -1,56 +1,56 @@
-import { ZERO } from '@portkey/constants/misc';
-import { unitConverter } from '@portkey/utils/converter';
+import { ZERO } from '@portkey-wallet/constants/misc';
+import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
+import { unitConverter } from '@portkey-wallet/utils/converter';
 import { defaultColors } from 'assets/theme';
 import { FontStyles } from 'assets/theme/styles';
 import CommonAvatar from 'components/CommonAvatar';
 import { TextL, TextS } from 'components/CommonText';
-import { IconName } from 'components/Svg';
 import { useWallet } from 'hooks/store';
 import React, { memo } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { pTd } from 'utils/unit';
 
 interface TokenListItemType {
-  icon?: IconName;
-  symbol?: string;
+  noBalanceShow?: boolean;
   item?: any;
   onPress?: (item: any) => void;
 }
 
 const TokenListItem: React.FC<TokenListItemType> = props => {
-  const { icon = 'aelf-avatar', symbol = 'ELF', onPress, item } = props;
+  const { noBalanceShow = false, onPress, item } = props;
   const { currentNetwork } = useWallet();
+  const symbolImages = useSymbolImages();
 
   return (
     <TouchableOpacity style={itemStyle.wrap} onPress={() => onPress?.(item)}>
       <CommonAvatar
         style={itemStyle.left}
-        title={item?.token?.symbol}
-        svgName={item?.token?.symbol === 'ELF' ? icon : undefined}
+        title={item?.symbol}
         avatarSize={pTd(48)}
+        imageUrl={symbolImages[item?.symbol]}
       />
       <View style={itemStyle.right}>
         <View style={itemStyle.infoWrap}>
           <TextL numberOfLines={1} ellipsizeMode={'tail'} style={itemStyle.tokenName}>
-            {item?.token?.symbol}
+            {item?.symbol}
           </TextL>
-          <TextS numberOfLines={1} style={[FontStyles.font7, itemStyle.chainInfo]}>
+          <TextS numberOfLines={1} style={[FontStyles.font3, itemStyle.chainInfo]}>
             {item?.chainId === 'AELF' ? 'MainChain ' : 'SideChain '} {item?.chainId}{' '}
-            {currentNetwork === 'MAIN' && 'Testnet'}
+            {currentNetwork === 'TESTNET' && 'Testnet'}
           </TextS>
         </View>
 
-        <View style={itemStyle.balanceWrap}>
-          {/* <TextL style={itemStyle.token} numberOfLines={1} ellipsizeMode={'tail'}>{`${unitConverter(
-            ZERO.plus(item.balance).div(`1e${item.decimals}`),
-          )} ${item?.token?.symbol}`}</TextL> */}
-          <TextL style={itemStyle.token} numberOfLines={1} ellipsizeMode={'tail'}>
-            {item?.amount}
-          </TextL>
-          <TextS numberOfLines={1} ellipsizeMode={'tail'} style={itemStyle.dollar}>
-            $ {item?.amountUsd}
-          </TextS>
-        </View>
+        {!noBalanceShow && (
+          <View style={itemStyle.balanceWrap}>
+            <TextL style={itemStyle.token} numberOfLines={1} ellipsizeMode={'tail'}>
+              {unitConverter(ZERO.plus(item?.balance).div(`1e${item.decimals}`))}
+            </TextL>
+            <TextS numberOfLines={1} ellipsizeMode={'tail'} style={itemStyle.dollar}>
+              {currentNetwork === 'MAIN' &&
+                `$ ${unitConverter(ZERO.plus(item?.balanceInUsd).div(`1e${item.decimal}`))}`}
+            </TextS>
+          </View>
+        )}
       </View>
     </TouchableOpacity>
   );
@@ -94,6 +94,7 @@ const itemStyle = StyleSheet.create({
   chainInfo: {
     lineHeight: pTd(16),
     marginTop: pTd(2),
+    width: pTd(150),
   },
   balanceWrap: {
     flex: 1,

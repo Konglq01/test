@@ -1,7 +1,7 @@
-import { ZERO } from '@portkey/constants/misc';
-import { useCurrentNetwork } from '@portkey/hooks/network';
-import { TokenItemType } from '@portkey/types/types-eoa/token';
-import { unitConverter } from '@portkey/utils/converter';
+import { ZERO } from '@portkey-wallet/constants/misc';
+import { useCurrentNetwork } from '@portkey-wallet/hooks/network';
+import { TokenItemType } from '@portkey-wallet/types/types-eoa/token';
+import { unitConverter } from '@portkey-wallet/utils/converter';
 import CustomSvg from 'components/CustomSvg';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';

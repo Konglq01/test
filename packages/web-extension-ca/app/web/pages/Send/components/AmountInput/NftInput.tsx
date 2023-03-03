@@ -1,83 +1,85 @@
-import { ZERO } from '@portkey/constants/misc';
-import { BaseToken } from '@portkey/types/types-ca/token';
+import { BaseToken } from '@portkey-wallet/types/types-ca/token';
 import { Input } from 'antd';
-import { parseInputChange } from '@portkey/utils/input';
 import { handleKeyDownInt } from 'pages/Send/utils/util.keyDown';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { ChainId } from '@portkey-wallet/types';
+import { getBalance } from 'utils/sandboxUtil/getBalance';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
+import { divDecimals, unitConverter } from '@portkey-wallet/utils/converter';
 
 export default function NftInput({
   toAccount,
+  fromAccount,
   token,
   value,
+  errorMsg,
   onChange,
 }: {
+  fromAccount: { address: string; AESEncryptPrivateKey: string };
   toAccount: { address: string };
   token: BaseToken;
   value: string;
-  onChange: (amount: string) => void;
+  errorMsg: string;
+  onChange: (params: { amount: string; balance: string }) => void;
 }) {
-  const isMain = true;
   const { t } = useTranslation();
-  const [errorMsg, setErrorMsg] = useState('Insufficient funds');
+  // const [errorMsg, setErrorMsg] = useState('Insufficient funds');
   const [amount, setAmount] = useState<string>(value);
-
-  const getTranslationInfo = useCallback(async () => {
-    if (!toAccount?.address) return;
-    // const privateData = await getPrivateData(fromAccount?.AESEncryptPrivateKey);
-    // if (!privateData?.privateKey) return message.error(t(WalletError.invalidPrivateKey));
-    // const transactionRes = await getTransactionFee({
-    //   contractAddress: token?.address || '',
-    //   privateKey: privateData.privateKey,
-    //   paramsOption: {
-    //     symbol: token?.symbol,
-    //     memo: '',
-    //     to: toAccount?.address,
-    //     amount: amount?.replace(` ${token?.symbol}`, ''),
-    //   },
-    //   chainType: currentChain.chainType,
-    //   methodName: 'Transfer',
-    //   rpcUrl: currentChain.rpcUrl,
-    // });
-    // if (!transactionRes?.message || transactionRes?.code === SandboxErrorCode.error)
-    //   throw Error(transactionRes?.message?.Error?.Message ?? transactionRes?.message ?? 'something error');
-    // const fee = transactionRes.message[currentChain.nativeCurrency?.symbol ?? 'ELF'];
-    // fee && setTransactionFee(divDecimalsStr(ZERO.plus(fee), currentChain.nativeCurrency?.decimals));
-  }, [toAccount]);
+  const currentChain = useCurrentChain(token.chainId as ChainId);
+  const currentNetwork = useCurrentNetworkInfo();
+  // const isMain = useMemo(() => currentNetwork.networkType === 'MAIN', [currentNetwork]);
+  const [balance, setBalance] = useState<string>('');
 
   const handleAmountBlur = useCallback(() => {
-    setAmount((v) => {
-      const reg = new RegExp(`.+\\.\\d{0,${token?.decimals || 8}}|.+`);
-      const valueProcessed = v
-        ?.replace(/\.+$/, '')
-        .replace(/^0+\./, '0.')
-        .replace(/^0+/, '')
-        .replace(/^\.+/, '0.')
-        .match(reg)
-        ?.toString();
-      const valueString = valueProcessed ? `${parseInputChange(valueProcessed, ZERO, token?.decimals) || 0}` : '';
-      onChange(valueString);
+    // setAmount((v) => {
+    //   const reg = new RegExp(`.+\\.\\d{0,${token?.decimals || 8}}|.+`);
+    //   const valueProcessed = v
+    //     ?.replace(/\.+$/, '')
+    //     .replace(/^0+\./, '0.')
+    //     .replace(/^0+/, '')
+    //     .replace(/^\.+/, '0.')
+    //     .match(reg)
+    //     ?.toString();
+    //   const valueString = valueProcessed ? `${parseInputChange(valueProcessed, ZERO, token?.decimals) || 0}` : '';
+    //   onChange(valueString);
+    //   return valueString.length ? `${valueString}` : '';
+    // });
+    onChange({ amount, balance });
+  }, [amount, balance, onChange]);
 
-      return valueString.length ? `${valueString}` : '';
+  const getTokenBalance = useCallback(async () => {
+    if (!currentChain) return;
+    const result = await getBalance({
+      rpcUrl: currentChain.endPoint,
+      address: token?.address,
+      chainType: currentNetwork.walletType,
+      paramsOption: {
+        owner: fromAccount.address,
+        symbol: token.symbol,
+      },
     });
-    setTimeout(() => {
-      getTranslationInfo();
-    }, 0);
-  }, [getTranslationInfo, onChange, token?.decimals]);
+    const balance = result.result.balance;
+    setBalance(balance);
+    console.log(result, currentChain, 'balances==getTokenBalance=');
+  }, [currentChain, currentNetwork.walletType, fromAccount.address, token]);
+
+  useEffect(() => {
+    getTokenBalance();
+  }, [getTokenBalance]);
 
   return (
     <div className="amount-wrap">
       <div className="item asset nft">
-        <div className="avatar">
-          <p>K</p>
-        </div>
+        <div className="avatar">{token.imageUrl ? <img src={token.imageUrl} /> : <p>{token.symbol[0]}</p>}</div>
         <div className="info">
-          <p className="index">
-            <span>Knight of Swords</span>
-            <span className="token-id">#0004</span>
-          </p>
+          <div className="index">
+            <p className="alias">{token.alias}</p>
+            <p className="token-id">#{token.tokenId}</p>
+          </div>
           <p className="quantity">
-            Balance: <span>{3}</span>
+            Balance: <span>{`${unitConverter(divDecimals(balance, token.decimals))}`}</span>
           </p>
         </div>
       </div>
@@ -94,6 +96,7 @@ export default function NftInput({
               onBlur={handleAmountBlur}
               onChange={(e) => {
                 setAmount(e.target.value);
+                onChange({ amount: e.target.value, balance });
               }}
             />
           </div>

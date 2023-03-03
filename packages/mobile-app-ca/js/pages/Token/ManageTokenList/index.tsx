@@ -1,138 +1,136 @@
 import PageContainer from 'components/PageContainer';
-import { useIsFetchingTokenList, useToken } from '@portkey/hooks/hooks-ca/useToken';
-import { TokenItemShowType } from '@portkey/types/types-ca/token';
-import { filterTokenList } from '@portkey/utils/token';
+import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
+import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
 import CommonInput from 'components/CommonInput';
-import { useAppCASelector } from '@portkey/hooks/index';
-import { Dialog } from '@rneui/themed';
+import { useAppCASelector } from '@portkey-wallet/hooks/hooks-ca';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import gStyles from 'assets/theme/GStyles';
 import { defaultColors } from 'assets/theme';
-import React, { memo, useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList } from 'react-native';
 import CommonToast from 'components/CommonToast';
-import { TextL, TextM } from 'components/CommonText';
+import { TextL, TextS } from 'components/CommonText';
 import { pTd } from 'utils/unit';
 import Svg from 'components/Svg';
 import CommonSwitch from 'components/CommonSwitch';
 import CommonAvatar from 'components/CommonAvatar';
 import { useLanguage } from 'i18n/hooks';
 import NoData from 'components/NoData';
+import { fetchAllTokenListAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
+import useDebounce from 'hooks/useDebounce';
+import { useAppCommonDispatch } from '@portkey-wallet/hooks';
+import { request } from '@portkey-wallet/api/api-did';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
+import { useCaAddresses, useChainIdList, useWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { fetchTokenListAsync } from '@portkey-wallet/store/store-ca/assets/slice';
+import Loading from 'components/Loading';
+import { formatChainInfo } from 'utils';
+import { FontStyles } from 'assets/theme/styles';
 
 interface ManageTokenListProps {
   route?: any;
 }
 
 type ItemProps = {
+  isTestnet: boolean;
   item: TokenItemShowType;
   onHandleToken: (item: TokenItemShowType, type: 'add' | 'delete') => void;
 };
-function areEqual(prevProps: ItemProps, nextProps: ItemProps) {
-  return nextProps.item.isAdded === prevProps.item.isAdded;
-}
 
-const Item = memo(({ item, onHandleToken }: ItemProps) => {
+const Item = ({ isTestnet, item, onHandleToken }: ItemProps) => {
+  const symbolImages = useSymbolImages();
   return (
-    <TouchableOpacity style={itemStyle.wrap} key={item.symbol}>
-      {item.symbol === 'ELF' ? (
-        <CommonAvatar
-          shapeType="circular"
-          title={item.symbol}
-          svgName="aelf-avatar"
-          avatarSize={pTd(48)}
-          style={itemStyle.left}
-        />
-      ) : (
-        <CommonAvatar shapeType="circular" title={item.symbol} avatarSize={pTd(48)} style={itemStyle.left} />
-      )}
+    <TouchableOpacity style={itemStyle.wrap} key={`${item.symbol}${item.address}${item.chainId}}`}>
+      <CommonAvatar
+        shapeType="circular"
+        title={item.symbol}
+        imageUrl={symbolImages[item.symbol]}
+        avatarSize={pTd(48)}
+        style={itemStyle.left}
+      />
 
       <View style={itemStyle.right}>
-        <TextL numberOfLines={1} ellipsizeMode={'tail'}>
-          {item.symbol}
-        </TextL>
+        <View>
+          <TextL numberOfLines={1} ellipsizeMode={'tail'}>
+            {item.symbol}
+          </TextL>
+          <TextS numberOfLines={1} ellipsizeMode={'tail'} style={[FontStyles.font3]}>
+            {`${formatChainInfo(item.chainId)} ${isTestnet && 'Testnet'}`}
+          </TextS>
+        </View>
 
         {item.isDefault ? (
           <Svg icon="lock" size={pTd(20)} iconStyle={itemStyle.addedStyle} />
         ) : (
-          <CommonSwitch
-            value={!!item.isAdded}
-            onValueChange={() => onHandleToken(item, item.isAdded ? 'delete' : 'add')}
-          />
+          <CommonSwitch value={!!item.isAdded} onChange={() => onHandleToken(item, item.isAdded ? 'delete' : 'add')} />
         )}
       </View>
     </TouchableOpacity>
   );
-}, areEqual);
+};
 Item.displayName = 'Item';
 
 const ManageTokenList: React.FC<ManageTokenListProps> = () => {
   const { t } = useLanguage();
-  const [tokenState, tokenActions] = useToken();
-  const { tokenDataShowInMarket } = tokenState;
 
-  const isLoading = useIsFetchingTokenList();
-  const { fetchTokenList } = tokenActions;
+  const currentNetworkInfo = useCurrentNetworkInfo();
+  const { currentNetwork } = useWallet();
+
+  const chainList = useChainIdList();
+
+  const dispatch = useAppCommonDispatch();
+  const caAddressArray = useCaAddresses();
+
+  const { tokenDataShowInMarket } = useAppCASelector(state => state.tokenManagement);
 
   const [keyword, setKeyword] = useState<string>('');
 
-  const [addedTokenList, setAddedTokenList] = useState<any[]>([]);
-  const [handledList, setHandledList] = useState<any[]>([]);
-  const [filteredList, setFilteredList] = useState<any[]>([]);
+  const debounceWord = useDebounce(keyword, 500);
+
+  // useEffect(() => {
+  //   return setTokenList(tokenDataShowInMarket);
+  // }, [tokenDataShowInMarket]);
 
   useEffect(() => {
     if (tokenDataShowInMarket.length) return;
-    fetchTokenList({ pageSize: 10000, pageNo: 1 });
+    dispatch(fetchAllTokenListAsync({ keyword: debounceWord, chainIdArray: chainList }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onHandleTokenItem = useCallback(async (item: TokenItemShowType, type: 'add' | 'delete') => {
-    // TODO
+  const onHandleTokenItem = useCallback(
+    async (item: TokenItemShowType, isAdded: boolean) => {
+      // TODO
+      Loading.show();
+      await request.token
+        .displayUserToken({
+          baseURL: currentNetworkInfo.apiUrl,
+          resourceUrl: `${item.userTokenId}/display`,
+          params: {
+            isDisplay: isAdded,
+          },
+        })
+        .then(res => {
+          console.log(res);
+          setTimeout(() => {
+            dispatch(fetchAllTokenListAsync({ keyword: debounceWord, chainIdArray: chainList }));
+            dispatch(fetchTokenListAsync({ caAddresses: caAddressArray }));
+            Loading.hide();
 
-    const setAccountToken = (data: any) => {
-      return true;
-    };
-
-    const data = {
-      tokenId: item?.id,
-      enable: type === 'add',
-    };
-    const result = setAccountToken(data);
-    if (result) CommonToast.success('Success');
-  }, []);
-
-  const fetchAddedList = useCallback(() => {
-    // TODO
-    const mockAddedTokenList = [
-      {
-        chainId: 'AELF',
-        id: 4,
-        name: 'STORAGE Token',
-        symbol: 'STORAGE',
-      },
-    ];
-    setAddedTokenList(mockAddedTokenList);
-  }, []);
-
-  // handle tokenList
-  useEffect(() => {
-    if (!tokenDataShowInMarket.length) return;
-    if (!addedTokenList.length) return;
-
-    const tmpList = tokenDataShowInMarket?.map(ele => {
-      return { ...ele, isAdded: !!addedTokenList.find(item => item.id === ele?.id) };
-    });
-    setHandledList(tmpList);
-    setFilteredList(tmpList);
-  }, [addedTokenList, handledList.length, tokenDataShowInMarket]);
-
-  // keyword filter list
-  useEffect(() => {
-    setFilteredList(filterTokenList(handledList, keyword));
-  }, [tokenDataShowInMarket, keyword, handledList]);
+            CommonToast.success('Success');
+          }, 1000);
+        })
+        .catch(err => {
+          console.log(err);
+          CommonToast.fail('Fail');
+        });
+    },
+    [caAddressArray, chainList, currentNetworkInfo.apiUrl, debounceWord, dispatch],
+  );
 
   useEffect(() => {
-    fetchAddedList();
-  }, [fetchAddedList]);
+    dispatch(fetchAllTokenListAsync({ keyword: debounceWord, chainIdArray: chainList }));
+  }, [chainList, debounceWord, dispatch]);
+
   return (
     <PageContainer
       titleDom={t('Add Tokens')}
@@ -149,15 +147,20 @@ const ManageTokenList: React.FC<ManageTokenListProps> = () => {
           }}
         />
       </View>
-
-      {!!keyword && !filteredList.length && <NoData noPic message={t('There is no search result.')} />}
+      {!!keyword && !tokenDataShowInMarket.length && <NoData noPic message={t('There is no search result.')} />}
       <FlatList
         style={pageStyles.list}
-        data={filteredList || []}
-        renderItem={({ item }) => <Item item={item} onHandleToken={onHandleTokenItem} />}
-        keyExtractor={(item: any) => item.symbol || ''}
+        data={tokenDataShowInMarket || []}
+        renderItem={({ item }: { item: TokenItemShowType }) => (
+          <Item
+            isTestnet={currentNetwork === 'TESTNET'}
+            item={item}
+            onHandleToken={() => onHandleTokenItem(item, !item?.isAdded)}
+          />
+        )}
+        keyExtractor={(item: TokenItemShowType) => item?.id || item?.symbol}
       />
-      {isLoading && <Dialog.Loading />}
+      {/* {isLoading && <Dialog.Loading />} */}
     </PageContainer>
   );
 };

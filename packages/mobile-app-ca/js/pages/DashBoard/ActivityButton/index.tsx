@@ -7,6 +7,7 @@ import { View, TouchableOpacity } from 'react-native';
 import { TextM } from 'components/CommonText';
 import { useLanguage } from 'i18n/hooks';
 import { pTd } from 'utils/unit';
+import GStyles from 'assets/theme/GStyles';
 
 interface ActivityButtonProps {
   themeType?: 'dashBoard' | 'innerPage';
@@ -20,6 +21,7 @@ const ActivityButton = (props: ActivityButtonProps) => {
   return (
     <View style={styles.buttonWrap}>
       <TouchableOpacity
+        style={[styles.iconWrapStyle, GStyles.alignCenter]}
         onPress={() => {
           return navigationService.navigate('ActivityListPage');
         }}>

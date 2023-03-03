@@ -49,7 +49,7 @@ let extensionPort: chrome.runtime.Port;
 let lastMessageReceivedTimestamp = Date.now();
 let ackTimeoutToDisplayError: NodeJS.Timeout;
 let isHasMessage: boolean;
-export const keepAliveOnPages = () => {
+export const keepAliveOnPages = ({ onError }: { onError?: () => void }) => {
   const windowType = ENVIRONMENT_TYPE_POPUP;
   extensionPort = apis.runtime.connect({ name: windowType });
   const ackKeepAliveListener = (message: chrome.runtime.Port) => {
@@ -75,6 +75,7 @@ export const keepAliveOnPages = () => {
         if (!isHasMessage) {
           isHasMessage = true;
           message.error(errorToReload, 0, () => (isHasMessage = false));
+          onError?.();
         }
         console.log('somethingIsWrong', new Error("Something's gone wrong. Try reloading the page."));
       }

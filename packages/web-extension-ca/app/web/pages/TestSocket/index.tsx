@@ -1,11 +1,11 @@
 import React from 'react';
 
-import Socket from '@portkey/socket/socket-did';
-import { SocketUrl } from '@portkey/constants/constants-ca/socket';
-import { randomId } from '@portkey/utils';
+import Socket from '@portkey-wallet/socket/socket-did';
+import { SocketUrl } from '@portkey-wallet/constants/constants-ca/socket';
+import { randomId } from '@portkey-wallet/utils';
 import AElf from 'aelf-sdk';
 import { Button, Divider } from 'antd';
-import { request } from '@portkey/api/api-did';
+import { request } from '@portkey-wallet/api/api-did';
 
 // const wallet = AElf.wallet.createNewWallet();
 const clientId = 'aelf1';

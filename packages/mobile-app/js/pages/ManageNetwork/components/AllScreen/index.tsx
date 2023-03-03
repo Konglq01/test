@@ -1,5 +1,5 @@
-import { fetchChainListAsync } from '@portkey/store/network/actions';
-import { ChainItemType } from '@portkey/types/chain';
+import { fetchChainListAsync } from '@portkey-wallet/store/network/actions';
+import { ChainItemType } from '@portkey-wallet/types/chain';
 import ListComponent, { ListComponentInterface } from 'components/ListComponent';
 import React, { memo, useRef } from 'react';
 import { useAppDispatch } from 'store/hooks';

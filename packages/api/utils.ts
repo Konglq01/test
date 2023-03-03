@@ -12,8 +12,6 @@ export function spliceUrl(baseUrl: string, extendArg: string = '') {
 }
 
 export function getRequestConfig(base: BaseConfig, config?: RequestConfig, defaultConfig?: RequestConfig) {
-  console.log(defaultConfig, '====defaultConfig');
-
   if (typeof base === 'string') {
     if (defaultConfig) {
       return {

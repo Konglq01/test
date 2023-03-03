@@ -1,5 +1,5 @@
-import { CAInfoType } from '@portkey/types/types-ca/wallet';
-import { VerifierInfo } from '@portkey/types/verifier';
+import { CAInfoType } from '@portkey-wallet/types/types-ca/wallet';
+import { VerifierInfo } from '@portkey-wallet/types/verifier';
 import { createAction } from '@reduxjs/toolkit';
 import { LoginInfo } from './type';
 

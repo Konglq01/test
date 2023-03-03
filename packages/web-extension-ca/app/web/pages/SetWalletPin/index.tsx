@@ -6,21 +6,23 @@ import { useCallback, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { useAppDispatch, useGuardiansInfo, useLoading, useLoginInfo } from 'store/Provider/hooks';
 import { setPinAction } from 'utils/lib/serviceWorkerAction';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { setLocalStorage } from 'utils/storage/chromeStorage';
-import { createWallet, setManagerInfo } from '@portkey/store/store-ca/wallet/actions';
+import { createWallet, setManagerInfo } from '@portkey-wallet/store/store-ca/wallet/actions';
 import { useTranslation } from 'react-i18next';
-import { recoveryDIDWallet, registerDIDWallet } from '@portkey/api/api-did/apiUtils/wallet';
-import { VerificationType } from '@portkey/types/verifier';
-import { isWalletError } from '@portkey/store/wallet/utils';
+import { recoveryDIDWallet, registerDIDWallet } from '@portkey-wallet/api/api-did/utils/wallet';
+import { VerificationType, VerifyStatus } from '@portkey-wallet/types/verifier';
+import { isWalletError } from '@portkey-wallet/store/wallet/utils';
 import { useHardwareBack } from 'hooks/useHardwareBack';
 import CommonModal from 'components/CommonModal';
-import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
+import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
 import AElf from 'aelf-sdk';
-import { DefaultChainId } from '@portkey/constants/constants-ca/network';
-import { randomId } from '@portkey/utils';
+import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
+import { randomId } from '@portkey-wallet/utils';
 import './index.less';
 import useFetchDidWallet from 'hooks/useFetchDidWallet';
+import { setPasswordSeed } from 'store/reducers/user/slice';
+import { DEVICE_TYPE } from 'constants/index';
 
 export default function SetWalletPin() {
   const [form] = Form.useForm();
@@ -49,7 +51,7 @@ export default function SetWalletPin() {
         type: LoginStrType[loginAccount.loginType],
         loginGuardianAccount: loginAccount.guardianAccount,
         managerAddress,
-        deviceString: Date.now().toString(), //navigator.userAgent,
+        deviceString: `${DEVICE_TYPE},${Date.now()}`, //navigator.userAgent,
         chainId: DefaultChainId,
         verifierId: registerVerifier.verifierId,
         verificationDoc: registerVerifier.verificationDoc,
@@ -68,13 +70,15 @@ export default function SetWalletPin() {
   );
 
   const getGuardiansApproved = useCallback(() => {
-    return Object.values(userGuardianStatus ?? {}).map((guardian) => ({
-      type: LoginStrType[guardian.guardianType],
-      value: guardian.guardianAccount,
-      verifierId: guardian.verifier?.id || '',
-      verificationDoc: guardian.verificationDoc || '',
-      signature: guardian.signature || '',
-    }));
+    return Object.values(userGuardianStatus ?? {})
+      .filter((guardian) => guardian.status === VerifyStatus.Verified)
+      .map((guardian) => ({
+        type: LoginStrType[guardian.guardianType],
+        value: guardian.guardianAccount,
+        verifierId: guardian.verifier?.id || '',
+        verificationDoc: guardian.verificationDoc || '',
+        signature: guardian.signature || '',
+      }));
   }, [userGuardianStatus]);
 
   const requestRecoveryDIDWallet = useCallback(
@@ -86,7 +90,7 @@ export default function SetWalletPin() {
       const result = await recoveryDIDWallet({
         loginGuardianAccount: loginAccount.guardianAccount,
         managerAddress,
-        deviceString: Date.now().toString(), //navigator.userAgent,
+        deviceString: `${DEVICE_TYPE},${Date.now()}`, //navigator.userAgent,
         chainId: DefaultChainId,
         guardiansApproved,
         context: {
@@ -121,6 +125,7 @@ export default function SetWalletPin() {
       await setLocalStorage({
         registerStatus: 'Registered',
       });
+      dispatch(setPasswordSeed(pin));
       await setPinAction(pin);
       navigate(`/success-page/${state}`);
     },
@@ -287,11 +292,9 @@ export default function SetWalletPin() {
         closable={false}
         open={returnOpen}
         className="set-pin-modal"
-        title={' Confirm return'}
+        title={t('Leave this page?')}
         getContainer={'#set-pin-wrapper'}>
-        <p className="modal-content">
-          After returning, you will need to re-select the operator and re-do the code verification.
-        </p>
+        <p className="modal-content">{t('returnTip')}</p>
         <div className="btn-wrapper">
           <Button onClick={() => setReturnOpen(false)}>No</Button>
           <Button type="primary" onClick={backHandler}>

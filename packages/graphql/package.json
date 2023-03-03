@@ -1,16 +1,16 @@
 {
-  "name": "@portkey/graphql",
+  "name": "@portkey-wallet/graphql",
   "publishConfig": {
     "access": "public"
   },
   "version": "0.0.1",
   "type": "commonjs",
   "scripts": {
-    "generate": "node gqlg.js && graphql-codegen --config codegen.config.ts"
+    "generate": "rm -rf ./**/*/__generated__ && node gqlg.js && graphql-codegen --config codegen.config.ts"
   },
   "dependencies": {
     "@apollo/client": "^3.7.3",
-    "@portkey/constants": "^0.0.1",
+    "@portkey-wallet/constants": "^0.0.1",
     "graphql": "^16.6.0",
     "subscriptions-transport-ws": "^0.11.0"
   },

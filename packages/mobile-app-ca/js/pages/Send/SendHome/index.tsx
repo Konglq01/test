@@ -1,26 +1,18 @@
-import React, { memo, useCallback, useMemo, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import PageContainer from 'components/PageContainer';
 import navigationService from 'utils/navigationService';
-import { useFocusEffect } from '@react-navigation/native';
-import { isAddress } from '@portkey/utils';
 import Svg from 'components/Svg';
 import From from '../From';
 import To from '../To';
-// import CommonToast from 'components/CommonToast';
-// import { divDecimals, timesDecimals } from '@portkey/utils/converter';
 import { styles } from './style';
 import { defaultColors } from 'assets/theme';
 import { pTd } from 'utils/unit';
 import ActionSheet from 'components/ActionSheet';
 import useQrScanPermission from 'hooks/useQrScanPermission';
-import { ZERO } from '@portkey/constants/misc';
-import { useGetELFRateQuery } from '@portkey/store/rate/api';
-import { customFetch } from '@portkey/utils/fetch';
-import useEffectOnce from 'hooks/useEffectOnce';
-import { formatAddress2NoPrefix } from 'utils';
-import { addRecentContact } from '@portkey/store/trade/slice';
-import { isCrossChain } from '@portkey/utils/aelf';
+import { ZERO } from '@portkey-wallet/constants/misc';
+import { customFetch } from '@portkey-wallet/utils/fetch';
+import { getEntireDIDAelfAddress, isAllowAelfAddress, isCrossChain } from '@portkey-wallet/utils/aelf';
 import useDebounce from 'hooks/useDebounce';
 import { useLanguage } from 'i18n/hooks';
 import SelectContact from '../SelectContact';
@@ -29,7 +21,19 @@ import AmountNFT from '../AmountNFT';
 import NFTInfo from '../NFTInfo';
 import GStyles from 'assets/theme/GStyles';
 import CommonButton from 'components/CommonButton';
-import useRouterParams from '@portkey/hooks/useRouterParams';
+import { getContractBasic } from '@portkey-wallet/contracts/utils';
+import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { getManagerAccount } from 'utils/redux';
+import { usePin } from 'hooks/store';
+import { timesDecimals, unitConverter } from '@portkey-wallet/utils/converter';
+import { IToSendHomeParamsType, IToSendPreviewParamsType } from '@portkey-wallet/types/types-ca/routeParams';
+
+import { getELFChainBalance } from '@portkey-wallet/utils/balance';
+import { BGStyles } from 'assets/theme/styles';
+import { RouteProp, useRoute } from '@react-navigation/native';
+import Loading from 'components/Loading';
+
 export interface SendHomeProps {
   route?: any;
 }
@@ -37,84 +41,117 @@ enum ErrorMessage {
   RecipientAddressIsInvalid = 'Recipient address is invalid',
   NoCorrespondingNetwork = 'No corresponding network',
   InsufficientFunds = 'Insufficient funds',
+  InsufficientQuantity = 'Insufficient Quantity',
   InsufficientFundsForTransactionFee = 'Insufficient funds for transaction fee',
 }
 
 const SendHome: React.FC<SendHomeProps> = props => {
   const { t } = useLanguage();
 
-  const { tokenItem, nftItem, name, sendType, chainId, address } = useRouterParams<{
-    tokenItem: any;
-    nftItem: any;
-    name: string;
-    sendType: 'nft' | 'token';
-    chainId: string;
-    address: string;
-  }>();
+  const {
+    params: { sendType = 'token', toInfo, assetInfo },
+  } = useRoute<RouteProp<{ params: IToSendHomeParamsType }>>();
 
-  // tokenItem, address, name,
-  const { data, refetch } = useGetELFRateQuery({});
+  const wallet = useCurrentWalletInfo();
+  const chainInfo = useCurrentChain(assetInfo?.chainId);
+
+  const pin = usePin();
 
   const [, requestQrPermission] = useQrScanPermission();
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const [selectedFromAccount] = useState({ name: '11', address: '' }); // from
-  const [selectedToContact, setSelectedToContact] = useState({ name: '', address: '0' }); // to
-  const [selectedToken, setSelectedToken] = useState(tokenItem); // tokenType
+  const [selectedFromAccount] = useState({ name: '', address: '' }); // from
+  const [selectedToContact, setSelectedToContact] = useState(toInfo); // to
+  const [selectedAssets, setSelectedAssets] = useState(assetInfo); // token or nft
   const [sendNumber, setSendNumber] = useState<string>('0'); // tokenNumber  like 100
-  const debounceSendNumber = useDebounce(sendNumber, 1000);
-  const [transactionFee, setTransactionFee] = useState<string>('0'); // like 1.2ELF
+  const debounceSendNumber = useDebounce(sendNumber, 500);
+  const [, setTransactionFee] = useState<string>('0'); // like 1.2ELF
 
   const [step, setStep] = useState<1 | 2>(1);
   const [isLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<any[]>([]);
 
-  useEffectOnce(() => {
-    refetch();
-  });
-
-  useFocusEffect(
-    useCallback(() => {
-      const tmpAddress = formatAddress2NoPrefix(address || '');
-      setSelectedToContact({ name, address: tmpAddress });
-    }, [address, name]),
-  );
+  useEffect(() => {
+    setSelectedToContact(toInfo);
+  }, [toInfo]);
 
   // get transfer fee
+  const getTransactionFee = useCallback(
+    async (isCross: boolean) => {
+      if (!chainInfo || !pin) return;
+      const account = getManagerAccount(pin);
+      if (!account) return;
 
-  const totalPay = useMemo(() => {
-    // TODO: TransferNumber + Transaction Fee
-    const totalTransactionFee = ZERO.plus(transactionFee).times(data?.USDT || 0);
-    const totalTransferNumber = selectedToken === 'ELF' ? ZERO.plus(sendNumber).times(data?.USDT || 0) : ZERO;
-    console.log(totalTransactionFee.valueOf(), totalTransferNumber.valueOf());
+      const contract = await getContractBasic({
+        contractAddress: chainInfo.caContractAddress,
+        rpcUrl: chainInfo?.endPoint,
+        account: account,
+      });
 
-    return totalTransactionFee.plus(totalTransferNumber);
-  }, [data?.USDT, selectedToken, sendNumber, transactionFee]);
+      const raw = await contract.encodedTx('ManagerForwardCall', {
+        caHash: wallet.caHash,
+        contractAddress: selectedAssets.tokenContractAddress,
+        methodName: 'Transfer',
+        args: {
+          symbol: selectedAssets.symbol,
+          to: isCross ? wallet.address : selectedToContact.address,
+          amount: timesDecimals(debounceSendNumber, selectedAssets.decimals || '0').toNumber(),
+          memo: '',
+        },
+      });
 
-  const buttonDisabled = useMemo(() => {
-    console.log(!selectedToContact.address, Number(sendNumber));
+      const { TransactionFee } = await customFetch(`${chainInfo?.endPoint}/api/blockChain/calculateTransactionFee`, {
+        method: 'POST',
+        params: {
+          RawTransaction: raw,
+        },
+      });
 
-    if (!selectedToContact.address) return true;
-    if (Number(sendNumber) <= 0) return true;
-    // if (transactionFee[0] === '-') return true;
+      console.log(
+        '====TransactionFee======',
+        TransactionFee,
+        unitConverter(ZERO.plus(TransactionFee?.ELF || '0').div('1e8')),
+      );
 
-    return false;
-  }, [selectedToContact.address, sendNumber]);
+      if (!TransactionFee) throw { code: 500, message: 'no enough fee' };
 
-  const nextDisable = useMemo(() => {
-    if (!selectedToContact?.address) return true;
-    return false;
-  }, [selectedToContact.address]);
+      return unitConverter(ZERO.plus(TransactionFee.ELF).div('1e8'));
+    },
+    [
+      chainInfo,
+      debounceSendNumber,
+      pin,
+      selectedAssets.decimals,
+      selectedAssets.symbol,
+      selectedAssets.tokenContractAddress,
+      selectedToContact.address,
+      wallet.address,
+      wallet.caHash,
+    ],
+  );
 
-  const previewDisable = useMemo(() => {
-    if (!selectedToContact?.address) return true;
-    if (sendNumber === '0' || !sendNumber) return true;
-    return false;
-  }, [selectedToContact?.address, sendNumber]);
+  const getAssetBalance = useCallback(
+    async (tokenContractAddress: string, symbol: string) => {
+      if (!chainInfo || !pin) return;
+      const account = getManagerAccount(pin);
+      if (!account) return;
+
+      const contract = await getContractBasic({
+        contractAddress: tokenContractAddress,
+        rpcUrl: chainInfo?.endPoint,
+        account: account,
+      });
+
+      const balance = await getELFChainBalance(contract, symbol, wallet?.[assetInfo?.chainId]?.caAddress || '');
+
+      return balance;
+    },
+    [assetInfo?.chainId, chainInfo, pin, wallet],
+  );
 
   // warning dialog
   const showDialog = useCallback(
-    (type: 'no-authority' | 'clearAddress' | 'crossChain') => {
+    (type: 'no-authority' | 'clearAddress' | 'crossChain', confirmCallBack?: () => void) => {
       switch (type) {
         case 'no-authority':
           ActionSheet.alert({
@@ -146,17 +183,18 @@ const SendHome: React.FC<SendHomeProps> = props => {
 
         case 'crossChain':
           ActionSheet.alert({
-            title: t('Enable Camera Access'),
-            message: t('The receiving address is a cross-chain transfer transaction'),
+            title: t('This is a cross-chain transaction'),
             buttons: [
               {
                 title: t('Cancel'),
-                type: 'solid',
+                type: 'outline',
               },
               {
                 title: t('Confirm'),
                 type: 'primary',
-                onPress: () => nextStep(true),
+                onPress: () => {
+                  confirmCallBack?.();
+                },
               },
             ],
           });
@@ -169,167 +207,131 @@ const SendHome: React.FC<SendHomeProps> = props => {
     [t],
   );
 
-  // const showCrossChainTips = () => {
-  //   CrossChainTransferModal.alert({});
-  // };
+  const nextDisable = useMemo(() => {
+    if (!selectedToContact?.address) return true;
+    return false;
+  }, [selectedToContact.address]);
+
+  const previewDisable = useMemo(() => {
+    if (!selectedToContact?.address) return true;
+    if (sendNumber === '0' || !sendNumber) return true;
+    return false;
+  }, [selectedToContact?.address, sendNumber]);
+
+  const checkCanNext = useCallback(() => {
+    if (!isAllowAelfAddress(selectedToContact.address)) {
+      setErrorMessage([ErrorMessage.RecipientAddressIsInvalid]);
+      return false;
+    }
+
+    // TODO: check if  cross chain
+    if (isCrossChain(selectedToContact.address, assetInfo.chainId)) {
+      showDialog('crossChain', () => setStep(2));
+      return false;
+    }
+
+    return true;
+  }, [assetInfo.chainId, selectedToContact.address, showDialog]);
+
+  const nextStep = useCallback(() => {
+    if (checkCanNext()) return setStep(2);
+  }, [checkCanNext]);
 
   //when finish send  upDate balance
 
-  const checkCanNext = () => {
-    const errorArr = [];
-    if (!isAddress(selectedToContact.address)) errorArr.push(ErrorMessage.RecipientAddressIsInvalid);
-    setErrorMessage(errorArr);
-    if (errorArr.length) return false;
+  /**
+   * elf:   elf balance \  elf sendNumber \elf fee
+   * not elf：  not elf balance \  not elf sendNumber \ elf balance \ elf fee
+   */
 
-    // TODO: check if  cross chain
-    if (isCrossChain(selectedToContact.address, 'AELF')) return showDialog('crossChain');
+  const checkCanPreview = useCallback(async () => {
+    let fee;
+    setErrorMessage([]);
 
-    return true;
-  };
+    const sendBigNumber = timesDecimals(sendNumber, selectedAssets.decimals || '0');
+    const assetBalanceBigNumber = ZERO.plus(selectedAssets.balance);
 
-  const checkCanPreview = () => {
-    console.log('checkCanPreview');
-  };
+    // input check
+    if (sendType === 'token') {
+      // token
+      if (assetInfo.symbol === 'ELF') {
+        // ELF
+        if (sendBigNumber.isGreaterThanOrEqualTo(assetBalanceBigNumber)) {
+          setErrorMessage([ErrorMessage.InsufficientFunds]);
+          return { status: false };
+        }
+      } else {
+        //Other Token
+        if (sendBigNumber.isGreaterThan(assetBalanceBigNumber)) {
+          setErrorMessage([ErrorMessage.InsufficientFunds]);
+          return { status: false };
+        }
+      }
+    } else {
+      // nft
+      if (sendBigNumber.isGreaterThan(assetBalanceBigNumber)) {
+        setErrorMessage([ErrorMessage.InsufficientQuantity]);
+        return { status: false };
+      }
+    }
 
-  const nextStep = (directNext?: boolean) => {
-    // directNext true , is cross chain and has finished check
-    if (directNext) return setStep(2);
+    const isCross = isCrossChain(selectedToContact.address, assetInfo.chainId);
 
-    if (!checkCanNext()) return;
-    setStep(2);
-  };
+    // transaction fee check
+    Loading.show();
+    try {
+      fee = await getTransactionFee(isCross);
 
-  const preview = () => {
+      setTransactionFee(fee || '0');
+    } catch (err: any) {
+      if (err?.code === 500) {
+        setErrorMessage([ErrorMessage.InsufficientFundsForTransactionFee]);
+        Loading.hide();
+
+        return { status: false };
+      }
+    }
+    Loading.hide();
+
+    return { status: true, fee };
+  }, [
+    assetInfo.chainId,
+    assetInfo.symbol,
+    getTransactionFee,
+    selectedAssets.balance,
+    selectedAssets.decimals,
+    selectedToContact.address,
+    sendNumber,
+    sendType,
+  ]);
+
+  const preview = useCallback(async () => {
     // TODO : getTransactionFee and check the balance
+    const result = await checkCanPreview();
+    if (!result?.status) return;
+
     navigationService.navigate('SendPreview', {
       sendType,
-      sendInfo: {
-        selectedToContact,
-        tokenItem,
+      assetInfo: selectedAssets,
+      toInfo: {
+        ...selectedToContact,
+        address: getEntireDIDAelfAddress(selectedToContact.address, undefined, assetInfo.chainId),
       },
-    });
-  };
+      transactionFee: result?.fee || '0',
+      sendNumber,
+    } as IToSendPreviewParamsType);
+  }, [assetInfo.chainId, checkCanPreview, selectedAssets, selectedToContact, sendNumber, sendType]);
 
-  return (
-    <PageContainer
-      safeAreaColor={['blue', step === 1 ? 'white' : 'gray']}
-      titleDom={t('Send')}
-      rightDom={
-        sendType === 'token' ? (
-          <TouchableOpacity
-            onPress={async () => {
-              if (selectedToContact?.address) return showDialog('clearAddress');
-              if (!(await requestQrPermission())) return showDialog('no-authority');
+  useEffect(() => {
+    (async () => {
+      const balance = await getAssetBalance(assetInfo.tokenContractAddress || assetInfo.address, assetInfo.symbol);
+      setSelectedAssets({ ...selectedAssets, balance });
+    })();
+  }, [assetInfo.address, assetInfo.symbol, assetInfo.tokenContractAddress, getAssetBalance, selectedAssets]);
 
-              navigationService.navigate('QrScanner', { fromSendPage: true });
-            }}>
-            <Svg icon="scan" size={pTd(17.5)} color={defaultColors.font2} />
-          </TouchableOpacity>
-        ) : undefined
-      }
-      containerStyles={styles.pageWrap}
-      scrollViewProps={{ disabled: true }}>
-      <View style={styles.group}>
-        <From selectedFromAccount={selectedFromAccount} />
-        <To
-          step={step}
-          tokenItem={tokenItem}
-          selectedToContact={selectedToContact}
-          setSelectedToContact={setSelectedToContact}
-          setStep={setStep}
-        />
-      </View>
-      {errorMessage.includes(ErrorMessage.RecipientAddressIsInvalid) && (
-        <Text style={styles.errorMessage}>{t(ErrorMessage.RecipientAddressIsInvalid)}</Text>
-      )}
-
-      {sendType === 'token' && step === 2 && (
-        <View style={styles.group}>
-          <AmountToken
-            rate={data ?? { USDT: 0 }}
-            balanceShow={'0'}
-            sendTokenNumber={sendNumber}
-            setSendTokenNumber={setSendNumber}
-            selectedToken={selectedToken}
-            selectedAccount={selectedFromAccount}
-            setSelectedToken={setSelectedToken}
-          />
-        </View>
-      )}
-
-      {sendType === 'nft' && step === 2 && (
-        <View style={styles.group}>
-          <NFTInfo />
-        </View>
-      )}
-
-      {sendType === 'nft' && step === 2 && (
-        <View style={styles.group}>
-          <AmountNFT sendNumber={sendNumber} setSendNumber={setSendNumber} />
-        </View>
-      )}
-
-      {errorMessage.includes(ErrorMessage.InsufficientFunds) && (
-        <Text style={styles.errorMessage}>{t(ErrorMessage.InsufficientFunds)}</Text>
-      )}
-
-      {errorMessage.includes(ErrorMessage.InsufficientFundsForTransactionFee) && (
-        <Text style={[styles.errorMessage, GStyles.textAlignCenter]}>
-          {t(ErrorMessage.InsufficientFundsForTransactionFee)}
-        </Text>
-      )}
-
-      {/* total fee */}
-      {/* <View style={styles.group}>
-        <View style={thirdGroupStyle.wrap}>
-          <TextM style={thirdGroupStyle.title}>{t('Transaction Fee')}</TextM>
-          <TextM style={thirdGroupStyle.tokenNum}>{`${
-            transactionFee === '0' ? '--' : unitConverter(transactionFee)
-          } ELF`}</TextM>
-          <TextS style={thirdGroupStyle.usdtNum}>
-            $
-            {transactionFee === '0'
-              ? '--'
-              : ZERO.plus(transactionFee || 0)
-                  .times(data?.USDT || 0)
-                  .toFixed(2)}
-          </TextS>
-        </View>
-
-        {selectedToken.symbol === 'ELF' && ZERO.plus(sendTokenNumber).gt(ZERO) && (
-          <View style={[thirdGroupStyle.wrap, thirdGroupStyle.borderTop]}>
-            <TextM style={thirdGroupStyle.title}>{t('Total')}</TextM>
-            <TextM style={thirdGroupStyle.tokenNum}>
-              {unitConverter(ZERO.plus(transactionFee).plus(ZERO.plus(sendTokenNumber)))}
-              {selectedToken?.symbol}
-            </TextM>
-            <TextS style={thirdGroupStyle.usdtNum}>${unitConverter(totalPay.toFixed(2))}</TextS>
-          </View>
-        )}
-
-        {selectedToken.symbol !== 'ELF' && ZERO.plus(sendTokenNumber).gt(ZERO) && (
-          <View style={[thirdGroupStyle.wrap, thirdGroupStyle.borderTop, thirdGroupStyle.notELFWrap]}>
-            <TextM style={thirdGroupStyle.title}>{t('Total')}</TextM>
-            <View>
-              <TextM style={thirdGroupStyle.tokenNum}>
-                {unitConverter(sendTokenNumber, selectedToken.decimal)} {selectedToken?.symbol}
-              </TextM>
-              <View style={thirdGroupStyle.totalWithUSD}>
-                <TextM style={thirdGroupStyle.tokenNum}>{`${transactionFee === '0' ? '--' : transactionFee} ${
-                  'ELF' ?? '--'
-                }`}</TextM>
-                <TextS style={thirdGroupStyle.usdtNum}>${unitConverter(totalPay.toFixed(2))}</TextS>
-              </View>
-            </View>
-          </View>
-        )}
-      </View> */}
-      <View style={styles.space} />
-      {step === 1 && (
-        <SelectContact onPress={(item: { address: string; name: string }) => setSelectedToContact(item)} />
-      )}
-
-      <View style={styles.buttonWrapStyle}>
+  const ButtonUI = useMemo(() => {
+    return (
+      <View style={[styles.buttonWrapStyle, step === 1 && BGStyles.bg1]}>
         {step === 2 && (
           <CommonButton
             disabled={previewDisable}
@@ -349,6 +351,95 @@ const SendHome: React.FC<SendHomeProps> = props => {
           />
         )}
       </View>
+    );
+  }, [isLoading, nextDisable, nextStep, preview, previewDisable, step, t]);
+
+  return (
+    <PageContainer
+      safeAreaColor={['blue', step === 1 ? 'white' : 'gray']}
+      titleDom={`${t('Send')}${sendType === 'token' ? ' ' + assetInfo.symbol : ''}`}
+      rightDom={
+        sendType === 'token' ? (
+          <TouchableOpacity
+            onPress={async () => {
+              if (selectedToContact?.address) return showDialog('clearAddress');
+              if (!(await requestQrPermission())) return showDialog('no-authority');
+
+              navigationService.navigate('QrScanner', { fromSendPage: true });
+            }}>
+            <Svg icon="scan" size={pTd(17.5)} color={defaultColors.font2} />
+          </TouchableOpacity>
+        ) : undefined
+      }
+      containerStyles={styles.pageWrap}
+      scrollViewProps={{ disabled: true }}>
+      {/* Group 1 */}
+      <View style={styles.group}>
+        <From />
+        <To
+          step={step}
+          setStep={setStep}
+          selectedToContact={selectedToContact}
+          setSelectedToContact={setSelectedToContact}
+        />
+      </View>
+      {errorMessage.includes(ErrorMessage.RecipientAddressIsInvalid) && (
+        <Text style={styles.errorMessage}>{t(ErrorMessage.RecipientAddressIsInvalid)}</Text>
+      )}
+
+      {/* Group 2 token */}
+      {sendType === 'token' && step === 2 && (
+        <View style={styles.group}>
+          <AmountToken
+            balanceShow={selectedAssets.balance}
+            sendTokenNumber={sendNumber}
+            setSendTokenNumber={setSendNumber}
+            selectedToken={assetInfo}
+            selectedAccount={selectedFromAccount}
+            setSelectedToken={setSelectedAssets}
+          />
+        </View>
+      )}
+
+      {/* Group 2 nft */}
+      {sendType === 'nft' && step === 2 && (
+        <View style={styles.group}>
+          <NFTInfo nftItem={assetInfo} />
+        </View>
+      )}
+
+      {sendType === 'nft' && step === 2 && (
+        <View style={styles.group}>
+          <AmountNFT sendNumber={sendNumber} setSendNumber={setSendNumber} />
+        </View>
+      )}
+
+      {errorMessage.includes(ErrorMessage.InsufficientFunds) && (
+        <Text style={[styles.errorMessage, GStyles.textAlignCenter]}>{t(ErrorMessage.InsufficientFunds)}</Text>
+      )}
+
+      {errorMessage.includes(ErrorMessage.InsufficientFundsForTransactionFee) && (
+        <Text style={[styles.errorMessage, GStyles.textAlignCenter]}>
+          {t(ErrorMessage.InsufficientFundsForTransactionFee)}
+        </Text>
+      )}
+
+      {errorMessage.includes(ErrorMessage.InsufficientQuantity) && (
+        <Text style={[styles.errorMessage, GStyles.textAlignCenter]}>{t(ErrorMessage.InsufficientQuantity)}</Text>
+      )}
+
+      {/* Group 3 contact */}
+      <View style={styles.space} />
+      {step === 1 && (
+        <SelectContact
+          chainId={assetInfo.chainId}
+          onPress={(item: { address: string; name: string }) => {
+            setSelectedToContact(item);
+          }}
+        />
+      )}
+
+      {ButtonUI}
     </PageContainer>
   );
 };

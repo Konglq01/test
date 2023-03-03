@@ -20,8 +20,6 @@ export const DEFAULT_METHOD = 'POST';
 export const BASE_APIS = {};
 
 const VerifyApiList = {
-  sendCode: '/api/app/account/sendVerificationRequest',
-  verifyCode: '/api/app/account/verifyCode',
   registerRequest: '/api/app/account/register/request',
   recoveryRequest: '/api/app/account/recovery/request',
 };

@@ -1,5 +1,5 @@
-import { useCurrentNetwork } from '@portkey/hooks/network';
-import { getAelfInstance } from '@portkey/utils/aelf';
+import { useCurrentNetwork } from '@portkey-wallet/hooks/network';
+import { getAelfInstance } from '@portkey-wallet/utils/aelf';
 import { BasicActions, getELFContract } from 'contexts/utils';
 import usePrevious from 'hooks/usePrevious';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useReducer } from 'react';

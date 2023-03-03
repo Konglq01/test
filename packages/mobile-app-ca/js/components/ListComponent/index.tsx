@@ -9,7 +9,7 @@ import {
   FlatListProps,
 } from 'react-native';
 import { defaultColors } from 'assets/theme';
-import { bottomBarHeight } from '@portkey/utils/mobile/device';
+import { bottomBarHeight } from '@portkey-wallet/utils/mobile/device';
 import { TextM } from 'components/CommonText';
 interface ListComponentProps<ItemT> extends FlatListProps<ItemT> {
   whetherAutomatic?: boolean; // Whether to automatically load more, if there is a ceiling, you can not set this property to true

@@ -1,14 +1,14 @@
 import { useCurrentNetwork } from '../network';
 import { useMemo, useCallback, useState } from 'react';
-import { Account } from '@portkey/types/types-ca/tokenBalance';
+import { Account } from '@portkey-wallet/types/types-ca/tokenBalance';
 import { useAppCASelector } from '.';
 import { useCurrentChain } from './chainList';
-import { getElfChainStatus } from '@portkey/store/network/utils';
+import { getElfChainStatus } from '@portkey-wallet/store/network/utils';
 import useInterval from '../useInterval';
-import { getELFTokenAddress } from '@portkey/contracts';
-import { getELFContract } from '@portkey/utils/aelf';
+import { getELFTokenAddress } from '@portkey-wallet/contracts';
+import { getELFContract } from '@portkey-wallet/utils/aelf';
 import { useCurrentWalletInfo } from './wallet';
-import { divDecimals, unitConverter } from '@portkey/utils/converter';
+import { divDecimals, unitConverter } from '@portkey-wallet/utils/converter';
 
 export function useAllBalances() {
   return useAppCASelector(state => state.tokenBalance.balances);
@@ -68,7 +68,7 @@ export function useCurrentELFBalances(dev?: boolean) {
       if (!dev) interval.remove();
       getBalances();
     },
-    10000,
+    60000,
     [getBalances],
   );
   return balance;

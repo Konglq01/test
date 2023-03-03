@@ -1,10 +1,10 @@
-import { CustomFetchConfig } from '@portkey/utils/fetch';
+import { CustomFetchConfig } from '@portkey-wallet/utils/fetch';
 import { BaseConfig, RequestConfig } from '../../types';
 
 export interface ESConfig extends CustomFetchConfig {
   params?: {
     filter?: string;
-    fort?: string;
+    sort?: string;
     sortType?: 0 | 1;
     skipCount?: number;
     maxResultCount?: number;

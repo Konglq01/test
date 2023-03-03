@@ -4,7 +4,7 @@ import { StatusBar, StatusBarProps } from 'react-native';
 import { ThemeProvider } from '@rneui/themed';
 import NavigationRoot from './js/navigation';
 import { useMemo } from 'react';
-import { isIos } from '@portkey/utils/mobile/device';
+import { isIos } from '@portkey-wallet/utils/mobile/device';
 import { Provider } from 'react-redux';
 import { store } from 'store';
 import { persistStore } from 'redux-persist';
@@ -12,7 +12,8 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { myTheme } from 'assets/theme';
 import { initLanguage } from 'i18n';
 import * as SplashScreen from 'expo-splash-screen';
-import secureStore from '@portkey/utils/mobile/secureStore';
+import * as Sentry from '@sentry/react-native';
+import secureStore from '@portkey-wallet/utils/mobile/secureStore';
 import Config from 'react-native-config';
 import TopView from 'rn-teaset/components/Overlay/TopView';
 import AppListener from 'components/AppListener/index';
@@ -23,6 +24,25 @@ import Updater from 'components/Updater';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
+
+// Sentry init
+const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
+
+Sentry.init({
+  dsn: Config.SENTRY_DNS,
+  // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
+  // We recommend adjusting this value in production.
+  tracesSampleRate: 1.0,
+
+  integrations: [
+    new Sentry.ReactNativeTracing({
+      // Pass instrumentation to be used as `routingInstrumentation`
+      routingInstrumentation,
+      tracingOrigins: ['localhost', 'my-site-url.com', /^\//],
+      // ...
+    }),
+  ],
+});
 
 initLanguage();
 secureStore.init(Config.PORT_KEY_CODE || 'EXAMPLE_PORT_KEY_CODE');
@@ -65,4 +85,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default Sentry.wrap(App);

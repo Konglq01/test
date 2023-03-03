@@ -10,7 +10,7 @@ import { TextL } from 'components/CommonText';
 import type { SafeAreaColorMapKeyUnit } from 'components/PageContainer';
 import { useLanguage } from 'i18n/hooks';
 import { ViewStyleType } from 'types/styles';
-import { useHardwareBackPress } from '@portkey/hooks/mobile';
+import { useHardwareBackPress } from '@portkey-wallet/hooks/mobile';
 
 export type CustomHeaderProps = {
   themeType?: SafeAreaColorMapKeyUnit;
@@ -31,7 +31,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = props => {
     leftDom = null,
     titleDom = 'title',
     rightDom = null,
-    backTitle,
+    backTitle = 'Back',
     leftCallback,
     type = 'default',
     themeType = 'white',
@@ -73,7 +73,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = props => {
       return (
         <TouchableOpacity style={[GStyles.flexRow, GStyles.itemCenter]} onPress={onPress}>
           {leftIcon}
-          <TextL style={styles.leftBackTitle}>{backTitle || t('Back')}</TextL>
+          <TextL style={styles.leftBackTitle}>{t(backTitle)}</TextL>
         </TouchableOpacity>
       );
     }

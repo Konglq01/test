@@ -1,4 +1,4 @@
-import { WalletError } from '@portkey/store/wallet/type';
+import { WalletError } from '@portkey-wallet/store/wallet/type';
 import { Button, Form, FormProps, message } from 'antd';
 import { FormItem } from 'components/BaseAntd';
 import CustomPassword from 'components/CustomPassword';
@@ -51,7 +51,7 @@ export default function LockPage({ onUnLockHandler, ...props }: LockPageProps) {
         if (result) {
           setIsPassword(1);
           dispatch(setPasswordSeed(password));
-          await InternalMessage.payload(InternalMessageTypes.SET_SEED, password).send();
+          InternalMessage.payload(InternalMessageTypes.SET_SEED, password).send();
           onUnLockHandler?.();
         }
       } catch (error: any) {

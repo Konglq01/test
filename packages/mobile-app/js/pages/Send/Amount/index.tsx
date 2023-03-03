@@ -1,19 +1,19 @@
-import { AccountType } from '@portkey/types/wallet';
-import { TokenItemShowType } from '@portkey/types/types-eoa/token';
+import { AccountType } from '@portkey-wallet/types/wallet';
+import { TokenItemShowType } from '@portkey-wallet/types/types-eoa/token';
 import React, { useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { useAllAccountTokenList } from '@portkey/hooks/hooks-eoa/useToken';
+import { useAllAccountTokenList } from '@portkey-wallet/hooks/hooks-eoa/useToken';
 import Svg from 'components/Svg';
 import TokenOverlay from 'components/TokenOverlay';
 import { pTd } from 'utils/unit';
-import { parseInputChange } from '@portkey/utils/input';
-import { ZERO } from '@portkey/constants/misc';
+import { parseInputChange } from '@portkey-wallet/utils/input';
+import { ZERO } from '@portkey-wallet/constants/misc';
 import { defaultColors } from 'assets/theme';
 import GStyles from 'assets/theme/GStyles';
 import { Input } from '@rneui/themed';
 import { TextS } from 'components/CommonText';
-import { unitConverter } from '@portkey/utils/converter';
-import { useCurrentNetwork } from '@portkey/hooks/network';
+import { unitConverter } from '@portkey-wallet/utils/converter';
+import { useCurrentNetwork } from '@portkey-wallet/hooks/network';
 import { useLanguage } from 'i18n/hooks';
 import { useWallet } from 'hooks/store';
 

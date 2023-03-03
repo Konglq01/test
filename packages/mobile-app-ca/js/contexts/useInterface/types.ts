@@ -1,6 +1,6 @@
-import { ChainId } from '@portkey/types';
-import { AElfInterface } from '@portkey/types/aelf';
-import { ContractBasic } from 'utils/contract';
+import { ChainId } from '@portkey-wallet/types';
+import { AElfInterface } from '@portkey-wallet/types/aelf';
+import { ContractBasic } from '@portkey-wallet/contracts/utils/ContractBasic';
 export type State = {
   currentInterface?: AElfInterface;
   viewContracts?: { [key: string]: ContractBasic };

@@ -1,8 +1,6 @@
-import { CONTACT_EVENT_TYPE } from '@portkey/constants/contact';
-import type { NetworkType } from '../index';
+import { PartialOption } from '../common';
+
 export interface AddressItem {
-  id: string;
-  chainType: NetworkType;
   chainId: string; // AELF tDVV tDVW
   address: string;
 }
@@ -12,23 +10,31 @@ export interface ContactItemType {
   index: string;
   name: string;
   addresses: AddressItem[];
+  modificationTime: number;
+  isDeleted: boolean;
+  userId: string;
 }
 
-export type FetchContractListApiType = Array<ContactItemType>;
+export type EditContactItemApiType = PartialOption<ContactItemType, 'isDeleted' | 'modificationTime' | 'userId'>;
+export type AddContactItemApiType = PartialOption<EditContactItemApiType, 'id' | 'index'>;
 
-export interface ContactEventItem {
-  type: CONTACT_EVENT_TYPE;
-  contactId: ContactItemType['id'];
-  updateTime: number;
-  contact?: ContactItemType;
-}
-
-export type GetContactEventListApiType = Array<ContactEventItem>;
+export type GetContractListApiType = {
+  totalCount: number;
+  items: Array<ContactItemType>;
+};
 
 export interface RecentContactItemType extends ContactItemType {
   transferTime: String | number;
+  caAddress?: string;
+  chainId?: string;
+  addressChainId?: string;
 }
 
 export type ContactIndexType = Pick<ContactItemType, 'index'> & { contacts: ContactItemType[] };
 
 export type ContactMapType = { [key: string]: ContactItemType[] };
+
+export interface IClickAddressProps extends AddressItem {
+  name?: string;
+  isDisable?: boolean;
+}

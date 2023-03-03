@@ -1,7 +1,7 @@
-import { AddressBookError } from '@portkey/store/addressBook/types';
-import { AddressBookItem, AddressBookType } from '@portkey/types/addressBook';
-import { ChainItemType } from '@portkey/types/chain';
-import { addressFormat, isAddress } from '@portkey/utils';
+import { AddressBookError } from '@portkey-wallet/store/addressBook/types';
+import { AddressBookItem, AddressBookType } from '@portkey-wallet/types/addressBook';
+import { ChainItemType } from '@portkey-wallet/types/chain';
+import { addressFormat, isAddress } from '@portkey-wallet/utils';
 import { Button, Form, Input, message, Modal } from 'antd';
 import { InfoCircleFilled } from '@ant-design/icons';
 import { ValidatorRule } from 'rc-field-form/lib/interface';

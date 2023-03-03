@@ -1,8 +1,8 @@
 import { Form, FormInstance } from 'antd';
 import CustomPassword from 'components/CustomPassword';
 import { ReactNode, useEffect, useState } from 'react';
-import { isValidPassword } from '@portkey/utils/reg';
-import { PinErrorMessage } from '@portkey/utils/wallet/types';
+import { isValidPin } from '@portkey-wallet/utils/reg';
+import { PinErrorMessage } from '@portkey-wallet/utils/wallet/types';
 import './index.less';
 import { useTranslation } from 'react-i18next';
 
@@ -59,14 +59,14 @@ export default function ConfirmPassword({
             label?.password
           ) : (
             <>
-              <span style={{ marginRight: 8 }}>{t('Pin (Must be at least 8 characters)')}</span>
+              <span className="confirm-label">{t('Pin (Must be at least 6 characters)')}</span>
             </>
           )
         }
         name="password1"
         validateStatus={createValidate.validateStatus}
         validateTrigger="onBlur"
-        help={createValidate.errorMsg || (isPasswordLengthTipShow ? t('Must be at least 8 characters') : undefined)}
+        help={createValidate.errorMsg || (isPasswordLengthTipShow ? t('Must be at least 6 characters') : undefined)}
         rules={[
           { required: true, message: t('Please enter Pin') },
           () => ({
@@ -78,14 +78,14 @@ export default function ConfirmPassword({
                 });
                 return Promise.reject(t('Please enter Pin'));
               }
-              if (value.length < 8) {
+              if (value.length < 6) {
                 setCreateValidate({
                   validateStatus: 'error',
                   errorMsg: t(PinErrorMessage.PinNotLong),
                 });
                 return Promise.reject(t(PinErrorMessage.PinNotLong));
               }
-              if (!isValidPassword(value)) {
+              if (!isValidPin(value)) {
                 setCreateValidate({
                   validateStatus: 'error',
                   errorMsg: t(PinErrorMessage.invalidPin),

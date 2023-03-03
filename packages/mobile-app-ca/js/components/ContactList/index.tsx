@@ -1,16 +1,13 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Text, View, TouchableOpacity } from 'react-native';
-import { useAppDispatch, useAppSelector } from 'store/hooks';
 import CommonInput from 'components/CommonInput';
 import navigationService from 'utils/navigationService';
 import Svg from 'components/Svg';
 import { styles as contactListStyles } from './style';
 import CommonButton from 'components/CommonButton';
 import { pTd } from 'utils/unit';
-import useEffectOnce from 'hooks/useEffectOnce';
 import { useLanguage } from 'i18n/hooks';
-import { fetchContractListAsync } from '@portkey/store/store-ca/contact/actions';
-import { ContactIndexType, ContactItemType } from '@portkey/types/types-ca/contact';
+import { ContactIndexType, ContactItemType } from '@portkey-wallet/types/types-ca/contact';
 import ContactItem, { styles as contactItemStyles } from 'components/ContactItem';
 import ContactFlashList from './ContactFlashList';
 import { TextL } from 'components/CommonText';
@@ -18,8 +15,9 @@ import { defaultColors } from 'assets/theme';
 import { BGStyles, FontStyles } from 'assets/theme/styles';
 import GStyles from 'assets/theme/GStyles';
 import { ViewStyleType } from 'types/styles';
-import { getAelfAddress } from '@portkey/utils/aelf';
-import { transContactsToIndexes } from '@portkey/store/store-ca/contact/utils';
+import { getAddressInfo, getAelfAddress } from '@portkey-wallet/utils/aelf';
+import { transContactsToIndexes } from '@portkey-wallet/store/store-ca/contact/utils';
+import { useContact } from '@portkey-wallet/hooks/hooks-ca/contact';
 
 interface ContactsListProps {
   isIndexBarShow?: boolean;
@@ -41,18 +39,14 @@ const ContactsList: React.FC<ContactsListProps> = ({
   style,
   ListFooterComponent,
 }) => {
-  const appDispatch = useAppDispatch();
   const { t } = useLanguage();
-  useEffectOnce(() => {
-    appDispatch(fetchContractListAsync());
-  });
-  const { contactIndexList, contactMap } = useAppSelector(state => state.contact);
-
+  const { contactIndexList, contactMap } = useContact();
   const [list, setList] = useState<ContactIndexType[]>([]);
 
   const flashListData = useMemo<FlashItemType[]>(() => {
     let _flashListData: FlashItemType[] = [];
     list.forEach(contactIndex => {
+      if (!contactIndex.contacts.length) return;
       _flashListData.push({
         ...contactIndex,
       });
@@ -71,9 +65,8 @@ const ContactsList: React.FC<ContactsListProps> = ({
   // keyword filter;
   const onChangeKeywords = useCallback(
     (value: string) => {
-      console.log(value, 'search contact===');
       setKeyWord(value);
-      let _value = value.trim();
+      const _value = value.trim();
       if (_value === '') {
         setList(contactIndexList);
         return;
@@ -88,13 +81,22 @@ const ContactsList: React.FC<ContactsListProps> = ({
         }));
       } else {
         // Address Search
-        _value = getAelfAddress(_value);
-        const result = contactMap[_value];
+        const addressInfo = getAddressInfo(_value);
+        let result: ContactItemType[] | undefined;
+        if (addressInfo.address) {
+          if (!addressInfo.suffix) {
+            // no suffix
+            result = contactMap[addressInfo.address];
+          } else {
+            result = contactMap[addressInfo.address].filter(item =>
+              item.addresses.find(address => address.chainId === addressInfo.suffix),
+            );
+          }
+        }
         if (result === undefined) filterList = [];
         else filterList = transContactsToIndexes(result);
       }
 
-      filterList = filterList.filter(({ contacts }) => contacts.length !== 0);
       setList(filterList);
     },
     [contactIndexList, contactMap],
@@ -115,7 +117,7 @@ const ContactsList: React.FC<ContactsListProps> = ({
         key={item.id}
         contact={item}
         onPress={() => {
-          navigationService.navigate('ContactDetail', { contact: JSON.stringify(item) });
+          navigationService.navigate('ContactDetail', { contact: item });
         }}
       />
     );

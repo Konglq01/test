@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Form, Input, message } from 'antd';
 import { FormItem } from 'components/BaseAntd';
-import { isValidCAWalletName } from '@portkey/utils/reg';
+import { isValidCAWalletName } from '@portkey-wallet/utils/reg';
 import './index.less';
 
 interface AccountNameProps {
@@ -48,7 +48,7 @@ export default function AccountName(props: AccountNameProps) {
       } else if (!isValidCAWalletName(name)) {
         setValidName({
           validateStatus: 'error',
-          errorMsg: 'only a-z, A-Z, 0-9 and "_" "空格" allowed',
+          errorMsg: '3-16 characters, only a-z, A-Z, 0-9, space and "_" allowed',
         });
         setDisable(true);
       } else {

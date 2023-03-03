@@ -9,8 +9,8 @@ import { useLanguage } from 'i18n/hooks';
 import { useGuardiansInfo } from 'hooks/store';
 import GuardianItem from '../components/GuardianItem';
 import Touchable from 'components/Touchable';
-import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
-import { useGetGuardiansInfoWriteStore } from 'hooks/guardian';
+import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { useGetGuardiansInfoWriteStore, useGetVerifierServers } from 'hooks/guardian';
 import useEffectOnce from 'hooks/useEffectOnce';
 import myEvents from 'utils/deviceEvent';
 import GStyles from 'assets/theme/GStyles';
@@ -26,6 +26,7 @@ export default function GuardianHome() {
 
   const { caHash } = useCurrentWalletInfo();
   const getGuardiansInfoWriteStore = useGetGuardiansInfoWriteStore();
+  const getVerifierServers = useGetVerifierServers();
   const refreshGuardiansList = useCallback(async () => {
     try {
       await getGuardiansInfoWriteStore({
@@ -37,6 +38,7 @@ export default function GuardianHome() {
   }, [caHash, getGuardiansInfoWriteStore]);
 
   useEffectOnce(() => {
+    getVerifierServers();
     refreshGuardiansList();
   });
 

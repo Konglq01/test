@@ -8,23 +8,23 @@ import navigationService from 'utils/navigationService';
 import PageContainer from 'components/PageContainer';
 import { pageStyles } from './style';
 import { useLanguage } from 'i18n/hooks';
-import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
+import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type';
 import CommonSwitch from 'components/CommonSwitch';
 import ActionSheet from 'components/ActionSheet';
 import { useGuardiansInfo } from 'hooks/store';
 import { useGetGuardiansInfo } from 'hooks/guardian';
 import Loading from 'components/Loading';
-import { request } from 'api';
 import CommonToast from 'components/CommonToast';
-import { VerificationType } from '@portkey/types/verifier';
-import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import { VerificationType } from '@portkey-wallet/types/verifier';
+import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import myEvents from 'utils/deviceEvent';
 import { VerifierImage } from '../components/VerifierImage';
 import { cancelLoginAccount } from 'utils/guardian';
 import { useGetCurrentCAContract } from 'hooks/contract';
-import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
+import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
+import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network-test2';
+import { verification } from 'utils/api';
 import { RouteProp, useRoute } from '@react-navigation/native';
-import { DefaultChainId } from '@portkey/constants/constants-ca/network-test2';
 
 type RouterParams = {
   guardian?: UserGuardianItem;
@@ -52,7 +52,7 @@ export default function GuardianDetail() {
           guardian: { ...guardian, isLoginAccount: false },
         });
       } else {
-        CommonToast.fail(req?.error.message);
+        CommonToast.fail(req?.error?.message || '');
       }
     } catch (error) {
       CommonToast.failError(error);
@@ -64,8 +64,8 @@ export default function GuardianDetail() {
     if (!guardian) return;
     try {
       Loading.show();
-      const req = await request.verify.sendCode({
-        data: {
+      const req = await verification.sendVerificationCode({
+        params: {
           type: LoginStrType[guardian.guardianType],
           guardianAccount: guardian.guardianAccount,
           verifierId: guardian.verifier?.id,

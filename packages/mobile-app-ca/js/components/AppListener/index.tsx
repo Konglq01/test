@@ -3,8 +3,8 @@ import LockManager from 'utils/LockManager';
 import useEffectOnce from 'hooks/useEffectOnce';
 import usePrevious from 'hooks/usePrevious';
 import { useSettings } from 'hooks/store';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
-import { isIos } from '@portkey/utils/mobile/device';
+import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { isIos } from '@portkey-wallet/utils/mobile/device';
 interface AppListenerProps {
   children: ReactElement;
 }

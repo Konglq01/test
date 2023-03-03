@@ -1,6 +1,10 @@
 import { mockAssetsData, mockNFTSeriesData, mockNFTsData, mockTokenData } from './data';
+import { request } from '@portkey-wallet/api/api-did';
+import { NetworkType } from '@portkey-wallet/types/index';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
+import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
+import { IAssetItemType } from './type';
 
-import { NetworkType } from '@portkey/types/index';
 const data = [0, 1, 2, 3, 4, 5, 6, 7].map((ele, index) => {
   return {
     isDefault: false, // boolean,
@@ -12,62 +16,97 @@ const data = [0, 1, 2, 3, 4, 5, 6, 7].map((ele, index) => {
   };
 });
 
+type ITokenItemResponse = Omit<TokenItemShowType, 'name' | 'address'>;
+
 export function fetchTokenList({
   // todo maybe remote tokenList change
-  networkType,
-  pageSize,
-  pageNo,
+  skipCount = 0,
+  maxResultCount = 1000,
+  caAddresses,
 }: {
-  networkType: NetworkType;
-  pageSize: number;
-  pageNo: number;
-}): Promise<{ data: any }> {
-  console.log('fetching....list', networkType, pageSize, pageNo);
-  return new Promise(resolve => setTimeout(() => resolve(mockTokenData), 500));
+  skipCount?: number;
+  maxResultCount?: number;
+  caAddresses: string[];
+}): Promise<{
+  data: ITokenItemResponse[];
+  totalRecordCount: number;
+}> {
+  console.log('fetching....list', skipCount, maxResultCount);
+  // return new Promise(resolve => setTimeout(() => resolve(mockTokenData), 500));
+  return request.assets.fetchAccountTokenList({
+    params: {
+      caAddresses,
+      skipCount,
+      maxResultCount,
+    },
+  });
 }
 
 export function fetchAssetList({
-  // todo maybe remote tokenList change
-  networkType,
-  pageSize,
-  pageNo,
+  caAddresses,
+  maxResultCount,
+  skipCount,
+  keyword = '',
 }: {
-  networkType: NetworkType;
-  pageSize: number;
-  pageNo: number;
-}): Promise<{ data: any }> {
-  console.log('fetching....list', networkType, pageSize, pageNo);
-
-  return new Promise(resolve => setTimeout(() => resolve(mockAssetsData), 500));
+  caAddresses: string[];
+  maxResultCount: number;
+  skipCount: number;
+  keyword: string;
+}): Promise<{ data: IAssetItemType[]; totalRecordCount: number }> {
+  return request.assets.fetchAccountAssetsByKeywords({
+    params: {
+      CaAddresses: caAddresses,
+      SkipCount: skipCount,
+      MaxResultCount: maxResultCount,
+      Keyword: keyword,
+    },
+  });
 }
 
 export function fetchNFTSeriesList({
-  networkType,
-  pageSize,
-  pageNo,
+  caAddresses = [],
+  skipCount = 0,
+  maxResultCount = 1000,
 }: {
-  networkType: NetworkType;
-  pageSize: number;
-  pageNo: number;
-}): Promise<{ data: any }> {
-  console.log('fetching....list', networkType, pageSize, pageNo);
-
-  return new Promise(resolve => setTimeout(() => resolve(mockNFTSeriesData), 500));
+  caAddresses: string[];
+  skipCount: number;
+  maxResultCount: number;
+}): Promise<{ data: any[]; totalRecordCount: number }> {
+  return request.assets.fetchAccountNftCollectionList({
+    params: {
+      caAddresses,
+      skipCount,
+      maxResultCount,
+    },
+  });
 }
 
 export function fetchNFTList({
-  // todo maybe remote tokenList change
-  networkType,
-  pageSize,
-  pageNo,
-  id,
+  symbol,
+  caAddresses,
+  skipCount = 0,
+  maxResultCount = 1000,
 }: {
-  networkType: NetworkType;
-  pageSize: number;
-  pageNo: number;
-  id: string;
-}): Promise<{ data: any }> {
-  console.log('fetching....list', networkType, pageSize, pageNo);
+  symbol: string;
+  caAddresses: string[];
+  skipCount: number;
+  maxResultCount: number;
+}): Promise<{ data: any[]; totalRecordCount: number }> {
+  return request.assets.fetchAccountNftCollectionItemList({
+    params: { caAddresses, symbol, skipCount, maxResultCount },
+  });
+}
 
-  return new Promise(resolve => setTimeout(() => resolve(mockNFTsData), 500));
+export function fetchTokenPrices({
+  symbols,
+}: {
+  symbols: string[];
+}): Promise<{ items: { symbol: string; priceInUsd: number }[]; totalRecordCount: number }> {
+  console.log('fetchTokenPrices....');
+
+  return request.token.fetchTokenPrice({
+    params: {
+      symbols,
+    },
+  });
 }

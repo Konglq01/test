@@ -1,7 +1,18 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ContactIndexType, ContactItemType, ContactMapType } from '@portkey/types/types-ca/contact';
-import { fetchContractListAsync } from './actions';
-import { executeEventToContactIndexList, sortContactIndexList, transIndexesToContactMap } from './utils';
+import { createSlice } from '@reduxjs/toolkit';
+import { ContactIndexType, ContactMapType } from '@portkey-wallet/types/types-ca/contact';
+import {
+  fetchContactListAsync,
+  addContactAction,
+  editContactAction,
+  deleteContactAction,
+  resetContactAction,
+} from './actions';
+import {
+  executeEventToContactIndexList,
+  getInitContactIndexList,
+  sortContactIndexList,
+  transIndexesToContactMap,
+} from './utils';
 
 export interface ContactState {
   lastModified: number;
@@ -11,7 +22,7 @@ export interface ContactState {
 
 export const initialState: ContactState = {
   lastModified: 0,
-  contactIndexList: [],
+  contactIndexList: getInitContactIndexList(),
   contactMap: {},
 };
 
@@ -21,8 +32,8 @@ export const contactSlice = createSlice({
   reducers: {},
   extraReducers: builder => {
     builder
-      // fetchContactList
-      .addCase(fetchContractListAsync.fulfilled, (state, action) => {
+      // getContactList
+      .addCase(fetchContactListAsync.fulfilled, (state, action) => {
         const { isInit, lastModified, contactIndexList, eventList } = action.payload;
         if (isInit && contactIndexList !== undefined) {
           state.contactIndexList = sortContactIndexList(contactIndexList);
@@ -36,10 +47,33 @@ export const contactSlice = createSlice({
           state.lastModified = lastModified;
         }
 
+        if (state.contactIndexList.length === 0) {
+          state.contactIndexList = getInitContactIndexList();
+        }
         state.contactMap = transIndexesToContactMap(state.contactIndexList);
       })
-      .addCase(fetchContractListAsync.rejected, (state, action) => {
-        console.log(action.error.message);
+      .addCase(fetchContactListAsync.rejected, (state, action) => {
+        console.log('fetchContactListAsync.rejected: error', action.error.message);
+      })
+      .addCase(addContactAction, (state, action) => {
+        let _contactIndexList = [...state.contactIndexList];
+        _contactIndexList = executeEventToContactIndexList(_contactIndexList, [action.payload]);
+        state.contactIndexList = sortContactIndexList(_contactIndexList);
+      })
+      .addCase(editContactAction, (state, action) => {
+        let _contactIndexList = [...state.contactIndexList];
+        _contactIndexList = executeEventToContactIndexList(_contactIndexList, [action.payload]);
+        state.contactIndexList = sortContactIndexList(_contactIndexList);
+      })
+      .addCase(deleteContactAction, (state, action) => {
+        let _contactIndexList = [...state.contactIndexList];
+        _contactIndexList = executeEventToContactIndexList(_contactIndexList, [action.payload]);
+        state.contactIndexList = sortContactIndexList(_contactIndexList);
+      })
+      .addCase(resetContactAction, state => {
+        state.contactIndexList = getInitContactIndexList();
+        state.contactMap = {};
+        state.lastModified = 0;
       });
   },
 });

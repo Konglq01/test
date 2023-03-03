@@ -1,19 +1,19 @@
-import { useAppCASelector, useAppCommonDispatch } from '@portkey/hooks';
-import { clearState, fetchActivitiesAsync } from '@portkey/store/store-ca/activity/slice';
-import { Transaction } from '@portkey/types/types-ca/trade';
+import { useAppCASelector, useAppCommonDispatch } from '@portkey-wallet/hooks';
 import ActivityList from 'pages/components/ActivityList';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useEffectOnce } from 'react-use';
-import { useWalletInfo } from 'store/Provider/hooks';
+import { getActivityListAsync } from '@portkey-wallet/store/store-ca/activity/action';
+import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { useUserInfo } from 'store/Provider/hooks';
+import { transactionTypesForActivityList } from '@portkey-wallet/constants/constants-ca/activity';
+import { IActivitiesApiParams } from '@portkey-wallet/store/store-ca/activity/type';
+import { clearActivity } from '@portkey-wallet/store/store-ca/activity/slice';
 
 export interface ActivityProps {
-  data?: Transaction[];
-  total?: number;
-  rate: any;
-  loading: boolean;
   appendData?: Function;
   clearData?: Function;
+  chainId?: string;
+  symbol?: string;
 }
 
 export enum EmptyTipMessage {
@@ -21,42 +21,38 @@ export enum EmptyTipMessage {
   NETWORK_NO_TRANSACTIONS = 'No transaction records accessible from the current custom network',
 }
 
-export default function Activity({ data = [], total, loading, rate, appendData, clearData }: ActivityProps) {
-  const { t } = useTranslation();
-  const { currentNetwork } = useWalletInfo();
-  // TODO use this selector to get data
-  const activities = useAppCASelector((state) => state.activity);
-  const dispatch = useAppCommonDispatch();
-  let ticking = false;
+const AMX_RESULT_COUNT = 10;
+const SKIP_COUNT = 0;
 
-  useEffectOnce(() => {
-    // TODO We need to get the activities of the current network
-    // TODO If you want to get the latest data, please dispatch(clearState()) first
-    dispatch(clearState());
-    dispatch(fetchActivitiesAsync({ type: currentNetwork }));
-  });
+export default function Activity({ appendData, clearData, chainId, symbol }: ActivityProps) {
+  const { t } = useTranslation();
+  const activity = useAppCASelector((state) => state.activity);
+
+  const dispatch = useAppCommonDispatch();
+  const { passwordSeed } = useUserInfo();
+  const currentWallet = useCurrentWallet();
+  const {
+    walletInfo: { caAddressList },
+  } = currentWallet;
 
   useEffect(() => {
-    console.log('>>>>activities', activities);
-  }, [activities]);
+    if (passwordSeed) {
+      // We need to get the activities of the current network
+      // If you want to get the latest data, please dispatch(clearState()) first
+      dispatch(clearActivity());
 
-  const handleScroll: EventListener = (event) => {
-    const target = event.target as Element;
-    if (!ticking) {
-      window.requestAnimationFrame(() => {
-        if (target) {
-          if (target.clientHeight === target.scrollHeight - target.scrollTop) {
-            if (!loading) {
-              // TODO page change
-              dispatch(fetchActivitiesAsync({ type: 'MAIN' }));
-            }
-          }
-        }
-        ticking = false;
-      });
-      ticking = true;
+      const params: IActivitiesApiParams = {
+        maxResultCount: AMX_RESULT_COUNT,
+        skipCount: SKIP_COUNT,
+        caAddresses: caAddressList,
+        chainId: chainId,
+        symbol: symbol,
+        transactionTypes: transactionTypesForActivityList,
+      };
+      dispatch(getActivityListAsync(params));
     }
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [passwordSeed]);
 
   useEffect(() => {
     clearData?.();
@@ -64,20 +60,29 @@ export default function Activity({ data = [], total, loading, rate, appendData, 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffectOnce(() => {
-    const root = document.querySelector('#root');
-    root?.addEventListener('scroll', handleScroll);
-    return root?.removeEventListener('scroll', handleScroll);
-  });
+  const loadMoreActivities = useCallback(() => {
+    const { data, maxResultCount, skipCount, totalRecordCount } = activity;
+    if (data.length < totalRecordCount) {
+      const params = {
+        maxResultCount: AMX_RESULT_COUNT,
+        skipCount: skipCount + maxResultCount,
+        caAddresses: caAddressList,
+        chainId: chainId,
+        symbol: symbol,
+        transactionTypes: transactionTypesForActivityList,
+      };
+      return dispatch(getActivityListAsync(params));
+    }
+  }, [activity, caAddressList, chainId, dispatch, symbol]);
 
   return (
     <div className="activity-wrapper">
-      {!total ? (
+      {activity.totalRecordCount ? (
         <ActivityList
-          hasMore={false}
-          loadMore={function (isRetry: boolean): Promise<void> {
-            throw new Error('Function not implemented.');
-          }}
+          data={activity.data}
+          chainId={chainId}
+          hasMore={activity.data.length < activity.totalRecordCount}
+          loadMore={loadMoreActivities}
         />
       ) : (
         <p className="empty">{t(EmptyTipMessage.NO_TRANSACTIONS)}</p>

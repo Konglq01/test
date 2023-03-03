@@ -1,8 +1,7 @@
-import { sendVerificationCode } from '@portkey/api/api-did/apiUtils/verification';
-import { setCurrentGuardianAction, setUserGuardianItemStatus } from '@portkey/store/store-ca/guardians/actions';
-import { UserGuardianItem, UserGuardianStatus } from '@portkey/store/store-ca/guardians/type';
-import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
-import { VerifyStatus } from '@portkey/types/verifier';
+import { setCurrentGuardianAction, setUserGuardianItemStatus } from '@portkey-wallet/store/store-ca/guardians/actions';
+import { UserGuardianItem, UserGuardianStatus } from '@portkey-wallet/store/store-ca/guardians/type';
+import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
+import { VerifyStatus } from '@portkey-wallet/types/verifier';
 import { Button, message } from 'antd';
 import clsx from 'clsx';
 import VerifierPair from 'components/VerifierPair';
@@ -12,8 +11,9 @@ import { useLocation, useNavigate } from 'react-router';
 import { useAppDispatch, useLoading } from 'store/Provider/hooks';
 import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
 import { LoginInfo } from 'store/reducers/loginCache/type';
-import { DefaultChainId } from '@portkey/constants/constants-ca/network';
-import { contractErrorHandler } from 'utils/tryErrorHandler';
+import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
+import { verifyErrorHandler } from 'utils/tryErrorHandler';
+import { verification } from 'utils/api';
 
 interface GuardianItemProps {
   disabled?: boolean;
@@ -38,11 +38,13 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
             loginType: item.guardianType,
           }),
         );
-        const result = await sendVerificationCode({
-          guardianAccount: item?.guardianAccount,
-          type: LoginStrType[item.guardianType],
-          verifierId: item?.verifier?.id || '',
-          chainId: DefaultChainId,
+        const result = await verification.sendVerificationCode({
+          params: {
+            guardianAccount: item?.guardianAccount,
+            type: LoginStrType[item.guardianType],
+            verifierId: item?.verifier?.id || '',
+            chainId: DefaultChainId,
+          },
         });
         setLoading(false);
         if (result.verifierSessionId) {
@@ -67,7 +69,7 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
       } catch (error: any) {
         console.log('---guardian-sendCode-error', error);
         setLoading(false);
-        message.error(contractErrorHandler(error));
+        message.error(verifyErrorHandler(error));
       }
     },
     [setLoading, dispatch, navigate, state],
@@ -87,11 +89,13 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
             'User registration information is invalid, please fill in the registration method again',
           );
         setLoading(true);
-        const result = await sendVerificationCode({
-          guardianAccount: item?.guardianAccount,
-          type: LoginStrType[loginAccount.loginType],
-          verifierId: item.verifier?.id || '',
-          chainId: DefaultChainId,
+        const result = await verification.sendVerificationCode({
+          params: {
+            guardianAccount: item?.guardianAccount,
+            type: LoginStrType[loginAccount.loginType],
+            verifierId: item.verifier?.id || '',
+            chainId: DefaultChainId,
+          },
         });
         setLoading(false);
         if (result.verifierSessionId) {
@@ -116,7 +120,8 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
       } catch (error: any) {
         console.log(error, 'error===');
         setLoading(false);
-        message.error(error?.error?.message ?? error?.type ?? 'Something error');
+        const _error = verifyErrorHandler(error);
+        message.error(_error);
       }
     },
     [state, loginAccount, setLoading, guardianSendCode, dispatch, navigate],

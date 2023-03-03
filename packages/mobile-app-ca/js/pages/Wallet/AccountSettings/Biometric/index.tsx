@@ -1,10 +1,8 @@
 import React, { useCallback } from 'react';
 import PageContainer from 'components/PageContainer';
 import ListItem from 'components/ListItem';
-import { touchAuth } from '@portkey/utils/mobile/authentication';
+import { touchAuth } from '@portkey-wallet/utils/mobile/authentication';
 import CommonToast from 'components/CommonToast';
-import { useAppDispatch } from 'store/hooks';
-import { setBiometrics } from 'store/user/actions';
 import useBiometricsReady from 'hooks/useBiometrics';
 import navigationService from 'utils/navigationService';
 import { StyleSheet } from 'react-native';
@@ -16,13 +14,13 @@ import i18n from 'i18n';
 import { useUser } from 'hooks/store';
 import { TextM } from 'components/CommonText';
 import ActionSheet from 'components/ActionSheet';
-import { setSecureStoreItem } from '@portkey/utils/mobile/biometric';
+import { setSecureStoreItem } from '@portkey-wallet/utils/mobile/biometric';
 import myEvents from 'utils/deviceEvent';
+import { useSetBiometrics } from '@portkey-wallet/hooks/mobile';
 
 export default function Biometric() {
-  const dispatch = useAppDispatch();
   const { biometrics } = useUser();
-
+  const setBiometrics = useSetBiometrics();
   const biometricsReady = useBiometricsReady();
   const { t } = useLanguage();
   const openBiometrics = useCallback(
@@ -30,14 +28,14 @@ export default function Biometric() {
       if (checkPin(pin)) {
         try {
           await setSecureStoreItem('Pin', pin);
-          dispatch(setBiometrics(true));
+          await setBiometrics(true);
         } catch (error: any) {
           CommonToast.failError(error, i18n.t('Failed to enable biometrics'));
-          dispatch(setBiometrics(false));
+          await setBiometrics(false);
         }
       }
     },
-    [dispatch],
+    [setBiometrics],
   );
   useEffectOnce(() => {
     const listener = myEvents.openBiometrics.addListener(openBiometrics);
@@ -58,16 +56,20 @@ export default function Biometric() {
               type: 'primary',
               title: 'Confirm',
               onPress: async () => {
-                const enrolled = await touchAuth();
-                if (enrolled.success) dispatch(setBiometrics(value));
-                else CommonToast.fail(enrolled.warning || enrolled.error);
+                try {
+                  const enrolled = await touchAuth();
+                  if (enrolled.success) await setBiometrics(value);
+                  else CommonToast.fail(enrolled.warning || enrolled.error);
+                } catch (error) {
+                  CommonToast.failError(error, i18n.t('Failed to enable biometrics'));
+                }
               },
             },
           ],
         });
       }
     },
-    [dispatch],
+    [setBiometrics],
   );
   return (
     <PageContainer containerStyles={styles.containerStyles} safeAreaColor={['blue', 'gray']} titleDom={t('Biometric')}>

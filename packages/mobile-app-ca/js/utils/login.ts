@@ -1,9 +1,9 @@
-import { GUARDIAN_TYPE_TYPE, LoginStrType } from '@portkey/constants/constants-ca/guardian';
-import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
-import { resetWallet } from '@portkey/store/store-ca/wallet/actions';
-import { GuardiansInfo } from '@portkey/types/guardian';
-import { LoginType } from '@portkey/types/types-ca/wallet';
-import { VerifierItem } from '@portkey/types/verifier';
+import { GUARDIAN_TYPE_TYPE, LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
+import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type';
+import { resetWallet } from '@portkey-wallet/store/store-ca/wallet/actions';
+import { GuardiansInfo } from '@portkey-wallet/types/guardian';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import { VerifierItem } from '@portkey-wallet/types/verifier';
 import ActionSheet from 'components/ActionSheet';
 import { GuardiansStatus } from 'pages/Guardian/types';
 import { AppDispatch } from 'store';
@@ -48,14 +48,16 @@ export function handleUserGuardiansList(holderInfo: GuardiansInfo, verifierServe
 }
 
 export function handleGuardiansApproved(guardiansStatus: GuardiansStatus, userGuardiansList: UserGuardianItem[]) {
-  return Object.keys(guardiansStatus).map(key => {
-    const status = guardiansStatus?.[key];
-    const guardian = userGuardiansList?.find(item => item.key === key);
-    return {
-      ...status?.verifierInfo,
-      value: guardian?.guardianAccount,
-      guardianType: guardian?.guardianType,
-      type: LoginStrType[guardian?.guardianType as LoginType],
-    };
-  });
+  return Object.keys(guardiansStatus)
+    .map(key => {
+      const status = guardiansStatus?.[key];
+      const guardian = userGuardiansList?.find(item => item.key === key);
+      return {
+        ...status?.verifierInfo,
+        value: guardian?.guardianAccount,
+        guardianType: guardian?.guardianType,
+        type: LoginStrType[guardian?.guardianType as LoginType],
+      };
+    })
+    .filter(item => item.signature && item.verificationDoc);
 }

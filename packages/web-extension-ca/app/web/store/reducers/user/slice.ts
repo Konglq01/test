@@ -1,9 +1,9 @@
-import { opacityType } from '@portkey/types';
+import { OpacityType } from '@portkey-wallet/types';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface UserState {
   passwordSeed: string;
-  isLoading?: boolean | opacityType;
+  isLoading?: boolean | OpacityType;
 }
 
 export const initialState: UserState = {
@@ -18,7 +18,7 @@ export const userSlice = createSlice({
     setPasswordSeed: (state, action: PayloadAction<string>) => {
       state.passwordSeed = action.payload;
     },
-    setGlobalLoading: (state, action: PayloadAction<boolean | opacityType>) => {
+    setGlobalLoading: (state, action: PayloadAction<boolean | OpacityType>) => {
       state.isLoading = action.payload;
     },
   },

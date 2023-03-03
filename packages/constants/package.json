@@ -1,5 +1,5 @@
 {
-  "name": "@portkey/constants",
+  "name": "@portkey-wallet/constants",
   "publishConfig": {
     "access": "public"
   },
@@ -10,5 +10,8 @@
     "build": "tsc",
     "start": "tsc --watch",
     "handle-network": "cd ./scripts && node handleNetwork.js && cd .."
+  },
+  "dependencies": {
+    "@portkey-wallet/types": "^0.0.1"
   }
 }

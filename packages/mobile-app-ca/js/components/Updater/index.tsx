@@ -1,10 +1,15 @@
-import myServer from '@portkey/api/server';
-import { useChainListFetch } from '@portkey/hooks/hooks-ca/chainList';
-import { useCurrentApiUrl } from '@portkey/hooks/hooks-ca/network';
+import { request } from '@portkey-wallet/api/api-did';
+import { useChainListFetch } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { service } from 'api/utils';
+import { usePin } from 'hooks/store';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { useLanguage } from 'i18n/hooks';
 import { useMemo } from 'react';
+import { useRefreshTokenConfig } from '@portkey-wallet/hooks/hooks-ca/api';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
+import useLocking from 'hooks/useLocking';
+import { useCaInfoOnChain } from 'hooks/useCaInfoOnChain';
+import { useFetchSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
 
 export default function Updater() {
   // FIXME: delete language
@@ -13,14 +18,21 @@ export default function Updater() {
     changeLanguage('en');
   });
   useChainListFetch();
-
-  const apiUrl = useCurrentApiUrl();
+  const { apiUrl } = useCurrentNetworkInfo();
+  const pin = usePin();
+  const onLocking = useLocking();
+  useRefreshTokenConfig(pin);
+  useCaInfoOnChain();
+  useFetchSymbolImages();
   useMemo(() => {
-    myServer.set('baseURL', apiUrl);
+    request.set('baseURL', apiUrl);
     if (service.defaults.baseURL !== apiUrl) {
       service.defaults.baseURL = apiUrl;
     }
   }, [apiUrl]);
 
+  useMemo(() => {
+    request.setLockCallBack(onLocking);
+  }, [onLocking]);
   return null;
 }

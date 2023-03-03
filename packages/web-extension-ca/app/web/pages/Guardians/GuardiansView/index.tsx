@@ -4,32 +4,30 @@ import { useNavigate } from 'react-router';
 import CustomSvg from 'components/CustomSvg';
 import SettingHeader from 'pages/components/SettingHeader';
 import { useAppDispatch, useGuardiansInfo, useLoading, useUserInfo } from 'store/Provider/hooks';
-import { useState, useMemo, useCallback } from 'react';
-import { sendVerificationCode } from '@portkey/api/api-did/apiUtils/verification';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { handleGuardian } from 'utils/sandboxUtil/handleGuardian';
 import './index.less';
 import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
-import { LoginType } from '@portkey/types/types-ca/wallet';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import {
   setCurrentGuardianAction,
   setOpGuardianAction,
   setPreGuardianAction,
-} from '@portkey/store/store-ca/guardians/actions';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
-import getPrivateKeyAndMnemonic from 'utils/Wallet/getPrivateKeyAndMnemonic';
+} from '@portkey-wallet/store/store-ca/guardians/actions';
+import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { GuardianMth } from 'types/guardians';
-import { sleep } from '@portkey/utils';
-import { getAelfInstance } from '@portkey/utils/aelf';
-import { getTxResult } from 'utils/aelfUtils';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
-import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
-import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
-import { DefaultChainId } from '@portkey/constants/constants-ca/network';
+import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
+import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type';
+import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
+import useGuardianList from 'hooks/useGuardianList';
+import { verification } from 'utils/api';
+import aes from '@portkey-wallet/utils/aes';
 
 enum SwitchFail {
   default = 0,
@@ -40,6 +38,7 @@ enum SwitchFail {
 export default function GuardiansView() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const getGuardianList = useGuardianList();
   const { currentGuardian, opGuardian, userGuardiansList } = useGuardiansInfo();
   const [tipOpen, setTipOpen] = useState<boolean>(false);
   const [switchFail, setSwitchFail] = useState<SwitchFail>(SwitchFail.default);
@@ -51,44 +50,38 @@ export default function GuardiansView() {
   const { passwordSeed } = useUserInfo();
   const editable = useMemo(() => Object.keys(userGuardiansList ?? {}).length > 1, [userGuardiansList]);
 
+  useEffect(() => {
+    getGuardianList({ caHash: walletInfo.caHash });
+  }, [getGuardianList, walletInfo.caHash]);
+
   const verifyHandler = useCallback(async () => {
     try {
       if (opGuardian?.isLoginAccount) {
-        const res = await getPrivateKeyAndMnemonic(
-          {
-            AESEncryptPrivateKey: walletInfo.AESEncryptPrivateKey,
-          },
-          passwordSeed,
-        );
-        if (!currentChain?.endPoint || !res?.privateKey) return message.error('unset login account error');
+        const privateKey = aes.decrypt(walletInfo.AESEncryptPrivateKey, passwordSeed);
+        if (!currentChain?.endPoint || !privateKey) return message.error('unset login account error');
         setLoading(true);
         const result = await handleGuardian({
           rpcUrl: currentChain.endPoint,
           chainType: currentNetwork.walletType,
           address: currentChain.caContractAddress,
-          privateKey: res.privateKey,
+          privateKey: privateKey,
           paramsOption: {
             method: GuardianMth.UnsetGuardianTypeForLogin,
-            params: [
-              {
-                caHash: walletInfo?.AELF?.caHash,
-                guardianAccount: {
-                  guardian: {
-                    type: currentGuardian?.guardianType,
-                    verifier: {
-                      id: currentGuardian?.verifier?.id,
-                    },
+            params: {
+              caHash: walletInfo?.AELF?.caHash,
+              guardianAccount: {
+                guardian: {
+                  type: currentGuardian?.guardianType,
+                  verifier: {
+                    id: currentGuardian?.verifier?.id,
                   },
-                  value: currentGuardian?.guardianAccount,
                 },
+                value: currentGuardian?.guardianAccount,
               },
-            ],
+            },
           },
         });
-        const { TransactionId } = result.result.message || result;
-        await sleep(1000);
-        const aelfInstance = getAelfInstance(currentChain.endPoint);
-        await getTxResult(aelfInstance, TransactionId);
+        console.log('unSetLoginAccount', result);
         dispatch(
           setOpGuardianAction({
             ...opGuardian,
@@ -105,11 +98,14 @@ export default function GuardiansView() {
           }),
         );
         setLoading(true);
-        const result = await sendVerificationCode({
-          guardianAccount: opGuardian?.guardianAccount as string,
-          type: LoginStrType[opGuardian?.guardianType as LoginType],
-          verifierId: opGuardian?.verifier?.id || '',
-          chainId: DefaultChainId,
+
+        const result = await verification.sendVerificationCode({
+          params: {
+            guardianAccount: opGuardian?.guardianAccount as string,
+            type: LoginStrType[opGuardian?.guardianType as LoginType],
+            verifierId: opGuardian?.verifier?.id || '',
+            chainId: DefaultChainId,
+          },
         });
         setLoading(false);
         if (result.verifierSessionId) {
@@ -132,8 +128,8 @@ export default function GuardiansView() {
       }
     } catch (error: any) {
       setLoading(false);
-      message.error(contractErrorHandler(error) || error?.type);
-      console.log('---setLoginAccount-error', error);
+      message.error(contractErrorHandler(error?.error || error) || error?.type);
+      console.log('---setLoginAccount-error---', error);
     }
   }, [
     currentChain,
@@ -168,10 +164,11 @@ export default function GuardiansView() {
           });
           setSwitchFail(SwitchFail.openFail);
         } catch (error: any) {
-          if (error?.Error?.Details && error?.Error?.Details?.indexOf('Not found ca_hash')) {
+          const _error = contractErrorHandler(error);
+          if (_error.indexOf('Not found ca_hash')) {
             setTipOpen(true);
           } else {
-            message.error(contractErrorHandler(error));
+            message.error(_error);
             throw error;
           }
         }
@@ -244,14 +241,16 @@ export default function GuardiansView() {
               navigate('/setting/guardians/edit');
             }}
             type="primary">
-            {t('Change Verifier')}
+            {t('Edit')}
           </Button>
         </div>
       </div>
       <CommonModal className="verify-confirm-modal" closable={false} open={tipOpen} onCancel={() => setTipOpen(false)}>
-        <p className="modal-content">{`${opGuardian?.verifier?.name ?? ''} will send a verification code to ${
-          opGuardian?.guardianAccount
-        } to verify your email address.`}</p>
+        <p className="modal-content">
+          {`${opGuardian?.verifier?.name ?? ''} will send a verification code to `}
+          <span className="bold">{opGuardian?.guardianAccount}</span>
+          {` to verify your email address.`}
+        </p>
         <div className="btn-wrapper">
           <Button onClick={() => setTipOpen(false)}>{t('Cancel')}</Button>
           <Button type="primary" onClick={verifyHandler}>

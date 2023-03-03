@@ -1,38 +1,40 @@
-import { BaseToken } from '@portkey/types/types-ca/token';
+import { BaseToken } from '@portkey-wallet/types/types-ca/token';
 import NftInput from './NftInput';
 import TokenInput from './TokenInput';
 
 export default function AmountInput({
   fromAccount,
-  type,
+  type = 'token',
   toAccount,
   value,
   token,
+  errorMsg,
   onChange,
 }: {
-  fromAccount: { address: string; AESEncryptPrivateKey?: string };
+  fromAccount: { address: string; AESEncryptPrivateKey: string };
   type: 'token' | 'nft';
   toAccount: { address: string };
   value: string;
   token: BaseToken;
-  onChange: (amount: string) => void;
+  errorMsg: string;
+  onChange: (params: { amount: string; balance: string }) => void;
 }) {
   return type === 'token' ? (
     <TokenInput
-      toAccount={{
-        address: '',
-      }}
+      fromAccount={fromAccount}
+      toAccount={toAccount}
       value={value}
       token={token}
+      errorMsg={errorMsg}
       onChange={onChange}
     />
   ) : (
     <NftInput
-      toAccount={{
-        address: '',
-      }}
+      fromAccount={fromAccount}
+      toAccount={toAccount}
       value={value}
       token={token}
+      errorMsg={errorMsg}
       onChange={onChange}
     />
   );

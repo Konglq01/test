@@ -1,3 +1,5 @@
+import { DeviceType } from '@portkey-wallet/types/types-ca/wallet';
+
 export const prefixCls = 'portkey';
 // redux
 export const reduxStorageRoot = 'root';
@@ -14,3 +16,17 @@ export const ACK_KEEP_ALIVE_MESSAGE = 'ACK_KEEP_ALIVE_MESSAGE';
 export const TIME_45_MIN_IN_MS = 45 * 60 * 1000;
 export const WORKER_KEEP_ALIVE_INTERVAL = 1000;
 export const ACK_KEEP_ALIVE_WAIT_TIME = 60_000;
+
+// device
+export const DEVICE_TYPE = (() => {
+  if (!navigator?.userAgent) return DeviceType.other;
+  const agent = navigator.userAgent.toLowerCase();
+  const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
+  if (isMac) {
+    return DeviceType.mac;
+  }
+  if (agent.indexOf('win') >= 0 || agent.indexOf('wow') >= 0) {
+    return DeviceType.windows;
+  }
+  return DeviceType.other;
+})();

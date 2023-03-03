@@ -1,5 +1,5 @@
-import { useWallet } from '@portkey/hooks/hooks-ca/wallet';
-import { ContactItemType, RecentContactItemType } from '@portkey/types/types-ca/contact';
+import { useWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { RecentContactItemType } from '@portkey-wallet/types/types-ca/contact';
 import { defaultColors } from 'assets/theme';
 import { FontStyles } from 'assets/theme/styles';
 import GStyles from 'assets/theme/GStyles';
@@ -13,7 +13,7 @@ import { formatStr2EllipsisStr } from 'utils';
 import { pTd } from 'utils/unit';
 
 export interface ItemType {
-  contact: ContactItemType | RecentContactItemType;
+  contact: RecentContactItemType;
   onPress?: (item: any) => void;
 }
 
@@ -39,15 +39,16 @@ const RecentContactItem: React.FC<ItemType> = props => {
           {contact?.addresses?.map((ele, index) => (
             <TouchableOpacity
               style={[index !== 0 && styles.addressItemWrap]}
-              key={`${ele?.address}${ele.chainType}`}
+              key={`${ele?.address}${ele?.chainId}`}
               onPress={() => {
-                onPress?.({ address: contact.addresses?.[0].address, name: contact.name });
+                const { address, chainId } = contact.addresses?.[index];
+                onPress?.({ address: `ELF_${address}_${chainId}`, name: contact.name });
               }}>
-              <Text style={[styles.address, Math.random() > 0.5 && FontStyles.font7]}>
-                {formatStr2EllipsisStr(ele?.address, 10)}
+              <Text style={[styles.address, !!0 && FontStyles.font7]}>
+                {formatStr2EllipsisStr(`ELF_${ele?.address}_${ele.chainId}`, 10)}
               </Text>
               {/* TODO */}
-              <Text style={[styles.address, Math.random() > 0.5 && FontStyles.font7]}>
+              <Text style={[styles.address, !!0 && FontStyles.font7]}>
                 {`${ele?.chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${ele?.chainId} ${
                   currentNetwork === 'TESTNET' && 'Testnet'
                 }`}
@@ -62,12 +63,14 @@ const RecentContactItem: React.FC<ItemType> = props => {
     <TouchableOpacity
       style={styles.itemWrap}
       onPress={() => {
-        onPress?.({ address: contact.addresses?.[0].address, name: '' });
+        onPress?.({ address: `ELF_${contact.addresses?.[0].address}_${contact.addresses?.[0].chainId}`, name: '' });
       }}>
-      <TextS style={styles.address1}>{formatStr2EllipsisStr(contact.addresses?.[0].address, 10)}</TextS>
-      <Text style={styles.chainInfo1}>{`${contact?.id === 'AELF' ? 'MainChain' : 'SideChain'} ${contact?.id} ${
-        currentNetwork === 'TESTNET' && 'Testnet'
-      }`}</Text>
+      <TextS style={styles.address1}>
+        {formatStr2EllipsisStr(`ELF_${contact.addresses?.[0].address}_${contact.addressChainId}`, 10)}
+      </TextS>
+      <Text style={styles.chainInfo1}>{`${contact?.addressChainId === 'AELF' ? 'MainChain' : 'SideChain'} ${
+        contact?.addressChainId
+      } ${currentNetwork === 'TESTNET' && 'Testnet'}`}</Text>
     </TouchableOpacity>
   );
 };

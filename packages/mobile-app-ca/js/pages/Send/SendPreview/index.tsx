@@ -1,32 +1,47 @@
-import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
-import { Text, TouchableOpacity, View, StyleSheet } from 'react-native';
+import React, { memo, useCallback, useMemo, useRef, useState } from 'react';
+import { Text, View, StyleSheet } from 'react-native';
 import PageContainer from 'components/PageContainer';
-import navigationService from 'utils/navigationService';
-import { useFocusEffect } from '@react-navigation/native';
-import { useAppCASelector } from '@portkey/hooks/hooks-ca';
-import CommonToast from 'components/CommonToast';
-// import { divDecimals, timesDecimals } from '@portkey/utils/converter';
-
 import { defaultColors } from 'assets/theme';
 import { pTd } from 'utils/unit';
 import { TextM, TextS, TextL } from 'components/CommonText';
 import CommonButton from 'components/CommonButton';
 import ActionSheet from 'components/ActionSheet';
-import useQrScanPermission from 'hooks/useQrScanPermission';
-// import CrossChainTransferModal from '../components/CrossChainTransferModal';
-import { ZERO } from '@portkey/constants/misc';
-import { useGetELFRateQuery } from '@portkey/store/rate/api';
-// import { ContractBasic } from 'utils/contract';
-import useEffectOnce from 'hooks/useEffectOnce';
-import { formatAddress2NoPrefix, formatStr2EllipsisStr } from 'utils';
-import { addRecentContact } from '@portkey/store/store-ca/recent/slice';
-import { isAelfAddress } from '@portkey/utils/aelf';
-import { updateBalance } from '@portkey/store/tokenBalance/slice';
+import { formatChainInfo, formatStr2EllipsisStr } from 'utils';
+import { isCrossChain } from '@portkey-wallet/utils/aelf';
 import { useLanguage } from 'i18n/hooks';
-import { useAppCommonDispatch } from '@portkey/hooks';
+import { useAppCommonDispatch } from '@portkey-wallet/hooks';
 import GStyles from 'assets/theme/GStyles';
 import fonts from 'assets/theme/fonts';
 import { Image, ScreenHeight } from '@rneui/base';
+import { getContractBasic } from '@portkey-wallet/contracts/utils';
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { usePin, useWallet } from 'hooks/store';
+import { getManagerAccount } from 'utils/redux';
+import crossChainTransfer, {
+  CrossChainTransferParamsType,
+  intervalCrossChainTransfer,
+} from 'utils/transfer/crossChainTransfer';
+import { useCurrentNetwork } from '@portkey-wallet/hooks/network';
+import { useCaAddresses, useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { timesDecimals, unitConverter } from '@portkey-wallet/utils/converter';
+import sameChainTransfer from 'utils/transfer/sameChainTransfer';
+import { addFailedActivity, removeFailedActivity } from '@portkey-wallet/store/store-ca/activity/slice';
+import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
+import CommonToast from 'components/CommonToast';
+import navigationService from 'utils/navigationService';
+import Loading from 'components/Loading';
+import { IToSendPreviewParamsType } from '@portkey-wallet/types/types-ca/routeParams';
+import { BaseToken } from '@portkey-wallet/types/types-ca/token';
+import { ContractBasic } from '@portkey-wallet/contracts/utils/ContractBasic';
+import { ZERO } from '@portkey-wallet/constants/misc';
+import { CROSS_FEE } from '@portkey-wallet/constants/constants-ca/wallet';
+import {
+  clearNftCollection,
+  fetchNFTCollectionsAsync,
+  fetchTokenListAsync,
+} from '@portkey-wallet/store/store-ca/assets/slice';
+import { sleep } from '@portkey-wallet/utils';
+import { FontStyles } from 'assets/theme/styles';
 
 export interface SendHomeProps {
   route?: any;
@@ -34,125 +49,230 @@ export interface SendHomeProps {
 
 const SendHome: React.FC<SendHomeProps> = props => {
   const { t } = useLanguage();
-  const { route } = props;
-  const { params } = route;
-  const { sendType } = params;
-  const tokenItem = {
-    symbol: 'ELF',
-    address: 'xxx',
-    decimal: 8,
-    decimals: 8,
-  };
+
+  const { sendType, assetInfo, toInfo, transactionFee, sendNumber } = useRouterParams<IToSendPreviewParamsType>();
 
   const dispatch = useAppCommonDispatch();
 
+  const pin = usePin();
+  const chainInfo = useCurrentChain(assetInfo.chainId);
+  const caAddresses = useCaAddresses();
+
   const [isLoading] = useState(false);
+  const currentNetwork = useCurrentNetwork();
+  const wallet = useCurrentWalletInfo();
+  const { walletName } = useWallet();
+  const contractRef = useRef<ContractBasic>();
+  const tokenContractRef = useRef<ContractBasic>();
 
-  // TODO
-  // const totalPay = useMemo(() => {
-  //   // TODO: TransferNumber + Transaction Fee
-  //   const totalTransactionFee = ZERO.plus(transactionFee).times(data?.USDT || 0);
-  //   const totalTransferNumber =
-  //     selectedToken.symbol === 'ELF' ? ZERO.plus(sendTokenNumber).times(data?.USDT || 0) : ZERO;
-  //   console.log(totalTransactionFee.valueOf(), totalTransferNumber.valueOf());
+  const isCrossChainTransfer = isCrossChain(toInfo.address, assetInfo.chainId);
 
-  //   return totalTransactionFee.plus(totalTransferNumber);
-  // }, [data?.USDT, selectedToken, sendTokenNumber, transactionFee]);
+  const txFeeShow = useMemo(() => {
+    if (isCrossChainTransfer && assetInfo.symbol === 'ELF') {
+      return unitConverter(ZERO.plus(CROSS_FEE).plus(transactionFee).toNumber());
+    } else {
+      return transactionFee;
+    }
+  }, [isCrossChainTransfer, assetInfo.symbol, transactionFee]);
 
-  // const showCrossChainTips = () => {
-  //   CrossChainTransferModal.alert({});
-  // };
+  const showRetry = useCallback(
+    (retryFunc: () => void) => {
+      ActionSheet.alert({
+        title: t('Transaction failed ！'),
+        buttons: [
+          {
+            title: t('Resend'),
+            type: 'solid',
+            onPress: () => {
+              retryFunc();
+            },
+          },
+        ],
+      });
+    },
+    [t],
+  );
 
-  //  TODO: when finish send upDate balance
+  const transfer = useCallback(async () => {
+    const tokenInfo = {
+      symbol: assetInfo.symbol,
+      decimals: assetInfo.decimals ?? 0,
+      address: assetInfo.tokenContractAddress,
+    };
 
-  const transfer = async () => {
-    // TODO
-    CommonToast.success(t('Transfer Successful'));
-    navigationService.navigate('DashBoard');
+    if (!chainInfo || !pin) return;
+    const account = getManagerAccount(pin);
+    if (!account) return;
 
-    return;
+    if (!contractRef.current) {
+      contractRef.current = await getContractBasic({
+        contractAddress: chainInfo.caContractAddress,
+        rpcUrl: chainInfo.endPoint,
+        account,
+      });
+    }
 
-    // try {
-    //   const tmpAccount = getCurrentAccount(credentials?.pin || '', selectedFromAccount);
-    //   if (!tmpAccount) return;
-    //   setIsLoading(true);
-    //   const getContractParams = {
-    //     rpcUrl: currentChain?.rpcUrl,
-    //     contractAddress:
-    //       currentChain.basicContracts?.tokenContract || 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE',
-    //     account: tmpAccount,
-    //   };
+    const contract = contractRef.current;
+    const amount = timesDecimals(sendNumber, tokenInfo.decimals).toNumber();
 
-    //   const elfContract = await getELFContract(getContractParams);
-    //   console.log('elfContract', elfContract);
-    //   const accountBalance = await elfContract?.callViewMethod('GetBalance', {
-    //     symbol: 'ELF',
-    //     owner: tmpAccount.address,
-    //   });
-    //   console.log('accountBalance', accountBalance);
+    if (isCrossChainTransfer) {
+      if (!tokenContractRef.current) {
+        tokenContractRef.current = await getContractBasic({
+          contractAddress: tokenInfo.address,
+          rpcUrl: chainInfo.endPoint,
+          account,
+        });
+      }
+      const tokenContract = tokenContractRef.current;
 
-    //   const paramsOption = {
-    //     symbol: selectedToken?.symbol,
-    //     memo: '',
-    //     to: formatAddress2NoPrefix(selectedToContact.address),
-    //     amount: timesDecimals(sendTokenNumber, selectedToken?.decimals ?? 8).toFixed(),
-    //   };
-    //   console.log('paramsOption', paramsOption);
+      const crossChainTransferResult = await crossChainTransfer({
+        tokenContract,
+        contract,
+        chainType: currentNetwork.chainType ?? 'aelf',
+        managerAddress: wallet.address,
+        tokenInfo: { ...assetInfo, address: assetInfo.tokenContractAddress } as unknown as BaseToken,
+        caHash: wallet.caHash || '',
+        amount,
+        toAddress: toInfo.address,
+      });
 
-    //   const result = await elfContract?.callSendMethod('Transfer', '', paramsOption);
-    //   console.log('result', result);
-    //   if (result.error) {
-    //     setIsLoading(false);
-    //     return CommonToast.fail(result.error.message);
-    //   } else {
-    //     // success
-    //     console.log(result.TransactionId);
-    //     setIsLoading(false);
-    //     CommonToast.success(t('Transfer Successful'));
-    //     upDateBalance();
-    //     // dispatch(
-    //     //   addRecentContact({
-    //     //     rpcUrl: currentChain.rpcUrl,
-    //     //     contact: {
-    //     //       name: selectedToContact.name,
-    //     //       address: formatAddress2NoPrefix(selectedToContact.address),
-    //     //     },
-    //     //   }),
-    //     // );
+      console.log('crossChainTransferResult', crossChainTransferResult);
+    } else {
+      console.log('sameChainTransfers==sendHandler', tokenInfo);
+      const sameTransferResult = await sameChainTransfer({
+        contract,
+        tokenInfo: {
+          ...assetInfo,
+          address: assetInfo?.tokenContractAddress || assetInfo?.address,
+        } as unknown as BaseToken,
+        caHash: wallet.caHash || '',
+        amount,
+        toAddress: toInfo.address,
+      });
 
-    //     navigationService.goBack();
-    //   }
+      if (sameTransferResult.error) {
+        return CommonToast.fail(sameTransferResult?.error?.message || '');
+      }
+      console.log('sameTransferResult', sameTransferResult);
+    }
 
-    //   setIsLoading(false);
-    // } catch (error) {
-    //   console.log(error);
-    //   CommonToast.fail('Please Try Again Later');
-    //   setIsLoading(false);
-    // }
+    if (sendType === 'nft') {
+      dispatch(clearNftCollection({}));
+      dispatch(fetchNFTCollectionsAsync({ caAddresses: caAddresses }));
+    } else {
+      dispatch(fetchTokenListAsync({ caAddresses: caAddresses }));
+    }
+    await sleep(1);
+
+    navigationService.navigate('Tab', { clearType: sendType + Math.random() });
+    CommonToast.success('success');
+  }, [
+    assetInfo,
+    caAddresses,
+    chainInfo,
+    currentNetwork.chainType,
+    dispatch,
+    isCrossChainTransfer,
+    pin,
+    sendNumber,
+    sendType,
+    toInfo.address,
+    wallet.address,
+    wallet.caHash,
+  ]);
+
+  const retryCrossChain = useCallback(
+    async (managerTransferTxId: string, data: CrossChainTransferParamsType) => {
+      const tokenInfo = {
+        symbol: assetInfo.symbol,
+        decimals: assetInfo.decimals ?? 0,
+        address: assetInfo.tokenContractAddress,
+      };
+      if (!chainInfo || !pin) return;
+      const account = getManagerAccount(pin);
+      if (!account) return;
+
+      Loading.show();
+      try {
+        if (!tokenContractRef.current) {
+          tokenContractRef.current = await getContractBasic({
+            contractAddress: tokenInfo.address,
+            rpcUrl: chainInfo.endPoint,
+            account,
+          });
+        }
+        const tokenContract = tokenContractRef.current;
+        await intervalCrossChainTransfer(tokenContract, data);
+        dispatch(removeFailedActivity(managerTransferTxId));
+        navigationService.navigate('Tab');
+        CommonToast.success('success');
+      } catch (error) {
+        showRetry(() => {
+          retryCrossChain(managerTransferTxId, data);
+        });
+      }
+      Loading.hide();
+    },
+    [assetInfo.decimals, assetInfo.symbol, assetInfo.tokenContractAddress, chainInfo, dispatch, pin, showRetry],
+  );
+
+  const onSend = async () => {
+    Loading.show();
+    try {
+      await transfer();
+    } catch (error: any) {
+      console.log('sendHandler==error2222', error);
+      if (error.type === 'managerTransfer') {
+        console.log(error);
+        CommonToast.failError(error.error);
+        return;
+      } else if (error.type === 'crossChainTransfer') {
+        dispatch(
+          addFailedActivity({
+            transactionId: error.managerTransferTxId,
+            params: error.data,
+          }),
+        );
+        showRetry(() => {
+          retryCrossChain(error.managerTransferTxId, error.data);
+        });
+        return;
+      } else {
+        CommonToast.failError(error);
+      }
+    }
+    Loading.hide();
   };
 
-  const mockUrl =
-    'https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/fotojet-5-1650369753.jpg?crop=0.498xw:0.997xh;0,0&resize=640:*';
+  const networkInfoShow = (address: string) => {
+    const chainId = address.split('_')[2];
+    return chainId === 'AELF' ? 'MainChain AELF' : `SideChain ${chainId} `;
+  };
 
   return (
     <PageContainer
       safeAreaColor={['blue', 'white']}
-      titleDom={t('Send')}
+      titleDom={`${t('Send')}${sendType === 'token' ? ' ' + assetInfo.symbol : ''}`}
       containerStyles={styles.pageWrap}
       scrollViewProps={{ disabled: true }}>
       {sendType === 'nft' ? (
         <View style={styles.topWrap}>
-          {/* <Text style={styles.noImg}>A</Text> */}
-          <Image style={styles.img} source={{ uri: mockUrl }} />
+          {!assetInfo?.imageUrl ? (
+            <Text style={styles.noImg}>{assetInfo?.alias[0]}</Text>
+          ) : (
+            <Image style={styles.img} source={{ uri: assetInfo?.imageUrl }} />
+          )}
           <View style={styles.topLeft}>
-            <TextL style={styles.nftTitle}>BoxcatPlanet #2271</TextL>
-            <TextS>Amount：3</TextS>
+            <TextL style={[styles.nftTitle, fonts.mediumFont]}>{`${assetInfo.alias} #${assetInfo?.tokenId}`} </TextL>
+            <TextS>{`Amount：${sendNumber}`}</TextS>
           </View>
         </View>
       ) : (
         <>
-          <Text style={styles.tokenCount}>-12.2 ELF</Text>
-          <TextM style={styles.tokenUSD}>-$ 0.1</TextM>
+          <Text style={[styles.tokenCount, FontStyles.font3, fonts.mediumFont]}>
+            {`- ${sendNumber} ${assetInfo?.symbol}`}{' '}
+          </Text>
+          {/* <TextM style={styles.tokenUSD}>-$ -</TextM> */}
         </>
       )}
 
@@ -161,12 +281,12 @@ const SendHome: React.FC<SendHomeProps> = props => {
         <View style={styles.section}>
           <View style={[styles.flexSpaceBetween]}>
             <TextM style={styles.lightGrayFontColor}>{t('From')}</TextM>
-            <TextM style={styles.blackFontColor}>{'Wallet1'}</TextM>
+            <TextM style={styles.blackFontColor}>{walletName}</TextM>
           </View>
           <View style={[styles.flexSpaceBetween]}>
             <TextM style={styles.lightGrayFontColor} />
             <TextS style={styles.lightGrayFontColor}>
-              {formatStr2EllipsisStr('ELF_xsasadsadsaddasd_xasxasdsadsad_AELF')}
+              {formatStr2EllipsisStr(`ELF_${caAddresses[0]}_${assetInfo.chainId}`)}
             </TextS>
           </View>
         </View>
@@ -174,23 +294,21 @@ const SendHome: React.FC<SendHomeProps> = props => {
         {/* To */}
         <View style={styles.section}>
           <View style={[styles.flexSpaceBetween]}>
-            <TextM style={[styles.blackFontColor]}>{t('To')}</TextM>
-            <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${'Sally'}`}</TextM>
-          </View>
-          <View style={[styles.flexSpaceBetween]}>
-            <Text />
-            <TextS style={styles.lightGrayFontColor}>
-              {formatStr2EllipsisStr('ELF_xsasadsadsaddasd_xasxasdsadsad_AELF')}
-            </TextS>
+            <TextM style={[styles.lightGrayFontColor]}>{t('To')}</TextM>
+            <View style={styles.alignItemsEnd}>
+              {toInfo?.name && <TextM style={[styles.blackFontColor, styles.fontBold]}>{toInfo?.name}</TextM>}
+              <TextS style={styles.lightGrayFontColor}>{formatStr2EllipsisStr(toInfo?.address)}</TextS>
+            </View>
           </View>
         </View>
         <Text style={[styles.divider, styles.marginTop0]} />
         {/* more Info */}
         <View style={styles.section}>
           <View style={[styles.flexSpaceBetween]}>
-            <TextM style={[styles.blackFontColor]}>{t('Network')}</TextM>
-            <TextM
-              style={[styles.blackFontColor, styles.fontBold]}>{`${'MainChain AELF'} → ${'MainChain AELF'} `}</TextM>
+            <TextM style={[styles.lightGrayFontColor]}>{t('Network')}</TextM>
+            <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${formatChainInfo(
+              assetInfo.chainId,
+            )} → ${networkInfoShow(toInfo?.address)} `}</TextM>
           </View>
         </View>
         <Text style={[styles.divider, styles.marginTop0]} />
@@ -198,23 +316,32 @@ const SendHome: React.FC<SendHomeProps> = props => {
         <View style={styles.section}>
           <View style={[styles.flexSpaceBetween]}>
             <TextM style={[styles.blackFontColor, styles.fontBold]}>{t('Transaction Fee')}</TextM>
-            <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${'0.0001'} ${'ELF'} `}</TextM>
-          </View>
-          <View style={[styles.flexSpaceBetween, styles.marginTop4]}>
-            <Text />
-            <TextS style={styles.lightGrayFontColor}>{`$ ${'0.11'}`}</TextS>
+            <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${txFeeShow} ${'ELF'} `}</TextM>
           </View>
         </View>
+
+        {isCrossChainTransfer && assetInfo.symbol === 'ELF' && <Text style={[styles.divider, styles.marginTop0]} />}
+        {isCrossChainTransfer && assetInfo.symbol === 'ELF' && (
+          <View style={styles.section}>
+            <View style={[styles.flexSpaceBetween]}>
+              <TextM style={[styles.blackFontColor]}>{t('Estimated Amount Received')}</TextM>
+              <TextM style={[styles.blackFontColor, styles.fontBold]}>
+                {ZERO.plus(sendNumber).isLessThanOrEqualTo(ZERO.plus(CROSS_FEE))
+                  ? '0'
+                  : unitConverter(ZERO.plus(sendNumber).minus(ZERO.plus(CROSS_FEE)))}{' '}
+                {'ELF'}
+              </TextM>
+            </View>
+          </View>
+        )}
       </View>
 
       <View style={styles.buttonWrapStyle}>
-        <CommonButton loading={isLoading} title={t('Send')} type="primary" onPress={transfer} />
+        <CommonButton loading={isLoading} title={t('Send')} type="primary" onPress={onSend} />
       </View>
     </PageContainer>
   );
 };
-
-addRecentContact;
 
 export default memo(SendHome);
 
@@ -276,6 +403,8 @@ export const styles = StyleSheet.create({
   buttonWrapStyle: {
     flex: 1,
     justifyContent: 'flex-end',
+    paddingBottom: pTd(12),
+    paddingTop: pTd(12),
   },
   errorMessage: {
     lineHeight: pTd(16),
@@ -388,5 +517,8 @@ export const styles = StyleSheet.create({
   },
   alignItemsCenter: {
     alignItems: 'center',
+  },
+  alignItemsEnd: {
+    alignItems: 'flex-end',
   },
 });
