@@ -1,4 +1,4 @@
-import { LoginNumType } from '@portkey-wallet/constants/constants-ca/guardian';
+import { GUARDIAN_TYPE_TYPE, LoginNumType } from '@portkey-wallet/constants/constants-ca/guardian';
 import { ZERO } from '@portkey-wallet/constants/misc';
 import { GuardiansInfo } from '@portkey-wallet/types/types-ca/guardian';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
@@ -24,8 +24,8 @@ export function handleUserGuardiansList(
   return guardianList.guardians.map(item => {
     return {
       ...item,
-      guardianAccount: item.guardianIdentifier,
-      guardianType: LoginNumType[item.type],
+      guardianAccount: item.guardianIdentifier || item.identifierHash,
+      guardianType: LoginNumType[item.type] || (GUARDIAN_TYPE_TYPE as any)[item.type],
       key: `${item.guardianIdentifier}&${item.verifierId}`,
       verifier: Array.isArray(verifierServers)
         ? verifierServers.find(verifierItem => verifierItem.id === item.verifierId)

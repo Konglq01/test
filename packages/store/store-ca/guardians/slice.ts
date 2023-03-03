@@ -14,7 +14,7 @@ import {
   setOpGuardianAction,
 } from './actions';
 import { GuardiansState } from './type';
-import { LoginNumType } from '@portkey-wallet/constants/constants-ca/guardian';
+import { GUARDIAN_TYPE_TYPE, LoginNumType } from '@portkey-wallet/constants/constants-ca/guardian';
 
 const initialState: GuardiansState = {};
 export const guardiansSlice = createSlice({
@@ -53,12 +53,14 @@ export const guardiansSlice = createSlice({
           const key = `${item.guardianIdentifier}&${item.verifierId}`;
           const _guardian = {
             ...item,
-            guardianAccount: item.guardianIdentifier,
-            guardianType: LoginNumType[item.type],
+            guardianAccount: item.guardianIdentifier || item.identifierHash,
+            guardianType: LoginNumType[item.type] || (GUARDIAN_TYPE_TYPE as any)[item.type],
             key,
             verifier: verifierMap?.[item.verifierId],
             isLoginAccount: item.isLoginGuardian,
           };
+          console.log(_guardian, '=======_guardian');
+
           userStatus[key] = { ..._guardian, status: userStatus?.[key]?.status };
           return _guardian;
         });

@@ -6,7 +6,7 @@ import { handleError } from '@portkey-wallet/utils';
 import { checkEmail } from '@portkey-wallet/utils/check';
 import { BGStyles, FontStyles } from 'assets/theme/styles';
 import Loading from 'components/Loading';
-import { useGetGuardiansInfo, useGetGuardiansInfoWriteStore, useGetVerifierServers } from 'hooks/guardian';
+import { useGetGuardiansInfoWriteStore, useGetVerifierServers } from 'hooks/guardian';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { useLanguage } from 'i18n/hooks';
 import { useAppDispatch } from 'store/hooks';
@@ -33,7 +33,6 @@ export default function LoginEmail({ setLoginType }: { setLoginType: (type: Logi
   const chainInfo = useCurrentChain('AELF');
   const getVerifierServers = useGetVerifierServers();
   const getGuardiansInfoWriteStore = useGetGuardiansInfoWriteStore();
-  const getGuardiansInfo = useGetGuardiansInfo();
 
   const onLogin = useCallback(async () => {
     const message = checkEmail(loginAccount);
@@ -47,7 +46,7 @@ export default function LoginEmail({ setLoginType }: { setLoginType: (type: Logi
         if (Array.isArray(chainList.payload)) _chainInfo = chainList.payload[1];
       }
       const verifierServers = await getVerifierServers(_chainInfo);
-      const holderInfo = await getGuardiansInfo({ guardianIdentifier: loginAccount }, _chainInfo);
+      const holderInfo = await getGuardiansInfoWriteStore({ guardianIdentifier: loginAccount }, _chainInfo);
       navigationService.navigate('GuardianApproval', {
         loginAccount,
         userGuardiansList: handleUserGuardiansList(holderInfo, verifierServers),
@@ -58,7 +57,7 @@ export default function LoginEmail({ setLoginType }: { setLoginType: (type: Logi
       setErrorMessage(handleError(error));
     }
     Loading.hide();
-  }, [loginAccount, chainInfo, getVerifierServers, getGuardiansInfo, dispatch]);
+  }, [loginAccount, chainInfo, getVerifierServers, getGuardiansInfoWriteStore, dispatch]);
 
   useEffectOnce(() => {
     const listener = myEvents.clearLoginInput.addListener(() => {
