@@ -5,6 +5,7 @@ export interface ILoadingMoreProps {
   hasMore?: boolean;
   loadingText?: string;
   noDataText?: string;
+  className?: string;
   loadMore: (isRetry?: boolean) => Promise<void>;
 }
 
@@ -12,6 +13,7 @@ export default function LoadingMore({
   hasMore = false,
   loadingText = 'Loading',
   noDataText = 'No Data',
+  className = '',
   loadMore,
 }: ILoadingMoreProps) {
   const { t } = useTranslation();
@@ -20,11 +22,11 @@ export default function LoadingMore({
     <InfiniteScroll loadMore={loadMore} hasMore={hasMore} threshold={100}>
       {hasMore ? (
         <>
-          <span>{t(loadingText)}</span>
+          <span className={className}>{t(loadingText)}</span>
           <DotLoading />
         </>
       ) : (
-        <span>{t(noDataText)}</span>
+        <span className={className}>{t(noDataText)}</span>
       )}
     </InfiniteScroll>
   );

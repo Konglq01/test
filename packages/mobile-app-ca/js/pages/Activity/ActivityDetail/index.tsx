@@ -1,11 +1,10 @@
 import { TransactionTypes, transactionTypesMap } from '@portkey-wallet/constants/constants-ca/activity';
 import { ZERO } from '@portkey-wallet/constants/misc';
-import { TransactionStatus } from '@portkey-wallet/graphql/contract/__generated__/types';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { useCaAddresses, useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
 import { fetchActivity } from '@portkey-wallet/store/store-ca/activity/api';
-import { ActivityItemType } from '@portkey-wallet/types/types-ca/activity';
+import { ActivityItemType, TransactionStatus } from '@portkey-wallet/types/types-ca/activity';
 import { getExploreLink } from '@portkey-wallet/utils';
 import { unitConverter } from '@portkey-wallet/utils/converter';
 import { Image } from '@rneui/base';
@@ -70,7 +69,6 @@ const ActivityDetail = () => {
   const status = useMemo(() => {
     if (!activityItem?.status) return { text: '', style: 'confirmed' };
 
-    // TODO: do not use GraphQL TransactionStatus
     if (activityItem?.status === TransactionStatus.Mined)
       return {
         text: 'Confirmed',

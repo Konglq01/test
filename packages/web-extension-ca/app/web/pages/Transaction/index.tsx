@@ -1,8 +1,7 @@
 import { TransactionTypes, transactionTypesMap } from '@portkey-wallet/constants/constants-ca/activity';
-import { TransactionStatus } from '@portkey-wallet/graphql/contract/__generated__/types';
 import { useCaAddresses, useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { fetchActivity } from '@portkey-wallet/store/store-ca/activity/api';
-import { ActivityItemType } from '@portkey-wallet/types/types-ca/activity';
+import { ActivityItemType, TransactionStatus } from '@portkey-wallet/types/types-ca/activity';
 import { Transaction } from '@portkey-wallet/types/types-ca/trade';
 import { getExploreLink } from '@portkey-wallet/utils';
 import { AmountSign, formatAmount, transNetworkText } from '@portkey-wallet/utils/activity';
@@ -58,7 +57,6 @@ export default function Transaction() {
   });
 
   const status = useMemo(() => {
-    // TODO: do not use GraphQL TransactionStatus
     if (activityItem?.status === TransactionStatus.Mined)
       return {
         text: 'Confirmed',
