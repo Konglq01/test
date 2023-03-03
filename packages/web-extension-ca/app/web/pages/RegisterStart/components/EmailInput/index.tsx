@@ -8,7 +8,6 @@ import { NetworkItem } from '@portkey-wallet/types/types-ca/network';
 import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
 import { ChainItemType } from '@portkey-wallet/store/store-ca/wallet/type';
 import { checkEmail, EmailError } from '@portkey-wallet/utils/check';
-import { contractErrorHandler } from 'utils/tryErrorHandler';
 interface EmailInputProps {
   currentNetwork: NetworkItem;
   currentChain?: ChainItemType;
@@ -42,7 +41,7 @@ const EmailInput = forwardRef(
             },
           });
           console.log(checkResult, 'checkResult===GetHolderInfo');
-          if (checkResult.guardianList?.length > 0) {
+          if (checkResult.guardianList.guardians?.length > 0) {
             isHasAccount = true;
           }
         } catch (error: any) {
