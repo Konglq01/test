@@ -9,8 +9,12 @@ export interface Verifier {
   id: string; // aelf.Hash
 }
 export interface Guardian {
-  type: GuardianType;
-  verifier: Verifier;
+  guardianIdentifier: string;
+  identifierHash: string;
+  isLoginGuardian: true;
+  salt: string;
+  type: TLoginStrType;
+  verifierId: string;
 }
 
 export interface GuardianAccount {
@@ -19,8 +23,7 @@ export interface GuardianAccount {
 }
 
 export interface GuardiansInfo {
-  guardianAccounts: GuardianAccount[];
-  loginGuardianAccountIndexes: number[];
+  guardianList: Guardian[];
 }
 
 export interface Manager {

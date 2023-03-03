@@ -7,6 +7,7 @@ import { checkHolderError } from '@portkey-wallet/utils/check';
 import { VerifierItem } from '@portkey-wallet/types/verifier';
 import { ChainItemType } from '@portkey-wallet/store/store-ca/wallet/type';
 import { request } from '@portkey-wallet/api/api-did';
+import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network-test2';
 
 export const useGetHolderInfo = () => {
   const getCurrentCAViewContract = useGetCurrentCAViewContract();
@@ -14,7 +15,9 @@ export const useGetHolderInfo = () => {
     async (loginInfo: LoginInfo, chainInfo?: ChainItemType) => {
       if (!loginInfo) throw new Error('Could not find accountInfo');
       if (loginInfo.guardianIdentifier) {
-        return request.wallet.guardianIdentifiers({ params: { guardianIdentifier: loginInfo.guardianIdentifier } });
+        return request.wallet.guardianIdentifiers({
+          params: { chainId: DefaultChainId, guardianIdentifier: loginInfo.guardianIdentifier },
+        });
       }
       const caContract = await getCurrentCAViewContract(chainInfo);
       return caContract?.callViewMethod('GetHolderInfo', {
@@ -31,9 +34,7 @@ export const useGetGuardiansInfo = () => {
   return useCallback(
     async (loginInfo: LoginInfo, chainInfo?: ChainItemType) => {
       const res = await getHolderInfo(loginInfo, chainInfo);
-      console.log(res, '=======res');
-      // TODO: chainId
-      if (res && !res.error) return res?.data?.guardiansInfo || res[0];
+      if (res && !res.error) return res?.data || res;
       throw new Error(checkHolderError(res.error?.message));
     },
     [getHolderInfo],
