@@ -32,7 +32,7 @@ export interface GuardiansInfo {
 
 export interface GuardiansApprovedType {
   type: TLoginStrType;
-  value: string;
+  identifier: string;
   verifierId: string;
   verificationDoc: string;
   signature: string;

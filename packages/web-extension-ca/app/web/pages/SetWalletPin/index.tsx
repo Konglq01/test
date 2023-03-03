@@ -23,6 +23,8 @@ import './index.less';
 import useFetchDidWallet from 'hooks/useFetchDidWallet';
 import { setPasswordSeed } from 'store/reducers/user/slice';
 import { DEVICE_TYPE } from 'constants/index';
+import { GuardiansApprovedType } from '@portkey-wallet/types/types-ca/guardian';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 
 export default function SetWalletPin() {
   const [form] = Form.useForm();
@@ -36,7 +38,7 @@ export default function SetWalletPin() {
   const [returnOpen, setReturnOpen] = useState<boolean>();
   const { scanWalletInfo, scanCaWalletInfo, loginAccount, registerVerifier } = useLoginInfo();
   const getWalletCAAddressResult = useFetchDidWallet();
-
+  const network = useCurrentNetworkInfo();
   const { userGuardianStatus } = useGuardiansInfo();
   console.log(walletInfo, state, scanWalletInfo, scanCaWalletInfo, 'walletInfo===caWallet');
 
@@ -49,16 +51,16 @@ export default function SetWalletPin() {
       if (!registerVerifier) throw 'Missing Verifier Server';
       const result = await registerDIDWallet({
         type: LoginStrType[loginAccount.loginType],
-        loginGuardianAccount: loginAccount.guardianAccount,
-        managerAddress,
-        deviceString: `${DEVICE_TYPE},${Date.now()}`, //navigator.userAgent,
+        loginGuardianIdentifier: loginAccount.guardianAccount,
+        manager: managerAddress,
+        extraData: `${DEVICE_TYPE},${Date.now()}`, //navigator.userAgent,
         chainId: DefaultChainId,
         verifierId: registerVerifier.verifierId,
         verificationDoc: registerVerifier.verificationDoc,
         signature: registerVerifier.signature,
         context: {
           clientId: managerAddress,
-          requestId: requestId,
+          requestId,
         },
       });
       return {
@@ -69,12 +71,12 @@ export default function SetWalletPin() {
     [loginAccount, registerVerifier],
   );
 
-  const getGuardiansApproved = useCallback(() => {
+  const getGuardiansApproved: () => GuardiansApprovedType[] = useCallback(() => {
     return Object.values(userGuardianStatus ?? {})
       .filter((guardian) => guardian.status === VerifyStatus.Verified)
       .map((guardian) => ({
         type: LoginStrType[guardian.guardianType],
-        value: guardian.guardianAccount,
+        identifier: guardian.guardianAccount,
         verifierId: guardian.verifier?.id || '',
         verificationDoc: guardian.verificationDoc || '',
         signature: guardian.signature || '',
@@ -88,9 +90,9 @@ export default function SetWalletPin() {
       const guardiansApproved = getGuardiansApproved();
       const requestId = randomId();
       const result = await recoveryDIDWallet({
-        loginGuardianAccount: loginAccount.guardianAccount,
-        managerAddress,
-        deviceString: `${DEVICE_TYPE},${Date.now()}`, //navigator.userAgent,
+        loginGuardianIdentifier: loginAccount.guardianAccount,
+        manager: managerAddress,
+        extraData: `${DEVICE_TYPE},${Date.now()}`, //navigator.userAgent,
         chainId: DefaultChainId,
         guardiansApproved,
         context: {
@@ -175,6 +177,7 @@ export default function SetWalletPin() {
             )
           : dispatch(
               setManagerInfo({
+                networkType: network.networkType,
                 pin,
                 managerInfo,
               }),
@@ -209,6 +212,7 @@ export default function SetWalletPin() {
     [
       setLoading,
       state,
+      network,
       createByScan,
       loginAccount,
       walletInfo,
