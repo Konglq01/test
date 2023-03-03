@@ -10,18 +10,11 @@ import { request } from '@portkey-wallet/api/api-did';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network-test2';
 import { handleError } from '@portkey-wallet/utils';
 
-export const useGetHolderInfo = () => {
+export const useGetHolderInfoByViewContract = () => {
   const getCurrentCAViewContract = useGetCurrentCAViewContract();
   return useCallback(
     async (loginInfo: LoginInfo, chainInfo?: ChainItemType) => {
       if (!loginInfo) throw new Error('Could not find accountInfo');
-      if (loginInfo.guardianIdentifier) {
-        const req = await request.wallet.guardianIdentifiers({
-          params: { chainId: DefaultChainId, guardianIdentifier: loginInfo.guardianIdentifier },
-        });
-        // TODO: response
-        return { ...req, guardianList: { guardians: req.guardianList } };
-      }
       const caContract = await getCurrentCAViewContract(chainInfo);
       return caContract?.callViewMethod('GetHolderInfo', {
         caHash: loginInfo.caHash,
@@ -30,6 +23,18 @@ export const useGetHolderInfo = () => {
     },
     [getCurrentCAViewContract],
   );
+};
+
+export const useGetHolderInfo = () => {
+  return useCallback(async (loginInfo: LoginInfo, _chainInfo?: ChainItemType) => {
+    if (!loginInfo) throw new Error('Could not find accountInfo');
+    if (loginInfo.guardianIdentifier) {
+      const req = await request.wallet.guardianIdentifiers({
+        params: { chainId: DefaultChainId, ...loginInfo },
+      });
+      return { ...req, guardianList: { guardians: req.guardianList } };
+    }
+  }, []);
 };
 
 export const useGetGuardiansInfo = () => {
