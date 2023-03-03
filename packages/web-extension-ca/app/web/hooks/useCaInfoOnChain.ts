@@ -9,7 +9,7 @@ import InternalMessage from 'messages/InternalMessage';
 import InternalMessageTypes from 'messages/InternalMessageTypes';
 import { useCallback } from 'react';
 import { useAppDispatch } from 'store/Provider/hooks';
-import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
+import { getHolderInfoByContract } from 'utils/sandboxUtil/getHolderInfo';
 
 export const useCaInfoOnChain = () => {
   const { walletInfo, chainList } = useCurrentWallet();
@@ -28,7 +28,7 @@ export const useCaInfoOnChain = () => {
       caHash: string;
       walletType: ChainType;
     }) => {
-      const result = await getHolderInfo({
+      const result = await getHolderInfoByContract({
         rpcUrl: chain.endPoint,
         chainType: walletType,
         address: chain.caContractAddress,

@@ -43,3 +43,35 @@ export const getHolderInfo = async ({
     },
   };
 };
+
+export const getHolderInfoByContract = async ({
+  rpcUrl,
+  chainType,
+  address, // contract address
+  paramsOption,
+}: {
+  rpcUrl: string;
+  address: string;
+  chainType: ChainType;
+  paramsOption: {
+    guardianIdentifier?: string;
+    caHash?: string;
+  };
+}) => {
+  const resMessage = await SandboxEventService.dispatchAndReceive(SandboxEventTypes.callViewMethod, {
+    rpcUrl,
+    chainType,
+    address,
+    methodName: 'GetHolderInfo',
+    paramsOption,
+  });
+
+  if (resMessage.code === SandboxErrorCode.error) throw resMessage.error;
+  return {
+    code: resMessage.code,
+    result: {
+      rpcUrl,
+      ...resMessage.message,
+    },
+  };
+};
