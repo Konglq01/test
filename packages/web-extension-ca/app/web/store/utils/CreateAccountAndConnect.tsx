@@ -1,4 +1,9 @@
-import { addAccount, addAndReplaceAccount, importAccount, setCurrentAccount } from '@portkey/store/wallet/actions';
+import {
+  addAccount,
+  addAndReplaceAccount,
+  importAccount,
+  setCurrentAccount,
+} from '@portkey-wallet/store/wallet/actions';
 import { setAccountConnectModal } from 'store/reducers/modal/slice';
 import { getCurrentTab } from 'utils/platforms';
 import { getConnections } from 'utils/storage/storage.utils';

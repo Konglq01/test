@@ -1,8 +1,8 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { createAction } from '@reduxjs/toolkit';
-import { HandleTokenArgTypes, TokenState } from '@portkey/types/types-ca/token';
+import { HandleTokenArgTypes, TokenState } from '@portkey-wallet/types/types-ca/token';
 import { fetchAllTokenList } from './api';
-import { request } from '@portkey/api/api-did';
+import { request } from '@portkey-wallet/api/api-did';
 
 export const addTokenInCurrentAccount = createAction<HandleTokenArgTypes>('token/addTokenInCurrentAccount');
 

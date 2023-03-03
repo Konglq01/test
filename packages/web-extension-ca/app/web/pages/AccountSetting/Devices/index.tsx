@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router';
 import CustomSvg from 'components/CustomSvg';
 import SettingHeader from 'pages/components/SettingHeader';
 import { useTranslation } from 'react-i18next';
-import { useCurrentWalletInfo, useDeviceList } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentWalletInfo, useDeviceList } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import svgsList from 'assets/svgs';
 import { dateFormat } from 'utils';
 import './index.less';

@@ -1,10 +1,10 @@
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
-import useInterval from '@portkey/hooks/useInterval';
-import { setCAInfo } from '@portkey/store/store-ca/wallet/actions';
-import { ChainItemType } from '@portkey/store/store-ca/wallet/type';
-import { ChainId, ChainType } from '@portkey/types';
-import { isAddress } from '@portkey/utils';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
+import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import useInterval from '@portkey-wallet/hooks/useInterval';
+import { setCAInfo } from '@portkey-wallet/store/store-ca/wallet/actions';
+import { ChainItemType } from '@portkey-wallet/store/store-ca/wallet/type';
+import { ChainId, ChainType } from '@portkey-wallet/types';
+import { isAddress } from '@portkey-wallet/utils';
 import InternalMessage from 'messages/InternalMessage';
 import InternalMessageTypes from 'messages/InternalMessageTypes';
 import { useCallback } from 'react';

@@ -1,21 +1,21 @@
-import { checkVerificationCode } from '@portkey/api/api-did/utils/verification';
+import { checkVerificationCode } from '@portkey-wallet/api/api-did/utils/verification';
 import { Button, message } from 'antd';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAppDispatch, useCommonState, useLoading } from 'store/Provider/hooks';
 import { PasscodeInput } from 'antd-mobile';
 import { LoginInfo } from 'store/reducers/loginCache/type';
-import { DIGIT_CODE } from '@portkey/constants/misc';
+import { DIGIT_CODE } from '@portkey-wallet/constants/misc';
 import clsx from 'clsx';
 import VerifierPair from 'components/VerifierPair';
 import './index.less';
-import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
+import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type';
 import { useTranslation } from 'react-i18next';
-import { setUserGuardianSessionIdAction } from '@portkey/store/store-ca/guardians/actions';
+import { setUserGuardianSessionIdAction } from '@portkey-wallet/store/store-ca/guardians/actions';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
-import { LoginType } from '@portkey/types/types-ca/wallet';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import { useEffectOnce } from 'react-use';
-import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
-import { DefaultChainId } from '@portkey/constants/constants-ca/network';
+import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
+import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verification } from 'utils/api';
 
 const MAX_TIMER = 60;

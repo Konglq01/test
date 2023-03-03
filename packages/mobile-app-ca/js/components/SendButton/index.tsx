@@ -2,8 +2,8 @@ import React, { memo, useMemo } from 'react';
 import Svg from 'components/Svg';
 import { dashBoardBtnStyle, innerPageStyles } from './style';
 import navigationService from 'utils/navigationService';
-import { TokenItemShowType } from '@portkey/types/types-ca/token';
-import { IToSendHomeParamsType } from '@portkey/types/types-ca/routeParams';
+import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
+import { IToSendHomeParamsType } from '@portkey-wallet/types/types-ca/routeParams';
 
 import { View, TouchableOpacity } from 'react-native';
 import { TextM } from 'components/CommonText';

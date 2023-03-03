@@ -6,8 +6,8 @@ import { defaultColors } from 'assets/theme';
 import Svg from 'components/Svg';
 import { TextL } from 'components/CommonText';
 import { pTd } from 'utils/unit';
-import { statusBarHeight } from '@portkey/utils/mobile/device';
-import { handleError } from '@portkey/utils';
+import { statusBarHeight } from '@portkey-wallet/utils/mobile/device';
+import { handleError } from '@portkey-wallet/utils';
 
 type TostProps = [
   text: string,

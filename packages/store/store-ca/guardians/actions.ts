@@ -1,6 +1,6 @@
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
-import { VerifierItem, VerifyStatus } from '@portkey/types/verifier';
-import { GuardiansInfo } from '@portkey/types/guardian';
+import { VerifierItem, VerifyStatus } from '@portkey-wallet/types/verifier';
+import { GuardiansInfo } from '@portkey-wallet/types/guardian';
 
 import { IVerifierInfo, UserGuardianItem, UserGuardianStatus } from './type';
 

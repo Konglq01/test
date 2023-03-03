@@ -8,8 +8,8 @@
 //   SignUpAndLogin,
 //   SignUpBase,
 //   VerifierSelect,
-// } from '@portkey/did-ui-react';
-// import { NetworkList } from '@portkey/constants/constants-ca/network';
+// } from '@portkey-wallet/did-ui-react';
+// import { NetworkList } from '@portkey-wallet/constants/constants-ca/network';
 // import { Button } from 'antd';
 
 // export default function ExampleUI() {

@@ -1,9 +1,9 @@
 import { useCallback } from 'react';
 import { useAppDispatch } from 'store/Provider/hooks';
-import { setGuardiansAction } from '@portkey/store/store-ca/guardians/actions';
+import { setGuardiansAction } from '@portkey-wallet/store/store-ca/guardians/actions';
 import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
 
 const useGuardiansList = () => {

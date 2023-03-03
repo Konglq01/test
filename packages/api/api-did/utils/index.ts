@@ -1,9 +1,9 @@
-import { AElfWallet } from '@portkey/types/aelf';
-import { customFetch } from '@portkey/utils/fetch';
+import { AElfWallet } from '@portkey-wallet/types/aelf';
+import { customFetch } from '@portkey-wallet/utils/fetch';
 import { stringify } from 'query-string';
 import AElf from 'aelf-sdk';
 import { request } from '../index';
-import { DefaultChainId } from '@portkey/constants/constants-ca/network-test2';
+import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network-test2';
 export type RefreshTokenConfig = {
   grant_type: 'signature';
   client_id: 'CAServer_App';

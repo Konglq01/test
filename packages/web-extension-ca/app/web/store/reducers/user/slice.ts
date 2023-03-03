@@ -1,4 +1,4 @@
-import { OpacityType } from '@portkey/types';
+import { OpacityType } from '@portkey-wallet/types';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface UserState {

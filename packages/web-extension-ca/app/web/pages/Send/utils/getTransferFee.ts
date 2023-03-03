@@ -1,10 +1,10 @@
-import { CROSS_FEE } from '@portkey/constants/constants-ca/wallet';
-import { ZERO } from '@portkey/constants/misc';
-import { ChainItemType } from '@portkey/store/store-ca/wallet/type';
-import { ChainType } from '@portkey/types';
-import { BaseToken } from '@portkey/types/types-ca/token';
-import { isCrossChain } from '@portkey/utils/aelf';
-import { divDecimalsStr } from '@portkey/utils/converter';
+import { CROSS_FEE } from '@portkey-wallet/constants/constants-ca/wallet';
+import { ZERO } from '@portkey-wallet/constants/misc';
+import { ChainItemType } from '@portkey-wallet/store/store-ca/wallet/type';
+import { ChainType } from '@portkey-wallet/types';
+import { BaseToken } from '@portkey-wallet/types/types-ca/token';
+import { isCrossChain } from '@portkey-wallet/utils/aelf';
+import { divDecimalsStr } from '@portkey-wallet/utils/converter';
 import getTransactionFee from 'utils/sandboxUtil/getTransactionFee';
 
 const getTransferFee = async ({

@@ -1,4 +1,4 @@
-import { TokenItemShowType } from '@portkey/types/types-ca/token';
+import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
 
 export enum TransactionError {
   TOKEN_NOTE_ENOUGH = 'Insufficient funds',

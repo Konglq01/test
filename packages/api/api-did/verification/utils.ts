@@ -1,7 +1,7 @@
-import { IStorage, StorageBaseLoader } from '@portkey/types/storage';
-import { request } from '@portkey/api/api-did';
+import { IStorage, StorageBaseLoader } from '@portkey-wallet/types/storage';
+import { request } from '@portkey-wallet/api/api-did';
 import { RequestConfig } from '../../types';
-import { TLoginStrType } from '@portkey/types/types-ca/wallet';
+import { TLoginStrType } from '@portkey-wallet/types/types-ca/wallet';
 
 type VerifierInfo = {
   verifierSessionId: string;

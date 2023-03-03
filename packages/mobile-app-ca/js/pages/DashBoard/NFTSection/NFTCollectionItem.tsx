@@ -11,10 +11,10 @@ import Svg from 'components/Svg';
 import { TextM, TextS, TextXL } from 'components/CommonText';
 import { FontStyles } from 'assets/theme/styles';
 import { useWallet } from 'hooks/store';
-import { NFTCollectionItemShowType } from '@portkey/types/types-ca/assets';
+import { NFTCollectionItemShowType } from '@portkey-wallet/types/types-ca/assets';
 import Touchable from 'components/Touchable';
 import { OpenCollectionObjType } from './index.';
-import { ChainId } from '@portkey/types';
+import { ChainId } from '@portkey-wallet/types';
 import { chain } from 'lodash';
 
 export enum NoDataMessage {

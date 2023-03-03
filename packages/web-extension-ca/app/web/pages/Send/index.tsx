@@ -1,14 +1,20 @@
-import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
-import { AddressBookError } from '@portkey/store/addressBook/types';
-import { addFailedActivity, removeFailedActivity } from '@portkey/store/store-ca/activity/slice';
-import { ContactItemType, IClickAddressProps } from '@portkey/types/types-ca/contact';
-import { BaseToken } from '@portkey/types/types-ca/token';
-import { isDIDAddress } from '@portkey/utils';
-import { getAelfAddress, getEntireDIDAelfAddress, getWallet, isAelfAddress, isCrossChain } from '@portkey/utils/aelf';
-import aes from '@portkey/utils/aes';
-import { timesDecimals } from '@portkey/utils/converter';
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
+import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { AddressBookError } from '@portkey-wallet/store/addressBook/types';
+import { addFailedActivity, removeFailedActivity } from '@portkey-wallet/store/store-ca/activity/slice';
+import { ContactItemType, IClickAddressProps } from '@portkey-wallet/types/types-ca/contact';
+import { BaseToken } from '@portkey-wallet/types/types-ca/token';
+import { isDIDAddress } from '@portkey-wallet/utils';
+import {
+  getAelfAddress,
+  getEntireDIDAelfAddress,
+  getWallet,
+  isAelfAddress,
+  isCrossChain,
+} from '@portkey-wallet/utils/aelf';
+import aes from '@portkey-wallet/utils/aes';
+import { timesDecimals } from '@portkey-wallet/utils/converter';
 import { Button, message, Modal } from 'antd';
 import CustomSvg from 'components/CustomSvg';
 import TitleWrapper from 'components/TitleWrapper';
@@ -23,12 +29,12 @@ import AddressSelector from './components/AddressSelector';
 import AmountInput from './components/AmountInput';
 import SendPreview from './components/SendPreview';
 import ToAccount from './components/ToAccount';
-import { WalletError } from '@portkey/store/wallet/type';
+import { WalletError } from '@portkey-wallet/store/wallet/type';
 import getTransferFee from './utils/getTransferFee';
-import { ZERO } from '@portkey/constants/misc';
-import { TransactionError } from '@portkey/constants/constants-ca/assets';
+import { ZERO } from '@portkey-wallet/constants/misc';
+import { TransactionError } from '@portkey-wallet/constants/constants-ca/assets';
 import './index.less';
-import { the2ThFailedActivityItemType } from '@portkey/types/types-ca/activity';
+import { the2ThFailedActivityItemType } from '@portkey-wallet/types/types-ca/activity';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
 
 export type Account = { address: string; name?: string };

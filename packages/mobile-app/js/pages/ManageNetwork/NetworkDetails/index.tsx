@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import PageContainer from 'components/PageContainer';
-import { ChainItemType } from '@portkey/types/chain';
+import { ChainItemType } from '@portkey-wallet/types/chain';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import CommonInput from 'components/CommonInput';
 import { useSetState } from 'hooks';
@@ -11,9 +11,9 @@ import {
   removeCustomChainItem,
   setCurrentChain,
   updateCustomChainItem,
-} from '@portkey/store/network/actions';
-import { formatNetworkError, isNetworkError, NetWorkError } from '@portkey/store/network/utils';
-import { formatRpcUrl } from '@portkey/utils';
+} from '@portkey-wallet/store/network/actions';
+import { formatNetworkError, isNetworkError, NetWorkError } from '@portkey-wallet/store/network/utils';
+import { formatRpcUrl } from '@portkey-wallet/utils';
 import ActionSheet from 'components/ActionSheet';
 import CommonToast from 'components/CommonToast';
 import navigationService from 'utils/navigationService';
@@ -23,7 +23,7 @@ import { defaultColors } from 'assets/theme';
 import NetworkOverlay from 'components/NetworkOverlay';
 import { windowHeight } from 'utils/device';
 import { pTd } from 'utils/unit';
-import { ChainType } from '@portkey/types';
+import { ChainType } from '@portkey-wallet/types';
 import { useLanguage } from 'i18n/hooks';
 import i18n from 'i18n';
 type RouterParams = { chain: ChainItemType };

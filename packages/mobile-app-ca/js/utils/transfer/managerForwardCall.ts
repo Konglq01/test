@@ -8,8 +8,8 @@
  *    memo: string,
  */
 
-import { SendOptions } from '@portkey/contracts/types';
-import { ContractBasic } from '@portkey/contracts/utils/ContractBasic';
+import { SendOptions } from '@portkey-wallet/contracts/types';
+import { ContractBasic } from '@portkey-wallet/contracts/utils/ContractBasic';
 
 type ParamsOptionArgs = any;
 
