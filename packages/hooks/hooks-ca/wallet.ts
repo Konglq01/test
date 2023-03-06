@@ -94,7 +94,7 @@ export const useDeviceList = () => {
         // TODO: check ALL deviceString
         const extraDataArray = (item?.extraData || '').split(',').map(item => Number(item));
         let deviceType: DeviceType = 0,
-          loginTime = undefined;
+          loginTime: number | undefined = undefined;
         const firstNum = extraDataArray[0];
         if (firstNum !== undefined && !isNaN(firstNum)) {
           if (DeviceType[firstNum] !== undefined) {
