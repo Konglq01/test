@@ -57,6 +57,7 @@ export class DidService extends ServiceInit {
       method,
     });
     if (fetchResult && fetchResult.status === 401 && fetchResult.message === 'unauthorized') {
+      if (!this.refreshTokenConfig) throw fetchResult;
       if (reCount > 5) throw fetchResult;
       const token = await this.getConnectToken();
       if (!token) {
