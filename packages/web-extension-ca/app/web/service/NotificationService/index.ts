@@ -13,7 +13,7 @@ import { sleep } from '@portkey-wallet/utils';
 
 export interface NotificationType {
   sendResponse?: SendResponseFun;
-  message: PromptMessage & { externalLink?: string } & { [x: string]: any };
+  message: PromptMessage & { externalLink?: string };
   promptType?: CreatePromptType;
 }
 
@@ -65,7 +65,7 @@ export default class NotificationService {
       const { height, width, top, left, isFullscreen } = await getPromptConfig({
         message: notification.message,
       });
-      console.log(notification, 'showWindow===');
+
       let url;
       if (notification.message.externalLink) {
         url = notification.message.externalLink;
@@ -100,7 +100,6 @@ export default class NotificationService {
       this.openWindow = popupWindow;
       this.closeSender = { ...this.closeSender, [popupWindow.id?.toString() ?? '']: notification };
       this.openWindow = popupWindow;
-      console.log(this.closeSender, popupWindow, 'getPopup===');
       return popupWindow;
     } catch (error) {
       notification.sendResponse?.(errorHandler(500002, error));
@@ -142,8 +141,6 @@ export default class NotificationService {
       this.platform.closeTab(this.openTag.id);
       this.openTag = null;
     }
-
-    console.log(notification, 'showWindow==open');
 
     // Could not establish connection. Receiving end does not exist.
     // InternalMessage.payload(InternalMessageTypes.SET_PROMPT, JSON.stringify(notification)).send();
@@ -231,7 +228,6 @@ export default class NotificationService {
     }
 
     const sender = this.closeSender?.[_id?.toString() ?? ''];
-    console.log(this.closeSender, closeParams, 'completedWithoutClose===');
     sender?.sendResponse?.(closeParams);
     if (sender) {
       delete this.closeSender?.[_id?.toString() ?? ''];

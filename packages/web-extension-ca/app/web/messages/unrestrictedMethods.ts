@@ -1,5 +1,4 @@
 import { AelfMessageTypes, MethodMessageTypes, PortkeyMessageTypes, WalletMessageTypes } from './InternalMessageTypes';
-import walletMessage from './walletMessage';
 
 /**
  * All methods are unrestricted and can request Service Work

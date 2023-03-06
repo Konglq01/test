@@ -3,7 +3,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import GoogleLogin from './components/GoogleLogin';
 import SocialTem from './components/SocialTem';
 import { useRouter } from 'next/router';
-import { ThreeWayLogin } from '@portkey/types/types-ca/wallet';
+import { ThreeWayLogin } from '@portkey-wallet/types/types-ca/wallet';
 
 export default function ExtensionLogin() {
   console.log(process.env.NEXT_PUBLIC_GG_APP_ID, process.env, 'SocialTem==');
