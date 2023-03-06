@@ -4,7 +4,7 @@ import NFTSection from '../NFTSection/index.';
 import CommonTopTab from 'components/CommonTopTab';
 
 import { useLanguage } from 'i18n/hooks';
-// import { useCurrentELFBalances } from '@portkey/hooks/hooks-ca/balances';
+// import { useCurrentELFBalances } from '@portkey-wallet/hooks/hooks-ca/balances';
 type DashBoardTabProps = {
   getAccountBalance?: () => void;
 };

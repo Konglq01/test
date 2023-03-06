@@ -1,6 +1,4 @@
-import { GuardianAccount } from '@portkey/types/guardian';
-import { LoginType } from '@portkey/types/types-ca/wallet';
-import { VerifierItem, VerifyStatus } from '@portkey/types/verifier';
+import { VerifierItem, VerifyStatus } from '@portkey-wallet/types/verifier';
 import { createSlice } from '@reduxjs/toolkit';
 import moment from 'moment';
 import {
@@ -15,8 +13,8 @@ import {
   setPreGuardianAction,
   setOpGuardianAction,
 } from './actions';
-import { GuardiansState, UserGuardianStatus } from './type';
-import { GUARDIAN_TYPE_TYPE } from '@portkey/constants/constants-ca/guardian';
+import { GuardiansState } from './type';
+import { GUARDIAN_TYPE_TYPE, LoginNumType } from '@portkey-wallet/constants/constants-ca/guardian';
 
 const initialState: GuardiansState = {};
 export const guardiansSlice = createSlice({
@@ -48,35 +46,26 @@ export const guardiansSlice = createSlice({
           state.userGuardianStatus = {};
           return;
         }
-        const { loginGuardianAccountIndexes, guardianAccounts } = action.payload;
-        const _guardianAccounts: (GuardianAccount & { isLoginAccount?: boolean })[] = [...guardianAccounts];
-        loginGuardianAccountIndexes.forEach(item => {
-          _guardianAccounts[item].isLoginAccount = true;
-        });
-
+        const { guardianList } = action.payload;
         const userStatus = state.userGuardianStatus ?? {};
-        const guardiansList = _guardianAccounts.map(_guardianAccount => {
-          const guardianAccount = _guardianAccount.value;
-          const verifier = verifierMap?.[_guardianAccount.guardian.verifier.id];
-          const guardianType: LoginType = (
-            typeof _guardianAccount.guardian.type === 'string'
-              ? GUARDIAN_TYPE_TYPE[_guardianAccount.guardian.type]
-              : _guardianAccount.guardian.type
-          ) as any;
-
-          const _guardian: UserGuardianStatus = {
-            key: `${guardianAccount}&${verifier?.name}`,
-            isLoginAccount: _guardianAccount.isLoginAccount,
-            verifier: verifier,
-            guardianAccount,
-            guardianType,
+        // TODO
+        const _guardianList = guardianList.guardians.map(item => {
+          const key = `${item.guardianIdentifier}&${item.verifierId}`;
+          const _guardian = {
+            ...item,
+            guardianAccount: item.guardianIdentifier || item.identifierHash,
+            guardianType: LoginNumType[item.type] ?? (GUARDIAN_TYPE_TYPE as any)[item.type],
+            key,
+            verifier: verifierMap?.[item.verifierId],
+            isLoginAccount: item.isLoginGuardian,
           };
-          console.log(verifier, _guardianAccounts, verifierMap, 'verifier===');
+          console.log(_guardian, '=======_guardian');
 
-          userStatus[_guardian.key] = { ..._guardian, status: userStatus?.[_guardian.key]?.status };
+          userStatus[key] = { ..._guardian, status: userStatus?.[key]?.status };
           return _guardian;
         });
-        state.userGuardiansList = guardiansList;
+
+        state.userGuardiansList = _guardianList;
         state.userGuardianStatus = userStatus;
         state.guardianExpiredTime = undefined;
       })
@@ -115,11 +104,12 @@ export const guardiansSlice = createSlice({
         state.userGuardianStatus = userStatus;
       })
       .addCase(setUserGuardianItemStatus, (state, action) => {
-        const { key, status, signature, verificationDoc } = action.payload;
+        const { key, status, signature, verificationDoc, identifierHash } = action.payload;
         if (!state.userGuardianStatus?.[key]) throw Error("Can't find this item");
         state.userGuardianStatus[key]['status'] = status;
         state.userGuardianStatus[key]['signature'] = signature;
         state.userGuardianStatus[key]['verificationDoc'] = verificationDoc;
+        state.userGuardianStatus[key]['identifierHash'] = identifierHash || '';
         if (!state.guardianExpiredTime && status === VerifyStatus.Verified) {
           state.guardianExpiredTime = moment().add(1, 'h').subtract(2, 'minute').valueOf();
         }

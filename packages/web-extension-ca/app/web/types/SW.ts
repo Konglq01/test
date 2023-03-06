@@ -1,4 +1,4 @@
-import { WalletState } from '@portkey/store/store-ca/wallet/type';
+import { WalletState } from '@portkey-wallet/store/store-ca/wallet/type';
 import { AutoLockDataType } from 'constants/lock';
 import { RegisterStatus } from 'types';
 

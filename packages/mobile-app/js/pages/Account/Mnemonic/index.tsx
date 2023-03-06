@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 import { PrimaryText, TextL, TextM, TextXXXL } from 'components/CommonText';
 import { useAppSelector } from 'store/hooks';
-import aes from '@portkey/utils/aes';
+import aes from '@portkey-wallet/utils/aes';
 import useStyles from './styles';
 import GStyles from 'assets/theme/GStyles';
 import * as Clipboard from 'expo-clipboard';

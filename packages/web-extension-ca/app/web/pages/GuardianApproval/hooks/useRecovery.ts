@@ -1,12 +1,12 @@
-import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
+import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import {
   resetUserGuardianStatus,
   setOpGuardianAction,
   setPreGuardianAction,
-} from '@portkey/store/store-ca/guardians/actions';
-import aes from '@portkey/utils/aes';
+} from '@portkey-wallet/store/store-ca/guardians/actions';
+import aes from '@portkey-wallet/utils/aes';
 import { message } from 'antd';
 import { useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -68,11 +68,6 @@ export const useRecovery = () => {
           },
         },
       });
-      console.log('handleGuardian', result);
-      // const { TransactionId } = result.result.message || result;
-      // await sleep(1000);
-      // const aelfInstance = getAelfInstance(currentChain.endPoint);
-      // await getTxResult(aelfInstance, TransactionId);
       dispatch(resetLoginInfoAction());
       dispatch(resetUserGuardianStatus());
       dispatch(setPreGuardianAction());

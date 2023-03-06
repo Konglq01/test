@@ -1,4 +1,4 @@
-import * as Types from '../__generated__/types';
+import * as Types from '../types';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
@@ -9,65 +9,90 @@ export type CaHolderSearchTokenNftQueryVariables = Types.Exact<{
 
 export type CaHolderSearchTokenNftQuery = {
   __typename?: 'Query';
-  caHolderSearchTokenNFT?: Array<{
-    __typename?: 'CAHolderSearchTokenNFTDto';
-    chainId?: string | null;
-    caAddress?: string | null;
-    balance: number;
-    tokenInfo?: {
-      __typename?: 'TokenSearchInfoDto';
-      symbol?: string | null;
-      tokenContractAddress?: string | null;
-      decimals: number;
-      totalSupply: number;
-      tokenName?: string | null;
-      issuer?: string | null;
-      isBurnable: boolean;
-      issueChainId: number;
-    } | null;
-    nftInfo?: {
-      __typename?: 'NFTSearchInfoDto';
-      protocolName?: string | null;
-      symbol?: string | null;
+  caHolderSearchTokenNFT?: {
+    __typename?: 'CAHolderSearchTokenNFTPageResultDto';
+    totalRecordCount: number;
+    data?: Array<{
+      __typename?: 'CAHolderSearchTokenNFTDto';
+      chainId?: string | null;
+      caAddress?: string | null;
+      balance: number;
       tokenId: number;
-      nftContractAddress?: string | null;
-      owner?: string | null;
-      minter?: string | null;
-      quantity: number;
-      alias?: string | null;
-      baseUri?: string | null;
-      uri?: string | null;
-    } | null;
-  } | null> | null;
+      tokenInfo?: {
+        __typename?: 'TokenInfoDto';
+        id?: string | null;
+        chainId?: string | null;
+        blockHash?: string | null;
+        blockHeight: number;
+        previousBlockHash?: string | null;
+        symbol?: string | null;
+        type: Types.TokenType;
+        tokenContractAddress?: string | null;
+        decimals: number;
+        totalSupply: number;
+        tokenName?: string | null;
+        issuer?: string | null;
+        isBurnable: boolean;
+        issueChainId: number;
+      } | null;
+      nftInfo?: {
+        __typename?: 'NFTItemInfoDto';
+        symbol?: string | null;
+        tokenContractAddress?: string | null;
+        decimals: number;
+        supply: number;
+        totalSupply: number;
+        tokenName?: string | null;
+        issuer?: string | null;
+        isBurnable: boolean;
+        issueChainId: number;
+        imageUrl?: string | null;
+        collectionSymbol?: string | null;
+        collectionName?: string | null;
+      } | null;
+    } | null> | null;
+  } | null;
 };
 
 export const CaHolderSearchTokenNftDocument = gql`
   query caHolderSearchTokenNFT($dto: GetCAHolderSearchTokenNFTDto) {
     caHolderSearchTokenNFT(dto: $dto) {
-      chainId
-      caAddress
-      balance
-      tokenInfo {
-        symbol
-        tokenContractAddress
-        decimals
-        totalSupply
-        tokenName
-        issuer
-        isBurnable
-        issueChainId
-      }
-      nftInfo {
-        protocolName
-        symbol
+      totalRecordCount
+      data {
+        chainId
+        caAddress
+        balance
         tokenId
-        nftContractAddress
-        owner
-        minter
-        quantity
-        alias
-        baseUri
-        uri
+        tokenInfo {
+          id
+          chainId
+          blockHash
+          blockHeight
+          previousBlockHash
+          symbol
+          type
+          tokenContractAddress
+          decimals
+          totalSupply
+          tokenName
+          issuer
+          isBurnable
+          issueChainId
+        }
+        nftInfo {
+          symbol
+          tokenContractAddress
+          decimals
+          supply
+          totalSupply
+          tokenName
+          issuer
+          isBurnable
+          issueChainId
+          imageUrl
+          collectionSymbol
+          collectionName
+        }
       }
     }
   }

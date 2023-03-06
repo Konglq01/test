@@ -9,7 +9,7 @@ import { apis } from 'utils/BrowserApis';
 import errorHandler from 'utils/errorHandler';
 import getPromptConfig from 'service/NotificationService/getPromptConfig';
 import ExtensionPlatform from 'utils/platforms/extension';
-import { sleep } from '@portkey/utils';
+import { sleep } from '@portkey-wallet/utils';
 
 export interface NotificationType {
   sendResponse?: SendResponseFun;

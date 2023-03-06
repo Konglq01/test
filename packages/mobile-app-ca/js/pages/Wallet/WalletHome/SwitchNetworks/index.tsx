@@ -10,9 +10,9 @@ import Touchable from 'components/Touchable';
 import { defaultColors } from 'assets/theme';
 import { FontStyles } from 'assets/theme/styles';
 import Svg from 'components/Svg';
-import { changeNetworkType } from '@portkey/store/store-ca/wallet/actions';
-import { NetworkItem } from '@portkey/types/types-ca/network';
-import { useNetworkList } from '@portkey/hooks/hooks-ca/network';
+import { changeNetworkType } from '@portkey-wallet/store/store-ca/wallet/actions';
+import { NetworkItem } from '@portkey-wallet/types/types-ca/network';
+import { useNetworkList } from '@portkey-wallet/hooks/hooks-ca/network';
 
 const SwitchNetworks: React.FC = () => {
   const { t } = useLanguage();

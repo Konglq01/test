@@ -1,13 +1,13 @@
 import React, { memo, useMemo } from 'react';
 import Svg from 'components/Svg';
 import { dashBoardBtnStyle, innerPageStyles } from './style';
-import { useAllAccountTokenList } from '@portkey/hooks/hooks-eoa/useToken';
-import { useAppEOASelector } from '@portkey/hooks';
+import { useAllAccountTokenList } from '@portkey-wallet/hooks/hooks-eoa/useToken';
+import { useAppEOASelector } from '@portkey-wallet/hooks';
 
 import navigationService from 'utils/navigationService';
 import TokenOverlay from 'components/TokenOverlay/index';
-import { TokenItemShowType } from '@portkey/types/types-eoa/token';
-import { isSameTypeToken } from '@portkey/utils/token';
+import { TokenItemShowType } from '@portkey-wallet/types/types-eoa/token';
+import { isSameTypeToken } from '@portkey-wallet/utils/token';
 import { View, TouchableOpacity } from 'react-native';
 import { TextM } from 'components/CommonText';
 import { useLanguage } from 'i18n/hooks';

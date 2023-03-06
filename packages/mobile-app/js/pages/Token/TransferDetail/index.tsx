@@ -3,7 +3,7 @@ import PageContainer from 'components/PageContainer';
 import { Text, View, StyleSheet, TouchableOpacity, Linking } from 'react-native';
 import Svg from 'components/Svg';
 import { pTd } from 'utils/unit';
-import { getExploreLink } from '@portkey/utils';
+import { getExploreLink } from '@portkey-wallet/utils';
 import { defaultColors } from 'assets/theme';
 import GStyles from 'assets/theme/GStyles';
 import CommonButton from 'components/CommonButton';
@@ -11,7 +11,7 @@ import { TextM, TextS } from 'components/CommonText';
 import fonts from 'assets/theme/fonts';
 import navigationService from 'utils/navigationService';
 import { formatStr2EllipsisStr, formatTransferTime } from 'utils';
-import { useCurrentNetwork } from '@portkey/hooks/network';
+import { useCurrentNetwork } from '@portkey-wallet/hooks/network';
 import { useWallet } from 'hooks/store';
 import { useLanguage } from 'i18n/hooks';
 

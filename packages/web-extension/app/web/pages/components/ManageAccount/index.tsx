@@ -1,7 +1,7 @@
-import { AccountType } from '@portkey/types/wallet';
+import { AccountType } from '@portkey-wallet/types/wallet';
 import { DrawerProps } from 'antd';
 import CustomSvg from 'components/CustomSvg';
-import { useGetELFRateQuery } from '@portkey/store/rate/api';
+import { useGetELFRateQuery } from '@portkey-wallet/store/rate/api';
 import './index.less';
 import { useTranslation } from 'react-i18next';
 interface ManageAccountProps extends DrawerProps {

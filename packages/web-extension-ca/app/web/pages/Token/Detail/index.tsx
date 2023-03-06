@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router';
 import './index.less';
 import SettingHeader from 'pages/components/SettingHeader';
 import BalanceCard from 'pages/components/BalanceCard';
-import { divDecimals, unitConverter } from '@portkey/utils/converter';
+import { divDecimals, unitConverter } from '@portkey-wallet/utils/converter';
 import { useWalletInfo } from 'store/Provider/hooks';
 import Activity from 'pages/Home/components/Activity';
 

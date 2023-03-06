@@ -1,9 +1,9 @@
 import { useCallback } from 'react';
 import { useAppDispatch } from 'store/Provider/hooks';
-import { setGuardiansAction } from '@portkey/store/store-ca/guardians/actions';
+import { setGuardiansAction } from '@portkey-wallet/store/store-ca/guardians/actions';
 import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
 
 const useGuardiansList = () => {
@@ -12,7 +12,7 @@ const useGuardiansList = () => {
   const currentChain = useCurrentChain();
 
   const fetch = useCallback(
-    async (paramsOption: { loginGuardianAccount?: string; caHash?: string }) => {
+    async (paramsOption: { guardianIdentifier?: string; caHash?: string }) => {
       try {
         if (!currentChain?.endPoint) throw 'Could not find chain information';
         const res = await getHolderInfo({
@@ -21,7 +21,7 @@ const useGuardiansList = () => {
           address: currentChain.caContractAddress,
           paramsOption,
         });
-        dispatch(setGuardiansAction(res.result.guardiansInfo));
+        dispatch(setGuardiansAction(res));
       } catch (error: any) {
         throw contractErrorHandler(error);
       }

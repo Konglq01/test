@@ -1,7 +1,7 @@
-import { ZERO } from '@portkey/constants/misc';
-import { useGetELFRateQuery } from '@portkey/store/rate/api';
-import { TokenItemType } from '@portkey/types/types-eoa/token';
-import { unitConverter } from '@portkey/utils/converter';
+import { ZERO } from '@portkey-wallet/constants/misc';
+import { useGetELFRateQuery } from '@portkey-wallet/store/rate/api';
+import { TokenItemType } from '@portkey-wallet/types/types-eoa/token';
+import { unitConverter } from '@portkey-wallet/utils/converter';
 import { Modal } from 'antd';
 import CustomSvg from 'components/CustomSvg';
 import DropdownSearch from 'components/DropdownSearch';

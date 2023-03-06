@@ -1,5 +1,5 @@
-import { ChainItemType } from '@portkey/types/chain';
-import { BaseToken } from '@portkey/types/types-eoa/token';
+import { ChainItemType } from '@portkey-wallet/types/chain';
+import { BaseToken } from '@portkey-wallet/types/types-eoa/token';
 import SandboxEventTypes from 'messages/SandboxEventTypes';
 import SandboxEventService, { SandboxErrorCode } from 'service/SandboxEventService';
 

@@ -1,4 +1,4 @@
-import { ChainType } from '@portkey/types';
+import { ChainType } from '@portkey-wallet/types';
 import { isAddress as web3IsAddress } from 'web3-utils';
 import { isAelfAddress, isDIDAelfAddress } from './aelf';
 import * as uuid from 'uuid';

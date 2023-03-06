@@ -9,7 +9,7 @@ import Touchable from 'components/Touchable';
 import { defaultColors } from 'assets/theme';
 import { FontStyles } from 'assets/theme/styles';
 import Svg, { IconName } from 'components/Svg';
-import { useCurrentWalletInfo, useDeviceList } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentWalletInfo, useDeviceList } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { formatTransferTime } from 'utils';
 
 const Devices: React.FC = () => {

@@ -3,7 +3,7 @@ import { persistReducer } from 'redux-persist';
 import storeConfig from './config';
 import rootReducer from './rootReducer';
 import { testApi } from './testApi/slice';
-import { rateApi } from '@portkey/store/rate/api';
+import { rateApi } from '@portkey-wallet/store/rate/api';
 
 const persistedReducer = persistReducer(storeConfig.reduxPersistConfig, rootReducer);
 

@@ -1,16 +1,16 @@
-import { ChainItemType } from '@portkey/store/store-ca/wallet/type';
-import { ChainType } from '@portkey/types';
-import { BaseToken } from '@portkey/types/types-ca/token';
-import { getChainIdByAddress } from '@portkey/utils';
+import { ChainItemType } from '@portkey-wallet/store/store-ca/wallet/type';
+import { ChainType } from '@portkey-wallet/types';
+import { BaseToken } from '@portkey-wallet/types/types-ca/token';
+import { getChainIdByAddress } from '@portkey-wallet/utils';
 import { crossChainTransferToCa } from './crossChainTransferToCa';
 import { managerTransfer } from './managerTransfer';
-import { getChainNumber } from '@portkey/utils/aelf';
+import { getChainNumber } from '@portkey-wallet/utils/aelf';
 import { getBalance } from './getBalance';
-import token from '@portkey/api/api-did/token';
-import { ZERO } from '@portkey/constants/misc';
-import { CROSS_FEE } from '@portkey/constants/constants-ca/wallet';
-import { timesDecimals } from '@portkey/utils/converter';
-import { the2ThFailedActivityItemType } from '@portkey/types/types-ca/activity';
+import token from '@portkey-wallet/api/api-did/token';
+import { ZERO } from '@portkey-wallet/constants/misc';
+import { CROSS_FEE } from '@portkey-wallet/constants/constants-ca/wallet';
+import { timesDecimals } from '@portkey-wallet/utils/converter';
+import { the2ThFailedActivityItemType } from '@portkey-wallet/types/types-ca/activity';
 
 const nativeToken = {
   symbol: 'ELF',

@@ -6,7 +6,7 @@ import { useLanguage } from 'i18n/hooks';
 import navigationService from 'utils/navigationService';
 import Svg from 'components/Svg';
 import { pTd } from 'utils/unit';
-import { AddressItem, ContactItemType } from '@portkey/types/types-ca/contact';
+import { AddressItem, ContactItemType } from '@portkey-wallet/types/types-ca/contact';
 import Touchable from 'components/Touchable';
 import { setStringAsync } from 'expo-clipboard';
 import CommonToast from 'components/CommonToast';
@@ -15,7 +15,7 @@ import CommonButton from 'components/CommonButton';
 import GStyles from 'assets/theme/GStyles';
 import { FontStyles } from 'assets/theme/styles';
 import { useWallet } from 'hooks/store';
-import useRouterParams from '@portkey/hooks/useRouterParams';
+import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
 
 type RouterParams = {
   contact?: ContactItemType;

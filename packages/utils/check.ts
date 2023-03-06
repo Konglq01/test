@@ -13,5 +13,6 @@ export function checkEmail(email?: string) {
 
 export function checkHolderError(message?: string) {
   if (message?.includes('Not found ca_hash')) return EmailError.noAccount;
+  if (message?.includes('not exit')) return EmailError.noAccount;
   return message;
 }

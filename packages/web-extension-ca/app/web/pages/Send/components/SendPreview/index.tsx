@@ -1,13 +1,13 @@
-import { ZERO } from '@portkey/constants/misc';
+import { ZERO } from '@portkey-wallet/constants/misc';
 import clsx from 'clsx';
 import { useMemo } from 'react';
 import { useWalletInfo } from 'store/Provider/hooks';
-// import { useTokenPrice } from '@portkey/hooks/hooks-ca/useTokensPrice';
+// import { useTokenPrice } from '@portkey-wallet/hooks/hooks-ca/useTokensPrice';
 import './index.less';
-import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
-import { CROSS_FEE } from '@portkey/constants/constants-ca/wallet';
-import { unitConverter } from '@portkey/utils/converter';
-import { isAelfAddress } from '@portkey/utils/aelf';
+import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { CROSS_FEE } from '@portkey-wallet/constants/constants-ca/wallet';
+import { unitConverter } from '@portkey-wallet/utils/converter';
+import { isAelfAddress } from '@portkey-wallet/utils/aelf';
 
 export default function SendPreview({
   amount,

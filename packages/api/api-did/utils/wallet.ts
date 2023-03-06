@@ -1,15 +1,15 @@
-import { GuardiansApprovedType } from '@portkey/types/guardian';
-import { TLoginStrType } from '@portkey/types/types-ca/wallet';
-import { VerificationType } from '@portkey/types/verifier';
+import { GuardiansApprovedType } from '@portkey-wallet/types/types-ca/guardian';
+import { TLoginStrType } from '@portkey-wallet/types/types-ca/wallet';
+import { VerificationType } from '@portkey-wallet/types/verifier';
 import { request } from '..';
 import { IContext } from '../types';
 
 interface RegisterDIDWalletParams extends IContext {
   baseUrl?: string;
   type: TLoginStrType;
-  loginGuardianAccount: string; //account
-  managerAddress: string;
-  deviceString: string;
+  loginGuardianIdentifier: string; //account
+  manager: string;
+  extraData: string;
   verifierId: string;
   verificationDoc: string;
   signature: string;
@@ -31,9 +31,9 @@ export const registerDIDWallet = async (
 
 interface RecoveryDIDWalletParams extends IContext {
   baseURL?: string;
-  loginGuardianAccount: string;
-  managerAddress: string;
-  deviceString: string;
+  loginGuardianIdentifier: string;
+  manager: string;
+  extraData: string;
   chainId: string;
   guardiansApproved: GuardiansApprovedType[];
 }

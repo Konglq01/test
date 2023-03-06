@@ -1,6 +1,6 @@
 import { ErrorType } from 'types/common';
 import { Platform } from 'react-native';
-import { DeviceType } from '@portkey/types/types-ca/wallet';
+import { DeviceType } from '@portkey-wallet/types/types-ca/wallet';
 
 export const INIT_ERROR: ErrorType = {
   errorMsg: '',

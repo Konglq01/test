@@ -8,7 +8,7 @@ import Svg from 'components/Svg';
 import { TextXL } from 'components/CommonText';
 import { pTd } from 'utils/unit';
 import OverlayBody from 'components/OverlayModal/OverlayBody';
-import { VerifierItem } from '@portkey/types/verifier';
+import { VerifierItem } from '@portkey-wallet/types/verifier';
 import { VerifierImage } from '../VerifierImage';
 
 type VerifierListProps = {

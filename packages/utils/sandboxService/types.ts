@@ -1,4 +1,4 @@
-import { ChainType } from '@portkey/types';
+import { ChainType } from '@portkey-wallet/types';
 
 export enum SandboxEventTypes {
   getBalances = 'getBalances',

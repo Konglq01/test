@@ -1,16 +1,16 @@
-import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
-import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
-import { ChainId } from '@portkey/types';
-import aes from '@portkey/utils/aes';
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { ChainId } from '@portkey-wallet/types';
+import aes from '@portkey-wallet/utils/aes';
 import { useInterface } from 'contexts/useInterface';
 import { setCAContract, setViewContract } from 'contexts/useInterface/actions';
-import { getContractBasic } from '@portkey/contracts/utils';
+import { getContractBasic } from '@portkey-wallet/contracts/utils';
 import { useCallback, useMemo } from 'react';
 import { getDefaultWallet } from 'utils/aelfUtils';
 import AElf from 'aelf-sdk';
 import { usePin } from './store';
-import { ContractBasic } from '@portkey/contracts/utils/ContractBasic';
-import { ChainItemType } from '@portkey/store/store-ca/wallet/type';
+import { ContractBasic } from '@portkey-wallet/contracts/utils/ContractBasic';
+import { ChainItemType } from '@portkey-wallet/store/store-ca/wallet/type';
 
 export function useGetCurrentCAViewContract(chainId: ChainId = 'AELF') {
   const chainInfo = useCurrentChain(chainId);

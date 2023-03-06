@@ -3,16 +3,16 @@ import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import CommonModal from 'components/CommonModal';
 import './index.less';
-import { useCurrentWallet, useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentWallet, useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { useLoading, useUserInfo } from 'store/Provider/hooks';
-import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { removeManager } from 'utils/sandboxUtil/removeManager';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import { clearLocalStorage } from 'utils/storage/chromeStorage';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
 import useLogOut from 'hooks/useLogout';
 import { DEVICE_TYPE } from 'constants/index';
-import aes from '@portkey/utils/aes';
+import aes from '@portkey-wallet/utils/aes';
 
 interface ExitWalletProps {
   open: boolean;
@@ -42,17 +42,13 @@ export default function ExitWallet({ open, onCancel }: ExitWalletProps) {
         privateKey,
         paramsOption: {
           caHash: wallet?.caHash as string,
-          manager: {
-            managerAddress: wallet.address,
-            deviceString: `${DEVICE_TYPE},${Date.now()}`,
+          managerInfo: {
+            address: wallet.address,
+            extraData: `${DEVICE_TYPE},${Date.now()}`,
           },
         },
       });
       console.log('removeManager', 'removeManager==result', result);
-      // const { TransactionId } = result.result.message || result;
-      // await sleep(1000);
-      // const aelfInstance = getAelfInstance(currentChain.endPoint);
-      // await getTxResult(aelfInstance, TransactionId);
       logout();
       clearLocalStorage();
       setLoading(false);

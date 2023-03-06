@@ -1,8 +1,8 @@
-import { TokenItemShowType } from '@portkey/types/types-eoa/token';
+import { TokenItemShowType } from '@portkey-wallet/types/types-eoa/token';
 import React from 'react';
 import { View, Text, StyleSheet, TextInput } from 'react-native';
 import { pTd } from 'utils/unit';
-import { parseInputChange } from '@portkey/utils/input';
+import { parseInputChange } from '@portkey-wallet/utils/input';
 import { defaultColors } from 'assets/theme';
 import GStyles from 'assets/theme/GStyles';
 

@@ -1,4 +1,4 @@
-import { ChainItemType } from '@portkey/types/chain';
+import { ChainItemType } from '@portkey-wallet/types/chain';
 import { DropdownProps } from 'antd';
 import DropdownSearch from 'components/DropdownSearch';
 import { useEffect, useState } from 'react';

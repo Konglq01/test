@@ -1,4 +1,4 @@
-import { DIGIT_CODE } from '@portkey/constants/misc';
+import { DIGIT_CODE } from '@portkey-wallet/constants/misc';
 import GStyles from 'assets/theme/GStyles';
 import { TextM } from 'components/CommonText';
 import VerifierCountdown, { VerifierCountdownInterface } from 'components/VerifierCountdown';
@@ -6,24 +6,24 @@ import PageContainer from 'components/PageContainer';
 import DigitInput, { DigitInputInterface } from 'components/DigitInput';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { StyleSheet, Text } from 'react-native';
-import useRouterParams from '@portkey/hooks/useRouterParams';
-import { ApprovalType, VerificationType, VerifierInfo, VerifyStatus } from '@portkey/types/verifier';
+import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
+import { ApprovalType, VerificationType, VerifierInfo, VerifyStatus } from '@portkey-wallet/types/verifier';
 import GuardianItem from '../components/GuardianItem';
 import { FontStyles } from 'assets/theme/styles';
 import Loading from 'components/Loading';
 import navigationService from 'utils/navigationService';
 import CommonToast from 'components/CommonToast';
 import useEffectOnce from 'hooks/useEffectOnce';
-import { UserGuardianItem } from '@portkey/store/store-ca/guardians/type';
+import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type';
 import myEvents from 'utils/deviceEvent';
-import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { useGetCurrentCAContract } from 'hooks/contract';
 import { setLoginAccount } from 'utils/guardian';
-import { LoginType } from '@portkey/types/types-ca/wallet';
-import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
 import { GuardiansStatusItem } from '../types';
-import { DefaultChainId } from '@portkey/constants/constants-ca/network-test2';
-import { request } from '@portkey/api/api-did';
+import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network-test2';
+import { request } from '@portkey-wallet/api/api-did';
 import { verification } from 'utils/api';
 
 type RouterParams = {
@@ -105,7 +105,7 @@ export default function VerifierDetails() {
           params: {
             type: LoginStrType[guardianItem?.guardianType as LoginType],
             verificationCode: code,
-            guardianAccount: guardianItem.guardianAccount,
+            guardianIdentifier: guardianItem.guardianAccount,
             ...requestCodeResult,
             verifierId: guardianItem?.verifier?.id,
             chainId: DefaultChainId,
@@ -117,6 +117,8 @@ export default function VerifierDetails() {
           ...rst,
           verifierId: guardianItem?.verifier?.id,
         };
+        console.log(verifierInfo, '======verifierInfo');
+
         switch (verificationType) {
           case VerificationType.communityRecovery:
           case VerificationType.editGuardianApproval:
@@ -165,7 +167,7 @@ export default function VerifierDetails() {
       const req = await verification.sendVerificationCode({
         params: {
           type: LoginStrType[guardianItem?.guardianType as LoginType],
-          guardianAccount: guardianItem?.guardianAccount,
+          guardianIdentifier: guardianItem?.guardianAccount,
           verifierId: guardianItem?.verifier?.id,
           chainId: DefaultChainId,
         },

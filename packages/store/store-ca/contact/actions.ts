@@ -1,15 +1,15 @@
 import { createAsyncThunk, createAction } from '@reduxjs/toolkit';
-import { ContactItemType } from '@portkey/types/types-ca/contact';
+import { ContactItemType } from '@portkey-wallet/types/types-ca/contact';
 import { ContactState } from './slice';
 import { FetchContractListAsyncPayloadType } from './type';
-import { CONTACT_API_FETCH_SIZE, CONTACT_API_RETRY_LIMIT } from '@portkey/constants/constants-ca/contact';
+import { CONTACT_API_FETCH_SIZE, CONTACT_API_RETRY_LIMIT } from '@portkey-wallet/constants/constants-ca/contact';
 import { transContactsToIndexes } from './utils';
 import { WalletState } from '../wallet/type';
-import { NetworkList } from '@portkey/constants/constants-ca/network';
+import { NetworkList } from '@portkey-wallet/constants/constants-ca/network';
 import {
   getContactList as getContactListEs,
   getContactEventList as getContactEventListEs,
-} from '@portkey/api/api-did/es/utils';
+} from '@portkey-wallet/api/api-did/es/utils';
 
 export const fetchContactListAsync = createAsyncThunk<FetchContractListAsyncPayloadType, boolean | undefined>(
   'contact/fetchContactListAsync',

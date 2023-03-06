@@ -1,8 +1,8 @@
 import { useEffect, useMemo } from 'react';
 import { useAppCommonDispatch } from '../index';
-import { getChainListAsync } from '@portkey/store/store-ca/wallet/actions';
+import { getChainListAsync } from '@portkey-wallet/store/store-ca/wallet/actions';
 import { useCurrentWallet } from './wallet';
-import { ChainId } from '@portkey/types';
+import { ChainId } from '@portkey-wallet/types';
 
 export function useChainListFetch() {
   const dispatch = useAppCommonDispatch();

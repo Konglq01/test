@@ -6,10 +6,10 @@
 //   SetPinAndAddManager,
 //   GuardianList,
 //   GuardianApproval,
-// } from '@portkey/did-ui-react';
+// } from '@portkey-wallet/did-ui-react';
 // import { Button, Divider, Input } from 'antd';
 // import { useCallback } from 'react';
-// import { VerificationType } from '@portkey/types/verifier';
+// import { VerificationType } from '@portkey-wallet/types/verifier';
 // import { useEffectOnce } from 'react-use';
 // import useGuardiansList from 'hooks/useGuardianList';
 // import './index.less';

@@ -7,14 +7,14 @@ import CustomTokenDrawer from 'pages/components/CustomTokenDrawer';
 import { useTranslation } from 'react-i18next';
 import TokenList from '../Tokens';
 import Activity from '../Activity/index';
-import { Transaction } from '@portkey/types/types-ca/trade';
+import { Transaction } from '@portkey-wallet/types/types-ca/trade';
 import NFT from '../NFT/NFT';
-import { unitConverter } from '@portkey/utils/converter';
+import { unitConverter } from '@portkey-wallet/utils/converter';
 import { useAppDispatch, useUserInfo, useWalletInfo, useAssetInfo } from 'store/Provider/hooks';
-import { useCaAddresses, useChainIdList } from '@portkey/hooks/hooks-ca/wallet';
-import { fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
-import { fetchAllTokenListAsync, getSymbolImagesAsync } from '@portkey/store/store-ca/tokenManagement/action';
-import { getWalletNameAsync } from '@portkey/store/store-ca/wallet/actions';
+import { useCaAddresses, useChainIdList } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { fetchTokenListAsync } from '@portkey-wallet/store/store-ca/assets/slice';
+import { fetchAllTokenListAsync, getSymbolImagesAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
+import { getWalletNameAsync } from '@portkey-wallet/store/store-ca/wallet/actions';
 
 export interface TransactionResult {
   total: number;

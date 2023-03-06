@@ -8,16 +8,16 @@ import { useCallback, useMemo, useState } from 'react';
 import { useAppDispatch, useGuardiansInfo, useLoading } from 'store/Provider/hooks';
 import './index.less';
 import CustomSelect from 'pages/components/CustomSelect';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import {
   resetUserGuardianStatus,
   setCurrentGuardianAction,
   setOpGuardianAction,
-} from '@portkey/store/store-ca/guardians/actions';
+} from '@portkey-wallet/store/store-ca/guardians/actions';
 import useGuardianList from 'hooks/useGuardianList';
-import { LoginType } from '@portkey/types/types-ca/wallet';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
-import { VerifierItem } from '@portkey/types/verifier';
+import { VerifierItem } from '@portkey-wallet/types/verifier';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
 
@@ -69,7 +69,7 @@ export default function GuardiansEdit() {
   const guardiansChangeHandler = useCallback(async () => {
     const flag: boolean =
       Object.values(userGuardiansList ?? {})?.some((item) => {
-        return item.key === `${currentGuardian?.guardianAccount}&${selectName}`;
+        return item.key === `${currentGuardian?.guardianAccount}&${selectVal}`;
       }) ?? false;
     setExist(flag);
     if (flag) return;
@@ -85,11 +85,13 @@ export default function GuardiansEdit() {
       await userGuardianList({ caHash: walletInfo.caHash });
       dispatch(
         setOpGuardianAction({
-          key: `${currentGuardian?.guardianAccount}&${selectName}`,
+          key: `${currentGuardian?.guardianAccount}&${selectVal}`,
           verifier: targetVerifier()?.[0],
           isLoginAccount: opGuardian?.isLoginAccount,
           guardianAccount: opGuardian?.guardianAccount as string,
           guardianType: opGuardian?.guardianType as LoginType,
+          identifierHash: opGuardian?.identifierHash as string,
+          salt: opGuardian?.salt as string,
         }),
       );
       setLoading(false);
@@ -104,7 +106,7 @@ export default function GuardiansEdit() {
     dispatch,
     navigate,
     opGuardian,
-    selectName,
+    selectVal,
     setLoading,
     targetVerifier,
     userGuardianList,
@@ -136,6 +138,8 @@ export default function GuardiansEdit() {
         guardianAccount: opGuardian?.guardianAccount as string,
         guardianType: opGuardian?.guardianType as LoginType,
         key: opGuardian?.key as string,
+        identifierHash: opGuardian?.identifierHash as string,
+        salt: opGuardian?.salt as string,
       }),
     );
     navigate('/setting/guardians/guardian-approval', { state: 'guardians/del' }); // status

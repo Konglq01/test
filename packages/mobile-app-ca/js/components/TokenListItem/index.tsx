@@ -1,6 +1,6 @@
-import { ZERO } from '@portkey/constants/misc';
-import { useSymbolImages } from '@portkey/hooks/hooks-ca/useToken';
-import { unitConverter } from '@portkey/utils/converter';
+import { ZERO } from '@portkey-wallet/constants/misc';
+import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
+import { unitConverter } from '@portkey-wallet/utils/converter';
 import { defaultColors } from 'assets/theme';
 import { FontStyles } from 'assets/theme/styles';
 import CommonAvatar from 'components/CommonAvatar';

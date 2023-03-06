@@ -1,4 +1,4 @@
-import { AddressBookItem } from '@portkey/types/addressBook';
+import { AddressBookItem } from '@portkey-wallet/types/addressBook';
 import { Button } from 'antd';
 import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';

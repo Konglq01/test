@@ -1,14 +1,14 @@
 import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
-import { resetGuardiansState } from '@portkey/store/store-ca/guardians/actions';
+import { resetGuardiansState } from '@portkey-wallet/store/store-ca/guardians/actions';
 import { Button, message } from 'antd';
 import EmailInput, { EmailInputInstance } from 'pages/RegisterStart/components/EmailInput';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useAppDispatch, useLoading, useLoginInfo } from 'store/Provider/hooks';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import useGuardianList from 'hooks/useGuardianList';
-import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
-import { LoginType } from '@portkey/types/types-ca/wallet';
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import './index.less';
 
 export default function EmailLogin() {
@@ -46,7 +46,7 @@ export default function EmailLogin() {
       await emailInputInstance?.current?.validateEmail(val, 'login');
       loginHandler(val);
       dispatch(resetGuardiansState());
-      await fetchUserVerifier({ loginGuardianAccount: val });
+      await fetchUserVerifier({ guardianIdentifier: val });
       setLoading(false);
 
       navigate('/login/guardian-approval');

@@ -2,7 +2,7 @@
 import React, { ReactNode } from 'react';
 import Overlay from 'rn-teaset/components/Overlay/Overlay';
 import { StyleProp, StyleSheet, ViewStyle } from 'react-native';
-import { bottomBarHeight, screenHeight, screenWidth, statusBarHeight } from '@portkey/utils/mobile/device';
+import { bottomBarHeight, screenHeight, screenWidth, statusBarHeight } from '@portkey-wallet/utils/mobile/device';
 import { defaultColors } from 'assets/theme';
 import GStyles from 'assets/theme/GStyles';
 import { pTd } from 'utils/unit';

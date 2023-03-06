@@ -14,16 +14,16 @@ import ListItem from 'components/ListItem';
 import { pTd } from 'utils/unit';
 import fonts from 'assets/theme/fonts';
 import navigationService from 'utils/navigationService';
-import useRouterParams from '@portkey/hooks/useRouterParams';
+import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
 import CommonToast from 'components/CommonToast';
 import Loading from 'components/Loading';
-import { useVerifierList } from '@portkey/hooks/hooks-ca/network';
+import { useVerifierList } from '@portkey-wallet/hooks/hooks-ca/network';
 import VerifierOverlay from '../components/VerifierOverlay';
 import { VerifierImage } from '../components/VerifierImage';
-import { LoginType } from '@portkey/types/types-ca/wallet';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import myEvents from 'utils/deviceEvent';
-import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
-import { DefaultChainId } from '@portkey/constants/constants-ca/network-test2';
+import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
+import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network-test2';
 import { verification } from 'utils/api';
 
 const ScrollViewProps = { disabled: true };
@@ -42,7 +42,7 @@ export default function SelectVerifier() {
         const requestCodeResult = await verification.sendVerificationCode({
           params: {
             type: LoginStrType[LoginType.email],
-            guardianAccount: loginAccount,
+            guardianIdentifier: loginAccount,
             verifierId: selectedVerifier.id,
             chainId: DefaultChainId,
           },

@@ -1,4 +1,4 @@
-import { AccountType } from '@portkey/types/wallet';
+import { AccountType } from '@portkey-wallet/types/wallet';
 import { Button } from 'antd';
 import { useTranslation } from 'react-i18next';
 import './index.less';

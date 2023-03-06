@@ -4,7 +4,7 @@ import CustomPassword from 'components/CustomPassword';
 import { useCallback, useState } from 'react';
 import { AESEncryptWalletParam } from 'types/wallet';
 import getPrivateKeyAndMnemonic from 'utils/Wallet/getPrivateKeyAndMnemonic';
-import { AccountType } from '@portkey/types/wallet';
+import { AccountType } from '@portkey-wallet/types/wallet';
 import './index.less';
 import { useTranslation } from 'react-i18next';
 

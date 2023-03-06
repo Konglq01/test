@@ -3,7 +3,7 @@ import TransferList from 'components/TransferList';
 import NoData from 'components/NoData';
 import { StyleSheet, FlatListProps } from 'react-native';
 import { defaultColors } from 'assets/theme';
-import { useCurrentNetwork } from '@portkey/hooks/network';
+import { useCurrentNetwork } from '@portkey-wallet/hooks/network';
 import navigationService from 'utils/navigationService';
 import { useLanguage } from 'i18n/hooks';
 

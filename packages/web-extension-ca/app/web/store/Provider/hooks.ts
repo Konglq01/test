@@ -1,4 +1,4 @@
-import { OpacityType } from '@portkey/types';
+import { OpacityType } from '@portkey-wallet/types';
 import { useCallback, useMemo } from 'react';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import { setGlobalLoading } from 'store/reducers/user/slice';

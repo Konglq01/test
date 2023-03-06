@@ -1,8 +1,8 @@
 import { Form, FormInstance } from 'antd';
 import CustomPassword from 'components/CustomPassword';
 import { ReactNode, useEffect, useState } from 'react';
-import { isValidPin } from '@portkey/utils/reg';
-import { PinErrorMessage } from '@portkey/utils/wallet/types';
+import { isValidPin } from '@portkey-wallet/utils/reg';
+import { PinErrorMessage } from '@portkey-wallet/utils/wallet/types';
 import './index.less';
 import { useTranslation } from 'react-i18next';
 
