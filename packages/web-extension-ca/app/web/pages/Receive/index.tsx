@@ -1,6 +1,6 @@
-import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
-import { ChainId } from '@portkey/types';
-import { SendTokenQRDataType } from '@portkey/types/types-ca/qrcode';
+import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { ChainId } from '@portkey-wallet/types';
+import { SendTokenQRDataType } from '@portkey-wallet/types/types-ca/qrcode';
 import clsx from 'clsx';
 import Copy from 'components/Copy';
 import CustomSvg from 'components/CustomSvg';

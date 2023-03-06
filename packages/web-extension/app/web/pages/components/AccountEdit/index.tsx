@@ -1,4 +1,4 @@
-import { removeAccount, updateAccountName } from '@portkey/store/wallet/actions';
+import { removeAccount, updateAccountName } from '@portkey-wallet/store/wallet/actions';
 import { Modal, message, Dropdown } from 'antd';
 import Copy from 'components/Copy';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -8,14 +8,14 @@ import ImportAccount from '../ImportAccount';
 import ImportAccountResult from '../ImportAccount/Result';
 import ManageAccount from '../ManageAccount';
 import CreateAccount from '../CreateAccount';
-import { isWalletError } from '@portkey/store/wallet/utils';
-import { WalletError } from '@portkey/store/wallet/type';
-import { AccountType } from '@portkey/types/wallet';
+import { isWalletError } from '@portkey-wallet/store/wallet/utils';
+import { WalletError } from '@portkey-wallet/store/wallet/type';
+import { AccountType } from '@portkey-wallet/types/wallet';
 import './index.less';
 import CustomSvg from 'components/CustomSvg';
 import { shortenCharacters } from 'utils/reg';
 import AccountConnect from '../AccountConnect';
-import { AddressBookError } from '@portkey/store/addressBook/types';
+import { AddressBookError } from '@portkey-wallet/store/addressBook/types';
 import {
   addAccountAndConnect,
   addAndReplaceAccountAndConnect,
@@ -24,9 +24,9 @@ import {
 } from 'store/utils/CreateAccountAndConnect';
 import { getBalance } from 'utils/sandboxUtil/getBalance';
 import { SandboxErrorCode } from 'service/SandboxEventService';
-import { updateBalance } from '@portkey/store/tokenBalance/slice';
-import { divDecimalsStr } from '@portkey/utils/converter';
-import { ZERO } from '@portkey/constants/misc';
+import { updateBalance } from '@portkey-wallet/store/tokenBalance/slice';
+import { divDecimalsStr } from '@portkey-wallet/utils/converter';
+import { ZERO } from '@portkey-wallet/constants/misc';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 

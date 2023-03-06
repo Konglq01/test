@@ -1,6 +1,6 @@
 import { useCurrentNetwork } from '../network';
 import { useMemo } from 'react';
-import { Account } from '@portkey/types/types-eoa/tokenBalance';
+import { Account } from '@portkey-wallet/types/types-eoa/tokenBalance';
 import { useAppEOASelector } from '.';
 
 export function useAllBalances() {

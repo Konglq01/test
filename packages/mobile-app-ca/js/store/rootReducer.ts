@@ -1,22 +1,22 @@
 import { combineReducers } from '@reduxjs/toolkit';
-import { walletSlice } from '@portkey/store/store-ca/wallet/slice';
-import { contactSlice } from '@portkey/store/store-ca/contact/slice';
-import chainSlice from '@portkey/store/network/slice';
-import tokenSlice from '@portkey/store/token/slice';
-import tokenBalanceSlice from '@portkey/store/tokenBalance/slice';
-import settingsSlice from '@portkey/store/settings/slice';
+import { walletSlice } from '@portkey-wallet/store/store-ca/wallet/slice';
+import { contactSlice } from '@portkey-wallet/store/store-ca/contact/slice';
+import chainSlice from '@portkey-wallet/store/network/slice';
+import tokenSlice from '@portkey-wallet/store/token/slice';
+import tokenBalanceSlice from '@portkey-wallet/store/tokenBalance/slice';
+import settingsSlice from '@portkey-wallet/store/settings/slice';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { persistReducer } from 'redux-persist';
 import userSlice from './user/slice';
-import { rateApi } from '@portkey/store/rate/api';
-import { recentSlice } from '@portkey/store/store-ca/recent/slice';
-import { assetsSlice } from '@portkey/store/store-ca/assets/slice';
-import { tokenManagementSlice } from '@portkey/store/store-ca/tokenManagement/slice';
+import { rateApi } from '@portkey-wallet/store/rate/api';
+import { recentSlice } from '@portkey-wallet/store/store-ca/recent/slice';
+import { assetsSlice } from '@portkey-wallet/store/store-ca/assets/slice';
+import { tokenManagementSlice } from '@portkey-wallet/store/store-ca/tokenManagement/slice';
 
-import { activitySlice } from '@portkey/store/store-ca/activity/slice';
-import { guardiansSlice } from '@portkey/store/store-ca/guardians/slice';
+import { activitySlice } from '@portkey-wallet/store/store-ca/activity/slice';
+import { guardiansSlice } from '@portkey-wallet/store/store-ca/guardians/slice';
 
 const userPersistConfig = {
   key: userSlice.name,

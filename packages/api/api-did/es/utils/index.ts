@@ -1,5 +1,5 @@
-import { request } from '@portkey/api/api-did';
-import { GetContractListApiType } from '@portkey/types/types-ca/contact';
+import { request } from '@portkey-wallet/api/api-did';
+import { GetContractListApiType } from '@portkey-wallet/types/types-ca/contact';
 
 export const getContactList = (
   baseURL: string,

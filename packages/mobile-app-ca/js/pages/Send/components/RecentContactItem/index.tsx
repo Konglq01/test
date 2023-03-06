@@ -1,5 +1,5 @@
-import { useWallet } from '@portkey/hooks/hooks-ca/wallet';
-import { RecentContactItemType } from '@portkey/types/types-ca/contact';
+import { useWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { RecentContactItemType } from '@portkey-wallet/types/types-ca/contact';
 import { defaultColors } from 'assets/theme';
 import { FontStyles } from 'assets/theme/styles';
 import GStyles from 'assets/theme/GStyles';

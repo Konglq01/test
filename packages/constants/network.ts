@@ -1,5 +1,5 @@
-import { ChainType } from '@portkey/types';
-import { ChainItemType } from '@portkey/types/chain';
+import { ChainType } from '@portkey-wallet/types';
+import { ChainItemType } from '@portkey-wallet/types/chain';
 
 export const DefaultChain: ChainItemType = {
   chainId: 'AELF',

@@ -1,4 +1,4 @@
-import { customFetch } from '@portkey/utils/fetch';
+import { customFetch } from '@portkey-wallet/utils/fetch';
 import { BaseConfig, RequestConfig, UrlObj } from '../types';
 import { getRequestConfig, spliceUrl } from '../utils';
 

@@ -1,8 +1,8 @@
 import { Form, FormInstance } from 'antd';
 import CustomPassword from 'components/CustomPassword';
 import { ReactNode, useEffect, useState } from 'react';
-import { isValidPassword } from '@portkey/utils/reg';
-import { PasswordErrorMessage } from '@portkey/utils/wallet/types';
+import { isValidPassword } from '@portkey-wallet/utils/reg';
+import { PasswordErrorMessage } from '@portkey-wallet/utils/wallet/types';
 import './index.less';
 import { useTranslation } from 'react-i18next';
 

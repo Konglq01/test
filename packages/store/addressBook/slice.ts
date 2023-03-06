@@ -1,9 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import type { AddressBookItem, AddressBookType } from '@portkey/types/addressBook';
-import { ChainItemType } from '@portkey/types/chain';
-import { addressFormat, isAddress } from '@portkey/utils';
+import type { AddressBookItem, AddressBookType } from '@portkey-wallet/types/addressBook';
+import { ChainItemType } from '@portkey-wallet/types/chain';
+import { addressFormat, isAddress } from '@portkey-wallet/utils';
 import { AddressBookError } from './types';
-import { UpdateType } from '@portkey/types';
+import { UpdateType } from '@portkey-wallet/types';
 
 export interface addressBookState {
   addressBook: AddressBookType;

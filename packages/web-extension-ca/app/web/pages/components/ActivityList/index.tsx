@@ -1,6 +1,6 @@
-import { TransactionTypes, transactionTypesMap } from '@portkey/constants/constants-ca/activity';
-import { ActivityItemType, the2ThFailedActivityItemType } from '@portkey/types/types-ca/activity';
-import { formatStr2EllipsisStr } from '@portkey/utils/converter';
+import { TransactionTypes, transactionTypesMap } from '@portkey-wallet/constants/constants-ca/activity';
+import { ActivityItemType, the2ThFailedActivityItemType } from '@portkey-wallet/types/types-ca/activity';
+import { formatStr2EllipsisStr } from '@portkey-wallet/utils/converter';
 import { List } from 'antd-mobile';
 import CustomSvg from 'components/CustomSvg';
 import { useCallback } from 'react';
@@ -8,17 +8,17 @@ import { useNavigate } from 'react-router';
 import './index.less';
 import LoadingMore from 'components/LoadingMore/LoadingMore';
 import { useIsTestnet } from 'hooks/useActivity';
-import { AmountSign, formatAmount, transNetworkText } from '@portkey/utils/activity';
+import { AmountSign, formatAmount, transNetworkText } from '@portkey-wallet/utils/activity';
 import { Button, Modal } from 'antd';
-import { useAppCASelector } from '@portkey/hooks/hooks-ca';
+import { useAppCASelector } from '@portkey-wallet/hooks/hooks-ca';
 import { dateFormat } from 'utils';
 import { useTranslation } from 'react-i18next';
 import { intervalCrossChainTransfer } from 'utils/sandboxUtil/crossChainTransfer';
 import { useAppDispatch, useLoading, useUserInfo } from 'store/Provider/hooks';
-import { removeFailedActivity } from '@portkey/store/store-ca/activity/slice';
-import { useCurrentChainList } from '@portkey/hooks/hooks-ca/chainList';
-import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
-import aes from '@portkey/utils/aes';
+import { removeFailedActivity } from '@portkey-wallet/store/store-ca/activity/slice';
+import { useCurrentChainList } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import aes from '@portkey-wallet/utils/aes';
 
 export interface IActivityListProps {
   data?: ActivityItemType[];

@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { SandboxErrorCode } from 'service/SandboxEventService';
 import { useAppDispatch, useAppSelector, useCommonState } from 'store/Provider/hooks';
-import { ZERO } from '@portkey/constants/misc';
+import { ZERO } from '@portkey-wallet/constants/misc';
 import { Tabs } from 'antd';
-import { useCurrentAccountTokenList } from '@portkey/hooks/hooks-eoa/useToken';
+import { useCurrentAccountTokenList } from '@portkey-wallet/hooks/hooks-eoa/useToken';
 import { useNavigate } from 'react-router';
-import { updateBalance } from '@portkey/store/tokenBalance/slice';
+import { updateBalance } from '@portkey-wallet/store/tokenBalance/slice';
 import { getBalance } from 'utils/sandboxUtil/getBalance';
 import './index.less';
-import { useGetELFRateQuery } from '@portkey/store/rate/api';
+import { useGetELFRateQuery } from '@portkey-wallet/store/rate/api';
 import BalanceCard from 'pages/components/BalanceCard';
 import Activity from '../Activity';
 import Assets from '../Assets';

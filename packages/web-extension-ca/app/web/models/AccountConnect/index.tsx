@@ -1,4 +1,5 @@
-import { AccountType } from '@portkey/types/wallet';
+/* eslint-disable no-inline-styles/no-inline-styles */
+import { AccountType } from '@portkey-wallet/types/wallet';
 import { Button } from 'antd';
 import CommonModal from 'components/CommonModal';
 import CustomSvg from 'components/CustomSvg';

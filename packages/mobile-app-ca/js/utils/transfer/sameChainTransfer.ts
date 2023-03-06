@@ -1,6 +1,6 @@
-import { SendOptions } from '@portkey/contracts/types';
-import { ContractBasic } from '@portkey/contracts/utils/ContractBasic';
-import { BaseToken } from '@portkey/types/types-ca/token';
+import { SendOptions } from '@portkey-wallet/contracts/types';
+import { ContractBasic } from '@portkey-wallet/contracts/utils/ContractBasic';
+import { BaseToken } from '@portkey-wallet/types/types-ca/token';
 import { managerForwardCall } from './managerForwardCall';
 
 const sameChainTransfer = ({

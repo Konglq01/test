@@ -1,5 +1,5 @@
-import { CAInfoType, LoginType } from '@portkey/types/types-ca/wallet';
-import { VerifierInfo } from '@portkey/types/verifier';
+import { CAInfoType, LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import { VerifierInfo } from '@portkey-wallet/types/verifier';
 
 export interface LoginInfo {
   guardianAccount: string; // account

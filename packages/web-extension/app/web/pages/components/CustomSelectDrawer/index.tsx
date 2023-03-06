@@ -1,13 +1,13 @@
 import CustomSvg from 'components/CustomSvg';
 import { DrawerProps } from 'antd';
 import BaseDrawer from '../BaseDrawer';
-import { AccountType } from '@portkey/types/wallet';
+import { AccountType } from '@portkey-wallet/types/wallet';
 import './index.less';
 import { useCallback } from 'react';
 import { useAppSelector } from 'store/Provider/hooks';
-import { useNetwork } from '@portkey/hooks/network';
-import { unitConverter } from '@portkey/utils/converter';
-import { ZERO } from '@portkey/constants/misc';
+import { useNetwork } from '@portkey-wallet/hooks/network';
+import { unitConverter } from '@portkey-wallet/utils/converter';
+import { ZERO } from '@portkey-wallet/constants/misc';
 import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
 

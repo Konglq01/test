@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AddressBookItem } from '@portkey/types/addressBook';
-import { RecentContactType, TransferItemType } from '@portkey/types/trade';
+import { AddressBookItem } from '@portkey-wallet/types/addressBook';
+import { RecentContactType, TransferItemType } from '@portkey-wallet/types/trade';
 
 export interface TradeState {
   recentContact?: RecentContactType;

@@ -1,18 +1,18 @@
 import { combineReducers } from '@reduxjs/toolkit';
-import { walletSlice } from '@portkey/store/wallet/slice';
-import addressBook from '@portkey/store/addressBook/slice';
-import chainSlice from '@portkey/store/network/slice';
-import tokenSlice from '@portkey/store/token/slice';
-import tokenBalanceSlice from '@portkey/store/tokenBalance/slice';
-import settingsSlice from '@portkey/store/settings/slice';
-import tradeSlice from '@portkey/store/trade/slice';
+import { walletSlice } from '@portkey-wallet/store/wallet/slice';
+import addressBook from '@portkey-wallet/store/addressBook/slice';
+import chainSlice from '@portkey-wallet/store/network/slice';
+import tokenSlice from '@portkey-wallet/store/token/slice';
+import tokenBalanceSlice from '@portkey-wallet/store/tokenBalance/slice';
+import settingsSlice from '@portkey-wallet/store/settings/slice';
+import tradeSlice from '@portkey-wallet/store/trade/slice';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { persistReducer } from 'redux-persist';
 import userSlice from './user/slice';
 import { counterSlice } from './counter/slice';
-import { rateApi } from '@portkey/store/rate/api';
+import { rateApi } from '@portkey-wallet/store/rate/api';
 
 const userPersistConfig = {
   key: userSlice.name,

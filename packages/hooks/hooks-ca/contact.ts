@@ -1,14 +1,14 @@
-import { request } from '@portkey/api/api-did';
-import { CheckContactNameResponseType } from '@portkey/api/api-did/contact/type';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { AddContactItemApiType, ContactItemType, EditContactItemApiType } from '@portkey/types/types-ca/contact';
+import { request } from '@portkey-wallet/api/api-did';
+import { CheckContactNameResponseType } from '@portkey-wallet/api/api-did/contact/type';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
+import { AddContactItemApiType, ContactItemType, EditContactItemApiType } from '@portkey-wallet/types/types-ca/contact';
 import { useCallback, useEffect } from 'react';
 import {
   addContactAction,
   deleteContactAction,
   editContactAction,
   fetchContactListAsync,
-} from '@portkey/store/store-ca/contact/actions';
+} from '@portkey-wallet/store/store-ca/contact/actions';
 import { useAppCommonDispatch, useAppCommonSelector } from '../index';
 
 const REFRESH_DELAY_TIME = 1.5 * 1000;

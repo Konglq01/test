@@ -1,5 +1,5 @@
 {
-  "name": "@portkey/api",
+  "name": "@portkey-wallet/api",
   "publishConfig": {
     "access": "public"
   },
@@ -11,6 +11,6 @@
     "start": "tsc --watch"
   },
   "dependencies": {
-    "@portkey/utils": "^0.0.1"
+    "@portkey-wallet/utils": "^0.0.1"
   }
 }

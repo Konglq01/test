@@ -1,4 +1,4 @@
-import { ChainChangeHandler, ChainItemType } from '@portkey/types/chain';
+import { ChainChangeHandler, ChainItemType } from '@portkey-wallet/types/chain';
 import { Button } from 'antd';
 import CustomSvg from 'components/CustomSvg';
 import { forwardRef, useCallback, useMemo } from 'react';

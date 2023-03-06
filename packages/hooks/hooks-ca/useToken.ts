@@ -1,9 +1,9 @@
 import { useAppCASelector, useAppCommonDispatch } from '../index';
-import { fetchAllTokenListAsync, getSymbolImagesAsync } from '@portkey/store/store-ca/tokenManagement/action';
-import { TokenState, TokenItemShowType } from '@portkey/types/types-ca/token';
+import { fetchAllTokenListAsync, getSymbolImagesAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
+import { TokenState, TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
 import { useMemo, useCallback } from 'react';
 import { useCurrentNetworkInfo } from './network';
-import { request } from '@portkey/api/api-did';
+import { request } from '@portkey-wallet/api/api-did';
 
 export interface TokenFuncsType {
   fetchTokenList: (params: { keyword: string; chainIdArray: string[] }) => void;

@@ -1,9 +1,9 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
-import { RateBaseType, NFTCollectionItemShowType } from '@portkey/types/types-ca/assets';
+import { RateBaseType, NFTCollectionItemShowType } from '@portkey-wallet/types/types-ca/assets';
 import { fetchAssetList, fetchNFTSeriesList, fetchNFTList, fetchTokenList, fetchTokenPrices } from './api';
-import { AccountAssets, TokenItemShowType } from '@portkey/types/types-ca/token';
-import { ChainId } from '@portkey/types';
-import { NEW_CLIENT_MOCK_ELF_LIST, PAGE_SIZE_IN_NFT_ITEM } from '@portkey/constants/constants-ca/assets';
+import { AccountAssets, TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
+import { ChainId } from '@portkey-wallet/types';
+import { NEW_CLIENT_MOCK_ELF_LIST, PAGE_SIZE_IN_NFT_ITEM } from '@portkey-wallet/constants/constants-ca/assets';
 
 // asset = token + nft
 export type AssetsStateType = {

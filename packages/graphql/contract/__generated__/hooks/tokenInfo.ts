@@ -1,4 +1,4 @@
-import * as Types from '../__generated__/types';
+import * as Types from '../types';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
@@ -17,6 +17,7 @@ export type TokenInfoQuery = {
     blockHeight: number;
     previousBlockHash?: string | null;
     symbol?: string | null;
+    type: Types.TokenType;
     tokenContractAddress?: string | null;
     decimals: number;
     totalSupply: number;
@@ -36,6 +37,7 @@ export const TokenInfoDocument = gql`
       blockHeight
       previousBlockHash
       symbol
+      type
       tokenContractAddress
       decimals
       totalSupply

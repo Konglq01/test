@@ -1,6 +1,6 @@
-import { ChainItemType } from '@portkey/store/store-ca/wallet/type';
-import { ChainType } from '@portkey/types';
-import { BaseToken } from '@portkey/types/types-ca/token';
+import { ChainItemType } from '@portkey-wallet/store/store-ca/wallet/type';
+import { ChainType } from '@portkey-wallet/types';
+import { BaseToken } from '@portkey-wallet/types/types-ca/token';
 import SandboxEventTypes from 'messages/SandboxEventTypes';
 import SandboxEventService, { SandboxErrorCode } from 'service/SandboxEventService';
 

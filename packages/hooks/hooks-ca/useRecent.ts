@@ -1,5 +1,5 @@
-import { addRecentContact } from '@portkey/store/store-ca/recent/slice';
-import { RecentContactItemType } from '@portkey/types/types-ca/contact';
+import { addRecentContact } from '@portkey-wallet/store/store-ca/recent/slice';
+import { RecentContactItemType } from '@portkey-wallet/types/types-ca/contact';
 import { useAppCommonDispatch } from '..';
 import { useAppCASelector } from './index';
 

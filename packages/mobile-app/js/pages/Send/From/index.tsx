@@ -1,4 +1,4 @@
-import type { AccountType } from '@portkey/types/wallet';
+import type { AccountType } from '@portkey-wallet/types/wallet';
 import { useWallet } from 'hooks/store';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';

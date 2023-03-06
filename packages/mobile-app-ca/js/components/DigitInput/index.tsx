@@ -1,11 +1,11 @@
-import { PIN_SIZE } from '@portkey/constants/misc';
+import { PIN_SIZE } from '@portkey-wallet/constants/misc';
 import { InputProps, Text } from '@rneui/base';
 import { defaultColors } from 'assets/theme';
 import { TextS } from 'components/CommonText';
 import React, { useRef, useState, useCallback, memo, useMemo, forwardRef, useImperativeHandle } from 'react';
 import { StyleSheet, View, TextInput, TouchableHighlight, StyleProp, ViewStyle } from 'react-native';
-import { screenWidth } from '@portkey/utils/mobile/device';
-import { isValidPositiveInteger } from '@portkey/utils/reg';
+import { screenWidth } from '@portkey-wallet/utils/mobile/device';
+import { isValidPositiveInteger } from '@portkey-wallet/utils/reg';
 
 export type DigitInputProps = {
   maxLength?: number;

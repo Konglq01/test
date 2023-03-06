@@ -17,8 +17,8 @@ import {
   checkPasswordInput,
   getAccountByPrivateKey,
   getNextBIP44Path,
-} from '@portkey/utils/wallet';
-import { DefaultBIP44Path } from '@portkey/constants/wallet';
+} from '@portkey-wallet/utils/wallet';
+import { DefaultBIP44Path } from '@portkey-wallet/constants/wallet';
 import { WalletError, WalletState } from './type';
 import {
   changeEncryptStr,
@@ -30,8 +30,8 @@ import {
   getAccountByWalletState,
   handlePrivateKey,
 } from './utils';
-import { isEqAddress } from '@portkey/utils/aelf';
-import { isPrivateKey } from '@portkey/utils';
+import { isEqAddress } from '@portkey-wallet/utils/aelf';
+import { isPrivateKey } from '@portkey-wallet/utils';
 const initialState: WalletState = {
   nextBIP44Path: DefaultBIP44Path,
   walletType: 'aelf',

@@ -1,7 +1,7 @@
 import { LocalStream } from 'extension-streams';
 import { getAllStorageLocalData, getLocalStorage } from 'utils/storage/chromeStorage';
 import storage from 'utils/storage/storage';
-import { PublicKey } from '@portkey/types/wallet';
+import { PublicKey } from '@portkey-wallet/types/wallet';
 import { AutoLockDataKey, AutoLockDataType, DefaultLock } from 'constants/lock';
 import SWEventController from 'controllers/SWEventController';
 import PermissionController from 'controllers/PermissionController';

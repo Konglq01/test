@@ -1,4 +1,4 @@
-import { isIos } from '@portkey/utils/mobile/device';
+import { isIos } from '@portkey-wallet/utils/mobile/device';
 import _BackgroundTimer from 'react-native-background-timer';
 
 export const setBackgroundTimeout = (callback: any, timeout: number): NodeJS.Timer =>

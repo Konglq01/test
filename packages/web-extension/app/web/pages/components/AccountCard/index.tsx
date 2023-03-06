@@ -5,14 +5,14 @@ import { AESEncryptWalletParam } from 'types/wallet';
 import QRCode from 'qrcode.react';
 import Copy from 'components/Copy';
 import CommonLink from 'components/CommonLink';
-import { addressFormat, getExploreLink } from '@portkey/utils';
+import { addressFormat, getExploreLink } from '@portkey-wallet/utils';
 import ExportPrivateKey from '../ExportPrivateKey';
 import RemoveAccount from '../RemoveAccount';
-import { AccountType } from '@portkey/types/wallet';
+import { AccountType } from '@portkey-wallet/types/wallet';
 import './index.less';
 import CustomSvg from 'components/CustomSvg';
 import clsx from 'clsx';
-import { ChainItemType } from '@portkey/types/chain';
+import { ChainItemType } from '@portkey-wallet/types/chain';
 import { useTranslation } from 'react-i18next';
 
 interface AccountCardProps extends CommonModalProps {

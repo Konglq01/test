@@ -1,17 +1,16 @@
-import React, { memo, useMemo } from 'react';
+import React, { memo } from 'react';
 import Svg from 'components/Svg';
 import { dashBoardBtnStyle, innerPageStyles } from './style';
 import navigationService from 'utils/navigationService';
-import { TokenItemShowType } from '@portkey/types/types-ca/token';
-import { IToSendHomeParamsType } from '@portkey/types/types-ca/routeParams';
+import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
+import { IToSendHomeParamsType } from '@portkey-wallet/types/types-ca/routeParams';
 
 import { View, TouchableOpacity } from 'react-native';
 import { TextM } from 'components/CommonText';
 import { useLanguage } from 'i18n/hooks';
-
 import { pTd } from 'utils/unit';
 import AssetsOverlay from 'pages/DashBoard/AssetsOverlay';
-import { useGetCurrentCAContract } from 'hooks/contract';
+import GStyles from 'assets/theme/GStyles';
 interface SendButtonType {
   themeType?: 'dashBoard' | 'innerPage';
   sentToken?: TokenItemShowType;
@@ -23,11 +22,10 @@ const SendButton = (props: SendButtonType) => {
 
   const { t } = useLanguage();
 
-  const getCurrentCAContract = useGetCurrentCAContract();
-
   return (
     <View style={styles.buttonWrap}>
       <TouchableOpacity
+        style={[styles.iconWrapStyle, GStyles.alignCenter]}
         onPress={async () => {
           if (themeType === 'innerPage')
             return navigationService.navigate('SendHome', {

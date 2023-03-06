@@ -1,28 +1,31 @@
 type Query {
   tokenInfo(dto: GetTokenInfoDto): [TokenInfoDto]
-  nftProtocolInfo(dto: GetNFTProtocolInfoDto): [NFTProtocolInfoDto]
-  caHolderTransaction(dto: GetCAHolderTransactionDto): [CAHolderTransactionDto]
+  caHolderTransaction(
+    dto: GetCAHolderTransactionDto
+  ): CAHolderTransactionPageResultDto
   caHolderManagerInfo(dto: GetCAHolderManagerInfoDto): [CAHolderManagerDto]
-  loginGuardianAccountInfo(
-    dto: GetLoginGuardianAccountInfoDto
-  ): [LoginGuardianAccountDto]
-  userNFTProtocolInfo(dto: GetUserNFTProtocolInfoDto): [UserNFTProtocolInfoDto]
-  userNFTInfo(dto: GetUserNFTInfoDto): [UserNFTInfoDto]
+  loginGuardianInfo(dto: GetLoginGuardianInfoDto): [LoginGuardianDto]
+  caHolderNFTCollectionBalanceInfo(
+    dto: GetCAHolderNFTCollectionInfoDto
+  ): CAHolderNFTCollectionBalancePageResultDto
+  caHolderNFTBalanceInfo(
+    dto: GetCAHolderNFTInfoDto
+  ): CAHolderNFTBalancePageResultDto
   caHolderTokenBalanceInfo(
     dto: GetCAHolderTokenBalanceDto
-  ): [CAHolderTokenBalanceDto]
+  ): CAHolderTokenBalancePageResultDto
   caHolderTransactionAddressInfo(
     dto: GetCAHolderTransactionAddressDto
-  ): [CAHolderTransactionAddressDto]
-  loginGuardianAccountChangeRecordInfo(
-    dto: GetLoginGuardianAccountChangeRecordDto
-  ): [LoginGuardianAccountChangeRecordDto]
+  ): CAHolderTransactionAddressPageResultDto
+  loginGuardianChangeRecordInfo(
+    dto: GetLoginGuardianChangeRecordDto
+  ): [LoginGuardianChangeRecordDto]
   caHolderManagerChangeRecordInfo(
     dto: GetCAHolderManagerChangeRecordDto
   ): [CAHolderManagerChangeRecordDto]
   caHolderSearchTokenNFT(
     dto: GetCAHolderSearchTokenNFTDto
-  ): [CAHolderSearchTokenNFTDto]
+  ): CAHolderSearchTokenNFTPageResultDto
   syncState(dto: GetSyncStateDto): SyncStateDto
 }
 
@@ -33,6 +36,7 @@ type TokenInfoDto {
   blockHeight: Long!
   previousBlockHash: String
   symbol: String
+  type: TokenType!
   tokenContractAddress: String
   decimals: Int!
   totalSupply: Long!
@@ -44,6 +48,12 @@ type TokenInfoDto {
 
 scalar Long
 
+enum TokenType {
+  TOKEN
+  NFT_COLLECTION
+  NFT_ITEM
+}
+
 input GetTokenInfoDto {
   symbol: String
   chainId: String
@@ -51,33 +61,9 @@ input GetTokenInfoDto {
   maxResultCount: Int!
 }
 
-type NFTProtocolInfoDto {
-  id: String
-  chainId: String
-  blockHash: String
-  blockHeight: Long!
-  previousBlockHash: String
-  protocolName: String
-  symbol: String
-  tokenId: Long!
-  owner: String
-  minter: String
-  quantity: Long!
-  alias: String
-  baseUri: String
-  uri: String
-  creator: String
-  nftType: String
-  totalQuantity: Long!
-  tokenHash: String
-  imageUrl: String
-}
-
-input GetNFTProtocolInfoDto {
-  symbol: String
-  chainId: String
-  skipCount: Int!
-  maxResultCount: Int!
+type CAHolderTransactionPageResultDto {
+  totalRecordCount: Long!
+  data: [CAHolderTransactionDto]
 }
 
 type CAHolderTransactionDto {
@@ -88,8 +74,8 @@ type CAHolderTransactionDto {
   previousBlockHash: String
   transactionId: String
   methodName: String
-  tokenInfo: TokenInfo
-  nftInfo: NFTInfo
+  tokenInfo: TokenInfoDto
+  nftInfo: NFTItemInfoDto
   status: TransactionStatus!
   timestamp: Long!
   transferInfo: TransferInfo
@@ -97,15 +83,19 @@ type CAHolderTransactionDto {
   transactionFees: [TransactionFee]
 }
 
-type TokenInfo {
+type NFTItemInfoDto {
   symbol: String
+  tokenContractAddress: String
   decimals: Int!
-}
-
-type NFTInfo {
-  url: String
-  alias: String
-  nftId: Long!
+  supply: Long!
+  totalSupply: Long!
+  tokenName: String
+  issuer: String
+  isBurnable: Boolean!
+  issueChainId: Int!
+  imageUrl: String
+  collectionSymbol: String
+  collectionName: String
 }
 
 enum TransactionStatus {
@@ -120,10 +110,12 @@ enum TransactionStatus {
 
 type TransferInfo {
   fromAddress: String
+  fromCAAddress: String
   toAddress: String
   amount: Long!
   fromChainId: String
   toChainId: String
+  transferTransactionId: String
 }
 
 type TransactionFee {
@@ -133,10 +125,13 @@ type TransactionFee {
 
 input GetCAHolderTransactionDto {
   chainId: String
+  startBlockHeight: Long!
+  endBlockHeight: Long!
   symbol: String
   caAddresses: [String]
   transactionId: String
   blockHash: String
+  transferTransactionId: String
   methodNames: [String]
   skipCount: Int!
   maxResultCount: Int!
@@ -152,7 +147,7 @@ type CAHolderManagerDto {
 
 type ManagerInfo {
   manager: String
-  deviceString: String
+  extraData: String
 }
 
 input GetCAHolderManagerInfoDto {
@@ -164,58 +159,59 @@ input GetCAHolderManagerInfoDto {
   maxResultCount: Int!
 }
 
-type LoginGuardianAccountDto {
+type LoginGuardianDto {
   id: String
   chainId: String
   caHash: String
   caAddress: String
   manager: String
-  loginGuardianAccount: GuardianAccountDto
-}
-
-type GuardianAccountDto {
-  guardian: GuardianDto
-  value: String
+  loginGuardian: GuardianDto
 }
 
 type GuardianDto {
   type: Int!
   verifier: String
+  identifierHash: String
+  salt: String
+  isLoginGuardian: Boolean!
 }
 
-input GetLoginGuardianAccountInfoDto {
+input GetLoginGuardianInfoDto {
   chainId: String
   caHash: String
   caAddress: String
-  loginGuardianAccount: String
+  loginGuardian: String
   skipCount: Int!
   maxResultCount: Int!
 }
 
-type UserNFTProtocolInfoDto {
+type CAHolderNFTCollectionBalancePageResultDto {
+  totalRecordCount: Long!
+  data: [CAHolderNFTCollectionBalanceInfoDto]
+}
+
+type CAHolderNFTCollectionBalanceInfoDto {
   id: String
   chainId: String
   caAddress: String
   tokenIds: [Long!]
-  nftProtocolInfo: NFTProtocolDto
+  nftCollectionInfo: NFTCollectionDto
 }
 
-type NFTProtocolDto {
-  id: String
+type NFTCollectionDto {
   symbol: String
-  creator: String
-  nftType: String
-  protocolName: String
-  baseUri: String
-  isTokenIdReuse: Boolean!
+  tokenContractAddress: String
+  decimals: Int!
   supply: Long!
   totalSupply: Long!
-  issueChainId: Int!
+  tokenName: String
+  issuer: String
   isBurnable: Boolean!
+  issueChainId: Int!
   imageUrl: String
 }
 
-input GetUserNFTProtocolInfoDto {
+input GetCAHolderNFTCollectionInfoDto {
   chainId: String
   symbol: String
   caAddresses: [String]
@@ -223,7 +219,12 @@ input GetUserNFTProtocolInfoDto {
   maxResultCount: Int!
 }
 
-type UserNFTInfoDto {
+type CAHolderNFTBalancePageResultDto {
+  totalRecordCount: Long!
+  data: [CAHolderNFTBalanceInfoDto]
+}
+
+type CAHolderNFTBalanceInfoDto {
   id: String
   chainId: String
   caAddress: String
@@ -231,38 +232,26 @@ type UserNFTInfoDto {
   nftInfo: NFTItemInfoDto
 }
 
-type NFTItemInfoDto {
-  id: String
-  protocolName: String
-  symbol: String
-  tokenId: Long!
-  owner: String
-  minter: String
-  quantity: Long!
-  alias: String
-  baseUri: String
-  uri: String
-  creator: String
-  nftType: String
-  totalQuantity: Long!
-  tokenHash: String
-  imageUrl: String
-}
-
-input GetUserNFTInfoDto {
+input GetCAHolderNFTInfoDto {
   chainId: String
   symbol: String
-  tokenId: Long! = 0
   caAddresses: [String]
+  collectionSymbol: String
   skipCount: Int!
   maxResultCount: Int!
+}
+
+type CAHolderTokenBalancePageResultDto {
+  totalRecordCount: Long!
+  data: [CAHolderTokenBalanceDto]
 }
 
 type CAHolderTokenBalanceDto {
   chainId: String
   caAddress: String
-  tokenInfo: TokenInfo
+  tokenInfo: TokenInfoDto
   balance: Long!
+  tokenIds: [Long!]
 }
 
 input GetCAHolderTokenBalanceDto {
@@ -271,6 +260,11 @@ input GetCAHolderTokenBalanceDto {
   symbol: String
   skipCount: Int!
   maxResultCount: Int!
+}
+
+type CAHolderTransactionAddressPageResultDto {
+  totalRecordCount: Long!
+  data: [CAHolderTransactionAddressDto]
 }
 
 type CAHolderTransactionAddressDto {
@@ -288,7 +282,7 @@ input GetCAHolderTransactionAddressDto {
   maxResultCount: Int!
 }
 
-type LoginGuardianAccountChangeRecordDto {
+type LoginGuardianChangeRecordDto {
   changeType: String
   blockHeight: Long!
   id: String
@@ -296,10 +290,10 @@ type LoginGuardianAccountChangeRecordDto {
   caHash: String
   caAddress: String
   manager: String
-  loginGuardianAccount: GuardianAccountDto
+  loginGuardian: GuardianDto
 }
 
-input GetLoginGuardianAccountChangeRecordDto {
+input GetLoginGuardianChangeRecordDto {
   chainId: String
   startBlockHeight: Long!
   endBlockHeight: Long!
@@ -319,36 +313,18 @@ input GetCAHolderManagerChangeRecordDto {
   endBlockHeight: Long!
 }
 
+type CAHolderSearchTokenNFTPageResultDto {
+  totalRecordCount: Long!
+  data: [CAHolderSearchTokenNFTDto]
+}
+
 type CAHolderSearchTokenNFTDto {
   chainId: String
   caAddress: String
   balance: Long!
-  tokenInfo: TokenSearchInfoDto
-  nftInfo: NFTSearchInfoDto
-}
-
-type TokenSearchInfoDto {
-  symbol: String
-  tokenContractAddress: String
-  decimals: Int!
-  totalSupply: Long!
-  tokenName: String
-  issuer: String
-  isBurnable: Boolean!
-  issueChainId: Int!
-}
-
-type NFTSearchInfoDto {
-  protocolName: String
-  symbol: String
   tokenId: Long!
-  nftContractAddress: String
-  owner: String
-  minter: String
-  quantity: Long!
-  alias: String
-  baseUri: String
-  uri: String
+  tokenInfo: TokenInfoDto
+  nftInfo: NFTItemInfoDto
 }
 
 input GetCAHolderSearchTokenNFTDto {

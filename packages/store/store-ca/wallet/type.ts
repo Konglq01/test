@@ -1,6 +1,6 @@
-import { ChainId, ChainType, NetworkType } from '@portkey/types';
-import { CAWalletInfoType } from '@portkey/types/types-ca/wallet';
-import { PinErrorMessage } from '@portkey/utils/wallet/types';
+import { ChainId, ChainType, NetworkType } from '@portkey-wallet/types';
+import { CAWalletInfoType } from '@portkey-wallet/types/types-ca/wallet';
+import { PinErrorMessage } from '@portkey-wallet/utils/wallet/types';
 
 export type WalletType = ChainType;
 

@@ -1,4 +1,4 @@
-import { UserGuardianItem, UserGuardianStatus } from '@portkey/store/store-ca/guardians/type';
+import { UserGuardianItem, UserGuardianStatus } from '@portkey-wallet/store/store-ca/guardians/type';
 import { GuardianItem } from 'types/guardians';
 
 export const formatAddGuardianValue = ({

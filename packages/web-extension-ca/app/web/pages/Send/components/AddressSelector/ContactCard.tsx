@@ -1,6 +1,6 @@
-import { ContactItemType, IClickAddressProps } from '@portkey/types/types-ca/contact';
-import { transNetworkText } from '@portkey/utils/activity';
-import { formatStr2EllipsisStr } from '@portkey/utils/converter';
+import { ContactItemType, IClickAddressProps } from '@portkey-wallet/types/types-ca/contact';
+import { transNetworkText } from '@portkey-wallet/utils/activity';
+import { formatStr2EllipsisStr } from '@portkey-wallet/utils/converter';
 import { Collapse } from 'antd';
 import clsx from 'clsx';
 import { useIsTestnet } from 'hooks/useActivity';

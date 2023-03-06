@@ -1,4 +1,4 @@
-import * as Types from '../__generated__/types';
+import * as Types from '../types';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
@@ -9,25 +9,62 @@ export type CaHolderTokenBalanceInfoQueryVariables = Types.Exact<{
 
 export type CaHolderTokenBalanceInfoQuery = {
   __typename?: 'Query';
-  caHolderTokenBalanceInfo?: Array<{
-    __typename?: 'CAHolderTokenBalanceDto';
-    chainId?: string | null;
-    caAddress?: string | null;
-    balance: number;
-    tokenInfo?: { __typename?: 'TokenInfo'; symbol?: string | null; decimals: number } | null;
-  } | null> | null;
+  caHolderTokenBalanceInfo?: {
+    __typename?: 'CAHolderTokenBalancePageResultDto';
+    totalRecordCount: number;
+    data?: Array<{
+      __typename?: 'CAHolderTokenBalanceDto';
+      chainId?: string | null;
+      caAddress?: string | null;
+      balance: number;
+      tokenIds?: Array<number> | null;
+      tokenInfo?: {
+        __typename?: 'TokenInfoDto';
+        id?: string | null;
+        chainId?: string | null;
+        blockHash?: string | null;
+        blockHeight: number;
+        previousBlockHash?: string | null;
+        symbol?: string | null;
+        type: Types.TokenType;
+        tokenContractAddress?: string | null;
+        decimals: number;
+        totalSupply: number;
+        tokenName?: string | null;
+        issuer?: string | null;
+        isBurnable: boolean;
+        issueChainId: number;
+      } | null;
+    } | null> | null;
+  } | null;
 };
 
 export const CaHolderTokenBalanceInfoDocument = gql`
   query caHolderTokenBalanceInfo($dto: GetCAHolderTokenBalanceDto) {
     caHolderTokenBalanceInfo(dto: $dto) {
-      chainId
-      caAddress
-      tokenInfo {
-        symbol
-        decimals
+      totalRecordCount
+      data {
+        chainId
+        caAddress
+        tokenInfo {
+          id
+          chainId
+          blockHash
+          blockHeight
+          previousBlockHash
+          symbol
+          type
+          tokenContractAddress
+          decimals
+          totalSupply
+          tokenName
+          issuer
+          isBurnable
+          issueChainId
+        }
+        balance
+        tokenIds
       }
-      balance
     }
   }
 `;

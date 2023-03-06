@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import PageContainer from 'components/PageContainer';
 import { TextM, TextXL } from 'components/CommonText';
-import { AccountType } from '@portkey/types/wallet';
+import { AccountType } from '@portkey-wallet/types/wallet';
 import { setStringAsync } from 'expo-clipboard';
 import CommonToast from 'components/CommonToast';
 import AccountOverlay from 'components/AccountOverlay';
@@ -12,7 +12,7 @@ import { useWallet } from 'hooks/store';
 import Svg from 'components/Svg';
 import { defaultColors } from 'assets/theme';
 import { useLanguage } from 'i18n/hooks';
-import { useAppEOASelector } from '@portkey/hooks/hooks-eoa';
+import { useAppEOASelector } from '@portkey-wallet/hooks/hooks-eoa';
 
 export default function Receive() {
   const { t } = useLanguage();

@@ -1,10 +1,10 @@
 import { Button } from 'antd';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLoginInfo, useGuardiansInfo, useCommonState } from 'store/Provider/hooks';
-import { VerifyStatus } from '@portkey/types/verifier';
+import { VerifyStatus } from '@portkey-wallet/types/verifier';
 import { useNavigate, useLocation } from 'react-router';
-import { UserGuardianStatus } from '@portkey/store/store-ca/guardians/type';
-import { getApprovalCount } from '@portkey/utils/guardian';
+import { UserGuardianStatus } from '@portkey-wallet/store/store-ca/guardians/type';
+import { getApprovalCount } from '@portkey-wallet/utils/guardian';
 import './index.less';
 import PortKeyTitle from 'pages/components/PortKeyTitle';
 import clsx from 'clsx';
