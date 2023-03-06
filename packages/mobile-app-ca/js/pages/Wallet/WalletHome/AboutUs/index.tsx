@@ -12,7 +12,7 @@ const AboutUs = () => {
   return (
     <PageContainer titleDom={t('About Us')} safeAreaColor={['blue', 'gray']} containerStyles={styles.pageContainer}>
       <Svg icon="app-blue-logo" oblongSize={[pTd(62), pTd(64)]} iconStyle={styles.logo} />
-      <TextM style={styles.version}>V 1.0.0</TextM>
+      <TextM style={styles.version}>V 1.1.2</TextM>
     </PageContainer>
   );
 };
