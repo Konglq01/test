@@ -20,8 +20,7 @@ import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import { fetchAssetList } from '@portkey-wallet/store/store-ca/assets/api';
 import { IAssetItemType } from '@portkey-wallet/store/store-ca/assets/type';
 import navigationService from 'utils/navigationService';
-import { IToSendAssetParamsType, IToSendHomeParamsType } from '@portkey-wallet/types/types-ca/routeParams';
-import useEffectOnce from 'hooks/useEffectOnce';
+import { IToSendHomeParamsType } from '@portkey-wallet/types/types-ca/routeParams';
 
 type onFinishSelectTokenType = (tokenItem: any) => void;
 type TokenListProps = {
@@ -42,8 +41,6 @@ const AssetItem = (props: { symbol: string; onPress: (item: any) => void; item: 
   if (item.tokenInfo)
     return (
       <TokenListItem
-        symbol={item.symbol}
-        icon={'aelf-avatar'}
         item={{ ...item, ...item?.tokenInfo, tokenContractAddress: item.address }}
         onPress={() => onPress(item)}
       />
