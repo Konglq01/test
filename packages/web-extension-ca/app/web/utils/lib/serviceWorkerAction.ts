@@ -1,4 +1,4 @@
-import { ThreeWayLogin } from '@portkey/types/types-ca/wallet';
+import { ThreeWayLogin } from '@portkey-wallet/types/types-ca/wallet';
 import { message } from 'antd';
 import InternalMessage from 'messages/InternalMessage';
 import { PortkeyMessageTypes } from 'messages/InternalMessageTypes';

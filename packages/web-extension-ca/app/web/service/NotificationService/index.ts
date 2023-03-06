@@ -99,7 +99,6 @@ export default class NotificationService {
       }
       this.openWindow = popupWindow;
       this.closeSender = { ...this.closeSender, [popupWindow.id?.toString() ?? '']: notification };
-      this.openWindow = popupWindow;
       return popupWindow;
     } catch (error) {
       notification.sendResponse?.(errorHandler(500002, error));
@@ -213,7 +212,6 @@ export default class NotificationService {
    */
   close = async (closeParams?: CloseParams, promptType: CreatePromptType = 'windows') => {
     const windowId = await this.completedWithoutClose(closeParams, promptType);
-
     windowId && apis[promptType].remove(windowId);
     return windowId;
   };
@@ -221,12 +219,11 @@ export default class NotificationService {
    * The user completes the action without closing the window
    */
   completedWithoutClose = async (closeParams?: CloseParams, promptType: CreatePromptType = 'windows') => {
-    let _id = closeParams?.windowId;
+    let _id = promptType === 'windows' ? this.openWindow?.id : closeParams?.windowId;
     if (!_id) {
       const ele = await apis[promptType].getCurrent();
       _id = ele?.id;
     }
-
     const sender = this.closeSender?.[_id?.toString() ?? ''];
     sender?.sendResponse?.(closeParams);
     if (sender) {

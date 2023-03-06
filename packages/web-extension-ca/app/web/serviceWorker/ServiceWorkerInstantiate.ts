@@ -45,37 +45,19 @@ const allowedMethod = [
   PortkeyMessageTypes.CHECK_WALLET_STATUS,
   PortkeyMessageTypes.EXPAND_FULL_SCREEN,
   PortkeyMessageTypes.OPEN_RECAPTCHA_PAGE,
-  PortkeyMessageTypes.ACTIVE_LOCK_STATUS,
   PortkeyMessageTypes.THREE_WAY_LOGIN,
   WalletMessageTypes.REQUEST_ACCOUNTS,
   MethodMessageTypes.GET_WALLET_STATE,
   // TODO SET_RECAPTCHA_CODE
   WalletMessageTypes.SET_RECAPTCHA_CODE_V2,
   WalletMessageTypes.THREE_WAY_LOGIN,
+  PortkeyMessageTypes.ACTIVE_LOCK_STATUS,
 ];
 
-const PortkeyMethod = [
-  PortkeyMessageTypes.GET_SEED,
-  PortkeyMessageTypes.SET_SEED,
-  PortkeyMessageTypes.LOCK_WALLET,
-  PortkeyMessageTypes.CHECK_WALLET_STATUS,
-  PortkeyMessageTypes.CLOSE_PROMPT,
-  PortkeyMessageTypes.REGISTER_WALLET,
-  PortkeyMessageTypes.LOGIN_WALLET,
-  PortkeyMessageTypes.EXPAND_FULL_SCREEN,
-  PortkeyMessageTypes.OPEN_RECAPTCHA_PAGE,
-  PortkeyMessageTypes.THREE_WAY_LOGIN,
-  WalletMessageTypes.SET_RECAPTCHA_CODE_V2,
-  WalletMessageTypes.THREE_WAY_LOGIN,
-  WalletMessageTypes.CONNECT,
-  WalletMessageTypes.SWITCH_CHAIN,
-  WalletMessageTypes.REQUEST_ACCOUNTS,
-  MethodMessageTypes.GET_WALLET_STATE,
-];
+const PortkeyMethod = [...allowedMethod, WalletMessageTypes.CONNECT, WalletMessageTypes.SWITCH_CHAIN];
 
 const initPageState = async () => {
   const allStorage = await getAllStorageLocalData();
-  console.log(allStorage, 'allStorage===');
   const reduxStore = JSON.parse(allStorage[storage.reduxStorageName] ?? null);
   pageState = {
     registerStatus: allStorage[storage.registerStatus],
@@ -115,8 +97,6 @@ export default class ServiceWorkerInstantiate {
   // Watches the internal messaging system ( LocalStream )
   async setupInternalMessaging() {
     try {
-      // clearLocalStorage();
-      // setLocalStorage({ connections: null });
       await initPageState();
       LocalStream.watch(async (request: any, sendResponse: SendResponseFun) => {
         const message = InternalMessage.fromJson(request);
@@ -224,8 +204,12 @@ export default class ServiceWorkerInstantiate {
         },
         'windows',
       );
-      if (result.error) return sendResponse(errorHandler(700001, result.error));
-      sendResponse({ ...errorHandler(0), data: result });
+      if (result.error)
+        return sendResponse({
+          ...errorHandler(700001),
+          error: (result as any)?.error?.message || result.error || result,
+        });
+      sendResponse({ ...errorHandler(0), data: (result as any)?.response || result });
     } catch (error) {
       sendResponse(errorHandler(100001, error));
     }
@@ -296,7 +280,7 @@ export default class ServiceWorkerInstantiate {
    */
   async connectWallet(sendResponse: SendResponseFun, message: any) {
     try {
-      sendResponse(errorHandler(700001, ''));
+      sendResponse(errorHandler(700001, message));
     } catch (error) {
       console.log(error, 'connectWallet==');
       return sendResponse(errorHandler(500001, error));

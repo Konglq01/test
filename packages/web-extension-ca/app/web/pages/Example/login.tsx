@@ -1,4 +1,4 @@
-import { ThreeWayLogin } from '@portkey/types/types-ca/wallet';
+import { ThreeWayLogin } from '@portkey-wallet/types/types-ca/wallet';
 import { Button } from 'antd';
 import { useCallback } from 'react';
 import { threeWayLoginAction } from 'utils/lib/serviceWorkerAction';
