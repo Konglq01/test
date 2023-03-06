@@ -70,7 +70,9 @@ export default function SelectVerifier() {
               endPoint: result.endPoint,
             },
             key: _key,
-          } as any),
+            identifierHash: '',
+            salt: '',
+          }),
         );
         navigate('/register/verifier-account', { state: 'register' });
       }

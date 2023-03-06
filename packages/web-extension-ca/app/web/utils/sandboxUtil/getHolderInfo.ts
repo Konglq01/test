@@ -1,13 +1,9 @@
 import { request } from '@portkey-wallet/api/api-did';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { ChainType } from '@portkey-wallet/types';
-import SandboxEventTypes from 'messages/SandboxEventTypes';
-import SandboxEventService, { SandboxErrorCode } from 'service/SandboxEventService';
+import { SandboxErrorCode, SandboxEventService, SandboxEventTypes } from '@portkey-wallet/utils/sandboxService';
 
 export const getHolderInfo = async ({
-  rpcUrl,
-  chainType,
-  address, // contract address
   paramsOption,
 }: {
   rpcUrl: string;
@@ -15,34 +11,12 @@ export const getHolderInfo = async ({
   chainType: ChainType;
   paramsOption: {
     guardianIdentifier?: string;
-    loginGuardianAccount?: string;
     caHash?: string;
   };
-}) => {
-  if (paramsOption.guardianIdentifier) {
-    return request.wallet.guardianIdentifiers({
-      params: { chainId: DefaultChainId, guardianIdentifier: paramsOption.guardianIdentifier },
-    });
-  }
-  const resMessage = await SandboxEventService.dispatchAndReceive(SandboxEventTypes.callViewMethod, {
-    rpcUrl,
-    chainType,
-    address,
-    methodName: 'GetHolderInfo',
-    paramsOption,
+}) =>
+  request.wallet.guardianIdentifiers({
+    params: { chainId: DefaultChainId, ...paramsOption },
   });
-
-  console.log(resMessage, 'resMessage===GetHolderInfo');
-
-  if (resMessage.code === SandboxErrorCode.error) throw resMessage.error;
-  return {
-    code: resMessage.code,
-    result: {
-      rpcUrl,
-      ...resMessage.message,
-    },
-  };
-};
 
 export const getHolderInfoByContract = async ({
   rpcUrl,

@@ -71,7 +71,7 @@ export default function useFetchDidWallet() {
 
           console.log(result, 'result===');
 
-          const managerList: any[] = result.result.managerInfos;
+          const managerList: any[] = result.managerInfos;
 
           if (!managerList.find((info) => info?.address === managerAddress)) throw `${managerAddress} is not a manager`;
 
