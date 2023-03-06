@@ -1,18 +1,6 @@
 import { useCurrentNetworkBalances, useAccountListNativeBalances } from './balances';
 import { renderHookWithProvider } from '../../../test/utils/render';
-import { createSlice, combineReducers, configureStore } from '@reduxjs/toolkit';
-
-function setupStore(state: any) {
-  const slice = createSlice({
-    name: 'slice',
-    initialState: state,
-    reducers: {},
-  });
-
-  return configureStore({
-    reducer: slice.reducer,
-  });
-}
+import { setupStore } from '../../../test/utils/setup';
 
 describe('useCurrentNetworkBalances', () => {
   test('rpcUrl undefined, and return undefined', () => {
