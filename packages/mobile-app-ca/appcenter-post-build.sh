@@ -3,9 +3,6 @@ if [ "$AGENT_JOBSTATUS" == "Succeeded" ]; then
     # Example: Upload main branch app binary to HockeyApp using the API
     if [ "$PLATFORM_TYPE" == "android" ];
      then
-        # curl -X POST -H "Content-Type: application/json" \
-        # -d '{"msg_type":"text","content":{"text":"DID:ANDROID端最新包 （id:'$APPCENTER_BUILD_ID'） build成功, 可在appcenter中下载最新包进行测试  https://install.appcenter.ms/orgs/aelf-web/apps/DID-Android"}}' \
-        # https://open.feishu.cn/open-apis/bot/v2/hook/f2d3fffd-c630-4e59-86e3-e7053a64e4b2
         curl -X POST -H "Content-Type: application/json" \
         -d '{
             "msg_type": "post",
@@ -16,7 +13,7 @@ if [ "$AGENT_JOBSTATUS" == "Succeeded" ]; then
                         "content": [
                             [{
                                     "tag": "text",
-                                    "text": "最新Android代码包（id:'$APPCENTER_BUILD_ID'）已经更新: "
+                                    "text": "最新'${environment}'环境Android代码包（id:'$APPCENTER_BUILD_ID'）已经更新: "
                                 },
                                 {
                                     "tag": "a",
@@ -46,9 +43,6 @@ if [ "$AGENT_JOBSTATUS" == "Succeeded" ]; then
     # Example: Upload main branch app binary to HockeyApp using the API
     if [ "$PLATFORM_TYPE" == "ios" ];
      then
-        # curl -X POST -H "Content-Type: application/json" \
-        # -d '{"msg_type":"text","content":{"text":"DID:IOS端最新包（id:'$APPCENTER_BUILD_ID'） build成功, 可在appcenter中下载最新包进行测试 https://install.appcenter.ms/orgs/aelf-web/apps/DID-IOS"}}' \
-        # https://open.feishu.cn/open-apis/bot/v2/hook/f2d3fffd-c630-4e59-86e3-e7053a64e4b2
         curl -X POST -H "Content-Type: application/json" \
         -d '{
             "msg_type": "post",
@@ -60,7 +54,7 @@ if [ "$AGENT_JOBSTATUS" == "Succeeded" ]; then
                             [
                                 {
                                     "tag": "text",
-                                    "text": "最新IOS代码包（id:'$APPCENTER_BUILD_ID'）已经更新，"
+                                    "text": "最新'${environment}'环境IOS代码包（id:'$APPCENTER_BUILD_ID'）已经更新，"
                                 },
                                 {
                                     "tag": "a",
@@ -89,12 +83,8 @@ if [ "$AGENT_JOBSTATUS" == "Succeeded" ]; then
      # Example: Upload main branch app binary to HockeyApp using the API
     if [ "$PLATFORM_TYPE" == "ios-testFlight" ];
      then
-        # curl -X POST -H "Content-Type: application/json" \
-        # -d '{"msg_type":"text","content":{"text":"DID:IOS端最新包（id:'$APPCENTER_BUILD_ID'） 已build成功并推送到testFlight，您可在testFlight查看最新版本的DID应用,并进行内部测试"}}' \
-        # https://open.feishu.cn/open-apis/bot/v2/hook/f2d3fffd-c630-4e59-86e3-e7053a64e4b2
-
         curl -X POST -H "Content-Type: application/json" \
-         -d '{"msg_type":"text","content":{"text":"DID:IOS端最新包（id:'$APPCENTER_BUILD_ID'） 已build成功并推送至TestFlight，您可申请进入内部测试组，并在TestFlight查看下载最新版本的DID应用"}}' \
+         -d '{"msg_type":"text","content":{"text":"DID:IOS端'${environment}'环境最新包（id:'$APPCENTER_BUILD_ID'） 已build成功并推送至TestFlight，您可申请进入内部测试组，并在TestFlight查看下载最新版本的DID应用"}}' \
         https://open.feishu.cn/open-apis/bot/v2/hook/f2d3fffd-c630-4e59-86e3-e7053a64e4b2
 
     else
