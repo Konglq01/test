@@ -11,6 +11,7 @@ import { useAppDispatch, useTokenInfo, useUserInfo, useWalletInfo } from 'store/
 import { fetchAllTokenListAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
 import { useChainIdList } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import './index.less';
+import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
 
 export default function AddToken() {
   const { t } = useTranslation();
@@ -79,8 +80,8 @@ export default function AddToken() {
     (item: TokenItemShowType) => (
       <div className="token-item" key={`${item.symbol}-${item.chainId}`}>
         <div className="token-item-content">
-          {symbolImages[item.symbol] ? (
-            <img className="token-logo" src={symbolImages[item.symbol]} />
+          {item.symbol === ELF_SYMBOL ? (
+            <CustomSvg className="token-logo" type="elf-icon" />
           ) : (
             <div className="token-logo custom-word-logo">{item.symbol?.[0] || ''}</div>
           )}
@@ -94,7 +95,7 @@ export default function AddToken() {
         <div className="token-item-action">{renderTokenItem(item)}</div>
       </div>
     ),
-    [isTestNet, renderTokenItem, symbolImages],
+    [isTestNet, renderTokenItem],
   );
 
   return (
