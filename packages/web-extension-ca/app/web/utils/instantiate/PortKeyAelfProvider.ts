@@ -58,7 +58,7 @@ export default class PortKeyAelfProvider extends BaseProvider {
     },
     callback: CommonFunType,
   ): any => {
-    return window?.portkey_ca
+    return window?.portkey_did
       ?.request({
         method: WalletMessageTypes.CONNECT,
         params: {
@@ -77,13 +77,13 @@ export default class PortKeyAelfProvider extends BaseProvider {
   };
 
   getAddress() {
-    return window?.portkey_ca?.request({
+    return window?.portkey_did?.request({
       method: WalletMessageTypes.REQUEST_ACCOUNTS,
     });
   }
 
   getSignature(param: { address: string; hexToBeSign: string }, callback: CommonFunType) {
-    return window?.portkey_ca
+    return window?.portkey_did
       ?.request({
         appName: this.appName,
         account: param.address,
@@ -256,7 +256,7 @@ export default class PortKeyAelfProvider extends BaseProvider {
           });
         });
 
-        const result = await window?.portkey_ca?.request({
+        const result = await window?.portkey_did?.request({
           method: AelfMessageTypes.INIT_AELF_CONTRACT,
           params: {
             appName: this.appName,
@@ -385,7 +385,7 @@ export default class PortKeyAelfProvider extends BaseProvider {
       if (!contractMethodMap[httpProvider]?.[contractAddress]) return errorHandler(700001, 'Could not find contract');
       const contract = contractMethodMap[httpProvider]?.[contractAddress];
       if (!contract[methodName]) return errorHandler(400001, `Method ${methodName} is not exist in the contract.`);
-      const result = await window.portkey_ca?.request({
+      const result = await window.portkey_did?.request({
         method: requestMethod,
         params: {
           appName: this.appName,
@@ -443,13 +443,13 @@ export default class PortKeyAelfProvider extends BaseProvider {
   };
 
   private _listenerEvent = () => {
-    window.portkey_ca?.on('chainChanged', this._chainChanged);
-    window.portkey_ca?.on('lockStateChanged', this._lockStateChanged);
-    // window.portkey_ca?.on('accountsChanged', this._accountsChanged);
+    window.portkey_did?.on('chainChanged', this._chainChanged);
+    window.portkey_did?.on('lockStateChanged', this._lockStateChanged);
+    // window.portkey_did?.on('accountsChanged', this._accountsChanged);
   };
   // get default state eq: httpProvider ...
   private _getDefaultState = async () => {
-    const result = await window?.portkey_ca?.request({
+    const result = await window?.portkey_did?.request({
       method: MethodMessageTypes.GET_WALLET_STATE,
     });
     if (result?.data && result?.data?.chain) {

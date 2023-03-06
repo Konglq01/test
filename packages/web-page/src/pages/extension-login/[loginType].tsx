@@ -6,7 +6,6 @@ import { useRouter } from 'next/router';
 import { ThreeWayLogin } from '@portkey-wallet/types/types-ca/wallet';
 
 export default function ExtensionLogin() {
-  console.log(process.env.NEXT_PUBLIC_GG_APP_ID, process.env, 'SocialTem==');
   const router = useRouter();
   const { loginType } = router.query;
   console.log(loginType, 'router===');
