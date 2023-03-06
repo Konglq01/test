@@ -11,7 +11,6 @@ import useEffectOnce from 'hooks/useEffectOnce';
 import { useLanguage } from 'i18n/hooks';
 import { useAppDispatch } from 'store/hooks';
 import myEvents from 'utils/deviceEvent';
-import { handleUserGuardiansList } from 'utils/login';
 import navigationService from 'utils/navigationService';
 import styles from '../styles';
 import Touchable from 'components/Touchable';
@@ -23,6 +22,7 @@ import Svg from 'components/Svg';
 import { pTd } from 'utils/unit';
 import qrCode from 'assets/image/pngs/QR-code.png';
 import { LoginType } from '..';
+import { handleUserGuardiansList } from '@portkey-wallet/utils/guardian';
 
 export default function LoginEmail({ setLoginType }: { setLoginType: (type: LoginType) => void }) {
   const { t } = useLanguage();
@@ -33,6 +33,7 @@ export default function LoginEmail({ setLoginType }: { setLoginType: (type: Logi
   const chainInfo = useCurrentChain('AELF');
   const getVerifierServers = useGetVerifierServers();
   const getGuardiansInfoWriteStore = useGetGuardiansInfoWriteStore();
+
   const onLogin = useCallback(async () => {
     const message = checkEmail(loginAccount);
     setErrorMessage(message);
@@ -45,12 +46,14 @@ export default function LoginEmail({ setLoginType }: { setLoginType: (type: Logi
         if (Array.isArray(chainList.payload)) _chainInfo = chainList.payload[1];
       }
       const verifierServers = await getVerifierServers(_chainInfo);
-      const holderInfo = await getGuardiansInfoWriteStore({ loginAccount }, _chainInfo);
+      const holderInfo = await getGuardiansInfoWriteStore({ guardianIdentifier: loginAccount }, _chainInfo);
       navigationService.navigate('GuardianApproval', {
         loginAccount,
         userGuardiansList: handleUserGuardiansList(holderInfo, verifierServers),
       });
     } catch (error) {
+      console.log(error, '=====error');
+
       setErrorMessage(handleError(error));
     }
     Loading.hide();

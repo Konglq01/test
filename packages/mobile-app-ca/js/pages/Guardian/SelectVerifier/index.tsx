@@ -42,7 +42,7 @@ export default function SelectVerifier() {
         const requestCodeResult = await verification.sendVerificationCode({
           params: {
             type: LoginStrType[LoginType.email],
-            guardianAccount: loginAccount,
+            guardianIdentifier: loginAccount,
             verifierId: selectedVerifier.id,
             chainId: DefaultChainId,
           },

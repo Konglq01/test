@@ -11,7 +11,7 @@ import { BGStyles } from 'assets/theme/styles';
 import navigationService from 'utils/navigationService';
 import Touchable from 'components/Touchable';
 import { useAppDispatch } from 'store/hooks';
-import { usePreventHardwareBack, useSetBiometrics } from '@portkey-wallet/hooks/mobile';
+import { usePreventHardwareBack } from '@portkey-wallet/hooks/mobile';
 import biometric from 'assets/image/pngs/biometric.png';
 import { pTd } from 'utils/unit';
 import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
@@ -25,6 +25,7 @@ import { VerificationType } from '@portkey-wallet/types/verifier';
 import CommonToast from 'components/CommonToast';
 import { useIntervalGetResult } from 'hooks/login';
 import useEffectOnce from 'hooks/useEffectOnce';
+import { useSetBiometrics } from 'hooks/useBiometrics';
 const ScrollViewProps = { disabled: true };
 export default function SetBiometrics() {
   usePreventHardwareBack();

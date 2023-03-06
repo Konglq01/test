@@ -69,23 +69,18 @@ export default function GuardiansView() {
             method: GuardianMth.UnsetGuardianTypeForLogin,
             params: {
               caHash: walletInfo?.AELF?.caHash,
-              guardianAccount: {
-                guardian: {
-                  type: currentGuardian?.guardianType,
-                  verifier: {
-                    id: currentGuardian?.verifier?.id,
-                  },
-                },
+              guardian: {
+                type: currentGuardian?.guardianType,
+                verifierId: currentGuardian?.verifier?.id,
+                identifierHash: currentGuardian?.identifierHash,
+                salt: currentGuardian?.salt,
                 value: currentGuardian?.guardianAccount,
+                isLoginGuardian: true,
               },
             },
           },
         });
         console.log('unSetLoginAccount', result);
-        // const { TransactionId } = result.result.message || result;
-        // await sleep(1000);
-        // const aelfInstance = getAelfInstance(currentChain.endPoint);
-        // await getTxResult(aelfInstance, TransactionId);
         dispatch(
           setOpGuardianAction({
             ...opGuardian,
@@ -105,7 +100,7 @@ export default function GuardiansView() {
 
         const result = await verification.sendVerificationCode({
           params: {
-            guardianAccount: opGuardian?.guardianAccount as string,
+            guardianIdentifier: opGuardian?.guardianAccount as string,
             type: LoginStrType[opGuardian?.guardianType as LoginType],
             verifierId: opGuardian?.verifier?.id || '',
             chainId: DefaultChainId,
@@ -125,6 +120,8 @@ export default function GuardiansView() {
               },
               key: opGuardian?.key as string,
               isInitStatus: true,
+              identifierHash: opGuardian?.identifierHash as string,
+              salt: opGuardian?.salt as string,
             }),
           );
           navigate('/setting/guardians/verifier-account', { state: 'guardians/setLoginAccount' });
@@ -163,7 +160,7 @@ export default function GuardiansView() {
             address: currentChain?.caContractAddress as string,
             chainType: currentNetwork.walletType,
             paramsOption: {
-              loginGuardianAccount: opGuardian?.guardianAccount,
+              guardianIdentifier: opGuardian?.guardianAccount,
             },
           });
           setSwitchFail(SwitchFail.openFail);

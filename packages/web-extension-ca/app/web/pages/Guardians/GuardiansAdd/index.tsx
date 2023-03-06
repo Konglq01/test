@@ -132,7 +132,7 @@ export default function AddGuardian() {
       await userGuardianList({ caHash: walletInfo.caHash });
       const result = await verification.sendVerificationCode({
         params: {
-          guardianAccount: emailVal as string,
+          guardianIdentifier: emailVal as string,
           type: LoginStrType[guardianType as LoginType],
           verifierId: selectVerifierItem?.id || '',
           chainId: DefaultChainId,
@@ -149,8 +149,10 @@ export default function AddGuardian() {
             sessionId: result.verifierSessionId,
             endPoint: result.endPoint,
           },
-          key: `${emailVal}&${selectVerifierItem?.name}`,
+          key: `${emailVal}&${selectVerifierItem?.id}`,
           isInitStatus: true,
+          identifierHash: '',
+          salt: '',
         };
         dispatch(setCurrentGuardianAction(newGuardian));
         dispatch(setOpGuardianAction(newGuardian));

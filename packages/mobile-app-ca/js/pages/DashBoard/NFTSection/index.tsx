@@ -64,7 +64,6 @@ export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
   const [reFreshing] = useState(false);
   const [openCollectionObj, setOpenCollectionObj] = useState<OpenCollectionObjType>({});
   const { clearType } = useRoute<any>();
-  console.log('clearTypeclearType', clearType);
 
   const fetchNFTList = useCallback(() => {
     if (caAddresses.length === 0) return;

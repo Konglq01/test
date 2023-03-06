@@ -76,7 +76,7 @@ function GuardianItemButton({
       const req = await verification.sendVerificationCode({
         params: {
           type: LoginStrType[guardianInfo.guardianItem.guardianType],
-          guardianAccount: guardianInfo.guardianItem.guardianAccount,
+          guardianIdentifier: guardianInfo.guardianItem.guardianAccount,
           verifierId: guardianInfo.guardianItem.verifier?.id,
           chainId: DefaultChainId,
         },

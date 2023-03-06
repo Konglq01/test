@@ -48,13 +48,13 @@ function SignupEmail() {
       }
       await getVerifierServers(_chainInfo);
       try {
-        const guardiansInfo = await getGuardiansInfo({ loginAccount: email }, _chainInfo);
-        if (guardiansInfo.guardianAccounts) {
+        const guardiansInfo = await getGuardiansInfo({ guardianIdentifier: email }, _chainInfo);
+        if (guardiansInfo?.guardianAccounts || guardiansInfo?.guardianList) {
           Loading.hide();
           return setErrorMessage(EmailError.alreadyRegistered);
         }
       } catch (error) {
-        console.debug(error, '====error');
+        console.log(error, '====error');
       }
       navigationService.navigate('SelectVerifier', { loginAccount: email });
     } catch (error) {

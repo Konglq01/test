@@ -67,7 +67,7 @@ export default function GuardianDetail() {
       const req = await verification.sendVerificationCode({
         params: {
           type: LoginStrType[guardian.guardianType],
-          guardianAccount: guardian.guardianAccount,
+          guardianIdentifier: guardian.guardianAccount,
           verifierId: guardian.verifier?.id,
           chainId: DefaultChainId,
         },

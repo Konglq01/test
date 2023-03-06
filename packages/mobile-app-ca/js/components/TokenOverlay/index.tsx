@@ -17,7 +17,7 @@ import { useLanguage } from 'i18n/hooks';
 import { useAppCommonDispatch } from '@portkey-wallet/hooks';
 import useDebounce from 'hooks/useDebounce';
 import useEffectOnce from 'hooks/useEffectOnce';
-import { useCaAddresses, useCurrentWalletInfo, useChainIdList } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { useChainIdList } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { fetchAllTokenListAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
 import NoData from 'components/NoData';
 
@@ -27,7 +27,7 @@ type TokenListProps = {
   onFinishSelectToken?: onFinishSelectTokenType;
 };
 
-const TokenList = ({ onFinishSelectToken, account }: TokenListProps) => {
+const TokenList = ({ onFinishSelectToken }: TokenListProps) => {
   const { t } = useLanguage();
 
   const { tokenDataShowInMarket } = useAppCASelector(state => state.tokenManagement);
@@ -39,18 +39,17 @@ const TokenList = ({ onFinishSelectToken, account }: TokenListProps) => {
   const debounceKeyword = useDebounce(keyword, 800);
 
   const renderItem = useCallback(
-    ({ item }: { item: TokenItemShowType }) => {
-      return (
-        <TokenListItem
-          noBalanceShow
-          item={item}
-          onPress={() => {
-            OverlayModal.hide();
-            onFinishSelectToken?.(item);
-          }}
-        />
-      );
-    },
+    ({ item }: { item: any }) => (
+      <TokenListItem
+        noBalanceShow
+        key={`${item.symbol}${item.chainId}`}
+        item={item}
+        onPress={() => {
+          OverlayModal.hide();
+          onFinishSelectToken?.(item);
+        }}
+      />
+    ),
     [onFinishSelectToken],
   );
 

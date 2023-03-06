@@ -52,21 +52,20 @@ export function useOnManagerAddressAndQueryResult() {
       try {
         const tmpWalletInfo = walletInfo?.address ? walletInfo : AElf.wallet.createNewWallet();
         let data: any = {
-          loginGuardianAccount: managerInfo.loginAccount,
-          managerAddress: tmpWalletInfo.address,
-          deviceString: `${DEVICE_TYPE},${Date.now()}`,
+          loginGuardianIdentifier: managerInfo.loginAccount,
+          manager: tmpWalletInfo.address,
+          extraData: `${DEVICE_TYPE},${Date.now()}`,
           context: {
             clientId: tmpWalletInfo.address,
             requestId: tmpWalletInfo.address,
           },
           chainId: DefaultChainId,
         };
-        console.log(data, JSON.stringify(data), '====data');
 
         let fetch = request.verify.registerRequest;
         if (isRecovery) {
           fetch = request.verify.recoveryRequest;
-          data.guardiansApproved = guardiansApproved;
+          data.guardiansApproved = guardiansApproved?.map(i => ({ identifier: i.value, ...i }));
         } else {
           data = {
             ...managerInfo,
@@ -75,13 +74,10 @@ export function useOnManagerAddressAndQueryResult() {
             ...data,
           };
         }
-        console.log(data, '====data');
-
+        console.log(data, JSON.stringify(data), managerInfo, '====data');
         const req = await fetch({
           data,
         });
-        console.log(req, '=====req');
-
         // whether there is wallet information
         const _managerInfo = {
           ...managerInfo,
