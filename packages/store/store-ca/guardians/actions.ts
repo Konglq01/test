@@ -31,6 +31,7 @@ export const setUserGuardianItemStatus = createAction<{
   status: VerifyStatus;
   signature?: string;
   verificationDoc?: string;
+  identifierHash?: string;
 }>('verifier/setUserGuardianItemStatus');
 
 export const setUserGuardianStatus = createAction<{ [x: string]: UserGuardianStatus }>(

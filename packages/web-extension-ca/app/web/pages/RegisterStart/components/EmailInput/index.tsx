@@ -8,7 +8,6 @@ import { NetworkItem } from '@portkey-wallet/types/types-ca/network';
 import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
 import { ChainItemType } from '@portkey-wallet/store/store-ca/wallet/type';
 import { checkEmail, EmailError } from '@portkey-wallet/utils/check';
-import { contractErrorHandler } from 'utils/tryErrorHandler';
 interface EmailInputProps {
   currentNetwork: NetworkItem;
   currentChain?: ChainItemType;

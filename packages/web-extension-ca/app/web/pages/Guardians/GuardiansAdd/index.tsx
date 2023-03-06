@@ -149,8 +149,10 @@ export default function AddGuardian() {
             sessionId: result.verifierSessionId,
             endPoint: result.endPoint,
           },
-          key: `${emailVal}&${selectVerifierItem?.name}`,
+          key: `${emailVal}&${selectVerifierItem?.id}`,
           isInitStatus: true,
+          identifierHash: '',
+          salt: '',
         };
         dispatch(setCurrentGuardianAction(newGuardian));
         dispatch(setOpGuardianAction(newGuardian));

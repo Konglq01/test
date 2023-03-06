@@ -49,7 +49,7 @@ export const guardiansSlice = createSlice({
         const { guardianList } = action.payload;
         const userStatus = state.userGuardianStatus ?? {};
         // TODO
-        const _guardianList = (guardianList.guardians ?? guardianList).map(item => {
+        const _guardianList = guardianList.guardians.map(item => {
           const key = `${item.guardianIdentifier}&${item.verifierId}`;
           const _guardian = {
             ...item,
@@ -104,11 +104,12 @@ export const guardiansSlice = createSlice({
         state.userGuardianStatus = userStatus;
       })
       .addCase(setUserGuardianItemStatus, (state, action) => {
-        const { key, status, signature, verificationDoc } = action.payload;
+        const { key, status, signature, verificationDoc, identifierHash } = action.payload;
         if (!state.userGuardianStatus?.[key]) throw Error("Can't find this item");
         state.userGuardianStatus[key]['status'] = status;
         state.userGuardianStatus[key]['signature'] = signature;
         state.userGuardianStatus[key]['verificationDoc'] = verificationDoc;
+        state.userGuardianStatus[key]['identifierHash'] = identifierHash || '';
         if (!state.guardianExpiredTime && status === VerifyStatus.Verified) {
           state.guardianExpiredTime = moment().add(1, 'h').subtract(2, 'minute').valueOf();
         }
