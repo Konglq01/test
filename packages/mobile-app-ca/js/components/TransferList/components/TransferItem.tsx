@@ -160,7 +160,7 @@ const itemStyle = StyleSheet.create({
   itemWrap: {
     ...GStyles.paddingArg(12, 20),
     width: '100%',
-    borderBottomWidth: pTd(0.5),
+    borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: defaultColors.bg7,
     backgroundColor: defaultColors.bg1,
   },

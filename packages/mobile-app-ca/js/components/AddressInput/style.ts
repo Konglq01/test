@@ -3,7 +3,7 @@ import { defaultColors } from 'assets/theme/index';
 import GStyles from 'assets/theme/GStyles';
 import { pTd } from 'utils/unit';
 
-const { font3, font5, error, bg1, border4 } = defaultColors;
+const { font5, error, bg1, border4 } = defaultColors;
 
 export const generalStyles = StyleSheet.create({
   outerWrap: {
@@ -23,11 +23,11 @@ export const generalStyles = StyleSheet.create({
   },
   prefix: {
     width: pTd(56),
-    borderRightWidth: pTd(1),
+    borderRightWidth: pTd(0.5),
   },
   suffix: {
     width: pTd(64),
-    borderLeftWidth: pTd(1),
+    borderLeftWidth: pTd(0.5),
   },
   containerStyle: {
     ...GStyles.paddingArg(0),

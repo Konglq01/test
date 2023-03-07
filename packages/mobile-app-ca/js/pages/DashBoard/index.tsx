@@ -7,9 +7,10 @@ import { defaultColors } from 'assets/theme';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { fetchTokenListAsync } from '@portkey-wallet/store/store-ca/assets/slice';
 import { useGetCurrentCAViewContract } from 'hooks/contract';
-import PageContainer from 'components/PageContainer';
 import { getWalletNameAsync } from '@portkey-wallet/store/store-ca/wallet/actions';
 import { getSymbolImagesAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
+import SafeAreaBox from 'components/SafeAreaBox';
+import { BGStyles } from 'assets/theme/styles';
 
 const DashBoard: React.FC = () => {
   const dispatch = useAppCommonDispatch();
@@ -27,25 +28,11 @@ const DashBoard: React.FC = () => {
   });
 
   return (
-    <PageContainer
-      hideHeader
-      safeAreaColor={['blue', 'white']}
-      containerStyles={styles.container}
-      scrollViewProps={{ disabled: true }}>
-      {/* TODO: showBalance */}
+    <SafeAreaBox edges={['top', 'right', 'left']} style={[BGStyles.bg5]}>
       <Card balanceUSD={''} />
       <DashBoardTab />
-    </PageContainer>
+    </SafeAreaBox>
   );
 };
 
 export default DashBoard;
-
-const styles = StyleSheet.create({
-  container: {
-    paddingLeft: 0,
-    paddingRight: 0,
-    height: '100%',
-    backgroundColor: defaultColors.primaryColor,
-  },
-});

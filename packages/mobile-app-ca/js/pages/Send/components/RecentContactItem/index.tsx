@@ -82,7 +82,7 @@ export const styles = StyleSheet.create({
     width: '100%',
     ...GStyles.paddingArg(20, 20),
     borderBottomColor: defaultColors.bg7,
-    borderBottomWidth: pTd(1),
+    borderBottomWidth: StyleSheet.hairlineWidth,
     backgroundColor: defaultColors.bg1,
   },
   itemAvatar: {

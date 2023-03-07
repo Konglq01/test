@@ -155,7 +155,6 @@ export default function NFTSection() {
         keyExtractor={(item: NFTCollectionItemShowType) => item?.symbol + item.chainId}
         onRefresh={() => {
           setOpenCollectionObj({});
-          getAccountBalance?.();
           fetchNFTList();
         }}
         onEndReached={() => {
