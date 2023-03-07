@@ -36,6 +36,7 @@ import { TransactionError } from '@portkey-wallet/constants/constants-ca/assets'
 import './index.less';
 import { the2ThFailedActivityItemType } from '@portkey-wallet/types/types-ca/activity';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
+import { CROSS_FEE } from '@portkey-wallet/constants/constants-ca/wallet';
 
 export type Account = { address: string; name?: string };
 
@@ -223,11 +224,16 @@ export default function Send() {
       if (!ZERO.plus(amount).toNumber()) return 'Please input amount';
       if (type === 'token') {
         if (ZERO.plus(amount).times(`1e${tokenInfo.decimals}`).isGreaterThan(ZERO.plus(balance))) {
-          return TransactionError.TOKEN_NOTE_ENOUGH;
+          return TransactionError.TOKEN_NOT_ENOUGH;
+        }
+        if (isCrossChain(toAccount.address, chainInfo?.chainId ?? 'AELF') && symbol === 'ELF') {
+          if (ZERO.plus(CROSS_FEE).isGreaterThan(ZERO.plus(amount))) {
+            return TransactionError.CROSS_NOT_ENOUGH;
+          }
         }
       } else if (type === 'nft') {
         if (ZERO.plus(amount).isGreaterThan(ZERO.plus(balance))) {
-          return TransactionError.NFT_NOTE_ENOUGH;
+          return TransactionError.NFT_NOT_ENOUGH;
         }
       } else {
         return 'input error';
@@ -237,16 +243,26 @@ export default function Send() {
       if (fee) {
         setTxFee(fee);
       } else {
-        return TransactionError.FEE_NOTE_ENOUGH;
+        return TransactionError.FEE_NOT_ENOUGH;
       }
       return '';
     } catch (error: any) {
       console.log('checkTransactionValue===', error);
-      return TransactionError.FEE_NOTE_ENOUGH;
+      return TransactionError.FEE_NOT_ENOUGH;
     } finally {
       setLoading(false);
     }
-  }, [setLoading, amount, type, getTranslationInfo, tokenInfo.decimals, balance]);
+  }, [
+    setLoading,
+    amount,
+    type,
+    getTranslationInfo,
+    tokenInfo.decimals,
+    balance,
+    toAccount.address,
+    chainInfo?.chainId,
+    symbol,
+  ]);
 
   const sendHandler = useCallback(async () => {
     try {
