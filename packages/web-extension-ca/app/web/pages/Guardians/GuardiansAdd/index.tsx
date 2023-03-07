@@ -113,11 +113,11 @@ export default function AddGuardian() {
     if (!selectVerifierItem) return message.error('Can not get the current verifier message');
     const isExist: boolean =
       Object.values(userGuardiansList ?? {})?.some((item) => {
-        return item.key === `${emailVal}&${verifierName}`;
+        return item.key === `${emailVal}&${verifierVal}`;
       }) ?? false;
     setExist(isExist);
     !isExist && setVisible(true);
-  }, [emailVal, selectVerifierItem, userGuardiansList, verifierName]);
+  }, [emailVal, selectVerifierItem, userGuardiansList, verifierVal]);
 
   const handleVerify = useCallback(async () => {
     try {

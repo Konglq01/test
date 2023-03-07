@@ -128,8 +128,8 @@ export default function GuardianDetail() {
       if (loginIndex === -1) {
         Loading.show();
         try {
-          const guardiansInfo = await getGuardiansInfo({ loginAccount: guardian.guardianAccount });
-          if (guardiansInfo.guardianAccounts) {
+          const guardiansInfo = await getGuardiansInfo({ guardianIdentifier: guardian.guardianAccount });
+          if (guardiansInfo?.guardianList?.guardians?.length) {
             Loading.hide();
             ActionSheet.alert({
               title2: t(`This account address is already a login account and cannot be used`),
@@ -143,8 +143,10 @@ export default function GuardianDetail() {
           }
         } catch (error) {
           console.debug(error, '====error');
+          return;
+        } finally {
+          Loading.hide();
         }
-        Loading.hide();
       }
 
       ActionSheet.alert({
