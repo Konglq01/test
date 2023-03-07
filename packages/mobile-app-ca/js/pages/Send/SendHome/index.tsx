@@ -41,7 +41,7 @@ enum ErrorMessage {
   RecipientAddressIsInvalid = 'Recipient address is invalid',
   NoCorrespondingNetwork = 'No corresponding network',
   InsufficientFunds = 'Insufficient funds',
-  InsufficientQuantity = 'Insufficient Quantity',
+  InsufficientQuantity = 'Insufficient quantity',
   InsufficientFundsForTransactionFee = 'Insufficient funds for transaction fee',
 }
 
@@ -415,11 +415,13 @@ const SendHome: React.FC<SendHomeProps> = props => {
       )}
 
       {errorMessage.includes(ErrorMessage.InsufficientFunds) && (
-        <Text style={[styles.errorMessage, GStyles.textAlignCenter]}>{t(ErrorMessage.InsufficientFunds)}</Text>
+        <Text style={[styles.errorMessage, sendType === 'nft' && GStyles.textAlignCenter]}>
+          {t(ErrorMessage.InsufficientFunds)}
+        </Text>
       )}
 
       {errorMessage.includes(ErrorMessage.InsufficientFundsForTransactionFee) && (
-        <Text style={[styles.errorMessage, GStyles.textAlignCenter]}>
+        <Text style={[styles.errorMessage, sendType === 'nft' && GStyles.textAlignCenter]}>
           {t(ErrorMessage.InsufficientFundsForTransactionFee)}
         </Text>
       )}
