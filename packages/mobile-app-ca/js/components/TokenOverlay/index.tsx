@@ -38,7 +38,7 @@ const TokenList = ({ onFinishSelectToken, account }: TokenListProps) => {
   const debounceKeyword = useDebounce(keyword, 800);
 
   const renderItem = useCallback(
-    ({ item }: { item: TokenItemShowType }) => {
+    ({ item }: { item: any }) => {
       return (
         <TokenListItem
           noBalanceShow
