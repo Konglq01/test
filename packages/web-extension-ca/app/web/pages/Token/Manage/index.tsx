@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 import { Button, message } from 'antd';
 import SettingHeader from 'pages/components/SettingHeader';
 import CustomSvg from 'components/CustomSvg';
-import { useSymbolImages, useToken } from '@portkey-wallet/hooks/hooks-ca/useToken';
+import { useToken } from '@portkey-wallet/hooks/hooks-ca/useToken';
 import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
 import DropdownSearch from 'components/DropdownSearch';
 import { useTranslation } from 'react-i18next';
@@ -26,7 +26,6 @@ export default function AddToken() {
   const { currentNetwork } = useWalletInfo();
   const chainIdArray = useChainIdList();
   const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'Testnet' : ''), [currentNetwork]);
-  const symbolImages = useSymbolImages();
 
   useEffect(() => {
     passwordSeed && appDispatch(fetchAllTokenListAsync({ keyword: filterWord, chainIdArray }));

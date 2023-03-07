@@ -165,12 +165,10 @@ export default function GuardiansView() {
           });
           setSwitchFail(SwitchFail.openFail);
         } catch (error: any) {
-          const _error = contractErrorHandler(error);
-          if (_error.indexOf('Not found ca_hash')) {
+          if (error?.error?.message?.indexOf('not exit')) {
             setTipOpen(true);
           } else {
-            message.error(_error);
-            throw error;
+            throw error?.error?.message || 'GetHolderInfo error';
           }
         }
       } else {
@@ -189,7 +187,7 @@ export default function GuardiansView() {
       currentChain,
       currentGuardian?.guardianAccount,
       currentNetwork.walletType,
-      opGuardian?.guardianAccount,
+      opGuardian,
       userGuardiansList,
       verifyHandler,
     ],
