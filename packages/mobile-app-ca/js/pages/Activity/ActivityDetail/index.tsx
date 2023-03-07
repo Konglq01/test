@@ -1,4 +1,8 @@
-import { TransactionTypes, transactionTypesMap } from '@portkey-wallet/constants/constants-ca/activity';
+import {
+  DEFAULT_DECIMAL,
+  TransactionTypes,
+  transactionTypesMap,
+} from '@portkey-wallet/constants/constants-ca/activity';
 import { ZERO } from '@portkey-wallet/constants/misc';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { useCaAddresses, useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
@@ -32,7 +36,6 @@ interface RouterParams {
   isReceived?: boolean;
 }
 
-const DEFAULT_DECIMAL = 8;
 const hiddenArr = [TransactionTypes.SOCIAL_RECOVERY, TransactionTypes.ADD_MANAGER, TransactionTypes.REMOVE_MANAGER];
 
 const ActivityDetail = () => {

@@ -78,7 +78,7 @@ const AssetItem = (props: { symbol: string; onPress: (item: any) => void; item: 
       </TouchableOpacity>
     );
   }
-  return <></>;
+  return null;
 };
 const MAX_RESULT_COUNT = 10;
 const INIT_PAGE_INFO = {
@@ -176,7 +176,7 @@ const AssetList = ({ account }: TokenListProps) => {
     <ModalBody modalBodyType="bottom" style={styles.modalStyle}>
       <TextXL style={[styles.title, FontStyles.font5]}>{t('Select Assets')}</TextXL>
 
-      {/* no assets in this accout  */}
+      {/* no assets in this account  */}
       {/* '{ import { list } from 'pages/SettingsPage/HelpAndFeedBack/config';' has been removed } */}
       <CommonInput
         placeholder={t('Search Assets')}

@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
   itemContent: {
     flex: 1,
     marginLeft: pTd(12),
-    borderBottomWidth: 1,
+    borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: defaultColors.border6,
     height: pTd(72),
     flexDirection: 'row',

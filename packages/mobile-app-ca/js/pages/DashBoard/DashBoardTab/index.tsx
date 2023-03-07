@@ -10,7 +10,7 @@ type DashBoardTabProps = {
 
 const DashBoardTab: React.FC<DashBoardTabProps> = (props: DashBoardTabProps) => {
   const { t } = useLanguage();
-  // const balance = useCurrentELFBalances(__DEV__);
+
   const tabList = useMemo(() => {
     return [
       {
@@ -19,7 +19,7 @@ const DashBoardTab: React.FC<DashBoardTabProps> = (props: DashBoardTabProps) => 
       },
       {
         name: t('NFTs'),
-        tabItemDom: <NFTSection {...props} />,
+        tabItemDom: <NFTSection />,
       },
     ];
   }, [props, t]);

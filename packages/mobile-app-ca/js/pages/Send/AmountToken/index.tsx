@@ -12,6 +12,7 @@ import { useLanguage } from 'i18n/hooks';
 import CommonAvatar from 'components/CommonAvatar';
 import { IToSendAssetParamsType } from '@portkey-wallet/types/types-ca/routeParams';
 import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
+import { FontStyles } from 'assets/theme/styles';
 
 interface AmountTokenProps {
   balanceShow: number | string;
@@ -71,7 +72,7 @@ export default function AmountToken({
             maxLength={18}
             containerStyle={styles.containerStyle}
             inputContainerStyle={styles.inputContainerStyle}
-            inputStyle={styles.inputStyle}
+            inputStyle={[styles.inputStyle, sendTokenNumber === '0' && FontStyles.font7]}
             onChangeText={v => {
               const newAmount = parseInputChange(v.trim(), ZERO, 4);
               setSendTokenNumber(newAmount);
