@@ -144,8 +144,6 @@ export default function GuardianDetail() {
         } catch (error: any) {
           if (error.code !== '3002') {
             CommonToast.fail('Setup failed');
-            console.log('guardiansInfo:error', error);
-            console.debug(error, '====error');
             return;
           }
         } finally {
