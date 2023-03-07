@@ -44,7 +44,7 @@ const EmailInput = forwardRef(
             isHasAccount = true;
           }
         } catch (error: any) {
-          if (error?.error?.message?.indexOf('not exit')) {
+          if (error?.error?.code?.toString() === '3002') {
             isHasAccount = false;
           } else {
             throw error?.error?.message || 'GetHolderInfo error';
