@@ -13,10 +13,10 @@ export default function NFT() {
       <SettingHeader leftCallBack={() => navigate(-1)} />
       <div className="picture">{state.imageUrl ? <img src={state.imageUrl} /> : state.symbol?.slice(0, 1)}</div>
       <div className="info">
-        <p className="title flex">
+        <div className="title flex">
           <p className="title-alias">{state.alias}&nbsp;</p>
           <p>#{state.tokenId}</p>
-        </p>
+        </div>
         <p className="amount">Balance: {state.balance}</p>
         <p className="label">{state.symbol}</p>
         {/* <p className="information">Symbol information Symbol information Symbol information</p> */}
