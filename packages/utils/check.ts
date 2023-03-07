@@ -11,8 +11,9 @@ export function checkEmail(email?: string) {
   if (!isValidEmail(email)) return EmailError.invalidEmail;
 }
 
-export function checkHolderError(message?: string) {
+export function checkHolderError(message?: string, code?: string) {
+  if (code === '3002') return EmailError.noAccount;
   if (message?.includes('Not found ca_hash')) return EmailError.noAccount;
-  if (message?.includes('not exit')) return EmailError.noAccount;
+  if (message?.includes('not exist')) return EmailError.noAccount;
   return message;
 }
