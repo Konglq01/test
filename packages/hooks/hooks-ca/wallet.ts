@@ -91,7 +91,7 @@ export const useDeviceList = () => {
     const managers = caHolderManagerInfo?.managerInfos || [];
     return managers
       .map(item => {
-        // TODO: check ALL deviceString
+        // TODO: extraData need decode
         const extraDataArray = (item?.extraData || '').split(',').map(item => Number(item));
         let deviceType: DeviceType = 0,
           loginTime: number | undefined = undefined;
