@@ -27,6 +27,7 @@ import { fetchTokenListAsync } from '@portkey-wallet/store/store-ca/assets/slice
 import Loading from 'components/Loading';
 import { formatChainInfo } from 'utils';
 import { FontStyles } from 'assets/theme/styles';
+import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
 
 interface ManageTokenListProps {
   route?: any;
@@ -45,6 +46,7 @@ const Item = ({ isTestnet, item, onHandleToken }: ItemProps) => {
       <CommonAvatar
         shapeType="circular"
         title={item.symbol}
+        svgName={item.symbol === ELF_SYMBOL ? 'elf-icon' : undefined}
         imageUrl={symbolImages[item.symbol]}
         avatarSize={pTd(48)}
         style={itemStyle.left}
@@ -74,7 +76,6 @@ Item.displayName = 'Item';
 const ManageTokenList: React.FC<ManageTokenListProps> = () => {
   const { t } = useLanguage();
 
-  const isLoading = useIsFetchingTokenList();
   const currentNetworkInfo = useCurrentNetworkInfo();
   const { currentNetwork } = useWallet();
 
@@ -84,8 +85,6 @@ const ManageTokenList: React.FC<ManageTokenListProps> = () => {
   const caAddressArray = useCaAddresses();
 
   const { tokenDataShowInMarket } = useAppCASelector(state => state.tokenManagement);
-
-  const [tokenList, setTokenList] = useState([]);
 
   const [keyword, setKeyword] = useState<string>('');
   // const [tokenList, setTokenList] = useState(tokenDataShowInMarket);
