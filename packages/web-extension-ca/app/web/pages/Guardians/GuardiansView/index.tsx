@@ -160,7 +160,7 @@ export default function GuardiansView() {
             address: currentChain?.caContractAddress as string,
             chainType: currentNetwork.walletType,
             paramsOption: {
-              guardianIdentifier: opGuardian?.identifierHash,
+              guardianIdentifier: opGuardian?.guardianAccount,
             },
           });
           setSwitchFail(SwitchFail.openFail);
