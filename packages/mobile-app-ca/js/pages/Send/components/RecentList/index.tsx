@@ -141,7 +141,7 @@ export const contactListStyles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'space-between',
     borderBottomColor: border6,
-    borderBottomWidth: pTd(0.5),
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   itemTitle: {
     color: font5,

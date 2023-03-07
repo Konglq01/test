@@ -207,7 +207,7 @@ const itemStyle = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderBottomColor: defaultColors.border6,
-    borderBottomWidth: pTd(0.5),
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   addedStyle: {
     marginRight: pTd(14),

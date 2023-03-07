@@ -23,11 +23,11 @@ export const generalStyles = StyleSheet.create({
   },
   prefix: {
     width: pTd(56),
-    borderRightWidth: pTd(0.5),
+    borderRightWidth: StyleSheet.hairlineWidth,
   },
   suffix: {
     width: pTd(64),
-    borderLeftWidth: pTd(0.5),
+    borderLeftWidth: StyleSheet.hairlineWidth,
   },
   containerStyle: {
     ...GStyles.paddingArg(0),

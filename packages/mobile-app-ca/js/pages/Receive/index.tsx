@@ -20,17 +20,14 @@ import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 
 export default function Receive() {
   const { t } = useLanguage();
-  const { currentChain } = useAppCASelector(state => state.chain);
   const { currentNetwork } = useWallet();
 
   const tokenItem = useRouterParams<TokenItemShowType>();
-  const { address, chainId, decimals, id, name, symbol, imageUrl, tokenContractAddress } = tokenItem;
+  const { chainId, symbol, imageUrl } = tokenItem;
 
   const currentWallet = useCurrentWalletInfo();
 
-  const currentCaAddress = currentWallet?.[chainId].caAddress;
-
-  const [account, setAccount] = useState<TokenItemShowType>(tokenItem);
+  const currentCaAddress = currentWallet?.[chainId]?.caAddress;
 
   // const addressShow = useMemo(() => {
   //   if (account?.address.match(/^ELF_.+_AELF$/g)) return account?.address || '';

@@ -190,7 +190,7 @@ const itemStyle = StyleSheet.create({
   },
   centerStatus: {
     color: defaultColors.font10,
-    marginTop: pTd(1),
+    marginTop: StyleSheet.hairlineWidth,
     fontSize: pTd(10),
     lineHeight: pTd(16),
   },

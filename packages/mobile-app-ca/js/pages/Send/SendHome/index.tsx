@@ -234,7 +234,10 @@ const SendHome: React.FC<SendHomeProps> = props => {
   }, [assetInfo.chainId, selectedToContact.address, showDialog]);
 
   const nextStep = useCallback(() => {
-    if (checkCanNext()) return setStep(2);
+    if (checkCanNext()) {
+      setErrorMessage([]);
+      return setStep(2);
+    }
   }, [checkCanNext]);
 
   //when finish send  upDate balance

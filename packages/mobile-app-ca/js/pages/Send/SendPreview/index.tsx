@@ -296,7 +296,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
           <View style={[styles.flexSpaceBetween]}>
             <TextM style={[styles.lightGrayFontColor]}>{t('To')}</TextM>
             <View style={styles.alignItemsEnd}>
-              {toInfo?.name && <TextM style={[styles.blackFontColor, styles.fontBold]}>{toInfo?.name}</TextM>}
+              {toInfo?.name && <TextM style={[styles.blackFontColor]}>{toInfo?.name}</TextM>}
               <TextS style={styles.lightGrayFontColor}>{formatStr2EllipsisStr(toInfo?.address)}</TextS>
             </View>
           </View>
@@ -306,9 +306,9 @@ const SendHome: React.FC<SendHomeProps> = props => {
         <View style={styles.section}>
           <View style={[styles.flexSpaceBetween]}>
             <TextM style={[styles.lightGrayFontColor]}>{t('Network')}</TextM>
-            <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${formatChainInfo(
-              assetInfo.chainId,
-            )} → ${networkInfoShow(toInfo?.address)} `}</TextM>
+            <TextM style={[styles.blackFontColor]}>{`${formatChainInfo(assetInfo.chainId)} → ${networkInfoShow(
+              toInfo?.address,
+            )} `}</TextM>
           </View>
         </View>
         <Text style={[styles.divider, styles.marginTop0]} />

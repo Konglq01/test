@@ -86,7 +86,7 @@ export const styles = StyleSheet.create({
     backgroundColor: defaultColors.bg1,
   },
   itemAvatar: {
-    borderWidth: pTd(1),
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: defaultColors.border1,
     width: pTd(40),
     height: pTd(40),

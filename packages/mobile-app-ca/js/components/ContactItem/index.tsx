@@ -51,7 +51,7 @@ export const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: pTd(1),
+    borderWidth: StyleSheet.hairlineWidth,
   },
   itemNameWrap: {
     flex: 1,
