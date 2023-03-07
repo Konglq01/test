@@ -160,7 +160,7 @@ const itemStyle = StyleSheet.create({
   itemWrap: {
     ...GStyles.paddingArg(12, 20),
     width: '100%',
-    borderBottomWidth: pTd(0.5),
+    borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: defaultColors.bg7,
     backgroundColor: defaultColors.bg1,
   },
@@ -190,7 +190,7 @@ const itemStyle = StyleSheet.create({
   },
   centerStatus: {
     color: defaultColors.font10,
-    marginTop: pTd(1),
+    marginTop: StyleSheet.hairlineWidth,
     fontSize: pTd(10),
     lineHeight: pTd(16),
   },

@@ -69,7 +69,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     position: 'relative',
     borderBottomColor: defaultColors.border6,
-    borderBottomWidth: pTd(0.5),
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   containerStyle: {
     width: '100%',
@@ -88,7 +88,7 @@ export const styles = StyleSheet.create({
     width: pTd(221),
     minHeight: pTd(38),
     borderBottomColor: defaultColors.bg7,
-    borderBottomWidth: pTd(1),
+    borderBottomWidth: StyleSheet.hairlineWidth,
     textAlign: 'center',
     // backgroundColor: 'green',
     // lineHeight: pTd(28),
