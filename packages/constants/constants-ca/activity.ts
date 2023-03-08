@@ -3,8 +3,8 @@ export enum TransactionTypes {
   CROSS_CHAIN_TRANSFER = 'CrossChainTransfer',
   CROSS_CHAIN_RECEIVE_TOKEN = 'CrossChainReceiveToken',
   SOCIAL_RECOVERY = 'SocialRecovery',
-  REMOVE_MANAGER = 'RemoveManager',
-  ADD_MANAGER = 'AddManager',
+  REMOVE_MANAGER = 'RemoveManagerInfo',
+  ADD_MANAGER = 'AddManagerInfo',
 }
 
 export const transactionTypes = [
