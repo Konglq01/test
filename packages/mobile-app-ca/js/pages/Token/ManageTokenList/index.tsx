@@ -1,5 +1,5 @@
 import PageContainer from 'components/PageContainer';
-import { useIsFetchingTokenList, useSymbolImages, useToken } from '@portkey-wallet/hooks/hooks-ca/useToken';
+import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
 import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
 import CommonInput from 'components/CommonInput';
 import { useAppCASelector } from '@portkey-wallet/hooks/hooks-ca';
@@ -10,7 +10,7 @@ import { defaultColors } from 'assets/theme';
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import { FlatList } from 'react-native';
 import CommonToast from 'components/CommonToast';
-import { TextL, TextM, TextS } from 'components/CommonText';
+import { TextL, TextS } from 'components/CommonText';
 import { pTd } from 'utils/unit';
 import Svg from 'components/Svg';
 import CommonSwitch from 'components/CommonSwitch';
@@ -25,7 +25,7 @@ import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import { useCaAddresses, useChainIdList, useWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { fetchTokenListAsync } from '@portkey-wallet/store/store-ca/assets/slice';
 import Loading from 'components/Loading';
-import { formatChainInfo } from 'utils';
+import { formatChainInfoToShow } from '@portkey-wallet/utils';
 import { FontStyles } from 'assets/theme/styles';
 import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
 
@@ -58,7 +58,7 @@ const Item = ({ isTestnet, item, onHandleToken }: ItemProps) => {
             {item.symbol}
           </TextL>
           <TextS numberOfLines={1} ellipsizeMode={'tail'} style={[FontStyles.font3]}>
-            {`${formatChainInfo(item.chainId)} ${isTestnet && 'Testnet'}`}
+            {`${formatChainInfoToShow(item.chainId)} ${isTestnet && 'Testnet'}`}
           </TextS>
         </View>
 

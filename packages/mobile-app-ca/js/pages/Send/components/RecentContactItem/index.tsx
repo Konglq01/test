@@ -8,8 +8,7 @@ import { TextM, TextS, TextXXXL } from 'components/CommonText';
 import Svg from 'components/Svg';
 import React, { memo, useState } from 'react';
 import { Text, View, TouchableOpacity, StyleSheet } from 'react-native';
-import { formatStr2EllipsisStr } from 'utils';
-// import { formatStr2EllipsisStr } from 'utils';
+import { formatStr2EllipsisStr } from '@portkey-wallet/utils';
 import { pTd } from 'utils/unit';
 
 export interface ItemType {

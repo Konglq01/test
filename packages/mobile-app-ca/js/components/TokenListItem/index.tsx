@@ -9,6 +9,7 @@ import { TextL, TextS } from 'components/CommonText';
 import { useWallet } from 'hooks/store';
 import React, { memo } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { formatChainInfoToShow } from '@portkey-wallet/utils';
 import { pTd } from 'utils/unit';
 interface TokenListItemType {
   noBalanceShow?: boolean;
@@ -36,8 +37,7 @@ const TokenListItem: React.FC<TokenListItemType> = props => {
             {item?.symbol}
           </TextL>
           <TextS numberOfLines={1} style={[FontStyles.font7, itemStyle.chainInfo]}>
-            {item?.chainId === 'AELF' ? 'MainChain ' : 'SideChain '} {item?.chainId}{' '}
-            {currentNetwork === 'TESTNET' && 'Testnet'}
+            {formatChainInfoToShow(item?.chainId, currentNetwork)}
           </TextS>
         </View>
 

@@ -6,7 +6,7 @@ import { pTd } from 'utils/unit';
 import { TextM, TextS, TextL } from 'components/CommonText';
 import CommonButton from 'components/CommonButton';
 import ActionSheet from 'components/ActionSheet';
-import { formatChainInfo, formatStr2EllipsisStr } from 'utils';
+import { formatChainInfoToShow, formatStr2EllipsisStr } from '@portkey-wallet/utils';
 import { addRecentContact } from '@portkey-wallet/store/store-ca/recent/slice';
 import { isCrossChain } from '@portkey-wallet/utils/aelf';
 import { useLanguage } from 'i18n/hooks';
@@ -305,7 +305,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
         <View style={styles.section}>
           <View style={[styles.flexSpaceBetween]}>
             <TextM style={[styles.blackFontColor]}>{t('Network')}</TextM>
-            <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${formatChainInfo(
+            <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${formatChainInfoToShow(
               assetInfo.chainId,
             )} → ${networkInfoShow(toInfo?.address)} `}</TextM>
           </View>
