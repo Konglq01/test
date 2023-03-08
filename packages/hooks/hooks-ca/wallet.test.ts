@@ -84,7 +84,7 @@ const INCOMPLETE_WALLET_STATE = {
 };
 
 describe('useCurrentWalletInfo', () => {
-  test('complete wallet data, and return success', () => {
+  test('complete wallet data, and return successfully', () => {
     const { result } = renderHookWithProvider(useCurrentWalletInfo, setupStore(COMPLETE_WALLET_STATE));
     expect(result.current).toHaveProperty('caHash', '2cd...ec7');
   });
@@ -96,7 +96,7 @@ describe('useCurrentWalletInfo', () => {
 });
 
 describe('useCurrentWallet', () => {
-  test('complete wallet data, and return success', () => {
+  test('complete wallet data, and return successfully', () => {
     const { result } = renderHookWithProvider(useCurrentWallet, setupStore(COMPLETE_WALLET_STATE));
     expect(result.current.chainList.length).toBe(2);
   });
@@ -125,7 +125,7 @@ describe('useSetWalletName', () => {
 });
 
 describe('useCaAddresses', () => {
-  test('complete wallet data, and return success', () => {
+  test('complete wallet data, and return successfully', () => {
     const { result } = renderHookWithProvider(useCaAddresses, setupStore(COMPLETE_WALLET_STATE));
     expect(result.current.length).toBe(2);
   });
@@ -136,7 +136,7 @@ describe('useCaAddresses', () => {
 });
 
 describe('useChainIdList', () => {
-  test('complete wallet data, and return success', () => {
+  test('complete wallet data, and return successfully', () => {
     const { result } = renderHookWithProvider(useChainIdList, setupStore(COMPLETE_WALLET_STATE));
     expect(result.current.length).toBe(2);
   });

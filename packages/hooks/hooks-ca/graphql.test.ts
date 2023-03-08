@@ -75,7 +75,7 @@ describe('useIntervalQueryCAInfoByAddress', () => {
     const { result } = renderHook(() => useIntervalQueryCAInfoByAddress(NETWORK, ADDRESS));
     expect(result.current).toBeUndefined();
   });
-  test('have total data, and return success', async () => {
+  test('have total data, and return successfully', async () => {
     const caHolderManagerInfo: CaHolderWithGuardian[] = [
       {
         __typename: 'CAHolderManagerDto',
