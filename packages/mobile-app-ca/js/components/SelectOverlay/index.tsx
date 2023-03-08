@@ -65,7 +65,7 @@ export const styles = StyleSheet.create({
   },
   divider: {
     width: '100%',
-    height: pTd(1),
+    height: StyleSheet.hairlineWidth,
     backgroundColor: defaultColors.border6,
   },
   listWrap: {

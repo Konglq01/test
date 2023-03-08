@@ -1,4 +1,8 @@
-import { TransactionTypes, transactionTypesMap } from '@portkey-wallet/constants/constants-ca/activity';
+import {
+  DEFAULT_DECIMAL,
+  TransactionTypes,
+  transactionTypesMap,
+} from '@portkey-wallet/constants/constants-ca/activity';
 import { ZERO } from '@portkey-wallet/constants/misc';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { useCaAddresses, useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
@@ -32,7 +36,6 @@ interface RouterParams {
   isReceived?: boolean;
 }
 
-const DEFAULT_DECIMAL = 8;
 const hiddenArr = [TransactionTypes.SOCIAL_RECOVERY, TransactionTypes.ADD_MANAGER, TransactionTypes.REMOVE_MANAGER];
 
 const ActivityDetail = () => {
@@ -350,7 +353,7 @@ export const styles = StyleSheet.create({
   divider: {
     marginTop: pTd(24),
     width: '100%',
-    height: pTd(1),
+    height: StyleSheet.hairlineWidth,
     backgroundColor: defaultColors.border1,
   },
   titles2: {
@@ -362,7 +365,7 @@ export const styles = StyleSheet.create({
   card: {
     marginTop: pTd(24),
     borderRadius: pTd(6),
-    borderWidth: pTd(0.5),
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: defaultColors.border1,
     width: '100%',
   },
