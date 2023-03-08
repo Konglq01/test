@@ -8,14 +8,13 @@ import NFTAvatar from 'components/NFTAvatar';
 import GStyles from 'assets/theme/GStyles';
 import CommonAvatar from 'components/CommonAvatar';
 import Svg from 'components/Svg';
-import { TextM, TextS, TextXL } from 'components/CommonText';
+import { TextL, TextM, TextS, TextXL } from 'components/CommonText';
 import { FontStyles } from 'assets/theme/styles';
 import { useWallet } from 'hooks/store';
 import { NFTCollectionItemShowType } from '@portkey-wallet/types/types-ca/assets';
 import Touchable from 'components/Touchable';
-import { OpenCollectionObjType } from './index.';
+import { OpenCollectionObjType } from './index';
 import { ChainId } from '@portkey-wallet/types';
-import { chain } from 'lodash';
 
 export enum NoDataMessage {
   CustomNetWorkNoData = 'No transaction records accessible from the current custom network',
@@ -64,11 +63,16 @@ export default function NFTItem(props: NFTItemPropsType) {
     [children, openCollectionInfo?.pageNum],
   );
 
+  const hasMore = useMemo(
+    () => showChildren?.length !== 0 && showChildren?.length < itemCount,
+    [itemCount, showChildren?.length],
+  );
+
   return (
     <View style={styles.wrap}>
       <Touchable
         onPressWithSecond={500}
-        style={styles.topSeries}
+        style={[styles.topSeries, !open && styles.marginBottom0]}
         onPress={() => {
           if (openCollectionObj?.[`${symbol}${chainId}`]) {
             closeItem(symbol, chainId);
@@ -77,14 +81,14 @@ export default function NFTItem(props: NFTItemPropsType) {
           }
         }}>
         <Svg
-          icon={collapsed ? 'right-arrow' : 'down-arrow'}
+          icon={!open ? 'right-arrow' : 'down-arrow'}
           size={pTd(16)}
           color={defaultColors.font3}
           iconStyle={styles.touchIcon}
         />
         <CommonAvatar imageUrl={imageUrl} title={collectionName} shapeType={'square'} style={styles.avatarStyle} />
         <View style={styles.topSeriesCenter}>
-          <TextXL style={styles.nftSeriesName}>{collectionName}</TextXL>
+          <TextL style={styles.nftSeriesName}>{collectionName}</TextL>
           <TextS style={styles.nftSeriesChainInfo}>
             {`${chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${chainId} ${currentNetwork !== 'MAIN' && 'Testnet'}`}
           </TextS>
@@ -95,7 +99,7 @@ export default function NFTItem(props: NFTItemPropsType) {
         </View>
       </Touchable>
       <Collapsible collapsed={!open}>
-        <View style={styles.listWrap}>
+        <View style={[styles.listWrap, open && hasMore && styles.marginBottom0]}>
           {showChildren?.map((ele: any, index: number) => (
             <NFTAvatar
               style={[styles.itemAvatarStyle, index % 3 === 2 ? styles.noMarginRight : {}]}
@@ -107,7 +111,7 @@ export default function NFTItem(props: NFTItemPropsType) {
             />
           ))}
         </View>
-        {showChildren?.length !== 0 && showChildren?.length < itemCount && (
+        {hasMore && (
           <Touchable
             style={styles.loadMore}
             onPress={() => loadMoreItem?.(symbol, chainId, openCollectionInfo?.pageNum)}>
@@ -189,5 +193,8 @@ const styles = StyleSheet.create({
     marginLeft: pTd(44),
     height: pTd(1),
     backgroundColor: defaultColors.bg7,
+  },
+  marginBottom0: {
+    marginBottom: 0,
   },
 });

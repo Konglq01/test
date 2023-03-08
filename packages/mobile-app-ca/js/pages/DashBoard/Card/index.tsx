@@ -29,7 +29,6 @@ const Card: React.FC<CardProps> = () => {
 
   const { accountBalance } = useAppCASelector(state => state.assets);
 
-  // warning dialog
   const showDialog = useCallback(
     () =>
       ActionSheet.alert({
