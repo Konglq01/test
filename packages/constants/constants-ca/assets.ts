@@ -1,9 +1,10 @@
 import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
 
 export enum TransactionError {
-  TOKEN_NOTE_ENOUGH = 'Insufficient funds',
-  NFT_NOTE_ENOUGH = 'Insufficient quantity',
-  FEE_NOTE_ENOUGH = 'Insufficient funds for transaction fee',
+  TOKEN_NOT_ENOUGH = 'Insufficient funds',
+  NFT_NOT_ENOUGH = 'Insufficient quantity',
+  FEE_NOT_ENOUGH = 'Insufficient funds for transaction fee',
+  CROSS_NOT_ENOUGH = 'Insufficient funds for cross chain transaction fee',
 }
 
 export const REFRESH_TIME = 5 * 60 * 1000; // 5min refresh

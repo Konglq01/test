@@ -76,11 +76,7 @@ export const PageRouter = () =>
       element: <Send />,
     },
     {
-      path: '/send/:type/:symbol/:tokenId',
-      element: <Send />,
-    },
-    {
-      path: '/receive/:type/:symbol/:chainId',
+      path: '/receive/:type/:symbol',
       element: <Receive />,
     },
     {

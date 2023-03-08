@@ -144,3 +144,5 @@ export const handleError = (error: any, errorText?: string) => {
   if (typeof error.message === 'string') return error.message;
   return errorText;
 };
+
+export const chainShowText = (chain: ChainId) => (chain === 'AELF' ? 'MainChain' : 'SideChain');
