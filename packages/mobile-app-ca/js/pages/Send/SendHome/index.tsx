@@ -33,6 +33,8 @@ import { getELFChainBalance } from '@portkey-wallet/utils/balance';
 import { BGStyles } from 'assets/theme/styles';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import Loading from 'components/Loading';
+import { DEFAULT_DECIMAL } from '@portkey-wallet/constants/constants-ca/activity';
+import { CROSS_FEE } from '@portkey-wallet/constants/constants-ca/wallet';
 
 export interface SendHomeProps {
   route?: any;
@@ -259,7 +261,10 @@ const SendHome: React.FC<SendHomeProps> = props => {
       // token
       if (assetInfo.symbol === 'ELF') {
         // ELF
-        if (sendBigNumber.isGreaterThanOrEqualTo(assetBalanceBigNumber)) {
+        if (
+          sendBigNumber.isGreaterThanOrEqualTo(assetBalanceBigNumber) ||
+          assetBalanceBigNumber.isLessThan(timesDecimals(CROSS_FEE, DEFAULT_DECIMAL))
+        ) {
           setErrorMessage([ErrorMessage.InsufficientFunds]);
           return { status: false };
         }
