@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { View, Text, Image } from 'react-native';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { getChainListAsync } from '@portkey-wallet/store/store-ca/wallet/actions';
-import { handleError } from '@portkey-wallet/utils';
+import { handleErrorMessage } from '@portkey-wallet/utils';
 import { checkEmail } from '@portkey-wallet/utils/check';
 import { BGStyles, FontStyles } from 'assets/theme/styles';
 import Loading from 'components/Loading';
@@ -54,7 +54,7 @@ export default function LoginEmail({ setLoginType }: { setLoginType: (type: Logi
     } catch (error) {
       console.log(error, '=====error');
 
-      setErrorMessage(handleError(error));
+      setErrorMessage(handleErrorMessage(error));
     }
     Loading.hide();
   }, [loginAccount, chainInfo, getVerifierServers, getGuardiansInfoWriteStore, dispatch]);

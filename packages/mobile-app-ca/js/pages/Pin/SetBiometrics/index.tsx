@@ -20,7 +20,7 @@ import { CAInfo } from '@portkey-wallet/types/types-ca/wallet';
 import Loading from 'components/Loading';
 import { setCAInfo } from '@portkey-wallet/store/store-ca/wallet/actions';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
-import { handleError } from '@portkey-wallet/utils';
+import { handleErrorMessage } from '@portkey-wallet/utils';
 import { VerificationType } from '@portkey-wallet/types/verifier';
 import CommonToast from 'components/CommonToast';
 import { useIntervalGetResult } from 'hooks/login';
@@ -99,7 +99,7 @@ export default function SetBiometrics() {
       await setBiometrics(true);
       await getResult();
     } catch (error) {
-      setErrorMessage(handleError(error, 'Failed To Verify'));
+      setErrorMessage(handleErrorMessage(error, 'Failed To Verify'));
     }
   }, [getResult, pin, setBiometrics]);
   const onSkip = useCallback(async () => {
