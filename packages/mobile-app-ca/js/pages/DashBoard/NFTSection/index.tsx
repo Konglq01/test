@@ -14,6 +14,7 @@ import { useWallet } from 'hooks/store';
 import Touchable from 'components/Touchable';
 import { ChainId } from '@portkey-wallet/types';
 import { useRoute } from '@react-navigation/native';
+import useLockCallback from 'hooks/useLockCallback';
 
 export interface OpenCollectionObjType {
   // key = symbol+chainId
@@ -85,9 +86,8 @@ export default function NFTSection() {
     [openCollectionObj],
   );
 
-  // TODO: useLockCallback
-  const openItem = useCallback(
-    (symbol: string, chainId: ChainId, itemCount: number) => {
+  const openItem = useLockCallback(
+    async (symbol: string, chainId: ChainId, itemCount: number) => {
       const currentCaAddress = walletInfo?.caInfo?.[currentNetwork]?.[chainId]?.caAddress;
 
       const key = `${symbol}${chainId}`;
@@ -100,7 +100,7 @@ export default function NFTSection() {
         },
       };
 
-      dispatch(
+      await dispatch(
         fetchNFTAsync({
           symbol,
           chainId,
