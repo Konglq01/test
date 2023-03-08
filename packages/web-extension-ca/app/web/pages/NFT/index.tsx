@@ -22,7 +22,7 @@ export default function NFT() {
         {/* <p className="information">Symbol information Symbol information Symbol information</p> */}
       </div>
       <div className="btn-wrap">
-        <Button type="primary" onClick={() => navigate(`/send/nft/${state.symbol}/${state.tokenId}`, { state })}>
+        <Button type="primary" onClick={() => navigate(`/send/nft/${state.symbol}`, { state })}>
           Send
         </Button>
       </div>

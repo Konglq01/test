@@ -19,6 +19,8 @@ import {
   useCheckContactName,
 } from '@portkey-wallet/hooks/hooks-ca/contact';
 import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
+import { transNetworkText } from '@portkey-wallet/utils/activity';
+import { useIsTestnet } from 'hooks/useActivity';
 
 const { Item: FormItem } = Form;
 export enum ContactInfoError {
@@ -64,18 +66,19 @@ export default function EditContact() {
   const checkExistNameApi = useCheckContactName();
   const { setLoading } = useLoading();
   const symbolImages = useSymbolImages();
+  const isTestNet = useIsTestnet();
 
   useEffect(() => {
     const { addresses } = state;
     const cusAddresses = addresses.map((ads: AddressItem) => ({
       ...ads,
-      networkName: ads.chainId === 'AELF' ? 'MainChain AELF Testnet' : 'SideChain tDVW Testnet',
+      networkName: transNetworkText(ads.chainId, isTestNet),
       validData: { validateStatus: '', errorMsg: '' },
     }));
     form.setFieldValue('addresses', cusAddresses);
     setAddressArr(cusAddresses);
     isEdit && setDisabled(false);
-  }, [form, isEdit, state]);
+  }, [form, isEdit, isTestNet, state]);
 
   const handleSelectNetwork = useCallback((i: number) => {
     setNetOpen(true);

@@ -54,7 +54,7 @@ export default function Send() {
   const navigate = useNavigate();
   const { walletName } = useWalletInfo();
   // TODO need get data from state and wait for BE data structure
-  const { type, symbol, tokenId } = useParams();
+  const { type, symbol } = useParams();
   const { state } = useLocation();
   const chainInfo = useCurrentChain(state.chainId);
   const wallet = useCurrentWalletInfo();
@@ -223,7 +223,7 @@ export default function Send() {
       setLoading(true);
       if (!ZERO.plus(amount).toNumber()) return 'Please input amount';
       if (type === 'token') {
-        if (ZERO.plus(amount).times(`1e${tokenInfo.decimals}`).isGreaterThan(ZERO.plus(balance))) {
+        if (timesDecimals(amount, tokenInfo.decimals).isGreaterThan(ZERO.plus(balance))) {
           return TransactionError.TOKEN_NOT_ENOUGH;
         }
         if (isCrossChain(toAccount.address, chainInfo?.chainId ?? 'AELF') && symbol === 'ELF') {
