@@ -177,50 +177,49 @@ const ActivityDetail = () => {
         {transactionTypesMap(activityItem?.transactionType, activityItem?.nftInfo?.nftId)}
       </Text>
 
-      {isNft ? (
-        <>
-          <View style={styles.topWrap}>
-            {activityItem?.nftInfo?.imageUrl ? (
-              <Image style={styles.img} source={{ uri: activityItem?.nftInfo?.imageUrl || '' }} />
-            ) : (
-              <Text style={styles.noImg}>{activityItem?.nftInfo?.alias?.slice(0, 1)}</Text>
-            )}
-            <View style={styles.nftInfo}>
-              <TextL style={styles.nftTitle}>{`${activityItem?.nftInfo?.alias || ''} #${
-                activityItem?.nftInfo?.nftId || ''
-              }`}</TextL>
-              <TextS style={[FontStyles.font3, styles.marginTop4]}>Amount: {activityItem?.amount || ''}</TextS>
+      {activityItem?.transactionType &&
+        !hiddenArr.includes(activityItem?.transactionType) &&
+        (isNft ? (
+          <>
+            <View style={styles.topWrap}>
+              {activityItem?.nftInfo?.imageUrl ? (
+                <Image style={styles.img} source={{ uri: activityItem?.nftInfo?.imageUrl || '' }} />
+              ) : (
+                <Text style={styles.noImg}>{activityItem?.nftInfo?.alias?.slice(0, 1)}</Text>
+              )}
+              <View style={styles.nftInfo}>
+                <TextL style={styles.nftTitle}>{`${activityItem?.nftInfo?.alias || ''} #${
+                  activityItem?.nftInfo?.nftId || ''
+                }`}</TextL>
+                <TextS style={[FontStyles.font3, styles.marginTop4]}>Amount: {activityItem?.amount || ''}</TextS>
+              </View>
             </View>
-          </View>
-          <View style={styles.divider} />
-        </>
-      ) : (
-        <>
-          <Text style={[styles.tokenCount, styles.fontBold]}>
-            {!hiddenArr.includes(activityItem?.transactionType as TransactionTypes) &&
-              (activityItem?.isReceived ? '+' : '-')}
-            {`${unitConverter(
-              ZERO.plus(activityItem?.amount || 0).div(`1e${activityItem?.decimals || DEFAULT_DECIMAL}`),
-            )} ${activityItem?.symbol || ''}`}
-          </Text>
-          {!isTestNet && (
-            <Text style={styles.usdtCount}>{`$ ${unitConverter(ZERO.plus(activityItem?.priceInUsd ?? 0), 2)}`}</Text>
-          )}
-        </>
-      )}
-
+            <View style={styles.divider} />
+          </>
+        ) : (
+          <>
+            <Text style={[styles.tokenCount, styles.fontBold]}>
+              {!hiddenArr.includes(activityItem?.transactionType as TransactionTypes) &&
+                (activityItem?.isReceived ? '+' : '-')}
+              {`${unitConverter(
+                ZERO.plus(activityItem?.amount || 0).div(`1e${activityItem?.decimals || DEFAULT_DECIMAL}`),
+              )} ${activityItem?.symbol || ''}`}
+            </Text>
+            {!isTestNet && (
+              <Text style={styles.usdtCount}>{`$ ${unitConverter(ZERO.plus(activityItem?.priceInUsd ?? 0), 2)}`}</Text>
+            )}
+          </>
+        ))}
       <View style={[styles.flexSpaceBetween, styles.titles1]}>
         <TextM style={styles.lightGrayFontColor}>{t('Status')}</TextM>
         <TextM style={styles.lightGrayFontColor}>{t('Date')}</TextM>
       </View>
-
       <View style={[styles.flexSpaceBetween, styles.values1]}>
         <TextM style={styles.greenFontColor}>{t(status.text)}</TextM>
         <TextM style={styles.blackFontColor}>
           {activityItem && activityItem.timestamp ? formatTransferTime(Number(activityItem?.timestamp) * 1000) : ''}
         </TextM>
       </View>
-
       <View style={styles.card}>
         {/* From */}
         {activityItem?.transactionType && !hiddenArr.includes(activityItem?.transactionType) && (
@@ -267,9 +266,7 @@ const ActivityDetail = () => {
         {/* transaction Fee */}
         {feeUI}
       </View>
-
       <View style={styles.space} />
-
       {explorerUrl && (
         <CommonButton
           containerStyle={[GStyles.marginTop(pTd(8)), styles.bottomButton]}
