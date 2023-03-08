@@ -3,23 +3,21 @@ import NoData from 'components/NoData';
 import { StyleSheet, View, FlatList } from 'react-native';
 import { defaultColors } from 'assets/theme';
 import { useLanguage } from 'i18n/hooks';
-import useEffectOnce from 'hooks/useEffectOnce';
 import { pTd } from 'utils/unit';
 import NFTCollectionItem from './NFTCollectionItem';
 import { useCaAddresses } from '@portkey-wallet/hooks/hooks-ca/wallet';
-import { fetchNFTAsync, fetchNFTCollectionsAsync, clearNftItem } from '@portkey-wallet/store/store-ca/assets/slice';
+import { fetchNFTAsync, fetchNFTCollectionsAsync } from '@portkey-wallet/store/store-ca/assets/slice';
 import { useAppCommonDispatch } from '@portkey-wallet/hooks';
 import { useAppCASelector } from '@portkey-wallet/hooks';
 import { NFTCollectionItemShowType } from '@portkey-wallet/types/types-ca/assets';
 import { useWallet } from 'hooks/store';
 import Touchable from 'components/Touchable';
-import { REFRESH_TIME } from '@portkey-wallet/constants/constants-ca/assets';
 import { ChainId } from '@portkey-wallet/types';
 import { useRoute } from '@react-navigation/native';
 
 export interface OpenCollectionObjType {
+  // key = symbol+chainId
   [key: string]: {
-    // key = symbol+chainId
     pageNum: number;
     pageSize: number;
     itemCount: number;

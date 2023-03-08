@@ -83,7 +83,6 @@ if [ "$AGENT_JOBSTATUS" == "Succeeded" ]; then
      # Example: Upload main branch app binary to HockeyApp using the API
     if [ "$PLATFORM_TYPE" == "ios-testFlight" ];
      then
-
         curl -X POST -H "Content-Type: application/json" \
          -d '{"msg_type":"text","content":{"text":"The latest ios package(id:'$APPCENTER_BUILD_ID') has been completed and successfully pushed to testFlight, you can apply to join the internal testing group and view/download the latest version of the app on testFlight."}}' \
         https://open.feishu.cn/open-apis/bot/v2/hook/f2d3fffd-c630-4e59-86e3-e7053a64e4b2

@@ -16,7 +16,6 @@ import { useWallet } from 'hooks/store';
 import TokenListItem from 'components/TokenListItem';
 import { FontStyles } from 'assets/theme/styles';
 import { useCaAddresses } from '@portkey-wallet/hooks/hooks-ca/wallet';
-import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import { fetchAssetList } from '@portkey-wallet/store/store-ca/assets/api';
 import { IAssetItemType } from '@portkey-wallet/store/store-ca/assets/type';
 import navigationService from 'utils/navigationService';
@@ -27,11 +26,6 @@ type TokenListProps = {
   account?: AccountType;
   onFinishSelectToken?: onFinishSelectTokenType;
 };
-
-// const enum noResult {
-//   'There are currently no assets to send' = 'There are currently no assets to send',
-//   'There is no search result.' = 'There is no search result.',
-// }
 
 const AssetItem = (props: { symbol: string; onPress: (item: any) => void; item: IAssetItemType }) => {
   const { symbol, onPress, item } = props;
@@ -93,13 +87,14 @@ const INIT_PAGE_INFO = {
   isLoading: false,
 };
 
-const AssetList = ({ onFinishSelectToken, account }: TokenListProps) => {
+const AssetList = ({ account }: TokenListProps) => {
   const { t } = useLanguage();
   const caAddresses = useCaAddresses();
-  const currentNetworkInfo = useCurrentNetworkInfo();
   const [keyword, setKeyword] = useState('');
 
   const debounceKeyword = useDebounce(keyword, 800);
+
+  console.log(account);
 
   const [listShow, setListShow] = useState<IAssetItemType[]>([]);
   const pageInfoRef = useRef({

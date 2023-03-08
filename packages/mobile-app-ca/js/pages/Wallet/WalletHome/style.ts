@@ -17,4 +17,5 @@ export const pageStyles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  exitButton: {},
 });
