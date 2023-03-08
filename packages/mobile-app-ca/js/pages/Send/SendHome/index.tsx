@@ -261,10 +261,12 @@ const SendHome: React.FC<SendHomeProps> = props => {
       // token
       if (assetInfo.symbol === 'ELF') {
         // ELF
-        if (
-          sendBigNumber.isGreaterThanOrEqualTo(assetBalanceBigNumber) ||
-          assetBalanceBigNumber.isLessThan(timesDecimals(CROSS_FEE, DEFAULT_DECIMAL))
-        ) {
+        if (sendBigNumber.isGreaterThanOrEqualTo(assetBalanceBigNumber)) {
+          setErrorMessage([ErrorMessage.InsufficientFunds]);
+          return { status: false };
+        }
+
+        if (assetBalanceBigNumber.isLessThan(timesDecimals(CROSS_FEE, DEFAULT_DECIMAL))) {
           setErrorMessage([ErrorMessage.InsufficientFunds]);
           return { status: false };
         }
