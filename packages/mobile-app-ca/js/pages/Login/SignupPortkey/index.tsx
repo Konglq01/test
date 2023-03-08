@@ -15,7 +15,7 @@ import Svg from 'components/Svg';
 import { BGStyles, FontStyles } from 'assets/theme/styles';
 import { isIos, screenHeight, screenWidth } from '@portkey-wallet/utils/mobile/device';
 import { useGetGuardiansInfo, useGetVerifierServers } from 'hooks/guardian';
-import { handleError } from '@portkey-wallet/utils';
+import { handleErrorMessage } from '@portkey-wallet/utils';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { useAppDispatch } from 'store/hooks';
 import { getChainListAsync } from '@portkey-wallet/store/store-ca/wallet/actions';
@@ -58,7 +58,7 @@ function SignupEmail() {
       }
       navigationService.navigate('SelectVerifier', { loginAccount: email });
     } catch (error) {
-      setErrorMessage(handleError(error));
+      setErrorMessage(handleErrorMessage(error));
     }
     Loading.hide();
   }, [chainInfo, dispatch, email, getGuardiansInfo, getVerifierServers]);
