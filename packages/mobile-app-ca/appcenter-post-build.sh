@@ -9,20 +9,20 @@ if [ "$AGENT_JOBSTATUS" == "Succeeded" ]; then
             "content": {
                 "post": {
                     "zh_cn": {
-                        "title": "代码包更新通知",
+                        "title": "Notification about package updatting",
                         "content": [
                             [{
                                     "tag": "text",
-                                    "text": "最新'${ENVIRONMENT}'环境Android代码包（id:'$APPCENTER_BUILD_ID'）已经更新: "
+                                    "text": "The latest android package（id:'$APPCENTER_BUILD_ID'）has updated: "
                                 },
                                 {
                                     "tag": "a",
-                                    "text": "点击此处",
+                                    "text": "click here",
                                     "href": "https://install.appcenter.ms/orgs/aelf-web/apps/DID-Android"
                                 },
                                       {
                                     "tag": "text",
-                                    "text": "进行查看和下载"
+                                    "text": "check and download"
                                 },
                                 {   
                                     "tag": "img",
@@ -49,21 +49,21 @@ if [ "$AGENT_JOBSTATUS" == "Succeeded" ]; then
             "content": {
                 "post": {
                     "zh_cn": {
-                        "title": "代码包更新通知",
+                        "title": "Notification about package updatting",
                         "content": [
                             [
                                 {
                                     "tag": "text",
-                                    "text": "最新'${ENVIRONMENT}'环境IOS代码包（id:'$APPCENTER_BUILD_ID'）已经更新，"
+                                    "text": "The latest ios package(id:'$APPCENTER_BUILD_ID')has updated: "
                                 },
                                 {
                                     "tag": "a",
-                                    "text": "点击此处",
+                                    "text": "click here",
                                     "href": "https://install.appcenter.ms/orgs/aelf-web/apps/DID-IOS"
                                 },
                                 {
                                     "tag": "text",
-                                    "text": "进行查看和下载"
+                                    "text": "check and download"
                                 },
                                 {   
                                     "tag": "img",
@@ -84,7 +84,7 @@ if [ "$AGENT_JOBSTATUS" == "Succeeded" ]; then
     if [ "$PLATFORM_TYPE" == "ios-testFlight" ];
      then
         curl -X POST -H "Content-Type: application/json" \
-         -d '{"msg_type":"text","content":{"text":"DID:IOS端'${ENVIRONMENT}'环境最新包（id:'$APPCENTER_BUILD_ID'） 已build成功并推送至TestFlight，您可申请进入内部测试组，并在TestFlight查看下载最新版本的DID应用"}}' \
+         -d '{"msg_type":"text","content":{"text":"The latest ios package(id:'$APPCENTER_BUILD_ID') has been completed and successfully pushed to testFlight, you can apply to join the internal testing group and view/download the latest version of the app on testFlight."}}' \
         https://open.feishu.cn/open-apis/bot/v2/hook/f2d3fffd-c630-4e59-86e3-e7053a64e4b2
 
     else
