@@ -23,7 +23,7 @@ export default function RecentItem({
         onClick({ ...item.addresses[0] });
       }}>
       <p className="address">
-        <span>ELF_</span>
+        <span>{`ELF_`}</span>
         <span>
           {formatStr2EllipsisStr(item.addresses[0].address, [6, 6])}_{item.addresses[0].chainId}
         </span>

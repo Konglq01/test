@@ -75,10 +75,12 @@ export default function ActivityList({ data, chainId, hasMore, loadMore }: IActi
 
   const fromAndUsdUI = useCallback(
     (item: ActivityItemType) => {
-      const { fromAddress, priceInUsd, nftInfo } = item;
+      const { fromAddress, fromChainId, priceInUsd, nftInfo } = item;
+      const transFromAddress = `ELF_${fromAddress}_${fromChainId}`;
+
       return (
         <p className="row-2">
-          <span>From: {formatStr2EllipsisStr(fromAddress, [7, 4])}</span>
+          <span>From: {formatStr2EllipsisStr(transFromAddress, [7, 4])}</span>
           {nftInfo?.nftId && <span className="nft-name">{formatStr2EllipsisStr(nftInfo.alias)}</span>}
           {!isTestNet && !nftInfo?.nftId && (
             <span>$ {formatAmount({ amount: priceInUsd, decimals: 0, digits: 2 })}</span>

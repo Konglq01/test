@@ -39,6 +39,11 @@ export default function Transaction() {
   const feeInfo = useMemo(() => activityItem.transactionFees, [activityItem.transactionFees]);
   const chainInfo = useCurrentChain(activityItem.fromChainId);
 
+  const hiddenTransactionTypeArr = useMemo(
+    () => [TransactionTypes.SOCIAL_RECOVERY, TransactionTypes.ADD_MANAGER, TransactionTypes.REMOVE_MANAGER],
+    [],
+  );
+
   // Obtain data through api to ensure data integrity.
   // Because some data is not returned in the Activities API. Such as from, to.
   useEffectOnce(() => {
@@ -98,17 +103,22 @@ export default function Transaction() {
   }, [activityItem]);
 
   const tokenHeaderUI = useCallback(() => {
-    const { amount, isReceived, decimals, symbol, priceInUsd } = activityItem;
+    const { amount, isReceived, decimals, symbol, priceInUsd, transactionType } = activityItem;
     const sign = isReceived ? AmountSign.PLUS : AmountSign.MINUS;
-    return (
-      <p className="amount">
-        {`${formatAmount({ amount, decimals, sign })} ${symbol ?? ''}`}
-        {!isTestNet && (
-          <span className="usd">{`$ ${formatAmount({ amount: priceInUsd, decimals: 0, digits: 2 })}`}</span>
-        )}
-      </p>
-    );
-  }, [activityItem, isTestNet]);
+    /* Hidden during [SocialRecovery, AddManager, RemoveManager] */
+    if (transactionType && !hiddenTransactionTypeArr.includes(transactionType)) {
+      return (
+        <p className="amount">
+          {`${formatAmount({ amount, decimals, sign })} ${symbol ?? ''}`}
+          {!isTestNet && (
+            <span className="usd">{`$ ${formatAmount({ amount: priceInUsd, decimals: 0, digits: 2 })}`}</span>
+          )}
+        </p>
+      );
+    } else {
+      return <p className="no-amount"></p>;
+    }
+  }, [activityItem, hiddenTransactionTypeArr, isTestNet]);
 
   const statusAndDateUI = useCallback(() => {
     return (
@@ -126,6 +136,9 @@ export default function Transaction() {
   }, [activityItem.timestamp, status.style, status.text, t]);
 
   const fromToUI = useCallback(() => {
+    const { from, fromAddress, fromChainId, to, toAddress, toChainId } = activityItem;
+    const transFromAddress = `ELF_${fromAddress}_${fromChainId}`;
+    const transToAddress = `ELF_${toAddress}_${toChainId}`;
     return (
       <div className="account-wrap">
         <p className="label">
@@ -134,29 +147,38 @@ export default function Transaction() {
         </p>
         <div className="value">
           <div className="content">
-            <span className="left name">{activityItem.from}</span>
-            <span className="left">{shortenCharacters(activityItem.fromAddress)}</span>
+            <span className="left name">{from}</span>
+            {fromAddress && (
+              <span className="left address-wrap">
+                <span>{formatStr2EllipsisStr(transFromAddress, [7, 4])}</span>
+                <Copy toCopy={transFromAddress} iconClassName="copy-address" />
+              </span>
+            )}
           </div>
-          <CustomSvg type="RightArrow" />
+          <CustomSvg type="RightArrow" className="right-arrow" />
           <div className="content">
-            <span className="right name">{activityItem.to}</span>
-            <span className="right">{shortenCharacters(activityItem.toAddress)}</span>
+            <span className="right name">{to}</span>
+            {toAddress && (
+              <span className="right address-wrap">
+                <span>{formatStr2EllipsisStr(transToAddress, [7, 4])}</span>
+                <Copy toCopy={transToAddress} iconClassName="copy-address" />
+              </span>
+            )}
           </div>
         </div>
       </div>
     );
-  }, [activityItem.from, activityItem.fromAddress, activityItem.to, activityItem.toAddress, t]);
+  }, [activityItem, t]);
 
   const networkUI = useCallback(() => {
     /* Hidden during [SocialRecovery, AddManager, RemoveManager] */
     const { transactionType, fromChainId, toChainId } = activityItem;
     const from = transNetworkText(fromChainId, isTestNet);
     const to = transNetworkText(toChainId, isTestNet);
-    const hiddenArr = [TransactionTypes.SOCIAL_RECOVERY, TransactionTypes.ADD_MANAGER, TransactionTypes.REMOVE_MANAGER];
 
     return (
       transactionType &&
-      !hiddenArr.includes(transactionType) && (
+      !hiddenTransactionTypeArr.includes(transactionType) && (
         <div className="network-wrap">
           <p className="label">
             <span className="left">{t('Network')}</span>
@@ -165,7 +187,7 @@ export default function Transaction() {
         </div>
       )
     );
-  }, [activityItem, isTestNet, t]);
+  }, [activityItem, hiddenTransactionTypeArr, isTestNet, t]);
 
   const feeUI = useCallback(() => {
     return (
