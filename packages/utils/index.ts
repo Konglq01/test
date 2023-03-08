@@ -133,6 +133,7 @@ export const handleError = (error: any) => {
 
 export const handleErrorMessage = (error: any, errorText?: string) => {
   error = handleError(error);
+  if (!error) return errorText;
   if (typeof error === 'string') return error;
   if (typeof error.message === 'string') return error.message;
   return errorText;
