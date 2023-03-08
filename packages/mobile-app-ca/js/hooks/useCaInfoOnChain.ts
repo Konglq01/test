@@ -11,8 +11,6 @@ import { useGetHolderInfoByViewContract } from './guardian';
 import { usePin } from './store';
 export const useCaInfoOnChain = () => {
   const { walletInfo, chainList } = useCurrentWallet();
-  console.log(walletInfo, '======walletInfo');
-
   const currentNetwork = useCurrentNetworkInfo();
   const dispatch = useAppDispatch();
   const getHolderInfo = useGetHolderInfoByViewContract();

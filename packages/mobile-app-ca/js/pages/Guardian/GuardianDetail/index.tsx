@@ -141,9 +141,11 @@ export default function GuardianDetail() {
             });
             return;
           }
-        } catch (error) {
-          console.debug(error, '====error');
-          return;
+        } catch (error: any) {
+          if (error.code !== '3002') {
+            CommonToast.fail('Setup failed');
+            return;
+          }
         } finally {
           Loading.hide();
         }

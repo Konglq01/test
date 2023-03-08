@@ -160,15 +160,17 @@ export default function GuardiansView() {
             address: currentChain?.caContractAddress as string,
             chainType: currentNetwork.walletType,
             paramsOption: {
-              guardianIdentifier: opGuardian?.identifierHash,
+              guardianIdentifier: opGuardian?.guardianAccount,
             },
           });
           setSwitchFail(SwitchFail.openFail);
         } catch (error: any) {
-          if (error?.error?.message?.indexOf('not exit')) {
+          if (error?.error?.code?.toString() === '3002') {
             setTipOpen(true);
           } else {
-            throw error?.error?.message || 'GetHolderInfo error';
+            const _err = error?.error?.message || 'GetHolderInfo error';
+            message.error(_err);
+            throw _err;
           }
         }
       } else {
