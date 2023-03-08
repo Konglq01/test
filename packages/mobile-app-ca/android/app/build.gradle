@@ -154,7 +154,7 @@ android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     defaultConfig {
-        applicationId "com.PortkeyApp"
+        applicationId "com.portkey.did"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -254,12 +254,6 @@ android {
             storePassword project.env.get("RELEASE_STORE_PASSWORD")
             keyAlias project.env.get("RELEASE_KEY_ALIAS")
             keyPassword project.env.get("RELEASE_KEY_PASSWORD")
-        }
-        releaseSigningConfigAppcenter {
-            storeFile rootProject.file("app/release-key.keystore")
-            storePassword System.getProperty("APPCENTER_KEYSTORE_PASSWORD")
-            keyAlias System.getProperty("APPCENTER_KEY_ALIAS")
-            keyPassword System.getProperty("APPCENTER_KEY_PASSWORD")
         }
     }
     buildTypes {

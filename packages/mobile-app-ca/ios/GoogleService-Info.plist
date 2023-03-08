@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>339329964702-3i2vcpa5hlekg5ob92dpu59pr3uj46u1.apps.googleusercontent.com</string>
+	<string>339329964702-49cp3l2v4o0gocfvl8m5ij9fi77sdht8.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.339329964702-3i2vcpa5hlekg5ob92dpu59pr3uj46u1</string>
+	<string>com.googleusercontent.apps.339329964702-49cp3l2v4o0gocfvl8m5ij9fi77sdht8</string>
 	<key>ANDROID_CLIENT_ID</key>
 	<string>339329964702-qbe65qoheb6g142qn8og79gba7dpdd7j.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
@@ -21,16 +21,16 @@
 	<key>STORAGE_BUCKET</key>
 	<string>wallet-test-dev-88ace.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
-	<false/>
+	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
-	<false/>
+	<false></false>
 	<key>IS_APPINVITE_ENABLED</key>
-	<true/>
+	<true></true>
 	<key>IS_GCM_ENABLED</key>
-	<true/>
+	<true></true>
 	<key>IS_SIGNIN_ENABLED</key>
-	<true/>
+	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:339329964702:ios:6d93597292bfaa2a5df98f</string>
+	<string>1:339329964702:ios:c81558c5852383de5df98f</string>
 </dict>
 </plist>
