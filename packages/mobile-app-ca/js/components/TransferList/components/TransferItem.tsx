@@ -24,6 +24,7 @@ import { getManagerAccount } from 'utils/redux';
 import { usePin } from 'hooks/store';
 import ActionSheet from 'components/ActionSheet';
 import CommonToast from 'components/CommonToast';
+import { addressFormat } from '@portkey-wallet/utils';
 
 interface ActivityItemPropsType {
   item?: ActivityItemType;
@@ -115,7 +116,7 @@ const ActivityItem: React.FC<ActivityItemPropsType> = ({ item, onPress }) => {
           <Text style={[itemStyle.centerStatus, FontStyles.font3]}>
             {t('From')}
             {':  '}
-            {formatStr2EllipsisStr(item?.fromAddress, 10)}
+            {formatStr2EllipsisStr(addressFormat(item?.fromAddress, item?.fromChainId), 10)}
           </Text>
 
           {item?.transactionType && !hiddenArr.includes(item?.transactionType) && (
