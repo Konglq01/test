@@ -31,7 +31,7 @@ export default function EmailLogin() {
       dispatch(
         setLoginAccountAction({
           guardianAccount,
-          loginType: LoginType.email,
+          loginType: LoginType.Email,
           createType: 'login',
         }),
       );

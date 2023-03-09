@@ -21,10 +21,10 @@ import myEvents from 'utils/deviceEvent';
 import { VerifierImage } from '../components/VerifierImage';
 import { cancelLoginAccount } from 'utils/guardian';
 import { useGetCurrentCAContract } from 'hooks/contract';
-import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network-test2';
 import { verification } from 'utils/api';
 import { RouteProp, useRoute } from '@react-navigation/native';
+import { LoginKeyType, LoginType } from '@portkey-wallet/types/types-ca/wallet';
 
 type RouterParams = {
   guardian?: UserGuardianItem;
@@ -66,7 +66,7 @@ export default function GuardianDetail() {
       Loading.show();
       const req = await verification.sendVerificationCode({
         params: {
-          type: LoginStrType[guardian.guardianType],
+          type: LoginType[guardian.guardianType],
           guardianIdentifier: guardian.guardianAccount,
           verifierId: guardian.verifier?.id,
           chainId: DefaultChainId,

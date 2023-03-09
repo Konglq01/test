@@ -20,9 +20,8 @@ import Loading from 'components/Loading';
 import { useVerifierList } from '@portkey-wallet/hooks/hooks-ca/network';
 import VerifierOverlay from '../components/VerifierOverlay';
 import { VerifierImage } from '../components/VerifierImage';
-import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import { LoginKeyType, LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import myEvents from 'utils/deviceEvent';
-import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network-test2';
 import { verification } from 'utils/api';
 
@@ -41,7 +40,7 @@ export default function SelectVerifier() {
         Loading.show();
         const requestCodeResult = await verification.sendVerificationCode({
           params: {
-            type: LoginStrType[LoginType.email],
+            type: LoginType[LoginType.Email],
             guardianIdentifier: loginAccount,
             verifierId: selectedVerifier.id,
             chainId: DefaultChainId,
@@ -55,7 +54,7 @@ export default function SelectVerifier() {
               isLoginAccount: true,
               verifier: selectedVerifier,
               guardianAccount: loginAccount,
-              guardianType: LoginType.email,
+              guardianType: LoginType.Email,
             },
           });
         } else {

@@ -25,11 +25,10 @@ import { FontStyles } from 'assets/theme/styles';
 import Loading from 'components/Loading';
 import CommonToast from 'components/CommonToast';
 import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
-import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import { LoginKeyType, LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import { useAppDispatch } from 'store/hooks';
 import { setPreGuardianAction } from '@portkey-wallet/store/store-ca/guardians/actions';
 import { VerifierImage } from '../components/VerifierImage';
-import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network-test2';
 import { verification } from 'utils/api';
 
@@ -123,7 +122,7 @@ const GuardianEdit: React.FC = () => {
               Loading.show();
               const req = await verification.sendVerificationCode({
                 params: {
-                  type: LoginStrType[selectedType.value],
+                  type: LoginType[selectedType.value],
                   guardianIdentifier: email,
                   verifierId: selectedVerifier.id,
                   chainId: DefaultChainId,
@@ -135,7 +134,7 @@ const GuardianEdit: React.FC = () => {
                     isLoginAccount: false,
                     verifier: selectedVerifier,
                     guardianAccount: email,
-                    guardianType: LoginType.email,
+                    guardianType: LoginType.Email,
                   },
                   requestCodeResult: {
                     verifierSessionId: req.verifierSessionId,
@@ -244,7 +243,7 @@ const GuardianEdit: React.FC = () => {
           </>
         )}
 
-        {selectedType && selectedType.value === LoginType.email && (
+        {selectedType && selectedType.value === LoginType.Email && (
           <CommonInput
             disabled={isEdit}
             type="general"
