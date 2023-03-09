@@ -1,6 +1,6 @@
 import { useAppCASelector, useAppCommonDispatch } from '@portkey-wallet/hooks';
 import ActivityList from 'pages/components/ActivityList';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getActivityListAsync } from '@portkey-wallet/store/store-ca/activity/action';
 import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
@@ -27,7 +27,9 @@ const SKIP_COUNT = 0;
 export default function Activity({ chainId, symbol }: ActivityProps) {
   const { t } = useTranslation();
   const activity = useAppCASelector((state) => state.activity);
-  const currentActivity = activity.activityMap[getCurrentActivityMapKey(chainId, symbol)];
+  const currentActivity = useMemo(() => {
+    return activity.activityMap[getCurrentActivityMapKey(chainId, symbol)] || {};
+  }, [activity.activityMap, chainId, symbol]);
 
   const dispatch = useAppCommonDispatch();
   const { passwordSeed } = useUserInfo();
@@ -68,11 +70,11 @@ export default function Activity({ chainId, symbol }: ActivityProps) {
 
   return (
     <div className="activity-wrapper">
-      {currentActivity.totalRecordCount ? (
+      {currentActivity?.totalRecordCount ? (
         <ActivityList
           data={currentActivity.data}
           chainId={chainId}
-          hasMore={currentActivity.data.length < currentActivity.totalRecordCount}
+          hasMore={currentActivity.data.length < currentActivity?.totalRecordCount}
           loadMore={loadMoreActivities}
         />
       ) : (
