@@ -3,6 +3,7 @@ import { NetworkType } from '@portkey-wallet/types/index';
 import { the2ThFailedActivityItemType } from '@portkey-wallet/types/types-ca/activity';
 import { getActivityListAsync } from './action';
 import { ActivityStateType } from './type';
+import { getCurrentActivityMapKey } from '@portkey-wallet/utils/activity';
 
 const initialState: ActivityStateType = {
   activityMap: {
@@ -35,15 +36,7 @@ export const activitySlice = createSlice({
   extraReducers: builder => {
     builder.addCase(getActivityListAsync.fulfilled, (state, action) => {
       const { data, totalRecordCount, skipCount, maxResultCount, chainId, symbol } = action.payload;
-
-      const getCurrentMapKey = () => {
-        if (!chainId && !symbol) {
-          return 'TOTAL';
-        } else {
-          return `${chainId}_${symbol}`;
-        }
-      };
-      const currentMapKey = getCurrentMapKey();
+      const currentMapKey = getCurrentActivityMapKey(chainId, symbol);
 
       state.activityMap[currentMapKey] = {
         data: skipCount === 0 ? data : [...state.activityMap[currentMapKey].data, ...data],

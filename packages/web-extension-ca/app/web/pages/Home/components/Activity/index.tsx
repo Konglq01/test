@@ -7,7 +7,7 @@ import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { useUserInfo } from 'store/Provider/hooks';
 import { transactionTypesForActivityList } from '@portkey-wallet/constants/constants-ca/activity';
 import { IActivitiesApiParams } from '@portkey-wallet/store/store-ca/activity/type';
-import { clearActivity } from '@portkey-wallet/store/store-ca/activity/slice';
+import { getCurrentActivityMapKey } from '@portkey-wallet/utils/activity';
 
 export interface ActivityProps {
   appendData?: Function;
@@ -27,14 +27,7 @@ const SKIP_COUNT = 0;
 export default function Activity({ chainId, symbol }: ActivityProps) {
   const { t } = useTranslation();
   const activity = useAppCASelector((state) => state.activity);
-  const activityMapKey = () => {
-    if (!chainId && !symbol) {
-      return 'TOTAL';
-    } else {
-      return `${chainId}_${symbol}`;
-    }
-  };
-  const currentActivity = activity.activityMap[activityMapKey()];
+  const currentActivity = activity.activityMap[getCurrentActivityMapKey(chainId, symbol)];
 
   const dispatch = useAppCommonDispatch();
   const { passwordSeed } = useUserInfo();
