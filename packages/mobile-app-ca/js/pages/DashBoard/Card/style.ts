@@ -2,6 +2,7 @@ import { StyleSheet } from 'react-native';
 import { defaultColors } from 'assets/theme';
 import { pTd } from 'utils/unit';
 import { screenWidth } from '@portkey-wallet/utils/mobile/device';
+import fonts from 'assets/theme/fonts';
 
 const { bg5, font2 } = defaultColors;
 
@@ -25,6 +26,7 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   usdtBalance: {
+    ...fonts.mediumFont,
     marginTop: pTd(14),
     fontSize: pTd(30),
     lineHeight: pTd(34),

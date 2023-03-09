@@ -11,7 +11,7 @@ interface VerifierPairProps {
   size?: number;
 }
 export default function VerifierPair({
-  guardianType = LoginType.email,
+  guardianType = LoginType.Email,
   size = 32,
   verifierSrc,
   wrapperClassName,
@@ -19,7 +19,7 @@ export default function VerifierPair({
   return (
     <div className={clsx('flex-row-center icon-pair', wrapperClassName)}>
       <CustomSvg
-        type={guardianType === LoginType.phone ? ('phone' as any) : 'email'}
+        type={guardianType === LoginType.PhoneNumber ? ('phone' as any) : 'email'}
         style={{ width: size, height: size, fontSize: size }}
       />
       <BaseVerifierIcon width={size} height={size} src={verifierSrc} />

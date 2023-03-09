@@ -11,7 +11,7 @@ import styles from '../styles';
 import Touchable from 'components/Touchable';
 import GStyles from 'assets/theme/GStyles';
 import { TextL, TextM, TextXXXL } from 'components/CommonText';
-import { LoginType } from '..';
+import { PageLoginType } from '..';
 import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { WalletInfoType } from '@portkey-wallet/types/wallet';
 import { usePin } from 'hooks/store';
@@ -24,7 +24,7 @@ import QRCode from 'react-native-qrcode-svg';
 import { useIsFocused } from '@react-navigation/native';
 import { DEVICE_TYPE } from 'constants/common';
 
-export default function LoginQRCode({ setLoginType }: { setLoginType: (type: LoginType) => void }) {
+export default function LoginQRCode({ setLoginType }: { setLoginType: (type: PageLoginType) => void }) {
   const { walletInfo, currentNetwork } = useCurrentWallet();
   const [newWallet, setNewWallet] = useState<WalletInfoType>();
   const dispatch = useAppDispatch();

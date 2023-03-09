@@ -115,6 +115,7 @@ export default function TokenInput({
               onBlur={handleAmountBlur}
               onChange={(e) => {
                 setAmount(e.target.value);
+                onChange({ amount: e.target.value, balance });
               }}
             />
             {isMain && (

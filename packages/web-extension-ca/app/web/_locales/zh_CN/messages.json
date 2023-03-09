@@ -2,5 +2,5 @@
   "pluginDesc": {
     "message": ""
   },
-  "helloWorld": { "message": "你好啊，世界！" }
+  "helloWorld": { "message": "Hello" }
 }

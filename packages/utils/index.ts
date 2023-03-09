@@ -1,9 +1,20 @@
-import { ChainType } from '@portkey-wallet/types';
+import { ChainId, ChainType, NetworkType } from '@portkey-wallet/types';
 import { isAddress as web3IsAddress } from 'web3-utils';
 import { isAelfAddress, isDIDAelfAddress } from './aelf';
 import * as uuid from 'uuid';
 
-export const addressFormat = (address: string, chainId: string | number, chainType: ChainType) => {
+/**
+ * format address like "aaa...bbb" to "ELF_aaa...bbb_AELF"
+ * @param address
+ * @param chainId
+ * @param chainType
+ * @returns
+ */
+export const addressFormat = (
+  address: string = 'address',
+  chainId: ChainId = 'AELF',
+  chainType: ChainType = 'aelf',
+): string => {
   if (chainType !== 'aelf') return address;
   const arr = address.split('_');
   if (address.includes('_') && arr.length < 3) return address;
@@ -139,6 +150,52 @@ export const handleErrorMessage = (error: any, errorText?: string) => {
   return errorText;
 };
 
+export const chainShowText = (chain: ChainId) => (chain === 'AELF' ? 'MainChain' : 'SideChain');
 export const handleErrorCode = (error: any) => {
   return handleError(error)?.code;
+};
+
+/**
+ * format information like "MainChain AELF" or "MainChain AELF Testnet"
+ * @param chainId
+ * @param isMainChain
+ * @returns
+ */
+export const formatChainInfoToShow = (chainId: ChainId = 'AELF', networkType?: NetworkType): string => {
+  if (typeof networkType === 'string')
+    return `${chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${chainId} ${networkType === 'MAIN' ? '' : 'Testnet'}`;
+
+  return `${chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${chainId}`;
+};
+
+/**
+ * this function is to format address,just like "formatStr2EllipsisStr" ---> "for...ess"
+ * @param address
+ * @param digit
+ * @param type
+ * @returns
+ */
+export const formatStr2EllipsisStr = (address = '', digit = 10, type: 'middle' | 'tail' = 'middle'): string => {
+  if (!address) return '';
+
+  const len = address.length;
+
+  if (type === 'tail') return `${address.slice(0, digit)}...`;
+
+  if (len < 2 * digit) return address;
+  const pre = address.substring(0, digit);
+  const suffix = address.substring(len - digit - 1);
+  return `${pre}...${suffix}`;
+};
+
+/**
+ * "aelf:ELF_xxx_AELF" to "ELF_xxx_AELF"
+ * @param address
+ * @returns
+ */
+export const formatAddress2NoPrefix = (address: string): string => {
+  if (address.match(/^aelf:.+/)) {
+    return address.split(':')[1];
+  }
+  return address;
 };

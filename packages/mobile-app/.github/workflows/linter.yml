@@ -58,7 +58,6 @@ jobs:
           LINTER_RULES_PATH: /
           JAVASCRIPT_ES_CONFIG_FILE: .eslintrc.json
           TYPESCRIPT_ES_CONFIG_FILE: .eslintrc.json
-          # less 只支持 postcss-less这种，需要别的自己来给super-linter提pr就行，小哥反应很快
           # CSS_FILE_NAME: .stylelintrc.json
           VALIDATE_CSS: fasle
           FILTER_REGEX_EXCLUDE: .*android/.*

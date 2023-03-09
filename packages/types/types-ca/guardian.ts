@@ -1,10 +1,4 @@
-import { TLoginStrType } from './wallet';
-
-export enum GuardianType {
-  GUARDIAN_TYPE_OF_EMAIL = 0,
-  GUARDIAN_TYPE_OF_PHONE = 1,
-}
-
+import { LoginKeyType } from './wallet';
 export interface Verifier {
   id: string; // aelf.Hash
 }
@@ -13,7 +7,7 @@ export interface Guardian {
   identifierHash: string;
   isLoginGuardian: true;
   salt: string;
-  type: TLoginStrType;
+  type: LoginKeyType;
   verifierId: string;
 }
 
@@ -31,7 +25,7 @@ export interface GuardiansInfo {
 }
 
 export interface GuardiansApprovedType {
-  type: TLoginStrType;
+  type: LoginKeyType;
   identifier: string;
   verifierId: string;
   verificationDoc: string;

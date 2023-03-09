@@ -1,16 +1,15 @@
 import PageContainer from 'components/PageContainer';
-import { useIsFetchingTokenList, useSymbolImages, useToken } from '@portkey-wallet/hooks/hooks-ca/useToken';
+import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
 import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
 import CommonInput from 'components/CommonInput';
 import { useAppCASelector } from '@portkey-wallet/hooks/hooks-ca';
-import { Dialog } from '@rneui/themed';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import gStyles from 'assets/theme/GStyles';
 import { defaultColors } from 'assets/theme';
-import React, { memo, useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList } from 'react-native';
 import CommonToast from 'components/CommonToast';
-import { TextL, TextM, TextS } from 'components/CommonText';
+import { TextL, TextS } from 'components/CommonText';
 import { pTd } from 'utils/unit';
 import Svg from 'components/Svg';
 import CommonSwitch from 'components/CommonSwitch';
@@ -25,7 +24,7 @@ import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import { useCaAddresses, useChainIdList, useWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { fetchTokenListAsync } from '@portkey-wallet/store/store-ca/assets/slice';
 import Loading from 'components/Loading';
-import { formatChainInfo } from 'utils';
+import { formatChainInfoToShow } from '@portkey-wallet/utils';
 import { FontStyles } from 'assets/theme/styles';
 import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
 
@@ -58,7 +57,7 @@ const Item = ({ isTestnet, item, onHandleToken }: ItemProps) => {
             {item.symbol}
           </TextL>
           <TextS numberOfLines={1} ellipsizeMode={'tail'} style={[FontStyles.font3]}>
-            {`${formatChainInfo(item.chainId)} ${isTestnet && 'Testnet'}`}
+            {`${formatChainInfoToShow(item.chainId)} ${isTestnet && 'Testnet'}`}
           </TextS>
         </View>
 
@@ -87,7 +86,6 @@ const ManageTokenList: React.FC<ManageTokenListProps> = () => {
   const { tokenDataShowInMarket } = useAppCASelector(state => state.tokenManagement);
 
   const [keyword, setKeyword] = useState<string>('');
-  // const [tokenList, setTokenList] = useState(tokenDataShowInMarket);
 
   const debounceWord = useDebounce(keyword, 500);
 
@@ -114,6 +112,7 @@ const ManageTokenList: React.FC<ManageTokenListProps> = () => {
           },
         })
         .then(res => {
+          console.log(res);
           setTimeout(() => {
             dispatch(fetchAllTokenListAsync({ keyword: debounceWord, chainIdArray: chainList }));
             dispatch(fetchTokenListAsync({ caAddresses: caAddressArray }));
@@ -210,7 +209,7 @@ const itemStyle = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderBottomColor: defaultColors.border6,
-    borderBottomWidth: pTd(0.5),
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   addedStyle: {
     marginRight: pTd(14),

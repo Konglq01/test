@@ -1,6 +1,6 @@
 {
   "name": "web-extension-ca",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "web-extension-ca",
   "private": true,
   "dependencies": {
@@ -155,7 +155,7 @@
       "last 1 safari version"
     ]
   },
-  "author": "huangzongzhe,hzz780",
+  "author": "hzz780, potter",
   "license": "MIT",
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": "eslint --cache --fix",

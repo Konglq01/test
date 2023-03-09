@@ -21,7 +21,6 @@ import {
 import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { GuardianMth } from 'types/guardians';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
-import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
 import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
@@ -101,7 +100,7 @@ export default function GuardiansView() {
         const result = await verification.sendVerificationCode({
           params: {
             guardianIdentifier: opGuardian?.guardianAccount as string,
-            type: LoginStrType[opGuardian?.guardianType as LoginType],
+            type: LoginType[opGuardian?.guardianType as LoginType],
             verifierId: opGuardian?.verifier?.id || '',
             chainId: DefaultChainId,
           },
@@ -247,9 +246,11 @@ export default function GuardiansView() {
         </div>
       </div>
       <CommonModal className="verify-confirm-modal" closable={false} open={tipOpen} onCancel={() => setTipOpen(false)}>
-        <p className="modal-content">{`${opGuardian?.verifier?.name ?? ''} will send a verification code to ${
-          opGuardian?.guardianAccount
-        } to verify your email address.`}</p>
+        <p className="modal-content">
+          {`${opGuardian?.verifier?.name ?? ''} will send a verification code to `}
+          <span className="bold">{opGuardian?.guardianAccount}</span>
+          {` to verify your email address.`}
+        </p>
         <div className="btn-wrapper">
           <Button onClick={() => setTipOpen(false)}>{t('Cancel')}</Button>
           <Button type="primary" onClick={verifyHandler}>
