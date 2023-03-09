@@ -1,10 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface ModalState {
+  countryCodeModal: boolean;
   accountConnectModal: boolean;
 }
 
 export const initialState: ModalState = {
+  countryCodeModal: false,
   accountConnectModal: false,
 };
 
@@ -16,9 +18,12 @@ export const ModalSlice = createSlice({
     setAccountConnectModal: (state, action: PayloadAction<boolean>) => {
       state.accountConnectModal = action.payload;
     },
+    setCountryModal: (state, action: PayloadAction<boolean>) => {
+      state.countryCodeModal = action.payload;
+    },
   },
 });
 
-export const { setAccountConnectModal } = ModalSlice.actions;
+export const { setAccountConnectModal, setCountryModal } = ModalSlice.actions;
 
 export default ModalSlice;
