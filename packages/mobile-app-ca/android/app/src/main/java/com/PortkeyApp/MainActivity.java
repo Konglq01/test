@@ -1,4 +1,4 @@
-package com.PortkeyApp;
+package com.portkey.did;
 import expo.modules.ReactActivityDelegateWrapper;
 
 import com.facebook.react.ReactActivity;

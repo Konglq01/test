@@ -31,6 +31,7 @@ const getCreateResultBySocket = ({
         },
         data => {
           console.log('onCaAccountRegister', data);
+          if (typeof data.body.registerStatus !== 'string') return;
           resolve({
             ...data.body,
             status: data.body.registerStatus,

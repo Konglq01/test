@@ -34,7 +34,7 @@ export type CaHolderManagerDto = {
   caHash?: Maybe<Scalars['String']>;
   chainId?: Maybe<Scalars['String']>;
   id?: Maybe<Scalars['String']>;
-  managers?: Maybe<Array<Maybe<ManagerInfo>>>;
+  managerInfos?: Maybe<Array<Maybe<ManagerInfo>>>;
 };
 
 export type CaHolderNftBalanceInfoDto = {
@@ -239,7 +239,7 @@ export type GuardianDto = {
   isLoginGuardian: Scalars['Boolean'];
   salt?: Maybe<Scalars['String']>;
   type: Scalars['Int'];
-  verifier?: Maybe<Scalars['String']>;
+  verifierId?: Maybe<Scalars['String']>;
 };
 
 export type LoginGuardianChangeRecordDto = {
@@ -266,8 +266,8 @@ export type LoginGuardianDto = {
 
 export type ManagerInfo = {
   __typename?: 'ManagerInfo';
+  address?: Maybe<Scalars['String']>;
   extraData?: Maybe<Scalars['String']>;
-  manager?: Maybe<Scalars['String']>;
 };
 
 export type NftCollectionDto = {

@@ -1,5 +1,5 @@
 import useVerifierList from 'hooks/useVerifierList';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { keepAliveOnPages } from 'utils/keepSWActive';
 import useUpdateRedux from './useUpdateRedux';
 import { useChainListFetch } from '@portkey-wallet/hooks/hooks-ca/chainList';
@@ -9,7 +9,6 @@ import { useRefreshTokenConfig } from '@portkey-wallet/hooks/hooks-ca/api';
 import { useUserInfo } from './hooks';
 import { request } from '@portkey-wallet/api/api-did';
 import useLocking from 'hooks/useLocking';
-import { useNavigate } from 'react-router';
 import { useActiveLockStatus } from 'hooks/useActiveLockStatus';
 
 keepAliveOnPages({});
@@ -17,17 +16,10 @@ keepAliveOnPages({});
 export default function Updater() {
   const onLocking = useLocking();
   const { passwordSeed } = useUserInfo();
-  console.log('---------passwordSeed', passwordSeed);
   useVerifierList();
   useUpdateRedux();
   useChainListFetch();
   useRefreshTokenConfig(passwordSeed);
-
-  const navigate = useNavigate();
-  // useEffect(() => {
-  //   keepAliveOnPages({});
-  //   // keepAliveOnPages({ onError: () => navigate('/unlock') });
-  // }, [navigate]);
 
   const apiUrl = useCurrentApiUrl();
 

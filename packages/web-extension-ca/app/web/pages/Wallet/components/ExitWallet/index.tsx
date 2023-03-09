@@ -42,17 +42,13 @@ export default function ExitWallet({ open, onCancel }: ExitWalletProps) {
         privateKey,
         paramsOption: {
           caHash: wallet?.caHash as string,
-          manager: {
-            managerAddress: wallet.address,
-            deviceString: `${DEVICE_TYPE},${Date.now()}`,
+          managerInfo: {
+            address: wallet.address,
+            extraData: `${DEVICE_TYPE},${Date.now()}`,
           },
         },
       });
       console.log('removeManager', 'removeManager==result', result);
-      // const { TransactionId } = result.result.message || result;
-      // await sleep(1000);
-      // const aelfInstance = getAelfInstance(currentChain.endPoint);
-      // await getTxResult(aelfInstance, TransactionId);
       logout();
       clearLocalStorage();
       setLoading(false);

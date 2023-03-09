@@ -7,7 +7,7 @@ query loginGuardianInfo($dto: GetLoginGuardianInfoDto){
         manager
         loginGuardian{
             type
-            verifier
+            verifierId
             identifierHash
             salt
             isLoginGuardian
