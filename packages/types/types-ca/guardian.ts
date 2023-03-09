@@ -1,4 +1,4 @@
-import { TLoginStrType } from './types-ca/wallet';
+import { TLoginStrType } from './wallet';
 
 export enum GuardianType {
   GUARDIAN_TYPE_OF_EMAIL = 0,
@@ -9,28 +9,30 @@ export interface Verifier {
   id: string; // aelf.Hash
 }
 export interface Guardian {
-  type: GuardianType;
-  verifier: Verifier;
+  guardianIdentifier: string;
+  identifierHash: string;
+  isLoginGuardian: true;
+  salt: string;
+  type: TLoginStrType;
+  verifierId: string;
 }
 
 export interface GuardianAccount {
   guardian: Guardian;
   value: string;
 }
-
-export interface GuardiansInfo {
-  guardianAccounts: GuardianAccount[];
-  loginGuardianAccountIndexes: number[];
-}
-
 export interface Manager {
-  managerAddress: string; //aelf.Address
-  device_string: string;
+  address: string; //aelf.Address
+  extraData: string;
+}
+export interface GuardiansInfo {
+  guardianList: { guardians: Guardian[] };
+  managerInfos: Manager[];
 }
 
 export interface GuardiansApprovedType {
   type: TLoginStrType;
-  value: string;
+  identifier: string;
   verifierId: string;
   verificationDoc: string;
   signature: string;

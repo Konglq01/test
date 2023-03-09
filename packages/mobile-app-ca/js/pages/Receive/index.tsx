@@ -1,8 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React from 'react';
 import PageContainer from 'components/PageContainer';
 import { TextL, TextM, TextXL, TextS } from 'components/CommonText';
-import { useAppCASelector } from '@portkey-wallet/hooks';
-import { AccountType } from '@portkey-wallet/types/wallet';
 import { setStringAsync } from 'expo-clipboard';
 import CommonToast from 'components/CommonToast';
 import AccountCard from 'pages/Receive/components/AccountCard';
@@ -17,14 +15,17 @@ import GStyles from 'assets/theme/GStyles';
 import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
 import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
 import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
+import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
 
 export default function Receive() {
   const { t } = useLanguage();
   const { currentNetwork } = useWallet();
 
   const tokenItem = useRouterParams<TokenItemShowType>();
-  const { chainId, symbol, imageUrl } = tokenItem;
+  const { chainId, symbol } = tokenItem;
 
+  const symbolImages = useSymbolImages();
   const currentWallet = useCurrentWalletInfo();
 
   const currentCaAddress = currentWallet?.[chainId]?.caAddress;
@@ -39,12 +40,18 @@ export default function Receive() {
     <PageContainer titleDom={t('Receive')} safeAreaColor={['blue', 'gray']} containerStyles={styles.containerStyles}>
       <TextXL style={styles.tips}>{t('You can provide QR code to receive')}</TextXL>
       <View style={styles.topWrap}>
-        <CommonAvatar
+        {/* <CommonAvatar
           title={symbol}
           svgName={'aelf-avatar'}
-          avatarSize={pTd(32)}
           imageUrl={imageUrl}
           style={styles.svgStyle}
+        /> */}
+        <CommonAvatar
+          style={styles.svgStyle}
+          title={symbol}
+          avatarSize={pTd(32)}
+          svgName={symbol === ELF_SYMBOL ? 'elf-icon' : undefined}
+          imageUrl={symbolImages?.[symbol] || ''}
         />
         <View>
           <TextL>{symbol}</TextL>

@@ -1,3 +1,4 @@
+import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
 import { ZERO } from '@portkey-wallet/constants/misc';
 import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
 import { unitConverter } from '@portkey-wallet/utils/converter';
@@ -9,7 +10,6 @@ import { useWallet } from 'hooks/store';
 import React, { memo } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { pTd } from 'utils/unit';
-
 interface TokenListItemType {
   noBalanceShow?: boolean;
   item?: any;
@@ -27,6 +27,7 @@ const TokenListItem: React.FC<TokenListItemType> = props => {
         style={itemStyle.left}
         title={item?.symbol}
         avatarSize={pTd(48)}
+        svgName={item?.symbol === ELF_SYMBOL ? 'elf-icon' : undefined}
         imageUrl={symbolImages[item?.symbol]}
       />
       <View style={itemStyle.right}>

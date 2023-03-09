@@ -131,7 +131,7 @@ const GuardianEdit: React.FC = () => {
               const req = await verification.sendVerificationCode({
                 params: {
                   type: LoginStrType[selectedType.value],
-                  guardianAccount: email,
+                  guardianIdentifier: email,
                   verifierId: selectedVerifier.id,
                   chainId: DefaultChainId,
                 },
