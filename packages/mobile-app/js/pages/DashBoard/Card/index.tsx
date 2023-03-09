@@ -4,11 +4,11 @@ import Svg from 'components/Svg';
 import { styles } from './style';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import AccountOverlay from 'components/AccountOverlay';
-import { AccountType } from '@portkey/types/wallet';
+import { AccountType } from '@portkey-wallet/types/wallet';
 import SendButton from 'components/SendButton';
 import ReceiveButton from 'components/ReceiveButton';
 import { TextM } from 'components/CommonText';
-import { useAppEOASelector } from '@portkey/hooks/hooks-eoa';
+import { useAppEOASelector } from '@portkey-wallet/hooks/hooks-eoa';
 
 interface CardProps {
   balanceShow: string;

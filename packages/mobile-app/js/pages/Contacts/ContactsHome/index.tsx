@@ -1,20 +1,20 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { FlatList, Text, View, TouchableOpacity } from 'react-native';
-// import { addressBookUpdate } from '@portkey/store/addressBook/actions';
-// import { addressFormat, isAddress } from '@portkey/utils';
-// import { NetworkType } from '@portkey/types';
+// import { addressBookUpdate } from '@portkey-wallet/store/addressBook/actions';
+// import { addressFormat, isAddress } from '@portkey-wallet/utils';
+// import { NetworkType } from '@portkey-wallet/types';
 import { useAppSelector } from 'store/hooks';
 import CommonInput from 'components/CommonInput';
 import navigationService from 'utils/navigationService';
 import Svg from 'components/Svg';
 import { pageStyles } from './style';
-import { AddressBookItem } from '@portkey/types/addressBook';
+import { AddressBookItem } from '@portkey-wallet/types/addressBook';
 import PageContainer from 'components/PageContainer';
 import { defaultColors } from 'assets/theme';
 import CommonButton from 'components/CommonButton';
 import { pTd } from 'utils/unit';
 import ContactListItem from 'components/ContactListItem';
-import { useGetELFRateQuery } from '@portkey/store/rate/api';
+import { useGetELFRateQuery } from '@portkey-wallet/store/rate/api';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { useLanguage } from 'i18n/hooks';
 interface ContactsHomeProps {

@@ -1,4 +1,4 @@
-import { AElfInterface } from '@portkey/types/aelf';
+import { AElfInterface } from '@portkey-wallet/types/aelf';
 
 export type SendOptions = {
   from?: string;

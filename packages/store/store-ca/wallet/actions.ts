@@ -1,9 +1,9 @@
-import { getCaHolder } from '@portkey/api/api-did/es/utils';
-import { DefaultChainId, NetworkList } from '@portkey/constants/constants-ca/network';
-import { ChainId, NetworkType } from '@portkey/types';
-import { CAInfo, CAInfoType, ManagerInfo } from '@portkey/types/types-ca/wallet';
-import { WalletInfoType } from '@portkey/types/wallet';
-import { checkPinInput, formatWalletInfo } from '@portkey/utils/wallet';
+import { getCaHolder } from '@portkey-wallet/api/api-did/es/utils';
+import { DefaultChainId, NetworkList } from '@portkey-wallet/constants/constants-ca/network';
+import { ChainId, NetworkType } from '@portkey-wallet/types';
+import { CAInfo, CAInfoType, ManagerInfo } from '@portkey-wallet/types/types-ca/wallet';
+import { WalletInfoType } from '@portkey-wallet/types/wallet';
+import { checkPinInput, formatWalletInfo } from '@portkey-wallet/utils/wallet';
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 import AElf from 'aelf-sdk';
 import { getChainList } from './api';

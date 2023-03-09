@@ -1,9 +1,9 @@
 import React, { useCallback, useState } from 'react';
 import { View, Text, Image } from 'react-native';
-import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
-import { getChainListAsync } from '@portkey/store/store-ca/wallet/actions';
-import { handleError } from '@portkey/utils';
-import { checkEmail } from '@portkey/utils/check';
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { getChainListAsync } from '@portkey-wallet/store/store-ca/wallet/actions';
+import { handleErrorMessage } from '@portkey-wallet/utils';
+import { checkEmail } from '@portkey-wallet/utils/check';
 import { BGStyles, FontStyles } from 'assets/theme/styles';
 import Loading from 'components/Loading';
 import { useGetGuardiansInfoWriteStore, useGetVerifierServers } from 'hooks/guardian';
@@ -11,7 +11,6 @@ import useEffectOnce from 'hooks/useEffectOnce';
 import { useLanguage } from 'i18n/hooks';
 import { useAppDispatch } from 'store/hooks';
 import myEvents from 'utils/deviceEvent';
-import { handleUserGuardiansList } from 'utils/login';
 import navigationService from 'utils/navigationService';
 import styles from '../styles';
 import Touchable from 'components/Touchable';
@@ -23,6 +22,7 @@ import Svg from 'components/Svg';
 import { pTd } from 'utils/unit';
 import qrCode from 'assets/image/pngs/QR-code.png';
 import { LoginType } from '..';
+import { handleUserGuardiansList } from '@portkey-wallet/utils/guardian';
 
 export default function LoginEmail({ setLoginType }: { setLoginType: (type: LoginType) => void }) {
   const { t } = useLanguage();
@@ -33,6 +33,7 @@ export default function LoginEmail({ setLoginType }: { setLoginType: (type: Logi
   const chainInfo = useCurrentChain('AELF');
   const getVerifierServers = useGetVerifierServers();
   const getGuardiansInfoWriteStore = useGetGuardiansInfoWriteStore();
+
   const onLogin = useCallback(async () => {
     const message = checkEmail(loginAccount);
     setErrorMessage(message);
@@ -45,13 +46,15 @@ export default function LoginEmail({ setLoginType }: { setLoginType: (type: Logi
         if (Array.isArray(chainList.payload)) _chainInfo = chainList.payload[1];
       }
       const verifierServers = await getVerifierServers(_chainInfo);
-      const holderInfo = await getGuardiansInfoWriteStore({ loginAccount }, _chainInfo);
+      const holderInfo = await getGuardiansInfoWriteStore({ guardianIdentifier: loginAccount }, _chainInfo);
       navigationService.navigate('GuardianApproval', {
         loginAccount,
         userGuardiansList: handleUserGuardiansList(holderInfo, verifierServers),
       });
     } catch (error) {
-      setErrorMessage(handleError(error));
+      console.log(error, '=====error');
+
+      setErrorMessage(handleErrorMessage(error));
     }
     Loading.hide();
   }, [loginAccount, chainInfo, getVerifierServers, getGuardiansInfoWriteStore, dispatch]);

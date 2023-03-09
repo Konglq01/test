@@ -6,23 +6,25 @@ import { useCallback, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { useAppDispatch, useGuardiansInfo, useLoading, useLoginInfo } from 'store/Provider/hooks';
 import { setPinAction } from 'utils/lib/serviceWorkerAction';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { setLocalStorage } from 'utils/storage/chromeStorage';
-import { createWallet, setManagerInfo } from '@portkey/store/store-ca/wallet/actions';
+import { createWallet, setManagerInfo } from '@portkey-wallet/store/store-ca/wallet/actions';
 import { useTranslation } from 'react-i18next';
-import { recoveryDIDWallet, registerDIDWallet } from '@portkey/api/api-did/utils/wallet';
-import { VerificationType, VerifyStatus } from '@portkey/types/verifier';
-import { isWalletError } from '@portkey/store/wallet/utils';
+import { recoveryDIDWallet, registerDIDWallet } from '@portkey-wallet/api/api-did/utils/wallet';
+import { VerificationType, VerifyStatus } from '@portkey-wallet/types/verifier';
+import { isWalletError } from '@portkey-wallet/store/wallet/utils';
 import { useHardwareBack } from 'hooks/useHardwareBack';
 import CommonModal from 'components/CommonModal';
-import { LoginStrType } from '@portkey/constants/constants-ca/guardian';
+import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
 import AElf from 'aelf-sdk';
-import { DefaultChainId } from '@portkey/constants/constants-ca/network';
-import { randomId } from '@portkey/utils';
+import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
+import { randomId } from '@portkey-wallet/utils';
 import './index.less';
 import useFetchDidWallet from 'hooks/useFetchDidWallet';
 import { setPasswordSeed } from 'store/reducers/user/slice';
 import { DEVICE_TYPE } from 'constants/index';
+import { GuardiansApprovedType } from '@portkey-wallet/types/types-ca/guardian';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 
 export default function SetWalletPin() {
   const [form] = Form.useForm();
@@ -36,7 +38,7 @@ export default function SetWalletPin() {
   const [returnOpen, setReturnOpen] = useState<boolean>();
   const { scanWalletInfo, scanCaWalletInfo, loginAccount, registerVerifier } = useLoginInfo();
   const getWalletCAAddressResult = useFetchDidWallet();
-
+  const network = useCurrentNetworkInfo();
   const { userGuardianStatus } = useGuardiansInfo();
   console.log(walletInfo, state, scanWalletInfo, scanCaWalletInfo, 'walletInfo===caWallet');
 
@@ -49,16 +51,16 @@ export default function SetWalletPin() {
       if (!registerVerifier) throw 'Missing Verifier Server';
       const result = await registerDIDWallet({
         type: LoginStrType[loginAccount.loginType],
-        loginGuardianAccount: loginAccount.guardianAccount,
-        managerAddress,
-        deviceString: `${DEVICE_TYPE},${Date.now()}`, //navigator.userAgent,
+        loginGuardianIdentifier: loginAccount.guardianAccount,
+        manager: managerAddress,
+        extraData: `${DEVICE_TYPE},${Date.now()}`, //navigator.userAgent,
         chainId: DefaultChainId,
         verifierId: registerVerifier.verifierId,
         verificationDoc: registerVerifier.verificationDoc,
         signature: registerVerifier.signature,
         context: {
           clientId: managerAddress,
-          requestId: requestId,
+          requestId,
         },
       });
       return {
@@ -69,12 +71,12 @@ export default function SetWalletPin() {
     [loginAccount, registerVerifier],
   );
 
-  const getGuardiansApproved = useCallback(() => {
+  const getGuardiansApproved: () => GuardiansApprovedType[] = useCallback(() => {
     return Object.values(userGuardianStatus ?? {})
       .filter((guardian) => guardian.status === VerifyStatus.Verified)
       .map((guardian) => ({
         type: LoginStrType[guardian.guardianType],
-        value: guardian.guardianAccount,
+        identifier: guardian.guardianAccount,
         verifierId: guardian.verifier?.id || '',
         verificationDoc: guardian.verificationDoc || '',
         signature: guardian.signature || '',
@@ -88,9 +90,9 @@ export default function SetWalletPin() {
       const guardiansApproved = getGuardiansApproved();
       const requestId = randomId();
       const result = await recoveryDIDWallet({
-        loginGuardianAccount: loginAccount.guardianAccount,
-        managerAddress,
-        deviceString: `${DEVICE_TYPE},${Date.now()}`, //navigator.userAgent,
+        loginGuardianIdentifier: loginAccount.guardianAccount,
+        manager: managerAddress,
+        extraData: `${DEVICE_TYPE},${Date.now()}`, //navigator.userAgent,
         chainId: DefaultChainId,
         guardiansApproved,
         context: {
@@ -164,7 +166,7 @@ export default function SetWalletPin() {
           type: loginAccount.loginType,
           verificationType: state === 'login' ? VerificationType.communityRecovery : VerificationType.register,
         };
-
+        console.log(managerInfo, 'managerInfo====1');
         !walletInfo.address
           ? dispatch(
               createWallet({
@@ -175,10 +177,12 @@ export default function SetWalletPin() {
             )
           : dispatch(
               setManagerInfo({
+                networkType: network.networkType,
                 pin,
                 managerInfo,
               }),
             );
+        console.log(managerInfo, 'managerInfo====');
         await setLocalStorage({
           registerStatus: 'registeredNotGetCaAddress',
         });
@@ -209,6 +213,7 @@ export default function SetWalletPin() {
     [
       setLoading,
       state,
+      network,
       createByScan,
       loginAccount,
       walletInfo,

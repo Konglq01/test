@@ -1,4 +1,4 @@
-import { NetworkType } from '@portkey/types';
+import { NetworkType } from '@portkey-wallet/types';
 
 export const NETWORK_CONFIG: {
   [key in NetworkType]: {

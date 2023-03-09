@@ -1,4 +1,4 @@
-import { customFetch } from '@portkey/utils/fetch';
+import { customFetch } from '@portkey-wallet/utils/fetch';
 
 const baseCMSUrl = 'http://192.168.66.186:1337';
 const defaultChainList = '/api/networks';

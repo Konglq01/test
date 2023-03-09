@@ -1,6 +1,10 @@
 export default {
   requestRegister: '/api/app/account/register/request',
   recoveryWallet: '/api/app/account/recovery/request',
+  guardianIdentifiers: {
+    target: '/api/app/account/guardianIdentifiers',
+    config: { method: 'GET' },
+  },
   // TODO Test api
   hubPing: '/api/app/account/hub/ping',
   getCreateResponse: 'api/app/account/hub/response',

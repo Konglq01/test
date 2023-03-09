@@ -7,41 +7,41 @@ import { TextM, TextS, TextL } from 'components/CommonText';
 import CommonButton from 'components/CommonButton';
 import ActionSheet from 'components/ActionSheet';
 import { formatChainInfo, formatStr2EllipsisStr } from 'utils';
-import { addRecentContact } from '@portkey/store/store-ca/recent/slice';
-import { isCrossChain } from '@portkey/utils/aelf';
+import { isCrossChain } from '@portkey-wallet/utils/aelf';
 import { useLanguage } from 'i18n/hooks';
-import { useAppCommonDispatch } from '@portkey/hooks';
+import { useAppCommonDispatch } from '@portkey-wallet/hooks';
 import GStyles from 'assets/theme/GStyles';
 import fonts from 'assets/theme/fonts';
 import { Image, ScreenHeight } from '@rneui/base';
-import { getContractBasic } from '@portkey/contracts/utils';
-import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+import { getContractBasic } from '@portkey-wallet/contracts/utils';
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { usePin, useWallet } from 'hooks/store';
 import { getManagerAccount } from 'utils/redux';
 import crossChainTransfer, {
   CrossChainTransferParamsType,
   intervalCrossChainTransfer,
 } from 'utils/transfer/crossChainTransfer';
-import { useCurrentNetwork } from '@portkey/hooks/network';
-import { useCaAddresses, useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
-import { timesDecimals, unitConverter } from '@portkey/utils/converter';
+import { useCurrentNetwork } from '@portkey-wallet/hooks/network';
+import { useCaAddresses, useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { timesDecimals, unitConverter } from '@portkey-wallet/utils/converter';
 import sameChainTransfer from 'utils/transfer/sameChainTransfer';
-import { addFailedActivity, removeFailedActivity } from '@portkey/store/store-ca/activity/slice';
-import useRouterParams from '@portkey/hooks/useRouterParams';
+import { addFailedActivity, removeFailedActivity } from '@portkey-wallet/store/store-ca/activity/slice';
+import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
 import CommonToast from 'components/CommonToast';
 import navigationService from 'utils/navigationService';
 import Loading from 'components/Loading';
-import { IToSendPreviewParamsType } from '@portkey/types/types-ca/routeParams';
-import { BaseToken } from '@portkey/types/types-ca/token';
-import { ContractBasic } from '@portkey/contracts/utils/ContractBasic';
-import { ZERO } from '@portkey/constants/misc';
-import { CROSS_FEE } from '@portkey/constants/constants-ca/wallet';
+import { IToSendPreviewParamsType } from '@portkey-wallet/types/types-ca/routeParams';
+import { BaseToken } from '@portkey-wallet/types/types-ca/token';
+import { ContractBasic } from '@portkey-wallet/contracts/utils/ContractBasic';
+import { ZERO } from '@portkey-wallet/constants/misc';
+import { CROSS_FEE } from '@portkey-wallet/constants/constants-ca/wallet';
 import {
   clearNftCollection,
   fetchNFTCollectionsAsync,
   fetchTokenListAsync,
-} from '@portkey/store/store-ca/assets/slice';
-import { sleep } from '@portkey/utils';
+} from '@portkey-wallet/store/store-ca/assets/slice';
+import { sleep } from '@portkey-wallet/utils';
+import { FontStyles } from 'assets/theme/styles';
 
 export interface SendHomeProps {
   route?: any;
@@ -225,7 +225,6 @@ const SendHome: React.FC<SendHomeProps> = props => {
       if (error.type === 'managerTransfer') {
         console.log(error);
         CommonToast.failError(error.error);
-        console.log('????');
         return;
       } else if (error.type === 'crossChainTransfer') {
         dispatch(
@@ -264,13 +263,15 @@ const SendHome: React.FC<SendHomeProps> = props => {
             <Image style={styles.img} source={{ uri: assetInfo?.imageUrl }} />
           )}
           <View style={styles.topLeft}>
-            <TextL style={styles.nftTitle}>{`${assetInfo.alias} #${assetInfo?.tokenId}`} </TextL>
+            <TextL style={[styles.nftTitle, fonts.mediumFont]}>{`${assetInfo.alias} #${assetInfo?.tokenId}`} </TextL>
             <TextS>{`Amount：${sendNumber}`}</TextS>
           </View>
         </View>
       ) : (
         <>
-          <Text style={styles.tokenCount}>{`- ${sendNumber} ${assetInfo?.symbol}`} </Text>
+          <Text style={[styles.tokenCount, FontStyles.font3, fonts.mediumFont]}>
+            {`- ${sendNumber} ${assetInfo?.symbol}`}{' '}
+          </Text>
           {/* <TextM style={styles.tokenUSD}>-$ -</TextM> */}
         </>
       )}
@@ -293,7 +294,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
         {/* To */}
         <View style={styles.section}>
           <View style={[styles.flexSpaceBetween]}>
-            <TextM style={[styles.blackFontColor]}>{t('To')}</TextM>
+            <TextM style={[styles.lightGrayFontColor]}>{t('To')}</TextM>
             <View style={styles.alignItemsEnd}>
               {toInfo?.name && <TextM style={[styles.blackFontColor, styles.fontBold]}>{toInfo?.name}</TextM>}
               <TextS style={styles.lightGrayFontColor}>{formatStr2EllipsisStr(toInfo?.address)}</TextS>
@@ -304,7 +305,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
         {/* more Info */}
         <View style={styles.section}>
           <View style={[styles.flexSpaceBetween]}>
-            <TextM style={[styles.blackFontColor]}>{t('Network')}</TextM>
+            <TextM style={[styles.lightGrayFontColor]}>{t('Network')}</TextM>
             <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${formatChainInfo(
               assetInfo.chainId,
             )} → ${networkInfoShow(toInfo?.address)} `}</TextM>
@@ -317,10 +318,6 @@ const SendHome: React.FC<SendHomeProps> = props => {
             <TextM style={[styles.blackFontColor, styles.fontBold]}>{t('Transaction Fee')}</TextM>
             <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${txFeeShow} ${'ELF'} `}</TextM>
           </View>
-          {/* <View style={[styles.flexSpaceBetween, styles.marginTop4]}>
-            <Text />
-            <TextS style={styles.lightGrayFontColor}>{`$ ${'-'}`}</TextS>
-          </View> */}
         </View>
 
         {isCrossChainTransfer && assetInfo.symbol === 'ELF' && <Text style={[styles.divider, styles.marginTop0]} />}
@@ -345,8 +342,6 @@ const SendHome: React.FC<SendHomeProps> = props => {
     </PageContainer>
   );
 };
-
-addRecentContact;
 
 export default memo(SendHome);
 
@@ -408,6 +403,8 @@ export const styles = StyleSheet.create({
   buttonWrapStyle: {
     flex: 1,
     justifyContent: 'flex-end',
+    paddingBottom: pTd(12),
+    paddingTop: pTd(12),
   },
   errorMessage: {
     lineHeight: pTd(16),

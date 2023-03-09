@@ -1,4 +1,4 @@
-import { ContactIndexType, ContactItemType, ContactMapType } from '@portkey/types/types-ca/contact';
+import { ContactIndexType, ContactItemType, ContactMapType } from '@portkey-wallet/types/types-ca/contact';
 
 type IContactIdMap = Record<string, ContactItemType>;
 const CHAR_CODE_A = 'A'.charCodeAt(0);

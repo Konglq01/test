@@ -1,9 +1,9 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
-import { NetworkType } from '@portkey/types';
+import { NetworkType } from '@portkey-wallet/types';
 import { useAppDispatch } from 'store/Provider/hooks';
-import { changeNetworkType } from '@portkey/store/store-ca/wallet/actions';
+import { changeNetworkType } from '@portkey-wallet/store/store-ca/wallet/actions';
 import CustomSvg from 'components/CustomSvg';
 import './index.less';
 
@@ -13,6 +13,7 @@ interface Network {
   walletType: string;
   networkType: NetworkType;
   disabled: boolean;
+  icon: string;
 }
 
 export default function SwitchNetwork() {
@@ -28,6 +29,7 @@ export default function SwitchNetwork() {
         walletType: 'aelf',
         networkType: 'TESTNET',
         disabled: false,
+        icon: 'elf-icon',
       },
       {
         key: 'aelf-Mainnet',
@@ -35,6 +37,7 @@ export default function SwitchNetwork() {
         walletType: 'aelf',
         networkType: 'MAIN',
         disabled: true,
+        icon: 'Aelf',
       },
     ],
     [],
@@ -61,7 +64,7 @@ export default function SwitchNetwork() {
             {curNet === net.key && <CustomSvg type="selected" className="selected-svg" />}
           </div>
           <div className="network-item-icon">
-            <CustomSvg type="Aelf" />
+            <CustomSvg type={net.icon as any} />
           </div>
           {t(net.name)}
         </div>

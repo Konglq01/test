@@ -2,9 +2,9 @@ import { defaultColors } from 'assets/theme';
 import GStyles from 'assets/theme/GStyles';
 import React, { memo } from 'react';
 import { Text, View, TouchableOpacity, StyleSheet } from 'react-native';
-// import { addressBookUpdate } from '@portkey/store/addressBook/actions';
-// import { addressFormat, isAddress } from '@portkey/utils';
-// import { NetworkType } from '@portkey/types';
+// import { addressBookUpdate } from '@portkey-wallet/store/addressBook/actions';
+// import { addressFormat, isAddress } from '@portkey-wallet/utils';
+// import { NetworkType } from '@portkey-wallet/types';
 import { formatStr2EllipsisStr } from 'utils';
 import { pTd } from 'utils/unit';
 

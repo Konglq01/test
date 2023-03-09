@@ -1,6 +1,6 @@
-import { useCurrentNetwork } from '@portkey/hooks/network';
-import { AccountType } from '@portkey/types/wallet';
-import { addressFormat } from '@portkey/utils';
+import { useCurrentNetwork } from '@portkey-wallet/hooks/network';
+import { AccountType } from '@portkey-wallet/types/wallet';
+import { addressFormat } from '@portkey-wallet/utils';
 import { ScreenWidth } from '@rneui/base';
 import { defaultColors } from 'assets/theme';
 import { TextM } from 'components/CommonText';
@@ -9,9 +9,9 @@ import React from 'react';
 import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { pTd } from 'utils/unit';
-import { TokenItemShowType } from '@portkey/types/types-ca/token';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { SendTokenQRDataType } from '@portkey/types/types-ca/qrcode';
+import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
+import { SendTokenQRDataType } from '@portkey-wallet/types/types-ca/qrcode';
 
 const cardWidth = ScreenWidth * 0.63;
 

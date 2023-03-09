@@ -1,14 +1,14 @@
-import { WalletInfoType } from '@portkey/types/wallet';
+import { WalletInfoType } from '@portkey-wallet/types/wallet';
 import CustomSvg from 'components/CustomSvg';
 import QRCode from 'qrcode.react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import AElf from 'aelf-sdk';
 import { useEffectOnce } from 'react-use';
-import { LoginQRData } from '@portkey/types/types-ca/qrcode';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
+import { LoginQRData } from '@portkey-wallet/types/types-ca/qrcode';
+import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { useAppDispatch } from 'store/Provider/hooks';
-import { useIntervalQueryCAInfoByAddress } from '@portkey/hooks/hooks-ca/graphql';
+import { useIntervalQueryCAInfoByAddress } from '@portkey-wallet/hooks/hooks-ca/graphql';
 import { setWalletInfoAction } from 'store/reducers/loginCache/actions';
 import './index.less';
 import { DEVICE_TYPE } from 'constants/index';

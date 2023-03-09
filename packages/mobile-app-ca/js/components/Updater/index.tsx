@@ -1,15 +1,15 @@
-import { request } from '@portkey/api/api-did';
-import { useChainListFetch } from '@portkey/hooks/hooks-ca/chainList';
+import { request } from '@portkey-wallet/api/api-did';
+import { useChainListFetch } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { service } from 'api/utils';
 import { usePin } from 'hooks/store';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { useLanguage } from 'i18n/hooks';
 import { useMemo } from 'react';
-import { useRefreshTokenConfig } from '@portkey/hooks/hooks-ca/api';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
+import { useRefreshTokenConfig } from '@portkey-wallet/hooks/hooks-ca/api';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import useLocking from 'hooks/useLocking';
 import { useCaInfoOnChain } from 'hooks/useCaInfoOnChain';
-import { useFetchSymbolImages } from '@portkey/hooks/hooks-ca/useToken';
+import { useFetchSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
 
 export default function Updater() {
   // FIXME: delete language

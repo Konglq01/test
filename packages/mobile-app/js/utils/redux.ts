@@ -1,8 +1,8 @@
 import { store } from 'store';
-import aes from '@portkey/utils/aes';
+import aes from '@portkey-wallet/utils/aes';
 import AElf from 'aelf-sdk';
-import { AccountType } from '@portkey/types/wallet';
-import { AElfWallet } from '@portkey/types/aelf';
+import { AccountType } from '@portkey-wallet/types/wallet';
+import { AElfWallet } from '@portkey-wallet/types/aelf';
 export const getState = () => {
   return store.getState();
 };

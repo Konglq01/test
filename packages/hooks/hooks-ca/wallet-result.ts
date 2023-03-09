@@ -1,10 +1,10 @@
-import Socket from '@portkey/socket/socket-did';
-import { useCurrentApiUrl } from '@portkey/hooks/hooks-ca/network';
-import { CreateWalletResult, RegisterStatus } from '@portkey/types/types-ca/wallet';
-import { requestCreateWallet } from '@portkey/api/api-did/utils/wallet';
-import { sleep } from '@portkey/utils';
+import Socket from '@portkey-wallet/socket/socket-did';
+import { useCurrentApiUrl } from '@portkey-wallet/hooks/hooks-ca/network';
+import { CreateWalletResult, RegisterStatus } from '@portkey-wallet/types/types-ca/wallet';
+import { requestCreateWallet } from '@portkey-wallet/api/api-did/utils/wallet';
+import { sleep } from '@portkey-wallet/utils';
 import { useCallback, useState } from 'react';
-import { VerificationType } from '@portkey/types/verifier';
+import { VerificationType } from '@portkey-wallet/types/verifier';
 
 const getCreateResultBySocket = ({
   type,
@@ -31,6 +31,7 @@ const getCreateResultBySocket = ({
         },
         data => {
           console.log('onCaAccountRegister', data);
+          if (typeof data.body.registerStatus !== 'string') return;
           resolve({
             ...data.body,
             status: data.body.registerStatus,

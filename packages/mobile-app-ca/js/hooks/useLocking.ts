@@ -1,4 +1,4 @@
-import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { useCallback } from 'react';
 import { useAppDispatch } from 'store/hooks';
 import { setCredentials } from 'store/user/actions';

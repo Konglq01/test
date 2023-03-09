@@ -1,4 +1,4 @@
-import { NetworkItem } from '@portkey/types/types-ca/network';
+import { NetworkItem } from '@portkey-wallet/types/types-ca/network';
 
 export const NetworkList: NetworkItem[] = [
   {

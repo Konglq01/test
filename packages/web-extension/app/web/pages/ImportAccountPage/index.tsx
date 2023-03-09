@@ -1,6 +1,6 @@
-import { WalletError } from '@portkey/store/wallet/type';
-import { isWalletError } from '@portkey/store/wallet/utils';
-import { AccountType } from '@portkey/types/wallet';
+import { WalletError } from '@portkey-wallet/store/wallet/type';
+import { isWalletError } from '@portkey-wallet/store/wallet/utils';
+import { AccountType } from '@portkey-wallet/types/wallet';
 import { Button, message } from 'antd';
 import BasicImportAccount from 'pages/components/BasicImportAccount';
 import ImportAccountResult from 'pages/components/ImportAccount/Result';

@@ -5,7 +5,7 @@ import Svg from 'components/Svg';
 import { defaultColors } from 'assets/theme';
 import { useLanguage } from 'i18n/hooks';
 import MyMenu from 'pages/MyMenu';
-import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import useLogOut from 'hooks/useLogOut';
 import HomeScreen from 'pages/Home';
 

@@ -1,15 +1,15 @@
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { useCurrentWallet } from '@portkey/hooks/hooks-ca/wallet';
-import useInterval from '@portkey/hooks/useInterval';
-import { setCAInfo } from '@portkey/store/store-ca/wallet/actions';
-import { ChainItemType } from '@portkey/store/store-ca/wallet/type';
-import { ChainId, ChainType } from '@portkey/types';
-import { isAddress } from '@portkey/utils';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
+import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import useInterval from '@portkey-wallet/hooks/useInterval';
+import { setCAInfo } from '@portkey-wallet/store/store-ca/wallet/actions';
+import { ChainItemType } from '@portkey-wallet/store/store-ca/wallet/type';
+import { ChainId, ChainType } from '@portkey-wallet/types';
+import { isAddress } from '@portkey-wallet/utils';
 import InternalMessage from 'messages/InternalMessage';
 import InternalMessageTypes from 'messages/InternalMessageTypes';
 import { useCallback } from 'react';
 import { useAppDispatch } from 'store/Provider/hooks';
-import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
+import { getHolderInfoByContract } from 'utils/sandboxUtil/getHolderInfo';
 
 export const useCaInfoOnChain = () => {
   const { walletInfo, chainList } = useCurrentWallet();
@@ -28,7 +28,7 @@ export const useCaInfoOnChain = () => {
       caHash: string;
       walletType: ChainType;
     }) => {
-      const result = await getHolderInfo({
+      const result = await getHolderInfoByContract({
         rpcUrl: chain.endPoint,
         chainType: walletType,
         address: chain.caContractAddress,
@@ -75,7 +75,7 @@ export const useCaInfoOnChain = () => {
   }, [chainList, currentNetwork.walletType, getHolderInfoByChainId, walletInfo]);
 
   const check = useCallback(
-    () => chainList?.every((chain) => walletInfo[chain.chainId as ChainId]),
+    () => chainList?.every((chain) => walletInfo[chain.chainId as ChainId] || !isAddress(chain.caContractAddress)),
     [chainList, walletInfo],
   );
 

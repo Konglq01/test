@@ -1,17 +1,17 @@
-import { TokenItemShowType } from '@portkey/types/types-eoa/token';
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { pTd } from 'utils/unit';
-import { parseInputChange } from '@portkey/utils/input';
-import { ZERO } from '@portkey/constants/misc';
+import { parseInputChange } from '@portkey-wallet/utils/input';
+import { ZERO } from '@portkey-wallet/constants/misc';
 import { defaultColors } from 'assets/theme';
 import GStyles from 'assets/theme/GStyles';
 import { Input } from '@rneui/themed';
-import { unitConverter } from '@portkey/utils/converter';
+import { unitConverter } from '@portkey-wallet/utils/converter';
 import { useLanguage } from 'i18n/hooks';
 import CommonAvatar from 'components/CommonAvatar';
-import { IToSendAssetParamsType } from '@portkey/types/types-ca/routeParams';
-import { useSymbolImages } from '@portkey/hooks/hooks-ca/useToken';
+import { IToSendAssetParamsType } from '@portkey-wallet/types/types-ca/routeParams';
+import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
+import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
 
 interface AmountTokenProps {
   balanceShow: number | string;
@@ -47,12 +47,23 @@ export default function AmountToken({
       <View style={styles.bottom}>
         <View style={styles.bottomLeft}>
           {/* <Svg icon="aelf-avatar" size={pTd(28)} /> */}
-          {symbolImages[selectedToken?.symbol] ? (
+          {/* {symbolImages[selectedToken?.symbol] ? (
             <CommonAvatar
               shapeType="circular"
               imageUrl={symbolImages[selectedToken.symbol] || ''}
               avatarSize={28}
               title={''}
+            />
+          ) : (
+            <Text style={styles.imgStyle}>{selectedToken?.symbol?.[0]}</Text>
+          )} */}
+
+          {selectedToken.symbol === ELF_SYMBOL ? (
+            <CommonAvatar
+              shapeType="circular"
+              svgName={selectedToken.symbol === ELF_SYMBOL ? 'elf-icon' : undefined}
+              imageUrl={symbolImages[selectedToken.symbol] || ''}
+              avatarSize={28}
             />
           ) : (
             <Text style={styles.imgStyle}>{selectedToken?.symbol?.[0]}</Text>

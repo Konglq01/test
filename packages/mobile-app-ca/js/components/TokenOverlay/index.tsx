@@ -4,21 +4,21 @@ import { FlatList, StyleSheet } from 'react-native';
 import { TextXL } from 'components/CommonText';
 import { ModalBody } from 'components/ModalBody';
 import CommonInput from 'components/CommonInput';
-import { useAppCASelector } from '@portkey/hooks/hooks-ca';
-import { TokenItemShowType } from '@portkey/types/types-eoa/token';
-import { filterTokenList } from '@portkey/utils/token';
-import { AccountType } from '@portkey/types/wallet';
+import { useAppCASelector } from '@portkey-wallet/hooks/hooks-ca';
+import { TokenItemShowType } from '@portkey-wallet/types/types-eoa/token';
+import { filterTokenList } from '@portkey-wallet/utils/token';
+import { AccountType } from '@portkey-wallet/types/wallet';
 import TokenListItem from 'components/TokenListItem';
 import { defaultColors } from 'assets/theme';
 import fonts from 'assets/theme/fonts';
 import { pTd } from 'utils/unit';
-import { screenHeight } from '@portkey/utils/mobile/device';
+import { screenHeight } from '@portkey-wallet/utils/mobile/device';
 import { useLanguage } from 'i18n/hooks';
-import { useAppCommonDispatch } from '@portkey/hooks';
+import { useAppCommonDispatch } from '@portkey-wallet/hooks';
 import useDebounce from 'hooks/useDebounce';
 import useEffectOnce from 'hooks/useEffectOnce';
-import { useCaAddresses, useCurrentWalletInfo, useChainIdList } from '@portkey/hooks/hooks-ca/wallet';
-import { fetchAllTokenListAsync } from '@portkey/store/store-ca/tokenManagement/action';
+import { useChainIdList } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { fetchAllTokenListAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
 import NoData from 'components/NoData';
 
 type onFinishSelectTokenType = (tokenItem: TokenItemShowType) => void;
@@ -27,7 +27,7 @@ type TokenListProps = {
   onFinishSelectToken?: onFinishSelectTokenType;
 };
 
-const TokenList = ({ onFinishSelectToken, account }: TokenListProps) => {
+const TokenList = ({ onFinishSelectToken }: TokenListProps) => {
   const { t } = useLanguage();
 
   const { tokenDataShowInMarket } = useAppCASelector(state => state.tokenManagement);
@@ -39,18 +39,17 @@ const TokenList = ({ onFinishSelectToken, account }: TokenListProps) => {
   const debounceKeyword = useDebounce(keyword, 800);
 
   const renderItem = useCallback(
-    ({ item }: { item: TokenItemShowType }) => {
-      return (
-        <TokenListItem
-          noBalanceShow
-          item={item}
-          onPress={() => {
-            OverlayModal.hide();
-            onFinishSelectToken?.(item);
-          }}
-        />
-      );
-    },
+    ({ item }: { item: any }) => (
+      <TokenListItem
+        noBalanceShow
+        key={`${item.symbol}${item.chainId}`}
+        item={item}
+        onPress={() => {
+          OverlayModal.hide();
+          onFinishSelectToken?.(item);
+        }}
+      />
+    ),
     [onFinishSelectToken],
   );
 

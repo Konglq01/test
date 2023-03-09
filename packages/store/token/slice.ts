@@ -1,9 +1,9 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
-import { ChainItemType } from '@portkey/types/chain';
-import { TokenItemType, TokenState } from '@portkey/types/types-eoa/token';
-import { AccountType } from '@portkey/types/wallet';
+import { ChainItemType } from '@portkey-wallet/types/chain';
+import { TokenItemType, TokenState } from '@portkey-wallet/types/types-eoa/token';
+import { AccountType } from '@portkey-wallet/types/wallet';
 import { fetchTokenList } from './api';
-import { isSameTypeToken } from '@portkey/utils/token';
+import { isSameTypeToken } from '@portkey-wallet/utils/token';
 
 const initialState: TokenState = {
   addedTokenData: {},

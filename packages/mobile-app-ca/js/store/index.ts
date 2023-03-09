@@ -2,7 +2,7 @@ import { Action, configureStore, ThunkAction } from '@reduxjs/toolkit';
 import { persistReducer } from 'redux-persist';
 import storeConfig from './config';
 import rootReducer from './rootReducer';
-import { rateApi } from '@portkey/store/rate/api';
+import { rateApi } from '@portkey-wallet/store/rate/api';
 
 const persistedReducer = persistReducer(storeConfig.reduxPersistConfig, rootReducer);
 

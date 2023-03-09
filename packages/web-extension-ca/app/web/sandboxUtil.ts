@@ -1,11 +1,11 @@
 import SandboxEventTypes from 'messages/SandboxEventTypes';
-import { encodedTx, getAelfInstance, getWallet } from '@portkey/utils/aelf';
+import { getWallet } from '@portkey-wallet/utils/aelf';
 import SandboxEventService, { SandboxErrorCode } from 'service/SandboxEventService';
-import { ChainType } from '@portkey/types';
-import { TokenItemType } from '@portkey/types/types-ca/token';
-import { customFetch } from '@portkey/utils/fetch';
-import { getContractBasic } from '@portkey/contracts/utils';
-import { ContractBasic } from '@portkey/contracts/utils/ContractBasic';
+import { ChainType } from '@portkey-wallet/types';
+import { TokenItemType } from '@portkey-wallet/types/types-ca/token';
+import { customFetch } from '@portkey-wallet/utils/fetch';
+import { getContractBasic } from '@portkey-wallet/contracts/utils';
+import { ContractBasic } from '@portkey-wallet/contracts/utils/ContractBasic';
 
 interface useBalancesProps {
   tokens: TokenItemType | TokenItemType[];

@@ -1,8 +1,8 @@
 import { ChainActionError } from './types';
 import AElf from 'aelf-sdk';
-import { ChainType } from '@portkey/types';
-import { enumToMap, formatRpcUrl, isUrl } from '@portkey/utils';
-import { ChainItemType } from '@portkey/types/chain';
+import { ChainType } from '@portkey-wallet/types';
+import { enumToMap, formatRpcUrl, isUrl } from '@portkey-wallet/utils';
+import { ChainItemType } from '@portkey-wallet/types/chain';
 
 type CheckRpcUrlParam = {
   chainList?: ChainItemType[];

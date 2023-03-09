@@ -1,32 +1,32 @@
 import PageContainer from 'components/PageContainer';
-import { useIsFetchingTokenList, useSymbolImages, useToken } from '@portkey/hooks/hooks-ca/useToken';
-import { TokenItemShowType } from '@portkey/types/types-ca/token';
+import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
+import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
 import CommonInput from 'components/CommonInput';
-import { useAppCASelector } from '@portkey/hooks/hooks-ca';
-import { Dialog } from '@rneui/themed';
+import { useAppCASelector } from '@portkey-wallet/hooks/hooks-ca';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import gStyles from 'assets/theme/GStyles';
 import { defaultColors } from 'assets/theme';
-import React, { memo, useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList } from 'react-native';
 import CommonToast from 'components/CommonToast';
-import { TextL, TextM, TextS } from 'components/CommonText';
+import { TextL, TextS } from 'components/CommonText';
 import { pTd } from 'utils/unit';
 import Svg from 'components/Svg';
 import CommonSwitch from 'components/CommonSwitch';
 import CommonAvatar from 'components/CommonAvatar';
 import { useLanguage } from 'i18n/hooks';
 import NoData from 'components/NoData';
-import { fetchAllTokenListAsync } from '@portkey/store/store-ca/tokenManagement/action';
+import { fetchAllTokenListAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
 import useDebounce from 'hooks/useDebounce';
-import { useAppCommonDispatch } from '@portkey/hooks';
-import { request } from '@portkey/api/api-did';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { useCaAddresses, useChainIdList, useWallet } from '@portkey/hooks/hooks-ca/wallet';
-import { fetchTokenListAsync } from '@portkey/store/store-ca/assets/slice';
+import { useAppCommonDispatch } from '@portkey-wallet/hooks';
+import { request } from '@portkey-wallet/api/api-did';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
+import { useCaAddresses, useChainIdList, useWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { fetchTokenListAsync } from '@portkey-wallet/store/store-ca/assets/slice';
 import Loading from 'components/Loading';
 import { formatChainInfo } from 'utils';
 import { FontStyles } from 'assets/theme/styles';
+import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
 
 interface ManageTokenListProps {
   route?: any;
@@ -45,6 +45,7 @@ const Item = ({ isTestnet, item, onHandleToken }: ItemProps) => {
       <CommonAvatar
         shapeType="circular"
         title={item.symbol}
+        svgName={item.symbol === ELF_SYMBOL ? 'elf-icon' : undefined}
         imageUrl={symbolImages[item.symbol]}
         avatarSize={pTd(48)}
         style={itemStyle.left}
@@ -74,7 +75,6 @@ Item.displayName = 'Item';
 const ManageTokenList: React.FC<ManageTokenListProps> = () => {
   const { t } = useLanguage();
 
-  const isLoading = useIsFetchingTokenList();
   const currentNetworkInfo = useCurrentNetworkInfo();
   const { currentNetwork } = useWallet();
 
@@ -85,10 +85,7 @@ const ManageTokenList: React.FC<ManageTokenListProps> = () => {
 
   const { tokenDataShowInMarket } = useAppCASelector(state => state.tokenManagement);
 
-  const [tokenList, setTokenList] = useState([]);
-
   const [keyword, setKeyword] = useState<string>('');
-  // const [tokenList, setTokenList] = useState(tokenDataShowInMarket);
 
   const debounceWord = useDebounce(keyword, 500);
 
@@ -115,6 +112,7 @@ const ManageTokenList: React.FC<ManageTokenListProps> = () => {
           },
         })
         .then(res => {
+          console.log(res);
           setTimeout(() => {
             dispatch(fetchAllTokenListAsync({ keyword: debounceWord, chainIdArray: chainList }));
             dispatch(fetchTokenListAsync({ caAddresses: caAddressArray }));

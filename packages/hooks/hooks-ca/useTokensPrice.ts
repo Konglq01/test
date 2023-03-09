@@ -1,4 +1,4 @@
-import { fetchTokensPriceAsync } from '@portkey/store/store-ca/assets/slice';
+import { fetchTokensPriceAsync } from '@portkey-wallet/store/store-ca/assets/slice';
 import { useMemo, useCallback, useEffect } from 'react';
 import { useAppCASelector, useAppCommonDispatch } from '../index';
 

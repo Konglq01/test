@@ -1,5 +1,5 @@
-import { UserGuardianItem, UserGuardianStatus } from '@portkey/store/store-ca/guardians/type';
-import { LoginType } from '@portkey/types/types-ca/wallet';
+import { UserGuardianItem, UserGuardianStatus } from '@portkey-wallet/store/store-ca/guardians/type';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import { GuardianItem } from 'types/guardians';
 
 export const formatDelGuardianValue = ({
@@ -15,7 +15,7 @@ export const formatDelGuardianValue = ({
 }) => {
   const guardianToRemove: GuardianItem = {
     type: opGuardian?.guardianType as LoginType,
-    value: opGuardian?.guardianAccount as string,
+    identifierHash: opGuardian?.identifierHash,
     verificationInfo: {
       id: opGuardian?.verifier?.id as string,
     },
@@ -24,13 +24,13 @@ export const formatDelGuardianValue = ({
   Object.values(userGuardianStatus ?? {})?.forEach((item: UserGuardianStatus) => {
     if (item.signature) {
       guardiansApproved.push({
-        value: item.guardianAccount,
         type: item.guardianType,
         verificationInfo: {
           id: item.verifier?.id as string,
           signature: Object.values(Buffer.from(item.signature as any, 'hex')),
           verificationDoc: item.verificationDoc as string,
         },
+        identifierHash: item.identifierHash,
       });
     }
   });

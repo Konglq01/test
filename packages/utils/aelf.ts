@@ -1,7 +1,7 @@
 import AElf from 'aelf-sdk';
-import { COMMON_PRIVATE } from '@portkey/constants';
-import { AElfInterface } from '@portkey/types/aelf';
-import { ChainId } from '@portkey/types';
+import { COMMON_PRIVATE } from '@portkey-wallet/constants';
+import { AElfInterface } from '@portkey-wallet/types/aelf';
+import { ChainId } from '@portkey-wallet/types';
 const Wallet = AElf.wallet;
 let wallet: any = null;
 

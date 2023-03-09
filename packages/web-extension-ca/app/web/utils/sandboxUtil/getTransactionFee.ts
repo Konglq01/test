@@ -1,5 +1,5 @@
-import { ChainType } from '@portkey/types';
-import { SandboxErrorCode } from '@portkey/utils/sandboxService';
+import { ChainType } from '@portkey-wallet/types';
+import { SandboxErrorCode } from '@portkey-wallet/utils/sandboxService';
 import SandboxEventTypes from 'messages/SandboxEventTypes';
 import SandboxEventService from 'service/SandboxEventService';
 

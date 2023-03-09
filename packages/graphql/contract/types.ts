@@ -1,4 +1,4 @@
-import { CaHolderManagerDto, GetCaHolderManagerInfoDto, LoginGuardianAccountDto } from './__generated__/types';
+import { CaHolderManagerDto, GetCaHolderManagerInfoDto, LoginGuardianDto } from './__generated__/types';
 
 type GenerateType<T> = {
   [K in keyof T]: T[K];
@@ -17,5 +17,5 @@ type GraphqlCommonOption<T> = T extends GraphqlRequestCommonType ? PartialOption
 export type GetCAHolderByManagerParamsType = Required<Pick<GetCaHolderManagerInfoDto, 'manager' | 'chainId'>>;
 
 export type CaHolderWithGuardian = CaHolderManagerDto & {
-  loginGuardianAccountInfo: Array<LoginGuardianAccountDto | null>;
+  loginGuardianInfo: Array<LoginGuardianDto | null>;
 };

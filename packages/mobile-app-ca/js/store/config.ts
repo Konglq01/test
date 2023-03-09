@@ -4,13 +4,13 @@ import {
   SerializableStateInvariantMiddlewareOptions,
 } from '@reduxjs/toolkit';
 import { FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE } from 'redux-persist';
-import { walletSlice } from '@portkey/store/wallet/slice';
-import { contactSlice } from '@portkey/store/store-ca/contact/slice';
-import chainSlice from '@portkey/store/network/slice';
-import { tokenBalanceSlice } from '@portkey/store/tokenBalance/slice';
-import settingsSlice from '@portkey/store/settings/slice';
-import recentSlice from '@portkey/store/store-ca/recent/slice';
-import activitySlice from '@portkey/store/store-ca/activity/slice';
+import { walletSlice } from '@portkey-wallet/store/wallet/slice';
+import { contactSlice } from '@portkey-wallet/store/store-ca/contact/slice';
+import chainSlice from '@portkey-wallet/store/network/slice';
+import { tokenBalanceSlice } from '@portkey-wallet/store/tokenBalance/slice';
+import settingsSlice from '@portkey-wallet/store/settings/slice';
+import recentSlice from '@portkey-wallet/store/store-ca/recent/slice';
+import activitySlice from '@portkey-wallet/store/store-ca/activity/slice';
 
 interface ThunkOptions<E = any> {
   extraArgument: E;

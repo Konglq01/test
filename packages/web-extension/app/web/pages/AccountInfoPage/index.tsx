@@ -6,8 +6,8 @@ import { useAppDispatch, useAppSelector, useWalletInfo } from 'store/Provider/ho
 import { useNavigate } from 'react-router';
 import { useCallback, useRef } from 'react';
 import { message } from 'antd';
-import { AddressBookError } from '@portkey/store/addressBook/types';
-import { updateAccountName } from '@portkey/store/wallet/actions';
+import { AddressBookError } from '@portkey-wallet/store/addressBook/types';
+import { updateAccountName } from '@portkey-wallet/store/wallet/actions';
 import { SecurityPrivacyType } from 'pages/SecurityPrivacy';
 import { useTranslation } from 'react-i18next';
 

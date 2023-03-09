@@ -2,6 +2,7 @@ import { StyleSheet } from 'react-native';
 import { defaultColors } from 'assets/theme';
 import { pTd } from 'utils/unit';
 import { ScreenHeight } from '@rneui/base';
+import GStyles from 'assets/theme/GStyles';
 
 export const styles = StyleSheet.create({
   pageWrap: {
@@ -23,10 +24,8 @@ export const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     justifyContent: 'flex-end',
-    paddingTop: pTd(12),
     width: pTd(375),
-    paddingLeft: pTd(20),
-    paddingRight: pTd(20),
+    ...GStyles.paddingArg(12, 20),
   },
   errorMessage: {
     lineHeight: pTd(16),

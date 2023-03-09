@@ -1,16 +1,18 @@
-import { ZERO } from '@portkey/constants/misc';
-import { BaseToken } from '@portkey/types/types-ca/token';
-import { divDecimals, unitConverter } from '@portkey/utils/converter';
+import { ZERO } from '@portkey-wallet/constants/misc';
+import { BaseToken } from '@portkey-wallet/types/types-ca/token';
+import { divDecimals, unitConverter } from '@portkey-wallet/utils/converter';
 import { Input } from 'antd';
 import clsx from 'clsx';
 import { handleKeyDown } from 'pages/Send/utils/util.keyDown';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getBalance } from 'utils/sandboxUtil/getBalance';
-import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
-import { ChainId } from '@portkey/types';
-import { useCurrentNetworkInfo } from '@portkey/hooks/hooks-ca/network';
-import { useSymbolImages } from '@portkey/hooks/hooks-ca/useToken';
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { ChainId } from '@portkey-wallet/types';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
+import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
+import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
+import CustomSvg from 'components/CustomSvg';
 
 export default function TokenInput({
   fromAccount,
@@ -81,8 +83,8 @@ export default function TokenInput({
         <div className="control">
           <div className="asset-selector">
             <div className="icon">
-              {symbolImages[token.symbol] ? (
-                <img src={symbolImages[token.symbol]} />
+              {token.symbol === ELF_SYMBOL ? (
+                <CustomSvg className="token-logo" type="elf-icon" />
               ) : (
                 <div className="custom">{token?.symbol[0]}</div>
               )}

@@ -1,26 +1,23 @@
-import { ZERO } from '@portkey/constants/misc';
-import { useSymbolImages } from '@portkey/hooks/hooks-ca/useToken';
-import { unitConverter } from '@portkey/utils/converter';
+import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
+import { ZERO } from '@portkey-wallet/constants/misc';
+import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
+import { unitConverter } from '@portkey-wallet/utils/converter';
 import { defaultColors } from 'assets/theme';
 import { FontStyles } from 'assets/theme/styles';
 import CommonAvatar from 'components/CommonAvatar';
 import { TextL, TextS } from 'components/CommonText';
-import { IconName } from 'components/Svg';
 import { useWallet } from 'hooks/store';
 import React, { memo } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { pTd } from 'utils/unit';
-
 interface TokenListItemType {
-  icon?: IconName;
-  symbol?: string;
   noBalanceShow?: boolean;
   item?: any;
   onPress?: (item: any) => void;
 }
 
 const TokenListItem: React.FC<TokenListItemType> = props => {
-  const { icon = 'aelf-avatar', symbol = 'ELF', noBalanceShow = false, onPress, item } = props;
+  const { noBalanceShow = false, onPress, item } = props;
   const { currentNetwork } = useWallet();
   const symbolImages = useSymbolImages();
 
@@ -30,6 +27,7 @@ const TokenListItem: React.FC<TokenListItemType> = props => {
         style={itemStyle.left}
         title={item?.symbol}
         avatarSize={pTd(48)}
+        svgName={item?.symbol === ELF_SYMBOL ? 'elf-icon' : undefined}
         imageUrl={symbolImages[item?.symbol]}
       />
       <View style={itemStyle.right}>
@@ -37,7 +35,7 @@ const TokenListItem: React.FC<TokenListItemType> = props => {
           <TextL numberOfLines={1} ellipsizeMode={'tail'} style={itemStyle.tokenName}>
             {item?.symbol}
           </TextL>
-          <TextS numberOfLines={1} style={[FontStyles.font7, itemStyle.chainInfo]}>
+          <TextS numberOfLines={1} style={[FontStyles.font3, itemStyle.chainInfo]}>
             {item?.chainId === 'AELF' ? 'MainChain ' : 'SideChain '} {item?.chainId}{' '}
             {currentNetwork === 'TESTNET' && 'Testnet'}
           </TextS>

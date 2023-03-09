@@ -1,4 +1,4 @@
-import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
+import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { useCallback } from 'react';
 // import { useNavigate } from 'react-router';
 import { useLockWallet } from 'utils/lib/serviceWorkerAction';

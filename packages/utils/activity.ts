@@ -1,7 +1,7 @@
 import { unitConverter } from './converter';
-import { DEFAULT_AMOUNT, DEFAULT_DECIMAL, DEFAULT_DIGITS } from '@portkey/constants/constants-ca/activity';
-import { ZERO } from '@portkey/constants/misc';
-import { MAIN_CHAIN, MAIN_CHAIN_ID, SIDE_CHAIN, TEST_NET } from '@portkey/constants/constants-ca/activity';
+import { DEFAULT_AMOUNT, DEFAULT_DECIMAL, DEFAULT_DIGITS } from '@portkey-wallet/constants/constants-ca/activity';
+import { ZERO } from '@portkey-wallet/constants/misc';
+import { MAIN_CHAIN, MAIN_CHAIN_ID, SIDE_CHAIN, TEST_NET } from '@portkey-wallet/constants/constants-ca/activity';
 
 export function transNetworkText(chainId: string, isTestnet: boolean): string {
   return `${chainId === MAIN_CHAIN_ID ? MAIN_CHAIN : SIDE_CHAIN} ${chainId}${isTestnet ? ' ' + TEST_NET : ''}`;

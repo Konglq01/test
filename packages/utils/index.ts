@@ -1,4 +1,4 @@
-import { ChainType } from '@portkey/types';
+import { ChainType } from '@portkey-wallet/types';
 import { isAddress as web3IsAddress } from 'web3-utils';
 import { isAelfAddress, isDIDAelfAddress } from './aelf';
 import * as uuid from 'uuid';
@@ -127,9 +127,18 @@ export const isExtension = () => process.env.DEVICE === 'extension';
 
 export const randomId = () => uuid.v4().replace(/-/g, '');
 
-export const handleError = (error: any, errorText?: string) => {
-  error = error?.error || error;
+export const handleError = (error: any) => {
+  return error?.error || error;
+};
+
+export const handleErrorMessage = (error: any, errorText?: string) => {
+  error = handleError(error);
+  if (!error) return errorText;
   if (typeof error === 'string') return error;
   if (typeof error.message === 'string') return error.message;
   return errorText;
+};
+
+export const handleErrorCode = (error: any) => {
+  return handleError(error)?.code;
 };

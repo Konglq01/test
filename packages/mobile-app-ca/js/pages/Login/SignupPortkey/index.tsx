@@ -7,18 +7,18 @@ import { ImageBackground, StyleSheet, View } from 'react-native';
 import CommonButton from 'components/CommonButton';
 import GStyles from 'assets/theme/GStyles';
 import { useLanguage } from 'i18n/hooks';
-import { checkEmail, EmailError } from '@portkey/utils/check';
+import { checkEmail, EmailError } from '@portkey-wallet/utils/check';
 import CommonInput from 'components/CommonInput';
 import navigationService from 'utils/navigationService';
 import background from '../img/background.png';
 import Svg from 'components/Svg';
 import { BGStyles, FontStyles } from 'assets/theme/styles';
-import { isIos, screenHeight, screenWidth } from '@portkey/utils/mobile/device';
+import { isIos, screenHeight, screenWidth } from '@portkey-wallet/utils/mobile/device';
 import { useGetGuardiansInfo, useGetVerifierServers } from 'hooks/guardian';
-import { handleError } from '@portkey/utils';
-import { useCurrentChain } from '@portkey/hooks/hooks-ca/chainList';
+import { handleErrorMessage } from '@portkey-wallet/utils';
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { useAppDispatch } from 'store/hooks';
-import { getChainListAsync } from '@portkey/store/store-ca/wallet/actions';
+import { getChainListAsync } from '@portkey-wallet/store/store-ca/wallet/actions';
 import Loading from 'components/Loading';
 import myEvents from 'utils/deviceEvent';
 import useEffectOnce from 'hooks/useEffectOnce';
@@ -48,17 +48,17 @@ function SignupEmail() {
       }
       await getVerifierServers(_chainInfo);
       try {
-        const guardiansInfo = await getGuardiansInfo({ loginAccount: email }, _chainInfo);
-        if (guardiansInfo.guardianAccounts) {
+        const guardiansInfo = await getGuardiansInfo({ guardianIdentifier: email }, _chainInfo);
+        if (guardiansInfo?.guardianAccounts || guardiansInfo?.guardianList) {
           Loading.hide();
           return setErrorMessage(EmailError.alreadyRegistered);
         }
       } catch (error) {
-        console.debug(error, '====error');
+        console.log(error, '====error');
       }
       navigationService.navigate('SelectVerifier', { loginAccount: email });
     } catch (error) {
-      setErrorMessage(handleError(error));
+      setErrorMessage(handleErrorMessage(error));
     }
     Loading.hide();
   }, [chainInfo, dispatch, email, getGuardiansInfo, getVerifierServers]);

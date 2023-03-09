@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { ContactIndexType, ContactMapType } from '@portkey/types/types-ca/contact';
+import { ContactIndexType, ContactMapType } from '@portkey-wallet/types/types-ca/contact';
 import {
   fetchContactListAsync,
   addContactAction,

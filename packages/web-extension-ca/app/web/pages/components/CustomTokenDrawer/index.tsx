@@ -1,4 +1,4 @@
-import { AccountAssetItem, AccountAssets, TokenItemShowType } from '@portkey/types/types-ca/token';
+import { AccountAssetItem, AccountAssets, TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
 import { DrawerProps } from 'antd';
 import CustomSvg from 'components/CustomSvg';
 import DropdownSearch from 'components/DropdownSearch';
@@ -6,12 +6,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAssetInfo, useTokenInfo, useUserInfo, useWalletInfo } from 'store/Provider/hooks';
 import BaseDrawer from '../BaseDrawer';
-import { fetchAssetAsync } from '@portkey/store/store-ca/assets/slice';
+import { fetchAssetAsync } from '@portkey-wallet/store/store-ca/assets/slice';
 import './index.less';
-import { divDecimals, unitConverter } from '@portkey/utils/converter';
-import { useCaAddresses, useChainIdList } from '@portkey/hooks/hooks-ca/wallet';
-import { fetchAllTokenListAsync } from '@portkey/store/store-ca/tokenManagement/action';
-import { useSymbolImages } from '@portkey/hooks/hooks-ca/useToken';
+import { divDecimals, unitConverter } from '@portkey-wallet/utils/converter';
+import { useCaAddresses, useChainIdList } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { fetchAllTokenListAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
+import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
+import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
 interface CustomSelectProps extends DrawerProps {
   onChange?: (v: AccountAssetItem, type: 'token' | 'nft') => void;
   onClose?: () => void;
@@ -67,7 +68,11 @@ export default function CustomTokenDrawer({
           onClick={onChange?.bind(undefined, token, 'token')}>
           <div className="icon">
             <div className="custom">
-              {symbolImages[token.symbol] ? <img src={symbolImages[token.symbol]} /> : token?.symbol?.slice(0, 1)}
+              {token.symbol === ELF_SYMBOL ? (
+                <CustomSvg className="token-logo" type="elf-icon" />
+              ) : (
+                token?.symbol?.slice(0, 1)
+              )}
             </div>
           </div>
           <div className="info">
@@ -89,7 +94,7 @@ export default function CustomTokenDrawer({
         </div>
       );
     },
-    [isTestNet, onChange, symbolImages],
+    [isTestNet, onChange],
   );
 
   const renderReceiveToken = useCallback(
@@ -113,7 +118,11 @@ export default function CustomTokenDrawer({
           onClick={onChange?.bind(undefined, tokenTmp, 'token')}>
           <div className="icon">
             <div className="custom">
-              {symbolImages[token.symbol] ? <img src={symbolImages[token.symbol]} /> : token?.symbol?.slice(0, 1)}
+              {token.symbol === ELF_SYMBOL ? (
+                <CustomSvg className="token-logo" type="elf-icon" />
+              ) : (
+                token?.symbol?.slice(0, 1)
+              )}
             </div>
           </div>
           <div className="info">
@@ -125,7 +134,7 @@ export default function CustomTokenDrawer({
         </div>
       );
     },
-    [isTestNet, onChange, symbolImages],
+    [isTestNet, onChange],
   );
 
   const renderNft = useCallback(

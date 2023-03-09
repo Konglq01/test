@@ -4,18 +4,18 @@ import {
   CAInfo,
   DeviceType,
   ManagerInfo,
-} from '@portkey/types/types-ca/wallet';
-import { VerificationType } from '@portkey/types/verifier';
-import { clearTimeoutInterval, setTimeoutInterval } from '@portkey/utils/interval';
+} from '@portkey-wallet/types/types-ca/wallet';
+import { VerificationType } from '@portkey-wallet/types/verifier';
+import { clearTimeoutInterval, setTimeoutInterval } from '@portkey-wallet/utils/interval';
 import Loading from 'components/Loading';
 import CommonToast from 'components/CommonToast';
 import { queryFailAlert } from './login';
 import { AppDispatch } from 'store';
-import { ContractBasic } from '@portkey/contracts/utils/ContractBasic';
-import { request } from '@portkey/api/api-did';
-import Signalr from '@portkey/socket';
-import { listenList } from '@portkey/constants/constants-ca/socket';
-import { LoginQRData } from '@portkey/types/types-ca/qrcode';
+import { ContractBasic } from '@portkey-wallet/contracts/utils/ContractBasic';
+import { request } from '@portkey-wallet/api/api-did';
+import Signalr from '@portkey-wallet/socket';
+import { listenList } from '@portkey-wallet/constants/constants-ca/socket';
+import { LoginQRData } from '@portkey-wallet/types/types-ca/qrcode';
 
 class SignalrDid extends Signalr {
   public Ack(clientId: string, requestId: string) {
@@ -150,11 +150,11 @@ export async function addManager({
   managerAddress?: LoginQRData['address'];
   deviceType?: LoginQRData['deviceType'];
 }) {
-  return contract.callSendMethod('AddManager', address, {
+  return contract.callSendMethod('AddManagerInfo', address, {
     caHash,
-    manager: {
-      managerAddress,
-      deviceString: `${deviceType !== undefined ? deviceType + ',' : ''}${Date.now()}`,
+    managerInfo: {
+      address: managerAddress,
+      extraData: `${deviceType !== undefined ? deviceType + ',' : ''}${Date.now()}`,
     },
   });
 }

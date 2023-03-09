@@ -1,24 +1,24 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import navigationService from 'utils/navigationService';
-import { getBalance } from '@portkey/utils/balance';
+import { getBalance } from '@portkey-wallet/utils/balance';
 import { useAppDispatch } from 'store/hooks';
-import { useCurrentAccountTokenList } from '@portkey/hooks/hooks-eoa/useToken';
+import { useCurrentAccountTokenList } from '@portkey-wallet/hooks/hooks-eoa/useToken';
 import { View, TouchableOpacity, FlatList } from 'react-native';
 import Svg from 'components/Svg';
-import { TokenItemShowType } from '@portkey/types/types-eoa/token';
-import { updateBalance } from '@portkey/store/tokenBalance/slice';
-import { clearMarketToken } from '@portkey/store/token/slice';
+import { TokenItemShowType } from '@portkey-wallet/types/types-eoa/token';
+import { updateBalance } from '@portkey-wallet/store/tokenBalance/slice';
+import { clearMarketToken } from '@portkey-wallet/store/token/slice';
 import { TextM } from 'components/CommonText';
 import { defaultColors } from 'assets/theme';
 import { pTd } from 'utils/unit';
 import TokenListItem from 'components/TokenListItem';
 import CommonToast from 'components/CommonToast';
-import { useGetELFRateQuery } from '@portkey/store/rate/api';
+import { useGetELFRateQuery } from '@portkey-wallet/store/rate/api';
 import { useTokenContract } from 'contexts/useInterface/hooks';
 import { useFocusEffect } from '@react-navigation/native';
 import { useLanguage } from 'i18n/hooks';
-import { useAppEOASelector } from '@portkey/hooks/hooks-eoa';
+import { useAppEOASelector } from '@portkey-wallet/hooks/hooks-eoa';
 
 let timer: any;
 

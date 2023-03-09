@@ -1,6 +1,6 @@
-import { useCurrentWalletInfo } from '@portkey/hooks/hooks-ca/wallet';
-import { ChainId } from '@portkey/types';
-import { SendTokenQRDataType } from '@portkey/types/types-ca/qrcode';
+import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { ChainId } from '@portkey-wallet/types';
+import { SendTokenQRDataType } from '@portkey-wallet/types/types-ca/qrcode';
 import clsx from 'clsx';
 import Copy from 'components/Copy';
 import CustomSvg from 'components/CustomSvg';
@@ -63,7 +63,7 @@ export default function Receive() {
           <div className="name">My Wallet Address to Receive</div>
         </div>
         <div className="token-info">
-          {symbol === 'ELF' ? <CustomSvg type="Aelf" /> : <div className="icon">{symbol?.[0]}</div>}
+          {symbol === 'ELF' ? <CustomSvg type="elf-icon" /> : <div className="icon">{symbol?.[0]}</div>}
           <p className="symbol">{symbol}</p>
           <p className="network">{`${isMainChain ? 'MainChain' : 'SideChain'} ${chainId} ${isTestNet}`}</p>
         </div>
