@@ -9,3 +9,8 @@ export const LoginStrType: { [x in LoginType]: TLoginStrType } = {
   [LoginType.email]: 'Email',
   [LoginType.phone]: 'PhoneNumber',
 };
+
+export const LoginNumType: { [x in TLoginStrType]: LoginType } = {
+  Email: LoginType.email,
+  PhoneNumber: LoginType.phone,
+};

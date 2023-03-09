@@ -88,13 +88,13 @@ export const useDeviceList = () => {
     if (error || !data || !data.caHolderManagerInfo || data.caHolderManagerInfo.length < 1) return [];
 
     const caHolderManagerInfo = data.caHolderManagerInfo[0];
-    const managers = caHolderManagerInfo?.managers || [];
+    const managers = caHolderManagerInfo?.managerInfos || [];
     return managers
       .map(item => {
-        // TODO: check ALL deviceString
+        // TODO: extraData need decode
         const extraDataArray = (item?.extraData || '').split(',').map(item => Number(item));
         let deviceType: DeviceType = 0,
-          loginTime = undefined;
+          loginTime: number | undefined = undefined;
         const firstNum = extraDataArray[0];
         if (firstNum !== undefined && !isNaN(firstNum)) {
           if (DeviceType[firstNum] !== undefined) {
@@ -116,7 +116,7 @@ export const useDeviceList = () => {
           deviceType,
           loginTime,
           deviceTypeInfo: DEVICE_TYPE_INFO[deviceType],
-          managerAddress: item?.manager,
+          managerAddress: item?.address,
         };
       })
       .reverse();

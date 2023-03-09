@@ -2,10 +2,11 @@ import { TLoginStrType } from '@portkey-wallet/types/types-ca/wallet';
 import { request } from '..';
 
 interface CheckVerificationCodeProps {
+  type: TLoginStrType;
   baseUrl?: string;
   verifierId: string;
   chainId: string | number;
-  guardianAccount: string;
+  guardianIdentifier: string;
   verifierSessionId: string;
   verificationCode: string;
 }
@@ -16,10 +17,11 @@ interface ErrorBack {
 }
 
 export async function checkVerificationCode({
+  type,
   baseUrl,
   chainId,
   verifierId,
-  guardianAccount,
+  guardianIdentifier,
   verificationCode,
   verifierSessionId,
 }: CheckVerificationCodeProps): Promise<{
@@ -30,10 +32,11 @@ export async function checkVerificationCode({
   return await request.verify.checkVerificationCode({
     baseURL: baseUrl,
     params: {
+      type,
       verifierId,
       verifierSessionId,
       verificationCode,
-      guardianAccount,
+      guardianIdentifier,
       chainId,
     },
   });

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 import { Button, message } from 'antd';
 import SettingHeader from 'pages/components/SettingHeader';
 import CustomSvg from 'components/CustomSvg';
-import { useSymbolImages, useToken } from '@portkey-wallet/hooks/hooks-ca/useToken';
+import { useToken } from '@portkey-wallet/hooks/hooks-ca/useToken';
 import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
 import DropdownSearch from 'components/DropdownSearch';
 import { useTranslation } from 'react-i18next';
@@ -11,6 +11,7 @@ import { useAppDispatch, useTokenInfo, useUserInfo, useWalletInfo } from 'store/
 import { fetchAllTokenListAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
 import { useChainIdList } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import './index.less';
+import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
 
 export default function AddToken() {
   const { t } = useTranslation();
@@ -25,7 +26,6 @@ export default function AddToken() {
   const { currentNetwork } = useWalletInfo();
   const chainIdArray = useChainIdList();
   const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'Testnet' : ''), [currentNetwork]);
-  const symbolImages = useSymbolImages();
 
   useEffect(() => {
     passwordSeed && appDispatch(fetchAllTokenListAsync({ keyword: filterWord, chainIdArray }));
@@ -79,8 +79,8 @@ export default function AddToken() {
     (item: TokenItemShowType) => (
       <div className="token-item" key={`${item.symbol}-${item.chainId}`}>
         <div className="token-item-content">
-          {symbolImages[item.symbol] ? (
-            <img className="token-logo" src={symbolImages[item.symbol]} />
+          {item.symbol === ELF_SYMBOL ? (
+            <CustomSvg className="token-logo" type="elf-icon" />
           ) : (
             <div className="token-logo custom-word-logo">{item.symbol?.[0] || ''}</div>
           )}
@@ -94,7 +94,7 @@ export default function AddToken() {
         <div className="token-item-action">{renderTokenItem(item)}</div>
       </div>
     ),
-    [isTestNet, renderTokenItem, symbolImages],
+    [isTestNet, renderTokenItem],
   );
 
   return (

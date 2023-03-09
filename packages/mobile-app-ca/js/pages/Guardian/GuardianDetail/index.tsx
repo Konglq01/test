@@ -67,7 +67,7 @@ export default function GuardianDetail() {
       const req = await verification.sendVerificationCode({
         params: {
           type: LoginStrType[guardian.guardianType],
-          guardianAccount: guardian.guardianAccount,
+          guardianIdentifier: guardian.guardianAccount,
           verifierId: guardian.verifier?.id,
           chainId: DefaultChainId,
         },
@@ -128,8 +128,8 @@ export default function GuardianDetail() {
       if (loginIndex === -1) {
         Loading.show();
         try {
-          const guardiansInfo = await getGuardiansInfo({ loginAccount: guardian.guardianAccount });
-          if (guardiansInfo.guardianAccounts) {
+          const guardiansInfo = await getGuardiansInfo({ guardianIdentifier: guardian.guardianAccount });
+          if (guardiansInfo?.guardianList?.guardians?.length) {
             Loading.hide();
             ActionSheet.alert({
               title2: t(`This account address is already a login account and cannot be used`),
@@ -141,10 +141,14 @@ export default function GuardianDetail() {
             });
             return;
           }
-        } catch (error) {
-          console.debug(error, '====error');
+        } catch (error: any) {
+          if (error.code !== '3002') {
+            CommonToast.fail('Setup failed');
+            return;
+          }
+        } finally {
+          Loading.hide();
         }
-        Loading.hide();
       }
 
       ActionSheet.alert({

@@ -14,7 +14,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { TextM } from 'components/CommonText';
 import GStyles from 'assets/theme/GStyles';
 import { FontStyles } from 'assets/theme/styles';
-import { isIos, screenHeight, screenWidth } from '@portkey/utils/mobile/device';
+import { isIos, screenHeight, screenWidth } from '@portkey-wallet/utils/mobile/device';
 
 // import { useAppCASelector } from '@portkey-wallet/hooks';
 

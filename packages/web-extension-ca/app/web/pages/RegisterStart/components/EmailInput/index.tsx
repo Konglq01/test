@@ -8,7 +8,6 @@ import { NetworkItem } from '@portkey-wallet/types/types-ca/network';
 import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
 import { ChainItemType } from '@portkey-wallet/store/store-ca/wallet/type';
 import { checkEmail, EmailError } from '@portkey-wallet/utils/check';
-import { contractErrorHandler } from 'utils/tryErrorHandler';
 interface EmailInputProps {
   currentNetwork: NetworkItem;
   currentChain?: ChainItemType;
@@ -38,21 +37,17 @@ const EmailInput = forwardRef(
             address: currentChain.caContractAddress,
             chainType: currentNetwork.walletType,
             paramsOption: {
-              loginGuardianAccount: email as string,
+              guardianIdentifier: email as string,
             },
           });
-          console.log(checkResult, 'checkResult===GetHolderInfo');
-          if (checkResult.result.guardiansInfo?.guardianAccounts?.length > 0) {
+          if (checkResult.guardianList?.guardians?.length > 0) {
             isHasAccount = true;
           }
         } catch (error: any) {
-          console.log(error, 'validateEmail===');
-          if (error?.message?.indexOf('Not found')) {
-            isHasAccount = false;
-          } else if (error?.Error?.Message === 'Invalid signature') {
+          if (error?.error?.code?.toString() === '3002') {
             isHasAccount = false;
           } else {
-            throw contractErrorHandler(error);
+            throw error?.error?.message || 'GetHolderInfo error';
           }
         }
 

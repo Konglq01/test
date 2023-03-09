@@ -11,7 +11,7 @@ import { BGStyles } from 'assets/theme/styles';
 import navigationService from 'utils/navigationService';
 import Touchable from 'components/Touchable';
 import { useAppDispatch } from 'store/hooks';
-import { usePreventHardwareBack, useSetBiometrics } from '@portkey-wallet/hooks/mobile';
+import { usePreventHardwareBack } from '@portkey-wallet/hooks/mobile';
 import biometric from 'assets/image/pngs/biometric.png';
 import { pTd } from 'utils/unit';
 import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
@@ -20,11 +20,12 @@ import { CAInfo } from '@portkey-wallet/types/types-ca/wallet';
 import Loading from 'components/Loading';
 import { setCAInfo } from '@portkey-wallet/store/store-ca/wallet/actions';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
-import { handleError } from '@portkey-wallet/utils';
+import { handleErrorMessage } from '@portkey-wallet/utils';
 import { VerificationType } from '@portkey-wallet/types/verifier';
 import CommonToast from 'components/CommonToast';
 import { useIntervalGetResult } from 'hooks/login';
 import useEffectOnce from 'hooks/useEffectOnce';
+import { useSetBiometrics } from 'hooks/useBiometrics';
 const ScrollViewProps = { disabled: true };
 export default function SetBiometrics() {
   usePreventHardwareBack();
@@ -98,7 +99,7 @@ export default function SetBiometrics() {
       await setBiometrics(true);
       await getResult();
     } catch (error) {
-      setErrorMessage(handleError(error, 'Failed To Verify'));
+      setErrorMessage(handleErrorMessage(error, 'Failed To Verify'));
     }
   }, [getResult, pin, setBiometrics]);
   const onSkip = useCallback(async () => {

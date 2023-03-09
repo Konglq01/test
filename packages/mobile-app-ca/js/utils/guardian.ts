@@ -2,18 +2,21 @@ import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type'
 import { VerifierInfo } from '@portkey-wallet/types/verifier';
 import { GuardiansStatus } from 'pages/Guardian/types';
 import { ContractBasic } from '@portkey-wallet/contracts/utils/ContractBasic';
+import { handleVerificationDoc } from '@portkey-wallet/utils/guardian';
 
 const getGuardiansApproved = (userGuardiansList: UserGuardianItem[], guardiansStatus: GuardiansStatus) => {
   return userGuardiansList
     .map(guardian => {
       if (!guardiansStatus[guardian.key] || !guardiansStatus[guardian.key].verifierInfo) return null;
+      const verificationDoc = guardiansStatus[guardian.key].verifierInfo?.verificationDoc || '';
+      const { guardianIdentifier } = handleVerificationDoc(verificationDoc);
       return {
-        value: guardian.guardianAccount,
+        identifierHash: guardianIdentifier,
         type: guardian.guardianType,
         verificationInfo: {
           id: guardian.verifier?.id,
           signature: Object.values(Buffer.from(guardiansStatus[guardian.key].verifierInfo?.signature as any, 'hex')),
-          verificationDoc: guardiansStatus[guardian.key].verifierInfo?.verificationDoc,
+          verificationDoc,
         },
       };
     })
@@ -29,7 +32,7 @@ export function deleteGuardian(
   guardiansStatus: GuardiansStatus,
 ) {
   const guardianToRemove = {
-    value: guardianItem.guardianAccount,
+    identifierHash: guardianItem.identifierHash,
     type: guardianItem.guardianType,
     verificationInfo: {
       id: guardianItem.verifier?.id,
@@ -52,8 +55,9 @@ export function addGuardian(
   userGuardiansList: UserGuardianItem[],
   guardiansStatus: GuardiansStatus,
 ) {
+  const { guardianIdentifier } = handleVerificationDoc(verifierInfo.verificationDoc);
   const guardianToAdd = {
-    value: guardianItem.guardianAccount,
+    identifierHash: guardianIdentifier,
     type: guardianItem.guardianType,
     verificationInfo: {
       id: guardianItem.verifier?.id,
@@ -79,14 +83,14 @@ export function editGuardian(
   guardiansStatus: GuardiansStatus,
 ) {
   const guardianToUpdatePre = {
-    value: preGuardianItem.guardianAccount,
+    identifierHash: preGuardianItem.identifierHash,
     type: preGuardianItem.guardianType,
     verificationInfo: {
       id: preGuardianItem.verifier?.id,
     },
   };
   const guardianToUpdateNew = {
-    value: guardianItem.guardianAccount,
+    identifierHash: preGuardianItem.identifierHash,
     type: guardianItem.guardianType,
     verificationInfo: {
       id: guardianItem.verifier?.id,
@@ -107,16 +111,12 @@ export function setLoginAccount(
   caHash: string,
   guardianItem: UserGuardianItem,
 ) {
-  return contract?.callSendMethod('SetGuardianAccountForLogin', address, {
+  return contract?.callSendMethod('SetGuardianForLogin', address, {
     caHash,
-    guardianAccount: {
-      value: guardianItem.guardianAccount,
-      guardian: {
-        type: guardianItem.guardianType,
-        verifier: {
-          id: guardianItem.verifier?.id,
-        },
-      },
+    guardian: {
+      type: guardianItem.guardianType,
+      verifierId: guardianItem.verifier?.id,
+      identifierHash: guardianItem.identifierHash,
     },
   });
 }
@@ -127,26 +127,22 @@ export function cancelLoginAccount(
   caHash: string,
   guardianItem: UserGuardianItem,
 ) {
-  return contract?.callSendMethod('UnsetGuardianAccountForLogin', address, {
+  return contract?.callSendMethod('UnsetGuardianForLogin', address, {
     caHash,
-    guardianAccount: {
-      value: guardianItem.guardianAccount,
-      guardian: {
-        type: guardianItem.guardianType,
-        verifier: {
-          id: guardianItem.verifier?.id,
-        },
-      },
+    guardian: {
+      type: guardianItem.guardianType,
+      verifierId: guardianItem.verifier?.id,
+      identifierHash: guardianItem.identifierHash,
     },
   });
 }
 
 export function removeManager(contract: ContractBasic, address: string, caHash: string) {
-  return contract?.callSendMethod('RemoveManager', address, {
+  return contract?.callSendMethod('RemoveManagerInfo', address, {
     caHash,
-    manager: {
-      managerAddress: address,
-      deviceString: new Date().getTime(),
+    managerInfo: {
+      address,
+      extraData: new Date().getTime(),
     },
   });
 }
