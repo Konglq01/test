@@ -20,7 +20,6 @@ import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { useGetCurrentCAContract } from 'hooks/contract';
 import { setLoginAccount } from 'utils/guardian';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
-import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
 import { GuardiansStatusItem } from '../types';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network-test2';
 import { request } from '@portkey-wallet/api/api-did';
@@ -103,7 +102,7 @@ export default function VerifierDetails() {
         Loading.show();
         const rst = await request.verify.checkVerificationCode({
           params: {
-            type: LoginStrType[guardianItem?.guardianType as LoginType],
+            type: LoginType[guardianItem?.guardianType as LoginType],
             verificationCode: code,
             guardianIdentifier: guardianItem.guardianAccount,
             ...requestCodeResult,
@@ -166,7 +165,7 @@ export default function VerifierDetails() {
     try {
       const req = await verification.sendVerificationCode({
         params: {
-          type: LoginStrType[guardianItem?.guardianType as LoginType],
+          type: LoginType[guardianItem?.guardianType as LoginType],
           guardianIdentifier: guardianItem?.guardianAccount,
           verifierId: guardianItem?.verifier?.id,
           chainId: DefaultChainId,

@@ -9,10 +9,10 @@ import BaseVerifierIcon from 'components/BaseVerifierIcon';
 import CommonSelect from 'components/CommonSelect1';
 import { useTranslation } from 'react-i18next';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
-import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verification } from 'utils/api';
 import './index.less';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 
 export default function SelectVerifier() {
   const { verifierMap } = useGuardiansInfo();
@@ -43,7 +43,7 @@ export default function SelectVerifier() {
 
   const verifyHandler = useCallback(async () => {
     try {
-      if (!loginAccount || !LoginStrType[loginAccount.loginType] || !loginAccount.guardianAccount)
+      if (!loginAccount || !LoginType[loginAccount.loginType] || !loginAccount.guardianAccount)
         return message.error('User registration information is invalid, please fill in the registration method again');
       if (!selectItem) return message.error('Can not get verification');
 
@@ -51,7 +51,7 @@ export default function SelectVerifier() {
       const result = await verification.sendVerificationCode({
         params: {
           guardianIdentifier: loginAccount.guardianAccount,
-          type: LoginStrType[loginAccount.loginType],
+          type: LoginType[loginAccount.loginType],
           verifierId: selectItem.id,
           chainId: DefaultChainId,
         },

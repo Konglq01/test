@@ -8,7 +8,6 @@ import {
   DeviceType,
   LoginType,
   RegisterStatus,
-  TLoginStrType,
 } from '@portkey-wallet/types/types-ca/wallet';
 import { WalletState } from '@portkey-wallet/store/store-ca/wallet/type';
 import { VerificationType } from '@portkey-wallet/types/verifier';
