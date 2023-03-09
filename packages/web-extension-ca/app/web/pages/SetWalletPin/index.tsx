@@ -200,15 +200,15 @@ export default function SetWalletPin() {
           managerAddress: _walletInfo.address,
         });
       } catch (error: any) {
-        setLoading(false);
         console.log(error, 'onCreate==error');
         const walletError = isWalletError(error);
         if (walletError) return message.error(walletError);
         if (error?.message || error?.error?.message) return message.error(error?.message || error?.error?.message);
         const errorString = typeof error === 'string' ? error : 'Something error';
         message.error(walletError || errorString);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     },
     [
       setLoading,
