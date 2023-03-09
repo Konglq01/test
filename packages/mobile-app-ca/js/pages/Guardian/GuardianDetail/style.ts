@@ -26,7 +26,7 @@ export const pageStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   verifierInfoWrap: {
-    borderTopWidth: pTd(1),
+    borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: border6,
     height: pTd(56),
     flexDirection: 'row',

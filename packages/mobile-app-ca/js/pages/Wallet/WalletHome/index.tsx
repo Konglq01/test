@@ -81,7 +81,8 @@ const WalletHome: React.FC<WalletHomeProps> = () => {
       </ScrollView>
 
       <CommonButton
-        containerStyle={[GStyles.paddingTop(pTd(16)), GStyles.marginArg(0, 4)]}
+        type="outline"
+        containerStyle={[GStyles.paddingTop(pTd(16)), GStyles.marginArg(0, 4), BorderStyles.border7]}
         buttonStyle={[BorderStyles.border7]}
         titleStyle={FontStyles.font12}
         onPress={() => {

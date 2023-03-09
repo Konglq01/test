@@ -75,6 +75,9 @@
           color: @font-13;
         }
       }
+      .no-amount {
+        height: 8px;
+      }
       .nft-amount {
         padding: 0 24px;
         width: 100vw;
@@ -180,8 +183,16 @@
             font-size: 14px;
             color: @font-11;
           }
+          .address-wrap {
+            display: flex;
+            gap: 4px;
+            .copy-address {
+              width: 12px;
+              height: 12px;
+            }
+          }
         }
-        .custom-svg {
+        .right-arrow {
           position: absolute;
           left: 50%;
           top: 50%;

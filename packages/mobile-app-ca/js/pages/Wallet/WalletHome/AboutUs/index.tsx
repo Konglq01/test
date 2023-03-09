@@ -6,13 +6,14 @@ import { pTd } from 'utils/unit';
 import { defaultColors } from 'assets/theme';
 import { useLanguage } from 'i18n/hooks';
 import { TextM } from 'components/CommonText';
+import * as Application from 'expo-application';
 
 const AboutUs = () => {
   const { t } = useLanguage();
   return (
     <PageContainer titleDom={t('About Us')} safeAreaColor={['blue', 'gray']} containerStyles={styles.pageContainer}>
       <Svg icon="app-blue-logo" oblongSize={[pTd(62), pTd(64)]} iconStyle={styles.logo} />
-      <TextM style={styles.version}>V 1.0.0</TextM>
+      <TextM style={styles.version}>V {Application.nativeApplicationVersion}</TextM>
     </PageContainer>
   );
 };
