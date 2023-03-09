@@ -45,9 +45,8 @@ const recentPersistConfig = {
 };
 
 const activityPersistConfig = {
-  key: recentSlice.name,
+  key: activitySlice.name,
   storage: AsyncStorage,
-  whitelist: ['failedActivityMap'],
 };
 
 const assetsPersistConfig = {
