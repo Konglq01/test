@@ -84,6 +84,8 @@ export default function SelectVerifier() {
     }
   }, [dispatch, loginAccount, navigate, selectItem, setLoading]);
 
+  const verifierShow = useMemo(() => Object.values(verifierMap ?? {}).slice(0, 3), [verifierMap]);
+
   return (
     <div className="common-page select-verifier-wrapper">
       <PortKeyTitle leftElement leftCallBack={() => navigate('/register/start/create')} />
@@ -95,14 +97,12 @@ export default function SelectVerifier() {
         <CommonSelect className="verifier-select" value={selectVal} onChange={handleChange} items={selectOptions} />
         <p className="popular-title">{t('Popular')}</p>
         <ul className="popular-content">
-          {Object.values(verifierMap ?? {})
-            .slice(0, 3)
-            ?.map((item) => (
-              <li key={item.name} className="popular-item" onClick={() => handleChange(item.id)}>
-                <BaseVerifierIcon src={item.imageUrl} rootClassName="popular-item-image" />
-                <p className="popular-item-name">{item.name}</p>
-              </li>
-            ))}
+          {verifierShow?.map((item) => (
+            <li key={item.name} className="popular-item" onClick={() => handleChange(item.id)}>
+              <BaseVerifierIcon src={item.imageUrl} rootClassName="popular-item-image" />
+              <p className="popular-item-name">{item.name}</p>
+            </li>
+          ))}
         </ul>
         <Button className="confirm-btn" type="primary" onClick={() => setOpen(true)}>
           {t('Confirm')}
