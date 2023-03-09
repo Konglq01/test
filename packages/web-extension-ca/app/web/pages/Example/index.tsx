@@ -4,6 +4,7 @@ import { setCountryModal } from 'store/reducers/modal/slice';
 
 export default function Example() {
   const dispatch = useAppDispatch();
+
   return (
     <div>
       <Button
