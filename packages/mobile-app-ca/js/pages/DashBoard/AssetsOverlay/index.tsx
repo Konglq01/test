@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import OverlayModal from 'components/OverlayModal';
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { TextL, TextS, TextXL } from 'components/CommonText';
 import { ModalBody } from 'components/ModalBody';
 import CommonInput from 'components/CommonInput';
@@ -172,7 +172,6 @@ const AssetList = ({ account }: TokenListProps) => {
       />
     );
   }, []);
-
   return (
     <ModalBody modalBodyType="bottom" style={styles.modalStyle}>
       <TextXL style={[styles.title, FontStyles.font5]}>{t('Select Assets')}</TextXL>
@@ -224,7 +223,7 @@ export default {
 
 export const styles = StyleSheet.create({
   modalStyle: {
-    height: screenHeight - pTd(100),
+    height: screenHeight - pTd(120),
   },
   title: {
     textAlign: 'center',

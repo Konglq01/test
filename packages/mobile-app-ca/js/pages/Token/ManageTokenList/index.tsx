@@ -64,7 +64,9 @@ const Item = ({ isTestnet, item, onHandleToken }: ItemProps) => {
         {item.isDefault ? (
           <Svg icon="lock" size={pTd(20)} iconStyle={itemStyle.addedStyle} />
         ) : (
-          <CommonSwitch value={!!item.isAdded} onChange={() => onHandleToken(item, item.isAdded ? 'delete' : 'add')} />
+         <TouchableOpacity activeOpacity={1} onPress={() => onHandleToken(item, item.isAdded ? 'delete' : 'add')} >
+            <CommonSwitch disabled={true} value={!!item.isAdded} />
+          </TouchableOpacity>
         )}
       </View>
     </TouchableOpacity>
@@ -113,9 +115,9 @@ const ManageTokenList: React.FC<ManageTokenListProps> = () => {
         })
         .then(res => {
           console.log(res);
-          setTimeout(() => {
-            dispatch(fetchAllTokenListAsync({ keyword: debounceWord, chainIdArray: chainList }));
-            dispatch(fetchTokenListAsync({ caAddresses: caAddressArray }));
+          setTimeout(async () => {
+            await dispatch(fetchAllTokenListAsync({ keyword: debounceWord, chainIdArray: chainList }));
+            await dispatch(fetchTokenListAsync({ caAddresses: caAddressArray }));
             Loading.hide();
 
             CommonToast.success('Success');

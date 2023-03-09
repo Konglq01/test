@@ -17,6 +17,7 @@ export const pageStyles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     width: pTd(110),
+    marginBottom: pTd(36),
   },
   nameInputStyle: {
     color: font5,
