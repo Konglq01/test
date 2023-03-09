@@ -24,7 +24,7 @@ import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import { useCaAddresses, useChainIdList, useWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { fetchTokenListAsync } from '@portkey-wallet/store/store-ca/assets/slice';
 import Loading from 'components/Loading';
-import { formatChainInfo } from 'utils';
+import { formatChainInfoToShow } from '@portkey-wallet/utils';
 import { FontStyles } from 'assets/theme/styles';
 import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
 
@@ -57,7 +57,7 @@ const Item = ({ isTestnet, item, onHandleToken }: ItemProps) => {
             {item.symbol}
           </TextL>
           <TextS numberOfLines={1} ellipsizeMode={'tail'} style={[FontStyles.font3]}>
-            {`${formatChainInfo(item.chainId)} ${isTestnet && 'Testnet'}`}
+            {`${formatChainInfoToShow(item.chainId)} ${isTestnet && 'Testnet'}`}
           </TextS>
         </View>
 

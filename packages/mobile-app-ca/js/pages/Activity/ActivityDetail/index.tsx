@@ -26,7 +26,8 @@ import useEffectOnce from 'hooks/useEffectOnce';
 import { useLanguage } from 'i18n/hooks';
 import React, { useCallback, useMemo, useState } from 'react';
 import { StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { formatStr2EllipsisStr, formatTransferTime } from 'utils';
+import { formatTransferTime } from 'utils';
+import { formatStr2EllipsisStr } from '@portkey-wallet/utils';
 import navigationService from 'utils/navigationService';
 import { pTd } from 'utils/unit';
 

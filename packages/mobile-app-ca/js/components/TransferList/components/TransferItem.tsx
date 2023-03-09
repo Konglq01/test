@@ -4,7 +4,9 @@ import GStyles from 'assets/theme/GStyles';
 import { useLanguage } from 'i18n/hooks';
 import React, { memo, useCallback, useMemo, useRef } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { formatChainInfo, formatStr2EllipsisStr, formatTransferTime } from 'utils';
+import { formatTransferTime } from 'utils';
+import { formatChainInfoToShow, formatStr2EllipsisStr } from '@portkey-wallet/utils';
+
 import { pTd } from 'utils/unit';
 import { ActivityItemType } from '@portkey-wallet/types/types-ca/activity';
 import { TransactionTypes, transactionTypesMap } from '@portkey-wallet/constants/constants-ca/activity';
@@ -121,9 +123,9 @@ const ActivityItem: React.FC<ActivityItemPropsType> = ({ item, onPress }) => {
 
           {item?.transactionType && !hiddenArr.includes(item?.transactionType) && (
             <Text style={[itemStyle.centerStatus, FontStyles.font3]}>
-              {formatChainInfo(item?.fromChainId)}
+              {formatChainInfoToShow(item?.fromChainId)}
               {'-->'}
-              {formatChainInfo(item?.toChainId)}
+              {formatChainInfoToShow(item?.toChainId)}
             </Text>
           )}
         </View>
