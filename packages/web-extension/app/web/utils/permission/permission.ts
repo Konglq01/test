@@ -1,8 +1,3 @@
-/**
- * @file permission.js
- * @author huangzongzhe
- */
-
 export function getApplicationPermissions(permissions: any[], domain: string) {
   const indexList: number[] = [];
   const permissionsTemp = permissions.filter((permission, index) => {
