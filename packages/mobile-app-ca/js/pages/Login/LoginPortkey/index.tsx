@@ -36,7 +36,7 @@ export default function LoginPortkey() {
         safeAreaColor={safeAreaColor}
         scrollViewProps={scrollViewProps}
         hideHeader>
-        <Svg icon="logo-icon" size={pTd(60)} iconStyle={styles.logoIconStyle} />
+        {/* <Svg icon="logo-icon" size={pTd(60)} iconStyle={styles.logoIconStyle} />
         <TextXXXL style={[styles.titleStyle, FontStyles.font11]}>{t('Log In To Portkey')}</TextXXXL>
         {loginType === 'email' ? (
           <LoginEmail setLoginType={setLoginType} />
@@ -48,7 +48,8 @@ export default function LoginPortkey() {
           style={[GStyles.flexRow, GStyles.itemCenter, styles.networkRow]}>
           <TextM style={[FontStyles.font11, styles.networkTip]}>{currentNetworkInfo.name}</TextM>
           <Svg size={pTd(16)} icon="down-arrow" color={FontStyles.font11.color} />
-        </Touchable>
+        </Touchable> */}
+        <TextXXXL style={{ color: 'red' }}>{process.env.ENVIRONMENT_PATH}</TextXXXL>
       </PageContainer>
     </ImageBackground>
   );
