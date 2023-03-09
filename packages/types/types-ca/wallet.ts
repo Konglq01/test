@@ -11,11 +11,13 @@ export type ManagerInfo = {
 };
 
 export enum LoginType {
-  email,
-  phone,
+  Email,
+  PhoneNumber,
+  Google,
+  Apple,
 }
 
-export type TLoginStrType = 'Email' | 'PhoneNumber';
+export type LoginKeyType = string;
 
 export type ThreeWayLogin = 'Google' | 'Apple';
 

@@ -1,12 +1,12 @@
 import { GuardiansApprovedType } from '@portkey-wallet/types/types-ca/guardian';
-import { TLoginStrType } from '@portkey-wallet/types/types-ca/wallet';
+import { LoginKeyType } from '@portkey-wallet/types/types-ca/wallet';
 import { VerificationType } from '@portkey-wallet/types/verifier';
 import { request } from '..';
 import { IContext } from '../types';
 
 interface RegisterDIDWalletParams extends IContext {
   baseUrl?: string;
-  type: TLoginStrType;
+  type: LoginKeyType;
   loginGuardianIdentifier: string; //account
   manager: string;
   extraData: string;
@@ -81,10 +81,9 @@ export const setWalletName = ({ nickname, baseURL = '' }: { baseURL?: string; ni
     },
   });
 };
-
 interface FetchCreateWalletParams {
   verificationType?: VerificationType;
-  type: TLoginStrType;
+  type: LoginKeyType;
   loginGuardianType: string;
   managerUniqueId: string;
   baseUrl?: string;

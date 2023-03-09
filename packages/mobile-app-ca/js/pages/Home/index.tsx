@@ -11,7 +11,7 @@ import { contractQueries } from '@portkey-wallet/graphql/index';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { getManagerAccount } from 'utils/redux';
-import { usePin } from 'hooks/store';
+import { useGuardiansInfo, usePin } from 'hooks/store';
 import { getContractBasic } from '@portkey-wallet/contracts/utils';
 import AElf from 'aelf-sdk';
 import { customFetch } from '@portkey-wallet/utils/fetch';
@@ -36,6 +36,9 @@ export default function HomeScreen() {
   const chainInfo = useCurrentChain('AELF');
   const { connectUrl } = useCurrentNetworkInfo();
   const getHolderInfo = useGetHolderInfo();
+  const { userGuardiansList, preGuardian } = useGuardiansInfo();
+  console.log(userGuardiansList, '=====userGuardiansList');
+
   return (
     <SafeAreaBox>
       <ScrollView>

@@ -23,7 +23,7 @@ export default function SignCard() {
       dispatch(
         setLoginAccountAction({
           guardianAccount: email,
-          loginType: LoginType.email,
+          loginType: LoginType.Email,
           createType: 'register',
         }),
       );

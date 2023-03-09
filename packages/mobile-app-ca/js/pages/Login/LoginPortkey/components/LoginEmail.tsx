@@ -21,10 +21,10 @@ import { TextL } from 'components/CommonText';
 import Svg from 'components/Svg';
 import { pTd } from 'utils/unit';
 import qrCode from 'assets/image/pngs/QR-code.png';
-import { LoginType } from '..';
+import { PageLoginType } from '..';
 import { handleUserGuardiansList } from '@portkey-wallet/utils/guardian';
 
-export default function LoginEmail({ setLoginType }: { setLoginType: (type: LoginType) => void }) {
+export default function LoginEmail({ setLoginType }: { setLoginType: (type: PageLoginType) => void }) {
   const { t } = useLanguage();
   const dispatch = useAppDispatch();
   const [loading] = useState<boolean>();

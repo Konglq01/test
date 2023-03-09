@@ -1,8 +1,8 @@
-import { TLoginStrType } from '@portkey-wallet/types/types-ca/wallet';
+import { LoginKeyType } from '@portkey-wallet/types/types-ca/wallet';
 import { request } from '..';
 
 interface CheckVerificationCodeProps {
-  type: TLoginStrType;
+  type: LoginKeyType;
   baseUrl?: string;
   verifierId: string;
   chainId: string | number;
