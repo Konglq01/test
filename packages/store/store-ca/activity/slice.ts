@@ -1,16 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { NetworkType } from '@portkey-wallet/types/index';
 import { the2ThFailedActivityItemType } from '@portkey-wallet/types/types-ca/activity';
 import { getActivityListAsync } from './action';
 import { ActivityStateType } from './type';
 import { getCurrentActivityMapKey } from '@portkey-wallet/utils/activity';
 
 const initialState: ActivityStateType = {
-  activityMap: {
-    TOTAL: { maxResultCount: 10, skipCount: 0, data: [], totalRecordCount: 0 },
-    AELF_ELF: { maxResultCount: 10, skipCount: 0, data: [], totalRecordCount: 0 },
-    tDVW_ELF: { maxResultCount: 10, skipCount: 0, data: [], totalRecordCount: 0 },
-  },
+  activityMap: {},
   isFetchingActivities: false,
   failedActivityMap: {},
 };
