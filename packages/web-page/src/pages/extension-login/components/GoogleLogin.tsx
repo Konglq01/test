@@ -19,9 +19,14 @@ export default function GoogleLoginCom() {
   });
   return (
     <>
-      <GoogleLogin onSuccess={tokenResponse => console.log(tokenResponse, 'GoogleLogin==')} auto_select={false} />
+      <GoogleLogin
+        onError={(...err) => {
+          console.log(err, 'GoogleLogin===error');
+        }}
+        onSuccess={tokenResponse => console.log(tokenResponse, 'GoogleLogin==')}
+        auto_select={false}
+      />
       <Button onClick={() => login()}>Google</Button>
-      {/* <Button onClick={() => loginTap()}>Google Tap</Button> */}
     </>
   );
 }
