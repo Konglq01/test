@@ -1,8 +1,3 @@
-/**
- * @file utils/getHostname
- * @author huangzongzhe
- */
-
 export default function getHostname() {
   let host = location.hostname || location.host;
   const protocol = location.href;

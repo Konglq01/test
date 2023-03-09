@@ -1,7 +1,3 @@
-/**
- * @file testNew
- * @author huangzongzhe
- */
 /* global portkey_ca */
 
 // century renew blade meadow faith evil uniform work discover poet ripple drill
@@ -369,7 +365,6 @@ document.addEventListener('Portkey_ca#initialized', (result) => {
     );
   };
 
-  // 根据hostname, address, contractAddress查询
   // checkPermissionDefault.onclick = function () {
   //     portkey_ca.api({
   //         appName: 'hzzTest',
