@@ -13,11 +13,11 @@ import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { useEffectOnce } from 'react-use';
-import { shortenCharacters } from 'utils/reg';
 import './index.less';
 import { useIsTestnet } from 'hooks/useActivity';
 import { dateFormat } from 'utils';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { addressFormat } from '@portkey-wallet/utils';
 
 export interface ITransactionQuery {
   item: ActivityItemType;
@@ -136,39 +136,44 @@ export default function Transaction() {
   }, [activityItem.timestamp, status.style, status.text, t]);
 
   const fromToUI = useCallback(() => {
-    const { from, fromAddress, fromChainId, to, toAddress, toChainId } = activityItem;
-    const transFromAddress = `ELF_${fromAddress}_${fromChainId}`;
-    const transToAddress = `ELF_${toAddress}_${toChainId}`;
+    const { from, fromAddress, fromChainId, to, toAddress, toChainId, transactionType } = activityItem;
+    const transFromAddress = addressFormat(fromAddress, fromChainId, 'aelf');
+    const transToAddress = addressFormat(toAddress, toChainId, 'aelf');
+
+    /* Hidden during [SocialRecovery, AddManager, RemoveManager] */
     return (
-      <div className="account-wrap">
-        <p className="label">
-          <span className="left">{t('From')}</span>
-          <span className="right">{t('To')}</span>
-        </p>
-        <div className="value">
-          <div className="content">
-            <span className="left name">{from}</span>
-            {fromAddress && (
-              <span className="left address-wrap">
-                <span>{formatStr2EllipsisStr(transFromAddress, [7, 4])}</span>
-                <Copy toCopy={transFromAddress} iconClassName="copy-address" />
-              </span>
-            )}
-          </div>
-          <CustomSvg type="RightArrow" className="right-arrow" />
-          <div className="content">
-            <span className="right name">{to}</span>
-            {toAddress && (
-              <span className="right address-wrap">
-                <span>{formatStr2EllipsisStr(transToAddress, [7, 4])}</span>
-                <Copy toCopy={transToAddress} iconClassName="copy-address" />
-              </span>
-            )}
+      transactionType &&
+      !hiddenTransactionTypeArr.includes(transactionType) && (
+        <div className="account-wrap">
+          <p className="label">
+            <span className="left">{t('From')}</span>
+            <span className="right">{t('To')}</span>
+          </p>
+          <div className="value">
+            <div className="content">
+              <span className="left name">{from}</span>
+              {fromAddress && (
+                <span className="left address-wrap">
+                  <span>{formatStr2EllipsisStr(transFromAddress, [7, 4])}</span>
+                  <Copy toCopy={transFromAddress} iconClassName="copy-address" />
+                </span>
+              )}
+            </div>
+            <CustomSvg type="RightArrow" className="right-arrow" />
+            <div className="content">
+              <span className="right name">{to}</span>
+              {toAddress && (
+                <span className="right address-wrap">
+                  <span>{formatStr2EllipsisStr(transToAddress, [7, 4])}</span>
+                  <Copy toCopy={transToAddress} iconClassName="copy-address" />
+                </span>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )
     );
-  }, [activityItem, t]);
+  }, [activityItem, hiddenTransactionTypeArr, t]);
 
   const networkUI = useCallback(() => {
     /* Hidden during [SocialRecovery, AddManager, RemoveManager] */

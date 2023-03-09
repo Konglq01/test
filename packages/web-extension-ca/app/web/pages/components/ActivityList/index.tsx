@@ -19,6 +19,7 @@ import { removeFailedActivity } from '@portkey-wallet/store/store-ca/activity/sl
 import { useCurrentChainList } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import aes from '@portkey-wallet/utils/aes';
+import { addressFormat } from '@portkey-wallet/utils';
 
 export interface IActivityListProps {
   data?: ActivityItemType[];
@@ -76,7 +77,7 @@ export default function ActivityList({ data, chainId, hasMore, loadMore }: IActi
   const fromAndUsdUI = useCallback(
     (item: ActivityItemType) => {
       const { fromAddress, fromChainId, priceInUsd, nftInfo } = item;
-      const transFromAddress = `ELF_${fromAddress}_${fromChainId}`;
+      const transFromAddress = addressFormat(fromAddress, fromChainId, 'aelf');
 
       return (
         <p className="row-2">

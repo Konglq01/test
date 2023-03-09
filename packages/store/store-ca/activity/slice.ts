@@ -5,10 +5,11 @@ import { getActivityListAsync } from './action';
 import { ActivityStateType } from './type';
 
 const initialState: ActivityStateType = {
-  maxResultCount: 10,
-  skipCount: 0,
-  data: [],
-  totalRecordCount: 0,
+  activityMap: {
+    TOTAL: { maxResultCount: 10, skipCount: 0, data: [], totalRecordCount: 0 },
+    AELF_ELF: { maxResultCount: 10, skipCount: 0, data: [], totalRecordCount: 0 },
+    tDVW_ELF: { maxResultCount: 10, skipCount: 0, data: [], totalRecordCount: 0 },
+  },
   isFetchingActivities: false,
   failedActivityMap: {},
 };
@@ -18,9 +19,6 @@ export const activitySlice = createSlice({
   name: 'activity',
   initialState: initialState,
   reducers: {
-    addPage: (state, { payload }: { payload: NetworkType }) => {
-      state.skipCount += state.maxResultCount;
-    },
     addFailedActivity: (state, { payload }: { payload: the2ThFailedActivityItemType }) => {
       state.failedActivityMap[payload?.transactionId] = payload;
     },
@@ -36,15 +34,29 @@ export const activitySlice = createSlice({
   },
   extraReducers: builder => {
     builder.addCase(getActivityListAsync.fulfilled, (state, action) => {
-      const { data, totalRecordCount, skipCount, maxResultCount } = action.payload;
-      state.data = [...state.data, ...data];
-      state.totalRecordCount = totalRecordCount;
-      state.skipCount = skipCount;
-      state.maxResultCount = maxResultCount;
+      const { data, totalRecordCount, skipCount, maxResultCount, chainId, symbol } = action.payload;
+
+      const getCurrentMapKey = () => {
+        if (!chainId && !symbol) {
+          return 'TOTAL';
+        } else {
+          return `${chainId}_${symbol}`;
+        }
+      };
+      const currentMapKey = getCurrentMapKey();
+
+      state.activityMap[currentMapKey] = {
+        data: skipCount === 0 ? data : [...state.activityMap[currentMapKey].data, ...data],
+        totalRecordCount,
+        skipCount,
+        maxResultCount,
+        chainId,
+        symbol,
+      };
     });
   },
 });
 
-export const { addPage, addFailedActivity, removeFailedActivity, clearState, clearActivity } = activitySlice.actions;
+export const { addFailedActivity, removeFailedActivity, clearState, clearActivity } = activitySlice.actions;
 
 export default activitySlice;
