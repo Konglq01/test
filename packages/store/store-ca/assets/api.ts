@@ -1,4 +1,3 @@
-import { mockAssetsData, mockNFTSeriesData, mockNFTsData, mockTokenData } from './data';
 import { request } from '@portkey-wallet/api/api-did';
 import { NetworkType } from '@portkey-wallet/types/index';
 import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';

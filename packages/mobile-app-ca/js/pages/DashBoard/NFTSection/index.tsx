@@ -14,6 +14,7 @@ import { useWallet } from 'hooks/store';
 import Touchable from 'components/Touchable';
 import { ChainId } from '@portkey-wallet/types';
 import { useRoute } from '@react-navigation/native';
+import useLockCallback from 'hooks/useLockCallback';
 
 export interface OpenCollectionObjType {
   // key = symbol+chainId
@@ -24,10 +25,6 @@ export interface OpenCollectionObjType {
   };
 }
 
-type NFTSectionPropsType = {
-  getAccountBalance?: () => void;
-};
-
 type NFTCollectionProps = NFTCollectionItemShowType & {
   isCollapsed: boolean;
   openCollectionObj: OpenCollectionObjType;
@@ -37,21 +34,21 @@ type NFTCollectionProps = NFTCollectionItemShowType & {
   loadMoreItem: (symbol: string, chainId: ChainId, pageNum: number) => void;
 };
 
-function areEqual(prevProps: NFTCollectionProps, nextProps: NFTCollectionProps) {
-  return false;
-  // return nextProps.isCollapsed === prevProps.isCollapsed && nextProps.children.length === prevProps.children.length;
-}
+// TODO make the list fluently
+// function areEqual(prevProps: NFTCollectionProps, nextProps: NFTCollectionProps) {
+//   return false;
+//    return nextProps.isCollapsed === prevProps.isCollapsed && nextProps.children.length === prevProps.children.length;
+// }
 
 const NFTCollection: React.FC<NFTCollectionProps> = memo((props: NFTCollectionProps) => {
   const { symbol, isCollapsed } = props;
-  // const dispatch = useAppCommonDispatch();
 
   return <NFTCollectionItem key={symbol} collapsed={isCollapsed} {...props} />;
-}, areEqual);
+});
 
 NFTCollection.displayName = 'NFTCollection';
 
-export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
+export default function NFTSection() {
   const { t } = useLanguage();
   const caAddresses = useCaAddresses();
   const { currentNetwork, walletInfo } = useWallet();
@@ -64,7 +61,6 @@ export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
   const [reFreshing] = useState(false);
   const [openCollectionObj, setOpenCollectionObj] = useState<OpenCollectionObjType>({});
   const { clearType } = useRoute<any>();
-  console.log('clearTypeclearType', clearType);
 
   const fetchNFTList = useCallback(() => {
     if (caAddresses.length === 0) return;
@@ -90,8 +86,8 @@ export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
     [openCollectionObj],
   );
 
-  const openItem = useCallback(
-    (symbol: string, chainId: ChainId, itemCount: number) => {
+  const openItem = useLockCallback(
+    async (symbol: string, chainId: ChainId, itemCount: number) => {
       const currentCaAddress = walletInfo?.caInfo?.[currentNetwork]?.[chainId]?.caAddress;
 
       const key = `${symbol}${chainId}`;
@@ -104,7 +100,7 @@ export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
         },
       };
 
-      dispatch(
+      await dispatch(
         fetchNFTAsync({
           symbol,
           chainId,
@@ -159,7 +155,6 @@ export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
         keyExtractor={(item: NFTCollectionItemShowType) => item?.symbol + item.chainId}
         onRefresh={() => {
           setOpenCollectionObj({});
-          getAccountBalance?.();
           fetchNFTList();
         }}
         onEndReached={() => {

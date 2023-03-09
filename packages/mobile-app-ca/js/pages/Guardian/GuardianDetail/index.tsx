@@ -1,8 +1,8 @@
 import GStyles from 'assets/theme/GStyles';
 import CommonButton from 'components/CommonButton';
-import { TextM } from 'components/CommonText';
+import { TextL, TextM } from 'components/CommonText';
 import React, { useCallback } from 'react';
-import { View } from 'react-native';
+import { Text, View } from 'react-native';
 import { pTd } from 'utils/unit';
 import navigationService from 'utils/navigationService';
 import PageContainer from 'components/PageContainer';
@@ -25,6 +25,7 @@ import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network-test2';
 import { verification } from 'utils/api';
 import { RouteProp, useRoute } from '@react-navigation/native';
+import fonts from 'assets/theme/fonts';
 
 type RouterParams = {
   guardian?: UserGuardianItem;
@@ -67,7 +68,7 @@ export default function GuardianDetail() {
       const req = await verification.sendVerificationCode({
         params: {
           type: LoginStrType[guardian.guardianType],
-          guardianAccount: guardian.guardianAccount,
+          guardianIdentifier: guardian.guardianAccount,
           verifierId: guardian.verifier?.id,
           chainId: DefaultChainId,
         },
@@ -128,8 +129,8 @@ export default function GuardianDetail() {
       if (loginIndex === -1) {
         Loading.show();
         try {
-          const guardiansInfo = await getGuardiansInfo({ loginAccount: guardian.guardianAccount });
-          if (guardiansInfo.guardianAccounts) {
+          const guardiansInfo = await getGuardiansInfo({ guardianIdentifier: guardian.guardianAccount });
+          if (guardiansInfo?.guardianList?.guardians?.length) {
             Loading.hide();
             ActionSheet.alert({
               title2: t(`This account address is already a login account and cannot be used`),
@@ -141,14 +142,24 @@ export default function GuardianDetail() {
             });
             return;
           }
-        } catch (error) {
-          console.debug(error, '====error');
+        } catch (error: any) {
+          if (error.code !== '3002') {
+            CommonToast.fail('Setup failed');
+            return;
+          }
+        } finally {
+          Loading.hide();
         }
-        Loading.hide();
       }
 
       ActionSheet.alert({
-        title2: `${guardian.verifier?.name} will send a verification code to ${guardian.guardianAccount} to verify your email address.`,
+        title2: (
+          <Text>
+            <TextL>{`${guardian.verifier?.name} will send a verification code to `}</TextL>
+            <TextL style={fonts.mediumFont}>{guardian.guardianAccount}</TextL>
+            <TextL>{` to verify your email address.`}</TextL>
+          </Text>
+        ),
         buttons: [
           {
             title: t('Cancel'),

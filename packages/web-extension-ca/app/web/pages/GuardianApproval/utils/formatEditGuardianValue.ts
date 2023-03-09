@@ -15,14 +15,14 @@ export const formatEditGuardianValue = ({
   preGuardian?: UserGuardianItem;
 }) => {
   const guardianToUpdatePre: GuardianItem = {
-    value: preGuardian?.guardianAccount as string,
+    identifierHash: preGuardian?.identifierHash,
     type: preGuardian?.guardianType as LoginType,
     verificationInfo: {
       id: preGuardian?.verifier?.id as string,
     },
   };
   const guardianToUpdateNew: GuardianItem = {
-    value: opGuardian?.guardianAccount as string,
+    identifierHash: preGuardian?.identifierHash,
     type: opGuardian?.guardianType as LoginType,
     verificationInfo: {
       id: opGuardian?.verifier?.id as string,
@@ -39,6 +39,7 @@ export const formatEditGuardianValue = ({
           signature: Object.values(Buffer.from(item.signature as any, 'hex')),
           verificationDoc: item.verificationDoc as string,
         },
+        identifierHash: item.identifierHash,
       });
     }
   });

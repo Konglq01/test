@@ -5427,6 +5427,11 @@
     color "^4.2.3"
     warn-once "^0.1.0"
 
+"@react-oauth/google@^0.8.0":
+  version "0.8.0"
+  resolved "https://registry.npmjs.org/@react-oauth/google/-/google-0.8.0.tgz#e95c9e2ef28f0da6d5de223e48c391a12eb4f821"
+  integrity sha512-xmIhYvvaBSblOzo3Fqv762lqub92SOFR8eRR7QpPyFPZEXZcOymaMuEkRSUKUrbu+9wfB8qtOaGMRJzrN7U2PA==
+
 "@react-spring/animated@~9.5.5":
   version "9.5.5"
   resolved "https://registry.yarnpkg.com/@react-spring/animated/-/animated-9.5.5.tgz#d3bfd0f62ed13a337463a55d2c93bb23c15bbf3e"
@@ -14229,7 +14234,7 @@ expo-image-loader@~3.2.0:
   resolved "https://registry.npmmirror.com/expo-image-loader/-/expo-image-loader-3.2.0.tgz#d98b021660edef7243f7c5ec011b8d0545626d41"
   integrity sha512-LU3Q2prn64/HxdToDmxgMIRXS1ZvD9Q3iCxRVTZn1fPQNNDciIQFE5okaa74Ogx20DFHs90r6WoUd7w9Af1OGQ==
 
-expo-image-picker@~13.3.1:
+expo-image-picker@^13.2.1, expo-image-picker@~13.3.1:
   version "13.3.1"
   resolved "https://registry.npmmirror.com/expo-image-picker/-/expo-image-picker-13.3.1.tgz#7e8fe1dd7a58ab9e0fa17569ab6b64256ece0c98"
   integrity sha512-IY84uDu9uxetAup5yw0CIIujigl/lM3grwyfpeZFMKGmWHzmKamptjd/sG8K65xkb6tF9awmGMW0qglHQ9hakQ==
@@ -23704,6 +23709,11 @@ react@18.2.0, react@^18.2.0:
   integrity sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==
   dependencies:
     loose-envify "^1.1.0"
+
+reactjs-social-login@^2.6.2:
+  version "2.6.2"
+  resolved "https://registry.npmjs.org/reactjs-social-login/-/reactjs-social-login-2.6.2.tgz#fffa8a8d216bcb373433322e1fe7328318c80177"
+  integrity sha512-7ngl3qMbnRkXJznsdd/fwCXLwE1wBpeLhaAZJlZF0Wki7tl9nwFL191t+uopZkSBnWuHRCBhmOGgT/y9KVSJAg==
 
 read-cmd-shim@^3.0.0:
   version "3.0.1"

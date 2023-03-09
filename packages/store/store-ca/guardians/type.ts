@@ -9,6 +9,8 @@ export interface BaseGuardianItem {
   guardianAccount: string;
   guardianType: LoginType;
   key: string; // `${loginGuardianType}&${verifier?.name}`,
+  identifierHash: string;
+  salt: string;
 }
 
 export interface IVerifierInfo {

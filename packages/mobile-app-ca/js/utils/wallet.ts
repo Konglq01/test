@@ -150,11 +150,11 @@ export async function addManager({
   managerAddress?: LoginQRData['address'];
   deviceType?: LoginQRData['deviceType'];
 }) {
-  return contract.callSendMethod('AddManager', address, {
+  return contract.callSendMethod('AddManagerInfo', address, {
     caHash,
-    manager: {
-      managerAddress,
-      deviceString: `${deviceType !== undefined ? deviceType + ',' : ''}${Date.now()}`,
+    managerInfo: {
+      address: managerAddress,
+      extraData: `${deviceType !== undefined ? deviceType + ',' : ''}${Date.now()}`,
     },
   });
 }

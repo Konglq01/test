@@ -1,7 +1,7 @@
 import { request } from '@portkey-wallet/api/api-did';
 
 export function fetchRecentTransactionUsers({
-  caAddresses = ['TxXSwp2P9mxeFnGA9DARi2qW1p3PskLFXyBix1GDerQFL7VD5'],
+  caAddresses = [],
   skipCount = 0,
   maxResultCount = 10,
 }: {
