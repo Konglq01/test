@@ -13,7 +13,6 @@ interface IMenuItem {
 
 export default function AboutUs() {
   const { t } = useTranslation();
-  const version = 'V 1.2.0 beta';
 
   const MenuList: IMenuItem[] = useMemo(
     () => [
@@ -40,7 +39,7 @@ export default function AboutUs() {
     <div className="about-us-drawer">
       <div className="flex-column-center header">
         <CustomSvg type="PortKey" />
-        <span className="version">{version}</span>
+        <span className="version">{process.env.SDK_VERSION?.toUpperCase()}</span>
       </div>
       <div className="content">
         {MenuList.map((item) => (
