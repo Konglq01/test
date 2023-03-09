@@ -286,7 +286,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
           <View style={[styles.flexSpaceBetween]}>
             <TextM style={styles.lightGrayFontColor} />
             <TextS style={styles.lightGrayFontColor}>
-              {formatStr2EllipsisStr(`ELF_${caAddresses[0]}_${assetInfo.chainId}`)}
+              {formatStr2EllipsisStr(`ELF_${wallet?.[assetInfo?.chainId]?.caAddress}_${assetInfo.chainId}`)}
             </TextS>
           </View>
         </View>
