@@ -49,7 +49,7 @@ export const recentSlice = createSlice({
     },
   },
   extraReducers: builder => {
-    builder.addCase(fetchRecentListAsync.rejected, (state, action) => {});
+    builder.addCase(fetchRecentListAsync.pending, (state, action) => {});
     builder.addCase(fetchRecentListAsync.rejected, (state, action) => {});
     builder.addCase(fetchRecentListAsync.fulfilled, (state, action) => {
       const { list } = action.payload;
