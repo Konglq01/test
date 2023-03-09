@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import TokenSection from '../TokenSection';
-import NFTSection from '../NFTSection';
+import NFTSection from '../NFTSection/index';
 import CommonTopTab from 'components/CommonTopTab';
 
 import { useLanguage } from 'i18n/hooks';

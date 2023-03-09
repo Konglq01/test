@@ -52,7 +52,7 @@ export const PortkeyMessageTypes = {
  */
 export const EXTENSION_MESSAGES = {
   CONNECTION_READY: 'CONNECTION_READY',
-  READY: 'PORTKEY_CA_EXTENSION_READY',
+  READY: 'PORTKEY_EOA_EXTENSION_READY',
 } as const;
 
 export default Object.assign(PortkeyMessageTypes, PromptRouteTypes);

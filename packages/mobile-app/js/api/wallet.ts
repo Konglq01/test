@@ -8,12 +8,12 @@ export const NETWORK_CONFIG: {
   };
 } = {
   MAIN: {
-    name: '主网',
+    name: 'Main',
     nameEn: 'MAIN',
     url: 'https://app-wallet-api.aelf.io',
   },
   TESTNET: {
-    name: '测试网',
+    name: 'Testnet',
     nameEn: 'TESTNET',
     url: 'https://wallet-app-api-test.aelf.io',
   },

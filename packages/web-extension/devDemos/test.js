@@ -1,7 +1,3 @@
-/**
- * @file testNew
- * @author huangzongzhe
- */
 /* global portkey */
 
 // century renew blade meadow faith evil uniform work discover poet ripple drill

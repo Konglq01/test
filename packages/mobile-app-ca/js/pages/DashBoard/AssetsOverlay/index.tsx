@@ -20,6 +20,8 @@ import { fetchAssetList } from '@portkey-wallet/store/store-ca/assets/api';
 import { IAssetItemType } from '@portkey-wallet/store/store-ca/assets/type';
 import navigationService from 'utils/navigationService';
 import { IToSendHomeParamsType } from '@portkey-wallet/types/types-ca/routeParams';
+import { formatChainInfoToShow } from '@portkey-wallet/utils';
+import { ChainId } from '@portkey-wallet/types';
 
 type onFinishSelectTokenType = (tokenItem: any) => void;
 type TokenListProps = {
@@ -42,7 +44,7 @@ const AssetItem = (props: { symbol: string; onPress: (item: any) => void; item: 
 
   if (item.nftInfo) {
     const {
-      nftInfo: { tokenId },
+      nftInfo: { tokenId, chainId },
     } = item;
     return (
       <TouchableOpacity style={itemStyle.wrap} onPress={() => onPress?.(item)}>
@@ -60,8 +62,7 @@ const AssetItem = (props: { symbol: string; onPress: (item: any) => void; item: 
             {/* TODO: why use currentNetwork   */}
             {currentNetwork ? (
               <TextS numberOfLines={1} style={[FontStyles.font7, itemStyle.nftItemInfo]}>
-                {item.chainId === 'AELF' ? 'MainChain' : 'SideChain'} {item.chainId}{' '}
-                {currentNetwork === 'TESTNET' && 'Testnet'}
+                {formatChainInfoToShow(chainId as ChainId, currentNetwork)}
               </TextS>
             ) : (
               // TODO: price use witch one
