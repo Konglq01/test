@@ -26,6 +26,7 @@ import { fetchTokenListAsync } from '@portkey-wallet/store/store-ca/assets/slice
 import Loading from 'components/Loading';
 import { formatChainInfo } from 'utils';
 import { FontStyles } from 'assets/theme/styles';
+import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
 
 interface ManageTokenListProps {
   route?: any;
@@ -44,6 +45,7 @@ const Item = ({ isTestnet, item, onHandleToken }: ItemProps) => {
       <CommonAvatar
         shapeType="circular"
         title={item.symbol}
+        svgName={item.symbol === ELF_SYMBOL ? 'elf-icon' : undefined}
         imageUrl={symbolImages[item.symbol]}
         avatarSize={pTd(48)}
         style={itemStyle.left}

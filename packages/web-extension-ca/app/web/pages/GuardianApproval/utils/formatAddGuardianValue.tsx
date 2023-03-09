@@ -22,6 +22,7 @@ export const formatAddGuardianValue = ({
           signature: Object.values(Buffer.from(item.signature as any, 'hex')),
           verificationDoc: item.verificationDoc || '',
         },
+        identifierHash: item.identifierHash,
       };
     } else if (item.signature) {
       guardiansApproved.push({
@@ -32,6 +33,7 @@ export const formatAddGuardianValue = ({
           signature: Object.values(Buffer.from(item.signature as any, 'hex')),
           verificationDoc: item.verificationDoc as string,
         },
+        identifierHash: item.identifierHash,
       });
     }
   });

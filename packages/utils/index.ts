@@ -1,9 +1,20 @@
-import { ChainType } from '@portkey-wallet/types';
+import { ChainId, ChainType } from '@portkey-wallet/types';
 import { isAddress as web3IsAddress } from 'web3-utils';
 import { isAelfAddress, isDIDAelfAddress } from './aelf';
 import * as uuid from 'uuid';
 
-export const addressFormat = (address: string, chainId: string | number, chainType: ChainType) => {
+/**
+ * format address like "aaa...bbb" to "ELF_aaa...bbb_AELF"
+ * @param address
+ * @param chainId
+ * @param chainType
+ * @returns
+ */
+export const addressFormat = (
+  address: string = 'address',
+  chainId: ChainId = 'AELF',
+  chainType: ChainType = 'aelf',
+): string => {
   if (chainType !== 'aelf') return address;
   const arr = address.split('_');
   if (address.includes('_') && arr.length < 3) return address;
@@ -127,9 +138,19 @@ export const isExtension = () => process.env.DEVICE === 'extension';
 
 export const randomId = () => uuid.v4().replace(/-/g, '');
 
-export const handleError = (error: any, errorText?: string) => {
-  error = error?.error || error;
+export const handleError = (error: any) => {
+  return error?.error || error;
+};
+
+export const handleErrorMessage = (error: any, errorText?: string) => {
+  error = handleError(error);
+  if (!error) return errorText;
   if (typeof error === 'string') return error;
   if (typeof error.message === 'string') return error.message;
   return errorText;
+};
+
+export const chainShowText = (chain: ChainId) => (chain === 'AELF' ? 'MainChain' : 'SideChain');
+export const handleErrorCode = (error: any) => {
+  return handleError(error)?.code;
 };

@@ -26,7 +26,7 @@ type TokenListProps = {
   onFinishSelectToken?: onFinishSelectTokenType;
 };
 
-const TokenList = ({ onFinishSelectToken, account }: TokenListProps) => {
+const TokenList = ({ onFinishSelectToken }: TokenListProps) => {
   const { t } = useLanguage();
 
   const { tokenDataShowInMarket } = useAppCASelector(state => state.tokenManagement);
@@ -38,18 +38,17 @@ const TokenList = ({ onFinishSelectToken, account }: TokenListProps) => {
   const debounceKeyword = useDebounce(keyword, 800);
 
   const renderItem = useCallback(
-    ({ item }: { item: any }) => {
-      return (
-        <TokenListItem
-          noBalanceShow
-          item={item}
-          onPress={() => {
-            OverlayModal.hide();
-            onFinishSelectToken?.(item);
-          }}
-        />
-      );
-    },
+    ({ item }: { item: any }) => (
+      <TokenListItem
+        noBalanceShow
+        key={`${item.symbol}${item.chainId}`}
+        item={item}
+        onPress={() => {
+          OverlayModal.hide();
+          onFinishSelectToken?.(item);
+        }}
+      />
+    ),
     [onFinishSelectToken],
   );
 

@@ -1,4 +1,4 @@
-package com.PortkeyApp.newarchitecture.components;
+package com.portkey.did.newarchitecture.components;
 
 import com.facebook.jni.HybridData;
 import com.facebook.proguard.annotations.DoNotStrip;

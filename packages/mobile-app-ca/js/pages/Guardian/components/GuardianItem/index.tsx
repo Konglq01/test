@@ -76,7 +76,7 @@ function GuardianItemButton({
       const req = await verification.sendVerificationCode({
         params: {
           type: LoginStrType[guardianInfo.guardianItem.guardianType],
-          guardianAccount: guardianInfo.guardianItem.guardianAccount,
+          guardianIdentifier: guardianInfo.guardianItem.guardianAccount,
           verifierId: guardianInfo.guardianItem.verifier?.id,
           chainId: DefaultChainId,
         },
@@ -164,7 +164,7 @@ export default function GuardianItem({
   isSuccess,
   approvalType = ApprovalType.register,
 }: GuardianAccountItemProps) {
-  console.log(guardianItem, '=====guardianItem');
+  // console.log(guardianItem, '=====guardianItem');
   const itemStatus = useMemo(() => guardiansStatus?.[guardianItem.key], [guardianItem.key, guardiansStatus]);
   const disabled = isSuccess && itemStatus?.status !== VerifyStatus.Verified;
   return (
