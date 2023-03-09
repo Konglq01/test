@@ -33,7 +33,7 @@ export default class PermissionController {
     }
     return {
       error: 0,
-      errorMessage: 'Unlock',
+      message: 'Unlock',
     };
   }
 
@@ -41,7 +41,7 @@ export default class PermissionController {
     if (this.allowedMethod?.includes(method))
       return {
         error: 0,
-        errorMessage: 'no check',
+        message: 'no check',
       };
     const seed = this?.getPassword?.() ?? null;
     try {
@@ -49,7 +49,8 @@ export default class PermissionController {
     } catch (error) {
       return {
         error: 500001,
-        errorMessage: 'something error',
+        message: 'Something error',
+        Error: error,
       };
     }
   }
@@ -71,7 +72,7 @@ export default class PermissionController {
     if (this.allowedMethod?.includes(method))
       return {
         error: 0,
-        errorMessage: 'no check',
+        message: 'no check',
       };
     const registerStatus = await this.checkRegisterStatus();
     if (registerStatus !== 'Registered') {
@@ -84,7 +85,7 @@ export default class PermissionController {
     } else {
       return {
         error: 0,
-        errorMessage: 'Registered',
+        message: 'Registered',
       };
     }
   }

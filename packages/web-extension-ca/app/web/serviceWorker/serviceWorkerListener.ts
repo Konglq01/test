@@ -4,7 +4,6 @@
  */
 import { AutoLockDataKey, AutoLockDataType } from 'constants/lock';
 import SWController from 'controllers/SWController';
-import SWEventController from 'controllers/SWEventController';
 import { apis } from 'utils/BrowserApis';
 import storage from 'utils/storage/storage';
 import connectListener from './connectListener';
