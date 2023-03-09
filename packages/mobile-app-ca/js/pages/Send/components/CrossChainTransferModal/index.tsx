@@ -98,7 +98,7 @@ export const styles = StyleSheet.create({
   },
   divider: {
     width: '100%',
-    height: pTd(0.5),
+    height: StyleSheet.hairlineWidth,
     backgroundColor: defaultColors.bg7,
     ...GStyles.marginArg(16, 0),
   },

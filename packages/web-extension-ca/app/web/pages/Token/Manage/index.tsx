@@ -7,10 +7,12 @@ import { useToken } from '@portkey-wallet/hooks/hooks-ca/useToken';
 import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
 import DropdownSearch from 'components/DropdownSearch';
 import { useTranslation } from 'react-i18next';
-import { useAppDispatch, useTokenInfo, useUserInfo, useWalletInfo } from 'store/Provider/hooks';
+import { useAppDispatch, useTokenInfo, useUserInfo } from 'store/Provider/hooks';
 import { fetchAllTokenListAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
 import { useChainIdList } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import './index.less';
+import { transNetworkText } from '@portkey-wallet/utils/activity';
+import { useIsTestnet } from 'hooks/useActivity';
 import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
 
 export default function AddToken() {
@@ -23,9 +25,8 @@ export default function AddToken() {
   const [openDrop, setOpenDrop] = useState<boolean>(false);
   const { passwordSeed } = useUserInfo();
   const appDispatch = useAppDispatch();
-  const { currentNetwork } = useWalletInfo();
   const chainIdArray = useChainIdList();
-  const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'Testnet' : ''), [currentNetwork]);
+  const isTestNet = useIsTestnet();
 
   useEffect(() => {
     passwordSeed && appDispatch(fetchAllTokenListAsync({ keyword: filterWord, chainIdArray }));
@@ -86,9 +87,7 @@ export default function AddToken() {
           )}
           <p className="token-info">
             <span className="token-item-symbol">{item.symbol}</span>
-            <span className="token-item-net">
-              {`${item.chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${item.chainId} ${isTestNet}`}
-            </span>
+            <span className="token-item-net">{transNetworkText(item.chainId, isTestNet)}</span>
           </p>
         </div>
         <div className="token-item-action">{renderTokenItem(item)}</div>

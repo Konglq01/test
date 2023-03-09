@@ -10,7 +10,7 @@ import TransferItem from 'components/TransferList/components/TransferItem';
 import { getActivityListAsync } from '@portkey-wallet/store/store-ca/activity/action';
 import { useAppCASelector, useAppCommonDispatch } from '@portkey-wallet/hooks';
 import NoData from 'components/NoData';
-import { IActivitysApiParams } from '@portkey-wallet/store/store-ca/activity/type';
+import { IActivitiesApiParams } from '@portkey-wallet/store/store-ca/activity/type';
 import { clearActivity } from '@portkey-wallet/store/store-ca/activity/slice';
 import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
@@ -41,7 +41,7 @@ const ActivityListPage = () => {
         dispatch(clearActivity());
       }
 
-      const params: IActivitysApiParams = {
+      const params: IActivitiesApiParams = {
         maxResultCount: maxResultCount,
         skipCount: isInit ? 0 : skipCount + maxResultCount,
         caAddresses: currentWallet.walletInfo.caAddressList,

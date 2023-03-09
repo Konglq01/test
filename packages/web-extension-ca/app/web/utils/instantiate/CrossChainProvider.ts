@@ -25,7 +25,7 @@ export default class CrossChainProvider {
   }
 
   send(param: any) {
-    return window?.portkey_ca?.request({
+    return window?.portkey_did?.request({
       method: 'CROSS_SEND',
       params: {
         method: 'CROSS_SEND',
@@ -37,7 +37,7 @@ export default class CrossChainProvider {
   }
 
   receive(param: any) {
-    return window?.portkey_ca?.request({
+    return window?.portkey_did?.request({
       method: 'CROSS_RECEIVE',
       params: {
         method: 'CROSS_RECEIVE',

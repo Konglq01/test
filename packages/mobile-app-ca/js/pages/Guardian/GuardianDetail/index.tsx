@@ -1,8 +1,8 @@
 import GStyles from 'assets/theme/GStyles';
 import CommonButton from 'components/CommonButton';
-import { TextM } from 'components/CommonText';
+import { TextL, TextM } from 'components/CommonText';
 import React, { useCallback } from 'react';
-import { View } from 'react-native';
+import { Text, View } from 'react-native';
 import { pTd } from 'utils/unit';
 import navigationService from 'utils/navigationService';
 import PageContainer from 'components/PageContainer';
@@ -24,7 +24,8 @@ import { useGetCurrentCAContract } from 'hooks/contract';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network-test2';
 import { verification } from 'utils/api';
 import { RouteProp, useRoute } from '@react-navigation/native';
-import { LoginKeyType, LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import fonts from 'assets/theme/fonts';
 
 type RouterParams = {
   guardian?: UserGuardianItem;
@@ -152,7 +153,13 @@ export default function GuardianDetail() {
       }
 
       ActionSheet.alert({
-        title2: `${guardian.verifier?.name} will send a verification code to ${guardian.guardianAccount} to verify your email address.`,
+        title2: (
+          <Text>
+            <TextL>{`${guardian.verifier?.name} will send a verification code to `}</TextL>
+            <TextL style={fonts.mediumFont}>{guardian.guardianAccount}</TextL>
+            <TextL>{` to verify your email address.`}</TextL>
+          </Text>
+        ),
         buttons: [
           {
             title: t('Cancel'),

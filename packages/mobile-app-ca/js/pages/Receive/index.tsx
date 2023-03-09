@@ -24,6 +24,7 @@ export default function Receive() {
 
   const tokenItem = useRouterParams<TokenItemShowType>();
   const { chainId, symbol } = tokenItem;
+
   const symbolImages = useSymbolImages();
   const currentWallet = useCurrentWalletInfo();
 

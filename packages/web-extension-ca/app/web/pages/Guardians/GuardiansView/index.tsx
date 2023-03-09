@@ -246,9 +246,11 @@ export default function GuardiansView() {
         </div>
       </div>
       <CommonModal className="verify-confirm-modal" closable={false} open={tipOpen} onCancel={() => setTipOpen(false)}>
-        <p className="modal-content">{`${opGuardian?.verifier?.name ?? ''} will send a verification code to ${
-          opGuardian?.guardianAccount
-        } to verify your email address.`}</p>
+        <p className="modal-content">
+          {`${opGuardian?.verifier?.name ?? ''} will send a verification code to `}
+          <span className="bold">{opGuardian?.guardianAccount}</span>
+          {` to verify your email address.`}
+        </p>
         <div className="btn-wrapper">
           <Button onClick={() => setTipOpen(false)}>{t('Cancel')}</Button>
           <Button type="primary" onClick={verifyHandler}>

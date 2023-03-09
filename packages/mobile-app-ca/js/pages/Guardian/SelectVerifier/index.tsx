@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import PageContainer from 'components/PageContainer';
-import { TextM, TextS, TextXXXL } from 'components/CommonText';
+import { TextL, TextM, TextS, TextXXXL } from 'components/CommonText';
 import GStyles from 'assets/theme/GStyles';
 import Svg from 'components/Svg';
 import Touchable from 'components/Touchable';
@@ -66,7 +66,13 @@ export default function SelectVerifier() {
       Loading.hide();
     };
     ActionSheet.alert({
-      title2: `${selectedVerifier.name} will send a verification code to ${loginAccount} to verify your email address.`,
+      title2: (
+        <Text>
+          <TextL>{`${selectedVerifier.name} will send a verification code to `}</TextL>
+          <TextL style={fonts.mediumFont}>{loginAccount}</TextL>
+          <TextL>{` to verify your email address.`}</TextL>
+        </Text>
+      ),
       buttons: [
         {
           title: t('Cancel'),

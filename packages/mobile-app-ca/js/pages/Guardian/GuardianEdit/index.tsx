@@ -1,9 +1,9 @@
 import GStyles from 'assets/theme/GStyles';
 import CommonButton from 'components/CommonButton';
-import { TextM, TextS } from 'components/CommonText';
+import { TextL, TextM, TextS } from 'components/CommonText';
 import Svg from 'components/Svg';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { View } from 'react-native';
+import { Text, View } from 'react-native';
 import { pTd } from 'utils/unit';
 import navigationService from 'utils/navigationService';
 import PageContainer from 'components/PageContainer';
@@ -31,6 +31,7 @@ import { setPreGuardianAction } from '@portkey-wallet/store/store-ca/guardians/a
 import { VerifierImage } from '../components/VerifierImage';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network-test2';
 import { verification } from 'utils/api';
+import fonts from 'assets/theme/fonts';
 
 type RouterParams = {
   guardian?: UserGuardianItem;
@@ -109,7 +110,13 @@ const GuardianEdit: React.FC = () => {
     if (selectedVerifier === undefined || selectedType === undefined) return;
 
     ActionSheet.alert({
-      title2: `${selectedVerifier.name} will send a verification code to ${email} to verify your email address.`,
+      title2: (
+        <Text>
+          <TextL>{`${selectedVerifier.name} will send a verification code to `}</TextL>
+          <TextL style={fonts.mediumFont}>{email}</TextL>
+          <TextL>{` to verify your email address.`}</TextL>
+        </Text>
+      ),
       buttons: [
         {
           title: t('Cancel'),
