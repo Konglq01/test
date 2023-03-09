@@ -1,7 +1,3 @@
-/**
- * @file extractArgumentsIntoObject.js
- * @author atom.young,huangzongzhe
- */
 const isFunction = (object: any) => typeof object === 'function';
 const isBoolean = (object: any) => typeof object === 'boolean';
 export default function extractArgumentsIntoObject(args: any): {
