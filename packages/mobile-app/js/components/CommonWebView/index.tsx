@@ -23,9 +23,9 @@ const CommonWebView: React.FC<CommonWebViewProps> = props => {
   const {
     width = '100%',
     height = '100%',
-    // source = { uri: 'http://192.168.10.160:3002' }, // 本地demo
-    source = { uri: 'http://192.168.66.186:3001' }, // 线上测试网址
-    // source = { uri: 'http://192.168.10.160:3000' }, // 本地的aelf
+    // source = { uri: 'http://192.168.10.160:3002' }, // local demo
+    source = { uri: 'http://192.168.66.186:3001' }, // Online test URL
+    // source = { uri: 'http://192.168.10.160:3000' }, //local aelf
     aelfInstance = new AElf(new AElf.providers.HttpProvider('http://192.168.66.251:8000')),
     wallet = AElf.wallet.createNewWallet(),
   } = props;
@@ -43,7 +43,7 @@ const CommonWebView: React.FC<CommonWebViewProps> = props => {
   // deal with Webview(dapp) message post
   const handleMessageEvent = async ({ nativeEvent }: WebViewMessageEvent) => {
     const { data } = nativeEvent;
-    console.log(data, deserializeMessage(data), '收到的消息');
+    console.log(data, deserializeMessage(data), 'deserializeMessage');
 
     const messageObj: WebViewRequestTypes = deserializeMessage(data) as WebViewRequestTypes;
     if (!messageObj) return;

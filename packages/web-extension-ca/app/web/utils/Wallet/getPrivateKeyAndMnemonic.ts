@@ -1,8 +1,3 @@
-/**
- * @file getPrivateKeyAndMnemonic.js
- * @author huangzongzhe
- * 2020.01.04
- */
 import AElf from 'aelf-sdk';
 import { AESEncryptWalletParam } from 'types/wallet';
 

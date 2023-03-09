@@ -1,7 +1,3 @@
-/**
- * @file EncryptStream.js
- * @author huangzongzhe
- */
 // use Asymmetric encryption to transfer the key.
 // And use AES to cryto the message.
 // For one-to-one

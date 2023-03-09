@@ -1,8 +1,3 @@
-/**
- * @file NotificationService.js
- * @author huangzongzhe
- */
-
 import getPromptRoute, { PromptMessage } from './getPromptRoute';
 import { CreatePromptType, SendResponseFun, SendResponseParams } from 'types';
 import { apis } from 'utils/BrowserApis';
