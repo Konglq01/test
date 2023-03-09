@@ -1,12 +1,15 @@
-import { TransactionTypes, transactionTypesMap } from '@portkey-wallet/constants/constants-ca/activity';
+import {
+  DEFAULT_DECIMAL,
+  TransactionTypes,
+  transactionTypesMap,
+} from '@portkey-wallet/constants/constants-ca/activity';
 import { ZERO } from '@portkey-wallet/constants/misc';
-import { TransactionStatus } from '@portkey-wallet/graphql/contract/__generated__/types';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { useCaAddresses, useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
 import { fetchActivity } from '@portkey-wallet/store/store-ca/activity/api';
-import { ActivityItemType } from '@portkey-wallet/types/types-ca/activity';
-import { getExploreLink } from '@portkey-wallet/utils';
+import { ActivityItemType, TransactionStatus } from '@portkey-wallet/types/types-ca/activity';
+import { addressFormat, getExploreLink } from '@portkey-wallet/utils';
 import { unitConverter } from '@portkey-wallet/utils/converter';
 import { Image } from '@rneui/base';
 import { defaultColors } from 'assets/theme';
@@ -21,9 +24,10 @@ import Svg from 'components/Svg';
 import * as Clipboard from 'expo-clipboard';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { useLanguage } from 'i18n/hooks';
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { formatStr2EllipsisStr, formatTransferTime } from 'utils';
+import { formatTransferTime } from 'utils';
+import { formatStr2EllipsisStr } from '@portkey-wallet/utils';
 import navigationService from 'utils/navigationService';
 import { pTd } from 'utils/unit';
 
@@ -33,7 +37,6 @@ interface RouterParams {
   isReceived?: boolean;
 }
 
-const DEFAULT_DECIMAL = 8;
 const hiddenArr = [TransactionTypes.SOCIAL_RECOVERY, TransactionTypes.ADD_MANAGER, TransactionTypes.REMOVE_MANAGER];
 
 const ActivityDetail = () => {
@@ -70,7 +73,6 @@ const ActivityDetail = () => {
   const status = useMemo(() => {
     if (!activityItem?.status) return { text: '', style: 'confirmed' };
 
-    // TODO: do not use GraphQL TransactionStatus
     if (activityItem?.status === TransactionStatus.Mined)
       return {
         text: 'Confirmed',
@@ -81,6 +83,25 @@ const ActivityDetail = () => {
       style: 'failed',
     };
   }, [activityItem]);
+
+  const copyStr = useCallback(
+    async (str: string) => {
+      const isCopy = await Clipboard.setStringAsync(str);
+      isCopy && CommonToast.success(t('Copy Success'));
+    },
+    [t],
+  );
+
+  const CopyIconUI = useCallback(
+    (content: string) => (
+      <TouchableOpacity
+        style={[styles.marginLeft8, GStyles.flexCol, styles.copyIconWrap]}
+        onPress={() => copyStr(content)}>
+        <Svg icon="copy" size={pTd(13)} />
+      </TouchableOpacity>
+    ),
+    [copyStr],
+  );
 
   const networkUI = useMemo(() => {
     const { transactionType, fromChainId, toChainId, transactionId: _transactionId = '' } = activityItem || {};
@@ -105,23 +126,17 @@ const ActivityDetail = () => {
           )}
           <View style={[styles.flexSpaceBetween, isNetworkShow && styles.marginTop16]}>
             <TextM style={[styles.lightGrayFontColor]}>{t('Transaction ID')}</TextM>
-            <View style={[GStyles.flexRow, styles.alignItemsCenter]}>
-              <TextM style={{}}>{formatStr2EllipsisStr(_transactionId, 10, 'tail')}</TextM>
-              <TouchableOpacity
-                style={styles.marginLeft8}
-                onPress={async () => {
-                  const isCopy = await Clipboard.setStringAsync(_transactionId);
-                  isCopy && CommonToast.success(t('Copy Success'));
-                }}>
-                <Svg icon="copy" size={pTd(13)} />
-              </TouchableOpacity>
+            <View style={GStyles.flex1} />
+            <View style={[GStyles.flexRow, styles.alignItemsEnd]}>
+              <TextM>{formatStr2EllipsisStr(_transactionId, 10, 'tail')}</TextM>
             </View>
+            {CopyIconUI(transactionId)}
           </View>
         </View>
         <Text style={[styles.divider, styles.marginTop0]} />
       </>
     );
-  }, [activityItem, isTestNet, t]);
+  }, [CopyIconUI, activityItem, isTestNet, t, transactionId]);
 
   const feeUI = useMemo(() => {
     const transactionFees = activityItem?.transactionFees || [];
@@ -163,82 +178,96 @@ const ActivityDetail = () => {
         {transactionTypesMap(activityItem?.transactionType, activityItem?.nftInfo?.nftId)}
       </Text>
 
-      {isNft ? (
-        <>
-          <View style={styles.topWrap}>
-            {activityItem?.nftInfo?.imageUrl ? (
-              <Image style={styles.img} source={{ uri: activityItem?.nftInfo?.imageUrl || '' }} />
-            ) : (
-              <Text style={styles.noImg}>{activityItem?.nftInfo?.alias?.slice(0, 1)}</Text>
-            )}
-            <View style={styles.nftInfo}>
-              <TextL style={styles.nftTitle}>{`${activityItem?.nftInfo?.alias || ''} #${
-                activityItem?.nftInfo?.nftId || ''
-              }`}</TextL>
-              <TextS style={[FontStyles.font3, styles.marginTop4]}>Amount: {activityItem?.amount || ''}</TextS>
+      {activityItem?.transactionType &&
+        !hiddenArr.includes(activityItem?.transactionType) &&
+        (isNft ? (
+          <>
+            <View style={styles.topWrap}>
+              {activityItem?.nftInfo?.imageUrl ? (
+                <Image style={styles.img} source={{ uri: activityItem?.nftInfo?.imageUrl || '' }} />
+              ) : (
+                <Text style={styles.noImg}>{activityItem?.nftInfo?.alias?.slice(0, 1)}</Text>
+              )}
+              <View style={styles.nftInfo}>
+                <TextL style={styles.nftTitle}>{`${activityItem?.nftInfo?.alias || ''} #${
+                  activityItem?.nftInfo?.nftId || ''
+                }`}</TextL>
+                <TextS style={[FontStyles.font3, styles.marginTop4]}>Amount: {activityItem?.amount || ''}</TextS>
+              </View>
             </View>
-          </View>
-          <View style={styles.divider} />
-        </>
-      ) : (
-        <>
-          <Text style={[styles.tokenCount, styles.fontBold]}>
-            {!hiddenArr.includes(activityItem?.transactionType as TransactionTypes) &&
-              (activityItem?.isReceived ? '+' : '-')}
-            {`${unitConverter(
-              ZERO.plus(activityItem?.amount || 0).div(`1e${activityItem?.decimals || DEFAULT_DECIMAL}`),
-            )} ${activityItem?.symbol || ''}`}
-          </Text>
-          {!isTestNet && (
-            <Text style={styles.usdtCount}>{`$ ${unitConverter(ZERO.plus(activityItem?.priceInUsd ?? 0), 2)}`}</Text>
-          )}
-        </>
-      )}
-
+            <View style={styles.divider} />
+          </>
+        ) : (
+          <>
+            <Text style={[styles.tokenCount, styles.fontBold]}>
+              {!hiddenArr.includes(activityItem?.transactionType as TransactionTypes) &&
+                (activityItem?.isReceived ? '+' : '-')}
+              {`${unitConverter(
+                ZERO.plus(activityItem?.amount || 0).div(`1e${activityItem?.decimals || DEFAULT_DECIMAL}`),
+              )} ${activityItem?.symbol || ''}`}
+            </Text>
+            {!isTestNet && (
+              <Text style={styles.usdtCount}>{`$ ${unitConverter(ZERO.plus(activityItem?.priceInUsd ?? 0), 2)}`}</Text>
+            )}
+          </>
+        ))}
       <View style={[styles.flexSpaceBetween, styles.titles1]}>
         <TextM style={styles.lightGrayFontColor}>{t('Status')}</TextM>
         <TextM style={styles.lightGrayFontColor}>{t('Date')}</TextM>
       </View>
-
       <View style={[styles.flexSpaceBetween, styles.values1]}>
         <TextM style={styles.greenFontColor}>{t(status.text)}</TextM>
         <TextM style={styles.blackFontColor}>
           {activityItem && activityItem.timestamp ? formatTransferTime(Number(activityItem?.timestamp) * 1000) : ''}
         </TextM>
       </View>
-
       <View style={styles.card}>
         {/* From */}
-        <View style={styles.section}>
-          <View style={[styles.flexSpaceBetween]}>
-            <TextM style={styles.lightGrayFontColor}>{t('From')}</TextM>
-            <View style={styles.alignItemsEnd}>
-              {activityItem?.from && <TextM style={styles.blackFontColor}>{activityItem.from}</TextM>}
-              <TextS style={styles.lightGrayFontColor}>{formatStr2EllipsisStr(activityItem?.fromAddress)}</TextS>
+        {activityItem?.transactionType && !hiddenArr.includes(activityItem?.transactionType) && (
+          <>
+            <View style={styles.section}>
+              <View style={[GStyles.flexRow]}>
+                <TextM style={styles.lightGrayFontColor}>{t('From')}</TextM>
+                <View style={GStyles.flex1} />
+                <View style={[styles.alignItemsEnd, styles.justifyContentCenter]}>
+                  {activityItem?.from && <TextM style={styles.blackFontColor}>{activityItem.from}</TextM>}
+                  <TextS style={styles.lightGrayFontColor}>
+                    {formatStr2EllipsisStr(addressFormat(activityItem?.fromAddress, activityItem?.fromChainId))}
+                  </TextS>
+                </View>
+                {CopyIconUI(activityItem?.fromAddress || '')}
+              </View>
             </View>
-          </View>
-        </View>
-        <Text style={[styles.divider, styles.marginTop0]} />
+            <Text style={[styles.divider, styles.marginTop0]} />
+          </>
+        )}
         {/* To */}
-        <View style={styles.section}>
-          <View style={[styles.flexSpaceBetween]}>
-            <TextM style={[styles.lightGrayFontColor]}>{t('To')}</TextM>
-            <View style={styles.alignItemsEnd}>
-              {activityItem?.to && <TextM style={[styles.blackFontColor]}>{activityItem.to}</TextM>}
-              <TextS style={styles.lightGrayFontColor}>{formatStr2EllipsisStr(activityItem?.toAddress)}</TextS>
+        {activityItem?.transactionType && !hiddenArr.includes(activityItem?.transactionType) && (
+          <>
+            <View style={styles.section}>
+              <View style={[GStyles.flexRow]}>
+                <TextM style={[styles.lightGrayFontColor]}>{t('To')}</TextM>
+                <View style={GStyles.flex1} />
+                <View style={[styles.alignItemsEnd, styles.justifyContentCenter]}>
+                  {activityItem?.to && <TextM style={[styles.blackFontColor]}>{activityItem?.to}</TextM>}
+                  <TextS style={[styles.lightGrayFontColor]}>
+                    {formatStr2EllipsisStr(addressFormat(activityItem?.toAddress, activityItem?.toChainId))}
+                  </TextS>
+                </View>
+                {CopyIconUI(activityItem?.toAddress || '')}
+              </View>
             </View>
-          </View>
-        </View>
-        <Text style={[styles.divider, styles.marginTop0]} />
+            <Text style={[styles.divider, styles.marginTop0]} />
+          </>
+        )}
+
         {/* more Info */}
 
         {networkUI}
         {/* transaction Fee */}
         {feeUI}
       </View>
-
       <View style={styles.space} />
-
       {explorerUrl && (
         <CommonButton
           containerStyle={[GStyles.marginTop(pTd(8)), styles.bottomButton]}
@@ -352,7 +381,7 @@ export const styles = StyleSheet.create({
   divider: {
     marginTop: pTd(24),
     width: '100%',
-    height: pTd(1),
+    height: StyleSheet.hairlineWidth,
     backgroundColor: defaultColors.border1,
   },
   titles2: {
@@ -364,7 +393,7 @@ export const styles = StyleSheet.create({
   card: {
     marginTop: pTd(24),
     borderRadius: pTd(6),
-    borderWidth: pTd(0.5),
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: defaultColors.border1,
     width: '100%',
   },
@@ -410,6 +439,9 @@ export const styles = StyleSheet.create({
   alignItemsEnd: {
     alignItems: 'flex-end',
   },
+  justifyContentCenter: {
+    justifyContent: 'center',
+  },
   bottomButton: {
     backgroundColor: defaultColors.bg1,
   },
@@ -422,5 +454,10 @@ export const styles = StyleSheet.create({
   },
   transactionFeeItemWrap: {
     alignItems: 'flex-end',
+  },
+  copyIconWrap: {
+    justifyContent: 'flex-end',
+    // backgroundColor: 'red',
+    paddingBottom: pTd(3),
   },
 });

@@ -21,11 +21,11 @@ export default function ContactCard({ user, className, fromRecents = true, onCha
   const header = useMemo(
     () => (
       <div className="header">
-        <div className="icon">{user.name?.[0]}</div>
+        <div className="icon">{user.index || ''}</div>
         <p>{user.name}</p>
       </div>
     ),
-    [user.name],
+    [user.index, user.name],
   );
 
   return (
@@ -38,7 +38,7 @@ export default function ContactCard({ user, className, fromRecents = true, onCha
               className={isDisabled(address.address) ? 'disabled' : ''}
               onClick={() => onChange({ ...address, name: user.name, isDisable: isDisabled(address.address) })}>
               <span className="address">
-                ELF_{formatStr2EllipsisStr(address.address, [6, 6])}_{address.chainId}
+                {`ELF_${formatStr2EllipsisStr(address.address, [6, 6])}_${address.chainId}`}
               </span>
               <span className="network">{transNetworkText(address.chainId, isTestnet)}</span>
             </p>

@@ -1,11 +1,11 @@
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 
 export enum GuardianMth {
-  addGuardian = 'addGuardian',
+  addGuardian = 'AddGuardian',
   UpdateGuardian = 'UpdateGuardian',
   RemoveGuardian = 'RemoveGuardian',
-  SetGuardianTypeForLogin = 'SetGuardianAccountForLogin',
-  UnsetGuardianTypeForLogin = 'UnsetGuardianAccountForLogin',
+  SetGuardianTypeForLogin = 'SetGuardianForLogin',
+  UnsetGuardianTypeForLogin = 'UnsetGuardianForLogin',
 }
 
 export interface GuardianType {
@@ -26,8 +26,9 @@ export interface verificationInfo {
 }
 
 export interface GuardianItem {
-  value: string;
+  value?: string;
   type: LoginType;
+  identifierHash?: string;
   verificationInfo: verificationInfo;
 }
 

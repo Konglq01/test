@@ -45,33 +45,19 @@ const allowedMethod = [
   PortkeyMessageTypes.CHECK_WALLET_STATUS,
   PortkeyMessageTypes.EXPAND_FULL_SCREEN,
   PortkeyMessageTypes.OPEN_RECAPTCHA_PAGE,
-  PortkeyMessageTypes.ACTIVE_LOCK_STATUS,
+  PortkeyMessageTypes.THREE_WAY_LOGIN,
   WalletMessageTypes.REQUEST_ACCOUNTS,
   MethodMessageTypes.GET_WALLET_STATE,
   // TODO SET_RECAPTCHA_CODE
   WalletMessageTypes.SET_RECAPTCHA_CODE_V2,
+  WalletMessageTypes.THREE_WAY_LOGIN,
+  PortkeyMessageTypes.ACTIVE_LOCK_STATUS,
 ];
 
-const PortkeyMethod = [
-  PortkeyMessageTypes.GET_SEED,
-  PortkeyMessageTypes.SET_SEED,
-  PortkeyMessageTypes.LOCK_WALLET,
-  PortkeyMessageTypes.CHECK_WALLET_STATUS,
-  PortkeyMessageTypes.CLOSE_PROMPT,
-  PortkeyMessageTypes.REGISTER_WALLET,
-  PortkeyMessageTypes.LOGIN_WALLET,
-  PortkeyMessageTypes.EXPAND_FULL_SCREEN,
-  PortkeyMessageTypes.OPEN_RECAPTCHA_PAGE,
-  WalletMessageTypes.SET_RECAPTCHA_CODE_V2,
-  WalletMessageTypes.CONNECT,
-  WalletMessageTypes.SWITCH_CHAIN,
-  WalletMessageTypes.REQUEST_ACCOUNTS,
-  MethodMessageTypes.GET_WALLET_STATE,
-];
+const PortkeyMethod = [...allowedMethod, WalletMessageTypes.CONNECT, WalletMessageTypes.SWITCH_CHAIN];
 
 const initPageState = async () => {
   const allStorage = await getAllStorageLocalData();
-  console.log(allStorage, 'allStorage===');
   const reduxStore = JSON.parse(allStorage[storage.reduxStorageName] ?? null);
   pageState = {
     registerStatus: allStorage[storage.registerStatus],
@@ -111,8 +97,6 @@ export default class ServiceWorkerInstantiate {
   // Watches the internal messaging system ( LocalStream )
   async setupInternalMessaging() {
     try {
-      // clearLocalStorage();
-      // setLocalStorage({ connections: null });
       await initPageState();
       LocalStream.watch(async (request: any, sendResponse: SendResponseFun) => {
         const message = InternalMessage.fromJson(request);
@@ -125,7 +109,6 @@ export default class ServiceWorkerInstantiate {
         const registerRes = await this.permissionController.checkIsRegisterOtherwiseRegister(message.type);
         if (registerRes.error !== 0) return sendResponse(registerRes);
         const isLocked = await this.permissionController.checkIsLockOtherwiseUnlock(message.type);
-        console.log(isLocked.error, isLocked, message, 'isLocked==');
         if (isLocked.error !== 0) return sendResponse(isLocked);
         await this.dispenseMessage(sendResponse, message);
       });
@@ -177,6 +160,9 @@ export default class ServiceWorkerInstantiate {
         case PortkeyMessageTypes.OPEN_RECAPTCHA_PAGE:
           this.openRecaptchaPage(sendResponse, message.payload);
           break;
+        case PortkeyMessageTypes.THREE_WAY_LOGIN:
+          this.threeWayLogin(sendResponse, message.payload);
+          break;
         case WalletMessageTypes.CONNECT:
           this.connectWallet(sendResponse, message.payload);
           break;
@@ -186,6 +172,10 @@ export default class ServiceWorkerInstantiate {
         case MethodMessageTypes.GET_WALLET_STATE:
           ServiceWorkerInstantiate.getWalletState(sendResponse);
           break;
+        case WalletMessageTypes.THREE_WAY_LOGIN:
+          this.getLoginByThreeWay(sendResponse, message.payload);
+          break;
+
         default:
           sendResponse(errorHandler(700001, `Portkey does not contain this method (${message.type})`));
           break;
@@ -202,6 +192,31 @@ export default class ServiceWorkerInstantiate {
         ),
       );
     }
+  }
+
+  async threeWayLogin(sendResponse: SendResponseFun, { externalLink }: { externalLink: string }) {
+    try {
+      if (!externalLink) return sendResponse(errorHandler(400001, 'Missing param externalLink'));
+      const result = await notificationService.openPrompt(
+        {
+          method: PromptRouteTypes.EXPAND_FULL_SCREEN,
+          externalLink,
+        },
+        'windows',
+      );
+      if (result.error)
+        return sendResponse({
+          ...errorHandler(700001),
+          error: (result as any)?.error?.message || result.error || result,
+        });
+      sendResponse({ ...errorHandler(0), data: (result as any)?.response || result });
+    } catch (error) {
+      sendResponse(errorHandler(100001, error));
+    }
+  }
+
+  async getLoginByThreeWay(sendResponse: SendResponseFun, message: any) {
+    this.notificationServiceClose(sendResponse, { closeParams: message.params, promptType: 'windows' });
   }
 
   async openRecaptchaPage(sendResponse: SendResponseFun, message: any) {
@@ -265,7 +280,7 @@ export default class ServiceWorkerInstantiate {
    */
   async connectWallet(sendResponse: SendResponseFun, message: any) {
     try {
-      sendResponse(errorHandler(700001, ''));
+      sendResponse(errorHandler(700001, message));
     } catch (error) {
       console.log(error, 'connectWallet==');
       return sendResponse(errorHandler(500001, error));

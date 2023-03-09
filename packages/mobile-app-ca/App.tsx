@@ -62,6 +62,7 @@ const App = () => {
     // Lock the screen orientation Right-side up portrait only.
     lockScreenOrientation();
   }, []);
+
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>

@@ -1,8 +1,8 @@
 import { request } from '@portkey-wallet/api/api-did';
 import { ActivityItemType } from '@portkey-wallet/types/types-ca/activity';
-import { IActivityApiParams, IActivitysApiParams, IActivitysApiResponse } from './type';
+import { IActivityApiParams, IActivitiesApiParams, IActivitiesApiResponse } from './type';
 
-export function fetchActivities(params: IActivitysApiParams): Promise<IActivitysApiResponse> {
+export function fetchActivities(params: IActivitiesApiParams): Promise<IActivitiesApiResponse> {
   return request.activity.activityList({
     params: params,
   });

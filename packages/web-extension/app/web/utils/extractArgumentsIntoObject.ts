@@ -1,7 +1,3 @@
-/**
- * @file extractArgumentsIntoObject.js
- * @author atom.young,huangzongzhe
- */
 const isFunction = (object: any) => typeof object === 'function';
 const isBoolean = (object: any) => typeof object === 'boolean';
 export default function extractArgumentsIntoObject(args: any): {
@@ -9,6 +5,7 @@ export default function extractArgumentsIntoObject(args: any): {
   isSync: boolean;
 } {
   const result = {
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     callback: () => {},
     isSync: false, // isSync is forbidden in plugins
   };

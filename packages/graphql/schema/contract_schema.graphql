@@ -142,11 +142,11 @@ type CAHolderManagerDto {
   chainId: String
   caHash: String
   caAddress: String
-  managers: [ManagerInfo]
+  managerInfos: [ManagerInfo]
 }
 
 type ManagerInfo {
-  manager: String
+  address: String
   extraData: String
 }
 
@@ -170,7 +170,7 @@ type LoginGuardianDto {
 
 type GuardianDto {
   type: Int!
-  verifier: String
+  verifierId: String
   identifierHash: String
   salt: String
   isLoginGuardian: Boolean!
