@@ -38,13 +38,6 @@ export default function SendPreview({
   const wallet = useCurrentWalletInfo();
   const isTestNet = useMemo(() => currentNetwork === 'TESTNET', [currentNetwork]);
   // const ElfPrice = useTokenPrice(['ELF']);
-  const txFee = useMemo(() => {
-    if (isCross && symbol === 'ELF') {
-      return ZERO.plus(CROSS_FEE).plus(transactionFee).toNumber();
-    } else {
-      return transactionFee;
-    }
-  }, [isCross, symbol, transactionFee]);
   const toChain = useMemo(() => {
     const arr = toAccount.address.split('_');
     if (isAelfAddress(arr[arr.length - 1])) {
@@ -111,21 +104,29 @@ export default function SendPreview({
       <div className="fee-preview">
         <span className="label">Transaction fee</span>
         <p className="value">
-          <span className="symbol">{`${unitConverter(txFee)} ELF`}</span>
+          <span className="symbol">{`${unitConverter(transactionFee)} ELF`}</span>
           {/* <span className="usd">{`$ ${ZERO.plus(ElfPrice[0]).times(txFee).toFixed(2)}`}</span> */}
         </p>
       </div>
       {isCross && symbol === 'ELF' && (
-        <div className="fee-preview">
-          <span className="label">Estimated Amount Received</span>
-          <p className="value">
-            <span className="symbol">{`${
-              ZERO.plus(amount).isLessThanOrEqualTo(ZERO.plus(CROSS_FEE))
-                ? '0'
-                : unitConverter(ZERO.plus(amount).minus(ZERO.plus(CROSS_FEE)))
-            } ELF`}</span>
-          </p>
-        </div>
+        <>
+          <div className="fee-preview">
+            <span className="label">Cross chain Transaction fee</span>
+            <p className="value">
+              <span className="symbol">{`${unitConverter(CROSS_FEE)} ELF`}</span>
+            </p>
+          </div>
+          <div className="fee-preview">
+            <span className="label">Estimated Amount Received</span>
+            <p className="value">
+              <span className="symbol">{`${
+                ZERO.plus(amount).isLessThanOrEqualTo(ZERO.plus(CROSS_FEE))
+                  ? '0'
+                  : unitConverter(ZERO.plus(amount).minus(ZERO.plus(CROSS_FEE)))
+              } ELF`}</span>
+            </p>
+          </div>
+        </>
       )}
     </div>
   );

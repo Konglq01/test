@@ -11,16 +11,16 @@ interface MenuItemInfo {
   click: () => void;
 }
 
-export default function AccountSetting() {
+export default function WalletSecurity() {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
   const MenuList: MenuItemInfo[] = useMemo(
     () => [
       {
-        label: t('Change Pin'),
+        label: t('Manage Devices'),
         click: () => {
-          navigate('/setting/account-setting/set-pin');
+          navigate('/setting/wallet-security/manage-devices');
         },
       },
     ],
@@ -28,10 +28,10 @@ export default function AccountSetting() {
   );
 
   return (
-    <div className="account-setting-frame">
-      <div className="account-setting-title">
+    <div className="wallet-security-frame">
+      <div className="wallet-security-title">
         <BackHeader
-          title={t('Account Setting')}
+          title={t('Wallet Security')}
           leftCallBack={() => {
             navigate('/setting');
           }}
