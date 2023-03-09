@@ -6,7 +6,6 @@ import { ModalBody } from 'components/ModalBody';
 import CommonInput from 'components/CommonInput';
 import { useAppCASelector } from '@portkey-wallet/hooks/hooks-ca';
 import { TokenItemShowType } from '@portkey-wallet/types/types-eoa/token';
-import { filterTokenList } from '@portkey-wallet/utils/token';
 import { AccountType } from '@portkey-wallet/types/wallet';
 import TokenListItem from 'components/TokenListItem';
 import { defaultColors } from 'assets/theme';

@@ -31,7 +31,7 @@ export const pageStyles = StyleSheet.create({
     borderRadius: pTd(18),
     backgroundColor: bg6,
     marginRight: pTd(8),
-    borderWidth: pTd(1),
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: border1,
     alignItems: 'center',
     justifyContent: 'center',

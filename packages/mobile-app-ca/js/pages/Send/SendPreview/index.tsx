@@ -7,7 +7,6 @@ import { TextM, TextS, TextL } from 'components/CommonText';
 import CommonButton from 'components/CommonButton';
 import ActionSheet from 'components/ActionSheet';
 import { formatChainInfo, formatStr2EllipsisStr } from 'utils';
-import { addRecentContact } from '@portkey-wallet/store/store-ca/recent/slice';
 import { isCrossChain } from '@portkey-wallet/utils/aelf';
 import { useLanguage } from 'i18n/hooks';
 import { useAppCommonDispatch } from '@portkey-wallet/hooks';
@@ -42,6 +41,7 @@ import {
   fetchTokenListAsync,
 } from '@portkey-wallet/store/store-ca/assets/slice';
 import { sleep } from '@portkey-wallet/utils';
+import { FontStyles } from 'assets/theme/styles';
 
 export interface SendHomeProps {
   route?: any;
@@ -225,7 +225,6 @@ const SendHome: React.FC<SendHomeProps> = props => {
       if (error.type === 'managerTransfer') {
         console.log(error);
         CommonToast.failError(error.error);
-        console.log('????');
         return;
       } else if (error.type === 'crossChainTransfer') {
         dispatch(
@@ -264,13 +263,15 @@ const SendHome: React.FC<SendHomeProps> = props => {
             <Image style={styles.img} source={{ uri: assetInfo?.imageUrl }} />
           )}
           <View style={styles.topLeft}>
-            <TextL style={styles.nftTitle}>{`${assetInfo.alias} #${assetInfo?.tokenId}`} </TextL>
+            <TextL style={[styles.nftTitle, fonts.mediumFont]}>{`${assetInfo.alias} #${assetInfo?.tokenId}`} </TextL>
             <TextS>{`Amount：${sendNumber}`}</TextS>
           </View>
         </View>
       ) : (
         <>
-          <Text style={styles.tokenCount}>{`- ${sendNumber} ${assetInfo?.symbol}`} </Text>
+          <Text style={[styles.tokenCount, FontStyles.font3, fonts.mediumFont]}>
+            {`- ${sendNumber} ${assetInfo?.symbol}`}{' '}
+          </Text>
           {/* <TextM style={styles.tokenUSD}>-$ -</TextM> */}
         </>
       )}
@@ -293,9 +294,9 @@ const SendHome: React.FC<SendHomeProps> = props => {
         {/* To */}
         <View style={styles.section}>
           <View style={[styles.flexSpaceBetween]}>
-            <TextM style={[styles.blackFontColor]}>{t('To')}</TextM>
+            <TextM style={[styles.lightGrayFontColor]}>{t('To')}</TextM>
             <View style={styles.alignItemsEnd}>
-              {toInfo?.name && <TextM style={[styles.blackFontColor, styles.fontBold]}>{toInfo?.name}</TextM>}
+              {toInfo?.name && <TextM style={[styles.blackFontColor]}>{toInfo?.name}</TextM>}
               <TextS style={styles.lightGrayFontColor}>{formatStr2EllipsisStr(toInfo?.address)}</TextS>
             </View>
           </View>
@@ -304,10 +305,10 @@ const SendHome: React.FC<SendHomeProps> = props => {
         {/* more Info */}
         <View style={styles.section}>
           <View style={[styles.flexSpaceBetween]}>
-            <TextM style={[styles.blackFontColor]}>{t('Network')}</TextM>
-            <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${formatChainInfo(
-              assetInfo.chainId,
-            )} → ${networkInfoShow(toInfo?.address)} `}</TextM>
+            <TextM style={[styles.lightGrayFontColor]}>{t('Network')}</TextM>
+            <TextM style={[styles.blackFontColor]}>{`${formatChainInfo(assetInfo.chainId)} → ${networkInfoShow(
+              toInfo?.address,
+            )} `}</TextM>
           </View>
         </View>
         <Text style={[styles.divider, styles.marginTop0]} />
@@ -317,10 +318,6 @@ const SendHome: React.FC<SendHomeProps> = props => {
             <TextM style={[styles.blackFontColor, styles.fontBold]}>{t('Transaction Fee')}</TextM>
             <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${txFeeShow} ${'ELF'} `}</TextM>
           </View>
-          {/* <View style={[styles.flexSpaceBetween, styles.marginTop4]}>
-            <Text />
-            <TextS style={styles.lightGrayFontColor}>{`$ ${'-'}`}</TextS>
-          </View> */}
         </View>
 
         {isCrossChainTransfer && assetInfo.symbol === 'ELF' && <Text style={[styles.divider, styles.marginTop0]} />}
@@ -345,8 +342,6 @@ const SendHome: React.FC<SendHomeProps> = props => {
     </PageContainer>
   );
 };
-
-addRecentContact;
 
 export default memo(SendHome);
 
@@ -408,6 +403,8 @@ export const styles = StyleSheet.create({
   buttonWrapStyle: {
     flex: 1,
     justifyContent: 'flex-end',
+    paddingBottom: pTd(12),
+    paddingTop: pTd(12),
   },
   errorMessage: {
     lineHeight: pTd(16),
@@ -424,7 +421,7 @@ export const styles = StyleSheet.create({
   },
   borderTop: {
     borderTopColor: defaultColors.border6,
-    borderTopWidth: pTd(0.5),
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
   title: {
     flex: 1,
@@ -469,7 +466,7 @@ export const styles = StyleSheet.create({
   divider: {
     marginTop: pTd(24),
     width: '100%',
-    height: pTd(0.5),
+    height: StyleSheet.hairlineWidth,
     backgroundColor: defaultColors.border6,
   },
   titles2: {
@@ -481,7 +478,7 @@ export const styles = StyleSheet.create({
   card: {
     marginTop: pTd(40),
     borderRadius: pTd(6),
-    borderWidth: pTd(0.5),
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: defaultColors.border1,
     width: '100%',
   },

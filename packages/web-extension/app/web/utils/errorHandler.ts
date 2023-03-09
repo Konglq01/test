@@ -1,9 +1,4 @@
 /**
- * @file utils/errorHandler.ts
- * @author huangzongzhe
- */
-
-/**
  * 1xxxxx try catch
  * 2xxxxx handle
  * 3xxxxx
@@ -11,9 +6,7 @@
  * 5xxxxx rpc error
  * 6xxxxx event error
  */
-// About Error Code. Redundant design.
-// https://www.zhihu.com/question/24091286
-// https://open.taobao.com/doc.htm?docId=114&docType=1
+
 // Unified format: A-BB-CCC
 // A: Error level, such as 1 for system-level errors, 2 for service-level errors;
 // // B: Project or module name, generally the company will not have more than 99 projects;

@@ -223,7 +223,11 @@ export default function AddGuardian() {
         closable={false}
         open={visible}
         onCancel={() => setVisible(false)}>
-        <p className="modal-content">{`${verifierName} will send a verification code to ${emailVal} to verify your email address.`}</p>
+        <p className="modal-content">
+          {`${verifierName} will send a verification code to `}
+          <span className="bold">{emailVal}</span>
+          {` to verify your email address.`}
+        </p>
         <div className="btn-wrapper">
           <Button onClick={() => setVisible(false)}>{'Cancel'}</Button>
           <Button type="primary" onClick={handleVerify}>

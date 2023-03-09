@@ -7,9 +7,17 @@ const { font2, font4 } = defaultColors;
 export const dashBoardBtnStyle = StyleSheet.create({
   buttonWrap: {
     marginBottom: pTd(24),
+    width: pTd(54),
+  },
+  iconWrapStyle: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignContent: 'center',
+    justifyContent: 'center',
   },
   titleStyle: {
-    marginTop: pTd(2),
+    width: '100%',
+    marginTop: pTd(4),
     textAlign: 'center',
     color: font2,
     fontSize: pTd(14),
@@ -19,6 +27,11 @@ export const dashBoardBtnStyle = StyleSheet.create({
 
 export const innerPageStyles = StyleSheet.create({
   buttonWrap: {},
+  iconWrapStyle: {
+    display: 'flex',
+    alignContent: 'center',
+    justifyContent: 'center',
+  },
   titleStyle: {
     marginTop: pTd(2),
     textAlign: 'center',

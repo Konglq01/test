@@ -8,6 +8,8 @@ import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { CROSS_FEE } from '@portkey-wallet/constants/constants-ca/wallet';
 import { unitConverter } from '@portkey-wallet/utils/converter';
 import { isAelfAddress } from '@portkey-wallet/utils/aelf';
+import { ChainId } from '@portkey-wallet/types';
+import { chainShowText } from '@portkey-wallet/utils';
 
 export default function SendPreview({
   amount,
@@ -36,7 +38,6 @@ export default function SendPreview({
   const wallet = useCurrentWalletInfo();
   const isTestNet = useMemo(() => currentNetwork === 'TESTNET', [currentNetwork]);
   // const ElfPrice = useTokenPrice(['ELF']);
-  const isMain = useMemo(() => (chainId === 'AELF' ? 'MainChain' : 'SideChain'), [chainId]);
   const txFee = useMemo(() => {
     if (isCross && symbol === 'ELF') {
       return ZERO.plus(CROSS_FEE).plus(transactionFee).toNumber();
@@ -101,7 +102,9 @@ export default function SendPreview({
         <div className="item network">
           <span>Network</span>
           <div>
-            <p>{`${isMain} ${chainId}->${toChain === 'AELF' ? 'MainChain' : 'SideChain'} ${toChain}`}</p>
+            <p className="chain">
+              {`${chainShowText(chainId as ChainId)} ${chainId}->${chainShowText(toChain as ChainId)} ${toChain}`}
+            </p>
           </div>
         </div>
       </div>

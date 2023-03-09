@@ -6,7 +6,7 @@ import { getActivityListAsync } from '@portkey-wallet/store/store-ca/activity/ac
 import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { useUserInfo } from 'store/Provider/hooks';
 import { transactionTypesForActivityList } from '@portkey-wallet/constants/constants-ca/activity';
-import { IActivitysApiParams } from '@portkey-wallet/store/store-ca/activity/type';
+import { IActivitiesApiParams } from '@portkey-wallet/store/store-ca/activity/type';
 import { clearActivity } from '@portkey-wallet/store/store-ca/activity/slice';
 
 export interface ActivityProps {
@@ -41,7 +41,7 @@ export default function Activity({ appendData, clearData, chainId, symbol }: Act
       // If you want to get the latest data, please dispatch(clearState()) first
       dispatch(clearActivity());
 
-      const params: IActivitysApiParams = {
+      const params: IActivitiesApiParams = {
         maxResultCount: AMX_RESULT_COUNT,
         skipCount: SKIP_COUNT,
         caAddresses: caAddressList,

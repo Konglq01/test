@@ -12,7 +12,6 @@ import ActionSheet from 'components/ActionSheet';
 import useQrScanPermission from 'hooks/useQrScanPermission';
 import { ZERO } from '@portkey-wallet/constants/misc';
 import { customFetch } from '@portkey-wallet/utils/fetch';
-import useEffectOnce from 'hooks/useEffectOnce';
 import { getEntireDIDAelfAddress, isAllowAelfAddress, isCrossChain } from '@portkey-wallet/utils/aelf';
 import useDebounce from 'hooks/useDebounce';
 import { useLanguage } from 'i18n/hooks';
@@ -34,6 +33,8 @@ import { getELFChainBalance } from '@portkey-wallet/utils/balance';
 import { BGStyles } from 'assets/theme/styles';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import Loading from 'components/Loading';
+import { DEFAULT_DECIMAL } from '@portkey-wallet/constants/constants-ca/activity';
+import { CROSS_FEE } from '@portkey-wallet/constants/constants-ca/wallet';
 
 export interface SendHomeProps {
   route?: any;
@@ -42,7 +43,7 @@ enum ErrorMessage {
   RecipientAddressIsInvalid = 'Recipient address is invalid',
   NoCorrespondingNetwork = 'No corresponding network',
   InsufficientFunds = 'Insufficient funds',
-  InsufficientQuantity = 'Insufficient Quantity',
+  InsufficientQuantity = 'Insufficient quantity',
   InsufficientFundsForTransactionFee = 'Insufficient funds for transaction fee',
 }
 
@@ -184,8 +185,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
 
         case 'crossChain':
           ActionSheet.alert({
-            title: t(''),
-            message: t('This is a cross-chain transaction'),
+            title: t('This is a cross-chain transaction'),
             buttons: [
               {
                 title: t('Cancel'),
@@ -236,7 +236,10 @@ const SendHome: React.FC<SendHomeProps> = props => {
   }, [assetInfo.chainId, selectedToContact.address, showDialog]);
 
   const nextStep = useCallback(() => {
-    if (checkCanNext()) return setStep(2);
+    if (checkCanNext()) {
+      setErrorMessage([]);
+      return setStep(2);
+    }
   }, [checkCanNext]);
 
   //when finish send  upDate balance
@@ -246,7 +249,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
    * not elf：  not elf balance \  not elf sendNumber \ elf balance \ elf fee
    */
 
-  const checkCanPreview = async () => {
+  const checkCanPreview = useCallback(async () => {
     let fee;
     setErrorMessage([]);
 
@@ -259,6 +262,11 @@ const SendHome: React.FC<SendHomeProps> = props => {
       if (assetInfo.symbol === 'ELF') {
         // ELF
         if (sendBigNumber.isGreaterThanOrEqualTo(assetBalanceBigNumber)) {
+          setErrorMessage([ErrorMessage.InsufficientFunds]);
+          return { status: false };
+        }
+
+        if (assetBalanceBigNumber.isLessThan(timesDecimals(CROSS_FEE, DEFAULT_DECIMAL))) {
           setErrorMessage([ErrorMessage.InsufficientFunds]);
           return { status: false };
         }
@@ -296,9 +304,18 @@ const SendHome: React.FC<SendHomeProps> = props => {
     Loading.hide();
 
     return { status: true, fee };
-  };
+  }, [
+    assetInfo.chainId,
+    assetInfo.symbol,
+    getTransactionFee,
+    selectedAssets.balance,
+    selectedAssets.decimals,
+    selectedToContact.address,
+    sendNumber,
+    sendType,
+  ]);
 
-  const preview = async () => {
+  const preview = useCallback(async () => {
     // TODO : getTransactionFee and check the balance
     const result = await checkCanPreview();
     if (!result?.status) return;
@@ -313,12 +330,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
       transactionFee: result?.fee || '0',
       sendNumber,
     } as IToSendPreviewParamsType);
-  };
-
-  // get the target token balance
-  // useEffectOnce(() => {
-
-  // });
+  }, [assetInfo.chainId, checkCanPreview, selectedAssets, selectedToContact, sendNumber, sendType]);
 
   useEffect(() => {
     (async () => {
@@ -326,6 +338,31 @@ const SendHome: React.FC<SendHomeProps> = props => {
       setSelectedAssets({ ...selectedAssets, balance });
     })();
   }, [assetInfo.address, assetInfo.symbol, assetInfo.tokenContractAddress, getAssetBalance, selectedAssets]);
+
+  const ButtonUI = useMemo(() => {
+    return (
+      <View style={[styles.buttonWrapStyle, step === 1 && BGStyles.bg1]}>
+        {step === 2 && (
+          <CommonButton
+            disabled={previewDisable}
+            loading={isLoading}
+            title={t('Preview')}
+            type="primary"
+            onPress={preview}
+          />
+        )}
+        {step === 1 && (
+          <CommonButton
+            loading={isLoading}
+            disabled={nextDisable}
+            title={t('Next')}
+            type="primary"
+            onPress={() => nextStep()}
+          />
+        )}
+      </View>
+    );
+  }, [isLoading, nextDisable, nextStep, preview, previewDisable, step, t]);
 
   return (
     <PageContainer
@@ -348,7 +385,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
       scrollViewProps={{ disabled: true }}>
       {/* Group 1 */}
       <View style={styles.group}>
-        <From selectedFromAccount={selectedFromAccount} />
+        <From />
         <To
           step={step}
           setStep={setStep}
@@ -388,11 +425,13 @@ const SendHome: React.FC<SendHomeProps> = props => {
       )}
 
       {errorMessage.includes(ErrorMessage.InsufficientFunds) && (
-        <Text style={[styles.errorMessage, GStyles.textAlignCenter]}>{t(ErrorMessage.InsufficientFunds)}</Text>
+        <Text style={[styles.errorMessage, sendType === 'nft' && GStyles.textAlignCenter]}>
+          {t(ErrorMessage.InsufficientFunds)}
+        </Text>
       )}
 
       {errorMessage.includes(ErrorMessage.InsufficientFundsForTransactionFee) && (
-        <Text style={[styles.errorMessage, GStyles.textAlignCenter]}>
+        <Text style={[styles.errorMessage, sendType === 'nft' && GStyles.textAlignCenter]}>
           {t(ErrorMessage.InsufficientFundsForTransactionFee)}
         </Text>
       )}
@@ -412,26 +451,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
         />
       )}
 
-      <View style={[styles.buttonWrapStyle, step === 1 && BGStyles.bg1]}>
-        {step === 2 && (
-          <CommonButton
-            disabled={previewDisable}
-            loading={isLoading}
-            title={t('Preview')}
-            type="primary"
-            onPress={preview}
-          />
-        )}
-        {step === 1 && (
-          <CommonButton
-            loading={isLoading}
-            disabled={nextDisable}
-            title={t('Next')}
-            type="primary"
-            onPress={() => nextStep()}
-          />
-        )}
-      </View>
+      {ButtonUI}
     </PageContainer>
   );
 };

@@ -16,7 +16,6 @@ import { useWallet } from 'hooks/store';
 import TokenListItem from 'components/TokenListItem';
 import { FontStyles } from 'assets/theme/styles';
 import { useCaAddresses } from '@portkey-wallet/hooks/hooks-ca/wallet';
-import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import { fetchAssetList } from '@portkey-wallet/store/store-ca/assets/api';
 import { IAssetItemType } from '@portkey-wallet/store/store-ca/assets/type';
 import navigationService from 'utils/navigationService';
@@ -27,11 +26,6 @@ type TokenListProps = {
   account?: AccountType;
   onFinishSelectToken?: onFinishSelectTokenType;
 };
-
-// const enum noResult {
-//   'There are currently no assets to send' = 'There are currently no assets to send',
-//   'There is no search result.' = 'There is no search result.',
-// }
 
 const AssetItem = (props: { symbol: string; onPress: (item: any) => void; item: IAssetItemType }) => {
   const { symbol, onPress, item } = props;
@@ -84,7 +78,7 @@ const AssetItem = (props: { symbol: string; onPress: (item: any) => void; item: 
       </TouchableOpacity>
     );
   }
-  return <></>;
+  return null;
 };
 const MAX_RESULT_COUNT = 10;
 const INIT_PAGE_INFO = {
@@ -93,13 +87,14 @@ const INIT_PAGE_INFO = {
   isLoading: false,
 };
 
-const AssetList = ({ onFinishSelectToken, account }: TokenListProps) => {
+const AssetList = ({ account }: TokenListProps) => {
   const { t } = useLanguage();
   const caAddresses = useCaAddresses();
-  const currentNetworkInfo = useCurrentNetworkInfo();
   const [keyword, setKeyword] = useState('');
 
   const debounceKeyword = useDebounce(keyword, 800);
+
+  console.log(account);
 
   const [listShow, setListShow] = useState<IAssetItemType[]>([]);
   const pageInfoRef = useRef({
@@ -181,7 +176,7 @@ const AssetList = ({ onFinishSelectToken, account }: TokenListProps) => {
     <ModalBody modalBodyType="bottom" style={styles.modalStyle}>
       <TextXL style={[styles.title, FontStyles.font5]}>{t('Select Assets')}</TextXL>
 
-      {/* no assets in this accout  */}
+      {/* no assets in this account  */}
       {/* '{ import { list } from 'pages/SettingsPage/HelpAndFeedBack/config';' has been removed } */}
       <CommonInput
         placeholder={t('Search Assets')}
@@ -285,7 +280,7 @@ const itemStyle = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderBottomColor: defaultColors.bg7,
-    borderBottomWidth: pTd(0.5),
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   tokenName: {
     flex: 1,

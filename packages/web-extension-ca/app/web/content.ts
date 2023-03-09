@@ -69,7 +69,7 @@ const onMessageSetUpExtensionStreams = (msg: any) => {
   //   if (!stream) {
   //     new Content();
   //   }
-  //   return Promise.resolve(`Portkey_ca: handled ${EXTENSION_MESSAGES.READY}`);
+  //   return Promise.resolve(`Portkey_did: handled ${EXTENSION_MESSAGES.READY}`);
   // }
   return undefined;
 };

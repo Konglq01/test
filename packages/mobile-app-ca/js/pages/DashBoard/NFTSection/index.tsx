@@ -3,32 +3,27 @@ import NoData from 'components/NoData';
 import { StyleSheet, View, FlatList } from 'react-native';
 import { defaultColors } from 'assets/theme';
 import { useLanguage } from 'i18n/hooks';
-import useEffectOnce from 'hooks/useEffectOnce';
 import { pTd } from 'utils/unit';
 import NFTCollectionItem from './NFTCollectionItem';
 import { useCaAddresses } from '@portkey-wallet/hooks/hooks-ca/wallet';
-import { fetchNFTAsync, fetchNFTCollectionsAsync, clearNftItem } from '@portkey-wallet/store/store-ca/assets/slice';
+import { fetchNFTAsync, fetchNFTCollectionsAsync } from '@portkey-wallet/store/store-ca/assets/slice';
 import { useAppCommonDispatch } from '@portkey-wallet/hooks';
 import { useAppCASelector } from '@portkey-wallet/hooks';
 import { NFTCollectionItemShowType } from '@portkey-wallet/types/types-ca/assets';
 import { useWallet } from 'hooks/store';
 import Touchable from 'components/Touchable';
-import { REFRESH_TIME } from '@portkey-wallet/constants/constants-ca/assets';
 import { ChainId } from '@portkey-wallet/types';
 import { useRoute } from '@react-navigation/native';
+import useLockCallback from 'hooks/useLockCallback';
 
 export interface OpenCollectionObjType {
+  // key = symbol+chainId
   [key: string]: {
-    // key = symbol+chainId
     pageNum: number;
     pageSize: number;
     itemCount: number;
   };
 }
-
-type NFTSectionPropsType = {
-  getAccountBalance?: () => void;
-};
 
 type NFTCollectionProps = NFTCollectionItemShowType & {
   isCollapsed: boolean;
@@ -39,21 +34,21 @@ type NFTCollectionProps = NFTCollectionItemShowType & {
   loadMoreItem: (symbol: string, chainId: ChainId, pageNum: number) => void;
 };
 
-function areEqual(prevProps: NFTCollectionProps, nextProps: NFTCollectionProps) {
-  return false;
-  // return nextProps.isCollapsed === prevProps.isCollapsed && nextProps.children.length === prevProps.children.length;
-}
+// TODO make the list fluently
+// function areEqual(prevProps: NFTCollectionProps, nextProps: NFTCollectionProps) {
+//   return false;
+//    return nextProps.isCollapsed === prevProps.isCollapsed && nextProps.children.length === prevProps.children.length;
+// }
 
 const NFTCollection: React.FC<NFTCollectionProps> = memo((props: NFTCollectionProps) => {
   const { symbol, isCollapsed } = props;
-  // const dispatch = useAppCommonDispatch();
 
   return <NFTCollectionItem key={symbol} collapsed={isCollapsed} {...props} />;
-}, areEqual);
+});
 
 NFTCollection.displayName = 'NFTCollection';
 
-export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
+export default function NFTSection() {
   const { t } = useLanguage();
   const caAddresses = useCaAddresses();
   const { currentNetwork, walletInfo } = useWallet();
@@ -91,8 +86,8 @@ export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
     [openCollectionObj],
   );
 
-  const openItem = useCallback(
-    (symbol: string, chainId: ChainId, itemCount: number) => {
+  const openItem = useLockCallback(
+    async (symbol: string, chainId: ChainId, itemCount: number) => {
       const currentCaAddress = walletInfo?.caInfo?.[currentNetwork]?.[chainId]?.caAddress;
 
       const key = `${symbol}${chainId}`;
@@ -105,7 +100,7 @@ export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
         },
       };
 
-      dispatch(
+      await dispatch(
         fetchNFTAsync({
           symbol,
           chainId,
@@ -160,7 +155,6 @@ export default function NFTSection({ getAccountBalance }: NFTSectionPropsType) {
         keyExtractor={(item: NFTCollectionItemShowType) => item?.symbol + item.chainId}
         onRefresh={() => {
           setOpenCollectionObj({});
-          getAccountBalance?.();
           fetchNFTList();
         }}
         onEndReached={() => {

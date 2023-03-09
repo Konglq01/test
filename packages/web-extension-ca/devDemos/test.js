@@ -1,7 +1,3 @@
-/**
- * @file testNew
- * @author huangzongzhe
- */
 /* global portkey_did */
 
 // century renew blade meadow faith evil uniform work discover poet ripple drill
@@ -13,27 +9,27 @@ const tokenContractAddress = 'ELF_JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvo
 let testAddress = 'YUW9zH5GhRboT5JK4vXp5BLAfCDv28rRmTQwo418FuaJmkSg8';
 
 // events
-document.addEventListener('Portkey_ca#initialized', (result) => {
+document.addEventListener('Portkey_did#initialized', (result) => {
   console.log('portkey_did#initialized', Date.now());
   console.log('portkey_did test.html: ', result);
 
-  portkey_did.on('connect', (...args) => {
+  window.portkey_did.on('connect', (...args) => {
     console.log(args, 'connect== on');
   });
 
-  portkey_did.on('chainChanged', (...args) => {
+  window.portkey_did.on('chainChanged', (...args) => {
     console.log(args, '_handleChainChanged== on');
     const loginInfo = document.getElementById('chain-info');
     loginInfo.innerHTML = JSON.stringify(args[0]);
     testAddress = args[0].address;
   });
 
-  portkey_did.on('accountsChanged', (...args) => {
+  window.portkey_did.on('accountsChanged', (...args) => {
     const loginInfo = document.getElementById('login-info');
     console.log(args, 'accountsChanged== on');
     loginInfo.innerHTML = JSON.stringify(args[0]);
   });
-  portkey_did.on('onDisconnect', (...args) => {
+  window.portkey_did.on('onDisconnect', (...args) => {
     console.log(args, 'onDisconnect== on');
   });
 
@@ -369,7 +365,6 @@ document.addEventListener('Portkey_ca#initialized', (result) => {
     );
   };
 
-  // 根据hostname, address, contractAddress查询
   // checkPermissionDefault.onclick = function () {
   //     portkey_did.api({
   //         appName: 'hzzTest',
@@ -421,7 +416,7 @@ document.addEventListener('Portkey_ca#initialized', (result) => {
 
   const illegalMethod = document.getElementById('error-illegal-method');
   illegalMethod.onclick = function () {
-    portkey_did
+    window.portkey_did
       .request({
         appName: 'hzzTest',
         method: 'GET_ADDRESS233',
@@ -460,7 +455,7 @@ document.addEventListener('Portkey_ca#initialized', (result) => {
 
   const setRecaptchaCode = document.getElementById('set-recaptcha-code');
   setRecaptchaCode.onclick = async () => {
-    const list = await window.Portkey_ca.request({
+    const list = await window.Portkey_did.request({
       method: 'portkey_setReCaptchaCodeV2',
       params: {
         a: 1,
