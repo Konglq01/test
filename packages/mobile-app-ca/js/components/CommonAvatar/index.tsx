@@ -7,7 +7,7 @@ import { defaultColors } from 'assets/theme';
 import { Image } from 'react-native';
 
 interface CommonAvatarProps {
-  title: string;
+  title?: string;
   avatarSize?: string | number;
   svgName?: IconName;
   imageUrl?: string;
@@ -27,14 +27,6 @@ export default function CommonAvatar(props: CommonAvatarProps) {
     borderRadius: shapeType === 'square' ? pTd(6) : Number(avatarSize) / 2,
   };
 
-  if (imageUrl)
-    return (
-      <Image
-        style={[styles.avatarWrap, shapeType === 'square' && styles.squareStyle, sizeStyle, style]}
-        source={{ uri: imageUrl }}
-      />
-    );
-
   if (svgName)
     return (
       <Svg
@@ -47,6 +39,14 @@ export default function CommonAvatar(props: CommonAvatarProps) {
           ...sizeStyle,
           ...style,
         }}
+      />
+    );
+
+  if (imageUrl)
+    return (
+      <Image
+        style={[styles.avatarWrap, shapeType === 'square' && styles.squareStyle, sizeStyle, style]}
+        source={{ uri: imageUrl }}
       />
     );
 

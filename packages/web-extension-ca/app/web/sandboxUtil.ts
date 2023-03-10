@@ -1,5 +1,5 @@
 import SandboxEventTypes from 'messages/SandboxEventTypes';
-import { encodedTx, getAelfInstance, getWallet } from '@portkey-wallet/utils/aelf';
+import { getWallet } from '@portkey-wallet/utils/aelf';
 import SandboxEventService, { SandboxErrorCode } from 'service/SandboxEventService';
 import { ChainType } from '@portkey-wallet/types';
 import { TokenItemType } from '@portkey-wallet/types/types-ca/token';

@@ -1,13 +1,11 @@
-import { TokenItemShowType } from '@portkey-wallet/types/types-eoa/token';
 import React from 'react';
-import { View, Text, StyleSheet, TextInput } from 'react-native';
+import { View, StyleSheet, TextInput } from 'react-native';
 import { pTd } from 'utils/unit';
-import { parseInputChange } from '@portkey-wallet/utils/input';
 import { defaultColors } from 'assets/theme';
 import GStyles from 'assets/theme/GStyles';
 import { useLanguage } from 'i18n/hooks';
 import { TextM } from 'components/CommonText';
-import { style } from 'components/Dialog/style';
+import { FontStyles } from 'assets/theme/styles';
 
 interface AmountNFT {
   sendNumber: string;
@@ -23,7 +21,7 @@ export default function AmountNFT(props: AmountNFT) {
       <TextM style={styles.title}>Amount</TextM>
       <View style={styles.iptWrap}>
         <TextInput
-          style={styles.inputStyle}
+          style={[styles.inputStyle, sendNumber === '0' && FontStyles.font7]}
           keyboardType="numeric"
           maxLength={18}
           value={sendNumber}

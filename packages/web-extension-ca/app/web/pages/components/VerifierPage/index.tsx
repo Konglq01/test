@@ -12,9 +12,8 @@ import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type'
 import { useTranslation } from 'react-i18next';
 import { setUserGuardianSessionIdAction } from '@portkey-wallet/store/store-ca/guardians/actions';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
-import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import { LoginKeyType, LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import { useEffectOnce } from 'react-use';
-import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verification } from 'utils/api';
 
@@ -56,7 +55,8 @@ export default function VerifierPage({ currentGuardian, guardianType, isInitStat
           setLoading(true);
 
           const res = await checkVerificationCode({
-            guardianAccount: currentGuardian.guardianAccount,
+            type: LoginType[currentGuardian?.guardianType as LoginType],
+            guardianIdentifier: currentGuardian.guardianAccount,
             verifierSessionId: currentGuardian.verifierInfo.sessionId,
             verificationCode: code,
             verifierId: currentGuardian.verifier?.id || '',
@@ -91,8 +91,8 @@ export default function VerifierPage({ currentGuardian, guardianType, isInitStat
       setLoading(true);
       const res = await verification.sendVerificationCode({
         params: {
-          guardianAccount: currentGuardian.guardianAccount,
-          type: LoginStrType[guardianType],
+          guardianIdentifier: currentGuardian.guardianAccount,
+          type: LoginType[guardianType],
           verifierId: currentGuardian.verifier?.id || '',
           chainId: DefaultChainId,
         },

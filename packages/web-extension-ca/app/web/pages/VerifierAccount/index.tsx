@@ -25,6 +25,7 @@ import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { setRegisterVerifierAction } from 'store/reducers/loginCache/actions';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
 import aes from '@portkey-wallet/utils/aes';
+import { handleVerificationDoc } from '@portkey-wallet/utils/guardian';
 
 export default function VerifierAccount() {
   const { loginAccount } = useLoginInfo();
@@ -57,23 +58,18 @@ export default function VerifierAccount() {
               method: GuardianMth.SetGuardianTypeForLogin,
               params: {
                 caHash: walletInfo?.AELF?.caHash,
-                guardianAccount: {
-                  guardian: {
-                    type: currentGuardian?.guardianType,
-                    verifier: {
-                      id: currentGuardian?.verifier?.id,
-                    },
-                  },
+                guardian: {
+                  type: currentGuardian?.guardianType,
+                  verifierId: currentGuardian?.verifier?.id,
+                  identifierHash: currentGuardian?.identifierHash,
+                  salt: currentGuardian?.salt,
                   value: currentGuardian?.guardianAccount,
+                  isLoginGuardian: false,
                 },
               },
             },
           });
           console.log('setLoginAccount', result);
-          // const { TransactionId } = result.result.message || result;
-          // await sleep(1000);
-          // const aelfInstance = getAelfInstance(currentChain.endPoint);
-          // await getTxResult(aelfInstance, TransactionId);
           opGuardian &&
             dispatch(
               setOpGuardianAction({
@@ -90,12 +86,14 @@ export default function VerifierAccount() {
         }
       } else {
         if (!currentGuardian) return;
+        const { guardianIdentifier } = handleVerificationDoc(res.verificationDoc);
         dispatch(
           setUserGuardianItemStatus({
             key: currentGuardian.key,
             status: VerifyStatus.Verified,
             signature: res.signature,
             verificationDoc: res.verificationDoc,
+            identifierHash: guardianIdentifier,
           }),
         );
         navigate('/setting/guardians/guardian-approval', { state: state });

@@ -6,7 +6,7 @@ import { pTd } from 'utils/unit';
 import { TextM, TextS, TextL } from 'components/CommonText';
 import CommonButton from 'components/CommonButton';
 import ActionSheet from 'components/ActionSheet';
-import { formatChainInfo, formatStr2EllipsisStr } from 'utils';
+import { formatChainInfoToShow, formatStr2EllipsisStr } from '@portkey-wallet/utils';
 import { isCrossChain } from '@portkey-wallet/utils/aelf';
 import { useLanguage } from 'i18n/hooks';
 import { useAppCommonDispatch } from '@portkey-wallet/hooks';
@@ -286,7 +286,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
           <View style={[styles.flexSpaceBetween]}>
             <TextM style={styles.lightGrayFontColor} />
             <TextS style={styles.lightGrayFontColor}>
-              {formatStr2EllipsisStr(`ELF_${caAddresses[0]}_${assetInfo.chainId}`)}
+              {formatStr2EllipsisStr(`ELF_${wallet?.[assetInfo?.chainId]?.caAddress}_${assetInfo.chainId}`)}
             </TextS>
           </View>
         </View>
@@ -296,7 +296,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
           <View style={[styles.flexSpaceBetween]}>
             <TextM style={[styles.lightGrayFontColor]}>{t('To')}</TextM>
             <View style={styles.alignItemsEnd}>
-              {toInfo?.name && <TextM style={[styles.blackFontColor, styles.fontBold]}>{toInfo?.name}</TextM>}
+              {toInfo?.name && <TextM style={[styles.blackFontColor]}>{toInfo?.name}</TextM>}
               <TextS style={styles.lightGrayFontColor}>{formatStr2EllipsisStr(toInfo?.address)}</TextS>
             </View>
           </View>
@@ -305,8 +305,8 @@ const SendHome: React.FC<SendHomeProps> = props => {
         {/* more Info */}
         <View style={styles.section}>
           <View style={[styles.flexSpaceBetween]}>
-            <TextM style={[styles.lightGrayFontColor]}>{t('Network')}</TextM>
-            <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${formatChainInfo(
+            <TextM style={[styles.blackFontColor]}>{t('Network')}</TextM>
+            <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${formatChainInfoToShow(
               assetInfo.chainId,
             )} → ${networkInfoShow(toInfo?.address)} `}</TextM>
           </View>

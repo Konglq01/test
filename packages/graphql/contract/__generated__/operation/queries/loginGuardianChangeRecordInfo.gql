@@ -9,7 +9,7 @@ query loginGuardianChangeRecordInfo($dto: GetLoginGuardianChangeRecordDto){
         manager
         loginGuardian{
             type
-            verifier
+            verifierId
             identifierHash
             salt
             isLoginGuardian

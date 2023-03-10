@@ -4,8 +4,8 @@ query caHolderManagerInfo($dto: GetCAHolderManagerInfoDto){
         chainId
         caHash
         caAddress
-        managers{
-            manager
+        managerInfos{
+            address
             extraData
         }
     }

@@ -1,6 +1,5 @@
 import { setCurrentGuardianAction, setUserGuardianItemStatus } from '@portkey-wallet/store/store-ca/guardians/actions';
 import { UserGuardianItem, UserGuardianStatus } from '@portkey-wallet/store/store-ca/guardians/type';
-import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
 import { VerifyStatus } from '@portkey-wallet/types/verifier';
 import { Button, message } from 'antd';
 import clsx from 'clsx';
@@ -14,6 +13,7 @@ import { LoginInfo } from 'store/reducers/loginCache/type';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
 import { verification } from 'utils/api';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 
 interface GuardianItemProps {
   disabled?: boolean;
@@ -40,8 +40,8 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
         );
         const result = await verification.sendVerificationCode({
           params: {
-            guardianAccount: item?.guardianAccount,
-            type: LoginStrType[item.guardianType],
+            guardianIdentifier: item?.guardianAccount,
+            type: LoginType[item.guardianType],
             verifierId: item?.verifier?.id || '',
             chainId: DefaultChainId,
           },
@@ -84,15 +84,15 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
           guardianSendCode(item);
           return;
         }
-        if (!loginAccount || !LoginStrType[loginAccount.loginType] || !loginAccount.guardianAccount)
+        if (!loginAccount || !LoginType[loginAccount.loginType] || !loginAccount.guardianAccount)
           return message.error(
             'User registration information is invalid, please fill in the registration method again',
           );
         setLoading(true);
         const result = await verification.sendVerificationCode({
           params: {
-            guardianAccount: item?.guardianAccount,
-            type: LoginStrType[loginAccount.loginType],
+            guardianIdentifier: item?.guardianAccount,
+            type: LoginType[loginAccount.loginType],
             verifierId: item.verifier?.id || '',
             chainId: DefaultChainId,
           },

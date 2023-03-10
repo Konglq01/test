@@ -1,7 +1,7 @@
 import { IStorage, StorageBaseLoader } from '@portkey-wallet/types/storage';
 import { request } from '@portkey-wallet/api/api-did';
 import { RequestConfig } from '../../types';
-import { TLoginStrType } from '@portkey-wallet/types/types-ca/wallet';
+import { LoginKeyType } from '@portkey-wallet/types/types-ca/wallet';
 
 type VerifierInfo = {
   verifierSessionId: string;
@@ -10,8 +10,8 @@ type VerifierInfo = {
 
 interface SendVerificationConfig extends RequestConfig {
   params: {
-    type: TLoginStrType;
-    guardianAccount?: string;
+    type: LoginKeyType;
+    guardianIdentifier?: string;
     verifierId?: string;
     chainId: string | number;
   };
@@ -59,8 +59,8 @@ export class Verification extends StorageBaseLoader {
     await this.save();
   }
   public async sendVerificationCode(config: SendVerificationConfig) {
-    const { guardianAccount, verifierId } = config.params;
-    const key = guardianAccount || '' + verifierId || '';
+    const { guardianIdentifier, verifierId } = config.params;
+    const key = guardianIdentifier || '' + verifierId || '';
     try {
       const req = await request.verify.sendVerificationRequest(config);
       await this.set(key, { ...req, time: Date.now() });

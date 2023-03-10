@@ -1,3 +1,4 @@
+import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
 import { ZERO } from '@portkey-wallet/constants/misc';
 import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
 import { unitConverter } from '@portkey-wallet/utils/converter';
@@ -8,8 +9,8 @@ import { TextL, TextS } from 'components/CommonText';
 import { useWallet } from 'hooks/store';
 import React, { memo } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { formatChainInfoToShow } from '@portkey-wallet/utils';
 import { pTd } from 'utils/unit';
-
 interface TokenListItemType {
   noBalanceShow?: boolean;
   item?: any;
@@ -27,6 +28,7 @@ const TokenListItem: React.FC<TokenListItemType> = props => {
         style={itemStyle.left}
         title={item?.symbol}
         avatarSize={pTd(48)}
+        svgName={item?.symbol === ELF_SYMBOL ? 'elf-icon' : undefined}
         imageUrl={symbolImages[item?.symbol]}
       />
       <View style={itemStyle.right}>
@@ -34,9 +36,8 @@ const TokenListItem: React.FC<TokenListItemType> = props => {
           <TextL numberOfLines={1} ellipsizeMode={'tail'} style={itemStyle.tokenName}>
             {item?.symbol}
           </TextL>
-          <TextS numberOfLines={1} style={[FontStyles.font3, itemStyle.chainInfo]}>
-            {item?.chainId === 'AELF' ? 'MainChain ' : 'SideChain '} {item?.chainId}{' '}
-            {currentNetwork === 'TESTNET' && 'Testnet'}
+          <TextS numberOfLines={1} style={[FontStyles.font7, itemStyle.chainInfo]}>
+            {formatChainInfoToShow(item?.chainId, currentNetwork)}
           </TextS>
         </View>
 

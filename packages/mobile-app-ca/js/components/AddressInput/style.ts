@@ -3,7 +3,7 @@ import { defaultColors } from 'assets/theme/index';
 import GStyles from 'assets/theme/GStyles';
 import { pTd } from 'utils/unit';
 
-const { font3, font5, error, bg1, border4 } = defaultColors;
+const { font5, error, bg1, border4 } = defaultColors;
 
 export const generalStyles = StyleSheet.create({
   outerWrap: {

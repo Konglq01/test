@@ -4,12 +4,11 @@ import { defaultColors } from 'assets/theme';
 import { FontStyles } from 'assets/theme/styles';
 import GStyles from 'assets/theme/GStyles';
 import Collapsible from 'components/Collapsible';
-import { TextM, TextS, TextXXXL } from 'components/CommonText';
+import { TextM, TextS, TextXXL } from 'components/CommonText';
 import Svg from 'components/Svg';
 import React, { memo, useState } from 'react';
 import { Text, View, TouchableOpacity, StyleSheet } from 'react-native';
-import { formatStr2EllipsisStr } from 'utils';
-// import { formatStr2EllipsisStr } from 'utils';
+import { formatStr2EllipsisStr } from '@portkey-wallet/utils';
 import { pTd } from 'utils/unit';
 
 export interface ItemType {
@@ -29,7 +28,7 @@ const RecentContactItem: React.FC<ItemType> = props => {
       <TouchableOpacity style={styles.itemWrap}>
         <TouchableOpacity style={styles.topWrap} onPress={() => setCollapsed(!collapsed)}>
           <View style={styles.itemAvatar}>
-            <TextXXXL>{contact.name.slice(0, 1)}</TextXXXL>
+            <TextXXL>{contact.name.slice(0, 1)}</TextXXL>
           </View>
           <TextM style={styles.contactName}>{contact.name}</TextM>
           <Svg icon={collapsed ? 'down-arrow' : 'up-arrow'} size={pTd(20)} />
@@ -88,8 +87,8 @@ export const styles = StyleSheet.create({
   itemAvatar: {
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: defaultColors.border1,
-    width: pTd(45),
-    height: pTd(45),
+    width: pTd(40),
+    height: pTd(40),
     borderRadius: pTd(23),
     backgroundColor: defaultColors.bg4,
     marginRight: pTd(10),

@@ -1,4 +1,5 @@
 import React from 'react';
+import { StyleSheet } from 'react-native';
 import PageContainer from 'components/PageContainer';
 import { useLanguage } from 'i18n/hooks';
 import navigationService from 'utils/navigationService';

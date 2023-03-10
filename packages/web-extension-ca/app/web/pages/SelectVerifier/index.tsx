@@ -6,13 +6,13 @@ import { useNavigate } from 'react-router';
 import { useAppDispatch, useLoginInfo, useGuardiansInfo, useLoading } from 'store/Provider/hooks';
 import PortKeyTitle from 'pages/components/PortKeyTitle';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
-import './index.less';
 import CommonSelect from 'components/CommonSelect1';
 import { useTranslation } from 'react-i18next';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
-import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verification } from 'utils/api';
+import './index.less';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 
 export default function SelectVerifier() {
   const { verifierMap } = useGuardiansInfo();
@@ -43,15 +43,15 @@ export default function SelectVerifier() {
 
   const verifyHandler = useCallback(async () => {
     try {
-      if (!loginAccount || !LoginStrType[loginAccount.loginType] || !loginAccount.guardianAccount)
+      if (!loginAccount || !LoginType[loginAccount.loginType] || !loginAccount.guardianAccount)
         return message.error('User registration information is invalid, please fill in the registration method again');
       if (!selectItem) return message.error('Can not get verification');
 
       setLoading(true);
       const result = await verification.sendVerificationCode({
         params: {
-          guardianAccount: loginAccount.guardianAccount,
-          type: LoginStrType[loginAccount.loginType],
+          guardianIdentifier: loginAccount.guardianAccount,
+          type: LoginType[loginAccount.loginType],
           verifierId: selectItem.id,
           chainId: DefaultChainId,
         },
@@ -70,6 +70,8 @@ export default function SelectVerifier() {
               endPoint: result.endPoint,
             },
             key: _key,
+            identifierHash: '',
+            salt: '',
           }),
         );
         navigate('/register/verifier-account', { state: 'register' });
@@ -82,6 +84,8 @@ export default function SelectVerifier() {
     }
   }, [dispatch, loginAccount, navigate, selectItem, setLoading]);
 
+  const verifierShow = useMemo(() => Object.values(verifierMap ?? {}).slice(0, 3), [verifierMap]);
+
   return (
     <div className="common-page select-verifier-wrapper">
       <PortKeyTitle leftElement leftCallBack={() => navigate('/register/start/create')} />
@@ -93,14 +97,12 @@ export default function SelectVerifier() {
         <CommonSelect className="verifier-select" value={selectVal} onChange={handleChange} items={selectOptions} />
         <p className="popular-title">{t('Popular')}</p>
         <ul className="popular-content">
-          {Object.values(verifierMap ?? {})
-            .slice(0, 3)
-            ?.map((item) => (
-              <li key={item.name} className="popular-item" onClick={() => handleChange(item.id)}>
-                <BaseVerifierIcon src={item.imageUrl} rootClassName="popular-item-image" />
-                <p className="popular-item-name">{item.name}</p>
-              </li>
-            ))}
+          {verifierShow?.map((item) => (
+            <li key={item.name} className="popular-item" onClick={() => handleChange(item.id)}>
+              <BaseVerifierIcon src={item.imageUrl} rootClassName="popular-item-image" />
+              <p className="popular-item-name">{item.name}</p>
+            </li>
+          ))}
         </ul>
         <Button className="confirm-btn" type="primary" onClick={() => setOpen(true)}>
           {t('Confirm')}

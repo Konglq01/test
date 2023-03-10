@@ -1,9 +1,8 @@
-import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
-import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import { LoginKeyType } from '@portkey-wallet/types/types-ca/wallet';
 import { VerifierInfo, VerifyStatus } from '@portkey-wallet/types/verifier';
 
 export type GuardianApproved = {
-  type: typeof LoginStrType[LoginType];
+  type: LoginKeyType;
   value: string;
   verifierId: string;
   verificationDoc: string;

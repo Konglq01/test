@@ -1,9 +1,6 @@
-import { GUARDIAN_TYPE_TYPE, LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
 import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type';
 import { resetWallet } from '@portkey-wallet/store/store-ca/wallet/actions';
-import { GuardiansInfo } from '@portkey-wallet/types/guardian';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
-import { VerifierItem } from '@portkey-wallet/types/verifier';
 import ActionSheet from 'components/ActionSheet';
 import { GuardiansStatus } from 'pages/Guardian/types';
 import { AppDispatch } from 'store';
@@ -31,21 +28,6 @@ export function queryFailAlert(dispatch: AppDispatch, isRecovery?: boolean, isRe
     ],
   });
 }
-export function handleUserGuardiansList(holderInfo: GuardiansInfo, verifierServers: VerifierItem[]) {
-  const { loginGuardianAccountIndexes, guardianAccounts } = holderInfo;
-  return guardianAccounts.map((item, index: number) => {
-    const { value, guardian } = item;
-
-    return {
-      ...item,
-      guardianAccount: value,
-      guardianType: typeof guardian.type === 'string' ? (GUARDIAN_TYPE_TYPE as any)[guardian.type] : guardian.type,
-      key: `${value}&${guardian.verifier.id}`,
-      verifier: verifierServers.find(verifierItem => verifierItem.id === guardian.verifier.id),
-      isLoginAccount: loginGuardianAccountIndexes.includes(index),
-    };
-  });
-}
 
 export function handleGuardiansApproved(guardiansStatus: GuardiansStatus, userGuardiansList: UserGuardianItem[]) {
   return Object.keys(guardiansStatus)
@@ -56,7 +38,7 @@ export function handleGuardiansApproved(guardiansStatus: GuardiansStatus, userGu
         ...status?.verifierInfo,
         value: guardian?.guardianAccount,
         guardianType: guardian?.guardianType,
-        type: LoginStrType[guardian?.guardianType as LoginType],
+        type: LoginType[guardian?.guardianType as LoginType],
       };
     })
     .filter(item => item.signature && item.verificationDoc);

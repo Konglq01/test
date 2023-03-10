@@ -44,17 +44,17 @@ export default class Inject {
 new Inject();
 
 /**
- * Sets the given provider instance as window.Portkey_ca and dispatches the
- * 'Portkey_ca#initialized' event on window.
+ * Sets the given provider instance as window.Portkey_did and dispatches the
+ * 'Portkey_did#initialized' event on window.
  */
 export function setGlobalProvider(providerInstance: PortKeyProvider): void {
   console.log('first');
-  (window as Record<string, any>).portkey_ca = providerInstance;
+  (window as Record<string, any>).portkey_did = providerInstance;
   document.dispatchEvent(
-    new CustomEvent('Portkey_ca#initialized', {
+    new CustomEvent('Portkey_did#initialized', {
       detail: {
         error: 0,
-        message: 'Portkey_ca is ready.',
+        message: 'Portkey_did is ready.',
       },
     }),
   );
