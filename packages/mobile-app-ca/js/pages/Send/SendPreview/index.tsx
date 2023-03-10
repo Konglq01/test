@@ -316,7 +316,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
         <View style={styles.section}>
           <View style={[styles.flexSpaceBetween]}>
             <TextM style={[styles.blackFontColor, styles.fontBold]}>{t('Transaction Fee')}</TextM>
-            <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${txFeeShow} ${'ELF'} `}</TextM>
+            <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${transactionFee} ${'ELF'} `}</TextM>
           </View>
         </View>
 
@@ -324,7 +324,16 @@ const SendHome: React.FC<SendHomeProps> = props => {
         {isCrossChainTransfer && assetInfo.symbol === 'ELF' && (
           <View style={styles.section}>
             <View style={[styles.flexSpaceBetween]}>
-              <TextM style={[styles.blackFontColor]}>{t('Estimated Amount Received')}</TextM>
+              <TextM style={[styles.blackFontColor, styles.fontBold]}>{t('Cross chain Transaction fee')}</TextM>
+              <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${unitConverter(CROSS_FEE)} ELF`}</TextM>
+            </View>
+          </View>
+        )}
+        {isCrossChainTransfer && assetInfo.symbol === 'ELF' && <Text style={[styles.divider, styles.marginTop0]} />}
+        {isCrossChainTransfer && assetInfo.symbol === 'ELF' && (
+          <View style={styles.section}>
+            <View style={[styles.flexSpaceBetween]}>
+              <TextM style={[styles.blackFontColor, styles.fontBold]}>{t('Estimated Amount Received')}</TextM>
               <TextM style={[styles.blackFontColor, styles.fontBold]}>
                 {ZERO.plus(sendNumber).isLessThanOrEqualTo(ZERO.plus(CROSS_FEE))
                   ? '0'
