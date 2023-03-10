@@ -18,7 +18,7 @@ export default function SocialTem({ loginType }: { loginType: ThreeWayLogin }) {
     console.log(response, 'onResolve===LoginSocial');
 
     window.portkey_did?.request({
-      method: 'portkey_loginByThreeWay',
+      method: 'portkey_socialLogin',
       params: { response },
     });
   }, []);
@@ -26,7 +26,7 @@ export default function SocialTem({ loginType }: { loginType: ThreeWayLogin }) {
   const onError = useCallback((error: any) => {
     console.log(error, 'onError===LoginSocial');
     window.portkey_did?.request({
-      method: 'portkey_loginByThreeWay',
+      method: 'portkey_socialLogin',
       params: { error: typeof error === 'string' ? error : error?.err || error },
     });
   }, []);
