@@ -35,10 +35,10 @@ import AccountSetting from 'pages/AccountSetting';
 
 export const PageRouter = () =>
   useRoutes([
-    {
-      path: '/',
-      element: <Home />,
-    },
+    // {
+    //   path: '/',
+    //   element: <Home />,
+    // },
     {
       path: '/register',
       element: <ScreenOpeningPage />,
@@ -75,86 +75,86 @@ export const PageRouter = () =>
       path: '/login/verifier-account',
       element: <VerifierAccount />,
     },
-    {
-      path: '/setting',
-      element: <My />,
-    },
-    {
-      path: '/setting/guardians',
-      element: <Guardians />,
-    },
-    {
-      path: '/setting/guardians/add',
-      element: <AddGuardian />,
-    },
-    {
-      path: '/setting/guardians/edit',
-      element: <GuardiansEdit />,
-    },
-    {
-      path: '/setting/guardians/view',
-      element: <GuardiansView />,
-    },
-    {
-      path: '/setting/guardians/verifier-account',
-      element: <VerifierAccount />,
-    },
-    {
-      path: '/setting/guardians/guardian-approval',
-      element: <GuardianApproval />,
-    },
-    {
-      path: '/setting/wallet',
-      element: <Wallet />,
-    },
-    {
-      path: '/add-token',
-      element: <AddToken />,
-    },
-    {
-      path: '/transaction',
-      element: <Transaction />,
-    },
-    {
-      path: '/token-detail',
-      element: <TokenDetail />,
-    },
-    {
-      path: '/send/:type/:symbol',
-      element: <Send />,
-    },
-    {
-      path: '/receive/:type/:symbol',
-      element: <Receive />,
-    },
-    {
-      path: '/nft',
-      element: <NFT />,
-    },
-    {
-      path: 'setting/contacts',
-      element: <Contacts />,
-    },
-    {
-      path: '/setting/contacts/:type',
-      element: <Contact />,
-    },
-    {
-      path: '/setting/account-setting',
-      element: <AccountSetting />,
-    },
-    {
-      path: '/setting/account-setting/set-pin',
-      element: <SetPin />,
-    },
-    {
-      path: '/setting/wallet-security',
-      element: <WalletSecurity />,
-    },
-    {
-      path: '/setting/wallet-security/manage-devices',
-      element: <Device />,
-    },
+    // {
+    //   path: '/setting',
+    //   element: <My />,
+    // },
+    // {
+    //   path: '/setting/guardians',
+    //   element: <Guardians />,
+    // },
+    // {
+    //   path: '/setting/guardians/add',
+    //   element: <AddGuardian />,
+    // },
+    // {
+    //   path: '/setting/guardians/edit',
+    //   element: <GuardiansEdit />,
+    // },
+    // {
+    //   path: '/setting/guardians/view',
+    //   element: <GuardiansView />,
+    // },
+    // {
+    //   path: '/setting/guardians/verifier-account',
+    //   element: <VerifierAccount />,
+    // },
+    // {
+    //   path: '/setting/guardians/guardian-approval',
+    //   element: <GuardianApproval />,
+    // },
+    // {
+    //   path: '/setting/wallet',
+    //   element: <Wallet />,
+    // },
+    // {
+    //   path: '/add-token',
+    //   element: <AddToken />,
+    // },
+    // {
+    //   path: '/transaction',
+    //   element: <Transaction />,
+    // },
+    // {
+    //   path: '/token-detail',
+    //   element: <TokenDetail />,
+    // },
+    // {
+    //   path: '/send/:type/:symbol',
+    //   element: <Send />,
+    // },
+    // {
+    //   path: '/receive/:type/:symbol',
+    //   element: <Receive />,
+    // },
+    // {
+    //   path: '/nft',
+    //   element: <NFT />,
+    // },
+    // {
+    //   path: 'setting/contacts',
+    //   element: <Contacts />,
+    // },
+    // {
+    //   path: '/setting/contacts/:type',
+    //   element: <Contact />,
+    // },
+    // {
+    //   path: '/setting/account-setting',
+    //   element: <AccountSetting />,
+    // },
+    // {
+    //   path: '/setting/account-setting/set-pin',
+    //   element: <SetPin />,
+    // },
+    // {
+    //   path: '/setting/wallet-security',
+    //   element: <WalletSecurity />,
+    // },
+    // {
+    //   path: '/setting/wallet-security/manage-devices',
+    //   element: <Device />,
+    // },
     {
       path: '/unlock',
       element: <Unlock />,
