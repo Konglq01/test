@@ -43,11 +43,11 @@ export default function My() {
         icon: 'Guardian',
         router: '/setting/guardians',
       },
-      {
-        label: 'Wallet Security',
-        icon: 'Setting',
-        router: '/setting/wallet-security',
-      },
+      // {
+      //   label: 'Wallet Security',
+      //   icon: 'Setting',
+      //   router: '/setting/wallet-security',
+      // },
     ],
     [],
   );
