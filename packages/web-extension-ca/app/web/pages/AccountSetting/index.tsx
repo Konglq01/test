@@ -23,6 +23,12 @@ export default function AccountSetting() {
           navigate('/setting/account-setting/set-pin');
         },
       },
+      {
+        label: t('Devices'),
+        click: () => {
+          navigate('/setting/account-setting/device');
+        },
+      },
     ],
     [navigate, t],
   );
