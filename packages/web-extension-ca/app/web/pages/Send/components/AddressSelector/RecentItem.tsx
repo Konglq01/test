@@ -1,4 +1,4 @@
-import { ContactItemType, IClickAddressProps } from '@portkey-wallet/types/types-ca/contact';
+import { IClickAddressProps, RecentContactItemType } from '@portkey-wallet/types/types-ca/contact';
 import { transNetworkText } from '@portkey-wallet/utils/activity';
 import { formatStr2EllipsisStr } from '@portkey-wallet/utils/converter';
 import { useIsTestnet } from 'hooks/useActivity';
@@ -8,7 +8,7 @@ export default function RecentItem({
   item,
   onClick,
 }: {
-  item: ContactItemType;
+  item: RecentContactItemType;
   onClick: (account: IClickAddressProps) => void;
 }) {
   const isTestNet = useIsTestnet();
@@ -20,12 +20,10 @@ export default function RecentItem({
     <div
       className="recent-item"
       onClick={() => {
-        onClick({ ...item.addresses[0] });
+        onClick({ ...item });
       }}>
-      <p className="address">
-        {`ELF_${formatStr2EllipsisStr(item.addresses[0].address, [6, 6])}_${item.addresses[0].chainId}`}
-      </p>
-      <p className="network">{transNetworkText(item.addresses[0].chainId, isTestNet)}</p>
+      <p className="address">{`ELF_${formatStr2EllipsisStr(item.address, [6, 6])}_${item.chainId}`}</p>
+      <p className="network">{transNetworkText(item.chainId, isTestNet)}</p>
     </div>
   );
 }
