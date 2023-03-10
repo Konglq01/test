@@ -16,6 +16,8 @@ import GStyles from 'assets/theme/GStyles';
 import { FontStyles } from 'assets/theme/styles';
 import { isIos, screenHeight, screenWidth } from '@portkey-wallet/utils/mobile/device';
 
+import { Camera } from 'expo-camera';
+
 // import { useAppCASelector } from '@portkey-wallet/hooks';
 
 interface QrScannerProps {
@@ -70,11 +72,14 @@ const QrScanner: React.FC<QrScannerProps> = () => {
     }
   };
 
+  console.log(screenWidth, screenHeight);
+
   // TODO: test ui in Mason's Phone
   return (
     <View style={PageStyle.wrapper}>
       {refresh ? null : (
-        <BarCodeScanner
+        <Camera
+          // ratio={Camera.getSupportedRatiosAsync()}
           style={[PageStyle.barCodeScanner, !isIos && PageStyle.barCodeScannerAndroid]}
           onBarCodeScanned={handleBarCodeScanned}>
           <SafeAreaView style={PageStyle.innerView}>
@@ -95,7 +100,7 @@ const QrScanner: React.FC<QrScannerProps> = () => {
               <TextM style={[FontStyles.font2, PageStyle.albumText]}>{t('Album')}</TextM>
             </TouchableOpacity>
           </SafeAreaView>
-        </BarCodeScanner>
+        </Camera>
       )}
     </View>
   );
