@@ -1,3 +1,4 @@
+import { ThreeWayLogin } from '@portkey-wallet/types/types-ca/wallet';
 import { message } from 'antd';
 import InternalMessage from 'messages/InternalMessage';
 import { PortkeyMessageTypes } from 'messages/InternalMessageTypes';
@@ -30,6 +31,10 @@ export const useActiveLockStatusAction = () => {
 };
 
 export const setPinAction = async (pin: string) => {
-  console.log('setPinAction===');
   await InternalMessage.payload(PortkeyMessageTypes.SET_SEED, pin).send();
 };
+
+const loginUrl = 'http://localhost:3000/extension-login';
+
+export const threeWayLoginAction = async (type: ThreeWayLogin) =>
+  await InternalMessage.payload(PortkeyMessageTypes.THREE_WAY_LOGIN, { externalLink: `${loginUrl}/${type}` }).send();

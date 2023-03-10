@@ -1,8 +1,3 @@
-/**
- * @file utils/AESUtils.js
- * @author huangzongzhe
- */
-
 import AES from 'crypto-js/aes';
 import encUtf8 from 'crypto-js/enc-utf8';
 

@@ -1,8 +1,3 @@
-/**
- * @file popup.js
- * @author huangzongzhe(hzz780)
- */
-
 import ReactDOM from 'react-dom/client';
 import { PageRouter } from './routes';
 import CustomProvider from 'store/Provider';
