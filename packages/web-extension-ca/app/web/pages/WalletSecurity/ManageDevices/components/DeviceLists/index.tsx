@@ -1,14 +1,11 @@
-import { useNavigate } from 'react-router';
 import CustomSvg from 'components/CustomSvg';
 import { useTranslation } from 'react-i18next';
 import { useCurrentWalletInfo, useDeviceList } from '@portkey-wallet/hooks/hooks-ca/wallet';
-import svgsList from 'assets/svgs';
 import { dateFormat } from 'utils';
-import './index.less';
 import { useCallback, useState } from 'react';
 import { DeviceItemType, DeviceType } from '@portkey-wallet/types/types-ca/wallet';
-import ChangeName from '../ChangeName';
-import DeviceDetail from '../DeviceDetail';
+import { IconType } from 'types/icon';
+import './index.less';
 
 const mockDeviceList: DeviceItemType[] = [
   {
@@ -49,42 +46,26 @@ const mockDeviceList: DeviceItemType[] = [
   },
 ];
 
-export type CustomSvgName = keyof typeof svgsList;
+interface IDeviceListsProps {
+  curPin: string;
+  setCurDevice: (d: DeviceItemType) => void;
+  handleNextStage: () => void;
+}
 
-export default function DeviceLists() {
+export default function DeviceLists({ setCurDevice, curPin, handleNextStage }: IDeviceListsProps) {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   // TODO
   // const deviceList = useDeviceList();
+  // TODO curPin decrypt device
   const walletInfo = useCurrentWalletInfo();
-  const [open, setOpen] = useState(false);
   const [showDeviceList, setShowDeviceList] = useState<DeviceItemType[]>(mockDeviceList);
-  const [curDevice, setCurDevice] = useState<DeviceItemType>();
 
-  const handleClick = useCallback((item: DeviceItemType) => {
-    setCurDevice(item);
-    setOpen(true);
-  }, []);
-
-  const handleSave = useCallback(
-    (name: string) => {
-      const temp = showDeviceList.map((item) => {
-        if (item.managerAddress === curDevice?.managerAddress) {
-          return {
-            ...item,
-            deviceTypeInfo: {
-              icon: item.deviceTypeInfo.icon,
-              name,
-            },
-          };
-        } else {
-          return item;
-        }
-      });
-      setShowDeviceList(temp);
-      setOpen(false);
+  const handleClick = useCallback(
+    (item: DeviceItemType) => {
+      setCurDevice(item);
+      handleNextStage();
     },
-    [curDevice, showDeviceList],
+    [handleNextStage, setCurDevice],
   );
 
   return (
@@ -95,7 +76,7 @@ export default function DeviceLists() {
             <div className="content-item">
               <div className="item-desc">
                 <div className="flex-center icon">
-                  <CustomSvg type={item.deviceTypeInfo.icon as CustomSvgName} />
+                  <CustomSvg type={item.deviceTypeInfo.icon as IconType} />
                 </div>
                 <div className="name">{item.deviceTypeInfo.name}</div>
                 {walletInfo.address === item.managerAddress && <div className="flex-center tag">{t('Current')}</div>}
@@ -107,13 +88,6 @@ export default function DeviceLists() {
           </div>
         ))}
       </div>
-      <ChangeName
-        onSave={handleSave}
-        initValue={{ name: curDevice?.deviceTypeInfo.name || '' }}
-        open={open}
-        setOpen={setOpen}
-      />
-      <DeviceDetail initValue={{ name: curDevice?.deviceTypeInfo.name || '' }} open={open} setOpen={setOpen} />
     </div>
   );
 }

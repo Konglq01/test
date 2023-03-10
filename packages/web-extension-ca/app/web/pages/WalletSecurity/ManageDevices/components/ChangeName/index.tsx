@@ -4,22 +4,17 @@ import { Button, Form, Input } from 'antd';
 import { FormItem } from 'components/BaseAntd';
 import { isValidCAWalletName } from '@portkey-wallet/utils/reg';
 import './index.less';
-import BaseDrawer from 'components/BaseDrawer';
-import BackHeader from 'components/BackHeader';
-import CustomSvg from 'components/CustomSvg';
 
 interface DeviceDetailProps {
-  onSave: (v: string) => void;
   initValue: Record<string, string>;
-  open: boolean;
-  setOpen: (f: boolean) => void;
+  onSave: (v: string) => void;
 }
 type ValidateStatus = Parameters<typeof Form.Item>[0]['validateStatus'];
 
 export default function DeviceDetail(props: DeviceDetailProps) {
   const [form] = Form.useForm();
   const { t } = useTranslation();
-  const { onSave, initValue, open, setOpen } = props;
+  const { onSave, initValue } = props;
   const [disable, setDisable] = useState<boolean>(false);
   const [validName, setValidName] = useState<{
     validateStatus?: ValidateStatus;
@@ -57,29 +52,7 @@ export default function DeviceDetail(props: DeviceDetailProps) {
   );
 
   return (
-    <BaseDrawer
-      destroyOnClose
-      open={open}
-      className="setting-wallet-drawer"
-      title={
-        <div className="wallet-drawer-title">
-          <BackHeader
-            title={t('Device Details')}
-            leftCallBack={() => {
-              setOpen(false);
-            }}
-            rightElement={
-              <CustomSvg
-                type="Close2"
-                onClick={() => {
-                  setOpen(false);
-                }}
-              />
-            }
-          />
-        </div>
-      }
-      placement="right">
+    <div className="device-detail-frame">
       <Form
         form={form}
         colon={false}
@@ -104,6 +77,6 @@ export default function DeviceDetail(props: DeviceDetailProps) {
           </FormItem>
         </div>
       </Form>
-    </BaseDrawer>
+    </div>
   );
 }

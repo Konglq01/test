@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 import { Button } from 'antd';
 import { useTranslation } from 'react-i18next';
 import CustomPassword from 'components/CustomPassword';
-// import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 // import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 // import aes from '@portkey-wallet/utils/aes';
 import { Stage } from '../../';
@@ -15,7 +15,7 @@ interface IEnterPinProps {
 
 export default function EnterPin({ setStage, setCurPin }: IEnterPinProps) {
   const { t } = useTranslation();
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const [disable, setDisable] = useState<boolean>(true);
   const [pin, setPin] = useState('');
   const [errMsg, setErrMsg] = useState('');
@@ -65,7 +65,7 @@ export default function EnterPin({ setStage, setCurPin }: IEnterPinProps) {
           className="submit-btn"
           type="link"
           onClick={() => {
-            setStage(Stage.SetNewPin);
+            navigate('/setting/wallet-security/manage-devices/chang-pin');
           }}>
           {t('Forget Pin ?')}
         </Button>

@@ -1,39 +1,25 @@
 import { useCallback } from 'react';
 import { Form, Button } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { setPinAction } from 'utils/lib/serviceWorkerAction';
-import { changePin } from '@portkey-wallet/store/store-ca/wallet/actions';
-import { useAppDispatch, useUserInfo } from 'store/Provider/hooks';
 import ConfirmPassword from 'components/ConfirmPassword';
-import { useNavigate } from 'react-router';
-import { setPasswordSeed } from 'store/reducers/user/slice';
 import './index.less';
 
 const FormItem = Form.Item;
 
 interface ISetNewPinProps {
-  setIsChangePin: (f: boolean) => void;
+  setCurPin: (pin: string) => void;
+  handleNextStage: () => void;
 }
 
-export default function SetNewPin() {
+export default function SetNewPin({ setCurPin, handleNextStage }: ISetNewPinProps) {
   const [form] = Form.useForm();
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-  const { passwordSeed } = useUserInfo();
 
-  const handleSave = useCallback(async () => {
-    const newPin = form.getFieldValue('confirmPassword');
-    dispatch(setPasswordSeed(newPin));
-    dispatch(
-      changePin({
-        pin: passwordSeed,
-        newPin,
-      }),
-    );
-    await setPinAction(newPin);
-    navigate('/setting/account-setting');
-  }, [dispatch, form, navigate, passwordSeed]);
+  const handleNext = useCallback(async () => {
+    const inputPin = form.getFieldValue('confirmPassword');
+    setCurPin(inputPin);
+    handleNextStage();
+  }, [form, handleNextStage, setCurPin]);
 
   return (
     <div className="set-pin-frame">
@@ -63,7 +49,7 @@ export default function SetNewPin() {
                 disabled={
                   !form.isFieldsTouched(true) || !!form.getFieldsError().filter(({ errors }) => errors.length).length
                 }
-                onClick={handleSave}>
+                onClick={handleNext}>
                 {t('Next')}
               </Button>
             )}

@@ -3,29 +3,31 @@ import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import BackHeader from 'components/BackHeader';
 import CustomSvg from 'components/CustomSvg';
-import EnterPin from './components/EnterPin';
-import DeviceLists from './components/DeviceLists';
-import './index.less';
-import DeviceDetail from './components/DeviceDetail';
+import DeviceLists from '../components/DeviceLists';
 import { DeviceItemType } from '@portkey-wallet/types/types-ca/wallet';
+import ChangeName from '../components/ChangeName';
+import './index.less';
+import SetNewPin from '../components/SetNewPin';
 
 export enum Stage {
-  'EnterPin',
+  'SetNewPin',
   'DeviceLists',
-  'DeviceDetails',
+  'ChangeName',
 }
 
-export default function ManageDevices() {
+export default function ChangePin() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [stage, setStage] = useState<Stage>(Stage.EnterPin);
+  const [stage, setStage] = useState<Stage>(Stage.SetNewPin);
   const [curPin, setCurPin] = useState<string>('');
   const [curDevice, setCurDevice] = useState<DeviceItemType>();
 
-  const enterPinProps = useMemo(
+  const setNewPinProps = useMemo(
     () => ({
-      setStage,
       setCurPin,
+      handleNextStage: () => {
+        setStage(Stage.DeviceLists);
+      },
     }),
     [],
   );
@@ -35,15 +37,18 @@ export default function ManageDevices() {
       setCurDevice,
       curPin,
       handleNextStage: () => {
-        setStage(Stage.DeviceDetails);
+        setStage(Stage.ChangeName);
       },
     }),
     [curPin],
   );
 
-  const deviceDetailProps = useMemo(
+  const changeNameProps = useMemo(
     () => ({
-      deviceName: curDevice?.deviceTypeInfo.name || '',
+      initValue: { name: curDevice?.deviceTypeInfo.name || '' },
+      onSave: (name = '') => {
+        //
+      },
     }),
     [curDevice?.deviceTypeInfo.name],
   );
@@ -51,8 +56,8 @@ export default function ManageDevices() {
   const stageObj = useMemo(
     () => ({
       0: {
-        title: t('Enter Pin'),
-        element: <EnterPin {...enterPinProps} />,
+        title: t('Set New Pin'),
+        element: <SetNewPin {...setNewPinProps} />,
         backFn: () => {
           navigate('/setting/wallet-security');
         },
@@ -62,20 +67,20 @@ export default function ManageDevices() {
         title: t('Devices'),
         element: <DeviceLists {...deviceListsProps} />,
         backFn: () => {
-          setStage(Stage.EnterPin);
+          setStage(Stage.SetNewPin);
         },
         btnNext: '',
       },
       2: {
         title: t('Device Details'),
-        element: <DeviceDetail {...deviceDetailProps} />,
+        element: <ChangeName {...changeNameProps} />,
         backFn: () => {
           setStage(Stage.DeviceLists);
         },
         btnText: '',
       },
     }),
-    [deviceDetailProps, deviceListsProps, enterPinProps, navigate, t],
+    [changeNameProps, deviceListsProps, navigate, setNewPinProps, t],
   );
 
   return (
