@@ -10,12 +10,12 @@ export function fetchRecentTransactionUsers({
   skipCount?: number;
   maxResultCount?: number;
 }): Promise<any> {
-  return new Promise(resolve => setTimeout(() => resolve(mockRecentData), 500));
-  // return request.recent.fetchRecentTransactionUsers({
-  //   params: {
-  //     caAddresses,
-  //     skipCount,
-  //     maxResultCount,
-  //   },
-  // });
+  // return new Promise(resolve => setTimeout(() => resolve(mockRecentData), 500));
+  return request.recent.fetchRecentTransactionUsers({
+    params: {
+      caAddresses,
+      skipCount,
+      maxResultCount,
+    },
+  });
 }
