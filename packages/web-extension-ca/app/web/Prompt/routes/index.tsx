@@ -157,8 +157,12 @@ export const PageRouter = () =>
       element: <ManageDevices />,
     },
     {
-      path: '/setting/wallet-security/manage-devices/chang-pin',
+      path: '/setting/wallet-security/manage-devices/change-pin',
       element: <ChangePin />,
+    },
+    {
+      path: '/setting/wallet-security/manage-devices/guardian-approval',
+      element: <GuardianApproval />,
     },
     {
       path: '/unlock',

@@ -114,6 +114,10 @@ export const PageRouter = () =>
       element: <ChangePin />,
     },
     {
+      path: '/setting/wallet-security/manage-devices/guardian-approval',
+      element: <GuardianApproval />,
+    },
+    {
       path: '/unlock',
       element: <Unlock />,
     },

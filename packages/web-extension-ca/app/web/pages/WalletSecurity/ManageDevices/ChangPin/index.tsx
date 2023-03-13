@@ -1,13 +1,19 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import BackHeader from 'components/BackHeader';
 import CustomSvg from 'components/CustomSvg';
 import DeviceLists from '../components/DeviceLists';
-import { DeviceItemType } from '@portkey-wallet/types/types-ca/wallet';
+import { DeviceItemType, DeviceType } from '@portkey-wallet/types/types-ca/wallet';
 import ChangeName from '../components/ChangeName';
-import './index.less';
 import SetNewPin from '../components/SetNewPin';
+import { useDeviceList } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { Button } from 'antd';
+import './index.less';
+import { useAppDispatch } from 'store/Provider/hooks';
+import { setPasswordSeed } from 'store/reducers/user/slice';
+import { changePin } from '@portkey-wallet/store/store-ca/wallet/actions';
+import { setPinAction } from 'utils/lib/serviceWorkerAction';
 
 export enum Stage {
   'SetNewPin',
@@ -18,9 +24,18 @@ export enum Stage {
 export default function ChangePin() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const deviceList = useDeviceList();
   const [stage, setStage] = useState<Stage>(Stage.SetNewPin);
   const [curPin, setCurPin] = useState<string>('');
   const [curDevice, setCurDevice] = useState<DeviceItemType>();
+  const [curName, setCurName] = useState('');
+  const disable = useMemo(() => stage === Stage.ChangeName && !curName, [curName, stage]);
+  const dispatch = useAppDispatch();
+  const [showDeviceList, setShowDeviceList] = useState<DeviceItemType[]>(deviceList);
+
+  useEffect(() => {
+    setCurName(curDevice?.deviceTypeInfo.name || '');
+  }, [curDevice?.deviceTypeInfo.name]);
 
   const setNewPinProps = useMemo(
     () => ({
@@ -34,24 +49,54 @@ export default function ChangePin() {
 
   const deviceListsProps = useMemo(
     () => ({
+      deviceList: showDeviceList,
       setCurDevice,
-      curPin,
       handleNextStage: () => {
         setStage(Stage.ChangeName);
       },
     }),
-    [curPin],
+    [showDeviceList],
   );
 
   const changeNameProps = useMemo(
     () => ({
-      initValue: { name: curDevice?.deviceTypeInfo.name || '' },
-      onSave: (name = '') => {
-        //
-      },
+      curDevice,
+      setCurName,
     }),
-    [curDevice?.deviceTypeInfo.name],
+    [curDevice],
   );
+
+  const handleSave = useCallback(() => {
+    const newDeviceList = showDeviceList.map((device) => {
+      if (device.managerAddress === curDevice?.managerAddress) {
+        return {
+          ...device,
+          deviceTypeInfo: {
+            ...device.deviceTypeInfo,
+            name: curName,
+          },
+        };
+      } else {
+        return device;
+      }
+    });
+    setShowDeviceList(newDeviceList);
+    setStage(Stage.DeviceLists);
+  }, [curDevice, curName, showDeviceList]);
+
+  const handleConfirm = useCallback(async () => {
+    // change pin
+    // dispatch(setPasswordSeed(curPin));
+    // dispatch(
+    //   changePin({
+    //     pin: '',
+    //     newPin: curPin,
+    //   }),
+    // );
+    // await setPinAction(curPin);
+    // contract
+    navigate('/setting/wallet-security/manage-devices');
+  }, [navigate]);
 
   const stageObj = useMemo(
     () => ({
@@ -61,7 +106,9 @@ export default function ChangePin() {
         backFn: () => {
           navigate('/setting/wallet-security');
         },
-        btnNext: '',
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        handler: () => {},
+        btnText: '',
       },
       1: {
         title: t('Devices'),
@@ -69,7 +116,8 @@ export default function ChangePin() {
         backFn: () => {
           setStage(Stage.SetNewPin);
         },
-        btnNext: '',
+        handler: handleConfirm,
+        btnText: 'Confirm',
       },
       2: {
         title: t('Device Details'),
@@ -77,22 +125,30 @@ export default function ChangePin() {
         backFn: () => {
           setStage(Stage.DeviceLists);
         },
-        btnText: '',
+        handler: handleSave,
+        btnText: 'Save',
       },
     }),
-    [changeNameProps, deviceListsProps, navigate, setNewPinProps, t],
+    [changeNameProps, deviceListsProps, handleConfirm, handleSave, navigate, setNewPinProps, t],
   );
 
   return (
-    <div className="wallet-security-frame">
-      <div className="wallet-security-title">
+    <div className="set-new-pin-frame">
+      <div className="set-new-pin-title">
         <BackHeader
           title={stageObj[stage].title}
           leftCallBack={stageObj[stage].backFn}
           rightElement={<CustomSvg type="Close2" onClick={stageObj[stage].backFn} />}
         />
       </div>
-      <div className="menu-list">{stageObj[stage].element}</div>
+      <div className="set-new-pin-content">{stageObj[stage].element}</div>
+      {stage !== Stage.SetNewPin && (
+        <div className="set-new-pin-btn">
+          <Button className="submit-btn" type="primary" disabled={disable} onClick={stageObj[stage].handler}>
+            {stageObj[stage].btnText}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

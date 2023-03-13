@@ -2,7 +2,6 @@ import { useCallback } from 'react';
 import { Form, Button } from 'antd';
 import { useTranslation } from 'react-i18next';
 import ConfirmPassword from 'components/ConfirmPassword';
-import './index.less';
 
 const FormItem = Form.Item;
 
@@ -22,7 +21,7 @@ export default function SetNewPin({ setCurPin, handleNextStage }: ISetNewPinProp
   }, [form, handleNextStage, setCurPin]);
 
   return (
-    <div className="set-pin-frame">
+    <div className="set-pin">
       <Form
         className="set-pin-form"
         name="SetPinForm"
