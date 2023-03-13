@@ -321,8 +321,16 @@ const SendHome: React.FC<SendHomeProps> = props => {
         <View style={styles.section}>
           <View style={[styles.flexSpaceBetween]}>
             <TextM style={[styles.blackFontColor, styles.fontBold]}>{t('Transaction Fee')}</TextM>
-            <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${transactionFee} ${'ELF'} `}</TextM>
+            <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${transactionFee} ${'ELF'}`}</TextM>
           </View>
+          {isMainNet(currentNetwork?.networkType ?? 'TESTNET') && (
+            <View>
+              <TextM />
+              <TextS style={[styles.blackFontColor, styles.lightGrayFontColor, GStyles.alignEnd]}>{`${unitConverter(
+                CROSS_FEE,
+              )}`}</TextS>
+            </View>
+          )}
         </View>
 
         {isCrossChainTransfer && assetInfo.symbol === 'ELF' && <Text style={[styles.divider, styles.marginTop0]} />}
