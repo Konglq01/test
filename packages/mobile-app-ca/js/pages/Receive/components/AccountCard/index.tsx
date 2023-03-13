@@ -56,7 +56,7 @@ export default function AccountCard({
   return (
     <View style={[styles.container, style]}>
       <View style={styles.logoBox}>
-        <Svg size={ScreenWidth * 0.13} icon="logo-icon" color={defaultColors.font9} />
+        <Svg size={ScreenWidth * 0.09} icon="logo-icon" color={defaultColors.font9} />
       </View>
       <QRCode size={cardWidth} value={JSON.stringify(info)} />
       <TextM style={styles.textStyle}>{toCaAddress}</TextM>
