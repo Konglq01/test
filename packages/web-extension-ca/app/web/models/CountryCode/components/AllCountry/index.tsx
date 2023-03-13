@@ -1,4 +1,3 @@
-import { CountryItem } from '@portkey-wallet/constants/constants-ca';
 import { IndexBar, IndexBarRef } from 'antd-mobile';
 import { useEffect, useRef } from 'react';
 import { ISelectCountryCode } from 'store/reducers/loginCache/type';
@@ -15,7 +14,7 @@ export default function AllCountry({ onSelect }: { onSelect: (v: ISelectCountryC
 
   return (
     <IndexBar ref={indexBarRef}>
-      {(countryCodeIndex as [string, CountryItem[]][]).map(([index, countries]) => {
+      {countryCodeIndex.map(([index, countries]) => {
         return (
           <IndexBar.Panel className={!countries.length ? 'country-empty' : ''} index={index} title={index} key={index}>
             {countries.map((item) => (
