@@ -11,7 +11,7 @@ import './index.less';
 import { divDecimals, unitConverter } from '@portkey-wallet/utils/converter';
 import { useCaAddresses, useChainIdList } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { fetchAllTokenListAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
-import { useIsTestnet } from 'hooks/useActivity';
+import { useIsTestnet } from 'hooks/useNetwork';
 import { transNetworkText } from '@portkey-wallet/utils/activity';
 import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
 interface CustomSelectProps extends DrawerProps {

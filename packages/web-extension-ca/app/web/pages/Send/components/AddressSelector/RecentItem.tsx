@@ -1,7 +1,7 @@
 import { IClickAddressProps, RecentContactItemType } from '@portkey-wallet/types/types-ca/contact';
 import { transNetworkText } from '@portkey-wallet/utils/activity';
 import { formatStr2EllipsisStr } from '@portkey-wallet/utils/converter';
-import { useIsTestnet } from 'hooks/useActivity';
+import { useIsTestnet } from 'hooks/useNetwork';
 import ContactCard from './ContactCard';
 
 export default function RecentItem({

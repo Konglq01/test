@@ -3,7 +3,7 @@ import { transNetworkText } from '@portkey-wallet/utils/activity';
 import { formatStr2EllipsisStr } from '@portkey-wallet/utils/converter';
 import { Collapse } from 'antd';
 import clsx from 'clsx';
-import { useIsTestnet } from 'hooks/useActivity';
+import { useIsTestnet } from 'hooks/useNetwork';
 import { useCallback, useMemo } from 'react';
 
 export interface IContactCardProps {
