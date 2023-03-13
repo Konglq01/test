@@ -23,8 +23,11 @@ import { pTd } from 'utils/unit';
 import qrCode from 'assets/image/pngs/QR-code.png';
 import { PageLoginType } from '../index';
 import { handleUserGuardiansList } from '@portkey-wallet/utils/guardian';
+import { CountryItem } from '@portkey-wallet/constants/constants-ca';
 
-export default function LoginEmail({ setLoginType }: { setLoginType: (type: PageLoginType) => void }) {
+const DefaultCountry = { country: 'Singapore', code: '65', iso: 'SG' };
+
+export default function LoginPhone({ setLoginType }: { setLoginType: (type: PageLoginType) => void }) {
   const { t } = useLanguage();
   const dispatch = useAppDispatch();
   const [loading] = useState<boolean>();
@@ -33,7 +36,7 @@ export default function LoginEmail({ setLoginType }: { setLoginType: (type: Page
   const chainInfo = useCurrentChain('AELF');
   const getVerifierServers = useGetVerifierServers();
   const getGuardiansInfoWriteStore = useGetGuardiansInfoWriteStore();
-
+  const [country, setCountry] = useState<CountryItem>(DefaultCountry);
   const onLogin = useCallback(async () => {
     const message = checkEmail(loginAccount);
     setErrorMessage(message);
@@ -64,7 +67,13 @@ export default function LoginEmail({ setLoginType }: { setLoginType: (type: Page
       setLoginAccount('');
       setErrorMessage(undefined);
     });
-    return () => listener.remove();
+    const listener2 = myEvents.setCountry.addListener((c: CountryItem) => {
+      setCountry(c);
+    });
+    return () => {
+      listener2.remove();
+      listener.remove();
+    };
   });
   return (
     <View style={[BGStyles.bg1, styles.card]}>
@@ -72,23 +81,29 @@ export default function LoginEmail({ setLoginType }: { setLoginType: (type: Page
         <Image source={qrCode} style={styles.iconStyle} />
       </Touchable>
       <CommonButton
-        title="Phone"
+        title="Email"
         onPress={() => {
-          setLoginType(PageLoginType.phone);
+          setLoginType(PageLoginType.email);
         }}
       />
-      <CommonInput
-        value={loginAccount}
-        label="Email"
-        type="general"
-        maxLength={30}
-        autoCorrect={false}
-        onChangeText={setLoginAccount}
-        errorMessage={errorMessage}
-        keyboardType="email-address"
-        placeholder={t('Enter Email')}
-        containerStyle={styles.inputContainerStyle}
-      />
+      <View style={[GStyles.flexRow, GStyles.itemCenter]}>
+        <Touchable onPress={() => navigationService.navigate('SelectCountry', { onSetCountry: setCountry })}>
+          <Text>+{country?.code}</Text>
+        </Touchable>
+        <CommonInput
+          value={loginAccount}
+          label="Phone"
+          type="general"
+          maxLength={30}
+          autoCorrect={false}
+          onChangeText={setLoginAccount}
+          errorMessage={errorMessage}
+          keyboardType="email-address"
+          placeholder={t('Enter Email')}
+          containerStyle={styles.inputContainerStyle}
+        />
+      </View>
+
       <CommonButton
         style={GStyles.marginTop(15)}
         disabled={!loginAccount}

@@ -1,18 +1,8 @@
 import { useAppCASelector } from '.';
 import { useMemo, useCallback } from 'react';
 import { WalletInfoType } from '@portkey-wallet/types/wallet';
-import {
-  CAInfo,
-  CAInfoType,
-  DeviceItemType,
-  DeviceType,
-  LoginType,
-  RegisterStatus,
-} from '@portkey-wallet/types/types-ca/wallet';
+import { CAInfoType, DeviceItemType, DeviceType } from '@portkey-wallet/types/types-ca/wallet';
 import { WalletState } from '@portkey-wallet/store/store-ca/wallet/type';
-import { VerificationType } from '@portkey-wallet/types/verifier';
-import { fetchCreateWalletResult, requestCreateWallet } from '@portkey-wallet/api/api-did/utils/wallet';
-import { sleep } from '@portkey-wallet/utils';
 import { useCurrentNetworkInfo } from './network';
 import { useCurrentChain } from './chainList';
 import { useCaHolderManagerInfoQuery } from '@portkey-wallet/graphql/contract/__generated__/hooks/caHolderManagerInfo';
@@ -64,6 +54,14 @@ export const useCurrentWallet = () => {
       chainList: chainInfo?.[currentNetwork],
     };
   }, [wallet]);
+};
+
+export const useCurrentWalletDetails = () => {
+  const { walletInfo, currentNetwork } = useWallet() || {};
+
+  return useMemo(() => {
+    return getCurrentWalletInfo(walletInfo, currentNetwork);
+  }, [walletInfo, currentNetwork]);
 };
 
 export const useDeviceList = () => {

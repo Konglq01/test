@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import PageContainer, { SafeAreaColorMapKeyUnit } from 'components/PageContainer';
 import { TextM, TextXXXL } from 'components/CommonText';
 import { pTd } from 'utils/unit';
@@ -16,18 +16,30 @@ import { useRoute } from '@react-navigation/native';
 import styles from './styles';
 import LoginEmail from './components/LoginEmail';
 import LoginQRCode from './components/LoginQRCode';
+import LoginPhone from './components/LoginPhone';
 
 const scrollViewProps = { extraHeight: 120 };
 const safeAreaColor: SafeAreaColorMapKeyUnit[] = ['transparent', 'transparent'];
 
-export type PageLoginType = 'email' | 'qr-code' | 'phone';
+export enum PageLoginType {
+  email,
+  qrCode,
+  phone,
+}
 
 export default function LoginPortkey() {
-  const [loginType, setLoginType] = useState<PageLoginType>('email');
+  const [loginType, setLoginType] = useState<PageLoginType>(PageLoginType.email);
   const { t } = useLanguage();
   const currentNetworkInfo = useCurrentNetworkInfo();
   const route = useRoute();
-
+  const loginMap = useMemo(
+    () => ({
+      [PageLoginType.email]: <LoginEmail setLoginType={setLoginType} />,
+      [PageLoginType.qrCode]: <LoginQRCode setLoginType={setLoginType} />,
+      [PageLoginType.phone]: <LoginPhone setLoginType={setLoginType} />,
+    }),
+    [],
+  );
   return (
     <ImageBackground style={styles.backgroundContainer} resizeMode="cover" source={background}>
       <PageContainer
@@ -38,11 +50,7 @@ export default function LoginPortkey() {
         hideHeader>
         <Svg icon="logo-icon" size={pTd(60)} iconStyle={styles.logoIconStyle} />
         <TextXXXL style={[styles.titleStyle, FontStyles.font11]}>{t('Log In To Portkey')}</TextXXXL>
-        {loginType === 'email' ? (
-          <LoginEmail setLoginType={setLoginType} />
-        ) : (
-          <LoginQRCode setLoginType={setLoginType} />
-        )}
+        {loginMap[loginType]}
         <Touchable
           onPress={() => NetworkOverlay.showSwitchNetwork(route)}
           style={[GStyles.flexRow, GStyles.itemCenter, styles.networkRow]}>

@@ -28,6 +28,7 @@ const styles = StyleSheet.create({
   },
   inputContainerStyle: {
     marginTop: 8,
+    flex: 1,
   },
   viewContainer: {
     minHeight: windowHeight - pTd(160),
