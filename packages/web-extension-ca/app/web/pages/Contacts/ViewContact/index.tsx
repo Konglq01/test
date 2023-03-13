@@ -7,7 +7,7 @@ import { AddressItem } from '@portkey-wallet/types/types-ca/contact';
 import { useCopyToClipboard } from 'react-use';
 import './index.less';
 import { useCallback } from 'react';
-import { useIsTestnet } from 'hooks/useActivity';
+import { useIsTestnet } from 'hooks/useNetwork';
 import { transNetworkText } from '@portkey-wallet/utils/activity';
 
 export default function ViewContact() {

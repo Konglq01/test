@@ -3,16 +3,10 @@ import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { AddressBookError } from '@portkey-wallet/store/addressBook/types';
 import { addFailedActivity, removeFailedActivity } from '@portkey-wallet/store/store-ca/activity/slice';
-import { ContactItemType, IClickAddressProps } from '@portkey-wallet/types/types-ca/contact';
+import { IClickAddressProps } from '@portkey-wallet/types/types-ca/contact';
 import { BaseToken } from '@portkey-wallet/types/types-ca/token';
 import { isDIDAddress } from '@portkey-wallet/utils';
-import {
-  getAelfAddress,
-  getEntireDIDAelfAddress,
-  getWallet,
-  isAelfAddress,
-  isCrossChain,
-} from '@portkey-wallet/utils/aelf';
+import { getEntireDIDAelfAddress, getWallet, isCrossChain } from '@portkey-wallet/utils/aelf';
 import aes from '@portkey-wallet/utils/aes';
 import { timesDecimals } from '@portkey-wallet/utils/converter';
 import { Button, message, Modal } from 'antd';
@@ -21,8 +15,7 @@ import TitleWrapper from 'components/TitleWrapper';
 import { ReactElement, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router';
-import { useDebounce } from 'react-use';
-import { useAppDispatch, useContact, useLoading, useUserInfo, useWalletInfo } from 'store/Provider/hooks';
+import { useAppDispatch, useLoading, useUserInfo, useWalletInfo } from 'store/Provider/hooks';
 import crossChainTransfer, { intervalCrossChainTransfer } from 'utils/sandboxUtil/crossChainTransfer';
 import sameChainTransfer from 'utils/sandboxUtil/sameChainTransfer';
 import AddressSelector from './components/AddressSelector';
@@ -63,7 +56,6 @@ export default function Send() {
   console.log(wallet, 'wallet===');
   const { setLoading } = useLoading();
   const dispatch = useAppDispatch();
-  const { contactIndexList } = useContact();
   const { t } = useTranslation();
   const [errorMsg, setErrorMsg] = useState('');
   const [tipMsg, setTipMsg] = useState('');
@@ -103,42 +95,6 @@ export default function Send() {
     if (toAccount.address === '' || (stage === Stage.Amount && amount === '')) return true;
     return false;
   }, [amount, stage, toAccount.address]);
-
-  const getToAddressChainId = useCallback(
-    (toAddress: string) => {
-      if (!toAddress.includes('_')) return chainInfo?.chainId;
-      const arr = toAddress.split('_');
-      const addressChainId = arr[arr.length - 1];
-      // no suffix
-      if (isAelfAddress(addressChainId)) {
-        return chainInfo?.chainId;
-      }
-      return addressChainId;
-    },
-    [chainInfo?.chainId],
-  );
-
-  useDebounce(
-    () => {
-      const value = getAelfAddress(toAccount.address);
-      const toAdsChainId = getToAddressChainId(toAccount.address);
-      const searchResult: ContactItemType[] = [];
-      contactIndexList.forEach(({ contacts }) => {
-        searchResult.push(
-          ...contacts.filter(
-            (contact) =>
-              contact.name.toLowerCase() === value.toLowerCase() ||
-              contact.addresses.some((ads) => ads.address === value && ads.chainId === toAdsChainId),
-          ),
-        );
-      });
-      if (searchResult[0] && searchResult[0].name) {
-        setToAccount((v) => ({ ...v, name: searchResult[0].name }));
-      }
-    },
-    300,
-    [contactIndexList, toAccount.address],
-  );
 
   const retryCrossChain = useCallback(
     async ({ transactionId, params }: the2ThFailedActivityItemType) => {

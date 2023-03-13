@@ -6,7 +6,7 @@ import clsx from 'clsx';
 import Copy from 'components/Copy';
 import CustomSvg from 'components/CustomSvg';
 import TitleWrapper from 'components/TitleWrapper';
-import { useIsTestnet } from 'hooks/useActivity';
+import { useIsTestnet } from 'hooks/useNetwork';
 import QRCode from 'qrcode.react';
 import { useMemo } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router';

@@ -1,17 +1,16 @@
 import CommonModal from 'components/CommonModal';
 import { useAppDispatch, useCustomModal } from 'store/Provider/hooks';
 import { setCountryModal } from 'store/reducers/modal/slice';
-import { Button, IndexBar, List } from 'antd-mobile';
-import countryCodeIndex from '@portkey-wallet/constants/constants-ca/countryCode/countryCodeIndex.json';
 import { countryCodeList } from '@portkey-wallet/constants/constants-ca/countryCode';
-
-import { CountryItem } from '@portkey-wallet/constants/constants-ca';
-import { ChangeEvent, useCallback, useMemo, useRef, useState } from 'react';
-import './index.less';
+import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import BackHeader from 'components/BackHeader';
 import { useTranslation } from 'react-i18next';
 import CustomSvg from 'components/CustomSvg';
 import { Input } from 'antd';
+import { setCountryCodeAction } from 'store/reducers/loginCache/actions';
+import { ISelectCountryCode } from 'store/reducers/loginCache/type';
+import AllCountry from './components/AllCountry';
+import './index.less';
 
 export default function CountryCode() {
   const { countryCodeModal } = useCustomModal();
@@ -40,55 +39,50 @@ export default function CountryCode() {
     [debounce],
   );
 
-  const AllCountry = useMemo(
-    () => (
-      <IndexBar>
-        {(countryCodeIndex as [string, CountryItem[]][]).map(([index, countries]) => {
-          return (
-            <IndexBar.Panel
-              className={!countries.length && !searchVal ? 'country-empty' : ''}
-              index={index}
-              title={index}
-              key={index}>
-              {countries.map((item) => (
-                <div
-                  key={`${item.code}_${item.country}`}
-                  onClick={() => {
-                    // navigate('/setting/countries/view', { state: { ...item, index: index } });
-                  }}>
-                  <div className="flex-between-center country-item-content">
-                    <span className="country-item-name">{item.country}</span>
-                    <div className="flex-center country-index-code">{item.code}</div>
-                  </div>
-                </div>
-              ))}
-            </IndexBar.Panel>
-          );
-        })}
-      </IndexBar>
-    ),
-    [searchVal],
+  const onSelect = useCallback(
+    (code: ISelectCountryCode) => {
+      dispatch(setCountryModal(false));
+      dispatch(setCountryCodeAction(code));
+    },
+    [dispatch],
   );
 
   const filterCountry = useMemo(
-    () => filterList.map((item) => <div key={item.code}>{item.country}</div>),
-    [filterList],
+    () =>
+      filterList.map((item) => (
+        <div
+          key={item.code}
+          onClick={() => {
+            onSelect({
+              index: item.country[0],
+              country: item,
+            });
+          }}>
+          {item.country}
+        </div>
+      )),
+    [filterList, onSelect],
   );
+
+  useEffect(() => {
+    setSearchVal(undefined);
+  }, [countryCodeModal]);
 
   return (
     <CommonModal
       className="country-code-modal"
       closable={false}
       open={countryCodeModal}
-      onCancel={() => dispatch(setCountryModal(false))}>
-      <div className="flex-column country-title">
+      onCancel={() => dispatch(setCountryModal(false))}
+      title={
         <BackHeader
           title={t('Select country/region')}
           leftCallBack={() => {
-            //
+            dispatch(setCountryModal(false));
           }}
-          rightElement={<></>}
         />
+      }>
+      <div className="flex-column country-title">
         <Input
           className="search-input"
           prefix={<CustomSvg type="SearchBlur" className="search-svg" />}
@@ -96,7 +90,13 @@ export default function CountryCode() {
           onChange={onSearchCountry}
         />
       </div>
-      {searchVal ? filterCountry : AllCountry}
+      <div
+        style={{
+          // eslint-disable-next-line no-inline-styles/no-inline-styles
+          height: 468,
+        }}>
+        {searchVal ? filterCountry : <AllCountry onSelect={onSelect} />}
+      </div>
     </CommonModal>
   );
 }

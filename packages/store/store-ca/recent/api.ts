@@ -1,5 +1,4 @@
 import { request } from '@portkey-wallet/api/api-did';
-import { mockRecentData } from './data';
 
 export function fetchRecentTransactionUsers({
   caAddresses = [],
@@ -10,12 +9,11 @@ export function fetchRecentTransactionUsers({
   skipCount?: number;
   maxResultCount?: number;
 }): Promise<any> {
-  return new Promise(resolve => setTimeout(() => resolve(mockRecentData), 500));
-  // return request.recent.fetchRecentTransactionUsers({
-  //   params: {
-  //     caAddresses,
-  //     skipCount,
-  //     maxResultCount,
-  //   },
-  // });
+  return request.recent.fetchRecentTransactionUsers({
+    params: {
+      caAddresses,
+      skipCount,
+      maxResultCount,
+    },
+  });
 }
