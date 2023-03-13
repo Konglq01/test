@@ -55,8 +55,6 @@ export default function LoginPhone({ setLoginType }: { setLoginType: (type: Page
         userGuardiansList: handleUserGuardiansList(holderInfo, verifierServers),
       });
     } catch (error) {
-      console.log(error, '=====error');
-
       setErrorMessage(handleErrorMessage(error));
     }
     Loading.hide();
@@ -83,7 +81,8 @@ export default function LoginPhone({ setLoginType }: { setLoginType: (type: Page
       <CommonButton
         title="Email"
         onPress={() => {
-          setLoginType(PageLoginType.email);
+          navigationService.navigate('Home');
+          // setLoginType(PageLoginType.email);
         }}
       />
       <View style={[GStyles.flexRow, GStyles.itemCenter]}>

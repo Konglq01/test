@@ -7,11 +7,13 @@ import {
   GestureResponderEvent,
   View,
   PanResponderCallbacks,
+  Animated,
 } from 'react-native';
 import { TextL } from 'components/CommonText';
 import usePrevious from 'hooks/usePrevious';
 import isEqual from 'lodash/isEqual';
 import { ViewStyleType } from 'types/styles';
+import { defaultColors } from 'assets/theme';
 export interface IndexBarProps {
   data: string[];
   indexBarItemStyle?: ViewStyleType;
@@ -32,6 +34,7 @@ interface IndexInfoType extends PageLocationType {
 type PopoverInfo = {
   text: string | number;
   top: number;
+  indexHeight: number;
 };
 
 interface PopoverInterface {
@@ -42,12 +45,27 @@ interface PopoverInterface {
 export const Popover = forwardRef((_, _ref) => {
   const [show, setShow] = useState<boolean>();
   const [popoverInfo, setPopoverInfo] = useState<PopoverInfo>();
-  useImperativeHandle(_ref, () => ({ setPopoverInfo, setShow }), []);
+  const marginTop = useRef(new Animated.Value(0)).current;
+  const onSetPopoverInfo = useCallback(
+    (info: PopoverInfo) => {
+      if (!info) return;
+      Animated.timing(marginTop, {
+        useNativeDriver: false,
+        toValue: info.top - info.indexHeight / 2,
+        duration: 200,
+      }).start(({ finished }) => {
+        finished && setPopoverInfo(info);
+      });
+    },
+    [marginTop],
+  );
+  useImperativeHandle(_ref, () => ({ setPopoverInfo: onSetPopoverInfo, setShow }), []);
+
   if (!popoverInfo || !show) return null;
   return (
-    <View style={styles.popover}>
-      <TextL style={{ marginTop: popoverInfo.top }}>{popoverInfo.text}</TextL>
-    </View>
+    <Animated.View style={[styles.popover, { marginTop }]}>
+      <TextL style={[styles.popoverItem]}>{popoverInfo.text}</TextL>
+    </Animated.View>
   );
 });
 Popover.displayName = 'Popover';
@@ -64,8 +82,6 @@ export default function IndexBar({
   const indexRef = useRef<View>(null);
   const popoverRef = useRef<PopoverInterface>();
   const prevData = usePrevious(data);
-  console.log(prevData, '======prevData');
-
   const getIndex = useCallback((nativePageY: number) => {
     if (!indexInfoRef.current) return;
     const { pageY, height, indexHeight } = indexInfoRef.current;
@@ -79,12 +95,10 @@ export default function IndexBar({
       if (!indexInfoRef.current) return;
       const { currentIndex, indexHeight } = indexInfoRef.current;
       const nowIndex = getIndex(nativePageY);
-      console.log(nowIndex, currentIndex);
-
       if (nowIndex !== undefined && nowIndex !== currentIndex) {
         indexInfoRef.current.currentIndex = nowIndex;
         onPress?.(nowIndex);
-        popoverRef.current?.setPopoverInfo({ top: nowIndex * indexHeight, text: data[nowIndex] });
+        popoverRef.current?.setPopoverInfo({ top: nowIndex * indexHeight, text: data[nowIndex], indexHeight });
       }
     },
     [data, getIndex, onPress],
@@ -174,9 +188,16 @@ const styles = StyleSheet.create({
   },
   popover: {
     position: 'absolute',
-    top: 0,
-    bottom: 0,
+    right: 30,
+    height: 50,
+    width: 50,
+    borderRadius: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+    backgroundColor: defaultColors.bg6,
   },
+  popoverItem: {},
   barBox: {
     position: 'absolute',
     right: 5,

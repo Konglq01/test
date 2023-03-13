@@ -4,6 +4,7 @@ import { View, ViewStyle, TextStyle, StyleSheet } from 'react-native';
 import CommonLargeList, { CommonLargeListProps } from 'components/CommonLargeList';
 import IndexBar from 'components/IndexBar';
 import { headerHeight as HeaderHeight } from 'components/CustomHeader/style/index.style';
+import { LargeList } from 'react-native-largelist';
 export interface IndexLargeListProps extends CommonLargeListProps {
   data: Array<any>;
   headerHeight?: number;
@@ -17,7 +18,7 @@ export interface IndexLargeListProps extends CommonLargeListProps {
   extraHeight?: number;
 }
 export default function IndexBarLargeList(props: IndexLargeListProps) {
-  const largeListRef = useRef<any>();
+  const largeListRef = useRef<LargeList>();
   const getOffset = useCallback(
     (key: number) => {
       const { data, indexHeight, sectionHeight, headerHeight, showHeader } = props;
@@ -42,10 +43,13 @@ export default function IndexBarLargeList(props: IndexLargeListProps) {
   const onSectionSelect = useCallback(
     (key: number) => {
       const offset = getOffset(key);
-      largeListRef.current?.scrollTo({
-        x: 0,
-        y: Math.min(maxOffset, offset),
-      });
+      largeListRef.current?.scrollTo(
+        {
+          x: 0,
+          y: Math.min(maxOffset, offset),
+        },
+        false,
+      );
     },
     [getOffset, maxOffset],
   );
@@ -71,7 +75,7 @@ export default function IndexBarLargeList(props: IndexLargeListProps) {
         allLoaded={allLoaded}
         renderItem={renderItem}
         renderSection={renderSection}
-        ref={largeListRef}
+        ref={largeListRef as any}
         sectionHeight={sectionHeight}
         indexHeight={indexHeight}
         renderHeader={showHeader ? renderHeader : undefined}
