@@ -37,4 +37,4 @@ export const setPinAction = async (pin: string) => {
 const loginUrl = 'http://localhost:3000/extension-login';
 
 export const threeWayLoginAction = async (type: ThreeWayLogin) =>
-  await InternalMessage.payload(PortkeyMessageTypes.THREE_WAY_LOGIN, { externalLink: `${loginUrl}/${type}` }).send();
+  await InternalMessage.payload(PortkeyMessageTypes.SOCIAL_LOGIN, { externalLink: `${loginUrl}/${type}` }).send();

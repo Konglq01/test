@@ -8,8 +8,7 @@ export function fetchRecentTransactionUsers({
   caAddresses?: string[];
   skipCount?: number;
   maxResultCount?: number;
-}): Promise<{ data: any }> {
-  // return new Promise(resolve => setTimeout(() => resolve(mockNFTSeriesData), 500));
+}): Promise<any> {
   return request.recent.fetchRecentTransactionUsers({
     params: {
       caAddresses,

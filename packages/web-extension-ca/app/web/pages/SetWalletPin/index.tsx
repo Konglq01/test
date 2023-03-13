@@ -15,7 +15,6 @@ import { VerificationType, VerifyStatus } from '@portkey-wallet/types/verifier';
 import { isWalletError } from '@portkey-wallet/store/wallet/utils';
 import { useHardwareBack } from 'hooks/useHardwareBack';
 import CommonModal from 'components/CommonModal';
-import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
 import AElf from 'aelf-sdk';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { randomId } from '@portkey-wallet/utils';
@@ -25,6 +24,7 @@ import { setPasswordSeed } from 'store/reducers/user/slice';
 import { DEVICE_TYPE } from 'constants/index';
 import { GuardiansApprovedType } from '@portkey-wallet/types/types-ca/guardian';
 import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 
 export default function SetWalletPin() {
   const [form] = Form.useForm();
@@ -45,12 +45,12 @@ export default function SetWalletPin() {
   const requestRegisterDIDWallet = useCallback(
     async ({ managerAddress }: { managerAddress: string }) => {
       console.log(loginAccount, registerVerifier, 'requestRegisterDIDWallet==');
-      if (!loginAccount?.guardianAccount || !LoginStrType[loginAccount.loginType])
+      if (!loginAccount?.guardianAccount || !LoginType[loginAccount.loginType])
         throw 'Missing account!!! Please login/register again';
       const requestId = randomId();
       if (!registerVerifier) throw 'Missing Verifier Server';
       const result = await registerDIDWallet({
-        type: LoginStrType[loginAccount.loginType],
+        type: LoginType[loginAccount.loginType],
         loginGuardianIdentifier: loginAccount.guardianAccount,
         manager: managerAddress,
         extraData: `${DEVICE_TYPE},${Date.now()}`, //navigator.userAgent,
@@ -75,7 +75,7 @@ export default function SetWalletPin() {
     return Object.values(userGuardianStatus ?? {})
       .filter((guardian) => guardian.status === VerifyStatus.Verified)
       .map((guardian) => ({
-        type: LoginStrType[guardian.guardianType],
+        type: LoginType[guardian.guardianType],
         identifier: guardian.guardianAccount,
         verifierId: guardian.verifier?.id || '',
         verificationDoc: guardian.verificationDoc || '',
@@ -85,7 +85,7 @@ export default function SetWalletPin() {
 
   const requestRecoveryDIDWallet = useCallback(
     async ({ managerAddress }: { managerAddress: string }) => {
-      if (!loginAccount?.guardianAccount || !LoginStrType[loginAccount.loginType])
+      if (!loginAccount?.guardianAccount || !LoginType[loginAccount.loginType])
         throw 'Missing account!!! Please login/register again';
       const guardiansApproved = getGuardiansApproved();
       const requestId = randomId();
@@ -141,7 +141,7 @@ export default function SetWalletPin() {
         console.log(state, 'state===');
 
         if (state === 'scan') return createByScan(pin);
-        if (!loginAccount?.guardianAccount || !LoginStrType[loginAccount.loginType])
+        if (!loginAccount?.guardianAccount || !LoginType[loginAccount.loginType])
           return message.error('Missing account!!! Please login/register again');
         setLoading(true);
         const _walletInfo = walletInfo.address ? walletInfo : AElf.wallet.createNewWallet();
@@ -200,15 +200,15 @@ export default function SetWalletPin() {
           managerAddress: _walletInfo.address,
         });
       } catch (error: any) {
-        setLoading(false);
         console.log(error, 'onCreate==error');
         const walletError = isWalletError(error);
         if (walletError) return message.error(walletError);
         if (error?.message || error?.error?.message) return message.error(error?.message || error?.error?.message);
         const errorString = typeof error === 'string' ? error : 'Something error';
         message.error(walletError || errorString);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     },
     [
       setLoading,

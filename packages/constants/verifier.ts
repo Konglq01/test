@@ -1,17 +1,19 @@
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 
 export const LOGIN_TYPE_LABEL_MAP: { [key in LoginType]: string } = {
-  [LoginType.email]: 'Email',
-  [LoginType.phone]: 'Phone',
+  [LoginType.Email]: 'Email',
+  [LoginType.PhoneNumber]: 'Phone',
+  [LoginType.Apple]: 'Apple',
+  [LoginType.Google]: 'Google',
 };
 
 export const LOGIN_TYPE_LIST = [
   {
-    value: LoginType.email,
-    name: LOGIN_TYPE_LABEL_MAP[LoginType.email],
+    value: LoginType.Email,
+    name: LOGIN_TYPE_LABEL_MAP[LoginType.Email],
   },
   // {
-  //   value: LoginType.phone,
-  //   name: LOGIN_TYPE_LABEL_MAP[LoginType.phone],
+  //   value: LoginType.PhoneNumber,
+  //   name: LOGIN_TYPE_LABEL_MAP[LoginType.PhoneNumber],
   // },
 ];

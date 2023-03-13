@@ -15,7 +15,7 @@ import { useCaAddresses, useChainIdList } from '@portkey-wallet/hooks/hooks-ca/w
 import { fetchTokenListAsync } from '@portkey-wallet/store/store-ca/assets/slice';
 import { fetchAllTokenListAsync, getSymbolImagesAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
 import { getWalletNameAsync } from '@portkey-wallet/store/store-ca/wallet/actions';
-import { useIsTestnet } from 'hooks/useActivity';
+import { useIsTestnet } from 'hooks/useNetwork';
 
 export interface TransactionResult {
   total: number;

@@ -4,7 +4,7 @@ import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
 import { transNetworkText } from '@portkey-wallet/utils/activity';
 import { divDecimals, unitConverter } from '@portkey-wallet/utils/converter';
 import CustomSvg from 'components/CustomSvg';
-import { useIsTestnet } from 'hooks/useActivity';
+import { useIsTestnet } from 'hooks/useNetwork';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
