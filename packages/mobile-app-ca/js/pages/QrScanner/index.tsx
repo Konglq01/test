@@ -16,6 +16,8 @@ import GStyles from 'assets/theme/GStyles';
 import { FontStyles } from 'assets/theme/styles';
 import { isIos, screenHeight, screenWidth } from '@portkey-wallet/utils/mobile/device';
 
+import { Camera } from 'expo-camera';
+
 // import { useAppCASelector } from '@portkey-wallet/hooks';
 
 interface QrScannerProps {
@@ -64,8 +66,6 @@ const QrScanner: React.FC<QrScannerProps> = () => {
     if (result && result?.uri) {
       const scanResult = await BarCodeScanner.scanFromURLAsync(result?.uri, [BarCodeScanner.Constants.BarCodeType.qr]);
 
-      console.log('scanResult', scanResult);
-
       if (scanResult[0]?.data) handleBarCodeScanned({ data: scanResult[0]?.data || '' });
     }
   };
@@ -74,7 +74,8 @@ const QrScanner: React.FC<QrScannerProps> = () => {
   return (
     <View style={PageStyle.wrapper}>
       {refresh ? null : (
-        <BarCodeScanner
+        <Camera
+          // ratio={Camera.getSupportedRatiosAsync()}
           style={[PageStyle.barCodeScanner, !isIos && PageStyle.barCodeScannerAndroid]}
           onBarCodeScanned={handleBarCodeScanned}>
           <SafeAreaView style={PageStyle.innerView}>
@@ -95,7 +96,7 @@ const QrScanner: React.FC<QrScannerProps> = () => {
               <TextM style={[FontStyles.font2, PageStyle.albumText]}>{t('Album')}</TextM>
             </TouchableOpacity>
           </SafeAreaView>
-        </BarCodeScanner>
+        </Camera>
       )}
     </View>
   );

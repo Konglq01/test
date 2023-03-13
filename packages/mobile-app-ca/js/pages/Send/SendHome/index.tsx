@@ -337,7 +337,8 @@ const SendHome: React.FC<SendHomeProps> = props => {
       const balance = await getAssetBalance(assetInfo.tokenContractAddress || assetInfo.address, assetInfo.symbol);
       setSelectedAssets({ ...selectedAssets, balance });
     })();
-  }, [assetInfo.address, assetInfo.symbol, assetInfo.tokenContractAddress, getAssetBalance, selectedAssets]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assetInfo.address, assetInfo.symbol, assetInfo.tokenContractAddress, getAssetBalance]);
 
   const ButtonUI = useMemo(() => {
     return (
