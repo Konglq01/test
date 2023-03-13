@@ -5,6 +5,7 @@ import SendButton from 'components/SendButton';
 import ReceiveButton from 'components/ReceiveButton';
 import { styles } from './style';
 import { useNavigation } from '@react-navigation/native';
+import useEffectOnce from 'hooks/useEffectOnce';
 
 import navigationService from 'utils/navigationService';
 import NoData from 'components/NoData';
@@ -17,11 +18,18 @@ import { TextXL } from 'components/CommonText';
 import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
 import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
 import { request } from '@portkey-wallet/api/api-did';
+import { useAppCASelector, useAppCommonDispatch } from '@portkey-wallet/hooks';
 import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { ActivityItemType } from '@portkey-wallet/types/types-ca/activity';
+import { getActivityListAsync } from '@portkey-wallet/store/store-ca/activity/action';
+import { getCurrentActivityMapKey } from '@portkey-wallet/utils/activity';
+import { IActivitiesApiParams } from '@portkey-wallet/store/store-ca/activity/type';
 import { unitConverter } from '@portkey-wallet/utils/converter';
 import { ZERO } from '@portkey-wallet/constants/misc';
-import { transactionTypesForActivityList as transactionList } from '@portkey-wallet/constants/constants-ca/activity';
+import {
+  transactionTypesForActivityList,
+  transactionTypesForActivityList as transactionList,
+} from '@portkey-wallet/constants/constants-ca/activity';
 import fonts from 'assets/theme/fonts';
 
 interface RouterParams {
@@ -40,7 +48,15 @@ const TokenDetail: React.FC = () => {
   const { tokenInfo } = useRouterParams<RouterParams>();
   const currentWallet = useCurrentWallet();
   const navigation = useNavigation();
-  const [listShow, setListShow] = useState<any[]>([]);
+  const dispatch = useAppCommonDispatch();
+  const activity = useAppCASelector(state => state.activity);
+  const currentActivity = activity?.activityMap?.[getCurrentActivityMapKey(tokenInfo.chainId, tokenInfo.symbol)];
+  console.log(
+    'currentActivity',
+    !!activity?.activityMap,
+    getCurrentActivityMapKey(tokenInfo.chainId, tokenInfo.symbol),
+  );
+  console.log('currentActivity', currentActivity);
 
   const fixedParamObj = useMemo(
     () => ({
@@ -57,32 +73,24 @@ const TokenDetail: React.FC = () => {
 
   const getActivityList = useCallback(
     async (isInit = false) => {
-      if (!isInit && listShow.length > 0 && listShow.length >= pageInfoRef.current.total) return;
+      const { data, maxResultCount, skipCount, totalRecordCount } = currentActivity || {};
+      if (!isInit && data?.length >= totalRecordCount) return;
       if (pageInfoRef.current.isLoading) return;
       pageInfoRef.current.isLoading = true;
-      try {
-        const response = await request.activity.activityList({
-          params: {
-            ...fixedParamObj,
-            skipCount: pageInfoRef.current.curPage * MAX_RESULT_COUNT,
-            maxResultCount: MAX_RESULT_COUNT,
-          },
-        });
-        pageInfoRef.current.curPage = pageInfoRef.current.curPage + 1;
-        pageInfoRef.current.total = response.totalRecordCount;
-        console.log('request.activity.activityList:', response);
-        if (isInit) {
-          setListShow(response.data);
-        } else {
-          setListShow(pre => pre.concat(response.data));
-        }
-      } catch (err) {
-        console.log('request.activity.activityList: err', err);
-      }
+      const params: IActivitiesApiParams = {
+        ...fixedParamObj,
+        skipCount: isInit ? 0 : skipCount + maxResultCount,
+        maxResultCount,
+      };
+      await dispatch(getActivityListAsync(params));
       pageInfoRef.current.isLoading = false;
     },
-    [fixedParamObj, listShow.length],
+    [fixedParamObj],
   );
+
+  useEffectOnce(() => {
+    getActivityList(true);
+  });
 
   const [currentToken] = useState<TokenItemShowType>(tokenInfo);
   const [reFreshing, setFreshing] = useState(false);
@@ -127,10 +135,10 @@ const TokenDetail: React.FC = () => {
       </View>
       {/* first time loading  */}
       {/* {isLoadingFirstTime && <Dialog.Loading />} */}
-      {listShow.length === 0 && <NoData noPic message="You have no transactions." />}
+      {!currentActivity?.totalRecordCount && !reFreshing && <NoData noPic message="You have no transactions." />}
       <FlashList
         refreshing={reFreshing}
-        data={listShow || []}
+        data={currentActivity?.data || []}
         keyExtractor={(_item, index) => `${index}`}
         renderItem={({ item }: { item: ActivityItemType }) => {
           return (
