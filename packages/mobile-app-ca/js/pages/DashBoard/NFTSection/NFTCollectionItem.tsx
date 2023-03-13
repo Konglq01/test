@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     width: '100%',
     marginTop: pTd(24),
     marginLeft: pTd(44),
-    height: pTd(1),
+    height: StyleSheet.hairlineWidth,
     backgroundColor: defaultColors.bg7,
   },
   marginBottom0: {

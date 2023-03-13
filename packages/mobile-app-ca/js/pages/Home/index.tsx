@@ -11,7 +11,7 @@ import { contractQueries } from '@portkey-wallet/graphql/index';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { getManagerAccount } from 'utils/redux';
-import { usePin } from 'hooks/store';
+import { useGuardiansInfo, usePin } from 'hooks/store';
 import { getContractBasic } from '@portkey-wallet/contracts/utils';
 import AElf from 'aelf-sdk';
 import { customFetch } from '@portkey-wallet/utils/fetch';
@@ -25,6 +25,8 @@ import { useAppCommonDispatch } from '@portkey-wallet/hooks';
 import { addFailedActivity } from '@portkey-wallet/store/store-ca/activity/slice';
 import { useAppCASelector } from '@portkey-wallet/hooks/hooks-ca';
 import { fetchTokensPriceAsync } from '@portkey-wallet/store/store-ca/assets/slice';
+import AppleTest from 'Test/AppleTest';
+import GoogleTest from 'Test/GoogleTest';
 
 export default function HomeScreen() {
   const wallet = useCurrentWalletInfo();
@@ -34,12 +36,16 @@ export default function HomeScreen() {
 
   const pin = usePin();
   const chainInfo = useCurrentChain('AELF');
-  const { connectUrl } = useCurrentNetworkInfo();
   const getHolderInfo = useGetHolderInfo();
+  const { userGuardiansList, preGuardian } = useGuardiansInfo();
+  console.log(userGuardiansList, '=====userGuardiansList');
+
   return (
     <SafeAreaBox>
       <ScrollView>
         <Text>Test Screen</Text>
+        <AppleTest />
+        <GoogleTest />
         <Button title="ActionSheet show" onPress={() => ActionSheet.show([{ title: '123' }, { title: '123' }])} />
         <Button
           title="loading show"

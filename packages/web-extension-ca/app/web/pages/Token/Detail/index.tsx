@@ -1,11 +1,11 @@
-import { useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import './index.less';
 import SettingHeader from 'pages/components/SettingHeader';
 import BalanceCard from 'pages/components/BalanceCard';
 import { divDecimals, unitConverter } from '@portkey-wallet/utils/converter';
-import { useWalletInfo } from 'store/Provider/hooks';
 import Activity from 'pages/Home/components/Activity';
+import { transNetworkText } from '@portkey-wallet/utils/activity';
+import { useIsTestnet } from 'hooks/useNetwork';
 
 export enum TokenTransferStatus {
   CONFIRMED = 'Confirmed',
@@ -14,13 +14,8 @@ export enum TokenTransferStatus {
 
 function TokenDetail() {
   const navigate = useNavigate();
-  const { currentNetwork } = useWalletInfo();
   const { state: currentToken } = useLocation();
-  const isMain = useMemo(() => currentNetwork === 'MAIN', [currentNetwork]);
-  const currentChain = useMemo(
-    () => (currentToken?.chainId.toLocaleLowerCase() === 'aelf' ? 'MainChain' : 'SideChain'),
-    [currentToken],
-  );
+  const isTestNet = useIsTestnet();
 
   console.log(currentToken, 'currentToken===');
 
@@ -31,7 +26,7 @@ function TokenDetail() {
           title={
             <div className="title">
               <p className="symbol">{currentToken?.symbol}</p>
-              <p className="network">{`${currentChain} ${currentToken?.chainId} ${isMain || 'Testnet'}`}</p>
+              <p className="network">{transNetworkText(currentToken.chainId, isTestNet)}</p>
             </div>
           }
           leftCallBack={() => navigate(-1)}
@@ -43,7 +38,7 @@ function TokenDetail() {
             <span className="amount">
               {unitConverter(divDecimals(currentToken.balance, currentToken.decimals || 8))} {currentToken.symbol}
             </span>
-            {isMain && (
+            {!isTestNet && (
               <span className="convert">
                 $ {unitConverter(divDecimals(currentToken.balanceInUsd, currentToken.decimals || 8))}
               </span>
@@ -52,12 +47,12 @@ function TokenDetail() {
           <BalanceCard
             amount={currentToken?.balanceInUsd}
             onSend={() => {
-              navigate(`/send/token/${currentToken?.symbol}/${currentToken?.chainId}`, {
+              navigate(`/send/token/${currentToken?.symbol}`, {
                 state: { ...currentToken, address: currentToken?.tokenContractAddress },
               });
             }}
             onReceive={() =>
-              navigate(`/receive/token/${currentToken?.symbol}/${currentToken?.chainId}`, {
+              navigate(`/receive/token/${currentToken?.symbol}`, {
                 state: { ...currentToken, address: currentToken.tokenContractAddress },
               })
             }

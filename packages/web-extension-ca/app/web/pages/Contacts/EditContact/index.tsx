@@ -18,6 +18,9 @@ import {
   useEditContact,
   useCheckContactName,
 } from '@portkey-wallet/hooks/hooks-ca/contact';
+import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
+import { transNetworkText } from '@portkey-wallet/utils/activity';
+import { useIsTestnet } from 'hooks/useNetwork';
 
 const { Item: FormItem } = Form;
 export enum ContactInfoError {
@@ -62,18 +65,20 @@ export default function EditContact() {
   const deleteContactApi = useDeleteContact();
   const checkExistNameApi = useCheckContactName();
   const { setLoading } = useLoading();
+  const symbolImages = useSymbolImages();
+  const isTestNet = useIsTestnet();
 
   useEffect(() => {
     const { addresses } = state;
     const cusAddresses = addresses.map((ads: AddressItem) => ({
       ...ads,
-      networkName: ads.chainId === 'AELF' ? 'MainChain AELF Testnet' : 'SideChain tDVW Testnet',
+      networkName: transNetworkText(ads.chainId, isTestNet),
       validData: { validateStatus: '', errorMsg: '' },
     }));
     form.setFieldValue('addresses', cusAddresses);
     setAddressArr(cusAddresses);
     isEdit && setDisabled(false);
-  }, [form, isEdit, state]);
+  }, [form, isEdit, isTestNet, state]);
 
   const handleSelectNetwork = useCallback((i: number) => {
     setNetOpen(true);
@@ -293,7 +298,7 @@ export default function EditContact() {
                       <FormItem {...restField} name={[name, 'networkName']} noStyle>
                         <Input
                           placeholder="Select Network"
-                          prefix={<CustomSvg type="Aelf" className="select-svg" />}
+                          prefix={<img className="select-svg" src={symbolImages['ELF']} />}
                           suffix={
                             <CustomSvg
                               type="Down"

@@ -20,12 +20,11 @@ import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
 import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type';
 import { useTranslation } from 'react-i18next';
-import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
 import './index.less';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verification } from 'utils/api';
 
-const guardianTypeList = [{ label: 'Email', value: LoginType.email }];
+const guardianTypeList = [{ label: 'Email', value: LoginType.Email }];
 
 enum EmailError {
   noEmail = 'Please enter Email address',
@@ -133,7 +132,7 @@ export default function AddGuardian() {
       const result = await verification.sendVerificationCode({
         params: {
           guardianIdentifier: emailVal as string,
-          type: LoginStrType[guardianType as LoginType],
+          type: LoginType[guardianType as LoginType],
           verifierId: selectVerifierItem?.id || '',
           chainId: DefaultChainId,
         },
@@ -187,7 +186,7 @@ export default function AddGuardian() {
           items={guardianTypeOptions}
         />
       </div>
-      {guardianType === LoginType.email && (
+      {guardianType === LoginType.Email && (
         <div className="input-item">
           <p className="label">{t("Guardian's email")}</p>
           <Input
@@ -223,7 +222,11 @@ export default function AddGuardian() {
         closable={false}
         open={visible}
         onCancel={() => setVisible(false)}>
-        <p className="modal-content">{`${verifierName} will send a verification code to ${emailVal} to verify your email address.`}</p>
+        <p className="modal-content">
+          {`${verifierName} will send a verification code to `}
+          <span className="bold">{emailVal}</span>
+          {` to verify your email address.`}
+        </p>
         <div className="btn-wrapper">
           <Button onClick={() => setVisible(false)}>{'Cancel'}</Button>
           <Button type="primary" onClick={handleVerify}>

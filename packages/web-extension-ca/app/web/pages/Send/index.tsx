@@ -36,6 +36,7 @@ import { TransactionError } from '@portkey-wallet/constants/constants-ca/assets'
 import './index.less';
 import { the2ThFailedActivityItemType } from '@portkey-wallet/types/types-ca/activity';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
+import { CROSS_FEE } from '@portkey-wallet/constants/constants-ca/wallet';
 
 export type Account = { address: string; name?: string };
 
@@ -53,7 +54,7 @@ export default function Send() {
   const navigate = useNavigate();
   const { walletName } = useWalletInfo();
   // TODO need get data from state and wait for BE data structure
-  const { type, symbol, tokenId } = useParams();
+  const { type, symbol } = useParams();
   const { state } = useLocation();
   const chainInfo = useCurrentChain(state.chainId);
   const wallet = useCurrentWalletInfo();
@@ -99,9 +100,9 @@ export default function Send() {
   }, []);
 
   const btnDisabled = useMemo(() => {
-    if (toAccount.address === '') return true;
+    if (toAccount.address === '' || (stage === Stage.Amount && amount === '')) return true;
     return false;
-  }, [toAccount.address]);
+  }, [amount, stage, toAccount.address]);
 
   const getToAddressChainId = useCallback(
     (toAddress: string) => {
@@ -222,12 +223,17 @@ export default function Send() {
       setLoading(true);
       if (!ZERO.plus(amount).toNumber()) return 'Please input amount';
       if (type === 'token') {
-        if (ZERO.plus(amount).times(`1e${tokenInfo.decimals}`).isGreaterThan(ZERO.plus(balance))) {
-          return TransactionError.TOKEN_NOTE_ENOUGH;
+        if (timesDecimals(amount, tokenInfo.decimals).isGreaterThan(ZERO.plus(balance))) {
+          return TransactionError.TOKEN_NOT_ENOUGH;
+        }
+        if (isCrossChain(toAccount.address, chainInfo?.chainId ?? 'AELF') && symbol === 'ELF') {
+          if (ZERO.plus(CROSS_FEE).isGreaterThanOrEqualTo(ZERO.plus(amount))) {
+            return TransactionError.CROSS_NOT_ENOUGH;
+          }
         }
       } else if (type === 'nft') {
         if (ZERO.plus(amount).isGreaterThan(ZERO.plus(balance))) {
-          return TransactionError.NFT_NOTE_ENOUGH;
+          return TransactionError.NFT_NOT_ENOUGH;
         }
       } else {
         return 'input error';
@@ -237,16 +243,26 @@ export default function Send() {
       if (fee) {
         setTxFee(fee);
       } else {
-        return TransactionError.FEE_NOTE_ENOUGH;
+        return TransactionError.FEE_NOT_ENOUGH;
       }
       return '';
     } catch (error: any) {
       console.log('checkTransactionValue===', error);
-      return TransactionError.FEE_NOTE_ENOUGH;
+      return TransactionError.FEE_NOT_ENOUGH;
     } finally {
       setLoading(false);
     }
-  }, [setLoading, amount, type, getTranslationInfo, tokenInfo.decimals, balance]);
+  }, [
+    setLoading,
+    amount,
+    type,
+    getTranslationInfo,
+    tokenInfo.decimals,
+    balance,
+    toAccount.address,
+    chainInfo?.chainId,
+    symbol,
+  ]);
 
   const sendHandler = useCallback(async () => {
     try {
@@ -332,6 +348,7 @@ export default function Send() {
               width: 320,
               content: t('This is a cross-chain transaction.'),
               className: 'cross-modal delete-modal',
+              autoFocusButton: null,
               icon: null,
               centered: true,
               okText: t('Continue'),

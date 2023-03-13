@@ -71,7 +71,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderTopColor: defaultColors.border6,
-    borderTopWidth: pTd(0.5),
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
   leftTitle: {
     width: pTd(49),

@@ -125,18 +125,24 @@
         }
       }
     }
+    .item.network {
+      .chain {
+        font-size: 12px;
+        color: @font-13;
+        line-height: 16px;
+      }
+    }
   }
   .fee-preview {
-    padding: 0 24px;
+    padding: 0 24px 16px;
     gap: 20px;
-    // height: 135px;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     color: @font-11;
     /* stylelint-disable-next-line no-descending-specificity */
     .label {
-      width: fit-content;
+      width: 120px;
       font-size: 14px;
       line-height: 20px;
     }

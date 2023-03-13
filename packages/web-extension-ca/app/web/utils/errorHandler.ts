@@ -1,9 +1,4 @@
 /**
- * @file utils/errorHandler.ts
- * @author huangzongzhe
- */
-
-/**
  * 1xxxxx try catch
  * 2xxxxx handle
  * 3xxxxx
@@ -12,8 +7,7 @@
  * 6xxxxx event error
  */
 // About Error Code. Redundant design.
-// https://www.zhihu.com/question/24091286
-// https://open.taobao.com/doc.htm?docId=114&docType=1
+
 // Unified format: A-BB-CCC
 // A: Error level, such as 1 for system-level errors, 2 for service-level errors;
 // // B: Project or module name, generally the company will not have more than 99 projects;
@@ -68,7 +62,8 @@ const errorMap = {
   700002: 'The contract call failed, please check the contract address and contract name',
 };
 
-interface ErrorHandleInfo {
+export interface PortKeyResultType {
+  error: keyof typeof errorMap;
   name?: string;
   message?: string;
   Error?: any;
@@ -76,34 +71,32 @@ interface ErrorHandleInfo {
   data?: any;
 }
 
-export interface PortKeyResultType {
-  error: keyof typeof errorMap;
-  errorMessage: string | ErrorHandleInfo;
-}
-
 export default function errorHandler(code: keyof typeof errorMap, error?: any | string): PortKeyResultType {
   const errorMessage = errorMap[code];
-  const output: PortKeyResultType = {
+  let output: PortKeyResultType = {
     error: code,
-    errorMessage: '',
+    message: '',
   };
   if (code === 0) {
     // success
   } else if (error && typeof error !== 'string') {
     console.log(error, 'errorHandler');
-    output.errorMessage = {
+    output = {
+      ...output,
       name: error.name,
       message: error.message || error.Error?.Message || error.Error,
       stack: error.stack,
       data: error?.data,
     };
   } else if (errorMessage) {
-    output.errorMessage = {
+    output = {
+      ...output,
       name: 'errorMap',
       message: error || errorMessage,
     };
   } else {
-    output.errorMessage = {
+    output = {
+      ...output,
       name: 'customError',
       message: error,
     };

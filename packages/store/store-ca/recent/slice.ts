@@ -1,70 +1,78 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { ContactItemType, RecentContactItemType } from '@portkey-wallet/types/types-ca/contact';
+import { fetchRecentTransactionUsers } from './api';
+import { initialRecentData } from '@portkey-wallet/hooks/hooks-ca/useRecent';
+
+import { RECENT_LIST_PAGE_SIZE } from '@portkey-wallet/constants/constants-ca/recent';
 
 export interface RecentStateType {
-  recentContactList: any[];
+  [caAddress: string]: {
+    isFetching: boolean;
+    totalRecordCount: number;
+    skipCount: number;
+    maxResultCount: number;
+    recentContactList: RecentContactItemType[];
+  };
 }
 
-export const initialState: RecentStateType = {
-  recentContactList: [],
-};
+export const initialState: RecentStateType = {};
+
+export const fetchRecentListAsync = createAsyncThunk(
+  'fetchRecentListAsync',
+  async ({ caAddress, isFirstTime = true }: { caAddress: string; isFirstTime: boolean }, { getState, dispatch }) => {
+    const { recent } = getState() as { recent: RecentStateType };
+    const { skipCount = 0 } = recent?.[caAddress];
+
+    const response = await fetchRecentTransactionUsers({
+      caAddresses: [caAddress],
+      skipCount: isFirstTime ? 0 : skipCount,
+      maxResultCount: RECENT_LIST_PAGE_SIZE,
+    });
+
+    return { isFirstTime, caAddress, response };
+  },
+);
 
 export const recentSlice = createSlice({
   name: 'recent',
   initialState,
   reducers: {
-    addRecentContact: (
+    initCurrentChainRecentData: (
       state,
       action: PayloadAction<{
-        contact: ContactItemType;
+        caAddress: string;
       }>,
     ) => {
-      const { contact } = action.payload;
-      const contactItem: RecentContactItemType = {
-        ...contact,
-        name: contact.name ?? '',
-        id: contact.id ?? contact.addresses[0]?.address,
-        transferTime: Date.now(),
-      };
+      const { caAddress } = action.payload;
+      state[caAddress] = initialRecentData;
+    },
+    clearRecent: state => {
+      state = initialState;
+    },
+  },
+  extraReducers: builder => {
+    builder.addCase(fetchRecentListAsync.pending, (state, action) => {});
+    builder.addCase(fetchRecentListAsync.rejected, (state, action) => {});
+    builder.addCase(fetchRecentListAsync.fulfilled, (state, action) => {
+      const { caAddress, isFirstTime, response } = action.payload;
 
-      const len = state.recentContactList.length;
+      const targetData = state?.[caAddress] ?? {};
+      targetData.isFetching = false;
+      targetData.totalRecordCount = response?.totalRecordCount;
+      targetData.skipCount += RECENT_LIST_PAGE_SIZE;
 
-      // same contact
-      if (contactItem.id === state.recentContactList[0].id) {
-        state.recentContactList[0].transferTime = contactItem.transferTime;
+      if (isFirstTime) {
+        // first Page
+        targetData.recentContactList = response.data;
       } else {
-        // different contact
-        if (len === 100) state.recentContactList.pop();
-        state.recentContactList.unshift(contactItem);
+        targetData.recentContactList = [...targetData.recentContactList, ...response.data];
       }
 
-      // const existed: boolean = !!state.recentContactList.find(item => item?.id === contactItem?.id);
-      // if (existed) {
-      //   const tmpRecentList = state.recentContactList.filter(ele => ele.id !== contactItem.id);
-      //   tmpRecentList.unshift(contactItem);
-      //   state.recentContactList = tmpRecentList;
-      // } else {
-      //   if (len === 100) state.recentContactList.pop();
-      //   state.recentContactList.unshift(contactItem);
-      // }
-    },
-    upDateContact: (
-      state,
-      action: PayloadAction<{
-        contact: ContactItemType;
-      }>,
-    ) => {
-      const { contact } = action.payload;
-      const index = state.recentContactList.findIndex(ele => ele.id === contact.id);
-
-      state.recentContactList[index] = contact;
-    },
-    clearRecentContactList: state => {
-      state.recentContactList = [];
-    },
+      state[caAddress] = targetData;
+    });
   },
 });
 
-export const { addRecentContact, clearRecentContactList } = recentSlice.actions;
+export const { clearRecent, initCurrentChainRecentData } = recentSlice.actions;
 
 export default recentSlice;

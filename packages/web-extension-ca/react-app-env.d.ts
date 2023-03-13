@@ -11,12 +11,12 @@ interface RequestsBack {
   method: string;
   data: any;
   error?: number;
-  errorMessage?: string | any;
+  message?: string | any;
 }
 
 type PromiseSend = (input: RequestArguments) => Promise<RequestsBack | undefined | null>;
 interface Window {
-  portkey_ca?: {
+  portkey_did?: {
     on: (eventName: string, listener: (...args: any[]) => void) => any;
     // emit: (type: string, ...args: any[]) => boolean;
     removeListener: (eventName: string | symbol, listener: (...args: any[]) => void) => any;

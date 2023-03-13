@@ -9,11 +9,11 @@ if [ "$AGENT_JOBSTATUS" == "Succeeded" ]; then
             "content": {
                 "post": {
                     "zh_cn": {
-                        "title": "Notification about package updatting",
+                        "title": "Notification about package updating",
                         "content": [
                             [{
                                     "tag": "text",
-                                    "text": "The latest android package（id:'$APPCENTER_BUILD_ID'）has updated: "
+                                    "text": "The latest android package（id:'$APPCENTER_BUILD_ID',environment:'$ENVIRONMENT'）has updated: "
                                 },
                                 {
                                     "tag": "a",
@@ -49,12 +49,12 @@ if [ "$AGENT_JOBSTATUS" == "Succeeded" ]; then
             "content": {
                 "post": {
                     "zh_cn": {
-                        "title": "Notification about package updatting",
+                        "title": "Notification about package updating",
                         "content": [
                             [
                                 {
                                     "tag": "text",
-                                    "text": "The latest ios package(id:'$APPCENTER_BUILD_ID')has updated: "
+                                    "text": "The latest ios package(id:'$APPCENTER_BUILD_ID',environment:'$ENVIRONMENT')has updated: "
                                 },
                                 {
                                     "tag": "a",

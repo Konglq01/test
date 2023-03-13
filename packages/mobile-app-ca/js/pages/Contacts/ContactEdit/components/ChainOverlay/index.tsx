@@ -5,12 +5,12 @@ import Touchable from 'components/Touchable';
 import styles from './styles';
 import GStyles from 'assets/theme/GStyles';
 import Svg from 'components/Svg';
-import { defaultColors } from 'assets/theme';
 import { TextL, TextXL } from 'components/CommonText';
 import { pTd } from 'utils/unit';
 import { useLanguage } from 'i18n/hooks';
 import CommonInput from 'components/CommonInput';
 import OverlayBody from 'components/OverlayModal/OverlayBody';
+import { MAIN_CHAIN_ID } from '@portkey-wallet/constants/constants-ca/activity';
 
 type ValueType = string | number;
 type DefaultValueType = string;
@@ -66,7 +66,11 @@ const SelectList = <ItemType extends ItemTypeBase<ItemValueType>, ItemValueType 
                   callBack(item);
                 }}>
                 <View style={[GStyles.paddingLeft(20), styles.itemRow]}>
-                  <Svg icon="logo-icon" color={defaultColors.primaryColor} size={pTd(40)} />
+                  {item.chainId === MAIN_CHAIN_ID ? (
+                    <Svg icon="mainnet" size={pTd(40)} />
+                  ) : (
+                    <Svg icon="testnet" size={pTd(40)} />
+                  )}
                   <View style={styles.itemContent}>
                     <TextL>{item[labelAttrName]}</TextL>
                     {value !== undefined && value === item.chainId && (

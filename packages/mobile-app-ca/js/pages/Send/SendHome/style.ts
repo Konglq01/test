@@ -49,7 +49,7 @@ export const thirdGroupStyle = StyleSheet.create({
   },
   borderTop: {
     borderTopColor: defaultColors.border6,
-    borderTopWidth: pTd(0.5),
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
   title: {
     flex: 1,

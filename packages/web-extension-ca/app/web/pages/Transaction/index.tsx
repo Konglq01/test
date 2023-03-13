@@ -1,8 +1,7 @@
 import { TransactionTypes, transactionTypesMap } from '@portkey-wallet/constants/constants-ca/activity';
-import { TransactionStatus } from '@portkey-wallet/graphql/contract/__generated__/types';
 import { useCaAddresses, useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { fetchActivity } from '@portkey-wallet/store/store-ca/activity/api';
-import { ActivityItemType } from '@portkey-wallet/types/types-ca/activity';
+import { ActivityItemType, TransactionStatus } from '@portkey-wallet/types/types-ca/activity';
 import { Transaction } from '@portkey-wallet/types/types-ca/trade';
 import { getExploreLink } from '@portkey-wallet/utils';
 import { AmountSign, formatAmount, transNetworkText } from '@portkey-wallet/utils/activity';
@@ -14,11 +13,11 @@ import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { useEffectOnce } from 'react-use';
-import { shortenCharacters } from 'utils/reg';
 import './index.less';
-import { useIsTestnet } from 'hooks/useActivity';
+import { useIsTestnet } from 'hooks/useNetwork';
 import { dateFormat } from 'utils';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { addressFormat } from '@portkey-wallet/utils';
 
 export interface ITransactionQuery {
   item: ActivityItemType;
@@ -40,6 +39,11 @@ export default function Transaction() {
   const feeInfo = useMemo(() => activityItem.transactionFees, [activityItem.transactionFees]);
   const chainInfo = useCurrentChain(activityItem.fromChainId);
 
+  const hiddenTransactionTypeArr = useMemo(
+    () => [TransactionTypes.SOCIAL_RECOVERY, TransactionTypes.ADD_MANAGER, TransactionTypes.REMOVE_MANAGER],
+    [],
+  );
+
   // Obtain data through api to ensure data integrity.
   // Because some data is not returned in the Activities API. Such as from, to.
   useEffectOnce(() => {
@@ -58,7 +62,6 @@ export default function Transaction() {
   });
 
   const status = useMemo(() => {
-    // TODO: do not use GraphQL TransactionStatus
     if (activityItem?.status === TransactionStatus.Mined)
       return {
         text: 'Confirmed',
@@ -100,17 +103,22 @@ export default function Transaction() {
   }, [activityItem]);
 
   const tokenHeaderUI = useCallback(() => {
-    const { amount, isReceived, decimals, symbol, priceInUsd } = activityItem;
+    const { amount, isReceived, decimals, symbol, priceInUsd, transactionType } = activityItem;
     const sign = isReceived ? AmountSign.PLUS : AmountSign.MINUS;
-    return (
-      <p className="amount">
-        {`${formatAmount({ amount, decimals, sign })} ${symbol ?? ''}`}
-        {!isTestNet && (
-          <span className="usd">{`$ ${formatAmount({ amount: priceInUsd, decimals: 0, digits: 2 })}`}</span>
-        )}
-      </p>
-    );
-  }, [activityItem, isTestNet]);
+    /* Hidden during [SocialRecovery, AddManager, RemoveManager] */
+    if (transactionType && !hiddenTransactionTypeArr.includes(transactionType)) {
+      return (
+        <p className="amount">
+          {`${formatAmount({ amount, decimals, sign })} ${symbol ?? ''}`}
+          {!isTestNet && (
+            <span className="usd">{`$ ${formatAmount({ amount: priceInUsd, decimals: 0, digits: 2 })}`}</span>
+          )}
+        </p>
+      );
+    } else {
+      return <p className="no-amount"></p>;
+    }
+  }, [activityItem, hiddenTransactionTypeArr, isTestNet]);
 
   const statusAndDateUI = useCallback(() => {
     return (
@@ -128,37 +136,54 @@ export default function Transaction() {
   }, [activityItem.timestamp, status.style, status.text, t]);
 
   const fromToUI = useCallback(() => {
+    const { from, fromAddress, fromChainId, to, toAddress, toChainId, transactionType } = activityItem;
+    const transFromAddress = addressFormat(fromAddress, fromChainId, 'aelf');
+    const transToAddress = addressFormat(toAddress, toChainId, 'aelf');
+
+    /* Hidden during [SocialRecovery, AddManager, RemoveManager] */
     return (
-      <div className="account-wrap">
-        <p className="label">
-          <span className="left">{t('From')}</span>
-          <span className="right">{t('To')}</span>
-        </p>
-        <div className="value">
-          <div className="content">
-            <span className="left name">{activityItem.from}</span>
-            <span className="left">{shortenCharacters(activityItem.fromAddress)}</span>
-          </div>
-          <CustomSvg type="RightArrow" />
-          <div className="content">
-            <span className="right name">{activityItem.to}</span>
-            <span className="right">{shortenCharacters(activityItem.toAddress)}</span>
+      transactionType &&
+      !hiddenTransactionTypeArr.includes(transactionType) && (
+        <div className="account-wrap">
+          <p className="label">
+            <span className="left">{t('From')}</span>
+            <span className="right">{t('To')}</span>
+          </p>
+          <div className="value">
+            <div className="content">
+              <span className="left name">{from}</span>
+              {fromAddress && (
+                <span className="left address-wrap">
+                  <span>{formatStr2EllipsisStr(transFromAddress, [7, 4])}</span>
+                  <Copy toCopy={transFromAddress} iconClassName="copy-address" />
+                </span>
+              )}
+            </div>
+            <CustomSvg type="RightArrow" className="right-arrow" />
+            <div className="content">
+              <span className="right name">{to}</span>
+              {toAddress && (
+                <span className="right address-wrap">
+                  <span>{formatStr2EllipsisStr(transToAddress, [7, 4])}</span>
+                  <Copy toCopy={transToAddress} iconClassName="copy-address" />
+                </span>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )
     );
-  }, [activityItem.from, activityItem.fromAddress, activityItem.to, activityItem.toAddress, t]);
+  }, [activityItem, hiddenTransactionTypeArr, t]);
 
   const networkUI = useCallback(() => {
     /* Hidden during [SocialRecovery, AddManager, RemoveManager] */
     const { transactionType, fromChainId, toChainId } = activityItem;
     const from = transNetworkText(fromChainId, isTestNet);
     const to = transNetworkText(toChainId, isTestNet);
-    const hiddenArr = [TransactionTypes.SOCIAL_RECOVERY, TransactionTypes.ADD_MANAGER, TransactionTypes.REMOVE_MANAGER];
 
     return (
       transactionType &&
-      !hiddenArr.includes(transactionType) && (
+      !hiddenTransactionTypeArr.includes(transactionType) && (
         <div className="network-wrap">
           <p className="label">
             <span className="left">{t('Network')}</span>
@@ -167,7 +192,7 @@ export default function Transaction() {
         </div>
       )
     );
-  }, [activityItem, isTestNet, t]);
+  }, [activityItem, hiddenTransactionTypeArr, isTestNet, t]);
 
   const feeUI = useCallback(() => {
     return (

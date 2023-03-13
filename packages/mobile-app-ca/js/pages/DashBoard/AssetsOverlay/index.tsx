@@ -20,6 +20,8 @@ import { fetchAssetList } from '@portkey-wallet/store/store-ca/assets/api';
 import { IAssetItemType } from '@portkey-wallet/store/store-ca/assets/type';
 import navigationService from 'utils/navigationService';
 import { IToSendHomeParamsType } from '@portkey-wallet/types/types-ca/routeParams';
+import { formatChainInfoToShow } from '@portkey-wallet/utils';
+import { ChainId } from '@portkey-wallet/types';
 
 type onFinishSelectTokenType = (tokenItem: any) => void;
 type TokenListProps = {
@@ -42,7 +44,7 @@ const AssetItem = (props: { symbol: string; onPress: (item: any) => void; item: 
 
   if (item.nftInfo) {
     const {
-      nftInfo: { tokenId },
+      nftInfo: { tokenId, chainId },
     } = item;
     return (
       <TouchableOpacity style={itemStyle.wrap} onPress={() => onPress?.(item)}>
@@ -60,8 +62,7 @@ const AssetItem = (props: { symbol: string; onPress: (item: any) => void; item: 
             {/* TODO: why use currentNetwork   */}
             {currentNetwork ? (
               <TextS numberOfLines={1} style={[FontStyles.font7, itemStyle.nftItemInfo]}>
-                {item.chainId === 'AELF' ? 'MainChain' : 'SideChain'} {item.chainId}{' '}
-                {currentNetwork === 'TESTNET' && 'Testnet'}
+                {formatChainInfoToShow(chainId as ChainId, currentNetwork)}
               </TextS>
             ) : (
               // TODO: price use witch one
@@ -78,7 +79,7 @@ const AssetItem = (props: { symbol: string; onPress: (item: any) => void; item: 
       </TouchableOpacity>
     );
   }
-  return <></>;
+  return null;
 };
 const MAX_RESULT_COUNT = 10;
 const INIT_PAGE_INFO = {
@@ -176,7 +177,7 @@ const AssetList = ({ account }: TokenListProps) => {
     <ModalBody modalBodyType="bottom" style={styles.modalStyle}>
       <TextXL style={[styles.title, FontStyles.font5]}>{t('Select Assets')}</TextXL>
 
-      {/* no assets in this accout  */}
+      {/* no assets in this account  */}
       {/* '{ import { list } from 'pages/SettingsPage/HelpAndFeedBack/config';' has been removed } */}
       <CommonInput
         placeholder={t('Search Assets')}
@@ -280,7 +281,7 @@ const itemStyle = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderBottomColor: defaultColors.bg7,
-    borderBottomWidth: pTd(0.5),
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   tokenName: {
     flex: 1,
