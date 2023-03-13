@@ -1,4 +1,9 @@
-import { AddressItem, IClickAddressProps, RecentContactItemType } from '@portkey-wallet/types/types-ca/contact';
+import {
+  AddressItem,
+  ContactItemType,
+  IClickAddressProps,
+  RecentContactItemType,
+} from '@portkey-wallet/types/types-ca/contact';
 import { transNetworkText } from '@portkey-wallet/utils/activity';
 import { formatStr2EllipsisStr } from '@portkey-wallet/utils/converter';
 import { Collapse } from 'antd';
@@ -7,7 +12,7 @@ import { useIsTestnet } from 'hooks/useNetwork';
 import { useCallback, useMemo } from 'react';
 
 export interface IContactCardProps {
-  user: RecentContactItemType;
+  user: RecentContactItemType | ContactItemType;
   onChange: (account: IClickAddressProps) => void;
   fromRecents?: boolean;
   className?: string;
