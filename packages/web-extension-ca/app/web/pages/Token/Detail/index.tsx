@@ -5,7 +5,7 @@ import BalanceCard from 'pages/components/BalanceCard';
 import { divDecimals, unitConverter } from '@portkey-wallet/utils/converter';
 import Activity from 'pages/Home/components/Activity';
 import { transNetworkText } from '@portkey-wallet/utils/activity';
-import { useIsTestnet } from 'hooks/useActivity';
+import { useIsTestnet } from 'hooks/useNetwork';
 
 export enum TokenTransferStatus {
   CONFIRMED = 'Confirmed',

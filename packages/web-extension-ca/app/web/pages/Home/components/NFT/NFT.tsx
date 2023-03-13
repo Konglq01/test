@@ -11,7 +11,7 @@ import clsx from 'clsx';
 import { useAppDispatch, useAssetInfo } from 'store/Provider/hooks';
 import './index.less';
 import { transNetworkText } from '@portkey-wallet/utils/activity';
-import { useIsTestnet } from 'hooks/useActivity';
+import { useIsTestnet } from 'hooks/useNetwork';
 
 export default function NFT() {
   const nav = useNavigate();

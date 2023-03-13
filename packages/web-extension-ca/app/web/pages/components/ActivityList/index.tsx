@@ -7,7 +7,7 @@ import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import './index.less';
 import LoadingMore from 'components/LoadingMore/LoadingMore';
-import { useIsTestnet } from 'hooks/useActivity';
+import { useIsTestnet } from 'hooks/useNetwork';
 import { AmountSign, formatAmount, transNetworkText } from '@portkey-wallet/utils/activity';
 import { Button, Modal } from 'antd';
 import { useAppCASelector } from '@portkey-wallet/hooks/hooks-ca';
@@ -48,8 +48,6 @@ export default function ActivityList({ data, chainId, hasMore, loadMore }: IActi
   };
 
   const nav = useNavigate();
-  console.log('activity', activity);
-  console.log('activity chainList', chainList);
 
   const navToDetail = useCallback(
     (item: ActivityItemType) => {
