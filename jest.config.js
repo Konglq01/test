@@ -21,22 +21,40 @@ module.exports = {
   moduleNameMapper: {
     '\\.(css|less)$': 'identity-obj-proxy',
   },
-  // projects: [
-  //   {
-  //     displayName: 'hooks',
-  //     preset: 'ts-jest',
-  //     testMatch: [
-  //       '<rootDir>/packages/hooks/**/*.test.tsx'
-  //     ],
-  //     testEnvironment: 'jsdom',
-  //   },
-  //   {
-  //     displayName: 'store',
-  //     preset: 'ts-jest',
-  //     testMatch: [
-  //       '<rootDir>/packages/store/**/*.test.tsx'
-  //     ],
-  //     testEnvironment: 'jsdom',
-  //   }
-  // ]
+
+  // transform: {
+  //   '^.+\\.(ts|tsx)$': [
+  //     'ts-jest',
+  //     {
+  //       babelConfig: {
+  //         presets: ['@babel/preset-typescript', '@babel/preset-react'],
+  //         plugins: ['@babel/plugin-transform-modules-commonjs'],
+  //       },
+  //       babelConfig: './packages/web-extension-ca/.babelrc',
+  //     },
+  //   ],
+  // },
+  // transformIgnorePatterns: ['/node_modules/'],
+
+  projects: [
+    {
+      displayName: 'hooks',
+      preset: 'ts-jest',
+      testMatch: ['<rootDir>/packages/web-extension-ca/app/web/hooks/useNetwork.test.{ts,tsx}'],
+      testEnvironment: 'jsdom',
+      transform: {
+        '^.+\\.(ts|tsx)$': [
+          `ts-jest`,
+          { isolatedModules: true, tsconfig: './packages/web-extension-ca/tsconfig.json' },
+        ],
+      },
+      roots: ['<rootDir>/packages/web-extension-ca'],
+      moduleNameMapper: {
+        '^utils/(.*)$': '<rootDir>/packages/web-extension-ca/app/web/utils/$1',
+        '^store/(.*)$': '<rootDir>/packages/web-extension-ca/app/web/store/$1',
+        '^constants/(.*)$': '<rootDir>/packages/web-extension-ca/app/web/constants/$1',
+        '^messages/(.*)$': '<rootDir>/packages/web-extension-ca/app/web/messages/$1',
+      },
+    },
+  ],
 };
