@@ -45,13 +45,6 @@ export default function Referral() {
               title={t('Get Started')}
               onPress={() => navigationService.reset('LoginPortkey')}
             />
-            <CommonButton
-              buttonStyle={[styles.buttonStyle, BGStyles.bg1]}
-              titleStyle={FontStyles.font4}
-              type="primary"
-              title={t('Home')}
-              onPress={() => navigationService.reset('Home')}
-            />
           </>
         ) : null}
       </SafeAreaBox>

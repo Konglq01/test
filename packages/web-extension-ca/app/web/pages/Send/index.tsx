@@ -227,7 +227,7 @@ export default function Send() {
           return TransactionError.TOKEN_NOT_ENOUGH;
         }
         if (isCrossChain(toAccount.address, chainInfo?.chainId ?? 'AELF') && symbol === 'ELF') {
-          if (ZERO.plus(CROSS_FEE).isGreaterThan(ZERO.plus(amount))) {
+          if (ZERO.plus(CROSS_FEE).isGreaterThanOrEqualTo(ZERO.plus(amount))) {
             return TransactionError.CROSS_NOT_ENOUGH;
           }
         }

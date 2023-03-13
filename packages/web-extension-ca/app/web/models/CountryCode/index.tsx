@@ -79,7 +79,7 @@ export default function CountryCode() {
     <CommonModal
       className="country-code-modal"
       closable={false}
-      open={true}
+      open={countryCodeModal}
       onCancel={() => dispatch(setCountryModal(false))}>
       <div className="flex-column country-title">
         <BackHeader

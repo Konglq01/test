@@ -1,5 +1,5 @@
-import React, { useMemo, useCallback, useEffect, useState } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import React, { useMemo, useCallback, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 import CommonTopTab from 'components/CommonTopTab';
 import GStyles from 'assets/theme/GStyles';
 import { defaultColors } from 'assets/theme';
@@ -20,6 +20,8 @@ import { request } from '@portkey-wallet/api/api-did';
 import { useContact } from '@portkey-wallet/hooks/hooks-ca/contact';
 import { ChainId } from '@portkey-wallet/types';
 import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { useRecent } from '@portkey-wallet/hooks/hooks-ca/useRecent';
+import { fetchRecentListAsync } from '@portkey-wallet/store/store-ca/recent/slice';
 
 interface ApiRecentAddressItemType {
   caAddress: string;
@@ -39,18 +41,20 @@ const MAX_RESULT_ACCOUNT = 10;
 
 export default function SelectContact(props: SelectContactProps) {
   const { chainId, onPress } = props;
+
   const { t } = useLanguage();
   const dispatch = useAppCommonDispatch();
   const { contactMap, contactIndexList } = useContact();
-
   const { walletInfo } = useCurrentWallet();
+
+  const { recentContactList } = useRecent(walletInfo?.[chainId]?.caAddress || '');
+
+  console.log('recentContactListrecentContactList', recentContactList);
 
   const [loading, setLoading] = useState<boolean>(false);
   const [skipCount, setSkipCount] = useState(0);
   const [recentTotalNumber, setRecentTotalNumber] = useState(0);
   const [recentList, setRecentList] = useState<RecentContactItemType[]>([]);
-
-  // const debouncedKeyword = useDebounce(keyword, 500);
 
   useEffectOnce(() => {
     dispatch(fetchContactListAsync());
@@ -88,14 +92,7 @@ export default function SelectContact(props: SelectContactProps) {
 
   // init Recent
   useEffectOnce(() => {
-    fetchRecents().then(res => {
-      const { data, totalRecordCount } = res;
-
-      setSkipCount(MAX_RESULT_ACCOUNT);
-      setLoading(false);
-      setRecentList(transFormData(data as ApiRecentAddressItemType[]));
-      setRecentTotalNumber(totalRecordCount);
-    });
+    dispatch(fetchRecentListAsync({ caAddress: walletInfo?.[chainId]?.caAddress || '', isFirstTime: true }));
   });
 
   // fetchMoreRecent
