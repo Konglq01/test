@@ -4,6 +4,9 @@ import { PartialOption } from '../common';
 export interface AddressItem {
   chainId: string; // AELF tDVV tDVW
   address: string;
+}
+
+export interface RecentAddressItem extends AddressItem {
   transactionTime: string;
 }
 
@@ -32,7 +35,7 @@ export interface RecentContactItemType extends ContactItemType {
   addressChainId: string;
   transactionTime: string;
   name: string;
-  addresses: AddressItem[];
+  addresses: RecentAddressItem[];
 }
 
 export type ContactIndexType = Pick<ContactItemType, 'index'> & { contacts: ContactItemType[] };
