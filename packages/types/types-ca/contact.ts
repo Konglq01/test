@@ -4,7 +4,7 @@ import { PartialOption } from '../common';
 export interface AddressItem {
   chainId: string; // AELF tDVV tDVW
   address: string;
-  transactionTime: string;
+  transactionTime?: string;
 }
 
 export interface ContactItemType {
