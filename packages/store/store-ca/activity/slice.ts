@@ -33,6 +33,8 @@ export const activitySlice = createSlice({
       const { data, totalRecordCount, skipCount, maxResultCount, chainId, symbol } = action.payload;
       const currentMapKey = getCurrentActivityMapKey(chainId, symbol);
 
+      if (!state.activityMap) state.activityMap = {};
+
       state.activityMap[currentMapKey] = {
         data: skipCount === 0 ? data : [...state.activityMap[currentMapKey].data, ...data],
         totalRecordCount,

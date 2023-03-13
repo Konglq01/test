@@ -17,7 +17,6 @@ import { FontStyles } from 'assets/theme/styles';
 import { TextXL } from 'components/CommonText';
 import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
 import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
-import { request } from '@portkey-wallet/api/api-did';
 import { useAppCASelector, useAppCommonDispatch } from '@portkey-wallet/hooks';
 import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { ActivityItemType } from '@portkey-wallet/types/types-ca/activity';
@@ -26,17 +25,13 @@ import { getCurrentActivityMapKey } from '@portkey-wallet/utils/activity';
 import { IActivitiesApiParams } from '@portkey-wallet/store/store-ca/activity/type';
 import { unitConverter } from '@portkey-wallet/utils/converter';
 import { ZERO } from '@portkey-wallet/constants/misc';
-import {
-  transactionTypesForActivityList,
-  transactionTypesForActivityList as transactionList,
-} from '@portkey-wallet/constants/constants-ca/activity';
+import { transactionTypesForActivityList as transactionList } from '@portkey-wallet/constants/constants-ca/activity';
 import fonts from 'assets/theme/fonts';
 
 interface RouterParams {
   tokenInfo: TokenItemShowType;
 }
 
-const MAX_RESULT_COUNT = 10;
 const INIT_PAGE_INFO = {
   curPage: 0,
   total: 0,
@@ -50,7 +45,11 @@ const TokenDetail: React.FC = () => {
   const navigation = useNavigation();
   const dispatch = useAppCommonDispatch();
   const activity = useAppCASelector(state => state.activity);
-  const currentActivity = activity?.activityMap?.[getCurrentActivityMapKey(tokenInfo.chainId, tokenInfo.symbol)];
+  const currentActivity = useMemo(
+    () => activity?.activityMap?.[getCurrentActivityMapKey(tokenInfo.chainId, tokenInfo.symbol)] ?? {},
+    [activity?.activityMap, tokenInfo.chainId, tokenInfo.symbol],
+  );
+
   console.log(
     'currentActivity',
     !!activity?.activityMap,
@@ -85,7 +84,7 @@ const TokenDetail: React.FC = () => {
       await dispatch(getActivityListAsync(params));
       pageInfoRef.current.isLoading = false;
     },
-    [fixedParamObj],
+    [currentActivity, dispatch, fixedParamObj],
   );
 
   useEffectOnce(() => {
@@ -133,13 +132,12 @@ const TokenDetail: React.FC = () => {
           <ReceiveButton currentTokenInfo={tokenInfo} themeType="innerPage" receiveButton={currentToken} />
         </View>
       </View>
-      {/* first time loading  */}
-      {/* {isLoadingFirstTime && <Dialog.Loading />} */}
-      {!currentActivity?.totalRecordCount && !reFreshing && <NoData noPic message="You have no transactions." />}
+
       <FlashList
         refreshing={reFreshing}
         data={currentActivity?.data || []}
         keyExtractor={(_item, index) => `${index}`}
+        ListEmptyComponent={<NoData noPic message="You have no transactions." />}
         renderItem={({ item }: { item: ActivityItemType }) => {
           return (
             <TransferItem

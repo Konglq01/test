@@ -27,12 +27,12 @@ const ActivityListPage = () => {
   const { t } = useLanguage();
   const dispatch = useAppCommonDispatch();
   const activity = useAppCASelector(state => state.activity);
-  const currentActivity = activity?.activityMap?.[getCurrentActivityMapKey(chainId, symbol)];
+  const currentActivity = activity?.activityMap?.[getCurrentActivityMapKey(chainId, symbol)] || {};
   const currentWallet = useCurrentWallet();
   const isLoadingRef = useRef(false);
   const getActivityList = async (isInit: boolean) => {
-    const { data, maxResultCount, skipCount, totalRecordCount } = currentActivity;
-    if (!isInit && data.length >= totalRecordCount) return;
+    const { data, maxResultCount = 10, skipCount = 0, totalRecordCount = 0 } = currentActivity;
+    if (!isInit && data?.length >= totalRecordCount) return;
     if (isLoadingRef.current) return;
     isLoadingRef.current = true;
     setRefreshing(true);
@@ -77,19 +77,15 @@ const ActivityListPage = () => {
       safeAreaColor={['blue', 'white']}
       containerStyles={pageStyles.pageWrap}
       scrollViewProps={{ disabled: true }}>
-      {!currentActivity?.totalRecordCount && !refreshing && (
-        <NoData message={t('You have no transactions.')} topDistance={pTd(160)} />
-      )}
-      {currentActivity?.data && (
-        <FlatList
-          refreshing={refreshing}
-          data={currentActivity?.data || []}
-          keyExtractor={(_item: ActivityItemType, index: number) => `${index}`}
-          renderItem={renderItem}
-          onRefresh={() => getActivityList(true)}
-          onEndReached={() => getActivityList(false)}
-        />
-      )}
+      <FlatList
+        refreshing={refreshing}
+        data={currentActivity?.data || []}
+        keyExtractor={(_item: ActivityItemType, index: number) => `${index}`}
+        renderItem={renderItem}
+        onRefresh={() => getActivityList(true)}
+        onEndReached={() => getActivityList(false)}
+        ListEmptyComponent={<NoData message={t('You have no transactions.')} topDistance={pTd(160)} />}
+      />
     </PageContainer>
   );
 };
