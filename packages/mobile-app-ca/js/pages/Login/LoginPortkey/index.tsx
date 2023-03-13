@@ -20,10 +20,10 @@ import LoginQRCode from './components/LoginQRCode';
 const scrollViewProps = { extraHeight: 120 };
 const safeAreaColor: SafeAreaColorMapKeyUnit[] = ['transparent', 'transparent'];
 
-export type LoginType = 'email' | 'qr-code' | 'phone';
+export type PageLoginType = 'email' | 'qr-code' | 'phone';
 
 export default function LoginPortkey() {
-  const [loginType, setLoginType] = useState<LoginType>('email');
+  const [loginType, setLoginType] = useState<PageLoginType>('email');
   const { t } = useLanguage();
   const currentNetworkInfo = useCurrentNetworkInfo();
   const route = useRoute();

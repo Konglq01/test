@@ -45,12 +45,12 @@ const allowedMethod = [
   PortkeyMessageTypes.CHECK_WALLET_STATUS,
   PortkeyMessageTypes.EXPAND_FULL_SCREEN,
   PortkeyMessageTypes.OPEN_RECAPTCHA_PAGE,
-  PortkeyMessageTypes.THREE_WAY_LOGIN,
+  PortkeyMessageTypes.SOCIAL_LOGIN,
   WalletMessageTypes.REQUEST_ACCOUNTS,
   MethodMessageTypes.GET_WALLET_STATE,
   // TODO SET_RECAPTCHA_CODE
   WalletMessageTypes.SET_RECAPTCHA_CODE_V2,
-  WalletMessageTypes.THREE_WAY_LOGIN,
+  WalletMessageTypes.SOCIAL_LOGIN,
   PortkeyMessageTypes.ACTIVE_LOCK_STATUS,
 ];
 
@@ -160,7 +160,7 @@ export default class ServiceWorkerInstantiate {
         case PortkeyMessageTypes.OPEN_RECAPTCHA_PAGE:
           this.openRecaptchaPage(sendResponse, message.payload);
           break;
-        case PortkeyMessageTypes.THREE_WAY_LOGIN:
+        case PortkeyMessageTypes.SOCIAL_LOGIN:
           this.threeWayLogin(sendResponse, message.payload);
           break;
         case WalletMessageTypes.CONNECT:
@@ -172,7 +172,7 @@ export default class ServiceWorkerInstantiate {
         case MethodMessageTypes.GET_WALLET_STATE:
           ServiceWorkerInstantiate.getWalletState(sendResponse);
           break;
-        case WalletMessageTypes.THREE_WAY_LOGIN:
+        case WalletMessageTypes.SOCIAL_LOGIN:
           this.getLoginByThreeWay(sendResponse, message.payload);
           break;
 

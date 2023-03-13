@@ -125,7 +125,7 @@ export default function GuardianApproval() {
       managerInfo: {
         verificationType: VerificationType.communityRecovery,
         loginAccount,
-        type: LoginType.email,
+        type: LoginType.Email,
       } as ManagerInfo,
       guardiansApproved: handleGuardiansApproved(
         guardiansStatus as GuardiansStatus,

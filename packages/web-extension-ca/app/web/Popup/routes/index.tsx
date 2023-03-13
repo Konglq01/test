@@ -18,8 +18,9 @@ import GuardiansView from 'pages/Guardians/GuardiansView';
 import VerifierAccount from 'pages/VerifierAccount';
 import Unlock from 'pages/Unlock';
 import Contact from 'pages/Contacts/ContactDetail';
-import Device from 'pages/AccountSetting/Devices';
+import ManageDevices from 'pages/WalletSecurity/ManageDevices';
 import SetPin from 'pages/AccountSetting/SetPin';
+import WalletSecurity from 'pages/WalletSecurity';
 
 export const PageRouter = () =>
   useRoutes([
@@ -96,12 +97,16 @@ export const PageRouter = () =>
       element: <AccountSetting />,
     },
     {
-      path: '/setting/account-setting/device',
-      element: <Device />,
-    },
-    {
       path: '/setting/account-setting/set-pin',
       element: <SetPin />,
+    },
+    {
+      path: '/setting/wallet-security',
+      element: <WalletSecurity />,
+    },
+    {
+      path: '/setting/wallet-security/manage-devices',
+      element: <ManageDevices />,
     },
     {
       path: '/unlock',

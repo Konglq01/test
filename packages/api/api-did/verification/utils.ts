@@ -1,7 +1,7 @@
 import { IStorage, StorageBaseLoader } from '@portkey-wallet/types/storage';
 import { request } from '@portkey-wallet/api/api-did';
 import { RequestConfig } from '../../types';
-import { TLoginStrType } from '@portkey-wallet/types/types-ca/wallet';
+import { LoginKeyType } from '@portkey-wallet/types/types-ca/wallet';
 
 type VerifierInfo = {
   verifierSessionId: string;
@@ -10,7 +10,7 @@ type VerifierInfo = {
 
 interface SendVerificationConfig extends RequestConfig {
   params: {
-    type: TLoginStrType;
+    type: LoginKeyType;
     guardianIdentifier?: string;
     verifierId?: string;
     chainId: string | number;

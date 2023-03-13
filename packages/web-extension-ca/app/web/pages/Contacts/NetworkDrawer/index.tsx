@@ -8,7 +8,7 @@ import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
 import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import './index.less';
 import { transNetworkText } from '@portkey-wallet/utils/activity';
-import { useIsTestnet } from 'hooks/useActivity';
+import { useIsTestnet } from 'hooks/useNetwork';
 
 interface CustomSelectProps extends DrawerProps {
   onChange: (v: Record<string, string>) => void;
