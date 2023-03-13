@@ -117,7 +117,7 @@ export default function SendPreview({
             </p>
           </div>
           <div className="fee-preview">
-            <span className="label">Estimated Amount Received</span>
+            <span className="label">Estimated amount received</span>
             <p className="value">
               <span className="symbol">{`${
                 ZERO.plus(amount).isLessThanOrEqualTo(ZERO.plus(CROSS_FEE))
