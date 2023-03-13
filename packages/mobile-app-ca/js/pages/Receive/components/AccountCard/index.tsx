@@ -56,7 +56,7 @@ export default function AccountCard({
   return (
     <View style={[styles.container, style]}>
       <View style={styles.logoBox}>
-        <Svg size={ScreenWidth * 0.09} icon="logo-icon" color={defaultColors.font9} />
+        <Svg size={ScreenWidth * 0.08} icon="logo-icon" color={defaultColors.font9} />
       </View>
       <QRCode size={cardWidth} value={JSON.stringify(info)} />
       <TextM style={styles.textStyle}>{toCaAddress}</TextM>
@@ -87,8 +87,8 @@ const styles = StyleSheet.create({
   logoBox: {
     position: 'absolute',
     zIndex: 99,
-    padding: pTd(14),
-    borderRadius: pTd(4),
+    padding: pTd(6),
+    borderRadius: pTd(6),
     backgroundColor: defaultColors.bg1,
     alignSelf: 'center',
     top: ScreenWidth * 0.27,
