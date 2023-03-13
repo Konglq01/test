@@ -2,7 +2,6 @@ import {
   CaAccountRecoverResult,
   CaAccountRegisterResult,
   CAInfo,
-  DeviceType,
   ManagerInfo,
 } from '@portkey-wallet/types/types-ca/wallet';
 import { VerificationType } from '@portkey-wallet/types/verifier';
@@ -142,19 +141,19 @@ export async function addManager({
   address,
   caHash,
   managerAddress,
-  deviceType,
+  extraData,
 }: {
   contract: ContractBasic;
   address: string;
   caHash: string;
   managerAddress?: LoginQRData['address'];
-  deviceType?: LoginQRData['deviceType'];
+  extraData?: string;
 }) {
   return contract.callSendMethod('AddManagerInfo', address, {
     caHash,
     managerInfo: {
       address: managerAddress,
-      extraData: `${deviceType !== undefined ? deviceType + ',' : ''}${Date.now()}`,
+      extraData: extraData || '',
     },
   });
 }

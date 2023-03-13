@@ -19,6 +19,7 @@ import SecurityLock from 'pages/SecurityLock';
 import Receive from 'pages/Receive';
 import NFTDetail from 'pages/NFT/NFTDetail';
 import QrScanner from 'pages/QrScanner';
+import MyNav from 'pages/My/router';
 
 const Stack = createStackNavigator();
 export const stackNav = [
@@ -40,6 +41,7 @@ export const stackNav = [
   ...GuardianNav,
   ...PinNav,
   ...WalletNav,
+  ...MyNav,
 ] as const;
 
 export type RootStackParamList = {
