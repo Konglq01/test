@@ -25,10 +25,10 @@ function SelectLanguage({ className }: { className?: string }) {
       className={clsx(styles.select, 'header-select', className)}
       value={language}
       dropdownClassName={styles['select-language-dropdown']}
-      onChange={(value) => {
+      onChange={value => {
         changeLanguage(value);
       }}>
-      {LOCAL_LANGUAGE.map((item) => (
+      {LOCAL_LANGUAGE.map(item => (
         <Select.Option key={item.language}>{item.title}</Select.Option>
       ))}
     </CommonSelect>
