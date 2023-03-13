@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { useEffectOnce } from 'react-use';
 import './index.less';
-import { useIsTestnet } from 'hooks/useActivity';
+import { useIsTestnet } from 'hooks/useNetwork';
 import { dateFormat } from 'utils';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { addressFormat } from '@portkey-wallet/utils';

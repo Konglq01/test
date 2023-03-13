@@ -20,7 +20,7 @@ import {
 } from '@portkey-wallet/hooks/hooks-ca/contact';
 import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
 import { transNetworkText } from '@portkey-wallet/utils/activity';
-import { useIsTestnet } from 'hooks/useActivity';
+import { useIsTestnet } from 'hooks/useNetwork';
 
 const { Item: FormItem } = Form;
 export enum ContactInfoError {
