@@ -3,19 +3,19 @@ import { DeviceInfoType, DeviceType } from '@portkey-wallet/types/types-ca/devic
 export const DEVICE_VERSION = '1.0.0';
 
 export const DEVICE_TYPE_INFO: Record<DeviceType, DeviceInfoType> = {
-  [DeviceType.other]: {
+  [DeviceType.OTHER]: {
     deviceName: 'Other',
   },
-  [DeviceType.mac]: {
+  [DeviceType.MAC]: {
     deviceName: 'macOS',
   },
-  [DeviceType.ios]: {
-    deviceName: 'iPhone',
+  [DeviceType.IOS]: {
+    deviceName: 'iOS',
   },
-  [DeviceType.windows]: {
+  [DeviceType.WINDOWS]: {
     deviceName: 'Windows',
   },
-  [DeviceType.android]: {
+  [DeviceType.ANDROID]: {
     deviceName: 'Android',
   },
 };

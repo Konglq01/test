@@ -18,7 +18,7 @@ import { setCredentials } from 'store/user/actions';
 import { DigitInputInterface } from 'components/DigitInput';
 import { GuardiansApproved } from 'pages/Guardian/types';
 import { useGetDeviceInfo } from './device';
-import { deviceEncode } from '@portkey-wallet/utils/device';
+import { extraDataEncode } from '@portkey-wallet/utils/device';
 
 export function useOnManagerAddressAndQueryResult() {
   const dispatch = useAppDispatch();
@@ -55,7 +55,7 @@ export function useOnManagerAddressAndQueryResult() {
         let data: any = {
           loginGuardianIdentifier: managerInfo.loginAccount,
           manager: tmpWalletInfo.address,
-          extraData: deviceEncode(confirmPin, getDeviceInfo()),
+          extraData: extraDataEncode(getDeviceInfo()),
           context: {
             clientId: tmpWalletInfo.address,
             requestId: tmpWalletInfo.address,

@@ -26,7 +26,7 @@ import { useAppCASelector } from '@portkey-wallet/hooks/hooks-ca';
 import { fetchTokensPriceAsync } from '@portkey-wallet/store/store-ca/assets/slice';
 import AppleTest from 'Test/AppleTest';
 import GoogleTest from 'Test/GoogleTest';
-import { deviceEncode } from '@portkey-wallet/utils/device';
+import { extraDataEncode } from '@portkey-wallet/utils/device';
 import { useGetDeviceInfo } from 'hooks/device';
 
 export default function HomeScreen() {
@@ -144,7 +144,7 @@ export default function HomeScreen() {
                 caHash: wallet.caHash,
                 address: wallet.address,
                 managerAddress: tmpWalletInfo.address,
-                extraData: deviceEncode(pin, getDeviceInfo()),
+                extraData: extraDataEncode(getDeviceInfo()),
               });
               console.log(req, '===req');
             } catch (error) {

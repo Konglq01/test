@@ -8,18 +8,21 @@ export interface ExtraDataType {
   version: string;
 }
 
-export interface DeviceItemType extends Omit<ExtraDataType, 'deviceInfo'> {
-  managerAddress?: string | null;
+export interface ExtraDataDecodeType extends Omit<ExtraDataType, 'deviceInfo'> {
   deviceInfo: DeviceInfoType;
+}
+
+export interface DeviceItemType extends ExtraDataDecodeType {
+  managerAddress?: string | null;
 }
 
 // version 0.0.1
 export enum DeviceType {
-  other,
-  mac,
-  ios,
-  windows,
-  android,
+  OTHER,
+  MAC,
+  IOS,
+  WINDOWS,
+  ANDROID,
 }
 
 // version 0.0.1

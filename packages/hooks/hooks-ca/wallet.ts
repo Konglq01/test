@@ -13,9 +13,8 @@ import { getApolloClient } from '@portkey-wallet/graphql/contract/apollo';
 import { request } from '@portkey-wallet/api/api-did';
 import { useAppCommonDispatch } from '../index';
 import { setWalletNameAction } from '@portkey-wallet/store/store-ca/wallet/actions';
-import { DeviceItemType, DeviceType, ExtraDataType } from '@portkey-wallet/types/types-ca/device';
-import { DEVICE_TYPE_INFO } from '@portkey-wallet/constants/constants-ca/device';
-import { deviceDecode } from '@portkey-wallet/utils/device';
+import { DeviceItemType } from '@portkey-wallet/types/types-ca/device';
+import { extraDataDecode } from '@portkey-wallet/utils/device';
 
 export interface CurrentWalletType extends WalletInfoType, CAInfoType {
   caHash?: string;
@@ -85,72 +84,11 @@ export const useDeviceList = (devicePin: string = '') => {
     const managers = caHolderManagerInfo?.managerInfos || [];
     return managers
       .map(item => {
-        // TODO: extraData need decode
-        let extraData: ExtraDataType | string = item?.extraData || '';
-        let version = '0.0.1';
-        try {
-          extraData = JSON.parse(extraData || '') as ExtraDataType;
-          version = extraData.version;
-        } catch (error) {
-          version = '0.0.1';
-        }
-
-        const deviceItem: DeviceItemType = {
+        const extraData = extraDataDecode(item?.extraData || '');
+        return {
+          ...extraData,
           managerAddress: item?.address,
-          version,
-          transactionTime: 0,
-          deviceInfo: {
-            deviceName: '',
-          },
         };
-
-        switch (version) {
-          case '0.0.1':
-            if (typeof extraData !== 'string') break;
-            const extraDataArray = (extraData || '').split(',').map(itemValue => Number(itemValue));
-            let deviceType: DeviceType = 0,
-              transactionTime: number | undefined = undefined;
-            const firstNum = extraDataArray[0];
-            if (firstNum !== undefined && !isNaN(firstNum)) {
-              if (DeviceType[firstNum] !== undefined) {
-                deviceType = firstNum;
-              } else if (!isNaN(new Date(firstNum).getTime())) {
-                transactionTime = firstNum;
-              }
-            }
-            const secondNum = extraDataArray[1];
-            if (
-              transactionTime === undefined &&
-              secondNum !== undefined &&
-              !isNaN(secondNum) &&
-              !isNaN(new Date(firstNum).getTime())
-            ) {
-              transactionTime = secondNum;
-            }
-            deviceItem.deviceInfo = DEVICE_TYPE_INFO[deviceType];
-            deviceItem.transactionTime = transactionTime || 0;
-            break;
-
-          case '1.0.0':
-            if (typeof extraData === 'string') break;
-            const extraDataDecoded = deviceDecode(devicePin, extraData);
-            if (extraDataDecoded.deviceInfo) {
-              try {
-                deviceItem.deviceInfo = JSON.parse(extraDataDecoded.deviceInfo);
-              } catch (error) {
-                deviceItem.deviceInfo.deviceName = extraData.deviceInfo;
-              }
-            } else {
-              deviceItem.deviceInfo.deviceName = extraData.deviceInfo;
-            }
-            deviceItem.transactionTime = extraData.transactionTime;
-            break;
-
-          default:
-            break;
-        }
-
-        return deviceItem;
       })
       .reverse();
   }, [data, error]);

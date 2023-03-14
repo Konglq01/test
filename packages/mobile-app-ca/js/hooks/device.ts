@@ -1,11 +1,11 @@
 import { useCallback } from 'react';
-import * as Device from 'expo-device';
 import { DeviceInfoType } from '@portkey-wallet/types/types-ca/device';
+import { DEVICE_NAME } from 'constants/common';
 
 export const useGetDeviceInfo = () => {
   return useCallback(
     (): DeviceInfoType => ({
-      deviceName: Device.deviceName || '',
+      deviceName: DEVICE_NAME || '',
     }),
     [],
   );
