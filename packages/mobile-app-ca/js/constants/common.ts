@@ -1,7 +1,6 @@
 import { ErrorType } from 'types/common';
 import { Platform } from 'react-native';
 import { DeviceType } from '@portkey-wallet/types/types-ca/device';
-import { DEVICE_TYPE_INFO } from '@portkey-wallet/constants/constants-ca/device';
 
 export const INIT_ERROR: ErrorType = {
   errorMsg: '',
@@ -15,18 +14,18 @@ export const INIT_HAS_ERROR: ErrorType = {
   isError: true,
 };
 
-export const DEVICE_NAME: string | undefined = (() => {
-  let deviceName: string | undefined;
+export const DEVICE_TYPE: DeviceType = (() => {
+  let deviceType: DeviceType;
   switch (Platform.OS) {
     case 'ios':
-      deviceName = DEVICE_TYPE_INFO[DeviceType.IOS].deviceName;
+      deviceType = DeviceType.IOS;
       break;
     case 'android':
-      deviceName = DEVICE_TYPE_INFO[DeviceType.ANDROID].deviceName;
+      deviceType = DeviceType.ANDROID;
       break;
     default:
-      deviceName = DEVICE_TYPE_INFO[DeviceType.OTHER].deviceName;
+      deviceType = DeviceType.OTHER;
       break;
   }
-  return deviceName;
+  return deviceType;
 })();

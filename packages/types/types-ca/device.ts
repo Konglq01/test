@@ -1,5 +1,6 @@
 export interface DeviceInfoType {
   deviceName?: string;
+  deviceType?: DeviceType;
 }
 
 export interface ExtraDataType {
