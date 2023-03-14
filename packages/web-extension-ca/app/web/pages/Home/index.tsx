@@ -8,7 +8,7 @@ export default function Home() {
   const navigate = useNavigate();
 
   const onUserClick = useCallback(() => {
-    navigate(`/setting`);
+    navigate(`/setting/wallet`);
   }, [navigate]);
 
   return (

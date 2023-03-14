@@ -1,0 +1,78 @@
+@import '../../assets/theme/color.less';
+
+.prompt-my-page {
+  min-height: 100%;
+  padding-bottom: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: @bg-13;
+
+  .prompt-my-frame {
+    background-color: @bg-11;
+    box-shadow: 0 2px 6px 0 @shadow-1;
+    width: 900px;
+    height: 637px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .portkey-header {
+    width: 100%;
+  }
+  .setting-header-wrapper {
+    background-color: @bg-11;
+    height: 67px;
+    flex-shrink: 0;
+  }
+
+  .lock-row {
+    cursor: pointer;
+    svg path {
+      fill: #5b8ef4;
+    }
+    .lock-text {
+      font-size: 16px;
+      height: 22px;
+      line-height: 22px;
+      color: #5b8ef4;
+      padding-left: 8px;
+    }
+  }
+
+  .prompt-my-body {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+
+    .prompt-my-menu-list {
+      width: 210px;
+      padding: 20px 0;
+      flex-shrink: 0;
+
+      .menu-item {
+        opacity: 0.6;
+        border: none;
+        &.menu-item-selected {
+          opacity: 1;
+        }
+        .icon-area {
+          margin-right: 12px;
+        }
+
+        .menu-item-title {
+          font-size: 14px;
+          line-height: 20px;
+          color: #262626;
+        }
+      }
+    }
+
+    .prompt-my-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 24px;
+    }
+  }
+}
