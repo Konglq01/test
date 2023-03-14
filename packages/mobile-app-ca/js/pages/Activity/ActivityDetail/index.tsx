@@ -235,7 +235,7 @@ const ActivityDetail = () => {
                     {formatStr2EllipsisStr(addressFormat(activityItem?.fromAddress, activityItem?.fromChainId))}
                   </TextS>
                 </View>
-                {CopyIconUI(activityItem?.fromAddress || '')}
+                {CopyIconUI(addressFormat(activityItem?.fromAddress, activityItem?.fromChainId) || '')}
               </View>
             </View>
             <Text style={[styles.divider, styles.marginTop0]} />
@@ -254,7 +254,7 @@ const ActivityDetail = () => {
                     {formatStr2EllipsisStr(addressFormat(activityItem?.toAddress, activityItem?.toChainId))}
                   </TextS>
                 </View>
-                {CopyIconUI(activityItem?.toAddress || '')}
+                {CopyIconUI(addressFormat(activityItem?.toAddress, activityItem?.toChainId) || '')}
               </View>
             </View>
             <Text style={[styles.divider, styles.marginTop0]} />
