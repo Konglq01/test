@@ -47,18 +47,6 @@ export default function AmountToken({
       </View>
       <View style={styles.bottom}>
         <View style={styles.bottomLeft}>
-          {/* <Svg icon="aelf-avatar" size={pTd(28)} /> */}
-          {/* {symbolImages[selectedToken?.symbol] ? (
-            <CommonAvatar
-              shapeType="circular"
-              imageUrl={symbolImages[selectedToken.symbol] || ''}
-              avatarSize={28}
-              title={''}
-            />
-          ) : (
-            <Text style={styles.imgStyle}>{selectedToken?.symbol?.[0]}</Text>
-          )} */}
-
           {selectedToken.symbol === ELF_SYMBOL ? (
             <CommonAvatar
               shapeType="circular"

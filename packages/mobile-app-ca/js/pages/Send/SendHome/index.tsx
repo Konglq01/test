@@ -45,6 +45,7 @@ enum ErrorMessage {
   InsufficientFunds = 'Insufficient funds',
   InsufficientQuantity = 'Insufficient quantity',
   InsufficientFundsForTransactionFee = 'Insufficient funds for transaction fee',
+  InsufficientFundsForCrossChain = 'Insufficient funds for cross chain transaction fee',
 }
 
 const SendHome: React.FC<SendHomeProps> = props => {
@@ -255,6 +256,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
 
     const sendBigNumber = timesDecimals(sendNumber, selectedAssets.decimals || '0');
     const assetBalanceBigNumber = ZERO.plus(selectedAssets.balance);
+    const isCross = isCrossChain(selectedToContact.address, assetInfo.chainId);
 
     // input check
     if (sendType === 'token') {
@@ -266,8 +268,8 @@ const SendHome: React.FC<SendHomeProps> = props => {
           return { status: false };
         }
 
-        if (assetBalanceBigNumber.isLessThan(timesDecimals(CROSS_FEE, DEFAULT_DECIMAL))) {
-          setErrorMessage([ErrorMessage.InsufficientFunds]);
+        if (isCross && sendBigNumber.isLessThanOrEqualTo(timesDecimals(CROSS_FEE, DEFAULT_DECIMAL))) {
+          setErrorMessage([ErrorMessage.InsufficientFundsForCrossChain]);
           return { status: false };
         }
       } else {
@@ -284,8 +286,6 @@ const SendHome: React.FC<SendHomeProps> = props => {
         return { status: false };
       }
     }
-
-    const isCross = isCrossChain(selectedToContact.address, assetInfo.chainId);
 
     // transaction fee check
     Loading.show();
@@ -435,6 +435,10 @@ const SendHome: React.FC<SendHomeProps> = props => {
         <Text style={[styles.errorMessage, sendType === 'nft' && GStyles.textAlignCenter]}>
           {t(ErrorMessage.InsufficientFundsForTransactionFee)}
         </Text>
+      )}
+
+      {errorMessage.includes(ErrorMessage.InsufficientFundsForCrossChain) && (
+        <Text style={[styles.errorMessage]}>{t(ErrorMessage.InsufficientFundsForCrossChain)}</Text>
       )}
 
       {errorMessage.includes(ErrorMessage.InsufficientQuantity) && (
