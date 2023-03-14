@@ -7,7 +7,7 @@ const CommonSwitch = (props: SwitchProps) => {
   return (
     <Switch
       thumbColor={isIOS ? defaultColors.bg1 : defaultColors.bg12}
-      trackColor={{ false: isIOS ? '' : defaultColors.bg5 }}
+      trackColor={{ true: isIOS ? '' : defaultColors.bg5 }}
       {...props}
     />
   );
