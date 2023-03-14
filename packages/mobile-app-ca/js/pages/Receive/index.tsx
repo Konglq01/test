@@ -30,22 +30,10 @@ export default function Receive() {
 
   const currentCaAddress = currentWallet?.[chainId]?.caAddress;
 
-  // const addressShow = useMemo(() => {
-  //   if (account?.address.match(/^ELF_.+_AELF$/g)) return account?.address || '';
-  //   if (currentChain?.chainType === 'aelf') return `ELF_${account?.address || ''}_AELF`;
-  //   return account?.address;
-  // }, [account?.address, currentChain.chainType]);
-
   return (
     <PageContainer titleDom={t('Receive')} safeAreaColor={['blue', 'gray']} containerStyles={styles.containerStyles}>
       <TextXL style={styles.tips}>{t('You can provide QR code to receive')}</TextXL>
       <View style={styles.topWrap}>
-        {/* <CommonAvatar
-          title={symbol}
-          svgName={'aelf-avatar'}
-          imageUrl={imageUrl}
-          style={styles.svgStyle}
-        /> */}
         <CommonAvatar
           style={styles.svgStyle}
           title={symbol}
