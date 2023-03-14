@@ -1,4 +1,4 @@
-import { ThreeWayLogin } from '@portkey-wallet/types/types-ca/wallet';
+import { ISocialLogin } from '@portkey-wallet/types/types-ca/wallet';
 import { message } from 'antd';
 import InternalMessage from 'messages/InternalMessage';
 import { PortkeyMessageTypes } from 'messages/InternalMessageTypes';
@@ -36,5 +36,5 @@ export const setPinAction = async (pin: string) => {
 
 const loginUrl = 'http://localhost:3000/extension-login';
 
-export const threeWayLoginAction = async (type: ThreeWayLogin) =>
+export const socialLoginAction = async (type: ISocialLogin) =>
   await InternalMessage.payload(PortkeyMessageTypes.SOCIAL_LOGIN, { externalLink: `${loginUrl}/${type}` }).send();

@@ -28,7 +28,7 @@ import errorHandler from 'utils/errorHandler';
 export default function connectListener() {
   apis.runtime.onConnect.addListener(async (port: any) => {
     const isContentConnect = getEnvironmentType(port.sender.url) === ENVIRONMENT_TYPE_SERVICE_WORKER;
-    console.log(isContentConnect, 'isContentConnect===');
+    console.log(isContentConnect, port, 'isContentConnect===');
     if (isContentConnect) {
       SWController.connectWebAppByTab(port.sender);
       // console.log(port, 'connectListener===port');
