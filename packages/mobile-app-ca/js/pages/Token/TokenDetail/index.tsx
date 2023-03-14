@@ -72,7 +72,7 @@ const TokenDetail: React.FC = () => {
 
   const getActivityList = useCallback(
     async (isInit = false) => {
-      const { data, maxResultCount, skipCount, totalRecordCount } = currentActivity || {};
+      const { data, maxResultCount = 10, skipCount = 0, totalRecordCount = 0 } = currentActivity || {};
       if (!isInit && data?.length >= totalRecordCount) return;
       if (pageInfoRef.current.isLoading) return;
       pageInfoRef.current.isLoading = true;
