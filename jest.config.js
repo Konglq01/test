@@ -13,6 +13,7 @@ module.exports = {
   // testMatch: ['<rootDir>/test/**/*.test.tsx', '<rootDir>/packages/hooks/**/*.test.tsx'],
   collectCoverageFrom: [
     '**/packages/hooks/hooks-ca/**/*.{ts,tsx}',
+    '**/packages/web-extension-ca/app/web/hooks/*.{ts,tsx}',
     'packages/web-extension-ca/app/web/components/DropdownSearch/*.{ts,tsx}',
     '**/packages/store/store-ca/guardians/*.{ts,tsx}',
     '**/packages/utils/wallet/*.ts',
@@ -21,21 +22,6 @@ module.exports = {
   moduleNameMapper: {
     '\\.(css|less)$': 'identity-obj-proxy',
   },
-
-  // transform: {
-  //   '^.+\\.(ts|tsx)$': [
-  //     'ts-jest',
-  //     {
-  //       babelConfig: {
-  //         presets: ['@babel/preset-typescript', '@babel/preset-react'],
-  //         plugins: ['@babel/plugin-transform-modules-commonjs'],
-  //       },
-  //       babelConfig: './packages/web-extension-ca/.babelrc',
-  //     },
-  //   ],
-  // },
-  // transformIgnorePatterns: ['/node_modules/'],
-
   projects: [
     {
       displayName: 'hooks',
@@ -50,6 +36,7 @@ module.exports = {
       },
       roots: ['<rootDir>/packages/web-extension-ca'],
       moduleNameMapper: {
+        '^react$': '<rootDir>/node_modules/react',
         '^utils/(.*)$': '<rootDir>/packages/web-extension-ca/app/web/utils/$1',
         '^store/(.*)$': '<rootDir>/packages/web-extension-ca/app/web/store/$1',
         '^constants/(.*)$': '<rootDir>/packages/web-extension-ca/app/web/constants/$1',
