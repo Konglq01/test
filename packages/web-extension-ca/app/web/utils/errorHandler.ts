@@ -88,17 +88,17 @@ export default function errorHandler(code: keyof typeof errorMap, error?: any | 
       stack: error.stack,
       data: error?.data,
     };
-  } else if (errorMessage) {
-    output = {
-      ...output,
-      name: 'errorMap',
-      message: error || errorMessage,
-    };
-  } else {
+  } else if (typeof error === 'string') {
     output = {
       ...output,
       name: 'customError',
       message: error,
+    };
+  } else {
+    output = {
+      ...output,
+      name: 'errorMap',
+      message: errorMessage,
     };
   }
   return output;

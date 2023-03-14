@@ -1,15 +1,16 @@
 import { useCallback } from 'react';
 import dynamic from 'next/dynamic';
-import { ThreeWayLogin } from '@portkey-wallet/types/types-ca/wallet';
+import { ISocialLogin } from '@portkey-wallet/types/types-ca/wallet';
 import { Button } from 'antd';
 import type { IResolveParams } from 'reactjs-social-login';
+
 const _LoginSocialGoogle = import('reactjs-social-login').then(i => i.LoginSocialGoogle);
 const _LoginSocialApple = import('reactjs-social-login').then(i => i.LoginSocialApple);
 
 const LoginSocialGoogle = dynamic(_LoginSocialGoogle, { ssr: false });
 const LoginSocialApple = dynamic(_LoginSocialApple, { ssr: false });
 
-export default function SocialTem({ loginType }: { loginType: ThreeWayLogin }) {
+export default function SocialTem({ loginType }: { loginType: ISocialLogin }) {
   const onSuccess = useCallback(async (response: IResolveParams) => {
     console.log(response, 'onResolve===LoginSocial');
     if (!response.data) return;
@@ -49,24 +50,32 @@ export default function SocialTem({ loginType }: { loginType: ThreeWayLogin }) {
   return (
     <div>
       <>
-        <LoginSocialGoogle
-          isOnlyGetToken
-          scope="openid email profile"
-          client_id={process.env.NEXT_PUBLIC_GG_APP_ID || ''}
-          onResolve={onSuccess}
-          onReject={onError}>
-          <Button>LoginSocialGoogle</Button>
-        </LoginSocialGoogle>
-
-        <LoginSocialApple
-          client_id={process.env.NEXT_PUBLIC_APP_APPLE_ID || ''}
-          scope={'name email'}
-          redirect_uri={'https://6bd8-123-113-146-87.jp.ngrok.io/appleAuth'}
-          onResolve={onSuccess}
-          onReject={onError}>
-          {/* <AppleLoginButton /> */}
-          <Button>LoginSocialApple</Button>
-        </LoginSocialApple>
+        {loginType === 'Google' && (
+          <LoginSocialGoogle
+            // isOnlyGetToken
+            // typeResponse="idToken"
+            // scope="openid email profile"
+            client_id={process.env.NEXT_PUBLIC_GG_APP_ID || ''}
+            onLoginStart={() => {
+              //
+            }}
+            onResolve={onSuccess}
+            onReject={onError}>
+            <Button>LoginSocialGoogle</Button>
+          </LoginSocialGoogle>
+        )}
+        {loginType === 'Apple' && (
+          <LoginSocialApple
+            client_id={process.env.NEXT_PUBLIC_APP_APPLE_ID || ''}
+            scope={'name email'}
+            redirect_uri={'https://6bd8-123-113-146-87.jp.ngrok.io/appleAuth'}
+            onResolve={onSuccess}
+            onReject={onError}>
+            {/* <AppleLoginButton /> */}
+            <Button>LoginSocialApple</Button>
+          </LoginSocialApple>
+        )}
+        {loginType !== 'Apple' && loginType !== 'Google' && <>NO CONTENT</>}
       </>
     </div>
   );

@@ -34,7 +34,7 @@ export default class NotificationService {
     this.init();
   }
   init() {
-    this.platform.addOnRemovedListener((number) => {
+    this.platform.windowOnRemovedListener((number) => {
       if (this.openWindow && this.openWindow.id === number) {
         this.openWindow = null;
       }
@@ -206,9 +206,9 @@ export default class NotificationService {
    * Otherwise you will double send responses and one will always be null.
    */
   close = async (closeParams?: CloseParams, promptType: CreatePromptType = 'windows') => {
-    const windowId = await this.completedWithoutClose(closeParams, promptType);
-    windowId && apis[promptType].remove(windowId);
-    return windowId;
+    const _id = await this.completedWithoutClose(closeParams, promptType);
+    _id && apis[promptType].remove(_id);
+    return _id;
   };
   /**
    * The user completes the action without closing the window
@@ -216,6 +216,7 @@ export default class NotificationService {
   completedWithoutClose = async (closeParams?: CloseParams, promptType: CreatePromptType = 'windows') => {
     let _id = promptType === 'windows' ? this.openWindow?.id : closeParams?.windowId;
     if (!_id) {
+      if (promptType === 'windows') throw 'The current window information is not obtained';
       const ele = await apis[promptType].getCurrent();
       _id = ele?.id;
     }
