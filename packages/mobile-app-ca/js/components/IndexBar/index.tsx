@@ -1,6 +1,5 @@
 import React, { forwardRef, useCallback, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import {
-  FlatList,
   StyleSheet,
   PanResponder,
   TextStyle,
@@ -9,17 +8,18 @@ import {
   PanResponderCallbacks,
   Animated,
 } from 'react-native';
-import { TextL } from 'components/CommonText';
+import { TextL, TextS } from 'components/CommonText';
 import usePrevious from 'hooks/usePrevious';
 import isEqual from 'lodash/isEqual';
 import { ViewStyleType } from 'types/styles';
 import { defaultColors } from 'assets/theme';
+import { pTd } from 'utils/unit';
 export interface IndexBarProps {
   data: string[];
+  style?: ViewStyleType;
   indexBarItemStyle?: ViewStyleType;
   indexTextStyle?: TextStyle;
   onPress?: (index: number) => void;
-  style?: ViewStyleType;
   showPopover?: boolean;
 }
 interface PageLocationType {
@@ -59,7 +59,7 @@ export const Popover = forwardRef((_, _ref) => {
     },
     [marginTop],
   );
-  useImperativeHandle(_ref, () => ({ setPopoverInfo: onSetPopoverInfo, setShow }), []);
+  useImperativeHandle(_ref, () => ({ setPopoverInfo: onSetPopoverInfo, setShow }), [onSetPopoverInfo]);
 
   if (!popoverInfo || !show) return null;
   return (
@@ -154,10 +154,10 @@ export default function IndexBar({
     [onPanResponderStart, setCurrentIndex],
   );
   const indexBarItem = useCallback(
-    ({ item }: { item: string; index: number }) => {
+    (item: string, index: number) => {
       return (
-        <View style={[styles.indexBarItemStyle, indexBarItemStyle]}>
-          <TextL style={[styles.indexTextStyle, indexTextStyle]}>{item}</TextL>
+        <View key={index} style={[styles.indexBarItemStyle, indexBarItemStyle]}>
+          <TextS style={[styles.indexTextStyle, indexTextStyle]}>{item}</TextS>
         </View>
       );
     },
@@ -166,22 +166,17 @@ export default function IndexBar({
   return (
     <View style={[styles.barBox, style]} ref={indexRef} {...panResponder.panHandlers}>
       {showPopover && <Popover ref={popoverRef} />}
-      <FlatList
-        data={data}
-        alwaysBounceVertical={false}
-        renderItem={indexBarItem}
-        keyExtractor={(_: string, index: number) => index.toString()}
-        initialNumToRender={data ? data.length : 10}
-      />
+      {data?.map(indexBarItem)}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   indexTextStyle: {
-    color: '#157EFB',
+    color: defaultColors.font3,
   },
   indexBarItemStyle: {
+    flex: 1,
     width: 20,
     justifyContent: 'center',
     alignItems: 'center',
@@ -200,6 +195,6 @@ const styles = StyleSheet.create({
   popoverItem: {},
   barBox: {
     position: 'absolute',
-    right: 5,
+    right: pTd(4),
   },
 });

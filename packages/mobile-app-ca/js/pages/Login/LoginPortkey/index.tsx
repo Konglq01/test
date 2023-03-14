@@ -17,6 +17,7 @@ import styles from './styles';
 import LoginEmail from './components/LoginEmail';
 import LoginQRCode from './components/LoginQRCode';
 import LoginPhone from './components/LoginPhone';
+import LoginReferral from './components/LoginReferral';
 
 const scrollViewProps = { extraHeight: 120 };
 const safeAreaColor: SafeAreaColorMapKeyUnit[] = ['transparent', 'transparent'];
@@ -25,10 +26,11 @@ export enum PageLoginType {
   email,
   qrCode,
   phone,
+  referral,
 }
 
 export default function LoginPortkey() {
-  const [loginType, setLoginType] = useState<PageLoginType>(PageLoginType.email);
+  const [loginType, setLoginType] = useState<PageLoginType>(PageLoginType.referral);
   const { t } = useLanguage();
   const currentNetworkInfo = useCurrentNetworkInfo();
   const route = useRoute();
@@ -37,6 +39,7 @@ export default function LoginPortkey() {
       [PageLoginType.email]: <LoginEmail setLoginType={setLoginType} />,
       [PageLoginType.qrCode]: <LoginQRCode setLoginType={setLoginType} />,
       [PageLoginType.phone]: <LoginPhone setLoginType={setLoginType} />,
+      [PageLoginType.referral]: <LoginReferral setLoginType={setLoginType} />,
     }),
     [],
   );

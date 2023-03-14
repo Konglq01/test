@@ -38,6 +38,7 @@ type RouterParams = {
   guardianItem?: UserGuardianItem;
   verifierInfo?: VerifierInfo;
   verifiedTime?: number;
+  loginType?: LoginType;
 };
 export default function GuardianApproval() {
   const {
@@ -47,6 +48,7 @@ export default function GuardianApproval() {
     guardianItem,
     verifierInfo,
     verifiedTime,
+    loginType,
   } = useRouterParams<RouterParams>();
   const dispatch = useAppDispatch();
 
@@ -72,14 +74,6 @@ export default function GuardianApproval() {
   const approvedList = useMemo(() => {
     return Object.values(guardiansStatus || {}).filter(guardian => guardian.status === VerifyStatus.Verified);
   }, [guardiansStatus]);
-
-  const isGuardianOpt = useMemo(
-    () =>
-      approvalType === ApprovalType.addGuardian ||
-      approvalType === ApprovalType.deleteGuardian ||
-      approvalType === ApprovalType.editGuardian,
-    [approvalType],
-  );
 
   const setGuardianStatus = useCallback((key: string, status: GuardiansStatusItem) => {
     if (key === 'resetGuardianApproval') {
@@ -125,14 +119,14 @@ export default function GuardianApproval() {
       managerInfo: {
         verificationType: VerificationType.communityRecovery,
         loginAccount,
-        type: LoginType.Email,
+        type: loginType,
       } as ManagerInfo,
       guardiansApproved: handleGuardiansApproved(
         guardiansStatus as GuardiansStatus,
         userGuardiansList as UserGuardianItem[],
       ),
     });
-  }, [guardiansStatus, loginAccount, userGuardiansList]);
+  }, [guardiansStatus, loginAccount, loginType, userGuardiansList]);
 
   const onAddGuardian = useCallback(async () => {
     if (!managerAddress || !caHash || !verifierInfo || !guardianItem || !guardiansStatus || !userGuardiansList) return;

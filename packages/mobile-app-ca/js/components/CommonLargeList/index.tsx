@@ -8,21 +8,17 @@ export interface CommonLargeListProps
 }
 
 const CommonLargeList = forwardRef((props: CommonLargeListProps, forwardedRef: Ref<LargeList>) => {
-  const { data, sectionHeight, indexHeight, renderItem, onLoading, allLoaded, onRefresh, renderSection, renderHeader } =
-    props;
+  const { data, sectionHeight, indexHeight, renderItem, renderSection, ...listProps } = props;
 
   const listData = data?.[0]?.items ? data : [{ items: data }];
   return (
     <LargeList
-      onLoading={onLoading}
-      allLoaded={allLoaded}
+      {...listProps}
       renderIndexPath={renderItem}
       renderSection={renderSection}
       ref={forwardedRef}
       heightForSection={() => sectionHeight}
       heightForIndexPath={() => indexHeight}
-      renderHeader={renderHeader}
-      onRefresh={onRefresh}
       data={Array.isArray(listData) ? listData : []}
     />
   );

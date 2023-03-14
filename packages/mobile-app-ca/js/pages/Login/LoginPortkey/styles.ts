@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
     marginTop: 32,
     paddingHorizontal: 20,
     paddingVertical: 32,
-    minHeight: Math.min(screenHeight * 0.5, 416),
+    minHeight: Math.min(screenHeight * 0.58, 494),
   },
   inputContainerStyle: {
     marginTop: 8,
@@ -50,8 +50,11 @@ const styles = StyleSheet.create({
   },
   signUpTip: {
     position: 'absolute',
-    bottom: 32,
-    left: 20,
+    bottom: 80,
+  },
+  termsServiceTip: {
+    position: 'absolute',
+    bottom: 24,
   },
   qrCodeTitle: {
     marginTop: 18,

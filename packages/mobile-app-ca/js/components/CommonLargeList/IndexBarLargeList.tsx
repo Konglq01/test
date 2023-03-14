@@ -14,7 +14,6 @@ export interface IndexLargeListProps extends CommonLargeListProps {
   indexTextStyle?: TextStyle;
   indexArray?: Array<string>;
   upPullRefresh?: boolean;
-  topOffset?: number;
   extraHeight?: number;
 }
 export default function IndexBarLargeList(props: IndexLargeListProps) {
@@ -66,7 +65,7 @@ export default function IndexBarLargeList(props: IndexLargeListProps) {
     renderSection,
     renderHeader,
     indexBarBoxStyle,
-    topOffset,
+    renderEmpty,
   } = props;
   return (
     <View style={styles.box}>
@@ -81,18 +80,14 @@ export default function IndexBarLargeList(props: IndexLargeListProps) {
         renderHeader={showHeader ? renderHeader : undefined}
         onRefresh={onRefresh}
         data={data}
+        renderEmpty={renderEmpty}
       />
       {indexArray && (
-        <IndexBar
-          showPopover
-          style={[{ top: topOffset }, indexBarBoxStyle]}
-          data={indexArray}
-          onPress={index => onSectionSelect(index)}
-        />
+        <IndexBar showPopover style={indexBarBoxStyle} data={indexArray} onPress={index => onSectionSelect(index)} />
       )}
     </View>
   );
 }
 const styles = StyleSheet.create({
-  box: { flex: 1 },
+  box: { flex: 1, position: 'relative' },
 });

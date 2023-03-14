@@ -20,9 +20,9 @@ import Loading from 'components/Loading';
 import { useVerifierList } from '@portkey-wallet/hooks/hooks-ca/network';
 import VerifierOverlay from '../components/VerifierOverlay';
 import { VerifierImage } from '../components/VerifierImage';
-import { LoginKeyType, LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import myEvents from 'utils/deviceEvent';
-import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network-test2';
+import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verification } from 'utils/api';
 
 const ScrollViewProps = { disabled: true };
@@ -32,15 +32,14 @@ export default function SelectVerifier() {
 
   const [selectedVerifier, setSelectedVerifier] = useState(verifierList[0]);
 
-  const { loginAccount } = useRouterParams<{ loginAccount?: string }>();
-
+  const { loginAccount, loginType } = useRouterParams<{ loginAccount?: string; loginType: LoginType }>();
   const onConfirm = useCallback(async () => {
     const confirm = async () => {
       try {
         Loading.show();
         const requestCodeResult = await verification.sendVerificationCode({
           params: {
-            type: LoginType[LoginType.Email],
+            type: LoginType[loginType],
             guardianIdentifier: loginAccount,
             verifierId: selectedVerifier.id,
             chainId: DefaultChainId,
@@ -54,7 +53,7 @@ export default function SelectVerifier() {
               isLoginAccount: true,
               verifier: selectedVerifier,
               guardianAccount: loginAccount,
-              guardianType: LoginType.Email,
+              guardianType: loginType,
             },
           });
         } else {
@@ -85,7 +84,7 @@ export default function SelectVerifier() {
         },
       ],
     });
-  }, [selectedVerifier, loginAccount, t]);
+  }, [selectedVerifier, loginAccount, t, loginType]);
   return (
     <PageContainer
       containerStyles={styles.containerStyles}
