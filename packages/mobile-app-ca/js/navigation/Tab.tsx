@@ -7,15 +7,19 @@ import { useLanguage } from 'i18n/hooks';
 import MyMenu from 'pages/MyMenu';
 import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import useLogOut from 'hooks/useLogOut';
+import { TextS } from 'components/CommonText';
+import { pTd } from 'utils/unit';
 
 const Tab = createBottomTabNavigator();
+
+type tabMenuIcon = typeof tabMenuList[number]['icon'];
 
 export const tabMenuList = [
   { name: 'Wallet', label: 'Wallet', index: 0, icon: 'logo-icon', component: DashBoard },
   { name: 'Settings', label: 'My', index: 2, icon: 'my', component: MyMenu },
 ] as const;
 
-type tabMenuIcon = typeof tabMenuList[number]['icon'];
+export const getLabel = (name: string): string => tabMenuList.find(ele => ele.name === name)?.label ?? '';
 
 export default function TabRoot() {
   const { t } = useLanguage();
@@ -43,6 +47,7 @@ export default function TabRoot() {
           component={ele.component}
           options={{
             title: t(ele.label),
+            tabBarActiveTintColor: defaultColors.font4,
           }}
         />
       ))}
