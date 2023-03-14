@@ -17,14 +17,18 @@ import Touchable from 'components/Touchable';
 import CommonInput from 'components/CommonInput';
 import CommonButton from 'components/CommonButton';
 import GStyles from 'assets/theme/GStyles';
-import { TextL } from 'components/CommonText';
+import { TextL, TextS } from 'components/CommonText';
 import Svg from 'components/Svg';
 import { pTd } from 'utils/unit';
 import qrCode from 'assets/image/pngs/QR-code.png';
 import { PageLoginType } from '../index';
 import { handleUserGuardiansList } from '@portkey-wallet/utils/guardian';
+import { CountryItem } from '@portkey-wallet/constants/constants-ca';
+import { OfficialWebsite } from '@portkey-wallet/constants/constants-ca/network';
 
-export default function LoginEmail({ setLoginType }: { setLoginType: (type: PageLoginType) => void }) {
+const DefaultCountry = { country: 'Singapore', code: '65', iso: 'SG' };
+
+export default function LoginReferral({ setLoginType }: { setLoginType: (type: PageLoginType) => void }) {
   const { t } = useLanguage();
   const dispatch = useAppDispatch();
   const [loading] = useState<boolean>();
@@ -33,7 +37,7 @@ export default function LoginEmail({ setLoginType }: { setLoginType: (type: Page
   const chainInfo = useCurrentChain('AELF');
   const getVerifierServers = useGetVerifierServers();
   const getGuardiansInfoWriteStore = useGetGuardiansInfoWriteStore();
-
+  const [country, setCountry] = useState<CountryItem>(DefaultCountry);
   const onLogin = useCallback(async () => {
     const message = checkEmail(loginAccount);
     setErrorMessage(message);
@@ -52,8 +56,6 @@ export default function LoginEmail({ setLoginType }: { setLoginType: (type: Page
         userGuardiansList: handleUserGuardiansList(holderInfo, verifierServers),
       });
     } catch (error) {
-      console.log(error, '=====error');
-
       setErrorMessage(handleErrorMessage(error));
     }
     Loading.hide();
@@ -64,39 +66,18 @@ export default function LoginEmail({ setLoginType }: { setLoginType: (type: Page
       setLoginAccount('');
       setErrorMessage(undefined);
     });
-    return () => listener.remove();
+    const listener2 = myEvents.setCountry.addListener(setCountry);
+    return () => {
+      listener2.remove();
+      listener.remove();
+    };
   });
   return (
-    <View style={[BGStyles.bg1, styles.card]}>
+    <View style={[BGStyles.bg1, styles.card, GStyles.itemCenter, GStyles.spaceBetween]}>
       <Touchable style={styles.iconBox} onPress={() => setLoginType(PageLoginType.qrCode)}>
         <Image source={qrCode} style={styles.iconStyle} />
       </Touchable>
-      <CommonButton
-        title="Phone"
-        onPress={() => {
-          setLoginType(PageLoginType.phone);
-        }}
-      />
-      <CommonInput
-        value={loginAccount}
-        label="Email"
-        type="general"
-        maxLength={30}
-        autoCorrect={false}
-        onChangeText={setLoginAccount}
-        errorMessage={errorMessage}
-        keyboardType="email-address"
-        placeholder={t('Enter Email')}
-        containerStyle={styles.inputContainerStyle}
-      />
-      <CommonButton
-        style={GStyles.marginTop(15)}
-        disabled={!loginAccount}
-        type="primary"
-        loading={loading}
-        onPress={onLogin}>
-        {t('Log In')}
-      </CommonButton>
+      <View style={[GStyles.flexRow, GStyles.itemCenter]} />
       <Touchable
         style={[GStyles.flexRow, GStyles.itemCenter, styles.signUpTip]}
         onPress={() => navigationService.navigate('SignupPortkey')}>
@@ -104,6 +85,18 @@ export default function LoginEmail({ setLoginType }: { setLoginType: (type: Page
           No account? <Text style={FontStyles.font4}>Sign up </Text>
         </TextL>
         <Svg size={pTd(20)} color={FontStyles.font4.color} icon="right-arrow2" />
+      </Touchable>
+      <Touchable
+        style={[GStyles.flexRow, GStyles.itemCenter, styles.termsServiceTip]}
+        onPress={() =>
+          navigationService.navigate('ViewOnWebView', {
+            title: 'Terms of Service',
+            url: `${OfficialWebsite}/terms-of-service`,
+          })
+        }>
+        <TextS style={FontStyles.font7}>
+          Use the application according to <Text style={FontStyles.font4}>Terms of Service </Text>
+        </TextS>
       </Touchable>
     </View>
   );

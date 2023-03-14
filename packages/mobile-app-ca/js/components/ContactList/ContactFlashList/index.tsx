@@ -74,7 +74,7 @@ const ContactsList: React.FC<ContactsListProps> = ({
       onResponderStart: async (evt: GestureResponderEvent) => {
         const eventPageY = evt.nativeEvent.pageY;
         if (indexInfoRef.current) {
-          indexInfoRef.current.currentIndex = 0;
+          indexInfoRef.current.currentIndex = -1;
         } else {
           const { height, pageX, pageY, indexHeight } = await new Promise<PageLocationType>((resolve, reject) => {
             if (indexRef.current === null) {

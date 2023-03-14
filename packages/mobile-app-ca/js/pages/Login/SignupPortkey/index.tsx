@@ -22,6 +22,7 @@ import { getChainListAsync } from '@portkey-wallet/store/store-ca/wallet/actions
 import Loading from 'components/Loading';
 import myEvents from 'utils/deviceEvent';
 import useEffectOnce from 'hooks/useEffectOnce';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 const safeAreaColor: SafeAreaColorMapKeyUnit[] = ['transparent', 'transparent'];
 
 const scrollViewProps = { extraHeight: 120 };
@@ -56,7 +57,7 @@ function SignupEmail() {
       } catch (error) {
         console.log(error, '====error');
       }
-      navigationService.navigate('SelectVerifier', { loginAccount: email });
+      navigationService.navigate('SelectVerifier', { loginAccount: email, loginType: LoginType.Email });
     } catch (error) {
       setErrorMessage(handleErrorMessage(error));
     }

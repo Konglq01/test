@@ -11,7 +11,7 @@ import styles from '../styles';
 import Touchable from 'components/Touchable';
 import GStyles from 'assets/theme/GStyles';
 import { TextL, TextM, TextXXXL } from 'components/CommonText';
-import { PageLoginType } from '..';
+import { PageLoginType } from '../index';
 import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { WalletInfoType } from '@portkey-wallet/types/wallet';
 import { usePin } from 'hooks/store';
@@ -93,7 +93,7 @@ export default function LoginQRCode({ setLoginType }: { setLoginType: (type: Pag
   }, [currentNetwork, newWallet]);
   return (
     <View style={[BGStyles.bg1, styles.card]}>
-      <Touchable style={styles.iconBox} onPress={() => setLoginType('email')}>
+      <Touchable style={styles.iconBox} onPress={() => setLoginType(PageLoginType.email)}>
         <Image source={phone} style={styles.iconStyle} />
       </Touchable>
       <TextXXXL style={[styles.qrCodeTitle, GStyles.textAlignCenter]}>Scan code to log in</TextXXXL>

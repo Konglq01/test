@@ -1,13 +1,13 @@
 import { ZERO } from '@portkey-wallet/constants/misc';
 import clsx from 'clsx';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useWalletInfo } from 'store/Provider/hooks';
 // import { useTokenPrice } from '@portkey-wallet/hooks/hooks-ca/useTokensPrice';
 import './index.less';
 import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { CROSS_FEE } from '@portkey-wallet/constants/constants-ca/wallet';
 import { unitConverter } from '@portkey-wallet/utils/converter';
-import { isAelfAddress } from '@portkey-wallet/utils/aelf';
+import { getEntireDIDAelfAddress, isAelfAddress } from '@portkey-wallet/utils/aelf';
 import { ChainId } from '@portkey-wallet/types';
 import { chainShowText } from '@portkey-wallet/utils';
 
@@ -45,6 +45,10 @@ export default function SendPreview({
     }
     return arr[arr.length - 1];
   }, [toAccount.address]);
+  const entireFromAddressShow = useMemo(
+    () => getEntireDIDAelfAddress(wallet[chainId].caAddress, undefined, chainId),
+    [chainId, wallet],
+  );
 
   return (
     <div className="send-preview">
@@ -74,11 +78,7 @@ export default function SendPreview({
           <span className="label">From</span>
           <div className="value">
             <p className="name">{walletName}</p>
-            <p className="address">
-              {wallet[chainId].caAddress.includes('ELF_')
-                ? wallet[chainId].caAddress.replace(/(?<=^\w{9})\w+(?=\w{10})/, '...')
-                : wallet[chainId].caAddress.replace(/(?<=^\w{6})\w+(?=\w{6})/, '...')}
-            </p>
+            <p className="address">{entireFromAddressShow.replace(/(?<=^\w{9})\w+(?=\w{10})/, '...')}</p>
           </div>
         </div>
         <div className={clsx('item', toAccount.name?.length || 'no-name')}>
@@ -117,7 +117,7 @@ export default function SendPreview({
             </p>
           </div>
           <div className="fee-preview">
-            <span className="label">Estimated Amount Received</span>
+            <span className="label">Estimated amount received</span>
             <p className="value">
               <span className="symbol">{`${
                 ZERO.plus(amount).isLessThanOrEqualTo(ZERO.plus(CROSS_FEE))
