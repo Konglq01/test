@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useMemo, useRef, useState } from 'react';
+import React, { memo, useCallback, useRef, useState } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import PageContainer from 'components/PageContainer';
 import { defaultColors } from 'assets/theme';
@@ -249,7 +249,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
       safeAreaColor={['blue', 'white']}
       titleDom={`${t('Send')}${sendType === 'token' ? ' ' + assetInfo.symbol : ''}`}
       containerStyles={styles.pageWrap}
-      scrollViewProps={{ disabled: true }}>
+      scrollViewProps={{ disabled: false }}>
       {sendType === 'nft' ? (
         <View style={styles.topWrap}>
           {!assetInfo?.imageUrl ? (
