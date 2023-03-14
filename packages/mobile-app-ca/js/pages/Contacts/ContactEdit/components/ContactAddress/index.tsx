@@ -12,6 +12,7 @@ import ListItem from 'components/ListItem';
 import GStyles from 'assets/theme/GStyles';
 import { defaultColors } from 'assets/theme';
 import { EditAddressType } from '../..';
+import { MAIN_CHAIN_ID } from '@portkey-wallet/constants/constants-ca/activity';
 
 interface ContactAddressProps {
   editAddressItem: EditAddressType;
@@ -66,7 +67,13 @@ const ContactAddress: React.FC<ContactAddressProps> = ({
       </View>
       <ListItem
         onPress={_onChainPress}
-        titleLeftElement={<Svg icon="app-blue-logo" size={28} />}
+        titleLeftElement={
+          editAddressItem.chainId === MAIN_CHAIN_ID ? (
+            <Svg icon="mainnet" size={pTd(28)} />
+          ) : (
+            <Svg icon="testnet" size={pTd(28)} />
+          )
+        }
         titleStyle={[GStyles.flexRow, GStyles.itemCenter]}
         titleTextStyle={styles.chainSelectTitleStyle}
         style={styles.selectedItem}

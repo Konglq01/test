@@ -3,7 +3,7 @@ import PageContainer from 'components/PageContainer';
 import ListItem from 'components/ListItem';
 import { touchAuth } from '@portkey-wallet/utils/mobile/authentication';
 import CommonToast from 'components/CommonToast';
-import useBiometricsReady from 'hooks/useBiometrics';
+import useBiometricsReady, { useSetBiometrics } from 'hooks/useBiometrics';
 import navigationService from 'utils/navigationService';
 import { StyleSheet } from 'react-native';
 import { defaultColors } from 'assets/theme';
@@ -16,7 +16,6 @@ import { TextM } from 'components/CommonText';
 import ActionSheet from 'components/ActionSheet';
 import { setSecureStoreItem } from '@portkey-wallet/utils/mobile/biometric';
 import myEvents from 'utils/deviceEvent';
-import { useSetBiometrics } from '@portkey-wallet/hooks/mobile';
 
 export default function Biometric() {
   const { biometrics } = useUser();

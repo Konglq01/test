@@ -21,7 +21,6 @@ import {
 import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { GuardianMth } from 'types/guardians';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
-import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
 import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
@@ -69,14 +68,13 @@ export default function GuardiansView() {
             method: GuardianMth.UnsetGuardianTypeForLogin,
             params: {
               caHash: walletInfo?.AELF?.caHash,
-              guardianAccount: {
-                guardian: {
-                  type: currentGuardian?.guardianType,
-                  verifier: {
-                    id: currentGuardian?.verifier?.id,
-                  },
-                },
+              guardian: {
+                type: currentGuardian?.guardianType,
+                verifierId: currentGuardian?.verifier?.id,
+                identifierHash: currentGuardian?.identifierHash,
+                salt: currentGuardian?.salt,
                 value: currentGuardian?.guardianAccount,
+                isLoginGuardian: true,
               },
             },
           },
@@ -101,8 +99,8 @@ export default function GuardiansView() {
 
         const result = await verification.sendVerificationCode({
           params: {
-            guardianAccount: opGuardian?.guardianAccount as string,
-            type: LoginStrType[opGuardian?.guardianType as LoginType],
+            guardianIdentifier: opGuardian?.guardianAccount as string,
+            type: LoginType[opGuardian?.guardianType as LoginType],
             verifierId: opGuardian?.verifier?.id || '',
             chainId: DefaultChainId,
           },
@@ -121,6 +119,8 @@ export default function GuardiansView() {
               },
               key: opGuardian?.key as string,
               isInitStatus: true,
+              identifierHash: opGuardian?.identifierHash as string,
+              salt: opGuardian?.salt as string,
             }),
           );
           navigate('/setting/guardians/verifier-account', { state: 'guardians/setLoginAccount' });
@@ -159,17 +159,17 @@ export default function GuardiansView() {
             address: currentChain?.caContractAddress as string,
             chainType: currentNetwork.walletType,
             paramsOption: {
-              loginGuardianAccount: opGuardian?.guardianAccount,
+              guardianIdentifier: opGuardian?.guardianAccount,
             },
           });
           setSwitchFail(SwitchFail.openFail);
         } catch (error: any) {
-          const _error = contractErrorHandler(error);
-          if (_error.indexOf('Not found ca_hash')) {
+          if (error?.error?.code?.toString() === '3002') {
             setTipOpen(true);
           } else {
-            message.error(_error);
-            throw error;
+            const _err = error?.error?.message || 'GetHolderInfo error';
+            message.error(_err);
+            throw _err;
           }
         }
       } else {
@@ -188,7 +188,7 @@ export default function GuardiansView() {
       currentChain,
       currentGuardian?.guardianAccount,
       currentNetwork.walletType,
-      opGuardian?.guardianAccount,
+      opGuardian,
       userGuardiansList,
       verifyHandler,
     ],

@@ -1,10 +1,12 @@
 import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { ChainId } from '@portkey-wallet/types';
 import { SendTokenQRDataType } from '@portkey-wallet/types/types-ca/qrcode';
+import { transNetworkText } from '@portkey-wallet/utils/activity';
 import clsx from 'clsx';
 import Copy from 'components/Copy';
 import CustomSvg from 'components/CustomSvg';
 import TitleWrapper from 'components/TitleWrapper';
+import { useIsTestnet } from 'hooks/useNetwork';
 import QRCode from 'qrcode.react';
 import { useMemo } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router';
@@ -13,13 +15,15 @@ import './index.less';
 
 export default function Receive() {
   const navigate = useNavigate();
-  const { symbol, chainId } = useParams();
+  const { symbol } = useParams();
+  const { state } = useLocation();
   const wallet = useCurrentWalletInfo();
   const { currentNetwork } = useWalletInfo();
-  const isMainChain = useMemo(() => chainId === 'AELF', [chainId]);
-  const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'Testnet' : ''), [currentNetwork]);
-  const { state } = useLocation();
-  const caAddress = useMemo(() => `ELF_${wallet?.[chainId || 'AELF']?.caAddress}_${chainId}`, [chainId, wallet]);
+  const isTestNet = useIsTestnet();
+  const caAddress = useMemo(
+    () => `ELF_${wallet?.[state.chainId || 'AELF']?.caAddress}_${state.chainId}`,
+    [state, wallet],
+  );
   console.log('---receive', state);
 
   const rightElement = useMemo(() => {
@@ -42,7 +46,7 @@ export default function Receive() {
       },
       assetInfo: {
         symbol: state.symbol as string,
-        chainId: chainId as ChainId,
+        chainId: state.chainId as ChainId,
         balance: state.balance as string,
         imageUrl: state.imageUrl as string,
         tokenContractAddress: state.address,
@@ -51,7 +55,7 @@ export default function Receive() {
       },
       address: caAddress,
     }),
-    [caAddress, chainId, currentNetwork, state],
+    [caAddress, currentNetwork, state],
   );
   console.log('-----qr', value);
 
@@ -63,9 +67,9 @@ export default function Receive() {
           <div className="name">My Wallet Address to Receive</div>
         </div>
         <div className="token-info">
-          {symbol === 'ELF' ? <CustomSvg type="Aelf" /> : <div className="icon">{symbol?.[0]}</div>}
+          {symbol === 'ELF' ? <CustomSvg type="elf-icon" /> : <div className="icon">{symbol?.[0]}</div>}
           <p className="symbol">{symbol}</p>
-          <p className="network">{`${isMainChain ? 'MainChain' : 'SideChain'} ${chainId} ${isTestNet}`}</p>
+          <p className="network">{transNetworkText(state.chainId, isTestNet)}</p>
         </div>
         <QRCode
           imageSettings={{ src: 'assets/svgIcon/PortkeyQR.svg', height: 20, width: 20, excavate: true }}

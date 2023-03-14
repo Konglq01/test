@@ -1,13 +1,18 @@
-import { ContactItemType, IClickAddressProps } from '@portkey-wallet/types/types-ca/contact';
+import {
+  AddressItem,
+  ContactItemType,
+  IClickAddressProps,
+  RecentContactItemType,
+} from '@portkey-wallet/types/types-ca/contact';
 import { transNetworkText } from '@portkey-wallet/utils/activity';
 import { formatStr2EllipsisStr } from '@portkey-wallet/utils/converter';
 import { Collapse } from 'antd';
 import clsx from 'clsx';
-import { useIsTestnet } from 'hooks/useActivity';
+import { useIsTestnet } from 'hooks/useNetwork';
 import { useCallback, useMemo } from 'react';
 
 export interface IContactCardProps {
-  user: ContactItemType & { address?: string };
+  user: RecentContactItemType | ContactItemType;
   onChange: (account: IClickAddressProps) => void;
   fromRecents?: boolean;
   className?: string;
@@ -15,8 +20,8 @@ export interface IContactCardProps {
 export default function ContactCard({ user, className, fromRecents = true, onChange }: IContactCardProps) {
   const isTestnet = useIsTestnet();
   const isDisabled = useCallback(
-    (itemAddress: string | undefined): boolean => fromRecents && user.address !== itemAddress,
-    [fromRecents, user.address],
+    (transactionTime: string | undefined): boolean => fromRecents && !transactionTime,
+    [fromRecents],
   );
   const header = useMemo(
     () => (
@@ -32,15 +37,19 @@ export default function ContactCard({ user, className, fromRecents = true, onCha
     <Collapse key={user.id} className={clsx('contact-card', className)}>
       <Collapse.Panel header={header} key={user.id}>
         <div className="content">
-          {user.addresses.map((address) => (
+          {user.addresses.map((address: AddressItem) => (
             <p
               key={address.address}
-              className={isDisabled(address.address) ? 'disabled' : ''}
-              onClick={() => onChange({ ...address, name: user.name, isDisable: isDisabled(address.address) })}>
-              <span className="address">
-                ELF_{formatStr2EllipsisStr(address.address, [6, 6])}_{address.chainId}
+              className={isDisabled(address?.transactionTime) ? 'disabled' : ''}
+              onClick={() =>
+                onChange({ ...address, name: user.name, isDisable: isDisabled(address?.transactionTime) })
+              }>
+              <span className={'address'}>
+                {`ELF_${formatStr2EllipsisStr(address.address, [6, 6])}_${address.chainId}`}
               </span>
-              <span className="network">{transNetworkText(address.chainId, isTestnet)}</span>
+              <span className={clsx(['network', isDisabled(address?.transactionTime) ? 'disabled' : ''])}>
+                {transNetworkText(address.chainId, isTestnet)}
+              </span>
             </p>
           ))}
         </div>

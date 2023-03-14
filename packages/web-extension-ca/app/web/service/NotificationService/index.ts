@@ -1,8 +1,3 @@
-/**
- * @file NotificationService.js
- * @author huangzongzhe
- */
-
 import getPromptRoute, { PromptMessage } from './getPromptRoute';
 import { CreatePromptType, SendResponseFun, SendResponseParams } from 'types';
 import { apis } from 'utils/BrowserApis';
@@ -39,7 +34,7 @@ export default class NotificationService {
     this.init();
   }
   init() {
-    this.platform.addOnRemovedListener((number) => {
+    this.platform.windowOnRemovedListener((number) => {
       if (this.openWindow && this.openWindow.id === number) {
         this.openWindow = null;
       }
@@ -66,7 +61,6 @@ export default class NotificationService {
         message: notification.message,
       });
 
-      console.log(height, width, top, left, isFullscreen, 'showWindow===');
       let url;
       if (notification.message.externalLink) {
         url = notification.message.externalLink;
@@ -80,6 +74,7 @@ export default class NotificationService {
         this.platform.closeWindow(this.openWindow?.id);
         this.openWindow = null;
       }
+
       // create new notification popup
       const popupWindow = await this.platform.openWindow({
         url,
@@ -99,8 +94,6 @@ export default class NotificationService {
       }
       this.openWindow = popupWindow;
       this.closeSender = { ...this.closeSender, [popupWindow.id?.toString() ?? '']: notification };
-      this.openWindow = popupWindow;
-      console.log(this.closeSender, popupWindow, 'getPopup===');
       return popupWindow;
     } catch (error) {
       notification.sendResponse?.(errorHandler(500002, error));
@@ -173,7 +166,7 @@ export default class NotificationService {
       const promptParam = {
         sendResponse: async (response?: SendResponseParams) => {
           await sleep(500);
-          resolve(response ?? { error: 0, errorMessage: 'Nothing' });
+          resolve(response ?? { error: 0, message: 'Nothing' });
         },
         message,
         promptType,
@@ -213,23 +206,21 @@ export default class NotificationService {
    * Otherwise you will double send responses and one will always be null.
    */
   close = async (closeParams?: CloseParams, promptType: CreatePromptType = 'windows') => {
-    const windowId = await this.completedWithoutClose(closeParams, promptType);
-
-    windowId && apis[promptType].remove(windowId);
-    return windowId;
+    const _id = await this.completedWithoutClose(closeParams, promptType);
+    _id && apis[promptType].remove(_id);
+    return _id;
   };
   /**
    * The user completes the action without closing the window
    */
   completedWithoutClose = async (closeParams?: CloseParams, promptType: CreatePromptType = 'windows') => {
-    let _id = closeParams?.windowId;
+    let _id = promptType === 'windows' ? this.openWindow?.id : closeParams?.windowId;
     if (!_id) {
+      if (promptType === 'windows') throw 'The current window information is not obtained';
       const ele = await apis[promptType].getCurrent();
       _id = ele?.id;
     }
-
     const sender = this.closeSender?.[_id?.toString() ?? ''];
-    console.log(this.closeSender, closeParams, 'completedWithoutClose===');
     sender?.sendResponse?.(closeParams);
     if (sender) {
       delete this.closeSender?.[_id?.toString() ?? ''];

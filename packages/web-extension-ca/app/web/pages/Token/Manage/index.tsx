@@ -3,14 +3,17 @@ import { useNavigate } from 'react-router';
 import { Button, message } from 'antd';
 import SettingHeader from 'pages/components/SettingHeader';
 import CustomSvg from 'components/CustomSvg';
-import { useSymbolImages, useToken } from '@portkey-wallet/hooks/hooks-ca/useToken';
+import { useToken } from '@portkey-wallet/hooks/hooks-ca/useToken';
 import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
 import DropdownSearch from 'components/DropdownSearch';
 import { useTranslation } from 'react-i18next';
-import { useAppDispatch, useTokenInfo, useUserInfo, useWalletInfo } from 'store/Provider/hooks';
+import { useAppDispatch, useTokenInfo, useUserInfo } from 'store/Provider/hooks';
 import { fetchAllTokenListAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
 import { useChainIdList } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import './index.less';
+import { transNetworkText } from '@portkey-wallet/utils/activity';
+import { useIsTestnet } from 'hooks/useNetwork';
+import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
 
 export default function AddToken() {
   const { t } = useTranslation();
@@ -22,10 +25,8 @@ export default function AddToken() {
   const [openDrop, setOpenDrop] = useState<boolean>(false);
   const { passwordSeed } = useUserInfo();
   const appDispatch = useAppDispatch();
-  const { currentNetwork } = useWalletInfo();
   const chainIdArray = useChainIdList();
-  const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'Testnet' : ''), [currentNetwork]);
-  const symbolImages = useSymbolImages();
+  const isTestNet = useIsTestnet();
 
   useEffect(() => {
     passwordSeed && appDispatch(fetchAllTokenListAsync({ keyword: filterWord, chainIdArray }));
@@ -79,22 +80,20 @@ export default function AddToken() {
     (item: TokenItemShowType) => (
       <div className="token-item" key={`${item.symbol}-${item.chainId}`}>
         <div className="token-item-content">
-          {symbolImages[item.symbol] ? (
-            <img className="token-logo" src={symbolImages[item.symbol]} />
+          {item.symbol === ELF_SYMBOL ? (
+            <CustomSvg className="token-logo" type="elf-icon" />
           ) : (
             <div className="token-logo custom-word-logo">{item.symbol?.[0] || ''}</div>
           )}
           <p className="token-info">
             <span className="token-item-symbol">{item.symbol}</span>
-            <span className="token-item-net">
-              {`${item.chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${item.chainId} ${isTestNet}`}
-            </span>
+            <span className="token-item-net">{transNetworkText(item.chainId, isTestNet)}</span>
           </p>
         </div>
         <div className="token-item-action">{renderTokenItem(item)}</div>
       </div>
     ),
-    [isTestNet, renderTokenItem, symbolImages],
+    [isTestNet, renderTokenItem],
   );
 
   return (

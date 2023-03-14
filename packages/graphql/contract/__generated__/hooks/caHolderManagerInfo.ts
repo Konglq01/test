@@ -15,7 +15,11 @@ export type CaHolderManagerInfoQuery = {
     chainId?: string | null;
     caHash?: string | null;
     caAddress?: string | null;
-    managers?: Array<{ __typename?: 'ManagerInfo'; manager?: string | null; extraData?: string | null } | null> | null;
+    managerInfos?: Array<{
+      __typename?: 'ManagerInfo';
+      address?: string | null;
+      extraData?: string | null;
+    } | null> | null;
   } | null> | null;
 };
 
@@ -26,8 +30,8 @@ export const CaHolderManagerInfoDocument = gql`
       chainId
       caHash
       caAddress
-      managers {
-        manager
+      managerInfos {
+        address
         extraData
       }
     }

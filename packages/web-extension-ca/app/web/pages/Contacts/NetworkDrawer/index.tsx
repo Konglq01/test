@@ -7,6 +7,8 @@ import BaseDrawer from 'components/BaseDrawer';
 import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
 import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import './index.less';
+import { transNetworkText } from '@portkey-wallet/utils/activity';
+import { useIsTestnet } from 'hooks/useNetwork';
 
 interface CustomSelectProps extends DrawerProps {
   onChange: (v: Record<string, string>) => void;
@@ -17,18 +19,18 @@ export default function NetworkDrawer({ onChange, onClose, ...props }: CustomSel
   const { t } = useTranslation();
   const [filterWord, setFilterWord] = useState<string>('');
   const [showNetworkLists, setShowNetworkLists] = useState<any[]>([]);
-  const { chainList } = useCurrentWallet();
-  const isMain = useCallback((chain: string) => (chain === 'AELF' ? 'MainChain' : 'SideChain'), []);
+  const { chainList, currentNetwork } = useCurrentWallet();
+  const isTestNet = useIsTestnet();
   const symbolImages = useSymbolImages();
 
   const networkLists = useMemo(
     () =>
       chainList?.map((chain) => ({
-        networkType: 'TESTNET',
+        networkType: currentNetwork,
         chainId: chain.chainId,
-        networkName: `${isMain(chain.chainId)} ${chain.chainId} Testnet`,
+        networkName: transNetworkText(chain.chainId, isTestNet),
       })),
-    [chainList, isMain],
+    [chainList, currentNetwork, isTestNet],
   );
 
   useEffect(() => {

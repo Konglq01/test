@@ -49,6 +49,7 @@ export const PortkeyMessageTypes = {
   EXPAND_FULL_SCREEN: 'EXPAND_FULL_SCREEN',
 
   OPEN_RECAPTCHA_PAGE: 'OPEN_RECAPTCHA_PAGE',
+  SOCIAL_LOGIN: 'SOCIAL_LOGIN',
 } as const;
 
 /**
@@ -56,7 +57,7 @@ export const PortkeyMessageTypes = {
  */
 export const EXTENSION_MESSAGES = {
   CONNECTION_READY: 'CONNECTION_READY',
-  READY: 'PORTKEY_CA_EXTENSION_READY',
+  READY: 'PORTKEY_DID_EXTENSION_READY',
 } as const;
 
 export default Object.assign(PortkeyMessageTypes, PromptRouteTypes);

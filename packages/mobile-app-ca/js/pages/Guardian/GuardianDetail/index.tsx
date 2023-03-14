@@ -21,10 +21,10 @@ import myEvents from 'utils/deviceEvent';
 import { VerifierImage } from '../components/VerifierImage';
 import { cancelLoginAccount } from 'utils/guardian';
 import { useGetCurrentCAContract } from 'hooks/contract';
-import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network-test2';
 import { verification } from 'utils/api';
 import { RouteProp, useRoute } from '@react-navigation/native';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import fonts from 'assets/theme/fonts';
 
 type RouterParams = {
@@ -67,8 +67,8 @@ export default function GuardianDetail() {
       Loading.show();
       const req = await verification.sendVerificationCode({
         params: {
-          type: LoginStrType[guardian.guardianType],
-          guardianAccount: guardian.guardianAccount,
+          type: LoginType[guardian.guardianType],
+          guardianIdentifier: guardian.guardianAccount,
           verifierId: guardian.verifier?.id,
           chainId: DefaultChainId,
         },
@@ -129,8 +129,8 @@ export default function GuardianDetail() {
       if (loginIndex === -1) {
         Loading.show();
         try {
-          const guardiansInfo = await getGuardiansInfo({ loginAccount: guardian.guardianAccount });
-          if (guardiansInfo.guardianAccounts) {
+          const guardiansInfo = await getGuardiansInfo({ guardianIdentifier: guardian.guardianAccount });
+          if (guardiansInfo?.guardianList?.guardians?.length) {
             Loading.hide();
             ActionSheet.alert({
               title2: t(`This account address is already a login account and cannot be used`),
@@ -142,10 +142,14 @@ export default function GuardianDetail() {
             });
             return;
           }
-        } catch (error) {
-          console.debug(error, '====error');
+        } catch (error: any) {
+          if (error.code !== '3002') {
+            CommonToast.fail('Setup failed');
+            return;
+          }
+        } finally {
+          Loading.hide();
         }
-        Loading.hide();
       }
 
       ActionSheet.alert({

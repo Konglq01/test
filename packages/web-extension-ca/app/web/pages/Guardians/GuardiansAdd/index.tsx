@@ -20,12 +20,11 @@ import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
 import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type';
 import { useTranslation } from 'react-i18next';
-import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
 import './index.less';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verification } from 'utils/api';
 
-const guardianTypeList = [{ label: 'Email', value: LoginType.email }];
+const guardianTypeList = [{ label: 'Email', value: LoginType.Email }];
 
 enum EmailError {
   noEmail = 'Please enter Email address',
@@ -113,11 +112,11 @@ export default function AddGuardian() {
     if (!selectVerifierItem) return message.error('Can not get the current verifier message');
     const isExist: boolean =
       Object.values(userGuardiansList ?? {})?.some((item) => {
-        return item.key === `${emailVal}&${verifierName}`;
+        return item.key === `${emailVal}&${verifierVal}`;
       }) ?? false;
     setExist(isExist);
     !isExist && setVisible(true);
-  }, [emailVal, selectVerifierItem, userGuardiansList, verifierName]);
+  }, [emailVal, selectVerifierItem, userGuardiansList, verifierVal]);
 
   const handleVerify = useCallback(async () => {
     try {
@@ -132,8 +131,8 @@ export default function AddGuardian() {
       await userGuardianList({ caHash: walletInfo.caHash });
       const result = await verification.sendVerificationCode({
         params: {
-          guardianAccount: emailVal as string,
-          type: LoginStrType[guardianType as LoginType],
+          guardianIdentifier: emailVal as string,
+          type: LoginType[guardianType as LoginType],
           verifierId: selectVerifierItem?.id || '',
           chainId: DefaultChainId,
         },
@@ -149,8 +148,10 @@ export default function AddGuardian() {
             sessionId: result.verifierSessionId,
             endPoint: result.endPoint,
           },
-          key: `${emailVal}&${selectVerifierItem?.name}`,
+          key: `${emailVal}&${selectVerifierItem?.id}`,
           isInitStatus: true,
+          identifierHash: '',
+          salt: '',
         };
         dispatch(setCurrentGuardianAction(newGuardian));
         dispatch(setOpGuardianAction(newGuardian));
@@ -185,7 +186,7 @@ export default function AddGuardian() {
           items={guardianTypeOptions}
         />
       </div>
-      {guardianType === LoginType.email && (
+      {guardianType === LoginType.Email && (
         <div className="input-item">
           <p className="label">{t("Guardian's email")}</p>
           <Input

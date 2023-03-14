@@ -31,7 +31,7 @@ export default function EmailLogin() {
       dispatch(
         setLoginAccountAction({
           guardianAccount,
-          loginType: LoginType.email,
+          loginType: LoginType.Email,
           createType: 'login',
         }),
       );
@@ -46,7 +46,7 @@ export default function EmailLogin() {
       await emailInputInstance?.current?.validateEmail(val, 'login');
       loginHandler(val);
       dispatch(resetGuardiansState());
-      await fetchUserVerifier({ loginGuardianAccount: val });
+      await fetchUserVerifier({ guardianIdentifier: val });
       setLoading(false);
 
       navigate('/login/guardian-approval');

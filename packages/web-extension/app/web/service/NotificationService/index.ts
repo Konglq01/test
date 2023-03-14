@@ -1,8 +1,3 @@
-/**
- * @file NotificationService.js
- * @author huangzongzhe
- */
-
 import getPromptRoute, { PromptMessage } from './getPromptRoute';
 import { CreatePromptType, SendResponseFun, SendResponseParams } from 'types';
 import { apis } from 'utils/BrowserApis';
@@ -39,7 +34,7 @@ export default class NotificationService {
     this.init();
   }
   init() {
-    this.platform.addOnRemovedListener((number) => {
+    this.platform.windowOnRemovedListener((number) => {
       if (this.openWindow && this.openWindow.id === number) {
         this.openWindow = null;
       }

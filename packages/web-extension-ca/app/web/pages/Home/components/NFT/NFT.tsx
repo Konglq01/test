@@ -5,17 +5,18 @@ import { NFTCollectionItemShowType, NFTItemBaseType } from '@portkey-wallet/type
 import { Collapse } from 'antd';
 import { List } from 'antd-mobile';
 import CustomSvg from 'components/CustomSvg';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import clsx from 'clsx';
-import { useAppDispatch, useAssetInfo, useWalletInfo } from 'store/Provider/hooks';
+import { useAppDispatch, useAssetInfo } from 'store/Provider/hooks';
 import './index.less';
+import { transNetworkText } from '@portkey-wallet/utils/activity';
+import { useIsTestnet } from 'hooks/useNetwork';
 
 export default function NFT() {
   const nav = useNavigate();
-  const { currentNetwork } = useWalletInfo();
   const [openPanel, setOpenPanel] = useState<string[]>([]);
-  const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'Testnet' : ''), [currentNetwork]);
+  const isTestNet = useIsTestnet();
   const {
     accountNFT: { accountNFTList },
   } = useAssetInfo();
@@ -80,9 +81,7 @@ export default function NFT() {
               </div>
               <div className="info">
                 <p className="alias">{nft.collectionName}</p>
-                <p className="network">{`${nft?.chainId?.toLocaleUpperCase() === 'AELF' ? 'MainChain' : 'SideChain'} ${
-                  nft.chainId
-                } ${isTestNet}`}</p>
+                <p className="network">{transNetworkText(nft.chainId, isTestNet)}</p>
               </div>
               <div className="amount">{nft.itemCount}</div>
             </div>

@@ -17,9 +17,9 @@ type AElfDialogProps = {
 const AElfDialog: React.FC<AElfDialogProps> = props => {
   const {
     isShow,
-    title = '标题',
-    confirmText = '确认',
-    cancelText = '取消',
+    title = 'Title',
+    confirmText = 'Confirm',
+    cancelText = 'Cancel',
     onConfirm,
     onCancel,
     onBackdropPress = onCancel,

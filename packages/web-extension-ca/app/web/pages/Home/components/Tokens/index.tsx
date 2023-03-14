@@ -1,17 +1,18 @@
+import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
 import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
 import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
+import { transNetworkText } from '@portkey-wallet/utils/activity';
 import { divDecimals, unitConverter } from '@portkey-wallet/utils/converter';
 import CustomSvg from 'components/CustomSvg';
-import { useCallback, useMemo } from 'react';
+import { useIsTestnet } from 'hooks/useNetwork';
+import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
-import { useWalletInfo } from 'store/Provider/hooks';
 
 export default function TokenList({ tokenList }: { tokenList: TokenItemShowType[] }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { currentNetwork } = useWalletInfo();
-  const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'Testnet' : ''), [currentNetwork]);
+  const isTestNet = useIsTestnet();
   const symbolImages = useSymbolImages();
 
   const onNavigate = useCallback(
@@ -31,16 +32,14 @@ export default function TokenList({ tokenList }: { tokenList: TokenItemShowType[
       <ul className="token-list">
         {tokenList.map((item) => (
           <li className="token-list-item" key={`${item.chainId}_${item.symbol}`} onClick={() => onNavigate(item)}>
-            {symbolImages[item.symbol] ? (
-              <img className="token-logo" src={symbolImages[item.symbol]} />
+            {item.symbol === ELF_SYMBOL ? (
+              <CustomSvg className="token-logo" type="elf-icon" />
             ) : (
               <div className="token-logo custom-word-logo">{item.symbol?.slice(0, 1)}</div>
             )}
             <div className="info">
               <span>{item.symbol}</span>
-              <span>
-                {item.chainId.toLowerCase() === 'aelf' ? 'MainChain' : 'SideChain'} {`${item.chainId} ${isTestNet}`}
-              </span>
+              <span>{transNetworkText(item.chainId, isTestNet)}</span>
             </div>
             <div className="amount">
               <p>{unitConverter(divDecimals(item.balance, item.decimals || 8))}</p>

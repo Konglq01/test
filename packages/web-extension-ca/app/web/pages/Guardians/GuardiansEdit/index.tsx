@@ -69,7 +69,7 @@ export default function GuardiansEdit() {
   const guardiansChangeHandler = useCallback(async () => {
     const flag: boolean =
       Object.values(userGuardiansList ?? {})?.some((item) => {
-        return item.key === `${currentGuardian?.guardianAccount}&${selectName}`;
+        return item.key === `${currentGuardian?.guardianAccount}&${selectVal}`;
       }) ?? false;
     setExist(flag);
     if (flag) return;
@@ -85,11 +85,13 @@ export default function GuardiansEdit() {
       await userGuardianList({ caHash: walletInfo.caHash });
       dispatch(
         setOpGuardianAction({
-          key: `${currentGuardian?.guardianAccount}&${selectName}`,
+          key: `${currentGuardian?.guardianAccount}&${selectVal}`,
           verifier: targetVerifier()?.[0],
           isLoginAccount: opGuardian?.isLoginAccount,
           guardianAccount: opGuardian?.guardianAccount as string,
           guardianType: opGuardian?.guardianType as LoginType,
+          identifierHash: opGuardian?.identifierHash as string,
+          salt: opGuardian?.salt as string,
         }),
       );
       setLoading(false);
@@ -104,7 +106,7 @@ export default function GuardiansEdit() {
     dispatch,
     navigate,
     opGuardian,
-    selectName,
+    selectVal,
     setLoading,
     targetVerifier,
     userGuardianList,
@@ -136,6 +138,8 @@ export default function GuardiansEdit() {
         guardianAccount: opGuardian?.guardianAccount as string,
         guardianType: opGuardian?.guardianType as LoginType,
         key: opGuardian?.key as string,
+        identifierHash: opGuardian?.identifierHash as string,
+        salt: opGuardian?.salt as string,
       }),
     );
     navigate('/setting/guardians/guardian-approval', { state: 'guardians/del' }); // status

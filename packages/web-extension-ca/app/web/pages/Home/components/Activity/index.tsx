@@ -1,13 +1,13 @@
 import { useAppCASelector, useAppCommonDispatch } from '@portkey-wallet/hooks';
 import ActivityList from 'pages/components/ActivityList';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getActivityListAsync } from '@portkey-wallet/store/store-ca/activity/action';
 import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { useUserInfo } from 'store/Provider/hooks';
 import { transactionTypesForActivityList } from '@portkey-wallet/constants/constants-ca/activity';
 import { IActivitiesApiParams } from '@portkey-wallet/store/store-ca/activity/type';
-import { clearActivity } from '@portkey-wallet/store/store-ca/activity/slice';
+import { getCurrentActivityMapKey } from '@portkey-wallet/utils/activity';
 
 export interface ActivityProps {
   appendData?: Function;
@@ -24,9 +24,12 @@ export enum EmptyTipMessage {
 const AMX_RESULT_COUNT = 10;
 const SKIP_COUNT = 0;
 
-export default function Activity({ appendData, clearData, chainId, symbol }: ActivityProps) {
+export default function Activity({ chainId, symbol }: ActivityProps) {
   const { t } = useTranslation();
   const activity = useAppCASelector((state) => state.activity);
+  const currentActivity = useMemo(() => {
+    return activity.activityMap[getCurrentActivityMapKey(chainId, symbol)] || {};
+  }, [activity.activityMap, chainId, symbol]);
 
   const dispatch = useAppCommonDispatch();
   const { passwordSeed } = useUserInfo();
@@ -37,10 +40,6 @@ export default function Activity({ appendData, clearData, chainId, symbol }: Act
 
   useEffect(() => {
     if (passwordSeed) {
-      // We need to get the activities of the current network
-      // If you want to get the latest data, please dispatch(clearState()) first
-      dispatch(clearActivity());
-
       const params: IActivitiesApiParams = {
         maxResultCount: AMX_RESULT_COUNT,
         skipCount: SKIP_COUNT,
@@ -54,14 +53,8 @@ export default function Activity({ appendData, clearData, chainId, symbol }: Act
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [passwordSeed]);
 
-  useEffect(() => {
-    clearData?.();
-    appendData?.();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const loadMoreActivities = useCallback(() => {
-    const { data, maxResultCount, skipCount, totalRecordCount } = activity;
+    const { data, maxResultCount, skipCount, totalRecordCount } = currentActivity;
     if (data.length < totalRecordCount) {
       const params = {
         maxResultCount: AMX_RESULT_COUNT,
@@ -73,15 +66,15 @@ export default function Activity({ appendData, clearData, chainId, symbol }: Act
       };
       return dispatch(getActivityListAsync(params));
     }
-  }, [activity, caAddressList, chainId, dispatch, symbol]);
+  }, [currentActivity, caAddressList, chainId, dispatch, symbol]);
 
   return (
     <div className="activity-wrapper">
-      {activity.totalRecordCount ? (
+      {currentActivity?.totalRecordCount ? (
         <ActivityList
-          data={activity.data}
+          data={currentActivity.data}
           chainId={chainId}
-          hasMore={activity.data.length < activity.totalRecordCount}
+          hasMore={currentActivity.data.length < currentActivity?.totalRecordCount}
           loadMore={loadMoreActivities}
         />
       ) : (

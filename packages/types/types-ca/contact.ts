@@ -1,8 +1,10 @@
+import { ChainId } from '..';
 import { PartialOption } from '../common';
 
 export interface AddressItem {
   chainId: string; // AELF tDVV tDVW
   address: string;
+  transactionTime?: string;
 }
 
 export interface ContactItemType {
@@ -24,10 +26,13 @@ export type GetContractListApiType = {
 };
 
 export interface RecentContactItemType extends ContactItemType {
-  transferTime: String | number;
-  caAddress?: string;
-  chainId?: string;
-  addressChainId?: string;
+  chainId: string;
+  caAddress: string;
+  address: string;
+  addressChainId: string;
+  transactionTime: string;
+  name: string;
+  addresses: AddressItem[];
 }
 
 export type ContactIndexType = Pick<ContactItemType, 'index'> & { contacts: ContactItemType[] };

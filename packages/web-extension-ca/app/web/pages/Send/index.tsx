@@ -3,16 +3,10 @@ import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { AddressBookError } from '@portkey-wallet/store/addressBook/types';
 import { addFailedActivity, removeFailedActivity } from '@portkey-wallet/store/store-ca/activity/slice';
-import { ContactItemType, IClickAddressProps } from '@portkey-wallet/types/types-ca/contact';
+import { IClickAddressProps } from '@portkey-wallet/types/types-ca/contact';
 import { BaseToken } from '@portkey-wallet/types/types-ca/token';
 import { isDIDAddress } from '@portkey-wallet/utils';
-import {
-  getAelfAddress,
-  getEntireDIDAelfAddress,
-  getWallet,
-  isAelfAddress,
-  isCrossChain,
-} from '@portkey-wallet/utils/aelf';
+import { getEntireDIDAelfAddress, getWallet, isCrossChain } from '@portkey-wallet/utils/aelf';
 import aes from '@portkey-wallet/utils/aes';
 import { timesDecimals } from '@portkey-wallet/utils/converter';
 import { Button, message, Modal } from 'antd';
@@ -21,8 +15,7 @@ import TitleWrapper from 'components/TitleWrapper';
 import { ReactElement, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router';
-import { useDebounce } from 'react-use';
-import { useAppDispatch, useContact, useLoading, useUserInfo, useWalletInfo } from 'store/Provider/hooks';
+import { useAppDispatch, useLoading, useUserInfo, useWalletInfo } from 'store/Provider/hooks';
 import crossChainTransfer, { intervalCrossChainTransfer } from 'utils/sandboxUtil/crossChainTransfer';
 import sameChainTransfer from 'utils/sandboxUtil/sameChainTransfer';
 import AddressSelector from './components/AddressSelector';
@@ -36,6 +29,7 @@ import { TransactionError } from '@portkey-wallet/constants/constants-ca/assets'
 import './index.less';
 import { the2ThFailedActivityItemType } from '@portkey-wallet/types/types-ca/activity';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
+import { CROSS_FEE } from '@portkey-wallet/constants/constants-ca/wallet';
 
 export type Account = { address: string; name?: string };
 
@@ -53,7 +47,7 @@ export default function Send() {
   const navigate = useNavigate();
   const { walletName } = useWalletInfo();
   // TODO need get data from state and wait for BE data structure
-  const { type, symbol, tokenId } = useParams();
+  const { type, symbol } = useParams();
   const { state } = useLocation();
   const chainInfo = useCurrentChain(state.chainId);
   const wallet = useCurrentWalletInfo();
@@ -62,7 +56,6 @@ export default function Send() {
   console.log(wallet, 'wallet===');
   const { setLoading } = useLoading();
   const dispatch = useAppDispatch();
-  const { contactIndexList } = useContact();
   const { t } = useTranslation();
   const [errorMsg, setErrorMsg] = useState('');
   const [tipMsg, setTipMsg] = useState('');
@@ -102,42 +95,6 @@ export default function Send() {
     if (toAccount.address === '' || (stage === Stage.Amount && amount === '')) return true;
     return false;
   }, [amount, stage, toAccount.address]);
-
-  const getToAddressChainId = useCallback(
-    (toAddress: string) => {
-      if (!toAddress.includes('_')) return chainInfo?.chainId;
-      const arr = toAddress.split('_');
-      const addressChainId = arr[arr.length - 1];
-      // no suffix
-      if (isAelfAddress(addressChainId)) {
-        return chainInfo?.chainId;
-      }
-      return addressChainId;
-    },
-    [chainInfo?.chainId],
-  );
-
-  useDebounce(
-    () => {
-      const value = getAelfAddress(toAccount.address);
-      const toAdsChainId = getToAddressChainId(toAccount.address);
-      const searchResult: ContactItemType[] = [];
-      contactIndexList.forEach(({ contacts }) => {
-        searchResult.push(
-          ...contacts.filter(
-            (contact) =>
-              contact.name.toLowerCase() === value.toLowerCase() ||
-              contact.addresses.some((ads) => ads.address === value && ads.chainId === toAdsChainId),
-          ),
-        );
-      });
-      if (searchResult[0] && searchResult[0].name) {
-        setToAccount((v) => ({ ...v, name: searchResult[0].name }));
-      }
-    },
-    300,
-    [contactIndexList, toAccount.address],
-  );
 
   const retryCrossChain = useCallback(
     async ({ transactionId, params }: the2ThFailedActivityItemType) => {
@@ -222,12 +179,17 @@ export default function Send() {
       setLoading(true);
       if (!ZERO.plus(amount).toNumber()) return 'Please input amount';
       if (type === 'token') {
-        if (ZERO.plus(amount).times(`1e${tokenInfo.decimals}`).isGreaterThan(ZERO.plus(balance))) {
-          return TransactionError.TOKEN_NOTE_ENOUGH;
+        if (timesDecimals(amount, tokenInfo.decimals).isGreaterThan(ZERO.plus(balance))) {
+          return TransactionError.TOKEN_NOT_ENOUGH;
+        }
+        if (isCrossChain(toAccount.address, chainInfo?.chainId ?? 'AELF') && symbol === 'ELF') {
+          if (ZERO.plus(CROSS_FEE).isGreaterThan(ZERO.plus(amount))) {
+            return TransactionError.CROSS_NOT_ENOUGH;
+          }
         }
       } else if (type === 'nft') {
         if (ZERO.plus(amount).isGreaterThan(ZERO.plus(balance))) {
-          return TransactionError.NFT_NOTE_ENOUGH;
+          return TransactionError.NFT_NOT_ENOUGH;
         }
       } else {
         return 'input error';
@@ -237,16 +199,26 @@ export default function Send() {
       if (fee) {
         setTxFee(fee);
       } else {
-        return TransactionError.FEE_NOTE_ENOUGH;
+        return TransactionError.FEE_NOT_ENOUGH;
       }
       return '';
     } catch (error: any) {
       console.log('checkTransactionValue===', error);
-      return TransactionError.FEE_NOTE_ENOUGH;
+      return TransactionError.FEE_NOT_ENOUGH;
     } finally {
       setLoading(false);
     }
-  }, [setLoading, amount, type, getTranslationInfo, tokenInfo.decimals, balance]);
+  }, [
+    setLoading,
+    amount,
+    type,
+    getTranslationInfo,
+    tokenInfo.decimals,
+    balance,
+    toAccount.address,
+    chainInfo?.chainId,
+    symbol,
+  ]);
 
   const sendHandler = useCallback(async () => {
     try {

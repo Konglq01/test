@@ -12,7 +12,7 @@ const useGuardiansList = () => {
   const currentChain = useCurrentChain();
 
   const fetch = useCallback(
-    async (paramsOption: { loginGuardianAccount?: string; caHash?: string }) => {
+    async (paramsOption: { guardianIdentifier?: string; caHash?: string }) => {
       try {
         if (!currentChain?.endPoint) throw 'Could not find chain information';
         const res = await getHolderInfo({
@@ -21,7 +21,7 @@ const useGuardiansList = () => {
           address: currentChain.caContractAddress,
           paramsOption,
         });
-        dispatch(setGuardiansAction(res.result.guardiansInfo));
+        dispatch(setGuardiansAction(res));
       } catch (error: any) {
         throw contractErrorHandler(error);
       }
