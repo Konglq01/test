@@ -14,6 +14,7 @@ export type DigitInputProps = {
   style?: StyleProp<ViewStyle>;
   type?: 'pin' | 'default';
   onFinish?: (code: string) => void;
+  value?: string;
 } & InputProps;
 
 export type DigitInputInterface = {
@@ -46,11 +47,13 @@ const DigitInput = forwardRef(
       errorMessage,
       type = 'default',
       onFinish,
+      value,
     }: DigitInputProps,
     forwardedRef,
   ) => {
     const input = useRef<any>();
     const [text, setText] = useState('');
+    const textLabel = useMemo(() => (value === undefined ? text : value), [text, value]);
     const styleProps = useMemo(() => {
       return {
         inputItem: {
@@ -66,19 +69,19 @@ const DigitInput = forwardRef(
       const inputItem = [];
       for (let i = 0; i < maxLength; i++) {
         if (type === 'pin') {
-          inputItem.push(<View key={i} style={i < text.length ? styles.pinSecureText : styles.pinPlaceholder} />);
+          inputItem.push(<View key={i} style={i < textLabel.length ? styles.pinSecureText : styles.pinPlaceholder} />);
         } else {
           inputItem.push(
             <View key={i} style={[styles.inputItem, styleProps.inputItem, inputItemStyle]}>
-              {i < text.length ? (
-                <InputItem secureTextEntry={secureTextEntry} iconStyle={iconStyle} text={text[i]} />
+              {i < textLabel.length ? (
+                <InputItem secureTextEntry={secureTextEntry} iconStyle={iconStyle} text={textLabel[i]} />
               ) : null}
             </View>,
           );
         }
       }
       return inputItem;
-    }, [iconStyle, inputItemStyle, maxLength, secureTextEntry, styleProps.inputItem, text, type]);
+    }, [iconStyle, inputItemStyle, maxLength, secureTextEntry, styleProps.inputItem, textLabel, type]);
     const reset = useCallback(() => setText(''), []);
     useImperativeHandle(forwardedRef, () => ({ reset }), [reset]);
 
@@ -94,11 +97,11 @@ const DigitInput = forwardRef(
               maxLength={maxLength}
               autoFocus={type === 'pin'}
               keyboardType={keyboardType}
-              onChangeText={value => {
-                if (value && !isValidPositiveInteger(value)) return;
-                setText(value);
-                onChangeText?.(value);
-                if (value.length === maxLength) onFinish?.(value);
+              onChangeText={_value => {
+                if (_value && !isValidPositiveInteger(_value)) return;
+                setText(_value);
+                onChangeText?.(_value);
+                if (_value.length === maxLength) onFinish?.(_value);
               }}
             />
             {getInputItem()}

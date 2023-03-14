@@ -1,30 +1,69 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { screenHeight, windowHeight } from '@portkey-wallet/utils/mobile/device';
+import { windowHeight } from '@portkey-wallet/utils/mobile/device';
 import GStyles from 'assets/theme/GStyles';
 import { TextL } from 'components/CommonText';
 import DigitInput, { DigitInputProps } from 'components/DigitInput';
 import { pTd } from 'utils/unit';
 import { headerHeight } from 'components/CustomHeader/style/index.style';
-function getMarginTop() {
-  if (screenHeight > 800) return 0.35;
-  if (screenHeight > 700) return 0.3;
-  return 0.25;
-}
+import Keypad, { KeypadPropsType } from 'components/Keypad';
 
 type PinContainerProps = {
   title: string;
   showHeader?: boolean;
-} & DigitInputProps;
+} & DigitInputProps &
+  KeypadPropsType;
 
-const PinContainer = forwardRef(({ title, style, showHeader, ...inputProps }: PinContainerProps, forwardedRef) => {
-  return (
-    <View style={[styles.container, showHeader ? { marginTop: styles.container.marginTop - headerHeight } : {}]}>
-      <TextL style={GStyles.textAlignCenter}>{title}</TextL>
-      <DigitInput ref={forwardedRef} type="pin" secureTextEntry style={[styles.pinStyle, style]} {...inputProps} />
-    </View>
-  );
-});
+const PinContainer = forwardRef(
+  (
+    {
+      title,
+      style,
+      showHeader,
+      onChangeText,
+      onFinish,
+      maxLength,
+      isBiometrics,
+      onBiometricsPress,
+      ...inputProps
+    }: PinContainerProps,
+    forwardedRef,
+  ) => {
+    const [value, setValue] = useState('');
+
+    return (
+      <View style={[styles.container, showHeader && { paddingTop: styles.container.paddingTop - headerHeight }]}>
+        <View>
+          <TextL style={GStyles.textAlignCenter}>{title}</TextL>
+          <DigitInput
+            disabled={true}
+            type="pin"
+            secureTextEntry
+            style={[styles.pinStyle, style]}
+            maxLength={maxLength}
+            value={value}
+            {...inputProps}
+          />
+        </View>
+
+        <Keypad
+          ref={forwardedRef}
+          maxLength={maxLength}
+          onChange={_value => {
+            setValue(_value);
+            onChangeText && onChangeText(_value);
+          }}
+          onFinish={onFinish}
+          onRest={() => {
+            setValue('');
+          }}
+          onBiometricsPress={onBiometricsPress}
+          isBiometrics={isBiometrics}
+        />
+      </View>
+    );
+  },
+);
 
 PinContainer.displayName = 'PinContainer';
 
@@ -32,7 +71,10 @@ export default PinContainer;
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: windowHeight * getMarginTop(),
+    height: '100%',
+    paddingTop: windowHeight * 0.25,
+    justifyContent: 'space-between',
+    paddingBottom: pTd(40),
   },
   pinStyle: {
     marginTop: 24,

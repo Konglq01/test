@@ -19,6 +19,7 @@ import { VerificationType, VerifierInfo } from '@portkey-wallet/types/verifier';
 import useBiometricsReady from 'hooks/useBiometrics';
 import PinContainer from 'components/PinContainer';
 import { GuardiansApproved } from 'pages/Guardian/types';
+import { StyleSheet } from 'react-native';
 
 type RouterParams = {
   oldPin?: string;
@@ -124,7 +125,9 @@ export default function ConfirmPin() {
       leftCallback={() => {
         myEvents.clearSetPin.emit('clearSetPin');
         navigationService.goBack();
-      }}>
+      }}
+      containerStyles={styles.container}
+      scrollViewProps={{ disabled: true }}>
       <PinContainer
         showHeader
         ref={pinRef}
@@ -135,3 +138,9 @@ export default function ConfirmPin() {
     </PageContainer>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
