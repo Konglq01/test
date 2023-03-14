@@ -14,21 +14,27 @@ interface IMenuItem {
 export default function AboutUs() {
   const { t } = useTranslation();
 
-  const MenuList: IMenuItem[] = useMemo(
+  const socialList: IMenuItem[] = useMemo(
     () => [
       {
-        icon: 'Aelf',
-        label: 'Terms of service',
-        link: '',
-      },
-      {
-        icon: 'Aelf',
+        icon: 'Twitter',
         label: 'Follow us on Twitter',
         link: '',
       },
       {
-        icon: 'Aelf',
+        icon: 'Discord',
         label: 'Join us on Discord',
+        link: '',
+      },
+    ],
+    [],
+  );
+
+  const serviceList: IMenuItem[] = useMemo(
+    () => [
+      {
+        icon: 'Basic',
+        label: 'Terms of service',
         link: '',
       },
     ],
@@ -38,21 +44,39 @@ export default function AboutUs() {
   return (
     <div className="about-us-drawer">
       <div className="flex-column-center header">
-        <CustomSvg type="PortKey" />
-        <span className="version">{process.env.SDK_VERSION?.toUpperCase()}</span>
+        <div className="flex-center logo">
+          <CustomSvg type="PortKey" />
+        </div>
+        <span className="name">{t('Portkey')}</span>
+        <span className="version">{`${process.env.SDK_VERSION?.toUpperCase()} beta`}</span>
       </div>
       <div className="content">
-        {MenuList.map((item) => (
-          <MenuItem
-            key={item.label}
-            height={53}
-            icon={<CustomSvg type={item.icon || 'Aelf'} />}
-            onClick={() => {
-              // navigate(item.link);
-            }}>
-            {t(item.label)}
-          </MenuItem>
-        ))}
+        <div className="content-item">
+          {socialList.map((item) => (
+            <MenuItem
+              key={item.label}
+              height={53}
+              icon={<CustomSvg type={item.icon || 'Aelf'} />}
+              onClick={() => {
+                // navigate(item.link);
+              }}>
+              {t(item.label)}
+            </MenuItem>
+          ))}
+        </div>
+        <div className="content-item">
+          {serviceList.map((item) => (
+            <MenuItem
+              key={item.label}
+              height={53}
+              icon={<CustomSvg type={item.icon || 'Aelf'} />}
+              onClick={() => {
+                // navigate(item.link);
+              }}>
+              {t(item.label)}
+            </MenuItem>
+          ))}
+        </div>
       </div>
     </div>
   );

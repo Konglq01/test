@@ -23,8 +23,14 @@ import { useTranslation } from 'react-i18next';
 import './index.less';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verification } from 'utils/api';
+import { IconType } from 'types/icon';
 
-const guardianTypeList = [{ label: 'Email', value: LoginType.Email }];
+const guardianTypeList = [
+  { label: 'Email', value: LoginType.Email, icon: 'email' },
+  { label: 'Phone', value: LoginType.PhoneNumber, icon: 'email' },
+  { label: 'Google', value: LoginType.Google, icon: 'email' },
+  { label: 'Apple', value: LoginType.Apple, icon: 'email' },
+];
 
 enum EmailError {
   noEmail = 'Please enter Email address',
@@ -70,7 +76,12 @@ export default function AddGuardian() {
     () =>
       guardianTypeList?.map((item) => ({
         value: item.value,
-        children: item.label,
+        children: (
+          <div className="flex select-option">
+            <CustomSvg type={item.icon as IconType} />
+            <span className="title">{item.label}</span>
+          </div>
+        ),
       })),
     [],
   );
@@ -188,7 +199,7 @@ export default function AddGuardian() {
       </div>
       {guardianType === LoginType.Email && (
         <div className="input-item">
-          <p className="label">{t("Guardian's email")}</p>
+          <p className="label">{t('Guardian Email')}</p>
           <Input
             className="login-input"
             value={emailVal}
@@ -198,6 +209,23 @@ export default function AddGuardian() {
             }}
           />
           {inputErr && <span className="err-text">{inputErr}</span>}
+        </div>
+      )}
+      {guardianType === LoginType.Google && (
+        <div className="input-item">
+          <p className="label">{t('Guardian Google')}</p>
+          <div className="google">
+            {emailVal ? (
+              <div className="flex-column google-input detail">
+                <span className="name">Goria</span>
+                <span className="email">{emailVal}</span>
+              </div>
+            ) : (
+              <div className="flex google-input click">
+                <span className="click-text">Click Add Google Account</span>
+              </div>
+            )}
+          </div>
         </div>
       )}
       <div className="input-item">
