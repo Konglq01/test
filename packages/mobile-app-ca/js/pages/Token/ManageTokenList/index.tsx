@@ -43,6 +43,7 @@ const Item = ({ isTestnet, item, onHandleToken }: ItemProps) => {
   return (
     <TouchableOpacity style={itemStyle.wrap} key={`${item.symbol}${item.address}${item.chainId}}`}>
       <CommonAvatar
+        hasBorder
         shapeType="circular"
         title={item.symbol}
         svgName={item.symbol === ELF_SYMBOL ? 'elf-icon' : undefined}

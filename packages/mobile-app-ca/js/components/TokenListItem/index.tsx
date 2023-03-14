@@ -25,6 +25,7 @@ const TokenListItem: React.FC<TokenListItemType> = props => {
   return (
     <TouchableOpacity style={itemStyle.wrap} onPress={() => onPress?.(item)}>
       <CommonAvatar
+        hasBorder
         style={itemStyle.left}
         title={item?.symbol}
         avatarSize={pTd(48)}
