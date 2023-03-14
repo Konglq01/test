@@ -21,12 +21,7 @@ export const activitySlice = createSlice({
     removeFailedActivity: (state, { payload }: { payload: string }) => {
       delete state.failedActivityMap[payload];
     },
-    clearActivity: state =>
-      (state = {
-        ...initialState,
-        failedActivityMap: state.failedActivityMap,
-      }),
-    clearState: state => (state = initialState),
+    clearActivity: state => initialState,
   },
   extraReducers: builder => {
     builder.addCase(getActivityListAsync.fulfilled, (state, action) => {
@@ -47,6 +42,6 @@ export const activitySlice = createSlice({
   },
 });
 
-export const { addFailedActivity, removeFailedActivity, clearState, clearActivity } = activitySlice.actions;
+export const { addFailedActivity, removeFailedActivity, clearActivity } = activitySlice.actions;
 
 export default activitySlice;

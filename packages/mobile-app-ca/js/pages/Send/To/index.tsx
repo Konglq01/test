@@ -6,7 +6,7 @@ import { useLanguage } from 'i18n/hooks';
 import React from 'react';
 import { View, StyleSheet, TextInput } from 'react-native';
 import { TouchableOpacity } from 'react-native';
-import { formatStr2EllipsisStr } from 'utils';
+import { formatStr2EllipsisStr } from '@portkey-wallet/utils';
 
 import { pTd } from 'utils/unit';
 

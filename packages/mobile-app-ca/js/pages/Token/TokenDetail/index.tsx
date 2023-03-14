@@ -27,6 +27,7 @@ import { unitConverter } from '@portkey-wallet/utils/converter';
 import { ZERO } from '@portkey-wallet/constants/misc';
 import { transactionTypesForActivityList as transactionList } from '@portkey-wallet/constants/constants-ca/activity';
 import fonts from 'assets/theme/fonts';
+import { fetchTokenListAsync } from '@portkey-wallet/store/store-ca/assets/slice';
 
 interface RouterParams {
   tokenInfo: TokenItemShowType;
@@ -45,17 +46,20 @@ const TokenDetail: React.FC = () => {
   const navigation = useNavigation();
   const dispatch = useAppCommonDispatch();
   const activity = useAppCASelector(state => state.activity);
+  const { accountToken } = useAppCASelector(state => state.assets);
+
+  const [reFreshing, setFreshing] = useState(false);
+
   const currentActivity = useMemo(
     () => activity?.activityMap?.[getCurrentActivityMapKey(tokenInfo.chainId, tokenInfo.symbol)] ?? {},
     [activity?.activityMap, tokenInfo.chainId, tokenInfo.symbol],
   );
 
-  console.log(
-    'currentActivity',
-    !!activity?.activityMap,
-    getCurrentActivityMapKey(tokenInfo.chainId, tokenInfo.symbol),
-  );
-  console.log('currentActivity', currentActivity);
+  const currentToken = useMemo(() => {
+    return accountToken.accountTokenList.find(
+      ele => ele.symbol === tokenInfo.symbol && ele.chainId === tokenInfo.chainId,
+    );
+  }, [accountToken.accountTokenList, tokenInfo.chainId, tokenInfo.symbol]);
 
   const fixedParamObj = useMemo(
     () => ({
@@ -72,7 +76,7 @@ const TokenDetail: React.FC = () => {
 
   const getActivityList = useCallback(
     async (isInit = false) => {
-      const { data, maxResultCount, skipCount, totalRecordCount } = currentActivity || {};
+      const { data, maxResultCount = 10, skipCount = 0, totalRecordCount = 0 } = currentActivity || {};
       if (!isInit && data?.length >= totalRecordCount) return;
       if (pageInfoRef.current.isLoading) return;
       pageInfoRef.current.isLoading = true;
@@ -87,12 +91,6 @@ const TokenDetail: React.FC = () => {
     [currentActivity, dispatch, fixedParamObj],
   );
 
-  useEffectOnce(() => {
-    getActivityList(true);
-  });
-
-  const [currentToken] = useState<TokenItemShowType>(tokenInfo);
-  const [reFreshing, setFreshing] = useState(false);
   const onRefreshList = useCallback(async () => {
     pageInfoRef.current = {
       ...INIT_PAGE_INFO,
@@ -102,7 +100,15 @@ const TokenDetail: React.FC = () => {
     setFreshing(false);
   }, [getActivityList]);
 
-  const balanceShow = `${unitConverter(ZERO.plus(tokenInfo?.balance || 0).div(`1e${tokenInfo.decimals}`))}`;
+  const balanceShow = `${unitConverter(ZERO.plus(currentToken?.balance || 0).div(`1e${currentToken?.decimals && 8}`))}`;
+
+  useEffectOnce(() => {
+    getActivityList(true);
+  });
+
+  useEffectOnce(() => {
+    dispatch(fetchTokenListAsync({ caAddresses: currentWallet.walletInfo.caAddressList || [] }));
+  });
 
   return (
     <PageContainer
@@ -121,15 +127,15 @@ const TokenDetail: React.FC = () => {
       containerStyles={styles.pageWrap}
       scrollViewProps={{ disabled: true }}>
       <View style={styles.card}>
-        <Text style={styles.tokenBalance}>{`${balanceShow} ${tokenInfo.symbol}`}</Text>
+        <Text style={styles.tokenBalance}>{`${balanceShow} ${currentToken?.symbol}`}</Text>
         {/* TODO : multiply rate */}
         {currentWallet?.currentNetwork === 'MAIN' && (
-          <Text style={styles.dollarBalance}>{`$ ${tokenInfo?.balanceInUsd}`}</Text>
+          <Text style={styles.dollarBalance}>{`$ ${currentToken?.balanceInUsd}`}</Text>
         )}
         <View style={styles.buttonGroupWrap}>
           <SendButton themeType="innerPage" sentToken={currentToken} />
           <View style={styles.space} />
-          <ReceiveButton currentTokenInfo={tokenInfo} themeType="innerPage" receiveButton={currentToken} />
+          <ReceiveButton currentTokenInfo={currentToken} themeType="innerPage" receiveButton={currentToken} />
         </View>
       </View>
 
