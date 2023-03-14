@@ -6,13 +6,14 @@ import svgsList from 'assets/svgs';
 import { dateFormat } from 'utils';
 import './index.less';
 import { useCallback, useState } from 'react';
-import { DeviceItemType, DeviceType } from '@portkey-wallet/types/types-ca/wallet';
+
 import ChangeName from '../ChangeName';
 import DeviceDetail from '../DeviceDetail';
+import { DeviceItemType, DeviceType } from '@portkey-wallet/types/types-ca/device';
 
 const mockDeviceList: DeviceItemType[] = [
   {
-    deviceType: DeviceType.mac,
+    deviceType: DeviceType.MAC,
     deviceTypeInfo: {
       icon: 'Aelf',
       name: 'Mac',
@@ -21,7 +22,7 @@ const mockDeviceList: DeviceItemType[] = [
     loginTime: 123232333,
   },
   {
-    deviceType: DeviceType.android,
+    deviceType: DeviceType.ANDROID,
     deviceTypeInfo: {
       icon: 'Aelf',
       name: 'Android',
@@ -30,7 +31,7 @@ const mockDeviceList: DeviceItemType[] = [
     loginTime: 123232333,
   },
   {
-    deviceType: DeviceType.ios,
+    deviceType: DeviceType.IOS,
     deviceTypeInfo: {
       icon: 'Aelf',
       name: 'IOS',
@@ -39,7 +40,7 @@ const mockDeviceList: DeviceItemType[] = [
     loginTime: 123232333,
   },
   {
-    deviceType: DeviceType.windows,
+    deviceType: DeviceType.WINDOWS,
     deviceTypeInfo: {
       icon: 'Aelf',
       name: 'Windows',
