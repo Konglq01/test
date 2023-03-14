@@ -67,14 +67,6 @@ const SendHome: React.FC<SendHomeProps> = props => {
 
   const isCrossChainTransfer = isCrossChain(toInfo.address, assetInfo.chainId);
 
-  const txFeeShow = useMemo(() => {
-    if (isCrossChainTransfer && assetInfo.symbol === 'ELF') {
-      return unitConverter(ZERO.plus(CROSS_FEE).plus(transactionFee).toNumber());
-    } else {
-      return transactionFee;
-    }
-  }, [isCrossChainTransfer, assetInfo.symbol, transactionFee]);
-
   const showRetry = useCallback(
     (retryFunc: () => void) => {
       ActionSheet.alert({
@@ -156,13 +148,14 @@ const SendHome: React.FC<SendHomeProps> = props => {
       console.log('sameTransferResult', sameTransferResult);
     }
 
+    await sleep(1500);
+
     if (sendType === 'nft') {
       dispatch(clearNftCollection({}));
       dispatch(fetchNFTCollectionsAsync({ caAddresses: caAddresses }));
     } else {
       dispatch(fetchTokenListAsync({ caAddresses: caAddresses }));
     }
-    await sleep(1);
 
     navigationService.navigate('Tab', { clearType: sendType + Math.random() });
     CommonToast.success('success');
@@ -308,11 +301,11 @@ const SendHome: React.FC<SendHomeProps> = props => {
         <View style={styles.section}>
           <View style={[styles.flexSpaceBetween]}>
             <TextM style={[styles.blackFontColor]}>{t('Network')}</TextM>
-            <TextM style={[styles.blackFontColor]}>{formatChainInfoToShow(assetInfo.chainId)}</TextM>
+            <TextM style={[styles.blackFontColor, GStyles.alignEnd]}>{formatChainInfoToShow(assetInfo.chainId)}</TextM>
           </View>
           <View style={[styles.flexSpaceBetween]}>
             <TextM style={styles.blackFontColor} />
-            <TextM style={[styles.blackFontColor]}>{`→${networkInfoShow(toInfo?.address)}`}</TextM>
+            <TextM style={[styles.blackFontColor, GStyles.alignEnd]}>{`→${networkInfoShow(toInfo?.address)}`}</TextM>
           </View>
         </View>
 
