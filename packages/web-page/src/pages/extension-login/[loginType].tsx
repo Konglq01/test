@@ -1,9 +1,7 @@
 import React from 'react';
-import { GoogleOAuthProvider } from '@react-oauth/google';
-import GoogleLogin from './components/GoogleLogin';
 import SocialTem from './components/SocialTem';
 import { useRouter } from 'next/router';
-import { ThreeWayLogin } from '@portkey-wallet/types/types-ca/wallet';
+import { ISocialLogin } from '@portkey-wallet/types/types-ca/wallet';
 
 export default function ExtensionLogin() {
   const router = useRouter();
@@ -12,10 +10,7 @@ export default function ExtensionLogin() {
 
   return (
     <div>
-      <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GG_APP_ID || ''}>
-        <GoogleLogin />
-      </GoogleOAuthProvider>
-      <SocialTem loginType={loginType as ThreeWayLogin} />
+      <SocialTem loginType={loginType as ISocialLogin} />
     </div>
   );
 }
