@@ -61,6 +61,7 @@ export const extraDataDecode = (extraDataStr: string): ExtraDataDecodeType => {
       if (typeof extraEncodeData === 'string') break;
       try {
         extraData.deviceInfo = {
+          ...extraData.deviceInfo,
           ...JSON.parse(extraEncodeData.deviceInfo),
         };
       } catch (error) {

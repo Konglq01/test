@@ -60,7 +60,7 @@ export const useCurrentWallet = () => {
   }, [wallet]);
 };
 
-export const useDeviceList = (devicePin: string = '') => {
+export const useDeviceList = () => {
   const networkInfo = useCurrentNetworkInfo();
   const walletInfo = useCurrentWalletInfo();
   const chainInfo = useCurrentChain();
