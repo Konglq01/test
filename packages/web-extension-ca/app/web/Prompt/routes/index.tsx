@@ -172,7 +172,7 @@ export const PageRouter = () =>
       element: <QueryPage />,
     },
     {
-      path: '/test/example-ui',
+      path: '/test',
       element: <Example />,
     },
     {

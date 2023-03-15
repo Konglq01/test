@@ -12,7 +12,7 @@ import { fetchAllTokenListAsync } from '@portkey-wallet/store/store-ca/tokenMana
 import { useChainIdList } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import './index.less';
 import { transNetworkText } from '@portkey-wallet/utils/activity';
-import { useIsTestnet } from 'hooks/useActivity';
+import { useIsTestnet } from 'hooks/useNetwork';
 import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
 
 export default function AddToken() {

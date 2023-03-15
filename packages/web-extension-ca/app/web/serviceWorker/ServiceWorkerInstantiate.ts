@@ -20,8 +20,11 @@ import InternalMessage from 'messages/InternalMessage';
 import { CreatePromptType, SendResponseFun } from 'types';
 import errorHandler from 'utils/errorHandler';
 import { apis } from 'utils/BrowserApis';
+import SocialLoginController from 'controllers/socialLoginController';
 
 const notificationService = new NotificationService();
+const socialLoginService = new SocialLoginController();
+
 // Get default data in redux
 const store = getStoreState();
 
@@ -45,12 +48,12 @@ const allowedMethod = [
   PortkeyMessageTypes.CHECK_WALLET_STATUS,
   PortkeyMessageTypes.EXPAND_FULL_SCREEN,
   PortkeyMessageTypes.OPEN_RECAPTCHA_PAGE,
-  PortkeyMessageTypes.THREE_WAY_LOGIN,
+  PortkeyMessageTypes.SOCIAL_LOGIN,
   WalletMessageTypes.REQUEST_ACCOUNTS,
   MethodMessageTypes.GET_WALLET_STATE,
   // TODO SET_RECAPTCHA_CODE
   WalletMessageTypes.SET_RECAPTCHA_CODE_V2,
-  WalletMessageTypes.THREE_WAY_LOGIN,
+  WalletMessageTypes.SOCIAL_LOGIN,
   PortkeyMessageTypes.ACTIVE_LOCK_STATUS,
 ];
 
@@ -160,8 +163,8 @@ export default class ServiceWorkerInstantiate {
         case PortkeyMessageTypes.OPEN_RECAPTCHA_PAGE:
           this.openRecaptchaPage(sendResponse, message.payload);
           break;
-        case PortkeyMessageTypes.THREE_WAY_LOGIN:
-          this.threeWayLogin(sendResponse, message.payload);
+        case PortkeyMessageTypes.SOCIAL_LOGIN:
+          this.socialLogin(sendResponse, message.payload);
           break;
         case WalletMessageTypes.CONNECT:
           this.connectWallet(sendResponse, message.payload);
@@ -172,8 +175,8 @@ export default class ServiceWorkerInstantiate {
         case MethodMessageTypes.GET_WALLET_STATE:
           ServiceWorkerInstantiate.getWalletState(sendResponse);
           break;
-        case WalletMessageTypes.THREE_WAY_LOGIN:
-          this.getLoginByThreeWay(sendResponse, message.payload);
+        case WalletMessageTypes.SOCIAL_LOGIN:
+          this.getSocialLogin(sendResponse, message.payload);
           break;
 
         default:
@@ -194,9 +197,13 @@ export default class ServiceWorkerInstantiate {
     }
   }
 
-  async threeWayLogin(sendResponse: SendResponseFun, { externalLink }: { externalLink: string }) {
+  async socialLogin(sendResponse: SendResponseFun, { externalLink }: { externalLink: string }) {
     try {
       if (!externalLink) return sendResponse(errorHandler(400001, 'Missing param externalLink'));
+      socialLoginService.startSocialLogin(() => {
+        notificationService.close(errorHandler(200001, 'Cancel'), 'windows');
+      });
+
       const result = await notificationService.openPrompt(
         {
           method: PromptRouteTypes.EXPAND_FULL_SCREEN,
@@ -206,16 +213,16 @@ export default class ServiceWorkerInstantiate {
       );
       if (result.error)
         return sendResponse({
-          ...errorHandler(700001),
-          error: (result as any)?.error?.message || result.error || result,
+          ...errorHandler(700001, result),
         });
+
       sendResponse({ ...errorHandler(0), data: (result as any)?.response || result });
     } catch (error) {
       sendResponse(errorHandler(100001, error));
     }
   }
 
-  async getLoginByThreeWay(sendResponse: SendResponseFun, message: any) {
+  async getSocialLogin(sendResponse: SendResponseFun, message: any) {
     this.notificationServiceClose(sendResponse, { closeParams: message.params, promptType: 'windows' });
   }
 

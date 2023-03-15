@@ -121,7 +121,7 @@ export default class ExtensionPlatform {
   //   }
   // }
 
-  addOnRemovedListener(listener: (windowId: number) => void) {
+  windowOnRemovedListener(listener: (windowId: number) => void) {
     apis.windows.onRemoved.addListener(listener);
   }
 
