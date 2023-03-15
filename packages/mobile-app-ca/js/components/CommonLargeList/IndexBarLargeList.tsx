@@ -1,9 +1,8 @@
-import { bottomBarHeight, windowHeight } from '@portkey-wallet/utils/mobile/device';
+import { screenHeight } from '@portkey-wallet/utils/mobile/device';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { View, ViewStyle, TextStyle, StyleSheet } from 'react-native';
 import CommonLargeList, { CommonLargeListProps } from 'components/CommonLargeList';
 import IndexBar from 'components/IndexBar';
-import { headerHeight as HeaderHeight } from 'components/CustomHeader/style/index.style';
 import { LargeList } from 'react-native-largelist';
 export interface IndexLargeListProps extends CommonLargeListProps {
   data: Array<any>;
@@ -37,7 +36,7 @@ export default function IndexBarLargeList(props: IndexLargeListProps) {
     [props],
   );
   const maxOffset = useMemo(() => {
-    return getOffset(props.data?.length) - windowHeight + HeaderHeight + bottomBarHeight + (props.extraHeight ?? 0);
+    return getOffset(props.data?.length) - screenHeight + (props.extraHeight ?? 0);
   }, [getOffset, props.data?.length, props.extraHeight]);
   const onSectionSelect = useCallback(
     (key: number) => {
