@@ -6,7 +6,6 @@ import { ModalBody } from 'components/ModalBody';
 import CommonInput from 'components/CommonInput';
 import { AccountType } from '@portkey-wallet/types/wallet';
 import { pTd } from 'utils/unit';
-import { screenHeight } from '@portkey-wallet/utils/mobile/device';
 import { useLanguage } from 'i18n/hooks';
 import useDebounce from 'hooks/useDebounce';
 import NoData from 'components/NoData';
@@ -20,6 +19,9 @@ import { fetchAssetList } from '@portkey-wallet/store/store-ca/assets/api';
 import { IAssetItemType } from '@portkey-wallet/store/store-ca/assets/type';
 import navigationService from 'utils/navigationService';
 import { IToSendHomeParamsType } from '@portkey-wallet/types/types-ca/routeParams';
+import { formatChainInfoToShow } from '@portkey-wallet/utils';
+import { ChainId } from '@portkey-wallet/types';
+import { useGStyles } from 'assets/theme/useGStyles';
 
 type onFinishSelectTokenType = (tokenItem: any) => void;
 type TokenListProps = {
@@ -42,7 +44,7 @@ const AssetItem = (props: { symbol: string; onPress: (item: any) => void; item: 
 
   if (item.nftInfo) {
     const {
-      nftInfo: { tokenId },
+      nftInfo: { tokenId, chainId },
     } = item;
     return (
       <TouchableOpacity style={itemStyle.wrap} onPress={() => onPress?.(item)}>
@@ -59,9 +61,8 @@ const AssetItem = (props: { symbol: string; onPress: (item: any) => void; item: 
 
             {/* TODO: why use currentNetwork   */}
             {currentNetwork ? (
-              <TextS numberOfLines={1} style={[FontStyles.font7, itemStyle.nftItemInfo]}>
-                {item.chainId === 'AELF' ? 'MainChain' : 'SideChain'} {item.chainId}{' '}
-                {currentNetwork === 'TESTNET' && 'Testnet'}
+              <TextS numberOfLines={1} style={[FontStyles.font3, itemStyle.nftItemInfo]}>
+                {formatChainInfoToShow(chainId as ChainId, currentNetwork)}
               </TextS>
             ) : (
               // TODO: price use witch one
@@ -78,7 +79,7 @@ const AssetItem = (props: { symbol: string; onPress: (item: any) => void; item: 
       </TouchableOpacity>
     );
   }
-  return <></>;
+  return null;
 };
 const MAX_RESULT_COUNT = 10;
 const INIT_PAGE_INFO = {
@@ -91,6 +92,7 @@ const AssetList = ({ account }: TokenListProps) => {
   const { t } = useLanguage();
   const caAddresses = useCaAddresses();
   const [keyword, setKeyword] = useState('');
+  const gStyles = useGStyles();
 
   const debounceKeyword = useDebounce(keyword, 800);
 
@@ -173,11 +175,10 @@ const AssetList = ({ account }: TokenListProps) => {
   }, []);
 
   return (
-    <ModalBody modalBodyType="bottom" style={styles.modalStyle}>
+    <ModalBody modalBodyType="bottom" style={gStyles.overlayStyle}>
       <TextXL style={[styles.title, FontStyles.font5]}>{t('Select Assets')}</TextXL>
 
-      {/* no assets in this accout  */}
-      {/* '{ import { list } from 'pages/SettingsPage/HelpAndFeedBack/config';' has been removed } */}
+      {/* no assets in this account  */}
       <CommonInput
         placeholder={t('Search Assets')}
         containerStyle={styles.containerStyle}
@@ -222,9 +223,6 @@ export default {
 };
 
 export const styles = StyleSheet.create({
-  modalStyle: {
-    height: screenHeight - pTd(100),
-  },
   title: {
     textAlign: 'center',
     height: pTd(22),
@@ -280,7 +278,7 @@ const itemStyle = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderBottomColor: defaultColors.bg7,
-    borderBottomWidth: pTd(0.5),
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   tokenName: {
     flex: 1,

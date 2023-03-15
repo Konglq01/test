@@ -6,7 +6,7 @@ import { useLanguage } from 'i18n/hooks';
 import React from 'react';
 import { View, StyleSheet, TextInput } from 'react-native';
 import { TouchableOpacity } from 'react-native';
-import { formatStr2EllipsisStr } from 'utils';
+import { formatStr2EllipsisStr } from '@portkey-wallet/utils';
 
 import { pTd } from 'utils/unit';
 
@@ -71,7 +71,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderTopColor: defaultColors.border6,
-    borderTopWidth: pTd(0.5),
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
   leftTitle: {
     width: pTd(49),

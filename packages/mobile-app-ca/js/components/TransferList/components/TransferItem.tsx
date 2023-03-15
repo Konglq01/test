@@ -4,7 +4,9 @@ import GStyles from 'assets/theme/GStyles';
 import { useLanguage } from 'i18n/hooks';
 import React, { memo, useCallback, useMemo, useRef } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { formatChainInfo, formatStr2EllipsisStr, formatTransferTime } from 'utils';
+import { formatTransferTime } from 'utils';
+import { formatChainInfoToShow, formatStr2EllipsisStr } from '@portkey-wallet/utils';
+
 import { pTd } from 'utils/unit';
 import { ActivityItemType } from '@portkey-wallet/types/types-ca/activity';
 import { TransactionTypes, transactionTypesMap } from '@portkey-wallet/constants/constants-ca/activity';
@@ -24,13 +26,14 @@ import { getManagerAccount } from 'utils/redux';
 import { usePin } from 'hooks/store';
 import ActionSheet from 'components/ActionSheet';
 import CommonToast from 'components/CommonToast';
+import { addressFormat } from '@portkey-wallet/utils';
+import CommonAvatar from 'components/CommonAvatar';
+import { HIDDEN_TRANSACTION_TYPES } from '@portkey-wallet/constants/constants-ca/activity';
 
 interface ActivityItemPropsType {
   item?: ActivityItemType;
   onPress?: (item: any) => void;
 }
-
-const hiddenArr = [TransactionTypes.SOCIAL_RECOVERY, TransactionTypes.ADD_MANAGER, TransactionTypes.REMOVE_MANAGER];
 
 const ActivityItem: React.FC<ActivityItemPropsType> = ({ item, onPress }) => {
   const { t } = useLanguage();
@@ -106,7 +109,13 @@ const ActivityItem: React.FC<ActivityItemPropsType> = ({ item, onPress }) => {
     <TouchableOpacity style={itemStyle.itemWrap} onPress={() => onPress?.(item)}>
       <Text style={itemStyle.time}>{formatTransferTime(Number(item?.timestamp) * 1000)}</Text>
       <View style={itemStyle.contentWrap}>
-        {<SvgUri style={itemStyle.left} width={pTd(32)} height={pTd(32)} uri={item?.listIcon || ''} />}
+        <CommonAvatar
+          style={itemStyle.left}
+          svgName={
+            HIDDEN_TRANSACTION_TYPES.includes(item?.transactionType as TransactionTypes) ? 'Contract' : 'transfer'
+          }
+          avatarSize={pTd(32)}
+        />
 
         <View style={itemStyle.center}>
           <Text style={itemStyle.centerType}>
@@ -115,14 +124,14 @@ const ActivityItem: React.FC<ActivityItemPropsType> = ({ item, onPress }) => {
           <Text style={[itemStyle.centerStatus, FontStyles.font3]}>
             {t('From')}
             {':  '}
-            {formatStr2EllipsisStr(item?.fromAddress, 10)}
+            {formatStr2EllipsisStr(addressFormat(item?.fromAddress, item?.fromChainId), 10)}
           </Text>
 
-          {item?.transactionType && !hiddenArr.includes(item?.transactionType) && (
+          {item?.transactionType && !HIDDEN_TRANSACTION_TYPES.includes(item?.transactionType) && (
             <Text style={[itemStyle.centerStatus, FontStyles.font3]}>
-              {formatChainInfo(item?.fromChainId)}
+              {formatChainInfoToShow(item?.fromChainId)}
               {'-->'}
-              {formatChainInfo(item?.toChainId)}
+              {formatChainInfoToShow(item?.toChainId)}
             </Text>
           )}
         </View>
@@ -160,7 +169,7 @@ const itemStyle = StyleSheet.create({
   itemWrap: {
     ...GStyles.paddingArg(12, 20),
     width: '100%',
-    borderBottomWidth: pTd(0.5),
+    borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: defaultColors.bg7,
     backgroundColor: defaultColors.bg1,
   },
@@ -190,7 +199,7 @@ const itemStyle = StyleSheet.create({
   },
   centerStatus: {
     color: defaultColors.font10,
-    marginTop: pTd(1),
+    marginTop: StyleSheet.hairlineWidth,
     fontSize: pTd(10),
     lineHeight: pTd(16),
   },

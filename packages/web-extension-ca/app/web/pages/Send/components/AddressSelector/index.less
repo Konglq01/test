@@ -141,6 +141,13 @@
           color: @font-12;
         }
       }
+      .network {
+        color: @font-13;
+        &.disabled {
+          cursor: not-allowed;
+          color: @font-12;
+        }
+      }
       .not-recent-address {
         color: @font-12;
       }
@@ -161,21 +168,16 @@
       .address {
         display: flex;
         color: @font-11;
-        span:nth-of-type(2) {
-          flex: 1;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-        span:nth-of-type(3) {
-          margin-left: -1px;
-        }
       }
       .network {
         color: @font-13;
       }
     }
-    .contact-card-in-recent{
+    .contact-card-in-recent {
       border-bottom: 1px solid #dee2e8;
+    }
+    .loading {
+      margin-top: 14px;
     }
   }
 

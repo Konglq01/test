@@ -2,16 +2,17 @@ import { AccountAssetItem, AccountAssets, TokenItemShowType } from '@portkey-wal
 import { DrawerProps } from 'antd';
 import CustomSvg from 'components/CustomSvg';
 import DropdownSearch from 'components/DropdownSearch';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAppDispatch, useAssetInfo, useTokenInfo, useUserInfo, useWalletInfo } from 'store/Provider/hooks';
+import { useAppDispatch, useAssetInfo, useTokenInfo, useUserInfo } from 'store/Provider/hooks';
 import BaseDrawer from '../BaseDrawer';
 import { fetchAssetAsync } from '@portkey-wallet/store/store-ca/assets/slice';
 import './index.less';
 import { divDecimals, unitConverter } from '@portkey-wallet/utils/converter';
 import { useCaAddresses, useChainIdList } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { fetchAllTokenListAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
-import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
+import { useIsTestnet } from 'hooks/useNetwork';
+import { transNetworkText } from '@portkey-wallet/utils/activity';
 import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
 interface CustomSelectProps extends DrawerProps {
   onChange?: (v: AccountAssetItem, type: 'token' | 'nft') => void;
@@ -29,8 +30,7 @@ export default function CustomTokenDrawer({
   ...props
 }: CustomSelectProps) {
   const { t } = useTranslation();
-  const { currentNetwork } = useWalletInfo();
-  const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'Testnet' : ''), [currentNetwork]);
+  const isTestNet = useIsTestnet();
   const { accountAssets } = useAssetInfo();
   const { tokenDataShowInMarket } = useTokenInfo();
   const [openDrop, setOpenDrop] = useState<boolean>(false);
@@ -40,7 +40,6 @@ export default function CustomTokenDrawer({
   const { passwordSeed } = useUserInfo();
   const caAddresses = useCaAddresses();
   const chainIdArray = useChainIdList();
-  const symbolImages = useSymbolImages();
 
   useEffect(() => {
     if (drawerType === 'send') {
@@ -77,9 +76,7 @@ export default function CustomTokenDrawer({
           </div>
           <div className="info">
             <p className="symbol">{`${token.symbol}`}</p>
-            <p className="network">
-              {`${token.chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${token.chainId} ${isTestNet}`}
-            </p>
+            <p className="network">{transNetworkText(token.chainId, isTestNet)}</p>
           </div>
           <div className="amount">
             <p className="quantity">
@@ -127,9 +124,7 @@ export default function CustomTokenDrawer({
           </div>
           <div className="info">
             <p className="symbol">{`${token.symbol}`}</p>
-            <p className="network">
-              {`${token.chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${token.chainId} ${isTestNet}`}
-            </p>
+            <p className="network">{transNetworkText(token.chainId, isTestNet)}</p>
           </div>
         </div>
       );
@@ -141,7 +136,7 @@ export default function CustomTokenDrawer({
     (token: AccountAssetItem) => {
       return (
         <div
-          key={`${token.nftInfo?.alias}_${token.nftInfo?.tokenId}`}
+          key={`${token.chainId}_${token.nftInfo?.alias}_${token.nftInfo?.tokenId}`}
           className="item protocol"
           onClick={onChange?.bind(undefined, token, 'nft')}>
           <div className="avatar">
@@ -149,9 +144,7 @@ export default function CustomTokenDrawer({
           </div>
           <div className="info">
             <p className="alias">{`${token.nftInfo?.alias} #${token.nftInfo?.tokenId}`}</p>
-            <p className="network">
-              {`${token.chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${token.chainId} ${isTestNet}`}
-            </p>
+            <p className="network">{transNetworkText(token.chainId, isTestNet)}</p>
           </div>
           <div className="amount">{token.nftInfo?.balance}</div>
         </div>

@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useMemo, useRef, useState } from 'react';
+import React, { memo, useCallback, useRef, useState } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import PageContainer from 'components/PageContainer';
 import { defaultColors } from 'assets/theme';
@@ -6,7 +6,7 @@ import { pTd } from 'utils/unit';
 import { TextM, TextS, TextL } from 'components/CommonText';
 import CommonButton from 'components/CommonButton';
 import ActionSheet from 'components/ActionSheet';
-import { formatChainInfo, formatStr2EllipsisStr } from 'utils';
+import { formatChainInfoToShow, formatStr2EllipsisStr, isMainNet } from '@portkey-wallet/utils';
 import { isCrossChain } from '@portkey-wallet/utils/aelf';
 import { useLanguage } from 'i18n/hooks';
 import { useAppCommonDispatch } from '@portkey-wallet/hooks';
@@ -21,7 +21,7 @@ import crossChainTransfer, {
   CrossChainTransferParamsType,
   intervalCrossChainTransfer,
 } from 'utils/transfer/crossChainTransfer';
-import { useCurrentNetwork } from '@portkey-wallet/hooks/network';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import { useCaAddresses, useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { timesDecimals, unitConverter } from '@portkey-wallet/utils/converter';
 import sameChainTransfer from 'utils/transfer/sameChainTransfer';
@@ -59,21 +59,13 @@ const SendHome: React.FC<SendHomeProps> = props => {
   const caAddresses = useCaAddresses();
 
   const [isLoading] = useState(false);
-  const currentNetwork = useCurrentNetwork();
+  const currentNetwork = useCurrentNetworkInfo();
   const wallet = useCurrentWalletInfo();
   const { walletName } = useWallet();
   const contractRef = useRef<ContractBasic>();
   const tokenContractRef = useRef<ContractBasic>();
 
   const isCrossChainTransfer = isCrossChain(toInfo.address, assetInfo.chainId);
-
-  const txFeeShow = useMemo(() => {
-    if (isCrossChainTransfer && assetInfo.symbol === 'ELF') {
-      return unitConverter(ZERO.plus(CROSS_FEE).plus(transactionFee).toNumber());
-    } else {
-      return transactionFee;
-    }
-  }, [isCrossChainTransfer, assetInfo.symbol, transactionFee]);
 
   const showRetry = useCallback(
     (retryFunc: () => void) => {
@@ -128,7 +120,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
       const crossChainTransferResult = await crossChainTransfer({
         tokenContract,
         contract,
-        chainType: currentNetwork.chainType ?? 'aelf',
+        chainType: currentNetwork.walletType ?? 'aelf',
         managerAddress: wallet.address,
         tokenInfo: { ...assetInfo, address: assetInfo.tokenContractAddress } as unknown as BaseToken,
         caHash: wallet.caHash || '',
@@ -156,13 +148,14 @@ const SendHome: React.FC<SendHomeProps> = props => {
       console.log('sameTransferResult', sameTransferResult);
     }
 
+    await sleep(1500);
+
     if (sendType === 'nft') {
       dispatch(clearNftCollection({}));
       dispatch(fetchNFTCollectionsAsync({ caAddresses: caAddresses }));
     } else {
       dispatch(fetchTokenListAsync({ caAddresses: caAddresses }));
     }
-    await sleep(1);
 
     navigationService.navigate('Tab', { clearType: sendType + Math.random() });
     CommonToast.success('success');
@@ -170,7 +163,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
     assetInfo,
     caAddresses,
     chainInfo,
-    currentNetwork.chainType,
+    currentNetwork.walletType,
     dispatch,
     isCrossChainTransfer,
     pin,
@@ -249,12 +242,14 @@ const SendHome: React.FC<SendHomeProps> = props => {
     return chainId === 'AELF' ? 'MainChain AELF' : `SideChain ${chainId} `;
   };
 
+  console.log('currentNetwork', currentNetwork);
+
   return (
     <PageContainer
       safeAreaColor={['blue', 'white']}
       titleDom={`${t('Send')}${sendType === 'token' ? ' ' + assetInfo.symbol : ''}`}
       containerStyles={styles.pageWrap}
-      scrollViewProps={{ disabled: true }}>
+      scrollViewProps={{ disabled: false }}>
       {sendType === 'nft' ? (
         <View style={styles.topWrap}>
           {!assetInfo?.imageUrl ? (
@@ -264,14 +259,12 @@ const SendHome: React.FC<SendHomeProps> = props => {
           )}
           <View style={styles.topLeft}>
             <TextL style={[styles.nftTitle, fonts.mediumFont]}>{`${assetInfo.alias} #${assetInfo?.tokenId}`} </TextL>
-            <TextS>{`Amount：${sendNumber}`}</TextS>
+            <TextS style={[FontStyles.font3]}>{`Amount：${sendNumber}`}</TextS>
           </View>
         </View>
       ) : (
         <>
-          <Text style={[styles.tokenCount, FontStyles.font3, fonts.mediumFont]}>
-            {`- ${sendNumber} ${assetInfo?.symbol}`}{' '}
-          </Text>
+          <Text style={[styles.tokenCount, fonts.mediumFont]}>{`- ${sendNumber} ${assetInfo?.symbol}`} </Text>
           {/* <TextM style={styles.tokenUSD}>-$ -</TextM> */}
         </>
       )}
@@ -286,7 +279,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
           <View style={[styles.flexSpaceBetween]}>
             <TextM style={styles.lightGrayFontColor} />
             <TextS style={styles.lightGrayFontColor}>
-              {formatStr2EllipsisStr(`ELF_${caAddresses[0]}_${assetInfo.chainId}`)}
+              {formatStr2EllipsisStr(`ELF_${wallet?.[assetInfo?.chainId]?.caAddress}_${assetInfo.chainId}`)}
             </TextS>
           </View>
         </View>
@@ -296,7 +289,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
           <View style={[styles.flexSpaceBetween]}>
             <TextM style={[styles.lightGrayFontColor]}>{t('To')}</TextM>
             <View style={styles.alignItemsEnd}>
-              {toInfo?.name && <TextM style={[styles.blackFontColor, styles.fontBold]}>{toInfo?.name}</TextM>}
+              {toInfo?.name && <TextM style={[styles.blackFontColor]}>{toInfo?.name}</TextM>}
               <TextS style={styles.lightGrayFontColor}>{formatStr2EllipsisStr(toInfo?.address)}</TextS>
             </View>
           </View>
@@ -306,31 +299,76 @@ const SendHome: React.FC<SendHomeProps> = props => {
         <View style={styles.section}>
           <View style={[styles.flexSpaceBetween]}>
             <TextM style={[styles.lightGrayFontColor]}>{t('Network')}</TextM>
-            <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${formatChainInfo(
-              assetInfo.chainId,
-            )} → ${networkInfoShow(toInfo?.address)} `}</TextM>
+            <TextM style={[styles.blackFontColor, GStyles.alignEnd]}>{formatChainInfoToShow(assetInfo.chainId)}</TextM>
+          </View>
+          <View style={[styles.flexSpaceBetween]}>
+            <TextM style={styles.blackFontColor} />
+            <TextM style={[styles.blackFontColor, GStyles.alignEnd]}>{`→${networkInfoShow(toInfo?.address)}`}</TextM>
           </View>
         </View>
+
         <Text style={[styles.divider, styles.marginTop0]} />
         {/* transaction Fee */}
         <View style={styles.section}>
           <View style={[styles.flexSpaceBetween]}>
             <TextM style={[styles.blackFontColor, styles.fontBold]}>{t('Transaction Fee')}</TextM>
-            <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${txFeeShow} ${'ELF'} `}</TextM>
+            <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${transactionFee} ${'ELF'}`}</TextM>
           </View>
+          {isMainNet(currentNetwork?.networkType ?? 'TESTNET') && (
+            <View>
+              <TextM />
+              <TextS style={[styles.blackFontColor, styles.lightGrayFontColor, GStyles.alignEnd]}>{`${unitConverter(
+                CROSS_FEE,
+              )}`}</TextS>
+            </View>
+          )}
         </View>
 
         {isCrossChainTransfer && assetInfo.symbol === 'ELF' && <Text style={[styles.divider, styles.marginTop0]} />}
         {isCrossChainTransfer && assetInfo.symbol === 'ELF' && (
           <View style={styles.section}>
             <View style={[styles.flexSpaceBetween]}>
-              <TextM style={[styles.blackFontColor]}>{t('Estimated Amount Received')}</TextM>
-              <TextM style={[styles.blackFontColor, styles.fontBold]}>
-                {ZERO.plus(sendNumber).isLessThanOrEqualTo(ZERO.plus(CROSS_FEE))
-                  ? '0'
-                  : unitConverter(ZERO.plus(sendNumber).minus(ZERO.plus(CROSS_FEE)))}{' '}
-                {'ELF'}
+              <TextM style={[styles.blackFontColor, styles.fontBold, styles.leftTitle]}>
+                {t('Cross chain Transaction fee')}
               </TextM>
+              <View>
+                <TextM style={[styles.blackFontColor, styles.fontBold, GStyles.alignEnd]}>{`${unitConverter(
+                  CROSS_FEE,
+                )} ELF`}</TextM>
+                {isMainNet(currentNetwork?.networkType ?? 'TESTNET') ? (
+                  <TextS style={[styles.blackFontColor, styles.lightGrayFontColor, GStyles.alignEnd]}>{`${unitConverter(
+                    CROSS_FEE,
+                  )}`}</TextS>
+                ) : (
+                  <TextM />
+                )}
+              </View>
+            </View>
+          </View>
+        )}
+        {isCrossChainTransfer && assetInfo.symbol === 'ELF' && <Text style={[styles.divider, styles.marginTop0]} />}
+        {isCrossChainTransfer && assetInfo.symbol === 'ELF' && (
+          <View style={styles.section}>
+            <View style={[styles.flexSpaceBetween]}>
+              <TextM style={[styles.blackFontColor, styles.fontBold, styles.leftTitle, GStyles.alignEnd]}>
+                {t('Estimated amount received')}
+              </TextM>
+              <View>
+                <TextM style={[styles.blackFontColor, styles.fontBold, GStyles.alignEnd]}>
+                  {ZERO.plus(sendNumber).isLessThanOrEqualTo(ZERO.plus(CROSS_FEE))
+                    ? '0'
+                    : unitConverter(ZERO.plus(sendNumber).minus(ZERO.plus(CROSS_FEE)))}{' '}
+                  {'ELF'}
+                </TextM>
+                {isMainNet(currentNetwork?.networkType ?? 'TESTNET') ? (
+                  <TextS
+                    style={[styles.blackFontColor, styles.lightGrayFontColor, GStyles.alignEnd]}>{`$ ${unitConverter(
+                    CROSS_FEE,
+                  )}`}</TextS>
+                ) : (
+                  <TextM />
+                )}
+              </View>
             </View>
           </View>
         )}
@@ -421,7 +459,7 @@ export const styles = StyleSheet.create({
   },
   borderTop: {
     borderTopColor: defaultColors.border6,
-    borderTopWidth: pTd(0.5),
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
   title: {
     flex: 1,
@@ -454,8 +492,8 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    height: pTd(20),
     width: '100%',
+    lineHeight: pTd(20),
   },
   titles1: {
     marginTop: pTd(56),
@@ -466,7 +504,7 @@ export const styles = StyleSheet.create({
   divider: {
     marginTop: pTd(24),
     width: '100%',
-    height: pTd(0.5),
+    height: StyleSheet.hairlineWidth,
     backgroundColor: defaultColors.border6,
   },
   titles2: {
@@ -478,7 +516,7 @@ export const styles = StyleSheet.create({
   card: {
     marginTop: pTd(40),
     borderRadius: pTd(6),
-    borderWidth: pTd(0.5),
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: defaultColors.border1,
     width: '100%',
   },
@@ -520,5 +558,9 @@ export const styles = StyleSheet.create({
   },
   alignItemsEnd: {
     alignItems: 'flex-end',
+  },
+  leftTitle: {
+    width: pTd(120),
+    lineHeight: pTd(20),
   },
 });

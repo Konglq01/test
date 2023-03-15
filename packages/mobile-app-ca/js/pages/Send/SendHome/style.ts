@@ -34,6 +34,11 @@ export const styles = StyleSheet.create({
     marginLeft: pTd(26),
     paddingLeft: pTd(8),
   },
+  nftErrorMessage: {
+    marginLeft: 0,
+    paddingLeft: 0,
+    textAlign: 'center',
+  },
   space: {
     height: pTd(24),
   },
@@ -49,7 +54,7 @@ export const thirdGroupStyle = StyleSheet.create({
   },
   borderTop: {
     borderTopColor: defaultColors.border6,
-    borderTopWidth: pTd(0.5),
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
   title: {
     flex: 1,

@@ -9,11 +9,13 @@ export default function Copy({
   children,
   className,
   iconType,
+  iconClassName,
 }: {
   toCopy: string;
   children?: React.ReactNode;
   className?: string;
   iconType?: string;
+  iconClassName?: string;
 }) {
   const { t } = useTranslation();
   const [, setCopied] = useCopyToClipboard();
@@ -25,8 +27,9 @@ export default function Copy({
         message.success(t('Copy Success'));
       }}
       className={clsx('flex-row-center copy-wrapper', className)}
+      // eslint-disable-next-line no-inline-styles/no-inline-styles
       style={{ cursor: 'pointer' }}>
-      <CustomSvg type={(iconType as any) || 'Copy2'} className="icon" />
+      <CustomSvg type={(iconType as any) || 'Copy2'} className={clsx(['icon', iconClassName])} />
       {children}
     </span>
   );

@@ -1,14 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { NetworkType } from '@portkey-wallet/types/index';
 import { the2ThFailedActivityItemType } from '@portkey-wallet/types/types-ca/activity';
 import { getActivityListAsync } from './action';
 import { ActivityStateType } from './type';
+import { getCurrentActivityMapKey } from '@portkey-wallet/utils/activity';
 
 const initialState: ActivityStateType = {
-  maxResultCount: 10,
-  skipCount: 0,
-  data: [],
-  totalRecordCount: 0,
+  activityMap: {},
   isFetchingActivities: false,
   failedActivityMap: {},
 };
@@ -18,33 +15,33 @@ export const activitySlice = createSlice({
   name: 'activity',
   initialState: initialState,
   reducers: {
-    addPage: (state, { payload }: { payload: NetworkType }) => {
-      state.skipCount += state.maxResultCount;
-    },
     addFailedActivity: (state, { payload }: { payload: the2ThFailedActivityItemType }) => {
       state.failedActivityMap[payload?.transactionId] = payload;
     },
     removeFailedActivity: (state, { payload }: { payload: string }) => {
       delete state.failedActivityMap[payload];
     },
-    clearActivity: state =>
-      (state = {
-        ...initialState,
-        failedActivityMap: state.failedActivityMap,
-      }),
-    clearState: state => (state = initialState),
+    clearActivity: state => initialState,
   },
   extraReducers: builder => {
     builder.addCase(getActivityListAsync.fulfilled, (state, action) => {
-      const { data, totalRecordCount, skipCount, maxResultCount } = action.payload;
-      state.data = [...state.data, ...data];
-      state.totalRecordCount = totalRecordCount;
-      state.skipCount = skipCount;
-      state.maxResultCount = maxResultCount;
+      const { data, totalRecordCount, skipCount, maxResultCount, chainId, symbol } = action.payload;
+      const currentMapKey = getCurrentActivityMapKey(chainId, symbol);
+
+      if (!state.activityMap) state.activityMap = {};
+
+      state.activityMap[currentMapKey] = {
+        data: skipCount === 0 ? data : [...state.activityMap[currentMapKey].data, ...data],
+        totalRecordCount,
+        skipCount,
+        maxResultCount,
+        chainId,
+        symbol,
+      };
     });
   },
 });
 
-export const { addPage, addFailedActivity, removeFailedActivity, clearState, clearActivity } = activitySlice.actions;
+export const { addFailedActivity, removeFailedActivity, clearActivity } = activitySlice.actions;
 
 export default activitySlice;

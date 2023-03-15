@@ -15,6 +15,7 @@ import { useCaAddresses, useChainIdList } from '@portkey-wallet/hooks/hooks-ca/w
 import { fetchTokenListAsync } from '@portkey-wallet/store/store-ca/assets/slice';
 import { fetchAllTokenListAsync, getSymbolImagesAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
 import { getWalletNameAsync } from '@portkey-wallet/store/store-ca/wallet/actions';
+import { useIsTestnet } from 'hooks/useNetwork';
 
 export interface TransactionResult {
   total: number;
@@ -24,7 +25,7 @@ export interface TransactionResult {
 // let timer: any;
 
 export default function MyBalance() {
-  const { walletName, currentNetwork } = useWalletInfo();
+  const { walletName } = useWalletInfo();
   const { t } = useTranslation();
   const [activeKey, setActiveKey] = useState<string>('assets');
   const [navTarget, setNavTarget] = useState<'send' | 'receive'>('send');
@@ -38,7 +39,27 @@ export default function MyBalance() {
   const appDispatch = useAppDispatch();
   const caAddresses = useCaAddresses();
   const chainIdArray = useChainIdList();
-  const isMain = useMemo(() => currentNetwork === 'MAIN', [currentNetwork]);
+  const isTestNet = useIsTestnet();
+  const renderTabsData = useMemo(
+    () => [
+      {
+        label: t('Tokens'),
+        key: 'tokens',
+        children: <TokenList tokenList={accountTokenList} />,
+      },
+      {
+        label: t('NFTs'),
+        key: 'nft',
+        children: <NFT />,
+      },
+      {
+        label: t('Activity'),
+        key: 'activity',
+        children: <Activity />,
+      },
+    ],
+    [accountTokenList, t],
+  );
 
   useEffect(() => {
     console.log('---passwordSeed-myBalance---', passwordSeed);
@@ -83,7 +104,7 @@ export default function MyBalance() {
             alias: type === 'nft' ? v.nftInfo?.alias : '',
             tokenId: type === 'nft' ? v.nftInfo?.tokenId : '',
           };
-          navigate(`/${navTarget}/${type}/${v.symbol}/${v.chainId}`, { state });
+          navigate(`/${navTarget}/${type}/${v.symbol}`, { state });
         }}
       />
     );
@@ -97,10 +118,10 @@ export default function MyBalance() {
     <div className="balance">
       <div className="wallet-name">{walletName}</div>
       <div className="balance-amount">
-        {isMain ? (
-          <span className="amount">$ {unitConverter(accountBalance)}</span>
-        ) : (
+        {isTestNet ? (
           <span className="dev-mode amount">Dev Mode</span>
+        ) : (
+          <span className="amount">$ {unitConverter(accountBalance)}</span>
         )}
       </div>
       <BalanceCard
@@ -115,28 +136,7 @@ export default function MyBalance() {
         }}
       />
       {SelectTokenELe}
-      <Tabs
-        accessKey={activeKey}
-        onChange={onChange}
-        centered
-        items={[
-          {
-            label: t('Tokens'),
-            key: 'tokens',
-            children: <TokenList tokenList={accountTokenList} />,
-          },
-          {
-            label: t('NFTs'),
-            key: 'nft',
-            children: <NFT />,
-          },
-          {
-            label: t('Activity'),
-            key: 'activity',
-            children: <Activity />,
-          },
-        ]}
-      />
+      <Tabs accessKey={activeKey} onChange={onChange} centered items={renderTabsData} />
     </div>
   );
 }

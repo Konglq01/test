@@ -2,15 +2,25 @@ import { ActivityItemType, the2ThFailedActivityItemType } from '@portkey-wallet/
 import { TransactionTypes } from '@portkey-wallet/constants/constants-ca/activity';
 
 export type ActivityStateType = {
-  maxResultCount: number;
-  skipCount: number;
-  data: ActivityItemType[];
-  totalRecordCount: number;
+  activityMap: ActivityStateMap;
   isFetchingActivities: boolean;
   failedActivityMap: { [transactionId: string]: the2ThFailedActivityItemType };
 };
 
-export interface IActivitysApiParams {
+export type ActivityStateMap = {
+  [key: string]: ActivityStateMapAttributes;
+};
+
+export type ActivityStateMapAttributes = {
+  maxResultCount: number;
+  skipCount: number;
+  data: ActivityItemType[];
+  totalRecordCount: number;
+  chainId?: string;
+  symbol?: string;
+};
+
+export interface IActivitiesApiParams {
   maxResultCount: number;
   skipCount: number;
   caAddresses?: string[];
@@ -20,7 +30,7 @@ export interface IActivitysApiParams {
   symbol?: string;
 }
 
-export interface IActivitysApiResponse {
+export interface IActivitiesApiResponse {
   data: ActivityItemType[];
   totalRecordCount: number;
 }

@@ -15,9 +15,7 @@ export interface ModalBodyProps extends ViewProps {
 }
 
 export const ModalBody: React.FC<ModalBodyProps> = props => {
-  const { title, modalBodyType, children, style = {} } = props;
-
-  console.log(title);
+  const { modalBodyType, children, style = {} } = props;
 
   if (modalBodyType === 'bottom') {
     return (
@@ -49,7 +47,7 @@ export const styles = StyleSheet.create({
     paddingTop: pTd(14),
     paddingBottom: pTd(7),
     alignItems: 'center',
-    borderBottomWidth: pTd(1),
+    borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: defaultColors.border6,
   },
   headerIcon: {

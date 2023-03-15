@@ -12,6 +12,9 @@ import { clearAssets } from '@portkey-wallet/store/store-ca/assets/slice';
 import { resetGuardiansState } from '@portkey-wallet/store/store-ca/guardians/actions';
 import { resetContactAction } from '@portkey-wallet/store/store-ca/contact/actions';
 import { request } from '@portkey-wallet/api/api-did';
+import { clearRecent } from '@portkey-wallet/store/store-ca/recent/slice';
+
+import { clearActivity } from '@portkey-wallet/store/store-ca/activity/slice';
 
 export default function useLogOut() {
   const dispatch = useAppDispatch();
@@ -20,10 +23,13 @@ export default function useLogOut() {
       dispatch(resetWallet());
       dispatch(resetUser());
       dispatch(clearAssets());
+      dispatch(clearRecent());
+      dispatch(clearActivity());
       dispatch(resetSettings());
       dispatch(resetNetwork());
       dispatch(resetGuardiansState());
       dispatch(resetContactAction());
+
       request.initService();
       setTimeout(() => {
         request.initService();

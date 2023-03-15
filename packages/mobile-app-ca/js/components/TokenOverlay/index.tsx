@@ -6,13 +6,11 @@ import { ModalBody } from 'components/ModalBody';
 import CommonInput from 'components/CommonInput';
 import { useAppCASelector } from '@portkey-wallet/hooks/hooks-ca';
 import { TokenItemShowType } from '@portkey-wallet/types/types-eoa/token';
-import { filterTokenList } from '@portkey-wallet/utils/token';
 import { AccountType } from '@portkey-wallet/types/wallet';
 import TokenListItem from 'components/TokenListItem';
 import { defaultColors } from 'assets/theme';
 import fonts from 'assets/theme/fonts';
 import { pTd } from 'utils/unit';
-import { screenHeight } from '@portkey-wallet/utils/mobile/device';
 import { useLanguage } from 'i18n/hooks';
 import { useAppCommonDispatch } from '@portkey-wallet/hooks';
 import useDebounce from 'hooks/useDebounce';
@@ -20,6 +18,7 @@ import useEffectOnce from 'hooks/useEffectOnce';
 import { useChainIdList } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { fetchAllTokenListAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
 import NoData from 'components/NoData';
+import { useGStyles } from 'assets/theme/useGStyles';
 
 type onFinishSelectTokenType = (tokenItem: TokenItemShowType) => void;
 type TokenListProps = {
@@ -33,6 +32,7 @@ const TokenList = ({ onFinishSelectToken }: TokenListProps) => {
   const { tokenDataShowInMarket } = useAppCASelector(state => state.tokenManagement);
   const dispatch = useAppCommonDispatch();
   const chainIdList = useChainIdList();
+  const gStyles = useGStyles();
 
   const [keyword, setKeyword] = useState('');
 
@@ -63,7 +63,7 @@ const TokenList = ({ onFinishSelectToken }: TokenListProps) => {
   });
 
   return (
-    <ModalBody modalBodyType="bottom" style={styles.modalStyle}>
+    <ModalBody modalBodyType="bottom" style={gStyles.overlayStyle}>
       <TextXL style={styles.title}>{t('Select Token')}</TextXL>
       <CommonInput
         placeholder={t('Token Name')}
@@ -97,9 +97,6 @@ export default {
 };
 
 export const styles = StyleSheet.create({
-  modalStyle: {
-    height: screenHeight - pTd(100),
-  },
   title: {
     textAlign: 'center',
     color: defaultColors.font5,

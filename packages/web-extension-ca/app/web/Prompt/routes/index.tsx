@@ -1,35 +1,37 @@
 import RegisterStart from 'pages/RegisterStart';
 import SelectVerifier from 'pages/SelectVerifier';
 import { useRoutes } from 'react-router-dom';
-import Home from 'pages/Home';
 import ScreenOpeningPage from 'pages/ScreenOpening';
-import Wallet from 'pages/Wallet';
 import VerifierAccount from 'pages/VerifierAccount';
-import Contacts from 'pages/Contacts';
 import SetWalletPin from 'pages/SetWalletPin';
 import SuccessPage from 'pages/SuccessPage';
 import GuardianApproval from 'pages/GuardianApproval';
-import Guardians from 'pages/Guardians';
-import GuardiansEdit from 'pages/Guardians/GuardiansEdit';
-import GuardiansView from 'pages/Guardians/GuardiansView';
-import AddToken from 'pages/Token/Manage';
-import Receive from 'pages/Receive';
-import AddGuardian from 'pages/Guardians/GuardiansAdd';
-import TokenDetail from 'pages/Token/Detail';
-import AccountSetting from 'pages/AccountSetting';
-import Contact from 'pages/Contacts/ContactDetail';
-import My from 'pages/My';
-import Send from 'pages/Send';
-import Transaction from 'pages/Transaction';
-import NFT from 'pages/NFT';
 import Unlock from 'pages/Unlock';
 import QueryPage from 'pages/QueryPage';
 import TestSocket from 'pages/TestSocket';
-import Device from 'pages/AccountSetting/Devices';
+import Device from 'pages/WalletSecurity/ManageDevices';
 import SetPin from 'pages/AccountSetting/SetPin';
+import WalletSecurity from 'pages/WalletSecurity';
 import NotFound from 'pages/NotFound';
 import Example from 'pages/Example';
 import SignUpUI from 'pages/Example/SignUpUI';
+import Login from 'pages/Example/login';
+import Home from 'pages/Home';
+import My from 'pages/My';
+import Guardians from 'pages/Guardians';
+import AddGuardian from 'pages/Guardians/GuardiansAdd';
+import GuardiansEdit from 'pages/Guardians/GuardiansEdit';
+import GuardiansView from 'pages/Guardians/GuardiansView';
+import Wallet from 'pages/Wallet';
+import AddToken from 'pages/Token/Manage';
+import Transaction from 'pages/Transaction';
+import TokenDetail from 'pages/Token/Detail';
+import Send from 'pages/Send';
+import Receive from 'pages/Receive';
+import NFT from 'pages/NFT';
+import Contacts from 'pages/Contacts';
+import Contact from 'pages/Contacts/ContactDetail';
+import AccountSetting from 'pages/AccountSetting';
 
 export const PageRouter = () =>
   useRoutes([
@@ -122,11 +124,7 @@ export const PageRouter = () =>
     //   element: <Send />,
     // },
     // {
-    //   path: '/send/:type/:symbol/:tokenId',
-    //   element: <Send />,
-    // },
-    // {
-    //   path: '/receive/:type/:symbol/:chainId',
+    //   path: '/receive/:type/:symbol',
     //   element: <Receive />,
     // },
     // {
@@ -146,12 +144,16 @@ export const PageRouter = () =>
     //   element: <AccountSetting />,
     // },
     // {
-    //   path: '/setting/account-setting/device',
-    //   element: <Device />,
-    // },
-    // {
     //   path: '/setting/account-setting/set-pin',
     //   element: <SetPin />,
+    // },
+    // {
+    //   path: '/setting/wallet-security',
+    //   element: <WalletSecurity />,
+    // },
+    // {
+    //   path: '/setting/wallet-security/manage-devices',
+    //   element: <Device />,
     // },
     {
       path: '/unlock',
@@ -162,13 +164,19 @@ export const PageRouter = () =>
       element: <QueryPage />,
     },
     {
-      path: '/test/example-ui',
+      path: '/test',
       element: <Example />,
     },
     {
       path: '/test/example-SignUpUI',
       element: <SignUpUI />,
     },
+
+    {
+      path: '/test/example-login',
+      element: <Login />,
+    },
+
     {
       path: '/test/socket',
       element: <TestSocket />,

@@ -1,6 +1,6 @@
 import { CurrentWalletType } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { createWallet, setCAInfo, setManagerInfo } from '@portkey-wallet/store/store-ca/wallet/actions';
-import { CAInfo, ManagerInfo } from '@portkey-wallet/types/types-ca/wallet';
+import { CAInfo, LoginType, ManagerInfo } from '@portkey-wallet/types/types-ca/wallet';
 import { VerificationType, VerifierInfo } from '@portkey-wallet/types/verifier';
 import { sleep } from '@portkey-wallet/utils';
 import Loading from 'components/Loading';
@@ -16,7 +16,6 @@ import CommonToast from 'components/CommonToast';
 import useEffectOnce from './useEffectOnce';
 import { setCredentials } from 'store/user/actions';
 import { DigitInputInterface } from 'components/DigitInput';
-import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
 import { GuardiansApproved } from 'pages/Guardian/types';
 import { DEVICE_TYPE } from 'constants/common';
 
@@ -70,7 +69,7 @@ export function useOnManagerAddressAndQueryResult() {
           data = {
             ...managerInfo,
             ...verifierInfo,
-            type: LoginStrType[managerInfo.type],
+            type: LoginType[managerInfo.type],
             ...data,
           };
         }

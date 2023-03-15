@@ -9,6 +9,7 @@ import { TextL, TextS } from 'components/CommonText';
 import { useWallet } from 'hooks/store';
 import React, { memo } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { formatChainInfoToShow } from '@portkey-wallet/utils';
 import { pTd } from 'utils/unit';
 interface TokenListItemType {
   noBalanceShow?: boolean;
@@ -24,6 +25,7 @@ const TokenListItem: React.FC<TokenListItemType> = props => {
   return (
     <TouchableOpacity style={itemStyle.wrap} onPress={() => onPress?.(item)}>
       <CommonAvatar
+        hasBorder
         style={itemStyle.left}
         title={item?.symbol}
         avatarSize={pTd(48)}
@@ -36,8 +38,7 @@ const TokenListItem: React.FC<TokenListItemType> = props => {
             {item?.symbol}
           </TextL>
           <TextS numberOfLines={1} style={[FontStyles.font3, itemStyle.chainInfo]}>
-            {item?.chainId === 'AELF' ? 'MainChain ' : 'SideChain '} {item?.chainId}{' '}
-            {currentNetwork === 'TESTNET' && 'Testnet'}
+            {formatChainInfoToShow(item?.chainId, currentNetwork)}
           </TextS>
         </View>
 
@@ -80,7 +81,7 @@ const itemStyle = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderBottomColor: defaultColors.border6,
-    borderBottomWidth: pTd(0.5),
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   infoWrap: {
     flex: 1,

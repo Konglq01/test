@@ -1,14 +1,10 @@
-import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
+import { createAsyncThunk } from '@reduxjs/toolkit';
 import { fetchActivities } from './api';
-import { ActivityStateType, IActivitysApiParams } from './type';
-
-export const setActivityListAction = createAction<any>('activity/setActivityListAction');
-export const setActivityAction = createAction<any>('activity/setActivityAction');
+import { ActivityStateMapAttributes, IActivitiesApiParams } from './type';
 
 export const getActivityListAsync = createAsyncThunk(
   'activity/getActivityList',
-  async (params: IActivitysApiParams, { getState, dispatch }): Promise<ActivityStateType> => {
-    const { activity } = getState() as { activity: ActivityStateType };
+  async (params: IActivitiesApiParams): Promise<ActivityStateMapAttributes> => {
     const response = await fetchActivities(params).catch(error => {
       if (error?.type) throw Error(error.type);
       if (error?.error?.message) throw Error(error.error.message);
@@ -17,11 +13,12 @@ export const getActivityListAsync = createAsyncThunk(
     if (!response?.data || !response?.totalRecordCount) throw Error('No data');
 
     return {
-      ...activity,
       data: response.data,
       totalRecordCount: response.totalRecordCount,
       maxResultCount: params.maxResultCount,
       skipCount: params.skipCount,
+      chainId: params.chainId,
+      symbol: params.symbol,
     };
   },
 );

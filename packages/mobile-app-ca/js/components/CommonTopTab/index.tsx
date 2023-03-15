@@ -32,7 +32,7 @@ const CommonTopTab: React.FC<CommonTopTabProps> = props => {
         tabBarLabelStyle: styles.tabBarLabelStyle,
         tabBarInactiveTintColor: defaultColors.font3, // active
         tabBarActiveTintColor: defaultColors.font4, // inactive
-        tabBarIndicatorStyle: { borderWidth: pTd(1), borderColor: defaultColors.bg5 }, // active border
+        tabBarIndicatorStyle: { borderWidth: StyleSheet.hairlineWidth, borderColor: defaultColors.bg5 }, // active border
       }}>
       {tabList.map(ele => (
         <Tab.Screen key={ele.name} name={ele.name}>
@@ -46,9 +46,9 @@ export default memo(CommonTopTab);
 
 const styles = StyleSheet.create({
   tabBarStyle: {
-    elevation: 10,
+    elevation: 1,
     shadowColor: defaultColors.border1,
-    shadowOffset: { width: 0, height: 3 },
+    shadowOffset: { width: 0, height: pTd(3) },
   },
   radiusTarBarStyle: {
     borderTopLeftRadius: pTd(8),

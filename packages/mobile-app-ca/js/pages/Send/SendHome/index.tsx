@@ -33,6 +33,8 @@ import { getELFChainBalance } from '@portkey-wallet/utils/balance';
 import { BGStyles } from 'assets/theme/styles';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import Loading from 'components/Loading';
+import { DEFAULT_DECIMAL } from '@portkey-wallet/constants/constants-ca/activity';
+import { CROSS_FEE } from '@portkey-wallet/constants/constants-ca/wallet';
 
 export interface SendHomeProps {
   route?: any;
@@ -41,8 +43,9 @@ enum ErrorMessage {
   RecipientAddressIsInvalid = 'Recipient address is invalid',
   NoCorrespondingNetwork = 'No corresponding network',
   InsufficientFunds = 'Insufficient funds',
-  InsufficientQuantity = 'Insufficient Quantity',
+  InsufficientQuantity = 'Insufficient quantity',
   InsufficientFundsForTransactionFee = 'Insufficient funds for transaction fee',
+  InsufficientFundsForCrossChain = 'Insufficient funds for cross chain transaction fee',
 }
 
 const SendHome: React.FC<SendHomeProps> = props => {
@@ -234,7 +237,10 @@ const SendHome: React.FC<SendHomeProps> = props => {
   }, [assetInfo.chainId, selectedToContact.address, showDialog]);
 
   const nextStep = useCallback(() => {
-    if (checkCanNext()) return setStep(2);
+    if (checkCanNext()) {
+      setErrorMessage([]);
+      return setStep(2);
+    }
   }, [checkCanNext]);
 
   //when finish send  upDate balance
@@ -250,6 +256,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
 
     const sendBigNumber = timesDecimals(sendNumber, selectedAssets.decimals || '0');
     const assetBalanceBigNumber = ZERO.plus(selectedAssets.balance);
+    const isCross = isCrossChain(selectedToContact.address, assetInfo.chainId);
 
     // input check
     if (sendType === 'token') {
@@ -258,6 +265,11 @@ const SendHome: React.FC<SendHomeProps> = props => {
         // ELF
         if (sendBigNumber.isGreaterThanOrEqualTo(assetBalanceBigNumber)) {
           setErrorMessage([ErrorMessage.InsufficientFunds]);
+          return { status: false };
+        }
+
+        if (isCross && sendBigNumber.isLessThanOrEqualTo(timesDecimals(CROSS_FEE, DEFAULT_DECIMAL))) {
+          setErrorMessage([ErrorMessage.InsufficientFundsForCrossChain]);
           return { status: false };
         }
       } else {
@@ -274,8 +286,6 @@ const SendHome: React.FC<SendHomeProps> = props => {
         return { status: false };
       }
     }
-
-    const isCross = isCrossChain(selectedToContact.address, assetInfo.chainId);
 
     // transaction fee check
     Loading.show();
@@ -327,7 +337,8 @@ const SendHome: React.FC<SendHomeProps> = props => {
       const balance = await getAssetBalance(assetInfo.tokenContractAddress || assetInfo.address, assetInfo.symbol);
       setSelectedAssets({ ...selectedAssets, balance });
     })();
-  }, [assetInfo.address, assetInfo.symbol, assetInfo.tokenContractAddress, getAssetBalance, selectedAssets]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assetInfo.address, assetInfo.symbol, assetInfo.tokenContractAddress, getAssetBalance]);
 
   const ButtonUI = useMemo(() => {
     return (
@@ -415,17 +426,23 @@ const SendHome: React.FC<SendHomeProps> = props => {
       )}
 
       {errorMessage.includes(ErrorMessage.InsufficientFunds) && (
-        <Text style={[styles.errorMessage, GStyles.textAlignCenter]}>{t(ErrorMessage.InsufficientFunds)}</Text>
+        <Text style={[styles.errorMessage, sendType === 'nft' && styles.nftErrorMessage]}>
+          {t(ErrorMessage.InsufficientFunds)}
+        </Text>
       )}
 
       {errorMessage.includes(ErrorMessage.InsufficientFundsForTransactionFee) && (
-        <Text style={[styles.errorMessage, GStyles.textAlignCenter]}>
+        <Text style={[styles.errorMessage, sendType === 'nft' && styles.nftErrorMessage]}>
           {t(ErrorMessage.InsufficientFundsForTransactionFee)}
         </Text>
       )}
 
+      {errorMessage.includes(ErrorMessage.InsufficientFundsForCrossChain) && (
+        <Text style={[styles.errorMessage]}>{t(ErrorMessage.InsufficientFundsForCrossChain)}</Text>
+      )}
+
       {errorMessage.includes(ErrorMessage.InsufficientQuantity) && (
-        <Text style={[styles.errorMessage, GStyles.textAlignCenter]}>{t(ErrorMessage.InsufficientQuantity)}</Text>
+        <Text style={[styles.errorMessage, styles.nftErrorMessage]}>{t(ErrorMessage.InsufficientQuantity)}</Text>
       )}
 
       {/* Group 3 contact */}

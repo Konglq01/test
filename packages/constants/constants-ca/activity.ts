@@ -3,8 +3,8 @@ export enum TransactionTypes {
   CROSS_CHAIN_TRANSFER = 'CrossChainTransfer',
   CROSS_CHAIN_RECEIVE_TOKEN = 'CrossChainReceiveToken',
   SOCIAL_RECOVERY = 'SocialRecovery',
-  REMOVE_MANAGER = 'RemoveManager',
-  ADD_MANAGER = 'AddManager',
+  REMOVE_MANAGER = 'RemoveManagerInfo',
+  ADD_MANAGER = 'AddManagerInfo',
 }
 
 export const transactionTypes = [
@@ -65,3 +65,9 @@ export const MAIN_CHAIN = 'MainChain';
 export const SIDE_CHAIN = 'SideChain';
 export const TESTNET = 'TESTNET';
 export const TEST_NET = 'Testnet';
+
+export const HIDDEN_TRANSACTION_TYPES = [
+  TransactionTypes.SOCIAL_RECOVERY,
+  TransactionTypes.ADD_MANAGER,
+  TransactionTypes.REMOVE_MANAGER,
+];
