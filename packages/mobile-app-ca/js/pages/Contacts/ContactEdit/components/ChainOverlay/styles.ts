@@ -1,12 +1,8 @@
 import { defaultColors } from 'assets/theme';
 import { StyleSheet } from 'react-native';
 import { pTd } from 'utils/unit';
-import { isIos, windowHeight } from '@portkey-wallet/utils/mobile/device';
 
 const styles = StyleSheet.create({
-  overlayWrap: {
-    height: windowHeight - pTd(isIos ? 68 : 100),
-  },
   titleWrap: {
     paddingHorizontal: pTd(16),
     marginBottom: pTd(8),
