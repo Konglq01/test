@@ -9,6 +9,7 @@ import { PinErrorMessage } from '@portkey-wallet/utils/wallet/types';
 import myEvents from 'utils/deviceEvent';
 import { useFocusEffect } from '@react-navigation/native';
 import PinContainer from 'components/PinContainer';
+import { StyleSheet } from 'react-native';
 
 export default function CheckPin() {
   const { openBiometrics } = useRouterParams<{ openBiometrics?: boolean }>();
@@ -39,8 +40,19 @@ export default function CheckPin() {
     [errorMessage, openBiometrics],
   );
   return (
-    <PageContainer titleDom type="leftBack" backTitle={!openBiometrics ? 'Change Pin' : 'Authentication'}>
+    <PageContainer
+      titleDom
+      type="leftBack"
+      backTitle={!openBiometrics ? 'Change Pin' : 'Authentication'}
+      containerStyles={styles.container}
+      scrollViewProps={{ disabled: true }}>
       <PinContainer showHeader ref={pinRef} title="Enter Pin" errorMessage={errorMessage} onChangeText={onChangeText} />
     </PageContainer>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});

@@ -115,7 +115,11 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
               status: VerifyStatus.Verifying,
             }),
           );
-          navigate('/login/verifier-account', { state: 'login' });
+          if (state?.indexOf('removeManage') !== -1) {
+            navigate('/setting/wallet-security/manage-devices/verifier-account', { state: state });
+          } else {
+            navigate('/login/verifier-account', { state: 'login' });
+          }
         }
       } catch (error: any) {
         console.log(error, 'error===');
@@ -130,9 +134,13 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
   const verifyingHandler = useCallback(
     async (item: UserGuardianItem) => {
       dispatch(setCurrentGuardianAction({ ...item, isInitStatus: false }));
-      state && state.indexOf('guardians') !== -1
-        ? navigate('/setting/guardians/verifier-account', { state: state })
-        : navigate('/login/verifier-account', { state: 'login' });
+      if (state?.indexOf('guardians') !== -1) {
+        navigate('/setting/guardians/verifier-account', { state: state });
+      } else if (state?.indexOf('removeManage') !== -1) {
+        navigate('/setting/wallet-security/manage-devices/verifier-account', { state: state });
+      } else {
+        navigate('/login/verifier-account', { state: 'login' });
+      }
     },
     [dispatch, navigate, state],
   );

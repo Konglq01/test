@@ -9,7 +9,7 @@ import GuardianApproval from 'pages/GuardianApproval';
 import Unlock from 'pages/Unlock';
 import QueryPage from 'pages/QueryPage';
 import TestSocket from 'pages/TestSocket';
-import Device from 'pages/WalletSecurity/ManageDevices';
+import ManageDevices from 'pages/WalletSecurity/ManageDevices';
 import SetPin from 'pages/AccountSetting/SetPin';
 import WalletSecurity from 'pages/WalletSecurity';
 import NotFound from 'pages/NotFound';
@@ -75,86 +75,94 @@ export const PageRouter = () =>
       path: '/login/verifier-account',
       element: <VerifierAccount />,
     },
-    // {
-    //   path: '/setting',
-    //   element: <My />,
-    // },
-    // {
-    //   path: '/setting/guardians',
-    //   element: <Guardians />,
-    // },
-    // {
-    //   path: '/setting/guardians/add',
-    //   element: <AddGuardian />,
-    // },
-    // {
-    //   path: '/setting/guardians/edit',
-    //   element: <GuardiansEdit />,
-    // },
-    // {
-    //   path: '/setting/guardians/view',
-    //   element: <GuardiansView />,
-    // },
-    // {
-    //   path: '/setting/guardians/verifier-account',
-    //   element: <VerifierAccount />,
-    // },
-    // {
-    //   path: '/setting/guardians/guardian-approval',
-    //   element: <GuardianApproval />,
-    // },
-    // {
-    //   path: '/setting/wallet',
-    //   element: <Wallet />,
-    // },
-    // {
-    //   path: '/add-token',
-    //   element: <AddToken />,
-    // },
-    // {
-    //   path: '/transaction',
-    //   element: <Transaction />,
-    // },
-    // {
-    //   path: '/token-detail',
-    //   element: <TokenDetail />,
-    // },
-    // {
-    //   path: '/send/:type/:symbol',
-    //   element: <Send />,
-    // },
-    // {
-    //   path: '/receive/:type/:symbol',
-    //   element: <Receive />,
-    // },
-    // {
-    //   path: '/nft',
-    //   element: <NFT />,
-    // },
-    // {
-    //   path: 'setting/contacts',
-    //   element: <Contacts />,
-    // },
-    // {
-    //   path: '/setting/contacts/:type',
-    //   element: <Contact />,
-    // },
-    // {
-    //   path: '/setting/account-setting',
-    //   element: <AccountSetting />,
-    // },
-    // {
-    //   path: '/setting/account-setting/set-pin',
-    //   element: <SetPin />,
-    // },
-    // {
-    //   path: '/setting/wallet-security',
-    //   element: <WalletSecurity />,
-    // },
-    // {
-    //   path: '/setting/wallet-security/manage-devices',
-    //   element: <Device />,
-    // },
+    {
+      path: '/setting',
+      element: <My />,
+    },
+    {
+      path: '/setting/guardians',
+      element: <Guardians />,
+    },
+    {
+      path: '/setting/guardians/add',
+      element: <AddGuardian />,
+    },
+    {
+      path: '/setting/guardians/edit',
+      element: <GuardiansEdit />,
+    },
+    {
+      path: '/setting/guardians/view',
+      element: <GuardiansView />,
+    },
+    {
+      path: '/setting/guardians/verifier-account',
+      element: <VerifierAccount />,
+    },
+    {
+      path: '/setting/guardians/guardian-approval',
+      element: <GuardianApproval />,
+    },
+    {
+      path: '/setting/wallet',
+      element: <Wallet />,
+    },
+    {
+      path: '/add-token',
+      element: <AddToken />,
+    },
+    {
+      path: '/transaction',
+      element: <Transaction />,
+    },
+    {
+      path: '/token-detail',
+      element: <TokenDetail />,
+    },
+    {
+      path: '/send/:type/:symbol',
+      element: <Send />,
+    },
+    {
+      path: '/receive/:type/:symbol',
+      element: <Receive />,
+    },
+    {
+      path: '/nft',
+      element: <NFT />,
+    },
+    {
+      path: 'setting/contacts',
+      element: <Contacts />,
+    },
+    {
+      path: '/setting/contacts/:type',
+      element: <Contact />,
+    },
+    {
+      path: '/setting/account-setting',
+      element: <AccountSetting />,
+    },
+    {
+      path: '/setting/account-setting/set-pin',
+      element: <SetPin />,
+    },
+    {
+      path: '/setting/wallet-security',
+      element: <WalletSecurity />,
+    },
+    {
+      path: '/setting/wallet-security/manage-devices',
+      element: <ManageDevices />,
+    },
+    {
+      path: '/setting/wallet-security/manage-devices/verifier-account',
+      element: <VerifierAccount />,
+    },
+    {
+      path: '/setting/wallet-security/manage-devices/guardian-approval',
+      element: <GuardianApproval />,
+    },
     {
       path: '/unlock',
       element: <Unlock />,
