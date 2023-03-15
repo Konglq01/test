@@ -9,7 +9,7 @@ import GuardianApproval from 'pages/GuardianApproval';
 import Unlock from 'pages/Unlock';
 import QueryPage from 'pages/QueryPage';
 import TestSocket from 'pages/TestSocket';
-import Device from 'pages/WalletSecurity/ManageDevices';
+import ManageDevices from 'pages/WalletSecurity/ManageDevices';
 import SetPin from 'pages/AccountSetting/SetPin';
 import WalletSecurity from 'pages/WalletSecurity';
 import NotFound from 'pages/NotFound';
@@ -153,7 +153,15 @@ export const PageRouter = () =>
     },
     {
       path: '/setting/wallet-security/manage-devices',
-      element: <Device />,
+      element: <ManageDevices />,
+    },
+    {
+      path: '/setting/wallet-security/manage-devices/verifier-account',
+      element: <VerifierAccount />,
+    },
+    {
+      path: '/setting/wallet-security/manage-devices/guardian-approval',
+      element: <GuardianApproval />,
     },
     {
       path: '/unlock',

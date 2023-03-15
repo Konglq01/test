@@ -25,12 +25,12 @@ export const formatDelGuardianValue = ({
     if (item.signature) {
       guardiansApproved.push({
         type: item.guardianType,
+        identifierHash: item.identifierHash,
         verificationInfo: {
           id: item.verifier?.id as string,
           signature: Object.values(Buffer.from(item.signature as any, 'hex')),
           verificationDoc: item.verificationDoc as string,
         },
-        identifierHash: item.identifierHash,
       });
     }
   });
