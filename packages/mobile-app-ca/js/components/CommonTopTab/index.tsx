@@ -46,9 +46,9 @@ export default memo(CommonTopTab);
 
 const styles = StyleSheet.create({
   tabBarStyle: {
-    elevation: 10,
+    elevation: 1,
     shadowColor: defaultColors.border1,
-    shadowOffset: { width: 0, height: 3 },
+    shadowOffset: { width: 0, height: pTd(3) },
   },
   radiusTarBarStyle: {
     borderTopLeftRadius: pTd(8),
