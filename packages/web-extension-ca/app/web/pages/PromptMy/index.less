@@ -2,24 +2,27 @@
 
 .prompt-my-page {
   min-height: 100%;
-  padding-bottom: 50px;
+  padding-bottom: 60px;
   display: flex;
   flex-direction: column;
   align-items: center;
   background-color: @bg-13;
 
+  .portkey-header {
+    width: 100%;
+    position: relative;
+  }
+
   .prompt-my-frame {
     background-color: @bg-11;
     box-shadow: 0 2px 6px 0 @shadow-1;
     width: 900px;
-    height: 637px;
+    height: 100%;
+    min-height: calc(100vh - 132px);
     display: flex;
     flex-direction: column;
   }
 
-  .portkey-header {
-    width: 100%;
-  }
   .setting-header-wrapper {
     background-color: @bg-11;
     height: 67px;
@@ -89,6 +92,59 @@
       display: flex;
       flex-direction: column;
       padding-bottom: 24px;
+    }
+  }
+
+  @media screen and (min-width: 1820px) {
+    .portkey-header {
+      max-width: 1440px;
+      width: 1440px;
+      .portkey-header-body {
+        padding-left: 0;
+        padding-right: 0;
+      }
+    }
+    .prompt-my-frame {
+      max-width: 1440px;
+      width: 1440px;
+    }
+  }
+  @media screen and (max-width: 1819px) and (min-width: 1280px) {
+    .portkey-header {
+      width: calc(100vw - 380px);
+      .portkey-header-body {
+        padding-left: 0;
+        padding-right: 0;
+      }
+    }
+    .prompt-my-frame {
+      width: calc(100vw - 380px);
+    }
+  }
+  @media screen and (max-width: 1279px) and (min-width: 768px) {
+    .portkey-header {
+      max-width: 1024px;
+      width: calc(100vw - 88px);
+      .portkey-header-body {
+        padding-left: 0;
+        padding-right: 0;
+      }
+    }
+    .prompt-my-frame {
+      max-width: 1024px;
+      width: calc(100vw - 88px);
+    }
+  }
+  @media screen and (max-width: 767px) {
+    .portkey-header {
+      width: 100vw;
+      min-width: 360px;
+    }
+    .prompt-my-frame {
+      width: 100vw;
+      min-width: 360px;
+      padding-left: 24px;
+      padding-right: 24px;
     }
   }
 }

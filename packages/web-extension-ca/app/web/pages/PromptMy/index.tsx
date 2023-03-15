@@ -30,7 +30,12 @@ export default function PromptMy() {
   const settingList: MyMenuItemInfo[] = useMemo(
     () => [
       { label: 'Wallet', key: 'wallet', icon: 'Wallet', element: <Wallet /> },
-      { label: 'Contacts', key: 'address-book', icon: 'AddressBook2', element: <Contacts /> },
+      {
+        label: 'Contacts',
+        key: 'address-book',
+        icon: 'AddressBook2',
+        element: <Contacts />,
+      },
       {
         label: 'Account Setting',
         key: 'account-setting',
@@ -66,15 +71,7 @@ export default function PromptMy() {
       <PortKeyHeader onUserClick={backCb} />
 
       <div className="prompt-my-frame">
-        <SettingHeader
-          title={t('My')}
-          leftCallBack={backCb}
-          // rightElement={
-          //   <div className="lock-btn" onClick={handleLock}>
-          //     {t('Lock')}
-          //   </div>
-          // }
-        />
+        <SettingHeader title={t('My')} leftCallBack={backCb} />
         <div className="prompt-my-body">
           <div className="prompt-my-menu-list">
             {settingList.map((item) => (
@@ -82,7 +79,6 @@ export default function PromptMy() {
                 className={clsx(['menu-item-common', item.key === curMenuInfo?.key ? 'menu-item-selected' : undefined])}
                 key={item.key}
                 height={56}
-                // eslint-disable-next-line no-inline-styles/no-inline-styles
                 icon={<CustomSvg type={item.icon || 'Aelf'} />}
                 onClick={() =>
                   navigate(`/setting/${item.key}`, {
