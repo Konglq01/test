@@ -11,27 +11,23 @@ import QueryPage from 'pages/QueryPage';
 import TestSocket from 'pages/TestSocket';
 import ManageDevices from 'pages/WalletSecurity/ManageDevices';
 import SetPin from 'pages/AccountSetting/SetPin';
-import WalletSecurity from 'pages/WalletSecurity';
 import NotFound from 'pages/NotFound';
 import Example from 'pages/Example';
 import SignUpUI from 'pages/Example/SignUpUI';
 import Login from 'pages/Example/login';
 import Home from 'pages/Home';
-import My from 'pages/My';
-import Guardians from 'pages/Guardians';
 import AddGuardian from 'pages/Guardians/GuardiansAdd';
 import GuardiansEdit from 'pages/Guardians/GuardiansEdit';
 import GuardiansView from 'pages/Guardians/GuardiansView';
-import Wallet from 'pages/Wallet';
 import AddToken from 'pages/Token/Manage';
 import Transaction from 'pages/Transaction';
 import TokenDetail from 'pages/Token/Detail';
 import Send from 'pages/Send';
 import Receive from 'pages/Receive';
 import NFT from 'pages/NFT';
-import Contacts from 'pages/Contacts';
 import Contact from 'pages/Contacts/ContactDetail';
 import AccountSetting from 'pages/AccountSetting';
+import PromptMy from 'pages/PromptMy';
 
 export const PageRouter = () =>
   useRoutes([
@@ -76,12 +72,8 @@ export const PageRouter = () =>
       element: <VerifierAccount />,
     },
     {
-      path: '/setting',
-      element: <My />,
-    },
-    {
-      path: '/setting/guardians',
-      element: <Guardians />,
+      path: '/setting/:menuKey',
+      element: <PromptMy />,
     },
     {
       path: '/setting/guardians/add',
@@ -102,10 +94,6 @@ export const PageRouter = () =>
     {
       path: '/setting/guardians/guardian-approval',
       element: <GuardianApproval />,
-    },
-    {
-      path: '/setting/wallet',
-      element: <Wallet />,
     },
     {
       path: '/add-token',
@@ -131,10 +119,7 @@ export const PageRouter = () =>
       path: '/nft',
       element: <NFT />,
     },
-    {
-      path: 'setting/contacts',
-      element: <Contacts />,
-    },
+
     {
       path: '/setting/contacts/:type',
       element: <Contact />,
@@ -147,10 +132,7 @@ export const PageRouter = () =>
       path: '/setting/account-setting/set-pin',
       element: <SetPin />,
     },
-    {
-      path: '/setting/wallet-security',
-      element: <WalletSecurity />,
-    },
+
     {
       path: '/setting/wallet-security/manage-devices',
       element: <ManageDevices />,
