@@ -116,7 +116,7 @@ export default function NFTItem(props: NFTItemPropsType) {
             />
           ))}
         </View>
-        {!hasMore && (
+        {hasMore && (
           <Touchable
             style={[styles.loadMore]}
             onPress={() => loadMoreItem?.(symbol, chainId, openCollectionInfo?.pageNum)}>
