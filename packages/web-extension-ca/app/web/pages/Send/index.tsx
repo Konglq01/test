@@ -500,11 +500,19 @@ export default function Send() {
         </div>
       )}
       <div className="stage-ele">{StageObj[stage].element}</div>
-      <div className="btn-wrap">
-        <Button disabled={btnDisabled} className="stage-btn" type="primary" onClick={StageObj[stage].handler}>
-          {StageObj[stage].btnText}
-        </Button>
-      </div>
+      {stage === Stage.Preview ? (
+        <div className="btn-wrap">
+          <Button disabled={btnDisabled} className="stage-btn" type="primary" onClick={StageObj[stage].handler}>
+            {StageObj[stage].btnText}
+          </Button>
+        </div>
+      ) : (
+        <p className="btn-wrap">
+          <Button disabled={btnDisabled} className="stage-btn" type="primary" onClick={StageObj[stage].handler}>
+            {StageObj[stage].btnText}
+          </Button>
+        </p>
+      )}
     </div>
   );
 }
