@@ -426,13 +426,13 @@ const SendHome: React.FC<SendHomeProps> = props => {
       )}
 
       {errorMessage.includes(ErrorMessage.InsufficientFunds) && (
-        <Text style={[styles.errorMessage, sendType === 'nft' && GStyles.textAlignCenter]}>
+        <Text style={[styles.errorMessage, sendType === 'nft' && styles.nftErrorMessage]}>
           {t(ErrorMessage.InsufficientFunds)}
         </Text>
       )}
 
       {errorMessage.includes(ErrorMessage.InsufficientFundsForTransactionFee) && (
-        <Text style={[styles.errorMessage, sendType === 'nft' && GStyles.textAlignCenter]}>
+        <Text style={[styles.errorMessage, sendType === 'nft' && styles.nftErrorMessage]}>
           {t(ErrorMessage.InsufficientFundsForTransactionFee)}
         </Text>
       )}
@@ -442,7 +442,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
       )}
 
       {errorMessage.includes(ErrorMessage.InsufficientQuantity) && (
-        <Text style={[styles.errorMessage, GStyles.textAlignCenter]}>{t(ErrorMessage.InsufficientQuantity)}</Text>
+        <Text style={[styles.errorMessage, styles.nftErrorMessage]}>{t(ErrorMessage.InsufficientQuantity)}</Text>
       )}
 
       {/* Group 3 contact */}
