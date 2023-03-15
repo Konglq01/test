@@ -3,7 +3,7 @@ import { ChainType } from '@portkey-wallet/types';
 import SandboxEventTypes from 'messages/SandboxEventTypes';
 import SandboxEventService, { SandboxErrorCode } from 'service/SandboxEventService';
 
-export const removeOtherManagerInfo = async ({
+export const removeOtherManager = async ({
   rpcUrl,
   chainType,
   address, // contract address

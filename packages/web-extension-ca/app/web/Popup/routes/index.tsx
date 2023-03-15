@@ -21,7 +21,6 @@ import Contact from 'pages/Contacts/ContactDetail';
 import ManageDevices from 'pages/WalletSecurity/ManageDevices';
 import SetPin from 'pages/AccountSetting/SetPin';
 import WalletSecurity from 'pages/WalletSecurity';
-import ChangePin from 'pages/WalletSecurity/ManageDevices/ChangPin';
 
 export const PageRouter = () =>
   useRoutes([
@@ -110,8 +109,8 @@ export const PageRouter = () =>
       element: <ManageDevices />,
     },
     {
-      path: '/setting/wallet-security/manage-devices/change-pin',
-      element: <ChangePin />,
+      path: '/setting/wallet-security/manage-devices/verifier-account',
+      element: <VerifierAccount />,
     },
     {
       path: '/setting/wallet-security/manage-devices/guardian-approval',

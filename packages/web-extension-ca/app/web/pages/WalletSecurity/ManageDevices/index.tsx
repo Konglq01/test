@@ -1,18 +1,15 @@
-import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import BackHeader from 'components/BackHeader';
 import CustomSvg from 'components/CustomSvg';
-import EnterPin from './components/EnterPin';
-import DeviceLists from './components/DeviceLists';
-import DeviceDetail from './components/DeviceDetail';
+import DeviceDetail from './DeviceDetail';
 import { DeviceItemType, DeviceType } from '@portkey-wallet/types/types-ca/wallet';
 import { useCurrentWalletInfo, useDeviceList } from '@portkey-wallet/hooks/hooks-ca/wallet';
-import aes from '@portkey-wallet/utils/aes';
+import DeviceLists from './DeviceLists';
 import './index.less';
 
 export enum Stage {
-  'EnterPin',
   'DeviceLists',
   'DeviceDetails',
 }
@@ -20,45 +17,37 @@ export enum Stage {
 export default function ManageDevices() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [stage, setStage] = useState<Stage>(Stage.EnterPin);
-  const [curPin, setCurPin] = useState<string>('');
-  const [curDevice, setCurDevice] = useState<DeviceItemType>();
-  const walletInfo = useCurrentWalletInfo();
+  const { state: manageAddress } = useLocation();
+  const [stage, setStage] = useState<Stage>(Stage.DeviceLists);
   const deviceList = useDeviceList();
+  const [curDevice, setCurDevice] = useState<DeviceItemType>(deviceList?.[0]);
+  const walletInfo = useCurrentWalletInfo();
 
-  const showDeviceList = useMemo(() => {
-    return deviceList.map((device) => ({
-      ...device,
-      deviceTypeInfo: {
-        ...device.deviceTypeInfo,
-        // TODO
-        // name: aes.decrypt(curPin, device.deviceTypeInfo.name),
-      },
-    }));
-  }, [deviceList]);
-
-  const enterPinProps = useMemo(
-    () => ({
-      setStage,
-      setCurPin,
-    }),
-    [],
-  );
+  useEffect(() => {
+    if (manageAddress) {
+      const temp = deviceList.filter((d) => d.managerAddress === manageAddress);
+      if (temp.length) {
+        setCurDevice(temp[0]);
+        setStage(Stage.DeviceDetails);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [manageAddress]);
 
   const deviceListsProps = useMemo(
     () => ({
-      deviceList: showDeviceList,
+      deviceList,
       setCurDevice,
       handleNextStage: () => {
         setStage(Stage.DeviceDetails);
       },
     }),
-    [showDeviceList],
+    [deviceList],
   );
 
   const deviceDetailProps = useMemo(
     () => ({
-      deviceName: curDevice?.deviceTypeInfo.name || '',
+      device: curDevice,
       isCurrent: curDevice?.managerAddress === walletInfo.address,
     }),
     [curDevice, walletInfo],
@@ -67,20 +56,13 @@ export default function ManageDevices() {
   const stageObj = useMemo(
     () => ({
       0: {
-        title: t('Enter Pin'),
-        element: <EnterPin {...enterPinProps} />,
+        title: t('Login Devices'),
+        element: <DeviceLists {...deviceListsProps} />,
         backFn: () => {
           navigate('/setting/wallet-security');
         },
       },
       1: {
-        title: t('Devices'),
-        element: <DeviceLists {...deviceListsProps} />,
-        backFn: () => {
-          setStage(Stage.EnterPin);
-        },
-      },
-      2: {
         title: t('Device Details'),
         element: <DeviceDetail {...deviceDetailProps} />,
         backFn: () => {
@@ -88,7 +70,7 @@ export default function ManageDevices() {
         },
       },
     }),
-    [deviceDetailProps, deviceListsProps, enterPinProps, navigate, t],
+    [deviceDetailProps, deviceListsProps, navigate, t],
   );
 
   return (

@@ -32,7 +32,6 @@ import NFT from 'pages/NFT';
 import Contacts from 'pages/Contacts';
 import Contact from 'pages/Contacts/ContactDetail';
 import AccountSetting from 'pages/AccountSetting';
-import ChangePin from 'pages/WalletSecurity/ManageDevices/ChangPin';
 
 export const PageRouter = () =>
   useRoutes([
@@ -157,8 +156,8 @@ export const PageRouter = () =>
       element: <ManageDevices />,
     },
     {
-      path: '/setting/wallet-security/manage-devices/change-pin',
-      element: <ChangePin />,
+      path: '/setting/wallet-security/manage-devices/verifier-account',
+      element: <VerifierAccount />,
     },
     {
       path: '/setting/wallet-security/manage-devices/guardian-approval',

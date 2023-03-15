@@ -26,8 +26,13 @@ export default function DeviceLists({ setCurDevice, deviceList, handleNextStage 
 
   return (
     <div className="device-list">
+      <div className="desc">
+        {t(
+          "You may delete any device from the list, but you'll need to verify your identity through your guardians next time you log in to Portkey from the deleted device.",
+        )}
+      </div>
       {deviceList.map((item) => (
-        <div key={item.managerAddress} onClick={() => handleClick(item)}>
+        <div className="device-item flex" key={item.managerAddress} onClick={() => handleClick(item)}>
           <div className="content-item">
             <div className="item-desc">
               <div className="flex-center icon">
@@ -40,6 +45,7 @@ export default function DeviceLists({ setCurDevice, deviceList, handleNextStage 
               {item.loginTime && <div className="time">{dateFormat(item.loginTime)}</div>}
             </div>
           </div>
+          <CustomSvg type="LeftArrow" />
         </div>
       ))}
     </div>

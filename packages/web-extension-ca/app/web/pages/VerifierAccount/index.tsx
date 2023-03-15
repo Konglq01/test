@@ -110,6 +110,24 @@ export default function VerifierAccount() {
     ],
   );
 
+  const onSuccessInRemoveOtherManage = useCallback(
+    (res: VerifierInfo) => {
+      if (!currentGuardian) return;
+      const { guardianIdentifier } = handleVerificationDoc(res.verificationDoc);
+      dispatch(
+        setUserGuardianItemStatus({
+          key: currentGuardian.key,
+          status: VerifyStatus.Verified,
+          signature: res.signature,
+          verificationDoc: res.verificationDoc,
+          identifierHash: guardianIdentifier,
+        }),
+      );
+      navigate('/setting/wallet-security/manage-devices/guardian-approval', { state: state });
+    },
+    [currentGuardian, dispatch, navigate, state],
+  );
+
   const onSuccess = useCallback(
     async (res: VerifierInfo) => {
       if (state === 'register') {
@@ -129,11 +147,13 @@ export default function VerifierAccount() {
       } else if (state?.indexOf('guardians') !== -1) {
         onSuccessInGuardian(res);
         message.success('Verified Successful');
+      } else if (state?.indexOf('removeManage') !== -1) {
+        onSuccessInRemoveOtherManage(res);
       } else {
         message.error('Router state error');
       }
     },
-    [state, navigate, currentGuardian, dispatch, onSuccessInGuardian],
+    [state, dispatch, navigate, currentGuardian, onSuccessInGuardian, onSuccessInRemoveOtherManage],
   );
 
   const handleBack = useCallback(() => {
