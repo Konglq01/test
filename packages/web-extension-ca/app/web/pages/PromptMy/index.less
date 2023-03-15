@@ -27,6 +27,10 @@
   }
 
   .lock-row {
+    position: absolute;
+    bottom: 28px;
+    left: 0;
+    right: 0;
     cursor: pointer;
     svg path {
       fill: #5b8ef4;
@@ -46,6 +50,7 @@
     display: flex;
 
     .prompt-my-menu-list {
+      position: relative;
       width: 210px;
       padding: 20px 0;
       flex-shrink: 0;
@@ -53,6 +58,17 @@
       .menu-item {
         opacity: 0.6;
         border: none;
+        &.menu-item-common {
+          flex: 1;
+          .custom-svg {
+            width: 20px;
+            height: 20px;
+            svg {
+              width: 20px;
+              height: 20px;
+            }
+          }
+        }
         &.menu-item-selected {
           opacity: 1;
         }

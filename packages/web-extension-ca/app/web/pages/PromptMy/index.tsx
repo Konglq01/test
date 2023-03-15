@@ -12,6 +12,7 @@ import Wallet from 'pages/Wallet';
 import Guardians from 'pages/Guardians';
 import Contacts from 'pages/Contacts';
 import WalletSecurity from 'pages/WalletSecurity';
+import clsx from 'clsx';
 
 interface MyMenuItemInfo {
   label: string;
@@ -78,11 +79,11 @@ export default function PromptMy() {
           <div className="prompt-my-menu-list">
             {settingList.map((item) => (
               <MenuItem
-                className={item.key === curMenuInfo?.key ? 'menu-item-selected' : undefined}
+                className={clsx(['menu-item-common', item.key === curMenuInfo?.key ? 'menu-item-selected' : undefined])}
                 key={item.key}
-                height={44}
+                height={56}
                 // eslint-disable-next-line no-inline-styles/no-inline-styles
-                icon={<CustomSvg type={item.icon} style={{ width: 20, height: 20 }} />}
+                icon={<CustomSvg type={item.icon || 'Aelf'} />}
                 onClick={() =>
                   navigate(`/setting/${item.key}`, {
                     replace: true,

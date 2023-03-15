@@ -75,7 +75,6 @@ export const PageRouter = () =>
       path: '/setting/:menuKey',
       element: <PromptMy />,
     },
-
     {
       path: '/setting/guardians/add',
       element: <AddGuardian />,
@@ -96,7 +95,6 @@ export const PageRouter = () =>
       path: '/setting/guardians/guardian-approval',
       element: <GuardianApproval />,
     },
-
     {
       path: '/add-token',
       element: <AddToken />,
