@@ -15,7 +15,7 @@ interface MenuItemProps {
 const MenuItem: React.FC<MenuItemProps> = ({ title, icon, onPress, suffix }) => {
   return (
     <TouchableOpacity style={styles.itemWrap} onPress={() => onPress?.()}>
-      {icon && <Svg icon={icon} size={26} iconStyle={styles.menuIcon} />}
+      {icon && <Svg icon={icon} size={28} iconStyle={styles.menuIcon} />}
       <TextL style={styles.title}>{title}</TextL>
       {suffix !== undefined && <TextM>{suffix}</TextM>}
       <Svg icon="right-arrow" size={16} color={defaultColors.font7} />

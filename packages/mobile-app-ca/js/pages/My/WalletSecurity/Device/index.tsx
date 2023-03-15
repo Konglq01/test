@@ -7,6 +7,8 @@ import { TextM } from 'components/CommonText';
 import { useCurrentWalletInfo, useDeviceList } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import DeviceItem from './components/DeviceItem';
 import navigationService from 'utils/navigationService';
+import { FontStyles } from 'assets/theme/styles';
+import { pTd } from 'utils/unit';
 
 const DeviceList: React.FC = () => {
   const deviceList = useDeviceList();
@@ -14,13 +16,12 @@ const DeviceList: React.FC = () => {
 
   return (
     <PageContainer
-      titleDom={'Devices'}
+      titleDom={'Login Devices'}
       safeAreaColor={['blue', 'gray']}
       containerStyles={pageStyles.pageWrap}
       scrollViewProps={{ disabled: true }}>
-      <TextM>
-        Your wallet address is logged in on the following device, you can delete the device, after deletion, the device
-        will exit the wallet.
+      <TextM style={[FontStyles.font3, pageStyles.tipsWrap]}>
+        {`You may delete any device from the list, but you'll need to verify your identity through your guardians next time you log in to Portkey from the deleted device.`}
       </TextM>
       {deviceList.map(item => (
         <DeviceItem
@@ -39,8 +40,12 @@ const DeviceList: React.FC = () => {
 const pageStyles = StyleSheet.create({
   pageWrap: {
     flex: 1,
-    backgroundColor: defaultColors.bg1,
-    ...GStyles.paddingArg(0, 20, 18),
+    backgroundColor: defaultColors.bg4,
+    ...GStyles.paddingArg(24, 20, 18),
+  },
+  tipsWrap: {
+    lineHeight: pTd(20),
+    marginBottom: pTd(24),
   },
 });
 

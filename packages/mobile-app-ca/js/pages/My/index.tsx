@@ -41,7 +41,7 @@ const MenuList: Array<MenuItem> = [
   {
     name: 'WalletSecurity',
     label: 'Wallet Security',
-    icon: 'guardian',
+    icon: 'wallet-security',
   },
 ];
 

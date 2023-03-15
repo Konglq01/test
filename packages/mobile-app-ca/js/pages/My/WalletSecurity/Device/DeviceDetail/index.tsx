@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import PageContainer from 'components/PageContainer';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { defaultColors } from 'assets/theme';
 import GStyles from 'assets/theme/GStyles';
 import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
@@ -10,6 +10,9 @@ import { DeviceItemType } from '@portkey-wallet/types/types-ca/device';
 import CommonButton from 'components/CommonButton';
 import navigationService from 'utils/navigationService';
 import { ApprovalType } from '@portkey-wallet/types/verifier';
+import { TextM } from 'components/CommonText';
+import { FontStyles } from 'assets/theme/styles';
+import { pTd } from 'utils/unit';
 
 interface RouterParams {
   deviceItem?: DeviceItemType;
@@ -29,10 +32,16 @@ const DeviceDetail: React.FC = () => {
       safeAreaColor={['blue', 'gray']}
       containerStyles={pageStyles.pageWrap}
       scrollViewProps={{ disabled: true }}>
-      {deviceItem && <DeviceItem deviceItem={deviceItem} isCurrent={isCurrent} />}
+      <View>
+        {deviceItem && <DeviceItem deviceItem={deviceItem} isCurrent={isCurrent} />}
+        <TextM style={[FontStyles.font3, pageStyles.tipsWrap]}>
+          {`Your account is logged in on this device. You may delete this device to remove its access to your account. You'll need to verify your identity through your guardians next time you log in to Portkey from this device.`}
+        </TextM>
+      </View>
       {!isCurrent && (
         <CommonButton
-          type="primary"
+          type="clear"
+          titleStyle={pageStyles.deleteBtnTitle}
           onPress={() => {
             if (!deviceItem?.managerAddress) return;
             navigationService.navigate('GuardianApproval', {
@@ -50,8 +59,15 @@ const DeviceDetail: React.FC = () => {
 const pageStyles = StyleSheet.create({
   pageWrap: {
     flex: 1,
-    backgroundColor: defaultColors.bg1,
-    ...GStyles.paddingArg(0, 20, 18),
+    backgroundColor: defaultColors.bg4,
+    justifyContent: 'space-between',
+    ...GStyles.paddingArg(24, 20, 18),
+  },
+  tipsWrap: {
+    lineHeight: pTd(20),
+  },
+  deleteBtnTitle: {
+    color: defaultColors.font12,
   },
 });
 
