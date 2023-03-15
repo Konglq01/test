@@ -259,14 +259,12 @@ const SendHome: React.FC<SendHomeProps> = props => {
           )}
           <View style={styles.topLeft}>
             <TextL style={[styles.nftTitle, fonts.mediumFont]}>{`${assetInfo.alias} #${assetInfo?.tokenId}`} </TextL>
-            <TextS>{`Amount：${sendNumber}`}</TextS>
+            <TextS style={[FontStyles.font3]}>{`Amount：${sendNumber}`}</TextS>
           </View>
         </View>
       ) : (
         <>
-          <Text style={[styles.tokenCount, FontStyles.font3, fonts.mediumFont]}>
-            {`- ${sendNumber} ${assetInfo?.symbol}`}{' '}
-          </Text>
+          <Text style={[styles.tokenCount, fonts.mediumFont]}>{`- ${sendNumber} ${assetInfo?.symbol}`} </Text>
           {/* <TextM style={styles.tokenUSD}>-$ -</TextM> */}
         </>
       )}
@@ -300,7 +298,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
         {/* more Info */}
         <View style={styles.section}>
           <View style={[styles.flexSpaceBetween]}>
-            <TextM style={[styles.blackFontColor]}>{t('Network')}</TextM>
+            <TextM style={[styles.lightGrayFontColor]}>{t('Network')}</TextM>
             <TextM style={[styles.blackFontColor, GStyles.alignEnd]}>{formatChainInfoToShow(assetInfo.chainId)}</TextM>
           </View>
           <View style={[styles.flexSpaceBetween]}>

@@ -61,7 +61,7 @@ const AssetItem = (props: { symbol: string; onPress: (item: any) => void; item: 
 
             {/* TODO: why use currentNetwork   */}
             {currentNetwork ? (
-              <TextS numberOfLines={1} style={[FontStyles.font7, itemStyle.nftItemInfo]}>
+              <TextS numberOfLines={1} style={[FontStyles.font3, itemStyle.nftItemInfo]}>
                 {formatChainInfoToShow(chainId as ChainId, currentNetwork)}
               </TextS>
             ) : (
@@ -178,7 +178,6 @@ const AssetList = ({ account }: TokenListProps) => {
       <TextXL style={[styles.title, FontStyles.font5]}>{t('Select Assets')}</TextXL>
 
       {/* no assets in this account  */}
-      {/* '{ import { list } from 'pages/SettingsPage/HelpAndFeedBack/config';' has been removed } */}
       <CommonInput
         placeholder={t('Search Assets')}
         containerStyle={styles.containerStyle}
