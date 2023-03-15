@@ -69,7 +69,9 @@ const Item = ({ isTestnet, item, onHandleToken }: ItemProps) => {
             onPress={() => {
               onHandleToken(item, item.isAdded ? 'delete' : 'add');
             }}>
-            <CommonSwitch pointerEvents="none" value={!!item.isAdded} />
+            <View pointerEvents="none">
+              <CommonSwitch value={!!item.isAdded} />
+            </View>
           </TouchableOpacity>
         )}
       </View>
