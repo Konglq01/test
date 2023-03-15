@@ -15,9 +15,7 @@ export interface ModalBodyProps extends ViewProps {
 }
 
 export const ModalBody: React.FC<ModalBodyProps> = props => {
-  const { title, modalBodyType, children, style = {} } = props;
-
-  console.log(title);
+  const { modalBodyType, children, style = {} } = props;
 
   if (modalBodyType === 'bottom') {
     return (

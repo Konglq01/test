@@ -6,7 +6,6 @@ import { ModalBody } from 'components/ModalBody';
 import CommonInput from 'components/CommonInput';
 import { AccountType } from '@portkey-wallet/types/wallet';
 import { pTd } from 'utils/unit';
-import { screenHeight } from '@portkey-wallet/utils/mobile/device';
 import { useLanguage } from 'i18n/hooks';
 import useDebounce from 'hooks/useDebounce';
 import NoData from 'components/NoData';
@@ -22,6 +21,7 @@ import navigationService from 'utils/navigationService';
 import { IToSendHomeParamsType } from '@portkey-wallet/types/types-ca/routeParams';
 import { formatChainInfoToShow } from '@portkey-wallet/utils';
 import { ChainId } from '@portkey-wallet/types';
+import { useGStyles } from 'assets/theme/useGStyles';
 
 type onFinishSelectTokenType = (tokenItem: any) => void;
 type TokenListProps = {
@@ -92,6 +92,7 @@ const AssetList = ({ account }: TokenListProps) => {
   const { t } = useLanguage();
   const caAddresses = useCaAddresses();
   const [keyword, setKeyword] = useState('');
+  const gStyles = useGStyles();
 
   const debounceKeyword = useDebounce(keyword, 800);
 
@@ -174,7 +175,7 @@ const AssetList = ({ account }: TokenListProps) => {
   }, []);
 
   return (
-    <ModalBody modalBodyType="bottom" style={styles.modalStyle}>
+    <ModalBody modalBodyType="bottom" style={gStyles.overlayStyle}>
       <TextXL style={[styles.title, FontStyles.font5]}>{t('Select Assets')}</TextXL>
 
       {/* no assets in this account  */}
@@ -222,9 +223,6 @@ export default {
 };
 
 export const styles = StyleSheet.create({
-  modalStyle: {
-    height: screenHeight - pTd(100),
-  },
   title: {
     textAlign: 'center',
     height: pTd(22),
