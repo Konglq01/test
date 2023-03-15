@@ -65,7 +65,12 @@ const Item = ({ isTestnet, item, onHandleToken }: ItemProps) => {
         {item.isDefault ? (
           <Svg icon="lock" size={pTd(20)} iconStyle={itemStyle.addedStyle} />
         ) : (
-          <CommonSwitch value={!!item.isAdded} onChange={() => onHandleToken(item, item.isAdded ? 'delete' : 'add')} />
+          <TouchableOpacity
+            onPress={() => {
+              onHandleToken(item, item.isAdded ? 'delete' : 'add');
+            }}>
+            <CommonSwitch pointerEvents="none" value={!!item.isAdded} />
+          </TouchableOpacity>
         )}
       </View>
     </TouchableOpacity>
