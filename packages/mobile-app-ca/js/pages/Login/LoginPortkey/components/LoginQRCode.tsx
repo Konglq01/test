@@ -22,7 +22,7 @@ import { LoginQRData } from '@portkey-wallet/types/types-ca/qrcode';
 import phone from 'assets/image/pngs/phone.png';
 import QRCode from 'react-native-qrcode-svg';
 import { useIsFocused } from '@react-navigation/native';
-import { DEVICE_TYPE } from 'constants/common';
+import { useGetDeviceInfo } from 'hooks/device';
 
 export default function LoginQRCode({ setLoginType }: { setLoginType: (type: PageLoginType) => void }) {
   const { walletInfo, currentNetwork } = useCurrentWallet();
@@ -60,6 +60,8 @@ export default function LoginQRCode({ setLoginType }: { setLoginType: (type: Pag
       console.error(error);
     }
   }, [walletInfo]);
+
+  const getDeviceInfo = useGetDeviceInfo();
   useEffectOnce(() => {
     const timer = setTimeout(() => {
       generateWallet();
@@ -87,10 +89,10 @@ export default function LoginQRCode({ setLoginType }: { setLoginType: (type: Pag
       type: 'login',
       address: newWallet.address,
       netWorkType: currentNetwork,
-      deviceType: DEVICE_TYPE,
+      deviceInfo: getDeviceInfo(),
     };
     return JSON.stringify(data);
-  }, [currentNetwork, newWallet]);
+  }, [currentNetwork, getDeviceInfo, newWallet]);
   return (
     <View style={[BGStyles.bg1, styles.card]}>
       <Touchable style={styles.iconBox} onPress={() => setLoginType('email')}>

@@ -16,6 +16,7 @@ import GStyles from 'assets/theme/GStyles';
 import { FontStyles } from 'assets/theme/styles';
 import { useWallet } from 'hooks/store';
 import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
+import { formatChainInfoToShow } from '@portkey-wallet/utils';
 
 type RouterParams = {
   contact?: ContactItemType;
@@ -33,11 +34,7 @@ const ContactDetail: React.FC = () => {
           <TextM style={pageStyles.addressLabel}>
             ELF_{addressItem.address}_{addressItem.chainId}
           </TextM>
-          <TextS style={FontStyles.font3}>
-            {`${addressItem.chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${addressItem.chainId} ${
-              currentNetwork === 'TESTNET' ? 'Testnet' : ''
-            }`}
-          </TextS>
+          <TextS style={FontStyles.font3}>{formatChainInfoToShow(addressItem.chainId, currentNetwork)}</TextS>
         </View>
         <Touchable
           style={GStyles.marginTop(12)}
