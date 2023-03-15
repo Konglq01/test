@@ -19,7 +19,7 @@ export enum LoginType {
 
 export type LoginKeyType = string;
 
-export type ThreeWayLogin = 'Google' | 'Apple';
+export type ISocialLogin = 'Google' | 'Apple';
 
 export interface CAInfo {
   caAddress: string;

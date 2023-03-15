@@ -20,3 +20,12 @@ export const countryCodeList = countryCodeMap.countryCode;
 export const countryCode = getCountryCodeJSON(countryCodeList);
 
 export const countryCodeIndex = getCountryCodeIndex(countryCodeList);
+
+export const countryCodeFilter = (filterFelid: string) => {
+  filterFelid = filterFelid.toLocaleLowerCase();
+  if (/\d/.test(filterFelid)) {
+    return countryCodeList.filter(country => country.code.includes(filterFelid));
+  } else {
+    return countryCodeList.filter(country => country.country.toLocaleLowerCase().includes(filterFelid));
+  }
+};
