@@ -1,11 +1,11 @@
-import { ThreeWayLogin } from '@portkey-wallet/types/types-ca/wallet';
+import { ISocialLogin } from '@portkey-wallet/types/types-ca/wallet';
 import { Button } from 'antd';
 import { useCallback } from 'react';
-import { threeWayLoginAction } from 'utils/lib/serviceWorkerAction';
+import { socialLoginAction } from 'utils/lib/serviceWorkerAction';
 
 export default function Login() {
-  const login = useCallback(async (v: ThreeWayLogin) => {
-    const result = await threeWayLoginAction(v);
+  const login = useCallback(async (v: ISocialLogin) => {
+    const result = await socialLoginAction(v);
     console.log(result, 'Login====');
   }, []);
 
