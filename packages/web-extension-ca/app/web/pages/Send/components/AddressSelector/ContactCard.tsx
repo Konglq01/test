@@ -40,7 +40,9 @@ export default function ContactCard({ user, className, fromRecents = true, onCha
               <span className="address">
                 {`ELF_${formatStr2EllipsisStr(address.address, [6, 6])}_${address.chainId}`}
               </span>
-              <span className="network">{transNetworkText(address.chainId, isTestnet)}</span>
+              <span className={clsx(['network', isDisabled(address.address) ? 'disabled' : ''])}>
+                {transNetworkText(address.chainId, isTestnet)}
+              </span>
             </p>
           ))}
         </div>
