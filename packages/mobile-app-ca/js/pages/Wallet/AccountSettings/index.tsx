@@ -9,10 +9,6 @@ import { useLanguage } from 'i18n/hooks';
 
 const list: ListItemProps[] = [
   {
-    title: 'Devices',
-    onPress: () => navigationService.navigate('Devices'),
-  },
-  {
     title: 'Change Pin',
     onPress: () => navigationService.navigate('CheckPin'),
   },

@@ -146,3 +146,22 @@ export function removeManager(contract: ContractBasic, address: string, caHash: 
     },
   });
 }
+
+export function removeOtherManager(
+  contract: ContractBasic,
+  address: string,
+  caHash: string,
+  userGuardiansList: UserGuardianItem[],
+  guardiansStatus: GuardiansStatus,
+) {
+  const managerInfo = {
+    address,
+    extraData: new Date().getTime(),
+  };
+  const guardiansApproved = getGuardiansApproved(userGuardiansList, guardiansStatus);
+  return contract?.callSendMethod('RemoveOtherManagerInfo', address, {
+    caHash,
+    managerInfo,
+    guardiansApproved: guardiansApproved,
+  });
+}

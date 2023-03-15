@@ -17,11 +17,13 @@ import useEffectOnce from './useEffectOnce';
 import { setCredentials } from 'store/user/actions';
 import { DigitInputInterface } from 'components/DigitInput';
 import { GuardiansApproved } from 'pages/Guardian/types';
-import { DEVICE_TYPE } from 'constants/common';
+import { useGetDeviceInfo } from './device';
+import { extraDataEncode } from '@portkey-wallet/utils/device';
 
 export function useOnManagerAddressAndQueryResult() {
   const dispatch = useAppDispatch();
   const biometricsReady = useBiometricsReady();
+  const getDeviceInfo = useGetDeviceInfo();
   const timer = useRef<TimerResult>();
   useEffectOnce(() => {
     return () => {
@@ -53,7 +55,7 @@ export function useOnManagerAddressAndQueryResult() {
         let data: any = {
           loginGuardianIdentifier: managerInfo.loginAccount,
           manager: tmpWalletInfo.address,
-          extraData: `${DEVICE_TYPE},${Date.now()}`,
+          extraData: extraDataEncode(getDeviceInfo()),
           context: {
             clientId: tmpWalletInfo.address,
             requestId: tmpWalletInfo.address,

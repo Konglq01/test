@@ -1,6 +1,6 @@
 import { ErrorType } from 'types/common';
 import { Platform } from 'react-native';
-import { DeviceType } from '@portkey-wallet/types/types-ca/wallet';
+import { DeviceType } from '@portkey-wallet/types/types-ca/device';
 
 export const INIT_ERROR: ErrorType = {
   errorMsg: '',
@@ -18,13 +18,13 @@ export const DEVICE_TYPE: DeviceType = (() => {
   let deviceType: DeviceType;
   switch (Platform.OS) {
     case 'ios':
-      deviceType = DeviceType.ios;
+      deviceType = DeviceType.IOS;
       break;
     case 'android':
-      deviceType = DeviceType.android;
+      deviceType = DeviceType.ANDROID;
       break;
     default:
-      deviceType = DeviceType.other;
+      deviceType = DeviceType.OTHER;
       break;
   }
   return deviceType;

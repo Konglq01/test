@@ -2,7 +2,7 @@ import { defaultColors } from 'assets/theme';
 import { TextM } from 'components/CommonText';
 import Svg, { IconName } from 'components/Svg';
 import React, { memo } from 'react';
-import { TouchableOpacity, StyleSheet } from 'react-native';
+import { TouchableOpacity, StyleSheet, StyleProp, ViewStyle, TextProps } from 'react-native';
 import { pTd } from 'utils/unit';
 import gStyles from 'assets/theme/GStyles';
 
@@ -10,14 +10,26 @@ interface MenuItemProps {
   title: string;
   icon?: IconName;
   onPress?: () => void;
+  style?: StyleProp<ViewStyle>;
+  size?: number;
+  TextComponent?: React.FC<TextProps>;
+  arrowSize?: number;
 }
 
-const WalletMenuItem: React.FC<MenuItemProps> = ({ title, icon, onPress }) => {
+const WalletMenuItem: React.FC<MenuItemProps> = ({
+  title,
+  icon,
+  onPress,
+  style,
+  size = 24,
+  TextComponent = TextM,
+  arrowSize = 16,
+}) => {
   return (
-    <TouchableOpacity style={styles.itemWrap} onPress={() => onPress?.()}>
-      {icon && <Svg icon={icon} size={24} iconStyle={styles.menuIcon} />}
-      <TextM style={styles.title}>{title}</TextM>
-      <Svg icon="right-arrow" size={16} color={defaultColors.font7} />
+    <TouchableOpacity style={[styles.itemWrap, style]} onPress={() => onPress?.()}>
+      {icon && <Svg icon={icon} size={size} iconStyle={styles.menuIcon} />}
+      <TextComponent style={styles.title}>{title}</TextComponent>
+      <Svg icon="right-arrow3" size={arrowSize} color={defaultColors.font7} />
     </TouchableOpacity>
   );
 };
