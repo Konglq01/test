@@ -1,51 +1,37 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PageContainer from 'components/PageContainer';
 import { StyleSheet } from 'react-native';
 import { defaultColors } from 'assets/theme';
 import GStyles from 'assets/theme/GStyles';
 import { TextM } from 'components/CommonText';
-import CommonInput from 'components/CommonInput';
-import CommonButton from 'components/CommonButton';
+import { useCurrentWalletInfo, useDeviceList } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import DeviceItem from './components/DeviceItem';
 import navigationService from 'utils/navigationService';
 
-const DeviceUnlock: React.FC = () => {
-  const [devicePin, setDevicePin] = useState('');
+const DeviceList: React.FC = () => {
+  const deviceList = useDeviceList();
+  const walletInfo = useCurrentWalletInfo();
 
   return (
     <PageContainer
-      titleDom={''}
+      titleDom={'Devices'}
       safeAreaColor={['blue', 'gray']}
       containerStyles={pageStyles.pageWrap}
       scrollViewProps={{ disabled: true }}>
-      <TextM>Enter Pin</TextM>
       <TextM>
-        To protect the privacy and security of your assets You need to enter the pin to decrypt and view the device
-        details
+        Your wallet address is logged in on the following device, you can delete the device, after deletion, the device
+        will exit the wallet.
       </TextM>
-      <CommonInput
-        type="general"
-        theme="white-bg"
-        label="Enter Pin"
-        value={devicePin}
-        placeholder="Enter Pin"
-        maxLength={16}
-        onChangeText={setDevicePin}
-        keyboardType="number-pad"
-      />
-      <CommonButton
-        type="primary"
-        onPress={() => {
-          navigationService.navigate('DeviceList', { devicePin });
-        }}>
-        Confirm
-      </CommonButton>
-      <CommonButton
-        type="primary"
-        onPress={() => {
-          //
-        }}>
-        forget pin?
-      </CommonButton>
+      {deviceList.map(item => (
+        <DeviceItem
+          key={item.managerAddress}
+          deviceItem={item}
+          isCurrent={walletInfo.address === item.managerAddress}
+          onPress={() => {
+            navigationService.navigate('DeviceDetail', { deviceItem: item });
+          }}
+        />
+      ))}
     </PageContainer>
   );
 };
@@ -58,4 +44,4 @@ const pageStyles = StyleSheet.create({
   },
 });
 
-export default DeviceUnlock;
+export default DeviceList;

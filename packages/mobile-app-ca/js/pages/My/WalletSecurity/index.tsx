@@ -20,7 +20,7 @@ const WalletSecurity: React.FC = () => {
         title="Manage Devices"
         suffix={deviceList.length}
         onPress={() => {
-          navigationService.navigate('DeviceUnlock');
+          navigationService.navigate('DeviceList');
         }}
       />
     </PageContainer>

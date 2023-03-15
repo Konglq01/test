@@ -1,15 +1,11 @@
 import React, { memo } from 'react';
-import PageContainer from 'components/PageContainer';
 import { StyleSheet, View } from 'react-native';
 import { defaultColors } from 'assets/theme';
-import GStyles from 'assets/theme/GStyles';
 import { TextM, TextS, TextXL } from 'components/CommonText';
 import Touchable from 'components/Touchable';
 import { pTd } from 'utils/unit';
 import { FontStyles } from 'assets/theme/styles';
 import { formatTransferTime } from 'utils';
-import { useCurrentWalletInfo, useDeviceList } from '@portkey-wallet/hooks/hooks-ca/wallet';
-import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
 import { DeviceItemType } from '@portkey-wallet/types/types-ca/device';
 
 interface DeviceItemProps {
@@ -36,6 +32,8 @@ const DeviceItemRender = ({ onPress, isCurrent, deviceItem }: DeviceItemProps) =
 };
 const DeviceItem = memo(DeviceItemRender);
 
+export default DeviceItem;
+
 const deviceItemStyles = StyleSheet.create({
   deviceItemWrap: {
     justifyContent: 'center',
@@ -61,42 +59,3 @@ const deviceItemStyles = StyleSheet.create({
     color: defaultColors.font3,
   },
 });
-
-interface RouterParams {
-  devicePin: string;
-}
-const DeviceList: React.FC = () => {
-  const { devicePin } = useRouterParams<RouterParams>();
-  const deviceList = useDeviceList(devicePin);
-  const walletInfo = useCurrentWalletInfo();
-
-  return (
-    <PageContainer
-      titleDom={'Devices'}
-      safeAreaColor={['blue', 'gray']}
-      containerStyles={pageStyles.pageWrap}
-      scrollViewProps={{ disabled: true }}>
-      <TextM>
-        Your wallet address is logged in on the following device, you can delete the device, after deletion, the device
-        will exit the wallet.
-      </TextM>
-      {deviceList.map(item => (
-        <DeviceItem
-          key={item.managerAddress}
-          deviceItem={item}
-          isCurrent={walletInfo.address === item.managerAddress}
-        />
-      ))}
-    </PageContainer>
-  );
-};
-
-const pageStyles = StyleSheet.create({
-  pageWrap: {
-    flex: 1,
-    backgroundColor: defaultColors.bg1,
-    ...GStyles.paddingArg(0, 20, 18),
-  },
-});
-
-export default DeviceList;

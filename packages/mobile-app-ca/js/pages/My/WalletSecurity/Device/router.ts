@@ -1,14 +1,14 @@
-import DeviceUnlock from '.';
-import DeviceList from './DeviceList';
+import DeviceList from './';
+import DeviceDetail from './DeviceDetail';
 
 const stackNav = [
   {
-    name: 'DeviceUnlock',
-    component: DeviceUnlock,
-  },
-  {
     name: 'DeviceList',
     component: DeviceList,
+  },
+  {
+    name: 'DeviceDetail',
+    component: DeviceDetail,
   },
 ] as const;
 
