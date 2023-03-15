@@ -20,6 +20,7 @@ export const defaultColors = {
   bg11: '#FEF6E7',
   bg12: '#BDD2FB',
   bg13: '#0075FF',
+  bg14: '#CEDDFC',
 
   font1: '#464B53',
   font2: 'white',
