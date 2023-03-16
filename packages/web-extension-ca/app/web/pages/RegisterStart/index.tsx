@@ -6,13 +6,13 @@ import ScanCard from './components/ScanCard';
 import SignCard from './components/SignCard';
 import { useCurrentNetworkInfo, useNetworkList } from '@portkey-wallet/hooks/hooks-ca/network';
 import { useCallback, useMemo } from 'react';
-import './index.less';
 import { useAppDispatch } from 'store/Provider/hooks';
 import { changeNetworkType } from '@portkey-wallet/store/store-ca/wallet/actions';
 import { NetworkType } from '@portkey-wallet/types';
 import CommonSelect from 'components/CommonSelect1';
 import { useChangeNetwork } from 'hooks/useChangeNetwork';
 import i18n from 'i18n';
+import './index.less';
 
 export default function RegisterStart() {
   const { type } = useParams();
@@ -53,21 +53,17 @@ export default function RegisterStart() {
         <div>
           {type === 'create' && <SignCard />}
           {type === 'scan' && <ScanCard />}
-          {(!type || type === 'login') && (
-            <>
-              <LoginCard />
-              <div className="network-list-wrapper">
-                <CommonSelect
-                  className="network-list-select"
-                  value={currentNetwork.networkType}
-                  items={selectItems}
-                  onChange={networkChange}
-                  showArrow={false}
-                  getPopupContainer={(triggerNode) => triggerNode.parentElement}
-                />
-              </div>
-            </>
-          )}
+          {(!type || type === 'login') && <LoginCard />}
+          <div className="network-list-wrapper">
+            <CommonSelect
+              className="network-list-select"
+              value={currentNetwork.networkType}
+              items={selectItems}
+              onChange={networkChange}
+              showArrow={false}
+              getPopupContainer={(triggerNode) => triggerNode.parentElement}
+            />
+          </div>
         </div>
       </div>
     </div>

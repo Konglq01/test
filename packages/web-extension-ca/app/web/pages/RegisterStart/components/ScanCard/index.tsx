@@ -63,7 +63,7 @@ export default function ScanCard() {
   }, [caWallet, dispatch, navigate, newWallet]);
 
   return (
-    <div className="login-card scan-card-wrapper">
+    <div className="register-start-card scan-card-wrapper">
       <h2 className="title">
         Scan code to log in
         <CustomSvg type="PC" onClick={() => navigate('/register/start')} />

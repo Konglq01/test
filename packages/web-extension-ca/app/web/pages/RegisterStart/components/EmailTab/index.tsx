@@ -1,48 +1,85 @@
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
+import { handleErrorCode, handleErrorMessage } from '@portkey-wallet/utils';
+import { EmailError } from '@portkey-wallet/utils/check';
 import { Button } from 'antd';
+import i18n from 'i18n';
 import { useCallback, useRef, useState } from 'react';
-import EmailInput, { EmailInputInstance } from 'pages/RegisterStart/components/EmailInput';
 import { useTranslation } from 'react-i18next';
-import './index.less';
-import { NetworkItem } from '@portkey-wallet/types/types-ca/network';
-import { ChainItemType } from '@portkey-wallet/store/store-ca/wallet/type';
+import { RegisterType } from 'types/wallet';
+import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
+import EmailInput, { EmailInputInstance } from '../EmailInput';
 
 interface EmailTabProps {
-  onSuccess: (email: string) => void;
-  currentNetwork: NetworkItem;
-  isTermsChecked?: boolean;
-  currentChain?: ChainItemType;
+  type: RegisterType;
+  onFinish?: (email: string) => void;
 }
 
-export default function EmailTab({ currentNetwork, currentChain, onSuccess }: EmailTabProps) {
-  const [error, setError] = useState<string>();
+export default function EmailTab({ type, onFinish }: EmailTabProps) {
+  const currentNetwork = useCurrentNetworkInfo();
+  const currentChain = useCurrentChain();
   const [val, setVal] = useState<string>();
-  const emailInputInstance = useRef<EmailInputInstance>();
+  const [error, setError] = useState<string>();
   const { t } = useTranslation();
-
-  const onSignUp = useCallback(async () => {
+  const emailInputInstance = useRef<EmailInputInstance>();
+  const onClick = useCallback(async () => {
     try {
-      await emailInputInstance?.current?.validateEmail(val, 'registered');
-      val && onSuccess(val);
+      await emailInputInstance?.current?.validateEmail(val);
+      val && onFinish?.(val);
     } catch (error: any) {
       setError(error);
     }
-  }, [onSuccess, val]);
+  }, [onFinish, val]);
+
+  const validateEmail = useCallback(
+    async (email?: string, type?: RegisterType | undefined) => {
+      //
+      if (!currentChain) throw 'Could not find chain information';
+      let isHasAccount = false;
+      try {
+        const checkResult = await getHolderInfo({
+          rpcUrl: currentChain.endPoint,
+          address: currentChain.caContractAddress,
+          chainType: currentNetwork.walletType,
+          paramsOption: {
+            guardianIdentifier: email as string,
+          },
+        });
+        if (checkResult.guardianList?.guardians?.length > 0) {
+          isHasAccount = true;
+        }
+      } catch (error: any) {
+        const code = handleErrorCode(error);
+        if (code?.toString === '3002') {
+          isHasAccount = false;
+        } else {
+          throw handleErrorMessage(error || 'GetHolderInfo error');
+        }
+      }
+
+      if (type === 'signUp') {
+        if (isHasAccount) throw i18n.t(EmailError.alreadyRegistered);
+      } else {
+        if (!isHasAccount) throw i18n.t(EmailError.noAccount);
+      }
+    },
+    [currentChain, currentNetwork.walletType],
+  );
 
   return (
     <div className="email-sign-wrapper">
       <EmailInput
-        currentNetwork={currentNetwork}
-        currentChain={currentChain}
         val={val}
         ref={emailInputInstance}
+        validate={validateEmail}
         error={error}
         onChange={(v) => {
           setError(undefined);
           setVal(v);
         }}
       />
-      <Button className="login-primary-btn" type="primary" disabled={!val || !!error} onClick={onSignUp}>
-        {t('Sign Up')}
+      <Button className="login-primary-btn" type="primary" disabled={!val || !!error} onClick={onClick}>
+        {type === 'signUp' ? t('Sign Up') : t('Login')}
       </Button>
     </div>
   );

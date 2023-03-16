@@ -22,7 +22,7 @@ export const countryCode = getCountryCodeJSON(countryCodeList);
 export const countryCodeIndex = getCountryCodeIndex(countryCodeList);
 
 export const countryCodeFilter = (filterFelid: string) => {
-  filterFelid = filterFelid.toLocaleLowerCase();
+  if (!filterFelid) return countryCodeList;
   if (/\d/.test(filterFelid)) {
     return countryCodeList.filter(country => country.code.includes(filterFelid));
   } else {

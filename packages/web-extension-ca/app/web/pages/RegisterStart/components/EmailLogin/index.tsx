@@ -9,6 +9,11 @@ import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import useGuardianList from 'hooks/useGuardianList';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import { RegisterType } from 'types/wallet';
+import { handleErrorCode, handleErrorMessage } from '@portkey-wallet/utils';
+import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
+import i18n from 'i18n';
+import { EmailError } from '@portkey-wallet/utils/check';
 import './index.less';
 
 export default function EmailLogin() {
@@ -43,7 +48,7 @@ export default function EmailLogin() {
     try {
       if (!val) return message.error('No Account');
       setLoading(true);
-      await emailInputInstance?.current?.validateEmail(val, 'login');
+      await emailInputInstance?.current?.validateEmail(val);
       loginHandler(val);
       dispatch(resetGuardiansState());
       await fetchUserVerifier({ guardianIdentifier: val });
@@ -57,14 +62,48 @@ export default function EmailLogin() {
     }
   }, [val, dispatch, fetchUserVerifier, loginHandler, navigate, setLoading]);
 
+  const validateEmail = useCallback(
+    async (email?: string, type?: RegisterType | undefined) => {
+      //
+      if (!currentChain) throw 'Could not find chain information';
+      let isHasAccount = false;
+      try {
+        const checkResult = await getHolderInfo({
+          rpcUrl: currentChain.endPoint,
+          address: currentChain.caContractAddress,
+          chainType: currentNetwork.walletType,
+          paramsOption: {
+            guardianIdentifier: email as string,
+          },
+        });
+        if (checkResult.guardianList?.guardians?.length > 0) {
+          isHasAccount = true;
+        }
+      } catch (error: any) {
+        const code = handleErrorCode(error);
+        if (code?.toString === '3002') {
+          isHasAccount = false;
+        } else {
+          throw handleErrorMessage(error || 'GetHolderInfo error');
+        }
+      }
+
+      if (type === 'signUp') {
+        if (isHasAccount) throw i18n.t(EmailError.alreadyRegistered);
+      } else {
+        if (!isHasAccount) throw i18n.t(EmailError.noAccount);
+      }
+    },
+    [currentChain, currentNetwork.walletType],
+  );
+
   return (
     <div className="email-login-wrapper">
       <EmailInput
-        currentNetwork={currentNetwork}
         val={val}
         ref={emailInputInstance}
         error={error}
-        currentChain={currentChain}
+        validate={validateEmail}
         onChange={(v) => {
           setError(undefined);
           setVal(v);
