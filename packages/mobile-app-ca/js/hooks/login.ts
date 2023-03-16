@@ -1,8 +1,13 @@
 import { CurrentWalletType } from '@portkey-wallet/hooks/hooks-ca/wallet';
-import { createWallet, setCAInfo, setManagerInfo } from '@portkey-wallet/store/store-ca/wallet/actions';
+import {
+  createWallet,
+  getChainListAsync,
+  setCAInfo,
+  setManagerInfo,
+} from '@portkey-wallet/store/store-ca/wallet/actions';
 import { CAInfo, LoginType, ManagerInfo } from '@portkey-wallet/types/types-ca/wallet';
 import { VerificationType, VerifierInfo } from '@portkey-wallet/types/verifier';
-import { sleep } from '@portkey-wallet/utils';
+import { handleErrorCode, sleep } from '@portkey-wallet/utils';
 import Loading from 'components/Loading';
 import AElf from 'aelf-sdk';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
@@ -19,6 +24,10 @@ import { DigitInputInterface } from 'components/DigitInput';
 import { GuardiansApproved } from 'pages/My/Guardian/types';
 import { useGetDeviceInfo } from './device';
 import { extraDataEncode } from '@portkey-wallet/utils/device';
+import { DEVICE_TYPE } from 'constants/common';
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { useGetGuardiansInfo, useGetVerifierServers } from './guardian';
+import { handleUserGuardiansList } from '@portkey-wallet/utils/guardian';
 
 export function useOnManagerAddressAndQueryResult() {
   const dispatch = useAppDispatch();
@@ -132,4 +141,40 @@ export function useOnManagerAddressAndQueryResult() {
 
 export function useIntervalGetResult() {
   return useCallback((params: IntervalGetResultParams) => intervalGetResult(params), []);
+}
+
+export function useOnLogin() {
+  const chainInfo = useCurrentChain('AELF');
+  const dispatch = useAppDispatch();
+  const getVerifierServers = useGetVerifierServers();
+  const getGuardiansInfo = useGetGuardiansInfo();
+  return useCallback(
+    async (loginAccount: string) => {
+      try {
+        let _chainInfo;
+        if (!chainInfo) {
+          const chainList = await dispatch(getChainListAsync());
+          if (Array.isArray(chainList.payload)) _chainInfo = chainList.payload[1];
+        }
+        const verifierServers = await getVerifierServers(_chainInfo);
+        const holderInfo = await getGuardiansInfo({ guardianIdentifier: loginAccount }, _chainInfo);
+        if (holderInfo?.guardianAccounts || holderInfo?.guardianList) {
+          // login
+          navigationService.navigate('GuardianApproval', {
+            loginAccount,
+            userGuardiansList: handleUserGuardiansList(holderInfo, verifierServers),
+          });
+        } else {
+          navigationService.navigate('SelectVerifier', { loginAccount, loginType: LoginType.Email });
+        }
+      } catch (error) {
+        if (handleErrorCode(error) === '3002') {
+          navigationService.navigate('SelectVerifier', { loginAccount, loginType: LoginType.Email });
+        } else {
+          throw error;
+        }
+      }
+    },
+    [chainInfo, dispatch, getGuardiansInfo, getVerifierServers],
+  );
 }

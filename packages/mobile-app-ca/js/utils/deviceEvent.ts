@@ -8,6 +8,7 @@ const EventList = [
   'clearQRWallet',
   'clearSignupInput',
   'refreshGuardiansList',
+  'setCountry',
 ] as const;
 
 // eslint-disable-next-line no-new-func

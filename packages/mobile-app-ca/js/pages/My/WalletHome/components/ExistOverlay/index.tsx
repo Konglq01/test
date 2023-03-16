@@ -49,7 +49,7 @@ const ExistOverlay = ({ callBack }: ExistOverlayProps) => {
 };
 
 const showExistOverlay = (params: ExistOverlayProps) => {
-  OverlayModal.show(<ExistOverlay {...params} />, { position: 'center' });
+  OverlayModal.show(<ExistOverlay {...params} />, { type: 'zoomOut', position: 'center' });
 };
 
 export default {

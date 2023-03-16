@@ -22,9 +22,23 @@ export const countryCode = getCountryCodeJSON(countryCodeList);
 export const countryCodeIndex = getCountryCodeIndex(countryCodeList);
 
 export const countryCodeFilter = (filterFelid: string) => {
-  filterFelid = filterFelid.toLocaleLowerCase();
+  if (!filterFelid) return countryCodeList;
   if (/\d/.test(filterFelid)) {
-    return countryCodeList.filter(country => country.code.includes(filterFelid));
+    // all numbers
+    const numStr = filterFelid.match(/\d+/g)?.join('').trim();
+    // all non-numeric
+    const str = filterFelid
+      .match(/[^0-9]/g)
+      ?.join('')
+      .trim();
+    const list: CountryItem[] = [];
+    if (numStr) {
+      list.push(...countryCodeList.filter(country => country.code.includes(numStr)));
+    }
+    if (str) {
+      list.push(...countryCodeList.filter(country => country.country.toLocaleLowerCase().includes(str)));
+    }
+    return Array.from(new Set(list));
   } else {
     return countryCodeList.filter(country => country.country.toLocaleLowerCase().includes(filterFelid));
   }

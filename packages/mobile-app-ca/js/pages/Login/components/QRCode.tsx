@@ -11,7 +11,7 @@ import styles from '../styles';
 import Touchable from 'components/Touchable';
 import GStyles from 'assets/theme/GStyles';
 import { TextL, TextM, TextXXXL } from 'components/CommonText';
-import { PageLoginType } from '..';
+import { PageLoginType } from '../types';
 import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { WalletInfoType } from '@portkey-wallet/types/wallet';
 import { usePin } from 'hooks/store';
@@ -20,11 +20,11 @@ import CommonToast from 'components/CommonToast';
 import { handleWalletInfo } from '@portkey-wallet/utils/wallet';
 import { LoginQRData } from '@portkey-wallet/types/types-ca/qrcode';
 import phone from 'assets/image/pngs/phone.png';
-import QRCode from 'react-native-qrcode-svg';
+import RQRCode from 'react-native-qrcode-svg';
 import { useIsFocused } from '@react-navigation/native';
 import { useGetDeviceInfo } from 'hooks/device';
 
-export default function LoginQRCode({ setLoginType }: { setLoginType: (type: PageLoginType) => void }) {
+export default function QRCode({ setLoginType }: { setLoginType: (type: PageLoginType) => void }) {
   const { walletInfo, currentNetwork } = useCurrentWallet();
   const [newWallet, setNewWallet] = useState<WalletInfoType>();
   const dispatch = useAppDispatch();
@@ -95,7 +95,7 @@ export default function LoginQRCode({ setLoginType }: { setLoginType: (type: Pag
   }, [currentNetwork, getDeviceInfo, newWallet]);
   return (
     <View style={[BGStyles.bg1, styles.card]}>
-      <Touchable style={styles.iconBox} onPress={() => setLoginType('email')}>
+      <Touchable style={styles.iconBox} onPress={() => setLoginType(PageLoginType.referral)}>
         <Image source={phone} style={styles.iconStyle} />
       </Touchable>
       <TextXXXL style={[styles.qrCodeTitle, GStyles.textAlignCenter]}>Scan code to log in</TextXXXL>
@@ -106,7 +106,7 @@ export default function LoginQRCode({ setLoginType }: { setLoginType: (type: Pag
             <TextL>Updating...</TextL>
           </View>
         )}
-        <QRCode value={qrData} size={200} />
+        <RQRCode value={qrData} size={200} />
       </View>
     </View>
   );
