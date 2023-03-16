@@ -25,6 +25,9 @@ export default function AmountNFT(props: AmountNFT) {
           keyboardType="numeric"
           maxLength={18}
           value={sendNumber}
+          onFocus={() => {
+            if (sendNumber === '0') setSendNumber('');
+          }}
           onChangeText={(v: string) => setSendNumber(v.replace(/^(0+)|[^\d]+/g, ''))}
         />
       </View>

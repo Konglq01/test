@@ -1,8 +1,11 @@
 @import '../../../../assets/theme/color.less';
 .send-preview {
+  max-height: 423px;
+  overflow-y: overlay;
   background-color: white;
   display: flex;
   flex-direction: column;
+  padding-bottom: 48px;
   .amount-preview {
     display: flex;
     flex-direction: column;
@@ -134,16 +137,15 @@
     }
   }
   .fee-preview {
-    padding: 0 24px;
+    padding: 0 24px 16px;
     gap: 20px;
-    // height: 135px;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     color: @font-11;
     /* stylelint-disable-next-line no-descending-specificity */
     .label {
-      width: fit-content;
+      width: 120px;
       font-size: 14px;
       line-height: 20px;
     }

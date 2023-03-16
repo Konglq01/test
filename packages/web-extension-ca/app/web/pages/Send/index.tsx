@@ -183,7 +183,7 @@ export default function Send() {
           return TransactionError.TOKEN_NOT_ENOUGH;
         }
         if (isCrossChain(toAccount.address, chainInfo?.chainId ?? 'AELF') && symbol === 'ELF') {
-          if (ZERO.plus(CROSS_FEE).isGreaterThan(ZERO.plus(amount))) {
+          if (ZERO.plus(CROSS_FEE).isGreaterThanOrEqualTo(ZERO.plus(amount))) {
             return TransactionError.CROSS_NOT_ENOUGH;
           }
         }
@@ -456,11 +456,19 @@ export default function Send() {
         </div>
       )}
       <div className="stage-ele">{StageObj[stage].element}</div>
-      <div className="btn-wrap">
-        <Button disabled={btnDisabled} className="stage-btn" type="primary" onClick={StageObj[stage].handler}>
-          {StageObj[stage].btnText}
-        </Button>
-      </div>
+      {stage === Stage.Preview ? (
+        <div className="btn-wrap">
+          <Button disabled={btnDisabled} className="stage-btn" type="primary" onClick={StageObj[stage].handler}>
+            {StageObj[stage].btnText}
+          </Button>
+        </div>
+      ) : (
+        <p className="btn-wrap">
+          <Button disabled={btnDisabled} className="stage-btn" type="primary" onClick={StageObj[stage].handler}>
+            {StageObj[stage].btnText}
+          </Button>
+        </p>
+      )}
     </div>
   );
 }

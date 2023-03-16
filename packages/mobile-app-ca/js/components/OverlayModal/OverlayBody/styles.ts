@@ -28,7 +28,7 @@ export const overlayStyles = StyleSheet.create({
     paddingTop: 14,
     paddingBottom: 7,
     alignItems: 'center',
-    borderBottomWidth: 1,
+    borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: defaultColors.border6,
   },
   headerIcon: {

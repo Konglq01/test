@@ -25,6 +25,7 @@ const TokenListItem: React.FC<TokenListItemType> = props => {
   return (
     <TouchableOpacity style={itemStyle.wrap} onPress={() => onPress?.(item)}>
       <CommonAvatar
+        hasBorder
         style={itemStyle.left}
         title={item?.symbol}
         avatarSize={pTd(48)}
@@ -36,7 +37,7 @@ const TokenListItem: React.FC<TokenListItemType> = props => {
           <TextL numberOfLines={1} ellipsizeMode={'tail'} style={itemStyle.tokenName}>
             {item?.symbol}
           </TextL>
-          <TextS numberOfLines={1} style={[FontStyles.font7, itemStyle.chainInfo]}>
+          <TextS numberOfLines={1} style={[FontStyles.font3, itemStyle.chainInfo]}>
             {formatChainInfoToShow(item?.chainId, currentNetwork)}
           </TextS>
         </View>

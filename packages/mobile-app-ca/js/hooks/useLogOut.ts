@@ -14,6 +14,8 @@ import { resetContactAction } from '@portkey-wallet/store/store-ca/contact/actio
 import { request } from '@portkey-wallet/api/api-did';
 import { clearRecent } from '@portkey-wallet/store/store-ca/recent/slice';
 
+import { clearActivity } from '@portkey-wallet/store/store-ca/activity/slice';
+
 export default function useLogOut() {
   const dispatch = useAppDispatch();
   return useCallback(() => {
@@ -22,6 +24,7 @@ export default function useLogOut() {
       dispatch(resetUser());
       dispatch(clearAssets());
       dispatch(clearRecent());
+      dispatch(clearActivity());
       dispatch(resetSettings());
       dispatch(resetNetwork());
       dispatch(resetGuardiansState());

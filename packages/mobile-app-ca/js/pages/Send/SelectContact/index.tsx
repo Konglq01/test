@@ -91,8 +91,16 @@ export default function SelectContact(props: SelectContactProps) {
   );
 
   // init Recent
+  // init Recent
   useEffectOnce(() => {
-    dispatch(fetchRecentListAsync({ caAddress: walletInfo?.[chainId]?.caAddress || '', isFirstTime: true }));
+    fetchRecents().then(res => {
+      const { data, totalRecordCount } = res;
+
+      setSkipCount(MAX_RESULT_ACCOUNT);
+      setLoading(false);
+      setRecentList(transFormData(data as ApiRecentAddressItemType[]));
+      setRecentTotalNumber(totalRecordCount);
+    });
   });
 
   // fetchMoreRecent

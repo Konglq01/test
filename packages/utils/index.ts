@@ -199,3 +199,10 @@ export const formatAddress2NoPrefix = (address: string): string => {
   }
   return address;
 };
+
+/**
+ * check current networkType
+ * @param network
+ * @returns
+ */
+export const isMainNet = (network: NetworkType): boolean => network === 'MAIN';

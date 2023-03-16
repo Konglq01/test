@@ -48,8 +48,6 @@ export default function ActivityList({ data, chainId, hasMore, loadMore }: IActi
   };
 
   const nav = useNavigate();
-  console.log('activity', activity);
-  console.log('activity chainList', chainList);
 
   const navToDetail = useCallback(
     (item: ActivityItemType) => {

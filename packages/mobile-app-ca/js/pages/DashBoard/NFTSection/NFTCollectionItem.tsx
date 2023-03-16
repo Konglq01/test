@@ -54,7 +54,6 @@ export default function NFTItem(props: NFTItemPropsType) {
   );
 
   useEffect(() => {
-    // console.log('xxxx', children?.length, collapsed, !children?.length && !collapsed);
     setOpen(!!children?.length && !collapsed);
   }, [children, collapsed, openCollectionInfo]);
 
@@ -72,7 +71,7 @@ export default function NFTItem(props: NFTItemPropsType) {
     <View style={styles.wrap}>
       <Touchable
         onPressWithSecond={500}
-        style={[styles.topSeries, !open && styles.marginBottom0]}
+        style={[styles.topSeries]}
         onPress={() => {
           if (openCollectionObj?.[`${symbol}${chainId}`]) {
             closeItem(symbol, chainId);
@@ -88,7 +87,9 @@ export default function NFTItem(props: NFTItemPropsType) {
         />
         <CommonAvatar imageUrl={imageUrl} title={collectionName} shapeType={'square'} style={styles.avatarStyle} />
         <View style={styles.topSeriesCenter}>
-          <TextL style={styles.nftSeriesName}>{collectionName}</TextL>
+          <TextL style={styles.nftSeriesName} ellipsizeMode="tail">
+            {collectionName}
+          </TextL>
           <TextS style={styles.nftSeriesChainInfo}>
             {`${chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${chainId} ${currentNetwork !== 'MAIN' && 'Testnet'}`}
           </TextS>
@@ -99,10 +100,14 @@ export default function NFTItem(props: NFTItemPropsType) {
         </View>
       </Touchable>
       <Collapsible collapsed={!open}>
-        <View style={[styles.listWrap, open && hasMore && styles.marginBottom0]}>
+        <View style={[styles.listWrap]}>
           {showChildren?.map((ele: any, index: number) => (
             <NFTAvatar
-              style={[styles.itemAvatarStyle, index % 3 === 2 ? styles.noMarginRight : {}]}
+              style={[
+                styles.itemAvatarStyle,
+                index < 3 ? styles.marginTop0 : {},
+                index % 3 === 2 ? styles.marginRight0 : {},
+              ]}
               key={ele.symbol}
               data={ele}
               onPress={() => {
@@ -113,7 +118,7 @@ export default function NFTItem(props: NFTItemPropsType) {
         </View>
         {hasMore && (
           <Touchable
-            style={styles.loadMore}
+            style={[styles.loadMore]}
             onPress={() => loadMoreItem?.(symbol, chainId, openCollectionInfo?.pageNum)}>
             <TextM style={FontStyles.font4}>More</TextM>
             <Svg icon="down-arrow" size={pTd(16)} color={defaultColors.primaryColor} iconStyle={styles.downArrow} />
@@ -146,7 +151,6 @@ const styles = StyleSheet.create({
     paddingLeft: pTd(44),
     paddingRight: pTd(20),
     marginTop: pTd(16),
-    marginBottom: pTd(16),
   },
   touchIcon: {
     marginRight: pTd(10),
@@ -169,7 +173,7 @@ const styles = StyleSheet.create({
   },
   itemAvatarStyle: {
     marginRight: pTd(8),
-    marginBottom: pTd(8),
+    marginTop: pTd(8),
   },
   noMarginRight: {
     marginRight: 0,
@@ -183,6 +187,7 @@ const styles = StyleSheet.create({
     paddingLeft: pTd(44),
     paddingRight: pTd(21),
     textAlign: 'center',
+    marginTop: pTd(16),
   },
   downArrow: {
     marginLeft: pTd(4),
@@ -196,5 +201,11 @@ const styles = StyleSheet.create({
   },
   marginBottom0: {
     marginBottom: 0,
+  },
+  marginTop0: {
+    marginTop: 0,
+  },
+  marginRight0: {
+    marginRight: 0,
   },
 });

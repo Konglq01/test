@@ -42,8 +42,6 @@ export default function ConfirmPin() {
     verifierInfo,
     guardiansApproved,
   } = useRouterParams<RouterParams>();
-  console.log(verifierInfo, managerInfo, guardiansApproved, '====verifierInfo');
-
   const biometricsReady = useBiometricsReady();
 
   const [errorMessage, setErrorMessage] = useState<string>();
@@ -122,6 +120,9 @@ export default function ConfirmPin() {
       titleDom
       type="leftBack"
       backTitle={oldPin ? 'Change Pin' : undefined}
+      onGestureStartCallback={() => {
+        myEvents.clearSetPin.emit('clearSetPin');
+      }}
       leftCallback={() => {
         myEvents.clearSetPin.emit('clearSetPin');
         navigationService.goBack();

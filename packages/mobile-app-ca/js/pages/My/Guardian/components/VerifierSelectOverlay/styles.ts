@@ -7,7 +7,7 @@ const styles = StyleSheet.create({
     height: pTd(76),
     flexDirection: 'row',
     alignItems: 'center',
-    borderBottomWidth: 1,
+    borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: defaultColors.border6,
   },
   itemContent: {
