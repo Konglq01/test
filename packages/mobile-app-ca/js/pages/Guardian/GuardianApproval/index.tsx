@@ -336,7 +336,6 @@ const styles = StyleSheet.create({
   approvalTitleRow: {
     justifyContent: 'space-between',
     borderBottomWidth: StyleSheet.hairlineWidth,
-    marginBottom: 8,
   },
   approvalRow: {
     paddingBottom: 12,

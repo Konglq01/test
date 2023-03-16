@@ -174,7 +174,7 @@ export default function GuardianItem({
         </View>
       )}
       <View style={[GStyles.flexRow, GStyles.itemCenter, GStyles.flex1]}>
-        <Svg icon={LoginGuardianTypeIcon[guardianItem.guardianType] as any} size={pTd(32)} />
+        <Svg iconStyle={styles.loginTypeIcon} icon={LoginGuardianTypeIcon[guardianItem.guardianType]} size={pTd(32)} />
         <VerifierImage size={pTd(32)} uri={guardianItem.verifier?.imageUrl} style={styles.iconStyle} />
         <TextM numberOfLines={1} style={[styles.nameStyle, GStyles.flex1]}>
           {guardianItem.guardianAccount}
@@ -198,6 +198,7 @@ export default function GuardianItem({
 const styles = StyleSheet.create({
   itemRow: {
     height: pTd(80),
+    marginTop: 8,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: defaultColors.border6,
     justifyContent: 'space-between',
@@ -253,5 +254,8 @@ const styles = StyleSheet.create({
   },
   disabledItemStyle: {
     opacity: 1,
+  },
+  loginTypeIcon: {
+    borderRadius: pTd(16),
   },
 });
