@@ -1,53 +1,56 @@
 import CustomSvg from 'components/CustomSvg';
 import MenuItem from 'components/MenuItem';
-import { useNavigate, useParams } from 'react-router';
-import { ReactNode, useCallback, useEffect, useMemo } from 'react';
+import { useLocation, useNavigate } from 'react-router';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import svgsList from 'assets/svgs';
 import { useLockWallet } from 'utils/lib/serviceWorkerAction';
 import PortKeyHeader from 'pages/components/PortKeyHeader';
 import SettingHeader from 'pages/components/SettingHeader';
 import './index.less';
-import Wallet from 'pages/Wallet';
-import Guardians from 'pages/Guardians';
-import Contacts from 'pages/Contacts';
-import WalletSecurity from 'pages/WalletSecurity';
+import { Outlet } from 'react-router-dom';
 import clsx from 'clsx';
 
 interface MyMenuItemInfo {
   label: string;
   key: string;
   icon: keyof typeof svgsList;
-  router?: string;
-  element?: ReactNode;
+  pathname: string;
 }
 
 export default function PromptMy() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { menuKey } = useParams();
+
+  const { pathname } = useLocation();
 
   const settingList: MyMenuItemInfo[] = useMemo(
     () => [
-      { label: 'Wallet', key: 'wallet', icon: 'Wallet', element: <Wallet /> },
+      { label: 'Wallet', key: '/setting/wallet', pathname: '/setting/wallet', icon: 'Wallet' },
       {
         label: 'Contacts',
-        key: 'address-book',
+        key: '/setting/contacts',
+        pathname: '/setting/contacts',
         icon: 'AddressBook2',
-        element: <Contacts />,
       },
       {
         label: 'Account Setting',
-        key: 'account-setting',
+        key: '/setting/account-setting',
+        pathname: '/setting/account-setting',
         icon: 'Setting',
-        element: <WalletSecurity />,
       },
-      { label: 'Guardians', key: 'guardian', icon: 'Guardian', element: <Guardians /> },
+      { label: 'Guardians', key: '/setting/guardians', pathname: '/setting/guardians', icon: 'Guardians' },
+      {
+        label: 'WalletSecurity',
+        key: '/setting/wallet-security',
+        pathname: '/setting/wallet-security',
+        icon: 'Guardians',
+      },
     ],
     [],
   );
 
-  const curMenuInfo = useMemo(() => settingList.find((item) => item.key === menuKey) || null, [menuKey, settingList]);
+  const curMenuInfo = useMemo(() => settingList.find((item) => item.key === pathname) || null, [pathname, settingList]);
 
   useEffect(() => {
     if (!curMenuInfo)
@@ -81,7 +84,7 @@ export default function PromptMy() {
                 height={56}
                 icon={<CustomSvg type={item.icon || 'Aelf'} />}
                 onClick={() =>
-                  navigate(`/setting/${item.key}`, {
+                  navigate(item.pathname, {
                     replace: true,
                   })
                 }
@@ -95,7 +98,9 @@ export default function PromptMy() {
               <span className="lock-text">{t('Lock')}</span>
             </div>
           </div>
-          <div className="prompt-my-content">{curMenuInfo && curMenuInfo.element}</div>
+          <div className="prompt-my-content">
+            <Outlet />
+          </div>
         </div>
       </div>
     </div>

@@ -28,6 +28,10 @@ import NFT from 'pages/NFT';
 import Contact from 'pages/Contacts/ContactDetail';
 import AccountSetting from 'pages/AccountSetting';
 import PromptMy from 'pages/PromptMy';
+import Guardians from 'pages/Guardians';
+import Wallet from 'pages/Wallet';
+import Contacts from 'pages/Contacts';
+import WalletSecurity from 'pages/WalletSecurity';
 
 export const PageRouter = () =>
   useRoutes([
@@ -72,29 +76,80 @@ export const PageRouter = () =>
       element: <VerifierAccount />,
     },
     {
-      path: '/setting/:menuKey',
+      path: '/setting',
       element: <PromptMy />,
+      children: [
+        {
+          path: '/setting/wallet',
+          element: <Wallet />,
+        },
+        {
+          path: '/setting/contacts',
+          element: <Contacts />,
+          children: [
+            {
+              path: '/setting/contacts/:type',
+              element: <Contact />,
+            },
+          ],
+        },
+        {
+          path: '/setting/account-setting',
+          element: <AccountSetting />,
+          children: [
+            {
+              path: '/setting/account-setting/set-pin',
+              element: <SetPin />,
+            },
+          ],
+        },
+        {
+          path: '/setting/guardians',
+          element: <Guardians />,
+          children: [
+            {
+              path: '/setting/guardians/add',
+              element: <AddGuardian />,
+            },
+            {
+              path: '/setting/guardians/edit',
+              element: <GuardiansEdit />,
+            },
+            {
+              path: '/setting/guardians/view',
+              element: <GuardiansView />,
+            },
+            {
+              path: '/setting/guardians/verifier-account',
+              element: <VerifierAccount />,
+            },
+            {
+              path: '/setting/guardians/guardian-approval',
+              element: <GuardianApproval />,
+            },
+          ],
+        },
+        {
+          path: '/setting/wallet-security',
+          element: <WalletSecurity />,
+          children: [
+            {
+              path: '/setting/wallet-security/manage-devices',
+              element: <ManageDevices />,
+            },
+            {
+              path: '/setting/wallet-security/manage-devices/verifier-account',
+              element: <VerifierAccount />,
+            },
+            {
+              path: '/setting/wallet-security/manage-devices/guardian-approval',
+              element: <GuardianApproval />,
+            },
+          ],
+        },
+      ],
     },
-    {
-      path: '/setting/guardians/add',
-      element: <AddGuardian />,
-    },
-    {
-      path: '/setting/guardians/edit',
-      element: <GuardiansEdit />,
-    },
-    {
-      path: '/setting/guardians/view',
-      element: <GuardiansView />,
-    },
-    {
-      path: '/setting/guardians/verifier-account',
-      element: <VerifierAccount />,
-    },
-    {
-      path: '/setting/guardians/guardian-approval',
-      element: <GuardianApproval />,
-    },
+
     {
       path: '/add-token',
       element: <AddToken />,
@@ -118,32 +173,6 @@ export const PageRouter = () =>
     {
       path: '/nft',
       element: <NFT />,
-    },
-
-    {
-      path: '/setting/contacts/:type',
-      element: <Contact />,
-    },
-    {
-      path: '/setting/account-setting',
-      element: <AccountSetting />,
-    },
-    {
-      path: '/setting/account-setting/set-pin',
-      element: <SetPin />,
-    },
-
-    {
-      path: '/setting/wallet-security/manage-devices',
-      element: <ManageDevices />,
-    },
-    {
-      path: '/setting/wallet-security/manage-devices/verifier-account',
-      element: <VerifierAccount />,
-    },
-    {
-      path: '/setting/wallet-security/manage-devices/guardian-approval',
-      element: <GuardianApproval />,
     },
     {
       path: '/unlock',
