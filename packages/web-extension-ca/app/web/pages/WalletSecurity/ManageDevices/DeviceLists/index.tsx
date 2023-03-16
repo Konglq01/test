@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { dateFormat } from 'utils';
 import { useCallback } from 'react';
-import { DeviceItemType } from '@portkey-wallet/types/types-ca/wallet';
-import { IconType } from 'types/icon';
+import { DeviceItemType, DeviceType } from '@portkey-wallet/types/types-ca/device';
+import { getDeviceIcon } from 'utils/device';
 
 interface IDeviceListsProps {
   deviceList: DeviceItemType[];
@@ -36,13 +36,13 @@ export default function DeviceLists({ setCurDevice, deviceList, handleNextStage 
           <div className="content-item">
             <div className="item-desc">
               <div className="flex-center icon">
-                <CustomSvg type={item.deviceTypeInfo.icon as IconType} />
+                <CustomSvg type={getDeviceIcon(item.deviceInfo.deviceType || DeviceType.OTHER)} />
               </div>
-              <div className="name">{item.deviceTypeInfo.name}</div>
+              <div className="name">{item.deviceInfo.deviceName}</div>
               {walletInfo.address === item.managerAddress && <div className="flex-center tag">{t('Current')}</div>}
             </div>
             <div className="item-time">
-              {item.loginTime && <div className="time">{dateFormat(item.loginTime)}</div>}
+              {item.transactionTime && <div className="time">{dateFormat(item.transactionTime)}</div>}
             </div>
           </div>
           <CustomSvg type="LeftArrow" />

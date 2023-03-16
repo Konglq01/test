@@ -7,10 +7,11 @@ import { resetUserGuardianStatus } from '@portkey-wallet/store/store-ca/guardian
 import useGuardianList from 'hooks/useGuardianList';
 import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import CustomSvg from 'components/CustomSvg';
-import { DeviceItemType, LoginType } from '@portkey-wallet/types/types-ca/wallet';
-import { IconType } from 'types/icon';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import { DeviceItemType, DeviceType } from '@portkey-wallet/types/types-ca/device';
 import { dateFormat } from 'utils';
 import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
+import { getDeviceIcon } from 'utils/device';
 
 interface DeviceDetailProps {
   device: DeviceItemType;
@@ -44,13 +45,13 @@ export default function DeviceDetail(props: DeviceDetailProps) {
       <div className="content-item">
         <div className="item-desc">
           <div className="flex-center icon">
-            <CustomSvg type={device.deviceTypeInfo.icon as IconType} />
+            <CustomSvg type={getDeviceIcon(device.deviceInfo.deviceType || DeviceType.OTHER)} />
           </div>
-          <div className="name">{device.deviceTypeInfo.name}</div>
+          <div className="name">{device.deviceInfo.deviceName}</div>
           {walletInfo.address === device.managerAddress && <div className="flex-center tag">{t('Current')}</div>}
         </div>
         <div className="item-time">
-          {device.loginTime && <div className="time">{dateFormat(device.loginTime)}</div>}
+          {device.transactionTime && <div className="time">{dateFormat(device.transactionTime)}</div>}
         </div>
       </div>
       {!isCurrent && (
