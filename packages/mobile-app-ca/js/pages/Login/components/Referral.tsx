@@ -14,8 +14,8 @@ import CommonButton from 'components/CommonButton';
 import TermsServiceButton from './TermsServiceButton';
 import { defaultColors } from 'assets/theme';
 import Divider from 'components/Divider';
-import appleAuthentication from 'utils/appleAuthentication';
 import CommonToast from 'components/CommonToast';
+import { useAppleAuthentication, useGoogleAuthentication } from 'hooks/authentication';
 
 const TitleMap = {
   [PageType.login]: {
@@ -37,6 +37,9 @@ export default function Referral({
   setLoginType: (type: PageLoginType) => void;
   type?: PageType;
 }) {
+  const { appleSign, appleResponse } = useAppleAuthentication();
+  const { googleSign, googleResponse } = useGoogleAuthentication();
+  console.log(googleResponse, '=====googleResponse');
   return (
     <View style={[BGStyles.bg1, styles.card, GStyles.itemCenter, GStyles.spaceBetween]}>
       <Touchable style={styles.iconBox} onPress={() => setLoginType(PageLoginType.qrCode)}>
@@ -49,7 +52,7 @@ export default function Referral({
           containerStyle={pageStyles.outlineContainerStyle}
           onPress={async () => {
             try {
-              const info = await appleAuthentication.signInAsync();
+              const info = await googleSign();
               console.log(info, '=======info');
             } catch (error) {
               CommonToast.failError(error);
@@ -63,7 +66,7 @@ export default function Referral({
           icon={<Svg icon="apple" size={24} />}
           onPress={async () => {
             try {
-              const info = await appleAuthentication.signInAsync();
+              const info = await appleSign();
               console.log(info, '=======info');
             } catch (error) {
               CommonToast.failError(error);
