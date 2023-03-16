@@ -7,7 +7,7 @@ import navigationService from 'utils/navigationService';
 import PageContainer from 'components/PageContainer';
 import { useLanguage } from 'i18n/hooks';
 import { useGuardiansInfo } from 'hooks/store';
-import GuardianItem from '../components/GuardianItem';
+import GuardianItem from 'pages/Guardian/components/GuardianItem';
 import Touchable from 'components/Touchable';
 import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { useGetGuardiansInfoWriteStore, useGetVerifierServers } from 'hooks/guardian';

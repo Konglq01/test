@@ -38,8 +38,8 @@ type RouterParams = {
   guardianItem?: UserGuardianItem;
   verifierInfo?: VerifierInfo;
   verifiedTime?: number;
-  loginType?: LoginType;
   removeManagerAddress?: string;
+  loginType?: LoginType;
 };
 export default function GuardianApproval() {
   const {
@@ -49,8 +49,8 @@ export default function GuardianApproval() {
     guardianItem,
     verifierInfo,
     verifiedTime,
-    loginType,
     removeManagerAddress,
+    loginType,
   } = useRouterParams<RouterParams>();
   const dispatch = useAppDispatch();
 

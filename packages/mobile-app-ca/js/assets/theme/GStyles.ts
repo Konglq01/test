@@ -5,6 +5,9 @@ export default {
     marginTop: 3,
     color: 'red',
   },
+  flex0: {
+    flex: 0,
+  },
   flex1: {
     flex: 1,
   },

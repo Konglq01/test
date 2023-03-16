@@ -18,7 +18,7 @@ import CommonToast from 'components/CommonToast';
 import { VerificationType } from '@portkey-wallet/types/verifier';
 import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import myEvents from 'utils/deviceEvent';
-import { VerifierImage } from '../components/VerifierImage';
+import { VerifierImage } from 'pages/Guardian/components/VerifierImage';
 import { cancelLoginAccount } from 'utils/guardian';
 import { useGetCurrentCAContract } from 'hooks/contract';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
