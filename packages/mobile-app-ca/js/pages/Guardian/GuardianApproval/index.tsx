@@ -26,7 +26,7 @@ import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import CommonToast from 'components/CommonToast';
 import { useAppDispatch } from 'store/hooks';
 import { setPreGuardianAction } from '@portkey-wallet/store/store-ca/guardians/actions';
-import { addGuardian, deleteGuardian, editGuardian } from 'utils/guardian';
+import { addGuardian, deleteGuardian, editGuardian, removeOtherManager } from 'utils/guardian';
 import { useGetCurrentCAContract } from 'hooks/contract';
 import { GuardiansStatus, GuardiansStatusItem } from '../types';
 import { handleGuardiansApproved } from 'utils/login';
@@ -39,6 +39,7 @@ type RouterParams = {
   verifierInfo?: VerifierInfo;
   verifiedTime?: number;
   loginType?: LoginType;
+  removeManagerAddress?: string;
 };
 export default function GuardianApproval() {
   const {
@@ -49,6 +50,7 @@ export default function GuardianApproval() {
     verifierInfo,
     verifiedTime,
     loginType,
+    removeManagerAddress,
   } = useRouterParams<RouterParams>();
   const dispatch = useAppDispatch();
 
@@ -216,6 +218,31 @@ export default function GuardianApproval() {
     userGuardiansList,
   ]);
 
+  const onRemoveOtherManager = useCallback(async () => {
+    if (!removeManagerAddress || !caHash || !guardiansStatus || !userGuardiansList) return;
+    Loading.show();
+    try {
+      const caContract = await getCurrentCAContract();
+      const req = await removeOtherManager(
+        caContract,
+        removeManagerAddress,
+        caHash,
+        userGuardiansList,
+        guardiansStatus,
+      );
+      if (req && !req.error) {
+        CommonToast.success('Device Deleted');
+        // myEvents.refreshGuardiansList.emit();
+        navigationService.navigate('DeviceList');
+      } else {
+        CommonToast.fail(req?.error?.message || '');
+      }
+    } catch (error) {
+      CommonToast.failError(error);
+    }
+    Loading.hide();
+  }, [caHash, getCurrentCAContract, guardiansStatus, removeManagerAddress, userGuardiansList]);
+
   const onFinish = useCallback(async () => {
     switch (approvalType) {
       case ApprovalType.register:
@@ -230,10 +257,13 @@ export default function GuardianApproval() {
       case ApprovalType.editGuardian:
         onEditGuardian();
         break;
+      case ApprovalType.removeOtherManager:
+        onRemoveOtherManager();
+        break;
       default:
         break;
     }
-  }, [onAddGuardian, approvalType, onDeleteGuardian, onEditGuardian, registerAccount]);
+  }, [approvalType, registerAccount, onAddGuardian, onDeleteGuardian, onEditGuardian, onRemoveOtherManager]);
 
   return (
     <PageContainer

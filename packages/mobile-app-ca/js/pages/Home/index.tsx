@@ -19,7 +19,6 @@ import { useGetCurrentCAContract } from 'hooks/contract';
 import { addManager } from 'utils/wallet';
 import { request } from '@portkey-wallet/api/api-did';
 import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
-import { DEVICE_TYPE } from 'constants/common';
 import { useGetHolderInfo } from 'hooks/guardian';
 import { useAppCommonDispatch } from '@portkey-wallet/hooks';
 import { addFailedActivity } from '@portkey-wallet/store/store-ca/activity/slice';
@@ -28,6 +27,8 @@ import { fetchTokensPriceAsync } from '@portkey-wallet/store/store-ca/assets/sli
 import AppleTest from 'Test/AppleTest';
 import GoogleTest from 'Test/GoogleTest';
 import * as Network from 'expo-network';
+import { extraDataEncode } from '@portkey-wallet/utils/device';
+import { useGetDeviceInfo } from 'hooks/device';
 
 export default function HomeScreen() {
   const wallet = useCurrentWalletInfo();
@@ -36,6 +37,7 @@ export default function HomeScreen() {
   const activity = useAppCASelector(state => state.activity);
 
   const pin = usePin();
+  const getDeviceInfo = useGetDeviceInfo();
   const chainInfo = useCurrentChain('AELF');
   const getHolderInfo = useGetHolderInfo();
   const { userGuardiansList, preGuardian } = useGuardiansInfo();
@@ -143,7 +145,7 @@ export default function HomeScreen() {
                 caHash: wallet.caHash,
                 address: wallet.address,
                 managerAddress: tmpWalletInfo.address,
-                deviceType: DEVICE_TYPE,
+                extraData: extraDataEncode(getDeviceInfo()),
               });
               console.log(req, '===req');
             } catch (error) {
