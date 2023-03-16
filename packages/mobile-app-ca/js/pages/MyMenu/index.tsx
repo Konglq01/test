@@ -3,7 +3,6 @@ import { StyleSheet } from 'react-native';
 import PageContainer from 'components/PageContainer';
 import { useLanguage } from 'i18n/hooks';
 import navigationService from 'utils/navigationService';
-import { pTd } from 'utils/unit';
 import { makeStyles } from '@rneui/themed';
 import { TextM } from 'components/CommonText';
 import GStyles from 'assets/theme/GStyles';

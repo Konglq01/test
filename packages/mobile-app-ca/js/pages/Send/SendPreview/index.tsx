@@ -443,6 +443,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     paddingBottom: pTd(12),
     paddingTop: pTd(12),
+    marginBottom: pTd(4),
   },
   errorMessage: {
     lineHeight: pTd(16),
