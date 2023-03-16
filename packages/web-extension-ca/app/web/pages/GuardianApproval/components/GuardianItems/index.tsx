@@ -115,7 +115,7 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
               status: VerifyStatus.Verifying,
             }),
           );
-          if (state?.indexOf('removeManage') !== -1) {
+          if (state && state.indexOf('removeManage') !== -1) {
             navigate('/setting/wallet-security/manage-devices/verifier-account', { state: state });
           } else {
             navigate('/login/verifier-account', { state: 'login' });

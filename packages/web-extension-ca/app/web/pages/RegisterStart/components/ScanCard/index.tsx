@@ -10,8 +10,9 @@ import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { useAppDispatch } from 'store/Provider/hooks';
 import { useIntervalQueryCAInfoByAddress } from '@portkey-wallet/hooks/hooks-ca/graphql';
 import { setWalletInfoAction } from 'store/reducers/loginCache/actions';
-import './index.less';
+import { getDeviceInfo } from 'utils/device';
 import { DEVICE_TYPE } from 'constants/index';
+import './index.less';
 
 export default function ScanCard() {
   const navigate = useNavigate();
@@ -44,7 +45,7 @@ export default function ScanCard() {
       address: newWallet.address,
       netWorkType: currentNetwork,
       chainType: 'aelf',
-      deviceType: DEVICE_TYPE,
+      deviceInfo: getDeviceInfo(DEVICE_TYPE),
     };
     return JSON.stringify(data);
   }, [currentNetwork, newWallet]);
