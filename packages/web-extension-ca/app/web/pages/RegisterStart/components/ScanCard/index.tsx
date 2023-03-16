@@ -19,6 +19,7 @@ export default function ScanCard() {
   const dispatch = useAppDispatch();
   const [newWallet, setNewWallet] = useState<WalletInfoType>();
   const { walletInfo, currentNetwork } = useCurrentWallet();
+  const deviceInfo = useMemo(() => getDeviceInfo(DEVICE_TYPE), []);
   const caWallet = useIntervalQueryCAInfoByAddress(currentNetwork, newWallet?.address);
   const generateKeystore = useCallback(() => {
     try {
@@ -45,10 +46,10 @@ export default function ScanCard() {
       address: newWallet.address,
       netWorkType: currentNetwork,
       chainType: 'aelf',
-      deviceInfo: getDeviceInfo(DEVICE_TYPE),
+      deviceInfo,
     };
     return JSON.stringify(data);
-  }, [currentNetwork, newWallet]);
+  }, [currentNetwork, deviceInfo, newWallet]);
 
   useEffect(() => {
     if (caWallet) {
