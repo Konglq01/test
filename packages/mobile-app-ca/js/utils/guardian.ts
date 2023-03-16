@@ -1,6 +1,6 @@
 import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type';
 import { VerifierInfo } from '@portkey-wallet/types/verifier';
-import { GuardiansStatus } from 'pages/Guardian/types';
+import { GuardiansStatus } from 'pages/My/Guardian/types';
 import { ContractBasic } from '@portkey-wallet/contracts/utils/ContractBasic';
 import { handleVerificationDoc } from '@portkey-wallet/utils/guardian';
 
