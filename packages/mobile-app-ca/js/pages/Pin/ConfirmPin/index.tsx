@@ -18,7 +18,7 @@ import { AElfWallet } from '@portkey-wallet/types/aelf';
 import { VerificationType, VerifierInfo } from '@portkey-wallet/types/verifier';
 import useBiometricsReady from 'hooks/useBiometrics';
 import PinContainer from 'components/PinContainer';
-import { GuardiansApproved } from 'pages/My/Guardian/types';
+import { GuardiansApproved } from 'pages/Guardian/types';
 import { StyleSheet } from 'react-native';
 
 type RouterParams = {
@@ -42,8 +42,6 @@ export default function ConfirmPin() {
     verifierInfo,
     guardiansApproved,
   } = useRouterParams<RouterParams>();
-  console.log(verifierInfo, managerInfo, guardiansApproved, '====verifierInfo');
-
   const biometricsReady = useBiometricsReady();
 
   const [errorMessage, setErrorMessage] = useState<string>();
@@ -122,6 +120,9 @@ export default function ConfirmPin() {
       titleDom
       type="leftBack"
       backTitle={oldPin ? 'Change Pin' : undefined}
+      onGestureStartCallback={() => {
+        myEvents.clearSetPin.emit('clearSetPin');
+      }}
       leftCallback={() => {
         myEvents.clearSetPin.emit('clearSetPin');
         navigationService.goBack();

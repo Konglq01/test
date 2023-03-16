@@ -2,6 +2,7 @@ import { StyleSheet } from 'react-native';
 import { defaultColors } from 'assets/theme';
 import { pTd } from 'utils/unit';
 import GStyles from 'assets/theme/GStyles';
+import fonts from 'assets/theme/fonts';
 
 const { bg1, bg4, font3, font5, font7 } = defaultColors;
 
@@ -20,9 +21,9 @@ export const styles = StyleSheet.create({
     marginTop: pTd(40),
   },
   tokenBalance: {
+    ...fonts.mediumFont,
     marginTop: pTd(60),
     color: font5,
-    fontWeight: 'bold',
     fontSize: pTd(28),
     lineHeight: pTd(28),
   },

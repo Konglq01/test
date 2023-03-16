@@ -1,5 +1,5 @@
 import { View, TouchableOpacity, ViewStyle, StyleProp } from 'react-native';
-import React, { ReactNode, useMemo } from 'react';
+import React, { ReactNode, useEffect, useMemo } from 'react';
 import Svg from 'components/Svg';
 import { blueStyles, hideTitleStyles, whitStyles } from './style/index.style';
 import { useNavigation } from '@react-navigation/native';
@@ -19,6 +19,7 @@ export type CustomHeaderProps = {
   rightDom?: ReactNode;
   backTitle?: string;
   leftCallback?: () => void;
+  onGestureStartCallback?: () => void;
   type?: 'leftBack' | 'default';
   leftIconType?: 'close' | 'back';
   style?: StyleProp<ViewStyle>;
@@ -37,6 +38,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = props => {
     themeType = 'white',
     style,
     leftIconType = 'back',
+    onGestureStartCallback,
   } = props;
 
   // theme change
@@ -65,9 +67,18 @@ const CustomHeader: React.FC<CustomHeaderProps> = props => {
     }
     return false;
   });
+  useEffect(() => {
+    if (onGestureStartCallback) {
+      const unsubscribe = navigation.addListener('gestureStart' as any, () => {
+        onGestureStartCallback();
+      });
+      return unsubscribe;
+    }
+  }, [navigation, onGestureStartCallback]);
+
   const letElement = useMemo(() => {
     if (leftDom) return leftDom;
-    if (!isCanGoBack) return null;
+    if (!isCanGoBack && !leftCallback) return null;
     const onPress = leftCallback ? leftCallback : () => navigationService.goBack();
     if (type === 'leftBack') {
       return (

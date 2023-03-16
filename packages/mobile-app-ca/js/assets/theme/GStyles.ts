@@ -5,11 +5,13 @@ export default {
     marginTop: 3,
     color: 'red',
   },
+  flex0: {
+    flex: 0,
+  },
   flex1: {
     flex: 1,
   },
   flexRow: {
-    display: 'flex',
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
@@ -21,8 +23,14 @@ export default {
   itemCenter: {
     alignItems: 'center',
   },
+  itemEnd: {
+    alignItems: 'end',
+  },
   alignCenter: {
     alignSelf: 'center',
+  },
+  alignEnd: {
+    alignSelf: 'flex-end',
   },
   center: {
     alignItems: 'center',
@@ -36,6 +44,9 @@ export default {
   },
   spaceAround: {
     justifyContent: 'space-around',
+  },
+  width100: {
+    width: '100%',
   },
   containerSpaceBetween: {
     minHeight: '100%',

@@ -1,0 +1,39 @@
+@import '../../assets/theme/color.less';
+.open-page-wrapper {
+  //
+  height: 100%;
+  background: greenyellow;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .open-page-content {
+    width: 370px;
+    text-align: center;
+    .custom-svg {
+      width: 100px;
+      height: 100px;
+      margin: auto;
+    }
+    h1 {
+      padding: 48px 0 16px;
+      font-weight: 500;
+      font-size: 36px;
+      line-height: 28px;
+      color: @font-5;
+    }
+    p {
+      font-size: 16px;
+      line-height: 22px;
+      color: rgb(255 255 255 /60%);
+      padding-bottom: 48px;
+    }
+    .@{app-prefix}-btn {
+      border: none;
+      border-radius: 24px;
+      line-height: 48px;
+      color: @font-9;
+      font-weight: 500;
+      font-size: 16px;
+    }
+  }
+}
