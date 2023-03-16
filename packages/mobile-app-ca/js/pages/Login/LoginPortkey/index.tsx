@@ -8,26 +8,25 @@ import GStyles from 'assets/theme/GStyles';
 import { useLanguage } from 'i18n/hooks';
 import background from '../img/background.png';
 import Svg from 'components/Svg';
-import { FontStyles } from 'assets/theme/styles';
+import { BGStyles, FontStyles } from 'assets/theme/styles';
 import Touchable from 'components/Touchable';
 import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import NetworkOverlay from 'components/NetworkOverlay';
 import { useRoute } from '@react-navigation/native';
-import styles from './styles';
-import LoginEmail from './components/LoginEmail';
-import LoginQRCode from './components/LoginQRCode';
-import LoginPhone from './components/LoginPhone';
-import LoginReferral from './components/LoginReferral';
+import styles from '../styles';
+import Email from '../components/Email';
+import QRCode from '../components/QRCode';
+import Phone from '../components/Phone';
+import Referral from '../components/Referral';
+import { PageLoginType } from '../types';
 
 const scrollViewProps = { extraHeight: 120 };
 const safeAreaColor: SafeAreaColorMapKeyUnit[] = ['transparent', 'transparent'];
 
-export enum PageLoginType {
-  email,
-  qrCode,
-  phone,
-  referral,
-}
+const BackType: any = {
+  [PageLoginType.email]: true,
+  [PageLoginType.phone]: true,
+};
 
 export default function LoginPortkey() {
   const [loginType, setLoginType] = useState<PageLoginType>(PageLoginType.referral);
@@ -36,21 +35,25 @@ export default function LoginPortkey() {
   const route = useRoute();
   const loginMap = useMemo(
     () => ({
-      [PageLoginType.email]: <LoginEmail setLoginType={setLoginType} />,
-      [PageLoginType.qrCode]: <LoginQRCode setLoginType={setLoginType} />,
-      [PageLoginType.phone]: <LoginPhone setLoginType={setLoginType} />,
-      [PageLoginType.referral]: <LoginReferral setLoginType={setLoginType} />,
+      [PageLoginType.email]: <Email setLoginType={setLoginType} />,
+      [PageLoginType.qrCode]: <QRCode setLoginType={setLoginType} />,
+      [PageLoginType.phone]: <Phone setLoginType={setLoginType} />,
+      [PageLoginType.referral]: <Referral setLoginType={setLoginType} />,
     }),
     [],
   );
   return (
     <ImageBackground style={styles.backgroundContainer} resizeMode="cover" source={background}>
       <PageContainer
+        titleDom
+        type="leftBack"
+        themeType="blue"
+        style={BGStyles.transparent}
         pageSafeBottomPadding={!isIos}
         containerStyles={styles.containerStyles}
         safeAreaColor={safeAreaColor}
         scrollViewProps={scrollViewProps}
-        hideHeader>
+        leftCallback={BackType[loginType] ? () => setLoginType(PageLoginType.referral) : undefined}>
         <Svg icon="logo-icon" size={pTd(60)} iconStyle={styles.logoIconStyle} />
         <TextXXXL style={[styles.titleStyle, FontStyles.font11]}>{t('Log In To Portkey')}</TextXXXL>
         {loginMap[loginType]}

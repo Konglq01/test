@@ -1,4 +1,4 @@
-import { screenHeight } from '@portkey-wallet/utils/mobile/device';
+import { bottomBarHeight, screenHeight } from '@portkey-wallet/utils/mobile/device';
 import React, { useMemo, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import Touchable from 'components/Touchable';
@@ -16,6 +16,7 @@ import { TextL, TextM } from 'components/CommonText';
 import { FontStyles } from 'assets/theme/styles';
 import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
 import NoData from 'components/NoData';
+import { headerHeight } from 'components/CustomHeader/style/index.style';
 
 const IndexHeight = 56,
   SectionHeight = 20;
@@ -71,7 +72,7 @@ export default function SelectCountry() {
         />
       </View>
       <IndexBarLargeList
-        extraHeight={20}
+        extraHeight={headerHeight + bottomBarHeight + 150}
         sectionHeight={searchList ? 0 : SectionHeight}
         indexHeight={IndexHeight}
         data={data}

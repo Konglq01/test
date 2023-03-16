@@ -1,5 +1,4 @@
 import { screenHeight, screenWidth, windowHeight } from '@portkey-wallet/utils/mobile/device';
-import { defaultColors } from 'assets/theme';
 import { StyleSheet } from 'react-native';
 import { pTd } from 'utils/unit';
 
@@ -12,7 +11,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logoIconStyle: {
-    marginTop: 44,
+    marginTop: 0,
   },
   titleStyle: {
     marginTop: pTd(12),
@@ -23,7 +22,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginTop: 32,
     paddingHorizontal: 20,
-    paddingVertical: 32,
+    paddingVertical: 24,
     minHeight: Math.min(screenHeight * 0.58, 494),
   },
   inputContainerStyle: {
@@ -32,12 +31,6 @@ const styles = StyleSheet.create({
   },
   viewContainer: {
     minHeight: windowHeight - pTd(160),
-  },
-  signUpbuttonStyle: {
-    borderColor: defaultColors.primaryColor,
-  },
-  signUpTitleStyle: {
-    color: defaultColors.primaryColor,
   },
   iconBox: {
     position: 'absolute',

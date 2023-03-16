@@ -1,9 +1,8 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import PageContainer, { SafeAreaColorMapKeyUnit } from 'components/PageContainer';
 import { TextXXXL } from 'components/CommonText';
 import { pTd } from 'utils/unit';
-import { defaultColors } from 'assets/theme';
-import { ImageBackground, StyleSheet, View } from 'react-native';
+import { ImageBackground, View } from 'react-native';
 import CommonButton from 'components/CommonButton';
 import GStyles from 'assets/theme/GStyles';
 import { useLanguage } from 'i18n/hooks';
@@ -13,7 +12,7 @@ import navigationService from 'utils/navigationService';
 import background from '../img/background.png';
 import Svg from 'components/Svg';
 import { BGStyles, FontStyles } from 'assets/theme/styles';
-import { isIos, screenHeight, screenWidth } from '@portkey-wallet/utils/mobile/device';
+import { isIos } from '@portkey-wallet/utils/mobile/device';
 import { useGetGuardiansInfo, useGetVerifierServers } from 'hooks/guardian';
 import { handleErrorMessage } from '@portkey-wallet/utils';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
@@ -23,10 +22,15 @@ import Loading from 'components/Loading';
 import myEvents from 'utils/deviceEvent';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import styles from '../styles';
+import Email from '../components/Email';
+import QRCode from '../components/QRCode';
+import Phone from '../components/Phone';
+import Referral from '../components/Referral';
+import { PageLoginType, PageType } from '../types';
 const safeAreaColor: SafeAreaColorMapKeyUnit[] = ['transparent', 'transparent'];
 
 const scrollViewProps = { extraHeight: 120 };
-type SignupType = 'email' | 'phone';
 function SignupEmail() {
   const { t } = useLanguage();
   const [loading] = useState<boolean>();
@@ -95,8 +99,17 @@ function SignupEmail() {
 }
 
 export default function SignupPortkey() {
-  const [signupType] = useState<SignupType>('email');
+  const [loginType, setLoginType] = useState<PageLoginType>(PageLoginType.referral);
   const { t } = useLanguage();
+  const signupMap = useMemo(
+    () => ({
+      [PageLoginType.email]: <Email setLoginType={setLoginType} type={PageType.signup} />,
+      [PageLoginType.qrCode]: <QRCode setLoginType={setLoginType} />,
+      [PageLoginType.phone]: <Phone setLoginType={setLoginType} type={PageType.signup} />,
+      [PageLoginType.referral]: <Referral setLoginType={setLoginType} type={PageType.signup} />,
+    }),
+    [],
+  );
   return (
     <ImageBackground style={styles.backgroundContainer} resizeMode="cover" source={background}>
       <PageContainer
@@ -114,45 +127,8 @@ export default function SignupPortkey() {
         }}>
         <Svg icon="logo-icon" size={pTd(60)} iconStyle={styles.iconStyle} />
         <TextXXXL style={[styles.titleStyle, FontStyles.font11]}>{t('Sign up Portkey')}</TextXXXL>
-        {signupType === 'email' ? <SignupEmail /> : null}
+        {signupMap[loginType]}
       </PageContainer>
     </ImageBackground>
   );
 }
-
-const styles = StyleSheet.create({
-  backgroundContainer: {
-    height: screenHeight,
-  },
-  containerStyles: {
-    backgroundColor: 'transparent',
-    alignItems: 'center',
-  },
-  iconStyle: {},
-  titleStyle: {
-    marginTop: pTd(8),
-    paddingHorizontal: pTd(20),
-    alignSelf: 'center',
-    textAlign: 'center',
-  },
-  detailsStyle: {
-    alignSelf: 'center',
-    textAlign: 'center',
-    paddingHorizontal: pTd(10),
-    color: defaultColors.font3,
-    marginTop: pTd(8),
-    marginBottom: pTd(24),
-  },
-  inputContainerStyle: {
-    marginTop: 8,
-  },
-  card: {
-    flex: 1,
-    width: screenWidth - 32,
-    borderRadius: 16,
-    marginTop: 32,
-    paddingHorizontal: 20,
-    paddingVertical: 32,
-    minHeight: Math.min(screenHeight * 0.5, 416),
-  },
-});

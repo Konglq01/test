@@ -9,7 +9,6 @@ export default {
     flex: 1,
   },
   flexRow: {
-    display: 'flex',
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
@@ -42,6 +41,9 @@ export default {
   },
   spaceAround: {
     justifyContent: 'space-around',
+  },
+  width100: {
+    width: '100%',
   },
   containerSpaceBetween: {
     minHeight: '100%',
