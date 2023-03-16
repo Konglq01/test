@@ -39,6 +39,7 @@ type RouterParams = {
   verifierInfo?: VerifierInfo;
   verifiedTime?: number;
   removeManagerAddress?: string;
+  loginType?: LoginType;
 };
 export default function GuardianApproval() {
   const {
@@ -49,6 +50,7 @@ export default function GuardianApproval() {
     verifierInfo,
     verifiedTime,
     removeManagerAddress,
+    loginType,
   } = useRouterParams<RouterParams>();
   const dispatch = useAppDispatch();
 
@@ -119,14 +121,14 @@ export default function GuardianApproval() {
       managerInfo: {
         verificationType: VerificationType.communityRecovery,
         loginAccount,
-        type: LoginType.Email,
+        type: loginType,
       } as ManagerInfo,
       guardiansApproved: handleGuardiansApproved(
         guardiansStatus as GuardiansStatus,
         userGuardiansList as UserGuardianItem[],
       ),
     });
-  }, [guardiansStatus, loginAccount, userGuardiansList]);
+  }, [guardiansStatus, loginAccount, loginType, userGuardiansList]);
 
   const onAddGuardian = useCallback(async () => {
     if (!managerAddress || !caHash || !verifierInfo || !guardianItem || !guardiansStatus || !userGuardiansList) return;

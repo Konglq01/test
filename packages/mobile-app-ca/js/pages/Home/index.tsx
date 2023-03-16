@@ -28,6 +28,7 @@ import AppleTest from 'Test/AppleTest';
 import GoogleTest from 'Test/GoogleTest';
 import { extraDataEncode } from '@portkey-wallet/utils/device';
 import { useGetDeviceInfo } from 'hooks/device';
+import * as Network from 'expo-network';
 
 export default function HomeScreen() {
   const wallet = useCurrentWalletInfo();
@@ -191,6 +192,20 @@ export default function HomeScreen() {
           title="fetch token Price"
           onPress={() => {
             dispatch(fetchTokensPriceAsync({}));
+          }}
+        />
+        <Button
+          title="SelectCountry"
+          onPress={() => {
+            navigationService.navigate('SelectCountry');
+          }}
+        />
+        <Button
+          title="getIpAddressAsync"
+          onPress={async () => {
+            const ipAddress = await Network.getIpAddressAsync();
+            const ipAddress2 = await customFetch('https://api.ipify.org/?format=json');
+            console.log(ipAddress, ipAddress2, '======ipAddress');
           }}
         />
 

@@ -75,9 +75,10 @@ const CustomHeader: React.FC<CustomHeaderProps> = props => {
       return unsubscribe;
     }
   }, [navigation, onGestureStartCallback]);
+
   const letElement = useMemo(() => {
     if (leftDom) return leftDom;
-    if (!isCanGoBack) return null;
+    if (!isCanGoBack && !leftCallback) return null;
     const onPress = leftCallback ? leftCallback : () => navigationService.goBack();
     if (type === 'leftBack') {
       return (

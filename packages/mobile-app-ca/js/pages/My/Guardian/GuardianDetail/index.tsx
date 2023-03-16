@@ -21,7 +21,7 @@ import myEvents from 'utils/deviceEvent';
 import { VerifierImage } from '../components/VerifierImage';
 import { cancelLoginAccount } from 'utils/guardian';
 import { useGetCurrentCAContract } from 'hooks/contract';
-import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network-test2';
+import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verification } from 'utils/api';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
