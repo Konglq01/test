@@ -1,57 +1,40 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import BackHeader from 'components/BackHeader';
-import CustomSvg from 'components/CustomSvg';
-import MenuItem from 'components/MenuItem';
-import './index.less';
+import { useCommonState } from 'store/Provider/hooks';
+import AccountSettingPrompt from './Prompt';
+import AccountSettingPopup from './Popup';
+import { MenuItemInfo } from 'pages/components/MenuList';
 
-interface MenuItemInfo {
-  label: string;
-  click: () => void;
+export interface IAccountSettingProps {
+  headerTitle: string;
+  menuList: MenuItemInfo[];
 }
 
 export default function AccountSetting() {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
+  const { isPrompt } = useCommonState();
+
   const MenuList: MenuItemInfo[] = useMemo(
     () => [
       {
-        label: t('Change Pin'),
+        label: 'Change Pin',
+        key: 1,
         click: () => {
           navigate('/setting/account-setting/set-pin');
         },
       },
     ],
-    [navigate, t],
+    [navigate],
   );
 
-  return (
-    <div className="account-setting-frame">
-      <div className="account-setting-title">
-        <BackHeader
-          title={t('Account Setting')}
-          leftCallBack={() => {
-            navigate('/setting');
-          }}
-          rightElement={
-            <CustomSvg
-              type="Close2"
-              onClick={() => {
-                navigate('/setting');
-              }}
-            />
-          }
-        />
-      </div>
-      <div className="menu-list">
-        {MenuList.map((item) => (
-          <MenuItem key={item.label} height={53} onClick={item.click}>
-            {t(item.label)}
-          </MenuItem>
-        ))}
-      </div>
-    </div>
+  const headerTitle = t('Account Setting');
+
+  return isPrompt ? (
+    <AccountSettingPrompt headerTitle={headerTitle} menuList={MenuList} />
+  ) : (
+    <AccountSettingPopup headerTitle={headerTitle} menuList={MenuList} />
   );
 }

@@ -130,19 +130,19 @@ export const PageRouter = () =>
           ],
         },
         {
-          path: '/setting/wallet-security',
+          path: '/setting/security',
           element: <WalletSecurity />,
           children: [
             {
-              path: '/setting/wallet-security/manage-devices',
+              path: '/setting/security/manage-devices',
               element: <ManageDevices />,
             },
             {
-              path: '/setting/wallet-security/manage-devices/verifier-account',
+              path: '/setting/security/manage-devices/verifier-account',
               element: <VerifierAccount />,
             },
             {
-              path: '/setting/wallet-security/manage-devices/guardian-approval',
+              path: '/setting/security/manage-devices/guardian-approval',
               element: <GuardianApproval />,
             },
           ],

@@ -42,22 +42,25 @@ export default function PromptMy() {
       { label: 'Guardians', key: '/setting/guardians', pathname: '/setting/guardians', icon: 'Guardians' },
       {
         label: 'WalletSecurity',
-        key: '/setting/wallet-security',
-        pathname: '/setting/wallet-security',
+        key: '/setting/security',
+        pathname: '/setting/security',
         icon: 'Guardians',
       },
     ],
     [],
   );
 
-  const curMenuInfo = useMemo(() => settingList.find((item) => item.key === pathname) || null, [pathname, settingList]);
+  const curMenuInfo = useMemo(
+    () => settingList.find((item) => pathname.indexOf(item.key) === 0) || null,
+    [pathname, settingList],
+  );
 
   useEffect(() => {
     if (!curMenuInfo)
-      navigate(`/setting/wallet`, {
+      navigate(settingList[0].pathname, {
         replace: true,
       });
-  }, [curMenuInfo, navigate]);
+  }, [curMenuInfo, navigate, settingList]);
 
   const lockWallet = useLockWallet();
   const handleLock = useCallback(() => {
