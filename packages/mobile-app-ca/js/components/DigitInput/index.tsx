@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
   inputItem: {
     justifyContent: 'center',
     alignItems: 'center',
-    borderBottomWidth: 1,
+    borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: defaultColors.border6,
   },
   iconStyle: {
