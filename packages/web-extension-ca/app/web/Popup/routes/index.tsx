@@ -21,7 +21,6 @@ import Contact from 'pages/Contacts/ContactDetail';
 import ManageDevices from 'pages/WalletSecurity/ManageDevices';
 import SetPin from 'pages/AccountSetting/SetPin';
 import WalletSecurity from 'pages/WalletSecurity';
-import Device from 'pages/AccountSetting/Devices';
 
 export const PageRouter = () =>
   useRoutes([
@@ -98,21 +97,17 @@ export const PageRouter = () =>
       element: <AccountSetting />,
     },
     {
-      path: '/setting/account-setting/device',
-      element: <Device />,
-    },
-    {
       path: '/setting/account-setting/set-pin',
       element: <SetPin />,
     },
-    // {
-    //   path: '/setting/wallet-security',
-    //   element: <WalletSecurity />,
-    // },
-    // {
-    //   path: '/setting/wallet-security/manage-devices',
-    //   element: <ManageDevices />,
-    // },
+    {
+      path: '/setting/wallet-security',
+      element: <WalletSecurity />,
+    },
+    {
+      path: '/setting/wallet-security/manage-devices',
+      element: <ManageDevices />,
+    },
     {
       path: '/setting/wallet-security/manage-devices/verifier-account',
       element: <VerifierAccount />,
