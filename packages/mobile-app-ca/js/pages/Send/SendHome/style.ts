@@ -34,6 +34,11 @@ export const styles = StyleSheet.create({
     marginLeft: pTd(26),
     paddingLeft: pTd(8),
   },
+  nftErrorMessage: {
+    marginLeft: 0,
+    paddingLeft: 0,
+    textAlign: 'center',
+  },
   space: {
     height: pTd(24),
   },

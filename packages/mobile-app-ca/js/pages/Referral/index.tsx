@@ -21,13 +21,16 @@ export default function Referral() {
   const gStyles = useGStyles();
   const { t } = useLanguage();
   const init = useCallback(async () => {
-    if (!isIos) await sleep(200);
-    await SplashScreen.hideAsync();
+    await sleep(200);
     if (address) {
       let name: keyof RootStackParamList = 'SecurityLock';
       if (credentials) name = 'Tab';
       navigationService.reset(name);
     }
+
+    setTimeout(() => {
+      SplashScreen.hideAsync();
+    }, 500);
   }, [credentials, address]);
   useEffect(() => {
     init();
@@ -44,13 +47,6 @@ export default function Referral() {
               type="primary"
               title={t('Get Started')}
               onPress={() => navigationService.reset('LoginPortkey')}
-            />
-            <CommonButton
-              buttonStyle={[styles.buttonStyle, BGStyles.bg1]}
-              titleStyle={FontStyles.font4}
-              type="primary"
-              title={t('Home')}
-              onPress={() => navigationService.reset('Home')}
             />
           </>
         ) : null}

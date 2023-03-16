@@ -36,7 +36,7 @@ function Network({
       }}
       style={[styles.itemRow, !network.isActive ? styles.disableItem : undefined]}
       key={network.name}>
-      <Svg size={40} icon="aelf-avatar" />
+      <Svg size={40} icon={network.networkType === 'MAIN' ? 'mainnet' : 'testnet'} />
       <View style={[styles.nameRow, BorderStyles.border4, !hideBorder ? styles.borderBottom1 : undefined]}>
         <TextL numberOfLines={1} style={styles.nameText}>
           {network.name}
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   borderBottom1: {
-    borderBottomWidth: 1,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   nameText: {
     flex: 1,
