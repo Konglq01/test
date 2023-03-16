@@ -13,7 +13,12 @@
     color: @font-14;
     display: inline-block;
   }
-  input {
+  .@{app-prefix}-input {
     box-shadow: none;
+    &:focus,
+    &:hover {
+      border-color: @border-1;
+      box-shadow: none !important;
+    }
   }
 }

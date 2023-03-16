@@ -39,7 +39,7 @@ export default function PhoneNumberInput({
         </div>
 
         <Input
-          placeholder="Enter Phone Number"
+          placeholder="Enter phone number"
           value={phoneNumber}
           onChange={(e) => onPhoneNumberChange?.(e.target.value)}
         />

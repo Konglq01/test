@@ -75,7 +75,7 @@ export default function AreaCode({ open, value, onChange, onCancel }: AreaCodePr
         <Input
           className="clear-input-border search-input"
           prefix={<CustomSvg type="SearchBlur" className="search-svg" />}
-          placeholder="Search"
+          placeholder="Search countries and regions"
           onChange={onSearchCountry}
         />
       </div>

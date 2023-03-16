@@ -15,6 +15,8 @@ import { DEVICE_TYPE } from 'constants/index';
 import { DEVICE_INFO_VERSION } from '@portkey-wallet/constants/constants-ca/device';
 import './index.less';
 
+const QR_SIZE = 200;
+
 export default function ScanCard() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -76,8 +78,7 @@ export default function ScanCard() {
       </h2>
       <p>Please use the portkey Dapp to scan the QR code</p>
       <div className="login-content">
-        {/* eslint-disable-next-line no-inline-styles/no-inline-styles */}
-        {qrData && <QRCode className="qrc" value={qrData} style={{ width: 170, height: 170 }} />}
+        {qrData && <QRCode className="qrc" value={qrData} style={{ width: QR_SIZE, height: QR_SIZE }} />}
       </div>
     </div>
   );

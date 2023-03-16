@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { checkEmail } from '@portkey-wallet/utils/check';
 import i18n from 'i18n';
 import clsx from 'clsx';
+import { ValidateHandler } from 'types/wallet';
 import './index.less';
 
 interface EmailInputProps {
@@ -15,7 +16,7 @@ interface EmailInputProps {
 }
 
 export interface EmailInputInstance {
-  validateEmail: (email?: string) => Promise<void>;
+  validateEmail: ValidateHandler;
 }
 
 const EmailInput = forwardRef(({ error, val, wrapperClassName, validate, onChange }: EmailInputProps, ref) => {

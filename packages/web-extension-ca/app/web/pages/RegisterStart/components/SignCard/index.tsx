@@ -1,29 +1,27 @@
 import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
 import { resetGuardiansState } from '@portkey-wallet/store/store-ca/guardians/actions';
-import CustomSvg from 'components/CustomSvg';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useAppDispatch } from 'store/Provider/hooks';
-import EmailTab from '../SignTab';
-import { useTranslation } from 'react-i18next';
-import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
-import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
-import './index.less';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import InputLogin from '../InputLogin';
+import SocialLogin from '../SocialLogin';
 
+enum STEP {
+  socialLogin,
+  inputLogin,
+}
 export default function SignCard() {
+  const [step, setStep] = useState<STEP>(STEP.socialLogin);
+
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { t } = useTranslation();
-  const currentNetwork = useCurrentNetworkInfo();
-  const currentChain = useCurrentChain();
-  const onEmailTabSuccess = useCallback(
-    (email: string) => {
-      console.log('onEmailTabSuccess');
+  const onFinish = useCallback(
+    (data: { loginType: LoginType; guardianAccount: string }) => {
       dispatch(
         setLoginAccountAction({
-          guardianAccount: email,
-          loginType: LoginType.Email,
+          guardianAccount: data.guardianAccount,
+          loginType: data.loginType,
           createType: 'register',
         }),
       );
@@ -32,15 +30,23 @@ export default function SignCard() {
     },
     [dispatch, navigate],
   );
+
+  const onSocialLoginFinish = useCallback(() => {
+    //
+  }, []);
+
   return (
     <div className="register-start-card sign-card">
-      <h1 className="title">
-        <CustomSvg type="BackLeft" onClick={() => navigate('/register/start')} />
-        <span>{t('Sign Up')}</span>
-      </h1>
-      <div className="login-content sign-content">
-        <EmailTab currentChain={currentChain} currentNetwork={currentNetwork} onSuccess={onEmailTabSuccess} />
-      </div>
+      {step === STEP.inputLogin ? (
+        <InputLogin type="Sign up" onFinish={onFinish} onBack={() => setStep(STEP.socialLogin)} />
+      ) : (
+        <SocialLogin
+          type="Sign up"
+          onFinish={onSocialLoginFinish}
+          switchLogin={() => setStep(STEP.inputLogin)}
+          onBack={() => navigate('/register/start')}
+        />
+      )}
     </div>
   );
 }

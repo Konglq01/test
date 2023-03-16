@@ -47,6 +47,7 @@
   }
   .area-code-item {
     padding: 13px 16px;
+    padding-right: 10px;
     cursor: pointer;
     & > span:first-child {
       color: @font-11;
@@ -59,13 +60,18 @@
       color: @font-13;
       text-align: right;
     }
-  }
-  .area-code-item.active-item {
-    background-color: @bg-9;
-    & > span {
-      color: @font-9;
+    &:hover {
+      & > span {
+        color: @font-9;
+      }
     }
   }
+  // .area-code-item.active-item {
+  //   background-color: @bg-9;
+  //   & > span {
+  //     color: @font-9;
+  //   }
+  // }
   .no-search-result {
     margin-top: 72px;
     font-size: 14px;

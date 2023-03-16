@@ -6,10 +6,11 @@ import { setCountryCodeAction } from 'store/reducers/loginCache/actions';
 import './index.less';
 
 interface PhoneTabProps {
+  confirmText: string;
   onFinish?: (phoneNumber: { code: string; phoneNumber: string }) => void;
 }
 
-export default function PhoneTab({ onFinish }: PhoneTabProps) {
+export default function PhoneTab({ confirmText, onFinish }: PhoneTabProps) {
   const { countryCode } = useLoginInfo();
 
   const dispatch = useAppDispatch();
@@ -39,7 +40,7 @@ export default function PhoneTab({ onFinish }: PhoneTabProps) {
             phoneNumber,
           });
         }}>
-        Login
+        {confirmText}
       </Button>
     </div>
   );

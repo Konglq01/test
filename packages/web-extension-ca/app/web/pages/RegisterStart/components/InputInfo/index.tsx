@@ -1,22 +1,18 @@
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import { Tabs, TabsProps } from 'antd';
-import { useCallback, useMemo } from 'react';
-import { RegisterType } from 'types/wallet';
+import { useMemo } from 'react';
+import { ValidateHandler } from 'types/wallet';
 import EmailTab from '../EmailTab';
 import PhoneTab from '../PhoneTab';
 import './index.less';
 
-export default function InputInfo({
-  type,
-  onFinish,
-}: {
-  type: RegisterType;
-  onFinish: (v: { loginType: LoginType; value: string }) => void;
-}) {
-  const onChange = useCallback((activeKey: string) => {
-    //
-    console.log(activeKey, 'activeKey===');
-  }, []);
+export interface InputInfoProps {
+  confirmText: string;
+  validateEmail?: ValidateHandler;
+  onFinish: (v: { loginType: LoginType; guardianAccount: string }) => void;
+}
+
+export default function InputInfo({ confirmText, validateEmail, onFinish }: InputInfoProps) {
   const items: TabsProps['items'] = useMemo(
     () => [
       {
@@ -24,10 +20,11 @@ export default function InputInfo({
         label: 'Phone',
         children: (
           <PhoneTab
+            confirmText={confirmText}
             onFinish={(v) => {
               onFinish({
                 loginType: LoginType.Apple,
-                value: `${v.code} ${v.phoneNumber}`,
+                guardianAccount: `${v.code} ${v.phoneNumber}`,
               });
             }}
           />
@@ -38,23 +35,24 @@ export default function InputInfo({
         label: 'Email',
         children: (
           <EmailTab
-            type={type}
+            confirmText={confirmText}
+            validateEmail={validateEmail}
             onFinish={(v) => {
               onFinish({
                 loginType: LoginType.Email,
-                value: v,
+                guardianAccount: v,
               });
             }}
           />
         ),
       },
     ],
-    [onFinish, type],
+    [onFinish, confirmText, validateEmail],
   );
 
   return (
     <div className="input-info-wrapper">
-      <Tabs defaultActiveKey={LoginType[LoginType.PhoneNumber]} items={items} onChange={onChange} />
+      <Tabs defaultActiveKey={LoginType[LoginType.PhoneNumber]} items={items} />
     </div>
   );
 }

@@ -1,67 +1,74 @@
-import { resetGuardiansState } from '@portkey-wallet/store/store-ca/guardians/actions';
-import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
-import { handleErrorMessage } from '@portkey-wallet/utils';
-import { message } from 'antd';
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
+import { handleErrorCode, handleErrorMessage } from '@portkey-wallet/utils';
+import { EmailError } from '@portkey-wallet/utils/check';
 import CustomSvg from 'components/CustomSvg';
-import useGuardianList from 'hooks/useGuardianList';
-import { useCallback } from 'react';
+import i18n from 'i18n';
+import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { useAppDispatch, useLoading } from 'store/Provider/hooks';
-import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
-import InputInfo from '../InputInfo';
+import { RegisterType } from 'types/wallet';
+import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
+import InputInfo, { InputInfoProps } from '../InputInfo';
 import './index.less';
 
-interface LoginInfo {
-  loginType: LoginType;
-  value: string;
-}
-
-export default function InputLogin({ onBack }: { onBack?: () => void }) {
+export default function InputLogin({
+  type,
+  onBack,
+  onFinish,
+}: {
+  type: RegisterType;
+  onBack?: () => void;
+  onFinish: InputInfoProps['onFinish'];
+}) {
   const { t } = useTranslation();
-  const { setLoading } = useLoading();
-  const dispatch = useAppDispatch();
-  const fetchUserVerifier = useGuardianList();
-  const navigate = useNavigate();
 
-  const loginHandler = useCallback(
-    (loginInfo: LoginInfo) => {
-      dispatch(
-        setLoginAccountAction({
-          guardianAccount: loginInfo.value,
-          loginType: loginInfo.loginType,
-          createType: 'login',
-        }),
-      );
-    },
-    [dispatch],
-  );
-  const onFinish = useCallback(
-    async (loginInfo: LoginInfo) => {
+  const currentNetwork = useCurrentNetworkInfo();
+  const currentChain = useCurrentChain();
+
+  const validateEmail = useCallback(
+    async (email?: string) => {
+      //
+      if (!currentChain) throw 'Could not find chain information';
+      let isHasAccount = false;
       try {
-        setLoading(true);
-        loginHandler(loginInfo);
-        dispatch(resetGuardiansState());
-        await fetchUserVerifier({ guardianIdentifier: loginInfo.value });
-        setLoading(false);
-        navigate('/login/guardian-approval');
-      } catch (error) {
-        console.log(error, '====');
-        const errMsg = handleErrorMessage(error, 'login error');
-        message.error(errMsg);
-      } finally {
-        setLoading(false);
+        const checkResult = await getHolderInfo({
+          rpcUrl: currentChain.endPoint,
+          address: currentChain.caContractAddress,
+          chainType: currentNetwork.walletType,
+          paramsOption: {
+            guardianIdentifier: email as string,
+          },
+        });
+        if (checkResult.guardianList?.guardians?.length > 0) {
+          isHasAccount = true;
+        }
+      } catch (error: any) {
+        const code = handleErrorCode(error);
+        if (code?.toString === '3002') {
+          isHasAccount = false;
+        } else {
+          throw handleErrorMessage(error || 'GetHolderInfo error');
+        }
+      }
+
+      if (type === 'Sign up') {
+        if (isHasAccount) throw i18n.t(EmailError.alreadyRegistered);
+      } else {
+        if (!isHasAccount) throw i18n.t(EmailError.noAccount);
       }
     },
-    [dispatch, fetchUserVerifier, loginHandler, navigate, setLoading],
+    [currentChain, currentNetwork.walletType, type],
   );
+
+  const title = useMemo(() => (type === 'Login' ? t('Login') : t('Sign up')), [t, type]);
+
   return (
     <div>
       <h1 className="title">
         <CustomSvg type="BackLeft" onClick={onBack} />
-        <span>{t('Login')}</span>
+        <span>{title}</span>
       </h1>
-      <InputInfo type="login" onFinish={onFinish} />
+      <InputInfo validateEmail={validateEmail} confirmText={title} onFinish={onFinish} />
     </div>
   );
 }
