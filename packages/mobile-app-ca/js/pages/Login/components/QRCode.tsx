@@ -23,6 +23,7 @@ import phone from 'assets/image/pngs/phone.png';
 import RQRCode from 'react-native-qrcode-svg';
 import { useIsFocused } from '@react-navigation/native';
 import { useGetDeviceInfo } from 'hooks/device';
+import { DEVICE_INFO_VERSION } from '@portkey-wallet/constants/constants-ca/device';
 
 export default function QRCode({ setLoginType }: { setLoginType: (type: PageLoginType) => void }) {
   const { walletInfo, currentNetwork } = useCurrentWallet();
@@ -89,7 +90,10 @@ export default function QRCode({ setLoginType }: { setLoginType: (type: PageLogi
       type: 'login',
       address: newWallet.address,
       netWorkType: currentNetwork,
-      deviceInfo: getDeviceInfo(),
+      extraData: {
+        deviceInfo: getDeviceInfo(),
+        version: DEVICE_INFO_VERSION,
+      },
     };
     return JSON.stringify(data);
   }, [currentNetwork, getDeviceInfo, newWallet]);
