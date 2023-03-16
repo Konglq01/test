@@ -16,10 +16,10 @@ import { ApprovalType, VerificationType, VerifyStatus } from '@portkey-wallet/ty
 import { BGStyles, FontStyles } from 'assets/theme/styles';
 import { isIOS } from '@rneui/base';
 import { LoginGuardianTypeIcon } from 'constants/misc';
-import { LoginKeyType, LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import { VerifierImage } from '../VerifierImage';
-import { GuardiansStatus, GuardiansStatusItem } from 'pages/Guardian/types';
-import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
+import { GuardiansStatus, GuardiansStatusItem } from 'pages/My/Guardian/types';
+import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network-test2';
 import useDebounceCallback from 'hooks/useDebounceCallback';
 import { verification } from 'utils/api';
 

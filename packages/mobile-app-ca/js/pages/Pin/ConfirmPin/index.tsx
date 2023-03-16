@@ -18,7 +18,7 @@ import { AElfWallet } from '@portkey-wallet/types/aelf';
 import { VerificationType, VerifierInfo } from '@portkey-wallet/types/verifier';
 import useBiometricsReady from 'hooks/useBiometrics';
 import PinContainer from 'components/PinContainer';
-import { GuardiansApproved } from 'pages/Guardian/types';
+import { GuardiansApproved } from 'pages/My/Guardian/types';
 import { StyleSheet } from 'react-native';
 
 type RouterParams = {
