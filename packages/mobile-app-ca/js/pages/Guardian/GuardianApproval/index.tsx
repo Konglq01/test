@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
   },
   approvalTitleRow: {
     justifyContent: 'space-between',
-    borderBottomWidth: 1,
+    borderBottomWidth: StyleSheet.hairlineWidth,
     marginBottom: 8,
   },
   approvalRow: {

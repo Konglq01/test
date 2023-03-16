@@ -70,14 +70,12 @@ const WalletHome: React.FC<WalletHomeProps> = () => {
         <Svg icon={(walletAvatar as IconName) || 'master1'} size={pTd(80)} />
       </View>
       <ScrollView alwaysBounceVertical={false}>
-        <TouchableWithoutFeedback>
-          <View>
-            <WalletMenuItem onPress={() => navigationService.navigate('WalletName')} title={walletName} />
-            <WalletMenuItem onPress={() => navigationService.navigate('AutoLock')} title={t('Auto-Lock')} />
-            <WalletMenuItem onPress={() => navigationService.navigate('SwitchNetworks')} title={t('Switch Networks')} />
-            <WalletMenuItem onPress={() => navigationService.navigate('AboutUs')} title={t('About Us')} />
-          </View>
-        </TouchableWithoutFeedback>
+        <View>
+          <WalletMenuItem onPress={() => navigationService.navigate('WalletName')} title={walletName} />
+          <WalletMenuItem onPress={() => navigationService.navigate('AutoLock')} title={t('Auto-Lock')} />
+          <WalletMenuItem onPress={() => navigationService.navigate('SwitchNetworks')} title={t('Switch Networks')} />
+          <WalletMenuItem onPress={() => navigationService.navigate('AboutUs')} title={t('About Us')} />
+        </View>
       </ScrollView>
 
       <CommonButton
