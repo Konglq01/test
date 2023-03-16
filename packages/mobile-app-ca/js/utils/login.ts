@@ -2,7 +2,7 @@ import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type'
 import { resetWallet } from '@portkey-wallet/store/store-ca/wallet/actions';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import ActionSheet from 'components/ActionSheet';
-import { GuardiansStatus } from 'pages/Guardian/types';
+import { GuardiansStatus } from 'pages/My/Guardian/types';
 import { AppDispatch } from 'store';
 import { resetUser } from 'store/user/actions';
 import navigationService from './navigationService';

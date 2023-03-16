@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import BackHeader from 'components/BackHeader';
 import CustomSvg from 'components/CustomSvg';
 import DeviceDetail from './DeviceDetail';
-import { DeviceItemType, DeviceType } from '@portkey-wallet/types/types-ca/wallet';
+import { DeviceItemType } from '@portkey-wallet/types/types-ca/device';
 import { useCurrentWalletInfo, useDeviceList } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import DeviceLists from './DeviceLists';
 import './index.less';

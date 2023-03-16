@@ -1,6 +1,6 @@
 import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type';
 import { VerifierInfo } from '@portkey-wallet/types/verifier';
-import { GuardiansStatus } from 'pages/Guardian/types';
+import { GuardiansStatus } from 'pages/My/Guardian/types';
 import { ContractBasic } from '@portkey-wallet/contracts/utils/ContractBasic';
 import { handleVerificationDoc } from '@portkey-wallet/utils/guardian';
 
@@ -144,5 +144,24 @@ export function removeManager(contract: ContractBasic, address: string, caHash: 
       address,
       extraData: new Date().getTime(),
     },
+  });
+}
+
+export function removeOtherManager(
+  contract: ContractBasic,
+  address: string,
+  caHash: string,
+  userGuardiansList: UserGuardianItem[],
+  guardiansStatus: GuardiansStatus,
+) {
+  const managerInfo = {
+    address,
+    extraData: new Date().getTime(),
+  };
+  const guardiansApproved = getGuardiansApproved(userGuardiansList, guardiansStatus);
+  return contract?.callSendMethod('RemoveOtherManagerInfo', address, {
+    caHash,
+    managerInfo,
+    guardiansApproved: guardiansApproved,
   });
 }

@@ -4,7 +4,7 @@ import DashBoard from 'pages/DashBoard';
 import Svg from 'components/Svg';
 import { defaultColors } from 'assets/theme';
 import { useLanguage } from 'i18n/hooks';
-import MyMenu from 'pages/MyMenu';
+import MyMenu from 'pages/My';
 import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import useLogOut from 'hooks/useLogOut';
 import HomeScreen from 'pages/Home';
