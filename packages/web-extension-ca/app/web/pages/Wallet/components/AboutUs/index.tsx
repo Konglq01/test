@@ -1,8 +1,8 @@
 import CustomSvg from 'components/CustomSvg';
-import MenuItem from 'components/MenuItem';
 import { useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
+import MenuItem from 'components/MenuItem';
 import { IconType } from 'types/icon';
+import { useTranslation } from 'react-i18next';
 import './index.less';
 
 interface IMenuItem {

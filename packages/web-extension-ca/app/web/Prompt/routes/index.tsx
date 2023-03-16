@@ -35,10 +35,10 @@ import AccountSetting from 'pages/AccountSetting';
 
 export const PageRouter = () =>
   useRoutes([
-    // {
-    //   path: '/',
-    //   element: <Home />,
-    // },
+    {
+      path: '/',
+      element: <Home />,
+    },
     {
       path: '/register',
       element: <ScreenOpeningPage />,

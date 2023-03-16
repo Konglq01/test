@@ -43,6 +43,7 @@ const Item = ({ isTestnet, item, onHandleToken }: ItemProps) => {
   return (
     <TouchableOpacity style={itemStyle.wrap} key={`${item.symbol}${item.address}${item.chainId}}`}>
       <CommonAvatar
+        hasBorder
         shapeType="circular"
         title={item.symbol}
         svgName={item.symbol === ELF_SYMBOL ? 'elf-icon' : undefined}
@@ -64,7 +65,14 @@ const Item = ({ isTestnet, item, onHandleToken }: ItemProps) => {
         {item.isDefault ? (
           <Svg icon="lock" size={pTd(20)} iconStyle={itemStyle.addedStyle} />
         ) : (
-          <CommonSwitch value={!!item.isAdded} onChange={() => onHandleToken(item, item.isAdded ? 'delete' : 'add')} />
+          <TouchableOpacity
+            onPress={() => {
+              onHandleToken(item, item.isAdded ? 'delete' : 'add');
+            }}>
+            <View pointerEvents="none">
+              <CommonSwitch value={!!item.isAdded} />
+            </View>
+          </TouchableOpacity>
         )}
       </View>
     </TouchableOpacity>

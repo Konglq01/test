@@ -65,3 +65,9 @@ export const MAIN_CHAIN = 'MainChain';
 export const SIDE_CHAIN = 'SideChain';
 export const TESTNET = 'TESTNET';
 export const TEST_NET = 'Testnet';
+
+export const HIDDEN_TRANSACTION_TYPES = [
+  TransactionTypes.SOCIAL_RECOVERY,
+  TransactionTypes.ADD_MANAGER,
+  TransactionTypes.REMOVE_MANAGER,
+];

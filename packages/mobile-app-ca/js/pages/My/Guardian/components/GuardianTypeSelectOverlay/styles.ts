@@ -10,7 +10,7 @@ const styles = StyleSheet.create({
   },
   itemContent: {
     flex: 1,
-    borderBottomWidth: 1,
+    borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: defaultColors.border6,
     height: pTd(60),
     flexDirection: 'row',

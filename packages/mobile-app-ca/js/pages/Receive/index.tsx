@@ -35,6 +35,7 @@ export default function Receive() {
       <TextXL style={styles.tips}>{t('You can provide QR code to receive')}</TextXL>
       <View style={styles.topWrap}>
         <CommonAvatar
+          hasBorder
           style={styles.svgStyle}
           title={symbol}
           avatarSize={pTd(32)}
@@ -90,6 +91,7 @@ const styles = StyleSheet.create({
   },
   svgStyle: {
     marginRight: pTd(8),
+    fontSize: pTd(16),
   },
 
   accountCardStyle: {

@@ -30,8 +30,6 @@ export function fetchTokenList({
   data: ITokenItemResponse[];
   totalRecordCount: number;
 }> {
-  console.log('fetching....list', skipCount, maxResultCount);
-  // return new Promise(resolve => setTimeout(() => resolve(mockTokenData), 500));
   return request.assets.fetchAccountTokenList({
     params: {
       caAddresses,

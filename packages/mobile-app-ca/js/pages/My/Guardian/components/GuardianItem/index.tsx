@@ -198,7 +198,7 @@ export default function GuardianItem({
 const styles = StyleSheet.create({
   itemRow: {
     height: pTd(80),
-    borderBottomWidth: 1,
+    borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: defaultColors.border6,
     justifyContent: 'space-between',
     flexDirection: 'row',
