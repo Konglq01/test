@@ -1,6 +1,6 @@
 import { ZERO } from '@portkey-wallet/constants/misc';
 import clsx from 'clsx';
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useWalletInfo } from 'store/Provider/hooks';
 // import { useTokenPrice } from '@portkey-wallet/hooks/hooks-ca/useTokensPrice';
 import './index.less';

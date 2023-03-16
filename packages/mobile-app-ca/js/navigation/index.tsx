@@ -5,13 +5,10 @@ import { createStackNavigator, StackNavigationProp, CardStyleInterpolators } fro
 import Tab, { tabMenuList } from './Tab';
 import navigationService from 'utils/navigationService';
 import LoginNav from 'pages/Login';
-import GuardianNav from 'pages/Guardian';
 import PinNav from 'pages/Pin';
-import ContactsNav from 'pages/Contacts';
 import TokenNav from 'pages/Token';
 import SendNav from 'pages/Send';
 import ActivityNav from 'pages/Activity';
-import WalletNav from 'pages/Wallet';
 import Home from 'pages/Home';
 
 import Referral from 'pages/Referral';
@@ -19,6 +16,7 @@ import SecurityLock from 'pages/SecurityLock';
 import Receive from 'pages/Receive';
 import NFTDetail from 'pages/NFT/NFTDetail';
 import QrScanner from 'pages/QrScanner';
+import MyNav from 'pages/My/router';
 
 const Stack = createStackNavigator();
 export const stackNav = [
@@ -33,13 +31,11 @@ export const stackNav = [
   { name: 'Home', component: Home },
 
   ...ActivityNav,
-  ...ContactsNav,
   ...LoginNav,
   ...TokenNav,
   ...SendNav,
-  ...GuardianNav,
   ...PinNav,
-  ...WalletNav,
+  ...MyNav,
 ] as const;
 
 export type RootStackParamList = {

@@ -114,6 +114,14 @@ export const PageRouter = () =>
     //   element: <ManageDevices />,
     // },
     {
+      path: '/setting/wallet-security/manage-devices/verifier-account',
+      element: <VerifierAccount />,
+    },
+    {
+      path: '/setting/wallet-security/manage-devices/guardian-approval',
+      element: <GuardianApproval />,
+    },
+    {
       path: '/unlock',
       element: <Unlock />,
     },

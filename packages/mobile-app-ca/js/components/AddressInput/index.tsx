@@ -19,7 +19,7 @@ const AelfInputWithAffix: React.FC<AelfInputWithAffixProps> = props => {
           <TextM>{affix[0]}</TextM>
         </View>
         <Input
-          selectionColor={defaultColors.bg13}
+          selectionColor={defaultColors.bg15}
           containerStyle={generalStyles.containerStyle}
           inputContainerStyle={generalStyles.inputContainerStyle}
           inputStyle={generalStyles.inputStyle}

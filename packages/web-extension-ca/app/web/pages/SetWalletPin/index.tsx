@@ -2,7 +2,7 @@ import { Button, Form, message } from 'antd';
 import { FormItem } from 'components/BaseAntd';
 import ConfirmPassword from 'components/ConfirmPassword';
 import PortKeyTitle from 'pages/components/PortKeyTitle';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { useAppDispatch, useGuardiansInfo, useLoading, useLoginInfo } from 'store/Provider/hooks';
 import { setPinAction } from 'utils/lib/serviceWorkerAction';
@@ -25,6 +25,8 @@ import { DEVICE_TYPE } from 'constants/index';
 import { GuardiansApprovedType } from '@portkey-wallet/types/types-ca/guardian';
 import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import { extraDataEncode } from '@portkey-wallet/utils/device';
+import { getDeviceInfo } from 'utils/device';
 
 export default function SetWalletPin() {
   const [form] = Form.useForm();
@@ -40,6 +42,7 @@ export default function SetWalletPin() {
   const getWalletCAAddressResult = useFetchDidWallet();
   const network = useCurrentNetworkInfo();
   const { userGuardianStatus } = useGuardiansInfo();
+  const extraData = useMemo(() => extraDataEncode(getDeviceInfo(DEVICE_TYPE)), []);
   console.log(walletInfo, state, scanWalletInfo, scanCaWalletInfo, 'walletInfo===caWallet');
 
   const requestRegisterDIDWallet = useCallback(
@@ -53,7 +56,7 @@ export default function SetWalletPin() {
         type: LoginType[loginAccount.loginType],
         loginGuardianIdentifier: loginAccount.guardianAccount,
         manager: managerAddress,
-        extraData: `${DEVICE_TYPE},${Date.now()}`, //navigator.userAgent,
+        extraData, //navigator.userAgent,
         chainId: DefaultChainId,
         verifierId: registerVerifier.verifierId,
         verificationDoc: registerVerifier.verificationDoc,
@@ -68,7 +71,7 @@ export default function SetWalletPin() {
         sessionId: result.sessionId,
       };
     },
-    [loginAccount, registerVerifier],
+    [extraData, loginAccount, registerVerifier],
   );
 
   const getGuardiansApproved: () => GuardiansApprovedType[] = useCallback(() => {
@@ -92,7 +95,7 @@ export default function SetWalletPin() {
       const result = await recoveryDIDWallet({
         loginGuardianIdentifier: loginAccount.guardianAccount,
         manager: managerAddress,
-        extraData: `${DEVICE_TYPE},${Date.now()}`, //navigator.userAgent,
+        extraData, //navigator.userAgent,
         chainId: DefaultChainId,
         guardiansApproved,
         context: {
@@ -106,7 +109,7 @@ export default function SetWalletPin() {
         sessionId: result.sessionId,
       };
     },
-    [loginAccount, getGuardiansApproved],
+    [loginAccount, getGuardiansApproved, extraData],
   );
 
   const createByScan = useCallback(

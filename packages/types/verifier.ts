@@ -27,6 +27,7 @@ export enum ApprovalType {
   addGuardian,
   deleteGuardian,
   editGuardian,
+  removeOtherManager,
 }
 
 export interface VerifierInfo {

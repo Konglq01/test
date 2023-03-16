@@ -91,6 +91,6 @@ const styles = StyleSheet.create({
     borderRadius: pTd(6),
     backgroundColor: defaultColors.bg1,
     alignSelf: 'center',
-    top: ScreenWidth * 0.27,
+    top: ScreenWidth * 0.3,
   },
 });

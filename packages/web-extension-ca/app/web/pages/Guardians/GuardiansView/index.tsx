@@ -72,9 +72,6 @@ export default function GuardiansView() {
                 type: currentGuardian?.guardianType,
                 verifierId: currentGuardian?.verifier?.id,
                 identifierHash: currentGuardian?.identifierHash,
-                salt: currentGuardian?.salt,
-                value: currentGuardian?.guardianAccount,
-                isLoginGuardian: true,
               },
             },
           },
@@ -215,8 +212,16 @@ export default function GuardiansView() {
       <div className="guardian-view-content">
         <div className="input-content">
           <div className="input-item">
-            <p className="label">{t('Guardian Type')}</p>
-            <p className="control">{opGuardian?.guardianAccount}</p>
+            <p className="label">{`Guardian ${LoginType[opGuardian?.guardianType || 0]}`}</p>
+            <p className="control">
+              <CustomSvg type="email" />
+              <div className="name account">{opGuardian?.guardianAccount}</div>
+              {/* TODO */}
+              {/* <div className="name account flex-column">
+                <span>Goria</span>
+                <span className="account">{opGuardian?.guardianAccount}</span>
+              </div> */}
+            </p>
           </div>
           <div className="input-item">
             <div className="label">{t('Verifier')}</div>

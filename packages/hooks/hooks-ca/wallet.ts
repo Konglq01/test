@@ -1,16 +1,17 @@
 import { useAppCASelector } from '.';
 import { useMemo, useCallback } from 'react';
 import { WalletInfoType } from '@portkey-wallet/types/wallet';
-import { CAInfoType, DeviceItemType, DeviceType } from '@portkey-wallet/types/types-ca/wallet';
+import { CAInfo, CAInfoType, LoginType, RegisterStatus } from '@portkey-wallet/types/types-ca/wallet';
 import { WalletState } from '@portkey-wallet/store/store-ca/wallet/type';
 import { useCurrentNetworkInfo } from './network';
 import { useCurrentChain } from './chainList';
 import { useCaHolderManagerInfoQuery } from '@portkey-wallet/graphql/contract/__generated__/hooks/caHolderManagerInfo';
 import { getApolloClient } from '@portkey-wallet/graphql/contract/apollo';
-import { DEVICE_TYPE_INFO } from '@portkey-wallet/constants/constants-ca/wallet';
 import { request } from '@portkey-wallet/api/api-did';
 import { useAppCommonDispatch } from '../index';
 import { setWalletNameAction } from '@portkey-wallet/store/store-ca/wallet/actions';
+import { DeviceItemType } from '@portkey-wallet/types/types-ca/device';
+import { extraDataDecode } from '@portkey-wallet/utils/device';
 
 export interface CurrentWalletType extends WalletInfoType, CAInfoType {
   caHash?: string;
@@ -88,31 +89,9 @@ export const useDeviceList = () => {
     const managers = caHolderManagerInfo?.managerInfos || [];
     return managers
       .map(item => {
-        // TODO: extraData need decode
-        const extraDataArray = (item?.extraData || '').split(',').map(item => Number(item));
-        let deviceType: DeviceType = 0,
-          loginTime: number | undefined = undefined;
-        const firstNum = extraDataArray[0];
-        if (firstNum !== undefined && !isNaN(firstNum)) {
-          if (DeviceType[firstNum] !== undefined) {
-            deviceType = firstNum;
-          } else if (!isNaN(new Date(firstNum).getTime())) {
-            loginTime = firstNum;
-          }
-        }
-        const secondNum = extraDataArray[1];
-        if (
-          loginTime === undefined &&
-          secondNum !== undefined &&
-          !isNaN(secondNum) &&
-          !isNaN(new Date(firstNum).getTime())
-        ) {
-          loginTime = secondNum;
-        }
+        const extraData = extraDataDecode(item?.extraData || '');
         return {
-          deviceType,
-          loginTime,
-          deviceTypeInfo: DEVICE_TYPE_INFO[deviceType],
+          ...extraData,
           managerAddress: item?.address,
         };
       })
