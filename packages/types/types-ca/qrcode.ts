@@ -1,5 +1,5 @@
 import { ChainId, ChainType, NetworkType } from '..';
-import { DeviceInfoType } from './device';
+import { DeviceType, QRExtraDataType } from './device';
 import { IToSendAssetParamsType } from './routeParams';
 import { TokenItemShowType } from './token';
 
@@ -12,7 +12,8 @@ export interface QRData {
 
 export interface LoginQRData extends QRData {
   type: 'login';
-  deviceInfo: DeviceInfoType;
+  extraData?: QRExtraDataType;
+  deviceType?: DeviceType; // 0.0.1
 }
 
 export interface SendTokenQRDataType extends QRData {

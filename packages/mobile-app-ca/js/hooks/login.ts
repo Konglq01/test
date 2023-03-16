@@ -126,7 +126,7 @@ export function useOnManagerAddressAndQueryResult() {
         pinRef?.current?.reset();
       }
     },
-    [biometricsReady, dispatch, onIntervalGetResult],
+    [biometricsReady, dispatch, getDeviceInfo, onIntervalGetResult],
   );
 }
 
