@@ -12,6 +12,7 @@ import { useIntervalQueryCAInfoByAddress } from '@portkey-wallet/hooks/hooks-ca/
 import { setWalletInfoAction } from 'store/reducers/loginCache/actions';
 import { getDeviceInfo } from 'utils/device';
 import { DEVICE_TYPE } from 'constants/index';
+import { DEVICE_INFO_VERSION } from '@portkey-wallet/constants/constants-ca/device';
 import './index.less';
 
 export default function ScanCard() {
@@ -46,7 +47,10 @@ export default function ScanCard() {
       address: newWallet.address,
       netWorkType: currentNetwork,
       chainType: 'aelf',
-      deviceInfo,
+      extraData: {
+        deviceInfo,
+        version: DEVICE_INFO_VERSION,
+      },
     };
     return JSON.stringify(data);
   }, [currentNetwork, deviceInfo, newWallet]);

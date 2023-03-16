@@ -1,4 +1,4 @@
-import { DEVICE_TYPE_INFO, DEVICE_VERSION } from '@portkey-wallet/constants/constants-ca/device';
+import { DEVICE_TYPE_INFO, DEVICE_INFO_VERSION } from '@portkey-wallet/constants/constants-ca/device';
 import {
   DeviceInfoType,
   DeviceType,
@@ -28,7 +28,7 @@ export const extraDataEncode = (deviceInfo: DeviceInfoType): string => {
   return JSON.stringify({
     transactionTime: Date.now(),
     deviceInfo: JSON.stringify(deviceInfo),
-    version: DEVICE_VERSION,
+    version: DEVICE_INFO_VERSION,
   });
 };
 
