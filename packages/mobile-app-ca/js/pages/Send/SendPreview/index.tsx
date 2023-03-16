@@ -264,7 +264,9 @@ const SendHome: React.FC<SendHomeProps> = props => {
         </View>
       ) : (
         <>
-          <Text style={[styles.tokenCount, fonts.mediumFont]}>{`- ${sendNumber} ${assetInfo?.symbol}`} </Text>
+          <Text style={[styles.tokenCount, FontStyles.font5, fonts.mediumFont]}>
+            {`- ${sendNumber} ${assetInfo?.symbol}`}{' '}
+          </Text>
           {/* <TextM style={styles.tokenUSD}>-$ -</TextM> */}
         </>
       )}
