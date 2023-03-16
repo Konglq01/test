@@ -223,6 +223,7 @@ export default class ServiceWorkerInstantiate {
   }
 
   async getSocialLogin(sendResponse: SendResponseFun, message: any) {
+    socialLoginService.finishSocialLogin();
     this.notificationServiceClose(sendResponse, { closeParams: message.params, promptType: 'windows' });
   }
 
