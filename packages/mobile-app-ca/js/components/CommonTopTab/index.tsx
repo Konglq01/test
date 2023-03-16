@@ -33,6 +33,7 @@ const CommonTopTab: React.FC<CommonTopTabProps> = props => {
         tabBarInactiveTintColor: defaultColors.font3, // active
         tabBarActiveTintColor: defaultColors.font4, // inactive
         tabBarIndicatorStyle: { borderWidth: StyleSheet.hairlineWidth, borderColor: defaultColors.bg5 }, // active border
+        tabBarPressColor: defaultColors.bg1,
       }}>
       {tabList.map(ele => (
         <Tab.Screen key={ele.name} name={ele.name}>

@@ -72,7 +72,7 @@ const AssetItem = (props: { symbol: string; onPress: (item: any) => void; item: 
 
           {/* TODO: num of nft use witch one */}
           <View style={itemStyle.balanceWrap}>
-            <TextXL style={[itemStyle.token, FontStyles.font5]}>{item.nftInfo.balance}</TextXL>
+            <TextL style={[itemStyle.token, FontStyles.font5]}>{item.nftInfo.balance}</TextL>
             <TextS style={itemStyle.dollar} />
           </View>
         </View>
