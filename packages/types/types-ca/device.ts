@@ -1,3 +1,5 @@
+import { PartialOption } from '../common';
+
 export interface DeviceInfoType {
   deviceName?: string;
   deviceType?: DeviceType;
@@ -12,6 +14,8 @@ export interface ExtraDataType {
 export interface ExtraDataDecodeType extends Omit<ExtraDataType, 'deviceInfo'> {
   deviceInfo: DeviceInfoType;
 }
+
+export type QRExtraDataType = PartialOption<ExtraDataDecodeType, 'transactionTime'>;
 
 export interface DeviceItemType extends ExtraDataDecodeType {
   managerAddress?: string | null;

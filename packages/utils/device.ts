@@ -1,8 +1,27 @@
 import { DEVICE_TYPE_INFO, DEVICE_VERSION } from '@portkey-wallet/constants/constants-ca/device';
-import { DeviceInfoType, DeviceType, ExtraDataDecodeType, ExtraDataType } from '@portkey-wallet/types/types-ca/device';
+import {
+  DeviceInfoType,
+  DeviceType,
+  ExtraDataDecodeType,
+  ExtraDataType,
+  QRExtraDataType,
+} from '@portkey-wallet/types/types-ca/device';
 
 const checkDateNumber = (value: number): boolean => {
   return !isNaN(value) && !isNaN(new Date(value).getTime());
+};
+
+export const getDeviceInfoFromQR = (qrExtraData?: QRExtraDataType, deviceType?: DeviceType): DeviceInfoType => {
+  if (qrExtraData !== undefined) {
+    return {
+      ...DEVICE_TYPE_INFO[DeviceType.OTHER],
+      ...qrExtraData.deviceInfo,
+    };
+  }
+  if (deviceType === undefined || DeviceType[deviceType] === undefined) {
+    return DEVICE_TYPE_INFO[DeviceType.OTHER];
+  }
+  return DEVICE_TYPE_INFO[deviceType];
 };
 
 export const extraDataEncode = (deviceInfo: DeviceInfoType): string => {
@@ -74,6 +93,10 @@ export const extraDataDecode = (extraDataStr: string): ExtraDataDecodeType => {
 
     default:
       break;
+  }
+
+  if (extraData.deviceInfo.deviceType === undefined || DeviceType[extraData.deviceInfo.deviceType] === undefined) {
+    extraData.deviceInfo.deviceType = DeviceType.OTHER;
   }
 
   return extraData;
