@@ -18,7 +18,7 @@ import { isIOS } from '@rneui/base';
 import { LoginGuardianTypeIcon } from 'constants/misc';
 import { LoginKeyType, LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import { VerifierImage } from '../VerifierImage';
-import { GuardiansStatus, GuardiansStatusItem } from 'pages/My/Guardian/types';
+import { GuardiansStatus, GuardiansStatusItem } from 'pages/Guardian/types';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import useDebounceCallback from 'hooks/useDebounceCallback';
 import { verification } from 'utils/api';

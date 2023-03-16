@@ -10,6 +10,7 @@ import TokenNav from 'pages/Token';
 import SendNav from 'pages/Send';
 import ActivityNav from 'pages/Activity';
 import Home from 'pages/Home';
+import GuardianNav from 'pages/Guardian';
 
 import Referral from 'pages/Referral';
 import SecurityLock from 'pages/SecurityLock';
@@ -30,6 +31,7 @@ export const stackNav = [
   // FIXME: test page
   { name: 'Home', component: Home },
 
+  ...GuardianNav,
   ...ActivityNav,
   ...LoginNav,
   ...TokenNav,

@@ -10,7 +10,7 @@ import { VerificationType, VerifierInfo } from '@portkey-wallet/types/verifier';
 import myEvents from 'utils/deviceEvent';
 import { AElfWallet } from '@portkey-wallet/types/aelf';
 import PinContainer from 'components/PinContainer';
-import { GuardiansApproved } from 'pages/My/Guardian/types';
+import { GuardiansApproved } from 'pages/Guardian/types';
 import { StyleSheet } from 'react-native';
 
 type RouterParams = {
