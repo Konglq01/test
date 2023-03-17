@@ -57,13 +57,13 @@ export default function SelectCountry() {
   };
   return (
     <PageContainer
-      titleDom="Select country/region"
+      titleDom="Country/Region"
       safeAreaColor={['blue', 'white']}
       containerStyles={styles.containerStyles}
       scrollViewProps={{ disabled: true }}>
       <View style={styles.inputContainerStyle}>
         <CommonInput
-          placeholder="Search countries and region"
+          placeholder="Search countries and regions"
           type="search"
           onChangeText={s => setSearchList(!s ? undefined : countryCodeFilter(s))}
         />

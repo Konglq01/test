@@ -16,6 +16,7 @@ import { defaultColors } from 'assets/theme';
 import Divider from 'components/Divider';
 import CommonToast from 'components/CommonToast';
 import { useAppleAuthentication, useGoogleAuthentication } from 'hooks/authentication';
+import { isIos } from '@portkey-wallet/utils/mobile/device';
 
 const TitleMap = {
   [PageType.login]: {
@@ -61,21 +62,26 @@ export default function Referral({
           titleStyle={[FontStyles.font3, pageStyles.outlineTitleStyle]}
           title={TitleMap[type].google}
         />
-        <CommonButton
-          type="outline"
-          icon={<Svg icon="apple" size={24} />}
-          onPress={async () => {
-            try {
-              const info = await appleSign();
-              console.log(info, '=======info');
-            } catch (error) {
-              CommonToast.failError(error);
-            }
-          }}
-          containerStyle={pageStyles.outlineContainerStyle}
-          titleStyle={[FontStyles.font3, pageStyles.outlineTitleStyle]}
-          title={TitleMap[type].apple}
-        />
+        {isIos && (
+          <CommonButton
+            type="outline"
+            icon={<Svg icon="apple" size={24} />}
+            onPress={async () => {
+              try {
+                const info = await appleSign();
+                console.log(info, '=======info');
+              } catch (error) {
+                console.log(error, '======error');
+
+                CommonToast.failError(error);
+              }
+            }}
+            containerStyle={pageStyles.outlineContainerStyle}
+            titleStyle={[FontStyles.font3, pageStyles.outlineTitleStyle]}
+            title={TitleMap[type].apple}
+          />
+        )}
+
         <Divider title="OR" inset={true} style={pageStyles.dividerStyle} />
         <CommonButton type="primary" onPress={() => setLoginType(PageLoginType.phone)} title={TitleMap[type].button} />
       </View>

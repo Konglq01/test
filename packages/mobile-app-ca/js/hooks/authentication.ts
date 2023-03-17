@@ -15,6 +15,7 @@ export function useGoogleAuthentication() {
   const [androidResponse, setResponse] = useState<any>();
   const [request, response, promptAsync] = Google.useAuthRequest({
     iosClientId: Config.GOOGLE_IOS_CLIENT_ID,
+    androidClientId: Config.GOOGLE_IOS_CLIENT_ID,
   });
   const androidPromptAsync = useCallback(async () => {
     try {

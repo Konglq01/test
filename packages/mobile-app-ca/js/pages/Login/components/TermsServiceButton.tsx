@@ -18,7 +18,7 @@ export default function TermsServiceButton() {
         })
       }>
       <TextS style={FontStyles.font7}>
-        Use the application according to <Text style={FontStyles.font4}>Terms of Service </Text>
+        By proceeding, you agree to the <Text style={FontStyles.font4}>Terms of Service.</Text>
       </TextS>
     </Touchable>
   );
