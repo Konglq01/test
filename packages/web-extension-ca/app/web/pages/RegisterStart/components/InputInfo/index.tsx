@@ -24,7 +24,7 @@ export default function InputInfo({ confirmText, validateEmail, onFinish }: Inpu
             onFinish={(v) => {
               onFinish({
                 loginType: LoginType.Apple,
-                guardianAccount: `${v.code} ${v.phoneNumber}`,
+                guardianAccount: `+${v.code} ${v.phoneNumber}`,
               });
             }}
           />
