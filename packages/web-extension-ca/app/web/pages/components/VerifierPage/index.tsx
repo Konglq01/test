@@ -143,7 +143,7 @@ export default function VerifierPage({ currentGuardian, guardianType, isInitStat
       </div>
       <div className="send-tip">
         {isPrompt || 'Please contact your guardians, and enter '}
-        {t('sendCodeTip1', { codeCount: DIGIT_CODE.length })}&nbsp;
+        <span>{t('sendCodeTip1', { codeCount: DIGIT_CODE.length })}</span>
         <span className="account">{currentGuardian?.guardianAccount}</span>
         <br />
         {t('sendCodeTip2', { minute: DIGIT_CODE.expiration })}

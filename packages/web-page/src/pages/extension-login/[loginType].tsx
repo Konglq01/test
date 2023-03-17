@@ -6,11 +6,10 @@ import { ISocialLogin } from '@portkey-wallet/types/types-ca/wallet';
 export default function ExtensionLogin() {
   const router = useRouter();
   const { loginType } = router.query;
-  console.log(loginType, 'router===');
 
   return (
-    <div>
+    <>
       <SocialTem loginType={loginType as ISocialLogin} />
-    </div>
+    </>
   );
 }
