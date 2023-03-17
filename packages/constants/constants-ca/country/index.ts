@@ -1,4 +1,4 @@
-import { CountryItem } from '../index';
+import { CountryItem } from '@portkey-wallet/types/types-ca/country';
 import countryCodeMap from './countryCodeList.json';
 
 export const getCountryCodeJSON = (countryCode: CountryItem[]) => {
@@ -43,3 +43,5 @@ export const countryCodeFilter = (filterFelid: string) => {
     return countryCodeList.filter(country => country.country.toLocaleLowerCase().includes(filterFelid));
   }
 };
+
+export const DefaultCountry = { country: 'Singapore', code: '65', iso: 'SG' };
