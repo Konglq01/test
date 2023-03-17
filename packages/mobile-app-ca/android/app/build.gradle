@@ -148,6 +148,14 @@ def reactNativeArchitectures() {
     return value ? value.split(",") : ["armeabi-v7a", "x86", "x86_64", "arm64-v8a"]
 }
 
+
+/*
+ * get release time
+ */
+def releaseTime() {
+    return new Date().format("MMddhhmm",TimeZone.getDefault())
+}
+
 android {
     ndkVersion rootProject.ext.ndkVersion
 
@@ -298,6 +306,10 @@ android {
                         defaultConfig.versionCode * 1000 + versionCodes.get(abi)
             }
 
+        }
+
+        variant.outputs.all {
+            outputFileName = "portkey_v${defaultConfig.versionName}_${releaseTime()}.apk"
         }
     }
 }
