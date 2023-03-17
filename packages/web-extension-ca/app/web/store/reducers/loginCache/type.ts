@@ -1,4 +1,4 @@
-import { CountryItem } from '@portkey-wallet/constants/constants-ca';
+import { CountryItem } from '@portkey-wallet/types/types-ca/country';
 import { CAInfoType, LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import { VerifierInfo } from '@portkey-wallet/types/verifier';
 
