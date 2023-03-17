@@ -9,7 +9,7 @@ import { TextL, TextXL } from 'components/CommonText';
 import { pTd } from 'utils/unit';
 import { useLanguage } from 'i18n/hooks';
 import OverlayBody from 'components/OverlayModal/OverlayBody';
-import { VerifierImage } from '../VerifierImage';
+import { VerifierImage } from 'pages/Guardian/components/VerifierImage';
 
 type ValueType = string | number;
 type DefaultValueType = string;
