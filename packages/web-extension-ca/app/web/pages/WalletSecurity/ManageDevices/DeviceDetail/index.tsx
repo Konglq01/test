@@ -47,7 +47,7 @@ export default function DeviceDetail(props: DeviceDetailProps) {
           <div className="flex-center icon">
             <CustomSvg type={getDeviceIcon(device.deviceInfo.deviceType || DeviceType.OTHER)} />
           </div>
-          <div className="name">{device.deviceInfo.deviceType}</div>
+          <div className="name">{device.deviceInfo.deviceName}</div>
           {walletInfo.address === device.managerAddress && <div className="flex-center tag">{t('Current')}</div>}
         </div>
         <div className="item-time">

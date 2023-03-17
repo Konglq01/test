@@ -55,7 +55,7 @@ export default function AboutUs() {
           {socialList.map((item) => (
             <MenuItem
               key={item.label}
-              height={53}
+              height={56}
               icon={<CustomSvg type={item.icon || 'Aelf'} />}
               onClick={() => {
                 // navigate(item.link);
@@ -68,7 +68,7 @@ export default function AboutUs() {
           {serviceList.map((item) => (
             <MenuItem
               key={item.label}
-              height={53}
+              height={56}
               icon={<CustomSvg type={item.icon || 'Aelf'} />}
               onClick={() => {
                 // navigate(item.link);
