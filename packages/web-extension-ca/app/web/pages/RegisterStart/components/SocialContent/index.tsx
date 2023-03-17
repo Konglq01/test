@@ -2,12 +2,13 @@ import { ISocialLogin } from '@portkey-wallet/types/types-ca/wallet';
 import { Button } from 'antd';
 import CustomSvg from 'components/CustomSvg';
 import { useCallback } from 'react';
+import { RegisterType } from 'types/wallet';
 import { socialLoginAction } from 'utils/lib/serviceWorkerAction';
 import './index.less';
 
 interface GoogleBtnProps {
   onFinish?: (v: any) => void;
-  type: 'Login' | 'Sign up';
+  type: RegisterType;
 }
 
 export default function SocialContent({ type, onFinish }: GoogleBtnProps) {

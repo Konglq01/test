@@ -5,14 +5,13 @@ import LoginCard from './components/LoginCard';
 import ScanCard from './components/ScanCard';
 import SignCard from './components/SignCard';
 import { useCurrentNetworkInfo, useNetworkList } from '@portkey-wallet/hooks/hooks-ca/network';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { useAppDispatch, useLoading } from 'store/Provider/hooks';
 import { changeNetworkType } from '@portkey-wallet/store/store-ca/wallet/actions';
 import { NetworkType } from '@portkey-wallet/types';
 import CommonSelect from 'components/CommonSelect1';
 import { useChangeNetwork } from 'hooks/useChangeNetwork';
 import i18n from 'i18n';
-import './index.less';
 import { LoginInfo } from 'store/reducers/loginCache/type';
 import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
 import { resetGuardiansState } from '@portkey-wallet/store/store-ca/guardians/actions';
@@ -21,10 +20,10 @@ import { handleErrorCode, handleErrorMessage } from '@portkey-wallet/utils';
 import { message } from 'antd';
 import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import './index.less';
 
 export default function RegisterStart() {
   const { type } = useParams();
-  console.log(type, 'useParams===');
   const currentNetwork = useCurrentNetworkInfo();
   const dispatch = useAppDispatch();
   const changeNetwork = useChangeNetwork();

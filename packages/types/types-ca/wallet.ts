@@ -19,7 +19,9 @@ export enum LoginType {
 
 export type LoginKeyType = string;
 
-export type ISocialLogin = 'Google' | 'Apple';
+export type LoginKey = keyof typeof LoginType;
+
+export type ISocialLogin = LoginKey;
 
 export interface CAInfo {
   caAddress: string;
