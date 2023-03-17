@@ -1,7 +1,7 @@
 import { useAppCASelector } from '.';
 import { useMemo, useCallback } from 'react';
 import { WalletInfoType } from '@portkey-wallet/types/wallet';
-import { CAInfo, CAInfoType, LoginType, RegisterStatus } from '@portkey-wallet/types/types-ca/wallet';
+import { CAInfoType } from '@portkey-wallet/types/types-ca/wallet';
 import { WalletState } from '@portkey-wallet/store/store-ca/wallet/type';
 import { useCurrentNetworkInfo } from './network';
 import { useCurrentChain } from './chainList';

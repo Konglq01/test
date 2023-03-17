@@ -21,14 +21,12 @@ import CommonToast from 'components/CommonToast';
 import useEffectOnce from './useEffectOnce';
 import { setCredentials } from 'store/user/actions';
 import { DigitInputInterface } from 'components/DigitInput';
-import { GuardiansApproved } from 'pages/My/Guardian/types';
+import { GuardiansApproved } from 'pages/Guardian/types';
 import { useGetDeviceInfo } from './device';
 import { extraDataEncode } from '@portkey-wallet/utils/device';
-import { DEVICE_TYPE } from 'constants/common';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { useGetGuardiansInfo, useGetVerifierServers } from './guardian';
 import { handleUserGuardiansList } from '@portkey-wallet/utils/guardian';
-
 export function useOnManagerAddressAndQueryResult() {
   const dispatch = useAppDispatch();
   const biometricsReady = useBiometricsReady();

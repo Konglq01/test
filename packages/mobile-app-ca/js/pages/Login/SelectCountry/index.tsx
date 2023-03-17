@@ -24,7 +24,6 @@ const List = countryCodeIndex.map(i => ({ index: i[0], items: i[1] }));
 
 export default function SelectCountry() {
   const { selectCountry } = useRouterParams<{ selectCountry?: CountryItem }>();
-  console.log(selectCountry, '=====selectCountry');
 
   const [searchList, setSearchList] = useState<CountryItem[]>();
   const data = useMemo(() => searchList || List, [searchList]);
@@ -56,8 +55,6 @@ export default function SelectCountry() {
       </View>
     );
   };
-  console.log(data, '======data');
-
   return (
     <PageContainer
       titleDom="Select country/region"

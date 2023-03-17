@@ -28,7 +28,7 @@ import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
 import { LoginKeyType, LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import { useAppDispatch } from 'store/hooks';
 import { setPreGuardianAction } from '@portkey-wallet/store/store-ca/guardians/actions';
-import { VerifierImage } from '../components/VerifierImage';
+import { VerifierImage } from 'pages/Guardian/components/VerifierImage';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verification } from 'utils/api';
 import fonts from 'assets/theme/fonts';

@@ -49,13 +49,16 @@ export const Popover = forwardRef((_, _ref) => {
   const onSetPopoverInfo = useCallback(
     (info: PopoverInfo) => {
       if (!info) return;
-      Animated.timing(marginTop, {
-        useNativeDriver: false,
-        toValue: info.top - info.indexHeight / 2,
-        duration: 200,
-      }).start(({ finished }) => {
-        finished && setPopoverInfo(info);
-      });
+      marginTop.setValue(info.top - info.indexHeight / 2);
+      setPopoverInfo(info);
+      // Animated ?
+      // Animated.timing(marginTop, {
+      //   useNativeDriver: false,
+      //   toValue: info.top - info.indexHeight / 2,
+      //   duration: 0,
+      // }).start(({ finished }) => {
+      //   finished && setPopoverInfo(info);
+      // });
     },
     [marginTop],
   );

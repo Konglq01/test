@@ -38,8 +38,8 @@ type RouterParams = {
   guardianItem?: UserGuardianItem;
   verifierInfo?: VerifierInfo;
   verifiedTime?: number;
-  loginType?: LoginType;
   removeManagerAddress?: string;
+  loginType?: LoginType;
 };
 export default function GuardianApproval() {
   const {
@@ -49,8 +49,8 @@ export default function GuardianApproval() {
     guardianItem,
     verifierInfo,
     verifiedTime,
-    loginType,
     removeManagerAddress,
+    loginType,
   } = useRouterParams<RouterParams>();
   const dispatch = useAppDispatch();
 
@@ -336,7 +336,6 @@ const styles = StyleSheet.create({
   approvalTitleRow: {
     justifyContent: 'space-between',
     borderBottomWidth: StyleSheet.hairlineWidth,
-    marginBottom: 8,
   },
   approvalRow: {
     paddingBottom: 12,

@@ -1,5 +1,6 @@
 import React, { forwardRef, Ref } from 'react';
 import { LargeList, LargeListPropType } from 'react-native-largelist';
+import UpPullLoading from './components/UpPullLoading';
 export interface CommonLargeListProps
   extends Omit<LargeListPropType, 'heightForIndexPath' | 'renderIndexPath' | 'heightForSection'> {
   indexHeight: number;
@@ -14,9 +15,10 @@ const CommonLargeList = forwardRef((props: CommonLargeListProps, forwardedRef: R
   return (
     <LargeList
       {...listProps}
+      ref={forwardedRef}
       renderIndexPath={renderItem}
       renderSection={renderSection}
-      ref={forwardedRef}
+      refreshHeader={UpPullLoading as any}
       heightForSection={() => sectionHeight}
       heightForIndexPath={() => indexHeight}
       data={Array.isArray(listData) ? listData : []}
