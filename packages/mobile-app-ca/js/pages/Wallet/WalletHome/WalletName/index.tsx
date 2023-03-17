@@ -63,6 +63,7 @@ const WalletName: React.FC = () => {
       scrollViewProps={{ disabled: true }}>
       <CommonInput
         type="general"
+        spellCheck={false}
         value={nameValue}
         theme={'white-bg'}
         placeholder={t('Enter Wallet Name')}
