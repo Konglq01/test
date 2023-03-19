@@ -42,6 +42,7 @@ import {
 } from '@portkey-wallet/store/store-ca/assets/slice';
 import { sleep } from '@portkey-wallet/utils';
 import { FontStyles } from 'assets/theme/styles';
+import { ChainId } from '@portkey-wallet/types';
 
 export interface SendHomeProps {
   route?: any;
@@ -238,8 +239,8 @@ const SendHome: React.FC<SendHomeProps> = props => {
   };
 
   const networkInfoShow = (address: string) => {
-    const chainId = address.split('_')[2];
-    return chainId === 'AELF' ? 'MainChain AELF' : `SideChain ${chainId} `;
+    const chainId = address.split('_')[2] as ChainId;
+    return formatChainInfoToShow(chainId);
   };
 
   console.log('currentNetwork', currentNetwork);

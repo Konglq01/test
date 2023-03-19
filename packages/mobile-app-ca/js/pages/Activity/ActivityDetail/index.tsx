@@ -9,7 +9,7 @@ import { useCaAddresses, useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca
 import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
 import { fetchActivity } from '@portkey-wallet/store/store-ca/activity/api';
 import { ActivityItemType, TransactionStatus } from '@portkey-wallet/types/types-ca/activity';
-import { addressFormat, getExploreLink } from '@portkey-wallet/utils';
+import { addressFormat, formatChainInfoToShow, getExploreLink } from '@portkey-wallet/utils';
 import { unitConverter } from '@portkey-wallet/utils/converter';
 import { Image } from '@rneui/base';
 import { defaultColors } from 'assets/theme';
@@ -30,6 +30,7 @@ import { formatTransferTime } from 'utils';
 import { formatStr2EllipsisStr } from '@portkey-wallet/utils';
 import navigationService from 'utils/navigationService';
 import { pTd } from 'utils/unit';
+import { useIsTestnet } from '@portkey-wallet/hooks/hooks-ca/network';
 
 interface RouterParams {
   transactionId?: string;
@@ -43,9 +44,8 @@ const ActivityDetail = () => {
   const { t } = useLanguage();
   const { transactionId = '', blockHash = '', isReceived: isReceivedParams } = useRouterParams<RouterParams>();
   const caAddresses = useCaAddresses();
+  const isTestnet = useIsTestnet();
   const { currentNetwork } = useCurrentWallet();
-
-  const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'TESTNET' : ''), [currentNetwork]);
 
   const [activityItem, setActivityItem] = useState<ActivityItemType>();
 
@@ -105,8 +105,6 @@ const ActivityDetail = () => {
 
   const networkUI = useMemo(() => {
     const { transactionType, fromChainId, toChainId, transactionId: _transactionId = '' } = activityItem || {};
-    const from = fromChainId === 'AELF' ? 'MainChain AELF' : `SideChain ${fromChainId}`;
-    const to = toChainId === 'AELF' ? 'MainChain AELF' : `SideChain ${toChainId}`;
 
     const isNetworkShow = transactionType && !hiddenArr.includes(transactionType);
     return (
@@ -116,10 +114,10 @@ const ActivityDetail = () => {
             <View style={[styles.flexSpaceBetween]}>
               <TextM style={[styles.lightGrayFontColor]}>{t('Network')}</TextM>
               <View style={styles.networkInfoContent}>
-                <TextM style={[styles.blackFontColor]}>{`${from} ${isTestNet}`}</TextM>
+                <TextM style={[styles.blackFontColor]}>{formatChainInfoToShow(fromChainId, currentNetwork)}</TextM>
                 <View style={GStyles.flexRow}>
                   <TextM style={[styles.lightGrayFontColor]}>{` → `}</TextM>
-                  <TextM style={[styles.blackFontColor]}>{`${to} ${isTestNet}`}</TextM>
+                  <TextM style={[styles.blackFontColor]}>{formatChainInfoToShow(toChainId, currentNetwork)}</TextM>
                 </View>
               </View>
             </View>
@@ -136,7 +134,7 @@ const ActivityDetail = () => {
         <Text style={[styles.divider, styles.marginTop0]} />
       </>
     );
-  }, [CopyIconUI, activityItem, isTestNet, t, transactionId]);
+  }, [CopyIconUI, activityItem, currentNetwork, t, transactionId]);
 
   const feeUI = useMemo(() => {
     const transactionFees =
@@ -154,7 +152,7 @@ const ActivityDetail = () => {
                 <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${unitConverter(
                   ZERO.plus(item?.fee ?? 0).div(`1e${DEFAULT_DECIMAL}`),
                 )} ${item.symbol}`}</TextM>
-                {!isTestNet && (
+                {!isTestnet && (
                   <TextS style={[styles.lightGrayFontColor, styles.marginTop4]}>{`$ ${unitConverter(
                     ZERO.plus(item?.feeInUsd ?? 0).div(`1e${DEFAULT_DECIMAL}`),
                     2,
@@ -166,7 +164,7 @@ const ActivityDetail = () => {
         </View>
       </View>
     );
-  }, [activityItem?.transactionFees, isTestNet, t]);
+  }, [activityItem?.transactionFees, isTestnet, t]);
 
   return (
     <PageContainer
@@ -210,7 +208,7 @@ const ActivityDetail = () => {
                 ZERO.plus(activityItem?.amount || 0).div(`1e${activityItem?.decimals || DEFAULT_DECIMAL}`),
               )} ${activityItem?.symbol || ''}`}
             </Text>
-            {!isTestNet && (
+            {!isTestnet && (
               <Text style={styles.usdtCount}>{`$ ${unitConverter(ZERO.plus(activityItem?.priceInUsd ?? 0), 2)}`}</Text>
             )}
           </>
