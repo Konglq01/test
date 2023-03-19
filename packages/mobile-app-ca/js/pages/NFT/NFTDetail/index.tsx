@@ -14,6 +14,7 @@ import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
 import { IToSendHomeParamsType } from '@portkey-wallet/types/types-ca/routeParams';
 import SafeAreaBox from 'components/SafeAreaBox';
 import Svg from 'components/Svg';
+import CommonAvatar from 'components/CommonAvatar';
 
 export interface TokenDetailProps {
   route?: any;
@@ -45,7 +46,10 @@ const NFTDetail: React.FC<TokenDetailProps> = props => {
       <TextXXL style={styles.title}>{`${alias} #${tokenId}`}</TextXXL>
       <TextM style={[FontStyles.font3, styles.balance]}>{`Balance ${balance}`}</TextM>
 
-      {!imageUrl ? (
+      {/* TODO: test style */}
+      <CommonAvatar title={alias} style={[imageUrl ? styles.image1 : styles.image]} imageUrl={imageUrl} />
+
+      {/* {!imageUrl ? (
         <Text style={styles.image}>{alias[0]}</Text>
       ) : (
         <Image
@@ -54,10 +58,9 @@ const NFTDetail: React.FC<TokenDetailProps> = props => {
           }}
           style={styles.image1}
         />
-      )}
+      )} */}
 
       <CommonButton
-        style={{}}
         type="primary"
         onPress={() => {
           navigationService.navigate('SendHome', {
