@@ -29,7 +29,7 @@ export type GetContractListApiType = {
 };
 
 export interface RecentContactItemType extends ContactItemType {
-  chainId: string;
+  chainId: ChainId;
   caAddress: string;
   address: string;
   addressChainId: string;
