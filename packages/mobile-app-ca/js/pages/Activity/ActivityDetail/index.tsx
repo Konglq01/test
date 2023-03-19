@@ -1,16 +1,11 @@
-import {
-  DEFAULT_DECIMAL,
-  TransactionTypes,
-  transactionTypesMap,
-} from '@portkey-wallet/constants/constants-ca/activity';
-import { ZERO } from '@portkey-wallet/constants/misc';
+import { ELF_DECIMAL, TransactionTypes, transactionTypesMap } from '@portkey-wallet/constants/constants-ca/activity';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { useCaAddresses, useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
 import { fetchActivity } from '@portkey-wallet/store/store-ca/activity/api';
 import { ActivityItemType, TransactionStatus } from '@portkey-wallet/types/types-ca/activity';
 import { addressFormat, formatChainInfoToShow, getExploreLink } from '@portkey-wallet/utils';
-import { unitConverter } from '@portkey-wallet/utils/converter';
+import { divDecimals, unitConverter } from '@portkey-wallet/utils/converter';
 import { Image } from '@rneui/base';
 import { defaultColors } from 'assets/theme';
 import fonts from 'assets/theme/fonts';
@@ -49,7 +44,7 @@ const ActivityDetail = () => {
 
   const [activityItem, setActivityItem] = useState<ActivityItemType>();
 
-  const { explorerUrl } = useCurrentChain(activityItem?.fromChainId) as { explorerUrl: string };
+  const { explorerUrl } = useCurrentChain(activityItem?.fromChainId) ?? {};
 
   useEffectOnce(() => {
     const params = {
@@ -150,11 +145,11 @@ const ActivityDetail = () => {
             {transactionFees.map((item, index) => (
               <View key={index} style={[styles.transactionFeeItemWrap, index > 0 && styles.marginTop8]}>
                 <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${unitConverter(
-                  ZERO.plus(item?.fee ?? 0).div(`1e${DEFAULT_DECIMAL}`),
+                  divDecimals(item?.fee ?? 0, ELF_DECIMAL),
                 )} ${item.symbol}`}</TextM>
                 {!isTestnet && (
                   <TextS style={[styles.lightGrayFontColor, styles.marginTop4]}>{`$ ${unitConverter(
-                    ZERO.plus(item?.feeInUsd ?? 0).div(`1e${DEFAULT_DECIMAL}`),
+                    divDecimals(item?.feeInUsd ?? 0, ELF_DECIMAL),
                     2,
                   )}`}</TextS>
                 )}
@@ -204,12 +199,12 @@ const ActivityDetail = () => {
             <Text style={[styles.tokenCount, styles.fontBold]}>
               {!hiddenArr.includes(activityItem?.transactionType as TransactionTypes) &&
                 (activityItem?.isReceived ? '+' : '-')}
-              {`${unitConverter(
-                ZERO.plus(activityItem?.amount || 0).div(`1e${activityItem?.decimals || DEFAULT_DECIMAL}`),
-              )} ${activityItem?.symbol || ''}`}
+              {`${unitConverter(divDecimals(activityItem?.amount, activityItem?.decimals))} ${
+                activityItem?.symbol || ''
+              }`}
             </Text>
             {!isTestnet && (
-              <Text style={styles.usdtCount}>{`$ ${unitConverter(ZERO.plus(activityItem?.priceInUsd ?? 0), 2)}`}</Text>
+              <Text style={styles.usdtCount}>{`$ ${unitConverter(activityItem?.priceInUsd ?? 0, 2)}`}</Text>
             )}
           </>
         ))}
@@ -274,7 +269,6 @@ const ActivityDetail = () => {
         <CommonButton
           containerStyle={[GStyles.marginTop(pTd(8)), styles.bottomButton]}
           onPress={() => {
-            if (!explorerUrl) return;
             if (!activityItem?.transactionId) return;
 
             navigationService.navigate('ViewOnWebView', {

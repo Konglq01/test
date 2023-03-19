@@ -12,7 +12,7 @@ import { useLanguage } from 'i18n/hooks';
 import { useAppCommonDispatch } from '@portkey-wallet/hooks';
 import GStyles from 'assets/theme/GStyles';
 import fonts from 'assets/theme/fonts';
-import { Image, ScreenHeight } from '@rneui/base';
+import { Image } from '@rneui/base';
 import { getContractBasic } from '@portkey-wallet/contracts/utils';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { usePin, useWallet } from 'hooks/store';
@@ -44,11 +44,7 @@ import { sleep } from '@portkey-wallet/utils';
 import { FontStyles } from 'assets/theme/styles';
 import { ChainId } from '@portkey-wallet/types';
 
-export interface SendHomeProps {
-  route?: any;
-}
-
-const SendHome: React.FC<SendHomeProps> = props => {
+const SendHome: React.FC = () => {
   const { t } = useLanguage();
 
   const { sendType, assetInfo, toInfo, transactionFee, sendNumber } = useRouterParams<IToSendPreviewParamsType>();
