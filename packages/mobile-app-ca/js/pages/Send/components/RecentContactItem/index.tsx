@@ -8,8 +8,9 @@ import { TextM, TextS, TextXXL } from 'components/CommonText';
 import Svg from 'components/Svg';
 import React, { memo, useState } from 'react';
 import { Text, View, TouchableOpacity, StyleSheet } from 'react-native';
-import { formatStr2EllipsisStr } from '@portkey-wallet/utils';
+import { formatChainInfoToShow, formatStr2EllipsisStr } from '@portkey-wallet/utils';
 import { pTd } from 'utils/unit';
+import { ChainId } from '@portkey-wallet/types';
 
 export interface ItemType {
   contact: RecentContactItemType;
@@ -48,9 +49,9 @@ const RecentContactItem: React.FC<ItemType> = props => {
               </Text>
               {/* TODO */}
               <Text style={[styles.address, !!0 && FontStyles.font7]}>
-                {`${ele?.chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${ele?.chainId} ${
-                  currentNetwork === 'TESTNET' && 'Testnet'
-                }`}
+                {/* TODO: delete as  */}
+
+                {formatChainInfoToShow(ele?.chainId as ChainId, currentNetwork)}
               </Text>
             </TouchableOpacity>
           ))}
@@ -67,9 +68,8 @@ const RecentContactItem: React.FC<ItemType> = props => {
       <TextS style={styles.address1}>
         {formatStr2EllipsisStr(`ELF_${contact.addresses?.[0].address}_${contact.addressChainId}`, 10)}
       </TextS>
-      <Text style={styles.chainInfo1}>{`${contact?.addressChainId === 'AELF' ? 'MainChain' : 'SideChain'} ${
-        contact?.addressChainId
-      } ${currentNetwork === 'TESTNET' && 'Testnet'}`}</Text>
+      {/* TODO: delete as  */}
+      <Text style={styles.chainInfo1}>{formatChainInfoToShow(contact?.addressChainId as ChainId, currentNetwork)}</Text>
     </TouchableOpacity>
   );
 };
