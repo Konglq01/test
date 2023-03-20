@@ -4,7 +4,7 @@ import { VerifyStatus } from '@portkey-wallet/types/verifier';
 import { Button, message } from 'antd';
 import clsx from 'clsx';
 import VerifierPair from 'components/VerifierPair';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { useAppDispatch, useLoading } from 'store/Provider/hooks';
@@ -14,6 +14,8 @@ import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
 import { verification } from 'utils/api';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import socialVerify from 'pages/GuardianApproval/utils/socialVerify';
+import { handleErrorMessage } from '@portkey-wallet/utils';
 
 interface GuardianItemProps {
   disabled?: boolean;
@@ -27,6 +29,11 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
   const { state } = useLocation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+
+  const isSocialLogin = useMemo(
+    () => item.guardianType === LoginType.Google || item.guardianType === LoginType.Apple,
+    [item.guardianType],
+  );
 
   const guardianSendCode = useCallback(
     async (item: UserGuardianItem) => {
@@ -131,8 +138,26 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
     [state, loginAccount, setLoading, guardianSendCode, dispatch, navigate],
   );
 
+  const socialVerifyHandler = useCallback(
+    async (item: UserGuardianItem) => {
+      //
+      try {
+        setLoading(true);
+        const result = await socialVerify(item);
+        // dispatch()
+      } catch (error) {
+        const msg = handleErrorMessage(error);
+        message.error(msg);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [setLoading],
+  );
+
   const verifyingHandler = useCallback(
     async (item: UserGuardianItem) => {
+      if (isSocialLogin) return socialVerifyHandler(item);
       dispatch(setCurrentGuardianAction({ ...item, isInitStatus: false }));
       if (state?.indexOf('guardians') !== -1) {
         navigate('/setting/guardians/verifier-account', { state: state });
@@ -142,7 +167,7 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
         navigate('/login/verifier-account', { state: 'login' });
       }
     },
-    [dispatch, navigate, state],
+    [dispatch, isSocialLogin, navigate, socialVerifyHandler, state],
   );
 
   return (
@@ -158,12 +183,12 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
         </Button>
       ) : (
         <>
-          {(!item.status || item.status === VerifyStatus.NotVerified) && (
+          {(!item.status || item.status === VerifyStatus.NotVerified) && !isSocialLogin && (
             <Button className="not-verified" type="primary" onClick={() => SendCode(item)}>
               {t('Send')}
             </Button>
           )}
-          {item.status === VerifyStatus.Verifying && (
+          {(item.status === VerifyStatus.Verifying || (!item.status && isSocialLogin)) && (
             <Button type="primary" className="verifying" onClick={() => verifyingHandler(item)}>
               {t('Verify')}
             </Button>

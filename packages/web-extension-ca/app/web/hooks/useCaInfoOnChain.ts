@@ -1,3 +1,4 @@
+import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import useInterval from '@portkey-wallet/hooks/useInterval';
@@ -61,7 +62,7 @@ export const useCaInfoOnChain = () => {
     const pin = getSeedResult.data.privateKey;
     if (!pin) return;
     chainList
-      .filter((chain) => chain.chainId !== 'AELF')
+      .filter((chain) => chain.chainId !== DefaultChainId)
       .forEach((chain) => {
         if (!walletInfo[chain.chainId as ChainId]) {
           getHolderInfoByChainId({

@@ -6,7 +6,7 @@ import { pTd } from 'utils/unit';
 import { useLanguage } from 'i18n/hooks';
 import { defaultColors } from 'assets/theme';
 
-type CommonInputProps = InputProps & { type?: 'search' | 'general'; theme?: 'white-bg' | 'gray-bg' };
+export type CommonInputProps = InputProps & { type?: 'search' | 'general'; theme?: 'white-bg' | 'gray-bg' };
 
 const CommonInput = forwardRef((props: CommonInputProps, forwardedRef: any) => {
   const { t } = useLanguage();

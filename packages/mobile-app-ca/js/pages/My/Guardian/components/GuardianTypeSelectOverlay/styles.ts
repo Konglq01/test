@@ -4,7 +4,7 @@ import { pTd } from 'utils/unit';
 
 const styles = StyleSheet.create({
   itemRow: {
-    height: pTd(60),
+    height: pTd(72),
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
     flex: 1,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: defaultColors.border6,
-    height: pTd(60),
+    height: pTd(72),
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -24,6 +24,10 @@ const styles = StyleSheet.create({
     marginTop: pTd(16),
     marginBottom: pTd(8),
     textAlign: 'center',
+  },
+  leftIcon: {
+    borderRadius: pTd(14),
+    marginRight: pTd(16),
   },
 });
 

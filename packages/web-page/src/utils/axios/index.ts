@@ -1,5 +1,4 @@
 /**
- * @author hzz780
  * @description
  * 1. Init axios, config axios, make multiple hook instances, etc
  * Please get more config follow this URL https://www.npmjs.com/package/axios-hooks#useaxiosurlconfig-options
