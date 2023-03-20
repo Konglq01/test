@@ -79,6 +79,7 @@ export const formatStr2EllipsisStr = (address = '', digits = [10, 10], type: 'mi
 export enum AmountSign {
   PLUS = '+',
   MINUS = '-',
+  USD = '$ ',
   EMPTY = '',
 }
 export interface IFormatAmountProps {
@@ -110,7 +111,7 @@ export function formatAmount({
 
 /**
  * formatAmount with prefix and thousand mark, not unit
- * @example $11.1   1,100.1
+ * @example $11.1  +11.1  -11.1  9,999.9
  */
 export function formatAmountWithThousandMark({
   amount = DEFAULT_AMOUNT,

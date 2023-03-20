@@ -84,7 +84,9 @@ export default function ActivityList({ data, chainId, hasMore, loadMore }: IActi
           <span>From: {formatStr2EllipsisStr(transFromAddress, [7, 4])}</span>
           {nftInfo?.nftId && <span className="nft-name">{formatStr2EllipsisStr(nftInfo.alias)}</span>}
           {!isTestNet && !nftInfo?.nftId && (
-            <span>$ {formatAmountWithThousandMark({ amount: priceInUsd, decimals: 0, digits: 2 })}</span>
+            <span>
+              {formatAmountWithThousandMark({ sign: AmountSign.USD, amount: priceInUsd, decimals: 0, digits: 2 })}
+            </span>
           )}
         </p>
       );

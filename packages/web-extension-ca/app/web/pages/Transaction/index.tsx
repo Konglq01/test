@@ -111,7 +111,8 @@ export default function Transaction() {
         <p className="amount">
           {`${formatAmountWithThousandMark({ amount, decimals, sign })} ${symbol ?? ''}`}
           {!isTestNet && (
-            <span className="usd">{`$ ${formatAmountWithThousandMark({
+            <span className="usd">{`${formatAmountWithThousandMark({
+              sign: AmountSign.USD,
               amount: priceInUsd,
               decimals: 0,
               digits: 2,
@@ -214,8 +215,8 @@ export default function Transaction() {
                   })} ${item.symbol ?? ''}`}</span>
                   {!isTestNet && (
                     <span className="right-usd">
-                      ${' '}
                       {formatAmountWithThousandMark({
+                        sign: AmountSign.USD,
                         amount: item.feeInUsd,
                         decimals: activityItem.decimals,
                         digits: 2,
