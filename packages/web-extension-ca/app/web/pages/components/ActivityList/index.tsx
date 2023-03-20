@@ -1,6 +1,6 @@
 import { TransactionTypes, transactionTypesMap } from '@portkey-wallet/constants/constants-ca/activity';
 import { ActivityItemType, the2ThFailedActivityItemType } from '@portkey-wallet/types/types-ca/activity';
-import { formatStr2EllipsisStr } from '@portkey-wallet/utils/converter';
+import { AmountSign, formatAmountWithThousandMark, formatStr2EllipsisStr } from '@portkey-wallet/utils/converter';
 import { List } from 'antd-mobile';
 import CustomSvg from 'components/CustomSvg';
 import { useCallback } from 'react';
@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router';
 import './index.less';
 import LoadingMore from 'components/LoadingMore/LoadingMore';
 import { useIsTestnet } from 'hooks/useNetwork';
-import { AmountSign, formatAmount, transNetworkText } from '@portkey-wallet/utils/activity';
+import { transNetworkText } from '@portkey-wallet/utils/activity';
 import { Button, Modal } from 'antd';
 import { useAppCASelector } from '@portkey-wallet/hooks/hooks-ca';
 import { dateFormat } from 'utils';
@@ -65,7 +65,9 @@ export default function ActivityList({ data, chainId, hasMore, loadMore }: IActi
         <span>
           <span>
             {nftInfo?.nftId && <span>#{nftInfo.nftId}</span>}
-            {!nftInfo?.nftId && <span>{`${formatAmount({ sign, amount, decimals, digits: 4 })} ${symbol ?? ''}`}</span>}
+            {!nftInfo?.nftId && (
+              <span>{`${formatAmountWithThousandMark({ sign, amount, decimals, digits: 4 })} ${symbol ?? ''}`}</span>
+            )}
           </span>
         </span>
       </p>
@@ -82,7 +84,7 @@ export default function ActivityList({ data, chainId, hasMore, loadMore }: IActi
           <span>From: {formatStr2EllipsisStr(transFromAddress, [7, 4])}</span>
           {nftInfo?.nftId && <span className="nft-name">{formatStr2EllipsisStr(nftInfo.alias)}</span>}
           {!isTestNet && !nftInfo?.nftId && (
-            <span>$ {formatAmount({ amount: priceInUsd, decimals: 0, digits: 2 })}</span>
+            <span>$ {formatAmountWithThousandMark({ amount: priceInUsd, decimals: 0, digits: 2 })}</span>
           )}
         </p>
       );
