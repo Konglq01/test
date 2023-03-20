@@ -1,3 +1,4 @@
+import { windowHeight } from '@portkey-wallet/utils/mobile/device';
 import { isIOS } from '@rneui/base';
 import { makeStyles } from '@rneui/themed';
 import { pTd } from 'utils/unit';
@@ -16,6 +17,9 @@ export const useGStyles = makeStyles(theme => {
     },
     safeAreaContainer: {
       paddingBottom: !isIOS ? 20 : undefined,
+    },
+    overlayStyle: {
+      height: windowHeight - pTd(isIOS ? 68 : 100),
     },
   };
 });

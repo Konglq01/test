@@ -31,7 +31,7 @@ export default function SelectVerifier() {
     () =>
       Object.values(verifierMap ?? {})?.map((item) => ({
         value: item.id,
-        iconUrl: item.imageUrl ?? '',
+        verifierUrl: item.imageUrl ?? '',
         label: item.name,
       })),
     [verifierMap],
@@ -92,14 +92,16 @@ export default function SelectVerifier() {
       <div className="common-content1 select-verifier-content" id="select-verifier-content">
         <div className="title">{t('Select verifier')}</div>
         <p className="description">
-          {t('The recovery of decentralized accounts requires approval from your verifiers')}
+          {t(
+            'Verifiers protect your account and help you recover your assets when they are subject to risks. Please note: The more diversified your verifiers are, the higher security your assets enjoy.',
+          )}
         </p>
         <CommonSelect className="verifier-select" value={selectVal} onChange={handleChange} items={selectOptions} />
         <p className="popular-title">{t('Popular')}</p>
         <ul className="popular-content">
           {verifierShow?.map((item) => (
             <li key={item.name} className="popular-item" onClick={() => handleChange(item.id)}>
-              <BaseVerifierIcon src={item.imageUrl} rootClassName="popular-item-image" />
+              <BaseVerifierIcon src={item.imageUrl} fallback={item.name[0]} rootClassName="popular-item-image" />
               <p className="popular-item-name">{item.name}</p>
             </li>
           ))}

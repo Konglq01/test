@@ -3,7 +3,9 @@ import { useAppSelector } from 'store/Provider/hooks';
 import './index.less';
 
 export default function ScreenLoading() {
-  const { isLoading } = useAppSelector((state) => state.userInfo);
+  const {
+    loadingInfo: { isLoading, loadingText },
+  } = useAppSelector((state) => state.userInfo);
 
   console.log(isLoading, 'isLoading===');
   return (
@@ -19,7 +21,7 @@ export default function ScreenLoading() {
                 }
           }>
           <Loading />
-          <div className="loading-text">Loading...</div>
+          <div className="loading-text">{loadingText ? loadingText : 'Loading...'}</div>
         </div>
       )}
     </>

@@ -206,3 +206,22 @@ export const formatAddress2NoPrefix = (address: string): string => {
  * @returns
  */
 export const isMainNet = (network: NetworkType): boolean => network === 'MAIN';
+
+export const getAddressChainId = (toAddress: string, defaultChainId: ChainId) => {
+  if (!toAddress.includes('_')) return defaultChainId;
+  const arr = toAddress.split('_');
+  const addressChainId = arr[arr.length - 1];
+  // no suffix
+  if (isAelfAddress(addressChainId)) {
+    return defaultChainId;
+  }
+  return addressChainId;
+};
+
+/**
+ *  check is the same address
+ * @param address1
+ * @param address2
+ * @returns
+ */
+export const isSameAddresses = (address1: string, address2: string): boolean => address1.trim() === address2.trim();

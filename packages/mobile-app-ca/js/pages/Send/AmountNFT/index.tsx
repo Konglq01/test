@@ -21,6 +21,7 @@ export default function AmountNFT(props: AmountNFT) {
       <TextM style={styles.title}>Amount</TextM>
       <View style={styles.iptWrap}>
         <TextInput
+          autoFocus
           style={[styles.inputStyle, sendNumber === '0' && FontStyles.font7]}
           keyboardType="numeric"
           maxLength={18}

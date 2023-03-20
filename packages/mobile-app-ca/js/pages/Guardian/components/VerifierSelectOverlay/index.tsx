@@ -8,8 +8,8 @@ import Svg from 'components/Svg';
 import { TextL, TextXL } from 'components/CommonText';
 import { pTd } from 'utils/unit';
 import { useLanguage } from 'i18n/hooks';
-import OverlayBody from 'components/OverlayModal/OverlayBody';
 import { VerifierImage } from '../VerifierImage';
+import { ModalBody } from 'components/ModalBody';
 
 type ValueType = string | number;
 type DefaultValueType = string;
@@ -35,8 +35,7 @@ const SelectList = <ItemType extends ItemTypeBase<ItemValueType>, ItemValueType 
   const { t } = useLanguage();
 
   return (
-    <OverlayBody>
-      <TextXL style={styles.typeOverlayTitleLabel}>{t('Select verifiers')}</TextXL>
+    <ModalBody title={t('Select verifiers')} modalBodyType="bottom">
       <ScrollView alwaysBounceVertical={false}>
         {list.map(item => {
           return (
@@ -47,7 +46,12 @@ const SelectList = <ItemType extends ItemTypeBase<ItemValueType>, ItemValueType 
                 callBack(item);
               }}>
               <View style={[GStyles.paddingLeft(24), styles.itemRow]}>
-                <VerifierImage style={GStyles.marginRight(12)} size={pTd(36)} uri={item.imageUrl} />
+                <VerifierImage
+                  label={item[labelAttrName]}
+                  style={GStyles.marginRight(12)}
+                  size={pTd(36)}
+                  uri={item.imageUrl}
+                />
 
                 <View style={styles.itemContent}>
                   <TextL>{item[labelAttrName]}</TextL>
@@ -60,7 +64,7 @@ const SelectList = <ItemType extends ItemTypeBase<ItemValueType>, ItemValueType 
           );
         })}
       </ScrollView>
-    </OverlayBody>
+    </ModalBody>
   );
 };
 

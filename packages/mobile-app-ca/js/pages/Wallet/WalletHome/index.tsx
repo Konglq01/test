@@ -40,7 +40,7 @@ const WalletHome: React.FC<WalletHomeProps> = () => {
   const onExitClick = useCallback(
     async (isConfirm: boolean) => {
       if (!isConfirm || !managerAddress || !caHash) return;
-      Loading.show();
+      Loading.show({ text: t('Signing out of Portkey...') });
       try {
         const caContract = await getCurrentCAContract();
         const req = await removeManager(caContract, managerAddress, caHash);
@@ -57,7 +57,7 @@ const WalletHome: React.FC<WalletHomeProps> = () => {
       }
       Loading.hide();
     },
-    [caHash, getCurrentCAContract, logout, managerAddress],
+    [caHash, getCurrentCAContract, logout, managerAddress, t],
   );
 
   return (
@@ -70,19 +70,17 @@ const WalletHome: React.FC<WalletHomeProps> = () => {
         <Svg icon={(walletAvatar as IconName) || 'master1'} size={pTd(80)} />
       </View>
       <ScrollView alwaysBounceVertical={false}>
-        <TouchableWithoutFeedback>
-          <View>
-            <WalletMenuItem onPress={() => navigationService.navigate('WalletName')} title={walletName} />
-            <WalletMenuItem onPress={() => navigationService.navigate('AutoLock')} title={t('Auto-Lock')} />
-            <WalletMenuItem onPress={() => navigationService.navigate('SwitchNetworks')} title={t('Switch Networks')} />
-            <WalletMenuItem onPress={() => navigationService.navigate('AboutUs')} title={t('About Us')} />
-          </View>
-        </TouchableWithoutFeedback>
+        <View>
+          <WalletMenuItem onPress={() => navigationService.navigate('WalletName')} title={walletName} />
+          <WalletMenuItem onPress={() => navigationService.navigate('AutoLock')} title={t('Auto-Lock')} />
+          <WalletMenuItem onPress={() => navigationService.navigate('SwitchNetworks')} title={t('Switch Networks')} />
+          <WalletMenuItem onPress={() => navigationService.navigate('AboutUs')} title={t('About Us')} />
+        </View>
       </ScrollView>
 
       <CommonButton
         type="outline"
-        containerStyle={[GStyles.paddingTop(pTd(16)), GStyles.marginArg(0, 4), BorderStyles.border7]}
+        containerStyle={[GStyles.paddingTop(pTd(16)), GStyles.marginArg(2, 4), BorderStyles.border7]}
         buttonStyle={[BorderStyles.border7]}
         titleStyle={FontStyles.font12}
         onPress={() => {

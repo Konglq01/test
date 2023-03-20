@@ -17,6 +17,7 @@ import { FontStyles } from 'assets/theme/styles';
 import { isIos, screenHeight, screenWidth } from '@portkey-wallet/utils/mobile/device';
 
 import { Camera } from 'expo-camera';
+import { expandQrData } from '@portkey-wallet/utils/qrCode';
 
 // import { useAppCASelector } from '@portkey-wallet/hooks';
 
@@ -44,7 +45,8 @@ const QrScanner: React.FC<QrScannerProps> = () => {
     ({ data = '' }) => {
       try {
         if (typeof data === 'string') {
-          const qrCodeData = JSON.parse(data);
+          const qrCodeData = expandQrData(JSON.parse(data));
+
           // if not currentNetwork
           if (currentNetwork !== qrCodeData.netWorkType) return invalidQRCode();
           handleQRCodeData(qrCodeData, previousRouteInfo, setRefresh);

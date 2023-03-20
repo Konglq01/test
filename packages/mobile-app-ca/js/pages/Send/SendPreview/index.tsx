@@ -1,18 +1,18 @@
 import React, { memo, useCallback, useRef, useState } from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import { Text, View, StyleSheet, ScrollView } from 'react-native';
 import PageContainer from 'components/PageContainer';
 import { defaultColors } from 'assets/theme';
 import { pTd } from 'utils/unit';
 import { TextM, TextS, TextL } from 'components/CommonText';
 import CommonButton from 'components/CommonButton';
 import ActionSheet from 'components/ActionSheet';
-import { formatChainInfoToShow, formatStr2EllipsisStr, isMainNet } from '@portkey-wallet/utils';
+import { addressFormat, formatChainInfoToShow, formatStr2EllipsisStr, isMainNet } from '@portkey-wallet/utils';
 import { isCrossChain } from '@portkey-wallet/utils/aelf';
 import { useLanguage } from 'i18n/hooks';
 import { useAppCommonDispatch } from '@portkey-wallet/hooks';
 import GStyles from 'assets/theme/GStyles';
 import fonts from 'assets/theme/fonts';
-import { Image, ScreenHeight } from '@rneui/base';
+import { Image } from '@rneui/base';
 import { getContractBasic } from '@portkey-wallet/contracts/utils';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { usePin, useWallet } from 'hooks/store';
@@ -42,12 +42,9 @@ import {
 } from '@portkey-wallet/store/store-ca/assets/slice';
 import { sleep } from '@portkey-wallet/utils';
 import { FontStyles } from 'assets/theme/styles';
+import { ChainId } from '@portkey-wallet/types';
 
-export interface SendHomeProps {
-  route?: any;
-}
-
-const SendHome: React.FC<SendHomeProps> = props => {
+const SendHome: React.FC = () => {
   const { t } = useLanguage();
 
   const { sendType, assetInfo, toInfo, transactionFee, sendNumber } = useRouterParams<IToSendPreviewParamsType>();
@@ -238,8 +235,8 @@ const SendHome: React.FC<SendHomeProps> = props => {
   };
 
   const networkInfoShow = (address: string) => {
-    const chainId = address.split('_')[2];
-    return chainId === 'AELF' ? 'MainChain AELF' : `SideChain ${chainId} `;
+    const chainId = address.split('_')[2] as ChainId;
+    return formatChainInfoToShow(chainId);
   };
 
   console.log('currentNetwork', currentNetwork);
@@ -249,7 +246,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
       safeAreaColor={['blue', 'white']}
       titleDom={`${t('Send')}${sendType === 'token' ? ' ' + assetInfo.symbol : ''}`}
       containerStyles={styles.pageWrap}
-      scrollViewProps={{ disabled: false }}>
+      scrollViewProps={{ disabled: true }}>
       {sendType === 'nft' ? (
         <View style={styles.topWrap}>
           {!assetInfo?.imageUrl ? (
@@ -264,115 +261,121 @@ const SendHome: React.FC<SendHomeProps> = props => {
         </View>
       ) : (
         <>
-          <Text style={[styles.tokenCount, fonts.mediumFont]}>{`- ${sendNumber} ${assetInfo?.symbol}`} </Text>
+          <Text style={[styles.tokenCount, FontStyles.font5, fonts.mediumFont]}>
+            {`- ${sendNumber} ${assetInfo?.symbol}`}{' '}
+          </Text>
           {/* <TextM style={styles.tokenUSD}>-$ -</TextM> */}
         </>
       )}
-
-      <View style={styles.card}>
-        {/* From */}
-        <View style={styles.section}>
-          <View style={[styles.flexSpaceBetween]}>
-            <TextM style={styles.lightGrayFontColor}>{t('From')}</TextM>
-            <TextM style={styles.blackFontColor}>{walletName}</TextM>
-          </View>
-          <View style={[styles.flexSpaceBetween]}>
-            <TextM style={styles.lightGrayFontColor} />
-            <TextS style={styles.lightGrayFontColor}>
-              {formatStr2EllipsisStr(`ELF_${wallet?.[assetInfo?.chainId]?.caAddress}_${assetInfo.chainId}`)}
-            </TextS>
-          </View>
-        </View>
-        <Text style={[styles.divider, styles.marginTop0]} />
-        {/* To */}
-        <View style={styles.section}>
-          <View style={[styles.flexSpaceBetween]}>
-            <TextM style={[styles.lightGrayFontColor]}>{t('To')}</TextM>
-            <View style={styles.alignItemsEnd}>
-              {toInfo?.name && <TextM style={[styles.blackFontColor]}>{toInfo?.name}</TextM>}
-              <TextS style={styles.lightGrayFontColor}>{formatStr2EllipsisStr(toInfo?.address)}</TextS>
+      <ScrollView>
+        <View style={styles.card}>
+          {/* From */}
+          <View style={styles.section}>
+            <View style={[styles.flexSpaceBetween]}>
+              <TextM style={styles.lightGrayFontColor}>{t('From')}</TextM>
+              <TextM style={styles.blackFontColor}>{walletName}</TextM>
+            </View>
+            <View style={[styles.flexSpaceBetween]}>
+              <TextM style={styles.lightGrayFontColor} />
+              <TextS style={styles.lightGrayFontColor}>
+                {formatStr2EllipsisStr(addressFormat(wallet?.[assetInfo?.chainId]?.caAddress, assetInfo.chainId))}
+              </TextS>
             </View>
           </View>
-        </View>
-        <Text style={[styles.divider, styles.marginTop0]} />
-        {/* more Info */}
-        <View style={styles.section}>
-          <View style={[styles.flexSpaceBetween]}>
-            <TextM style={[styles.lightGrayFontColor]}>{t('Network')}</TextM>
-            <TextM style={[styles.blackFontColor, GStyles.alignEnd]}>{formatChainInfoToShow(assetInfo.chainId)}</TextM>
+          <Text style={[styles.divider, styles.marginTop0]} />
+          {/* To */}
+          <View style={styles.section}>
+            <View style={[styles.flexSpaceBetween]}>
+              <TextM style={[styles.lightGrayFontColor]}>{t('To')}</TextM>
+              <View style={styles.alignItemsEnd}>
+                {toInfo?.name && <TextM style={[styles.blackFontColor]}>{toInfo?.name}</TextM>}
+                <TextS style={styles.lightGrayFontColor}>{formatStr2EllipsisStr(toInfo?.address)}</TextS>
+              </View>
+            </View>
           </View>
-          <View style={[styles.flexSpaceBetween]}>
-            <TextM style={styles.blackFontColor} />
-            <TextM style={[styles.blackFontColor, GStyles.alignEnd]}>{`→${networkInfoShow(toInfo?.address)}`}</TextM>
+          <Text style={[styles.divider, styles.marginTop0]} />
+          {/* more Info */}
+          <View style={styles.section}>
+            <View style={[styles.flexSpaceBetween]}>
+              <TextM style={[styles.lightGrayFontColor]}>{t('Network')}</TextM>
+              <TextM style={[styles.blackFontColor, GStyles.alignEnd]}>
+                {formatChainInfoToShow(assetInfo.chainId)}
+              </TextM>
+            </View>
+            <View style={[styles.flexSpaceBetween]}>
+              <TextM style={styles.blackFontColor} />
+              <TextM style={[styles.blackFontColor, GStyles.alignEnd]}>{`→${networkInfoShow(toInfo?.address)}`}</TextM>
+            </View>
           </View>
-        </View>
 
-        <Text style={[styles.divider, styles.marginTop0]} />
-        {/* transaction Fee */}
-        <View style={styles.section}>
-          <View style={[styles.flexSpaceBetween]}>
-            <TextM style={[styles.blackFontColor, styles.fontBold]}>{t('Transaction Fee')}</TextM>
-            <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${transactionFee} ${'ELF'}`}</TextM>
+          <Text style={[styles.divider, styles.marginTop0]} />
+          {/* transaction Fee */}
+          <View style={styles.section}>
+            <View style={[styles.flexSpaceBetween]}>
+              <TextM style={[styles.blackFontColor, styles.fontBold]}>{t('Transaction Fee')}</TextM>
+              <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${transactionFee} ${'ELF'}`}</TextM>
+            </View>
+            {isMainNet(currentNetwork?.networkType ?? 'TESTNET') && (
+              <View>
+                <TextM />
+                <TextS style={[styles.blackFontColor, styles.lightGrayFontColor, GStyles.alignEnd]}>{`${unitConverter(
+                  CROSS_FEE,
+                )}`}</TextS>
+              </View>
+            )}
           </View>
-          {isMainNet(currentNetwork?.networkType ?? 'TESTNET') && (
-            <View>
-              <TextM />
-              <TextS style={[styles.blackFontColor, styles.lightGrayFontColor, GStyles.alignEnd]}>{`${unitConverter(
-                CROSS_FEE,
-              )}`}</TextS>
+
+          {isCrossChainTransfer && assetInfo.symbol === 'ELF' && <Text style={[styles.divider, styles.marginTop0]} />}
+          {isCrossChainTransfer && assetInfo.symbol === 'ELF' && (
+            <View style={styles.section}>
+              <View style={[styles.flexSpaceBetween]}>
+                <TextM style={[styles.blackFontColor, styles.fontBold, styles.leftTitle]}>
+                  {t('Cross chain Transaction fee')}
+                </TextM>
+                <View>
+                  <TextM style={[styles.blackFontColor, styles.fontBold, GStyles.alignEnd]}>{`${unitConverter(
+                    CROSS_FEE,
+                  )} ELF`}</TextM>
+                  {isMainNet(currentNetwork?.networkType ?? 'TESTNET') ? (
+                    <TextS
+                      style={[styles.blackFontColor, styles.lightGrayFontColor, GStyles.alignEnd]}>{`${unitConverter(
+                      CROSS_FEE,
+                    )}`}</TextS>
+                  ) : (
+                    <TextM />
+                  )}
+                </View>
+              </View>
+            </View>
+          )}
+          {isCrossChainTransfer && assetInfo.symbol === 'ELF' && <Text style={[styles.divider, styles.marginTop0]} />}
+          {isCrossChainTransfer && assetInfo.symbol === 'ELF' && (
+            <View style={styles.section}>
+              <View style={[styles.flexSpaceBetween]}>
+                <TextM style={[styles.blackFontColor, styles.fontBold, styles.leftTitle, GStyles.alignEnd]}>
+                  {t('Estimated amount received')}
+                </TextM>
+                <View>
+                  <TextM style={[styles.blackFontColor, styles.fontBold, GStyles.alignEnd]}>
+                    {ZERO.plus(sendNumber).isLessThanOrEqualTo(ZERO.plus(CROSS_FEE))
+                      ? '0'
+                      : unitConverter(ZERO.plus(sendNumber).minus(ZERO.plus(CROSS_FEE)))}{' '}
+                    {'ELF'}
+                  </TextM>
+                  {isMainNet(currentNetwork?.networkType ?? 'TESTNET') ? (
+                    <TextS
+                      style={[styles.blackFontColor, styles.lightGrayFontColor, GStyles.alignEnd]}>{`$ ${unitConverter(
+                      CROSS_FEE,
+                    )}`}</TextS>
+                  ) : (
+                    <TextM />
+                  )}
+                </View>
+              </View>
             </View>
           )}
         </View>
-
-        {isCrossChainTransfer && assetInfo.symbol === 'ELF' && <Text style={[styles.divider, styles.marginTop0]} />}
-        {isCrossChainTransfer && assetInfo.symbol === 'ELF' && (
-          <View style={styles.section}>
-            <View style={[styles.flexSpaceBetween]}>
-              <TextM style={[styles.blackFontColor, styles.fontBold, styles.leftTitle]}>
-                {t('Cross chain Transaction fee')}
-              </TextM>
-              <View>
-                <TextM style={[styles.blackFontColor, styles.fontBold, GStyles.alignEnd]}>{`${unitConverter(
-                  CROSS_FEE,
-                )} ELF`}</TextM>
-                {isMainNet(currentNetwork?.networkType ?? 'TESTNET') ? (
-                  <TextS style={[styles.blackFontColor, styles.lightGrayFontColor, GStyles.alignEnd]}>{`${unitConverter(
-                    CROSS_FEE,
-                  )}`}</TextS>
-                ) : (
-                  <TextM />
-                )}
-              </View>
-            </View>
-          </View>
-        )}
-        {isCrossChainTransfer && assetInfo.symbol === 'ELF' && <Text style={[styles.divider, styles.marginTop0]} />}
-        {isCrossChainTransfer && assetInfo.symbol === 'ELF' && (
-          <View style={styles.section}>
-            <View style={[styles.flexSpaceBetween]}>
-              <TextM style={[styles.blackFontColor, styles.fontBold, styles.leftTitle, GStyles.alignEnd]}>
-                {t('Estimated amount received')}
-              </TextM>
-              <View>
-                <TextM style={[styles.blackFontColor, styles.fontBold, GStyles.alignEnd]}>
-                  {ZERO.plus(sendNumber).isLessThanOrEqualTo(ZERO.plus(CROSS_FEE))
-                    ? '0'
-                    : unitConverter(ZERO.plus(sendNumber).minus(ZERO.plus(CROSS_FEE)))}{' '}
-                  {'ELF'}
-                </TextM>
-                {isMainNet(currentNetwork?.networkType ?? 'TESTNET') ? (
-                  <TextS
-                    style={[styles.blackFontColor, styles.lightGrayFontColor, GStyles.alignEnd]}>{`$ ${unitConverter(
-                    CROSS_FEE,
-                  )}`}</TextS>
-                ) : (
-                  <TextM />
-                )}
-              </View>
-            </View>
-          </View>
-        )}
-      </View>
+      </ScrollView>
 
       <View style={styles.buttonWrapStyle}>
         <CommonButton loading={isLoading} title={t('Send')} type="primary" onPress={onSend} />
@@ -386,7 +389,7 @@ export default memo(SendHome);
 export const styles = StyleSheet.create({
   pageWrap: {
     backgroundColor: defaultColors.bg1,
-    height: ScreenHeight - pTd(130),
+    flex: 1,
   },
   topWrap: {
     width: '100%',
@@ -439,7 +442,6 @@ export const styles = StyleSheet.create({
     borderRadius: pTd(6),
   },
   buttonWrapStyle: {
-    flex: 1,
     justifyContent: 'flex-end',
     paddingBottom: pTd(12),
     paddingTop: pTd(12),

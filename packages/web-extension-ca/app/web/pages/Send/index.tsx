@@ -1,17 +1,16 @@
-import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { useCurrentChain, useCurrentChainList, useIsValidSuffix } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
-import { AddressBookError } from '@portkey-wallet/store/addressBook/types';
 import { addFailedActivity, removeFailedActivity } from '@portkey-wallet/store/store-ca/activity/slice';
 import { ContactItemType, IClickAddressProps } from '@portkey-wallet/types/types-ca/contact';
 import { BaseToken } from '@portkey-wallet/types/types-ca/token';
-import { isDIDAddress } from '@portkey-wallet/utils';
+import { getAddressChainId, isDIDAddress } from '@portkey-wallet/utils';
 import {
   getAelfAddress,
   getEntireDIDAelfAddress,
   getWallet,
-  isAelfAddress,
   isCrossChain,
+  isEqAddress,
 } from '@portkey-wallet/utils/aelf';
 import aes from '@portkey-wallet/utils/aes';
 import { timesDecimals } from '@portkey-wallet/utils/converter';
@@ -37,6 +36,7 @@ import './index.less';
 import { the2ThFailedActivityItemType } from '@portkey-wallet/types/types-ca/activity';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
 import { CROSS_FEE } from '@portkey-wallet/constants/constants-ca/wallet';
+import { AddressCheckError } from '@portkey-wallet/store/store-ca/assets/type';
 
 export type Account = { address: string; name?: string };
 
@@ -71,6 +71,7 @@ export default function Send() {
   const [stage, setStage] = useState<Stage>(Stage.Address);
   const [amount, setAmount] = useState('');
   const [balance, setBalance] = useState('');
+  const isValidSuffix = useIsValidSuffix();
 
   const [txFee, setTxFee] = useState<string>();
   const currentChain = useCurrentChain(state.chainId);
@@ -89,39 +90,33 @@ export default function Send() {
     [state],
   );
 
-  const validateToAddress = useCallback((value: { name?: string; address: string } | undefined) => {
-    if (!value) return false;
-    if (!isDIDAddress(value.address)) {
-      setErrorMsg(AddressBookError.recipientAddressIsInvalid);
-      return false;
-    }
-    setErrorMsg('');
-    return true;
-  }, []);
+  const validateToAddress = useCallback(
+    (value: { name?: string; address: string } | undefined) => {
+      if (!value) return false;
+      const suffix = getAddressChainId(toAccount.address, chainInfo?.chainId || 'AELF');
+      if (!isDIDAddress(value.address) || !isValidSuffix(suffix)) {
+        setErrorMsg(AddressCheckError.recipientAddressIsInvalid);
+        return false;
+      }
+      if (isEqAddress(state.address, getAelfAddress(toAccount.address)) && suffix === state.chainId) {
+        setErrorMsg(AddressCheckError.equalIsValid);
+        return false;
+      }
+      setErrorMsg('');
+      return true;
+    },
+    [chainInfo?.chainId, isValidSuffix, state.address, state.chainId, toAccount.address],
+  );
 
   const btnDisabled = useMemo(() => {
     if (toAccount.address === '' || (stage === Stage.Amount && amount === '')) return true;
     return false;
   }, [amount, stage, toAccount.address]);
 
-  const getToAddressChainId = useCallback(
-    (toAddress: string) => {
-      if (!toAddress.includes('_')) return chainInfo?.chainId;
-      const arr = toAddress.split('_');
-      const addressChainId = arr[arr.length - 1];
-      // no suffix
-      if (isAelfAddress(addressChainId)) {
-        return chainInfo?.chainId;
-      }
-      return addressChainId;
-    },
-    [chainInfo?.chainId],
-  );
-
   useDebounce(
     () => {
       const value = getAelfAddress(toAccount.address);
-      const toAdsChainId = getToAddressChainId(toAccount.address);
+      const toAdsChainId = getAddressChainId(toAccount.address, chainInfo?.chainId || 'AELF');
       const searchResult: ContactItemType[] = [];
       contactIndexList.forEach(({ contacts }) => {
         searchResult.push(

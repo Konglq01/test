@@ -17,6 +17,7 @@ import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
 import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
 import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
+import { formatChainInfoToShow } from '@portkey-wallet/utils';
 
 export default function Receive() {
   const { t } = useLanguage();
@@ -44,9 +45,7 @@ export default function Receive() {
         />
         <View>
           <TextL>{symbol}</TextL>
-          <TextS>
-            {chainId === 'AELF' ? 'MainChain ' : 'SideChain '} {chainId} {currentNetwork === 'TESTNET' && 'Testnet'}
-          </TextS>
+          <TextS>{formatChainInfoToShow(chainId, currentNetwork)}</TextS>
         </View>
       </View>
 
