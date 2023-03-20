@@ -1,7 +1,6 @@
 export enum AddressError {
   SAME_ADDRESS = 'The sender and recipient address are identical',
   INVALID_ADDRESS = 'Recipient address is invalid',
-  NO_CURRENT_CHAIN_ID = 'Recipient address is invalid',
 }
 
 export enum TransactionError {
@@ -11,5 +10,5 @@ export enum TransactionError {
   CROSS_NOT_ENOUGH = 'Insufficient funds for cross chain transaction fee',
 }
 
-export const TransactionErrorArray = Object.values(TransactionError);
 export const AddressErrorArray = Object.values(AddressError);
+export const TransactionErrorArray = Object.values(TransactionError);
