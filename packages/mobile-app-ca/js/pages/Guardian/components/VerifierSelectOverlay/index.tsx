@@ -46,7 +46,12 @@ const SelectList = <ItemType extends ItemTypeBase<ItemValueType>, ItemValueType 
                 callBack(item);
               }}>
               <View style={[GStyles.paddingLeft(24), styles.itemRow]}>
-                <VerifierImage style={GStyles.marginRight(12)} size={pTd(36)} uri={item.imageUrl} />
+                <VerifierImage
+                  label={item[labelAttrName]}
+                  style={GStyles.marginRight(12)}
+                  size={pTd(36)}
+                  uri={item.imageUrl}
+                />
 
                 <View style={styles.itemContent}>
                   <TextL>{item[labelAttrName]}</TextL>
