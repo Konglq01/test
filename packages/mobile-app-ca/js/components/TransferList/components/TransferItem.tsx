@@ -10,9 +10,7 @@ import { formatChainInfoToShow, formatStr2EllipsisStr } from '@portkey-wallet/ut
 import { pTd } from 'utils/unit';
 import { ActivityItemType } from '@portkey-wallet/types/types-ca/activity';
 import { TransactionTypes, transactionTypesMap } from '@portkey-wallet/constants/constants-ca/activity';
-import { unitConverter } from '@portkey-wallet/utils/converter';
-import { ZERO } from '@portkey-wallet/constants/misc';
-import { SvgUri } from 'react-native-svg';
+import { AmountSign, formatWithCommas } from '@portkey-wallet/utils/converter';
 import CommonButton from 'components/CommonButton';
 import { useAppCASelector } from '@portkey-wallet/hooks/hooks-ca';
 import Loading from 'components/Loading';
@@ -45,11 +43,11 @@ const ActivityItem: React.FC<ActivityItemPropsType> = ({ item, onPress }) => {
 
   const amountString = useMemo(() => {
     const { amount = '', isReceived, decimals = '', symbol } = item || {};
-    let _amountString = '';
-    if (amount) _amountString += isReceived ? '+' : '-';
-    _amountString += unitConverter(ZERO.plus(amount).div(`1e${decimals}`));
-    _amountString += symbol ? ` ${symbol}` : '';
-    return _amountString;
+    const prams = { amount, decimals } as any;
+
+    if (amount) prams.sign = isReceived ? AmountSign.PLUS : AmountSign.MINUS;
+
+    return `${formatWithCommas(prams)}${symbol ? ' ' + symbol : ''}`;
   }, [item]);
 
   const showRetry = useCallback(

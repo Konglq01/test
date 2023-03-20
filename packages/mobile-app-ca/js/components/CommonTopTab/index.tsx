@@ -27,7 +27,8 @@ const CommonTopTab: React.FC<CommonTopTabProps> = props => {
       initialRouteName={initialRouteName}
       initialLayout={{ width: screenWidth }}
       screenOptions={{
-        tabBarAllowFontScaling: false,
+        swipeEnabled: false,
+        tabBarScrollEnabled: false,
         tabBarStyle: [hasTabBarBorderRadius ? styles.radiusTarBarStyle : {}, styles.tabBarStyle], // tabWrap
         tabBarLabelStyle: styles.tabBarLabelStyle,
         tabBarInactiveTintColor: defaultColors.font3, // active

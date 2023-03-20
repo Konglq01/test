@@ -6,7 +6,7 @@ import { ZERO } from '@portkey-wallet/constants/misc';
 import { defaultColors } from 'assets/theme';
 import GStyles from 'assets/theme/GStyles';
 import { Input } from '@rneui/themed';
-import { unitConverter } from '@portkey-wallet/utils/converter';
+import { formatWithCommas } from '@portkey-wallet/utils/converter';
 import { useLanguage } from 'i18n/hooks';
 import CommonAvatar from 'components/CommonAvatar';
 import { IToSendAssetParamsType } from '@portkey-wallet/types/types-ca/routeParams';
@@ -41,9 +41,12 @@ export default function AmountToken({
     <View style={styles.amountWrap}>
       <View style={styles.top}>
         <Text style={styles.topTitle}>{t('Amount')}</Text>
-        <Text style={styles.topBalance}>{`${t('Balance')} ${unitConverter(
-          ZERO.plus(balanceShow).div(`1e${selectedToken?.decimals}`),
-        )} ${selectedToken?.symbol ?? '0'}`}</Text>
+        <Text style={styles.topBalance}>
+          {`${t('Balance')} ${formatWithCommas({
+            amount: balanceShow,
+            decimals: selectedToken.decimals,
+          })}`}
+        </Text>
       </View>
       <View style={styles.bottom}>
         <View style={styles.bottomLeft}>
