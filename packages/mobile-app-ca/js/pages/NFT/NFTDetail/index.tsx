@@ -1,6 +1,5 @@
 import React from 'react';
-import { Text, StyleSheet, TouchableOpacity, StatusBar } from 'react-native';
-import { Image } from '@rneui/base';
+import { StyleSheet, TouchableOpacity, StatusBar } from 'react-native';
 import { useLanguage } from 'i18n/hooks';
 import CommonButton from 'components/CommonButton';
 import GStyles from 'assets/theme/GStyles';
@@ -46,19 +45,7 @@ const NFTDetail: React.FC<TokenDetailProps> = props => {
       <TextXXL style={styles.title}>{`${alias} #${tokenId}`}</TextXXL>
       <TextM style={[FontStyles.font3, styles.balance]}>{`Balance ${balance}`}</TextM>
 
-      {/* TODO: test style */}
       <CommonAvatar title={alias} style={[imageUrl ? styles.image1 : styles.image]} imageUrl={imageUrl} />
-
-      {/* {!imageUrl ? (
-        <Text style={styles.image}>{alias[0]}</Text>
-      ) : (
-        <Image
-          source={{
-            uri: imageUrl,
-          }}
-          style={styles.image1}
-        />
-      )} */}
 
       <CommonButton
         type="primary"
