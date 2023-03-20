@@ -64,6 +64,7 @@ export default function GuardianHome() {
       scrollViewProps={{ disabled: false }}
       rightDom={
         <TouchableOpacity
+          style={{ padding: pTd(16), marginRight: -pTd(16) }}
           onPress={() => {
             navigationService.navigate('GuardianEdit');
           }}>
