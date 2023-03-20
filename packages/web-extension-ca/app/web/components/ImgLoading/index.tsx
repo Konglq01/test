@@ -27,6 +27,7 @@ export default function ImgLoading({
     <div className={clsx('img-loading-wrapper', className)} style={{ height: !isLoad ? defaultHeight : 'auto' }}>
       {!notReady && src && (
         <img
+          key={src}
           className="show-image"
           src={src}
           onLoad={(e) => {

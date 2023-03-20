@@ -31,7 +31,7 @@ export default function SelectVerifier() {
     () =>
       Object.values(verifierMap ?? {})?.map((item) => ({
         value: item.id,
-        iconUrl: item.imageUrl ?? '',
+        verifierUrl: item.imageUrl ?? '',
         label: item.name,
       })),
     [verifierMap],
