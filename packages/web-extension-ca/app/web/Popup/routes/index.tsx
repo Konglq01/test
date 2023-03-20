@@ -19,7 +19,7 @@ import VerifierAccount from 'pages/VerifierAccount';
 import Unlock from 'pages/Unlock';
 import Contact from 'pages/Contacts/ContactDetail';
 import ManageDevices from 'pages/WalletSecurity/ManageDevices';
-import SetPin from 'pages/AccountSetting/SetPin';
+import ConfirmPin from 'pages/AccountSetting/ConfirmPin';
 import WalletSecurity from 'pages/WalletSecurity';
 
 export const PageRouter = () =>
@@ -98,7 +98,7 @@ export const PageRouter = () =>
     },
     {
       path: '/setting/account-setting/set-pin',
-      element: <SetPin />,
+      element: <ConfirmPin />,
     },
     {
       path: '/setting/wallet-security',

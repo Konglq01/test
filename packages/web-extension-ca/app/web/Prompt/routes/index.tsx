@@ -10,7 +10,7 @@ import Unlock from 'pages/Unlock';
 import QueryPage from 'pages/QueryPage';
 import TestSocket from 'pages/TestSocket';
 import ManageDevices from 'pages/WalletSecurity/ManageDevices';
-import SetPin from 'pages/AccountSetting/SetPin';
+import ConfirmPin from 'pages/AccountSetting/ConfirmPin';
 import NotFound from 'pages/NotFound';
 import Example from 'pages/Example';
 import SignUpUI from 'pages/Example/SignUpUI';
@@ -99,7 +99,7 @@ export const PageRouter = () =>
           children: [
             {
               path: '/setting/account-setting/set-pin',
-              element: <SetPin />,
+              element: <ConfirmPin />,
             },
           ],
         },

@@ -10,9 +10,7 @@ export default function AccountSettingPrompt({ headerTitle, menuList }: IAccount
       <SecondPageHeader title={headerTitle} />
       <div className="account-setting-body">
         <MenuList list={menuList} height={64} />
-        {/* <div className="next-page"> */}
         <Outlet />
-        {/* </div> */}
       </div>
     </div>
   );
