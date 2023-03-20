@@ -217,3 +217,11 @@ export const getAddressChainId = (toAddress: string, defaultChainId: ChainId) =>
   }
   return addressChainId;
 };
+
+/**
+ *  check is the same address
+ * @param address1
+ * @param address2
+ * @returns
+ */
+export const isSameAddresses = (address1: string, address2: string): boolean => address1.trim() === address2.trim();
