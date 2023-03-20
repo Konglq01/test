@@ -99,7 +99,7 @@ export default function SelectVerifier() {
         <ul className="popular-content">
           {verifierShow?.map((item) => (
             <li key={item.name} className="popular-item" onClick={() => handleChange(item.id)}>
-              <BaseVerifierIcon src={item.imageUrl} rootClassName="popular-item-image" />
+              <BaseVerifierIcon src={item.imageUrl} fallback={item.name[0]} rootClassName="popular-item-image" />
               <p className="popular-item-name">{item.name}</p>
             </li>
           ))}

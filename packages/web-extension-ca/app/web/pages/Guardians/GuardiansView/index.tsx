@@ -221,7 +221,7 @@ export default function GuardiansView() {
           <div className="input-item">
             <div className="label">{t('Verifier')}</div>
             <div className="control">
-              <BaseVerifierIcon width={32} height={32} src={opGuardian?.verifier?.imageUrl} />
+              <BaseVerifierIcon src={opGuardian?.verifier?.imageUrl} fallback={opGuardian?.verifier?.name[0]} />
               <span className="name">{opGuardian?.verifier?.name ?? ''}</span>
             </div>
           </div>
