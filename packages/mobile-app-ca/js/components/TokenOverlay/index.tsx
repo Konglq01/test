@@ -63,8 +63,7 @@ const TokenList = ({ onFinishSelectToken }: TokenListProps) => {
   });
 
   return (
-    <ModalBody modalBodyType="bottom" style={gStyles.overlayStyle}>
-      <TextXL style={styles.title}>{t('Select Token')}</TextXL>
+    <ModalBody modalBodyType="bottom" title={t('Select Token')} style={gStyles.overlayStyle}>
       <CommonInput
         placeholder={t('Token Name')}
         containerStyle={styles.containerStyle}

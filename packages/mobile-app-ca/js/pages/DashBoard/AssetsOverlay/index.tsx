@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import OverlayModal from 'components/OverlayModal';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { TextL, TextS, TextXL } from 'components/CommonText';
+import { TextL, TextS } from 'components/CommonText';
 import { ModalBody } from 'components/ModalBody';
 import CommonInput from 'components/CommonInput';
 import { AccountType } from '@portkey-wallet/types/wallet';
@@ -170,9 +170,7 @@ const AssetList = ({ account }: TokenListProps) => {
   }, []);
 
   return (
-    <ModalBody modalBodyType="bottom" style={gStyles.overlayStyle}>
-      <TextXL style={[styles.title, FontStyles.font5]}>{t('Select Assets')}</TextXL>
-
+    <ModalBody modalBodyType="bottom" title={t('Select Assets')} style={gStyles.overlayStyle}>
       {/* no assets in this account  */}
       <CommonInput
         placeholder={t('Search Assets')}
@@ -224,6 +222,7 @@ export const styles = StyleSheet.create({
     lineHeight: pTd(22),
     marginTop: pTd(17),
     marginBottom: pTd(16),
+    fontSize: pTd(20),
   },
   containerStyle: {
     marginLeft: pTd(16),
