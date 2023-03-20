@@ -38,7 +38,7 @@ export default function LoginEmail({ setLoginType }: { setLoginType: (type: Page
     const message = checkEmail(loginAccount);
     setErrorMessage(message);
     if (message) return;
-    Loading.show();
+    Loading.show({ text: t('Checking account on the chain...') });
     try {
       let _chainInfo;
       if (!chainInfo) {
@@ -57,7 +57,7 @@ export default function LoginEmail({ setLoginType }: { setLoginType: (type: Page
       setErrorMessage(handleErrorMessage(error));
     }
     Loading.hide();
-  }, [loginAccount, chainInfo, getVerifierServers, getGuardiansInfoWriteStore, dispatch]);
+  }, [loginAccount, t, chainInfo, getVerifierServers, getGuardiansInfoWriteStore, dispatch]);
 
   useEffectOnce(() => {
     const listener = myEvents.clearLoginInput.addListener(() => {
@@ -72,6 +72,7 @@ export default function LoginEmail({ setLoginType }: { setLoginType: (type: Page
         <Image source={qrCode} style={styles.iconStyle} />
       </Touchable>
       <CommonInput
+        autoFocus
         value={loginAccount}
         label="Email"
         type="general"

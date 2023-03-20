@@ -22,6 +22,7 @@ import { GuardiansStatus, GuardiansStatusItem } from 'pages/Guardian/types';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network-test2';
 import useDebounceCallback from 'hooks/useDebounceCallback';
 import { verification } from 'utils/api';
+import { useLanguage } from 'i18n/hooks';
 
 interface GuardianAccountItemProps {
   guardianItem: UserGuardianItem;
@@ -45,6 +46,8 @@ function GuardianItemButton({
 }: GuardianAccountItemProps & {
   disabled?: boolean;
 }) {
+  const { t } = useLanguage();
+
   const itemStatus = useMemo(() => guardiansStatus?.[guardianItem.key], [guardianItem.key, guardiansStatus]);
 
   const { status, requestCodeResult } = itemStatus || {};
@@ -70,7 +73,7 @@ function GuardianItemButton({
     [guardianItem.key, setGuardianStatus],
   );
   const onSendCode = useDebounceCallback(async () => {
-    Loading.show();
+    Loading.show({ text: t('Processing on the chain...') });
     try {
       const req = await verification.sendVerificationCode({
         params: {

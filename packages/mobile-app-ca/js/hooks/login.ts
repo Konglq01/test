@@ -18,8 +18,10 @@ import { setCredentials } from 'store/user/actions';
 import { DigitInputInterface } from 'components/DigitInput';
 import { GuardiansApproved } from 'pages/Guardian/types';
 import { DEVICE_TYPE } from 'constants/common';
+import { useLanguage } from 'i18n/hooks';
 
 export function useOnManagerAddressAndQueryResult() {
+  const { t } = useLanguage();
   const dispatch = useAppDispatch();
   const biometricsReady = useBiometricsReady();
   const timer = useRef<TimerResult>();
@@ -45,7 +47,7 @@ export function useOnManagerAddressAndQueryResult() {
       verifierInfo?: VerifierInfo;
       guardiansApproved?: GuardiansApproved;
     }) => {
-      Loading.show();
+      Loading.show({ text: t('Creating your wallet account on-chain...') });
       await sleep(1000);
       const isRecovery = managerInfo.verificationType === VerificationType.communityRecovery;
       try {

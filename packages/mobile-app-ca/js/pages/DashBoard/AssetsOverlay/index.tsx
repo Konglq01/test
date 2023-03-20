@@ -22,6 +22,7 @@ import { IToSendHomeParamsType } from '@portkey-wallet/types/types-ca/routeParam
 import { formatChainInfoToShow } from '@portkey-wallet/utils';
 import { ChainId } from '@portkey-wallet/types';
 import { useGStyles } from 'assets/theme/useGStyles';
+import { useIsTestnet } from '@portkey-wallet/hooks/hooks-ca/network';
 
 type onFinishSelectTokenType = (tokenItem: any) => void;
 type TokenListProps = {
@@ -32,6 +33,7 @@ type TokenListProps = {
 const AssetItem = (props: { symbol: string; onPress: (item: any) => void; item: IAssetItemType }) => {
   const { symbol, onPress, item } = props;
 
+  const isTestnet = useIsTestnet();
   const { currentNetwork } = useWallet();
 
   if (item.tokenInfo)
@@ -59,20 +61,18 @@ const AssetItem = (props: { symbol: string; onPress: (item: any) => void; item: 
               {`${symbol || 'Name'} #${tokenId}`}
             </TextL>
 
-            {/* TODO: why use currentNetwork   */}
-            {currentNetwork ? (
+            {isTestnet ? (
               <TextS numberOfLines={1} style={[FontStyles.font3, itemStyle.nftItemInfo]}>
                 {formatChainInfoToShow(chainId as ChainId, currentNetwork)}
               </TextS>
             ) : (
-              // TODO: price use witch one
+              // TODO: price use
               <TextL style={[FontStyles.font7]}>$ -</TextL>
             )}
           </View>
 
-          {/* TODO: num of nft use witch one */}
           <View style={itemStyle.balanceWrap}>
-            <TextL style={[itemStyle.token, FontStyles.font5]}>{item.nftInfo.balance}</TextL>
+            <TextL style={[itemStyle.token, FontStyles.font5]}>{item?.nftInfo?.balance}</TextL>
             <TextS style={itemStyle.dollar} />
           </View>
         </View>
@@ -125,7 +125,6 @@ const AssetList = ({ account }: TokenListProps) => {
           setListShow(pre => pre.concat(response.data));
         }
       } catch (err) {
-        // TODO: should show err?
         console.log('fetchAccountAssetsByKeywords err:', err);
       }
       pageInfoRef.current.isLoading = false;
@@ -144,10 +143,6 @@ const AssetList = ({ account }: TokenListProps) => {
     onKeywordChange();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debounceKeyword]);
-
-  // useEffectOnce(() => {
-  //   onKeywordChange();
-  // });
 
   const renderItem = useCallback(({ item }: { item: IAssetItemType }) => {
     return (

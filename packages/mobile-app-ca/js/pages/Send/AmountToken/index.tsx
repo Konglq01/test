@@ -63,6 +63,7 @@ export default function AmountToken({
         </View>
         <View style={styles.bottomRight}>
           <Input
+            autoFocus
             onFocus={() => {
               if (sendTokenNumber === '0') setSendTokenNumber('');
             }}

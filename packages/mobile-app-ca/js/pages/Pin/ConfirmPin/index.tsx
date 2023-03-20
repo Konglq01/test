@@ -19,6 +19,7 @@ import { VerificationType, VerifierInfo } from '@portkey-wallet/types/verifier';
 import useBiometricsReady from 'hooks/useBiometrics';
 import PinContainer from 'components/PinContainer';
 import { GuardiansApproved } from 'pages/Guardian/types';
+import { useLanguage } from 'i18n/hooks';
 
 type RouterParams = {
   oldPin?: string;
@@ -31,6 +32,7 @@ type RouterParams = {
 };
 
 export default function ConfirmPin() {
+  const { t } = useLanguage();
   const { walletInfo } = useCurrentWallet();
   const {
     pin,
@@ -41,6 +43,7 @@ export default function ConfirmPin() {
     verifierInfo,
     guardiansApproved,
   } = useRouterParams<RouterParams>();
+
   const biometricsReady = useBiometricsReady();
 
   const [errorMessage, setErrorMessage] = useState<string>();
@@ -55,13 +58,13 @@ export default function ConfirmPin() {
         if (biometrics) await setSecureStoreItem('Pin', newPin);
         dispatch(changePin({ pin: oldPin, newPin }));
         dispatch(setCredentials({ pin: newPin }));
-        CommonToast.success('Modified Success');
+        CommonToast.success(t('Modified Successfully'));
       } catch (error) {
         CommonToast.failError(error);
       }
       navigationService.navigate('AccountSettings');
     },
-    [biometrics, dispatch, oldPin],
+    [biometrics, dispatch, oldPin, t],
   );
   const onFinish = useCallback(
     async (confirmPin: string) => {

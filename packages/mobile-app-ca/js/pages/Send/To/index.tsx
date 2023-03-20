@@ -111,7 +111,7 @@ export const styles = StyleSheet.create({
   inputStyle: {
     color: defaultColors.font5,
     paddingRight: pTd(30),
-    fontSize: pTd(14),
+    fontSize: pTd(12),
   },
   right: {
     width: pTd(16),

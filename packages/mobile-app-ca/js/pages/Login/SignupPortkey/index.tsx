@@ -39,7 +39,7 @@ function SignupEmail() {
     const message = checkEmail(email);
     setErrorMessage(message);
     if (message) return;
-    Loading.show();
+    Loading.show({ text: t('Checking account on the chain...') });
     try {
       let _chainInfo;
       if (!chainInfo) {
@@ -61,7 +61,7 @@ function SignupEmail() {
       setErrorMessage(handleErrorMessage(error));
     }
     Loading.hide();
-  }, [chainInfo, dispatch, email, getGuardiansInfo, getVerifierServers]);
+  }, [chainInfo, dispatch, email, getGuardiansInfo, getVerifierServers, t]);
   useEffectOnce(() => {
     const listener = myEvents.clearSignupInput.addListener(() => {
       setEmail('');
@@ -75,6 +75,7 @@ function SignupEmail() {
   return (
     <View style={[BGStyles.bg1, styles.card]}>
       <CommonInput
+        autoFocus
         value={email}
         label="Email"
         type="general"
