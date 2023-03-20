@@ -13,7 +13,6 @@ import { NetworkType } from '@portkey-wallet/types';
 import CommonSelect from 'components/CommonSelect1';
 import { useChangeNetwork } from 'hooks/useChangeNetwork';
 import i18n from 'i18n';
-import BaseVerifierIcon from 'components/BaseVerifierIcon';
 
 export default function RegisterStart() {
   const { type } = useParams();
