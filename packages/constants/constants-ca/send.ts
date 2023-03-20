@@ -1,6 +1,10 @@
-export enum TransactionError {
-  SAME_ADDRESS = 'The sending address is the same as the receiving address.',
+export enum AddressError {
+  SAME_ADDRESS = 'The sender and recipient address are identical',
   INVALID_ADDRESS = 'Recipient address is invalid',
+  NO_CURRENT_CHAIN_ID = 'Recipient address is invalid',
+}
+
+export enum TransactionError {
   TOKEN_NOT_ENOUGH = 'Insufficient funds',
   NFT_NOT_ENOUGH = 'Insufficient quantity',
   FEE_NOT_ENOUGH = 'Insufficient funds for transaction fee',
@@ -8,3 +12,4 @@ export enum TransactionError {
 }
 
 export const TransactionErrorArray = Object.values(TransactionError);
+export const AddressErrorArray = Object.values(AddressError);

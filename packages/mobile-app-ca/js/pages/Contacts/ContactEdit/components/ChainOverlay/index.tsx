@@ -9,9 +9,9 @@ import { TextL, TextXL } from 'components/CommonText';
 import { pTd } from 'utils/unit';
 import { useLanguage } from 'i18n/hooks';
 import CommonInput from 'components/CommonInput';
-import OverlayBody from 'components/OverlayModal/OverlayBody';
 import { MAIN_CHAIN_ID } from '@portkey-wallet/constants/constants-ca/activity';
 import { useGStyles } from 'assets/theme/useGStyles';
+import { ModalBody } from 'components/ModalBody';
 
 type ValueType = string | number;
 type DefaultValueType = string;
@@ -44,9 +44,8 @@ const SelectList = <ItemType extends ItemTypeBase<ItemValueType>, ItemValueType 
   }, [keyWord, labelAttrName, list]);
 
   return (
-    <OverlayBody style={gStyle.overlayStyle}>
+    <ModalBody style={gStyle.overlayStyle} title={t('Select Network')} modalBodyType="bottom">
       <View style={styles.titleWrap}>
-        <TextXL style={styles.titleLabel}>{t('Select Network')}</TextXL>
         <CommonInput
           containerStyle={styles.titleInputWrap}
           inputContainerStyle={styles.titleInputWrap}
@@ -87,7 +86,7 @@ const SelectList = <ItemType extends ItemTypeBase<ItemValueType>, ItemValueType 
       ) : (
         <TextL style={styles.noResult}>{t('No results found')}</TextL>
       )}
-    </OverlayBody>
+    </ModalBody>
   );
 };
 

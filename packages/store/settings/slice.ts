@@ -2,7 +2,7 @@ import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { LockingTimeType, SettingsState } from './types';
 
 const initialState: SettingsState = {
-  autoLockingTime: 15,
+  autoLockingTime: 60,
   leaveTime: -Infinity,
 };
 

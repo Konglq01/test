@@ -6,7 +6,7 @@ import { pTd } from 'utils/unit';
 import { TextM, TextS, TextL } from 'components/CommonText';
 import CommonButton from 'components/CommonButton';
 import ActionSheet from 'components/ActionSheet';
-import { formatChainInfoToShow, formatStr2EllipsisStr, isMainNet } from '@portkey-wallet/utils';
+import { addressFormat, formatChainInfoToShow, formatStr2EllipsisStr, isMainNet } from '@portkey-wallet/utils';
 import { isCrossChain } from '@portkey-wallet/utils/aelf';
 import { useLanguage } from 'i18n/hooks';
 import { useAppCommonDispatch } from '@portkey-wallet/hooks';
@@ -278,7 +278,7 @@ const SendHome: React.FC = () => {
             <View style={[styles.flexSpaceBetween]}>
               <TextM style={styles.lightGrayFontColor} />
               <TextS style={styles.lightGrayFontColor}>
-                {formatStr2EllipsisStr(`ELF_${wallet?.[assetInfo?.chainId]?.caAddress}_${assetInfo.chainId}`)}
+                {formatStr2EllipsisStr(addressFormat(wallet?.[assetInfo?.chainId]?.caAddress, assetInfo.chainId))}
               </TextS>
             </View>
           </View>
