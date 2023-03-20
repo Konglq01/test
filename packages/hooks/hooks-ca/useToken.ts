@@ -4,6 +4,7 @@ import { TokenState, TokenItemShowType } from '@portkey-wallet/types/types-ca/to
 import { useMemo, useCallback } from 'react';
 import { useCurrentNetworkInfo } from './network';
 import { request } from '@portkey-wallet/api/api-did';
+import useEffectOnce from 'hooks/useEffectOnce';
 
 export interface TokenFuncsType {
   fetchTokenList: (params: { keyword: string; chainIdArray: string[] }) => void;
@@ -60,12 +61,6 @@ export const useToken = (): [TokenState, TokenFuncsType] => {
   return [tokenState, tokenStoreFuncs];
 };
 
-// export const useAllAccountTokenList = (): AddedTokenData => {
-//   const { addedTokenData } = useAppCASelector(state => state.tokenManagement);
-
-//   return useMemo(() => addedTokenData, [addedTokenData]);
-// };
-
 export const useMarketTokenListInCurrentChain = (): TokenItemShowType[] => {
   const { tokenDataShowInMarket } = useAppCASelector(state => state.tokenManagement);
 
@@ -80,7 +75,10 @@ export const useIsFetchingTokenList = (): Boolean => {
 
 export const useFetchSymbolImages = () => {
   const dispatch = useAppCommonDispatch();
-  dispatch(getSymbolImagesAsync());
+
+  useEffectOnce(() => {
+    dispatch(getSymbolImagesAsync());
+  });
 };
 
 export const useSymbolImages = () => {
