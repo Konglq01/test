@@ -35,13 +35,15 @@ import Loading from 'components/Loading';
 import { DEFAULT_DECIMAL } from '@portkey-wallet/constants/constants-ca/activity';
 import { CROSS_FEE } from '@portkey-wallet/constants/constants-ca/wallet';
 
-import { TransactionError, TransactionErrorArray } from '@portkey-wallet/constants/constants-ca/send';
+import {
+  TransactionError,
+  TransactionErrorArray,
+  AddressError,
+  AddressErrorArray,
+} from '@portkey-wallet/constants/constants-ca/send';
+import { addressFormat, isSameAddresses } from '@portkey-wallet/utils';
 
-export interface SendHomeProps {
-  route?: any;
-}
-
-const SendHome: React.FC<SendHomeProps> = props => {
+const SendHome: React.FC = () => {
   const { t } = useLanguage();
 
   const {
@@ -216,7 +218,17 @@ const SendHome: React.FC<SendHomeProps> = props => {
 
   const checkCanNext = useCallback(() => {
     if (!isAllowAelfAddress(selectedToContact.address)) {
-      setErrorMessage([TransactionError.INVALID_ADDRESS]);
+      setErrorMessage([AddressError.INVALID_ADDRESS]);
+      return false;
+    }
+
+    if (
+      isSameAddresses(
+        addressFormat(wallet?.[assetInfo?.chainId]?.caAddress, assetInfo.chainId),
+        selectedToContact.address,
+      )
+    ) {
+      setErrorMessage([AddressError.SAME_ADDRESS]);
       return false;
     }
 
@@ -227,7 +239,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
     }
 
     return true;
-  }, [assetInfo.chainId, selectedToContact.address, showDialog]);
+  }, [assetInfo.chainId, selectedToContact.address, showDialog, wallet]);
 
   const nextStep = useCallback(() => {
     if (checkCanNext()) {
@@ -387,9 +399,11 @@ const SendHome: React.FC<SendHomeProps> = props => {
           setSelectedToContact={setSelectedToContact}
         />
       </View>
-      {errorMessage.includes(TransactionError.INVALID_ADDRESS) && (
-        <Text style={styles.errorMessage}>{t(TransactionError.INVALID_ADDRESS)}</Text>
-      )}
+      {AddressErrorArray.filter(ele => errorMessage.includes(ele)).map(err => (
+        <Text key={err} style={[styles.errorMessage]}>
+          {t(err)}
+        </Text>
+      ))}
 
       {/* Group 2 token */}
       {sendType === 'token' && step === 2 && (
@@ -407,15 +421,14 @@ const SendHome: React.FC<SendHomeProps> = props => {
 
       {/* Group 2 nft */}
       {sendType === 'nft' && step === 2 && (
-        <View style={styles.group}>
-          <NFTInfo nftItem={assetInfo} />
-        </View>
-      )}
-
-      {sendType === 'nft' && step === 2 && (
-        <View style={styles.group}>
-          <AmountNFT sendNumber={sendNumber} setSendNumber={setSendNumber} />
-        </View>
+        <>
+          <View style={styles.group}>
+            <NFTInfo nftItem={assetInfo} />
+          </View>
+          <View style={styles.group}>
+            <AmountNFT sendNumber={sendNumber} setSendNumber={setSendNumber} />
+          </View>
+        </>
       )}
 
       {TransactionErrorArray.filter(ele => errorMessage.includes(ele)).map(err => (
