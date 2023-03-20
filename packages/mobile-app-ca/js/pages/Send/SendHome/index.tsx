@@ -22,7 +22,7 @@ import NFTInfo from '../NFTInfo';
 import CommonButton from 'components/CommonButton';
 import { getContractBasic } from '@portkey-wallet/contracts/utils';
 import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
-import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { useCurrentChain, useIsValidSuffix } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { getManagerAccount } from 'utils/redux';
 import { usePin } from 'hooks/store';
 import { timesDecimals, unitConverter } from '@portkey-wallet/utils/converter';
@@ -41,10 +41,12 @@ import {
   AddressError,
   AddressErrorArray,
 } from '@portkey-wallet/constants/constants-ca/send';
-import { addressFormat, isSameAddresses } from '@portkey-wallet/utils';
+import { addressFormat, getAddressChainId, isSameAddresses } from '@portkey-wallet/utils';
 
 const SendHome: React.FC = () => {
   const { t } = useLanguage();
+
+  const isValidChainId = useIsValidSuffix();
 
   const {
     params: { sendType = 'token', toInfo, assetInfo },
@@ -232,14 +234,19 @@ const SendHome: React.FC = () => {
       return false;
     }
 
-    // TODO: check if  cross chain
+    if (!isValidChainId(getAddressChainId(selectedToContact.address, assetInfo.chainId))) {
+      setErrorMessage([AddressError.INVALID_ADDRESS]);
+      return false;
+    }
+
     if (isCrossChain(selectedToContact.address, assetInfo.chainId)) {
+      // TODO: check if  cross chain
       showDialog('crossChain', () => setStep(2));
       return false;
     }
 
     return true;
-  }, [assetInfo.chainId, selectedToContact.address, showDialog, wallet]);
+  }, [assetInfo.chainId, selectedToContact.address, showDialog, isValidChainId, wallet]);
 
   const nextStep = useCallback(() => {
     if (checkCanNext()) {
