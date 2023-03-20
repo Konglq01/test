@@ -92,7 +92,9 @@ export default function SelectVerifier() {
       <div className="common-content1 select-verifier-content" id="select-verifier-content">
         <div className="title">{t('Select verifier')}</div>
         <p className="description">
-          {t('The recovery of decentralized accounts requires approval from your verifiers')}
+          {t(
+            'Verifiers protect your account and help you recover your assets when they are subject to risks. Please note: The more diversified your verifiers are, the higher security your assets enjoy.',
+          )}
         </p>
         <CommonSelect className="verifier-select" value={selectVal} onChange={handleChange} items={selectOptions} />
         <p className="popular-title">{t('Popular')}</p>
