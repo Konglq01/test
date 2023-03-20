@@ -1,6 +1,6 @@
 import { TransactionTypes, transactionTypesMap } from '@portkey-wallet/constants/constants-ca/activity';
 import { ActivityItemType, the2ThFailedActivityItemType } from '@portkey-wallet/types/types-ca/activity';
-import { AmountSign, formatAmountWithThousandMark, formatStr2EllipsisStr } from '@portkey-wallet/utils/converter';
+import { AmountSign, formatWithCommas, formatStr2EllipsisStr } from '@portkey-wallet/utils/converter';
 import { List } from 'antd-mobile';
 import CustomSvg from 'components/CustomSvg';
 import { useCallback } from 'react';
@@ -66,7 +66,7 @@ export default function ActivityList({ data, chainId, hasMore, loadMore }: IActi
           <span>
             {nftInfo?.nftId && <span>#{nftInfo.nftId}</span>}
             {!nftInfo?.nftId && (
-              <span>{`${formatAmountWithThousandMark({ sign, amount, decimals, digits: 4 })} ${symbol ?? ''}`}</span>
+              <span>{`${formatWithCommas({ sign, amount, decimals, digits: 4 })} ${symbol ?? ''}`}</span>
             )}
           </span>
         </span>
@@ -84,9 +84,7 @@ export default function ActivityList({ data, chainId, hasMore, loadMore }: IActi
           <span>From: {formatStr2EllipsisStr(transFromAddress, [7, 4])}</span>
           {nftInfo?.nftId && <span className="nft-name">{formatStr2EllipsisStr(nftInfo.alias)}</span>}
           {!isTestNet && !nftInfo?.nftId && (
-            <span>
-              {formatAmountWithThousandMark({ sign: AmountSign.USD, amount: priceInUsd, decimals: 0, digits: 2 })}
-            </span>
+            <span>{formatWithCommas({ sign: AmountSign.USD, amount: priceInUsd, decimals: 0, digits: 2 })}</span>
           )}
         </p>
       );

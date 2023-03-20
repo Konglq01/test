@@ -113,7 +113,7 @@ export function formatAmount({
  * formatAmount with prefix and thousand mark, not unit
  * @example $11.1  +11.1  -11.1  9,999.9
  */
-export function formatAmountWithThousandMark({
+export function formatWithCommas({
   amount = DEFAULT_AMOUNT,
   decimals = DEFAULT_DECIMAL,
   digits = DEFAULT_DIGITS,
