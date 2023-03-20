@@ -2,7 +2,7 @@ import { ChainId } from '..';
 import { PartialOption } from '../common';
 
 export interface AddressItem {
-  chainId: string; // AELF tDVV tDVW
+  chainId: ChainId; // AELF tDVV tDVW
   address: string;
 }
 
