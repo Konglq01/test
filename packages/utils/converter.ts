@@ -1,4 +1,5 @@
 import { isEffectiveNumber, ZERO } from '@portkey-wallet/constants/misc';
+import { DEFAULT_AMOUNT, DEFAULT_DECIMAL, DEFAULT_DIGITS } from '@portkey-wallet/constants/constants-ca/activity';
 import BigNumber from 'bignumber.js';
 import i18n from 'i18next';
 
@@ -74,3 +75,55 @@ export const formatStr2EllipsisStr = (address = '', digits = [10, 10], type: 'mi
   const suffix = address.substring(len - digits[1]);
   return `${pre}...${suffix}`;
 };
+
+export enum AmountSign {
+  PLUS = '+',
+  MINUS = '-',
+  USD = '$ ',
+  EMPTY = '',
+}
+export interface IFormatAmountProps {
+  amount?: string | number;
+  decimals?: string | number;
+  digits?: number;
+  sign?: AmountSign;
+}
+
+/**
+ * formatAmount with prefix and unit
+ * @example $11.1   11.1K
+ */
+export function formatAmount({
+  amount = DEFAULT_AMOUNT,
+  decimals = DEFAULT_DECIMAL,
+  digits = DEFAULT_DIGITS,
+  sign = AmountSign.EMPTY,
+}: IFormatAmountProps): string {
+  let amountTrans = `${unitConverter(
+    ZERO.plus(amount).div(`1e${decimals || DEFAULT_DECIMAL}`),
+    digits || DEFAULT_DIGITS,
+  )}`;
+  if (sign && amountTrans !== '0') {
+    return `${sign}${amountTrans}`;
+  }
+  return amountTrans;
+}
+
+/**
+ * formatAmount with prefix and thousand mark, not unit
+ * @example $11.1  +11.1  -11.1  9,999.9
+ */
+export function formatAmountWithThousandMark({
+  amount = DEFAULT_AMOUNT,
+  decimals = DEFAULT_DECIMAL,
+  digits = DEFAULT_DIGITS,
+  sign = AmountSign.EMPTY,
+}: IFormatAmountProps): string {
+  let amountTrans = `${divDecimals(ZERO.plus(amount), decimals || DEFAULT_DECIMAL)
+    .decimalPlaces(digits || DEFAULT_DIGITS)
+    .toFormat()}`;
+  if (sign && amountTrans !== '0') {
+    return `${sign}${amountTrans}`;
+  }
+  return amountTrans;
+}
