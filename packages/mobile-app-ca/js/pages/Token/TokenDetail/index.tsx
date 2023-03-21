@@ -23,7 +23,7 @@ import { ActivityItemType } from '@portkey-wallet/types/types-ca/activity';
 import { getActivityListAsync } from '@portkey-wallet/store/store-ca/activity/action';
 import { getCurrentActivityMapKey } from '@portkey-wallet/utils/activity';
 import { IActivitiesApiParams } from '@portkey-wallet/store/store-ca/activity/type';
-import { unitConverter } from '@portkey-wallet/utils/converter';
+import { divDecimals, formatAmountShow, unitConverter } from '@portkey-wallet/utils/converter';
 import { ZERO } from '@portkey-wallet/constants/misc';
 import { transactionTypesForActivityList as transactionList } from '@portkey-wallet/constants/constants-ca/activity';
 import fonts from 'assets/theme/fonts';
@@ -101,7 +101,10 @@ const TokenDetail: React.FC = () => {
     setFreshing(false);
   }, [getActivityList]);
 
-  const balanceShow = `${unitConverter(ZERO.plus(currentToken?.balance || 0).div(`1e${currentToken?.decimals && 8}`))}`;
+  const balanceShow = useMemo(
+    () => `${formatAmountShow(divDecimals(currentToken?.balance || '0', currentToken?.decimals))}`,
+    [currentToken?.balance, currentToken?.decimals],
+  );
 
   useEffectOnce(() => {
     getActivityList(true);

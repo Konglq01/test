@@ -1,7 +1,7 @@
 import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
 import { ZERO } from '@portkey-wallet/constants/misc';
 import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
-import { formatWithCommas, unitConverter } from '@portkey-wallet/utils/converter';
+import { divDecimals, formatAmountShow, unitConverter } from '@portkey-wallet/utils/converter';
 import { defaultColors } from 'assets/theme';
 import { FontStyles } from 'assets/theme/styles';
 import CommonAvatar from 'components/CommonAvatar';
@@ -45,7 +45,7 @@ const TokenListItem: React.FC<TokenListItemType> = props => {
         {!noBalanceShow && (
           <View style={itemStyle.balanceWrap}>
             <TextL style={itemStyle.token} numberOfLines={1} ellipsizeMode={'tail'}>
-              {formatWithCommas({ amount: item?.balance, decimals: item.decimals })}
+              {formatAmountShow(divDecimals(item?.balance, item.decimals))}
             </TextL>
             <TextS numberOfLines={1} ellipsizeMode={'tail'} style={itemStyle.dollar}>
               {currentNetwork === 'MAIN' &&
