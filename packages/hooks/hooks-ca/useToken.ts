@@ -1,10 +1,9 @@
 import { useAppCASelector, useAppCommonDispatch } from '../index';
 import { fetchAllTokenListAsync, getSymbolImagesAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
 import { TokenState, TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useEffect } from 'react';
 import { useCurrentNetworkInfo } from './network';
 import { request } from '@portkey-wallet/api/api-did';
-import useEffectOnce from 'hooks/useEffectOnce';
 
 export interface TokenFuncsType {
   fetchTokenList: (params: { keyword: string; chainIdArray: string[] }) => void;
@@ -76,9 +75,9 @@ export const useIsFetchingTokenList = (): Boolean => {
 export const useFetchSymbolImages = () => {
   const dispatch = useAppCommonDispatch();
 
-  useEffectOnce(() => {
+  useEffect(() => {
     dispatch(getSymbolImagesAsync());
-  });
+  }, []);
 };
 
 export const useSymbolImages = () => {
