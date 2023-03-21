@@ -7,7 +7,7 @@ import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { ChainId } from '@portkey-wallet/types';
 import { getBalance } from 'utils/sandboxUtil/getBalance';
 import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
-import { divDecimals, unitConverter } from '@portkey-wallet/utils/converter';
+import { divDecimals, fixedDecimal } from '@portkey-wallet/utils/converter';
 
 export default function NftInput({
   toAccount,
@@ -79,7 +79,7 @@ export default function NftInput({
             <p className="token-id">#{token.tokenId}</p>
           </div>
           <p className="quantity">
-            Balance: <span>{`${unitConverter(divDecimals(balance, token.decimals))}`}</span>
+            Balance: <span>{`${fixedDecimal(divDecimals(balance, token.decimals))}`}</span>
           </p>
         </div>
       </div>
