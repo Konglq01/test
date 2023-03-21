@@ -1,8 +1,7 @@
 import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
-import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
 import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
 import { transNetworkText } from '@portkey-wallet/utils/activity';
-import { divDecimals, unitConverter } from '@portkey-wallet/utils/converter';
+import { divDecimals, fixedDecimal } from '@portkey-wallet/utils/converter';
 import CustomSvg from 'components/CustomSvg';
 import { useIsTestnet } from 'hooks/useNetwork';
 import { useCallback } from 'react';
@@ -13,7 +12,6 @@ export default function TokenList({ tokenList }: { tokenList: TokenItemShowType[
   const { t } = useTranslation();
   const navigate = useNavigate();
   const isTestNet = useIsTestnet();
-  const symbolImages = useSymbolImages();
 
   const onNavigate = useCallback(
     (tokenInfo: TokenItemShowType) => {
@@ -37,15 +35,20 @@ export default function TokenList({ tokenList }: { tokenList: TokenItemShowType[
             ) : (
               <div className="token-logo custom-word-logo">{item.symbol?.slice(0, 1)}</div>
             )}
-            <div className="info">
-              <span>{item.symbol}</span>
-              <span>{transNetworkText(item.chainId, isTestNet)}</span>
-            </div>
-            <div className="amount">
-              <p>{unitConverter(divDecimals(item.balance, item.decimals || 8))}</p>
-              {!isTestNet && (
-                <p className="convert">{`$ ${unitConverter(divDecimals(item.balanceInUsd, item.decimals || 8))}`}</p>
-              )}
+            <div className="desc">
+              <div className="info">
+                <span>{item.symbol}</span>
+                <span>{fixedDecimal(divDecimals(item.balance, item.decimals || 8))}</span>
+              </div>
+              <div className="amount">
+                <p>{transNetworkText(item.chainId, isTestNet)}</p>
+                {!isTestNet && (
+                  <p className="convert">{`$ ${fixedDecimal(
+                    divDecimals(item.balanceInUsd, item.decimals || 8),
+                    2,
+                  )}`}</p>
+                )}
+              </div>
             </div>
           </li>
         ))}

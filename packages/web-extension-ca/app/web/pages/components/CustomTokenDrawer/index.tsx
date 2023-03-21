@@ -8,7 +8,7 @@ import { useAppDispatch, useAssetInfo, useTokenInfo, useUserInfo } from 'store/P
 import BaseDrawer from '../BaseDrawer';
 import { fetchAssetAsync } from '@portkey-wallet/store/store-ca/assets/slice';
 import './index.less';
-import { divDecimals, unitConverter } from '@portkey-wallet/utils/converter';
+import { divDecimals, fixedDecimal } from '@portkey-wallet/utils/converter';
 import { useCaAddresses, useChainIdList } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { fetchAllTokenListAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
 import { useIsTestnet } from 'hooks/useNetwork';
@@ -74,19 +74,21 @@ export default function CustomTokenDrawer({
               )}
             </div>
           </div>
-          <div className="info">
-            <p className="symbol">{`${token.symbol}`}</p>
-            <p className="network">{transNetworkText(token.chainId, isTestNet)}</p>
-          </div>
-          <div className="amount">
-            <p className="quantity">
-              {unitConverter(divDecimals(token.tokenInfo?.balance, token.tokenInfo?.decimals))}
-            </p>
-            <p className="convert">
-              {isTestNet
-                ? ''
-                : `$ ${unitConverter(divDecimals(token.tokenInfo?.balanceInUsd, token.tokenInfo?.decimals))}`}
-            </p>
+          <div className="send-desc">
+            <div className="info">
+              <p className="symbol">{`${token.symbol}`}</p>
+              <p className="quantity">
+                {fixedDecimal(divDecimals(token.tokenInfo?.balance, token.tokenInfo?.decimals))}
+              </p>
+            </div>
+            <div className="amount">
+              <p className="network">{transNetworkText(token.chainId, isTestNet)}</p>
+              <p className="convert">
+                {isTestNet
+                  ? ''
+                  : `$ ${fixedDecimal(divDecimals(token.tokenInfo?.balanceInUsd, token.tokenInfo?.decimals), 2)}`}
+              </p>
+            </div>
           </div>
         </div>
       );
@@ -122,7 +124,7 @@ export default function CustomTokenDrawer({
               )}
             </div>
           </div>
-          <div className="info">
+          <div className="receive-info">
             <p className="symbol">{`${token.symbol}`}</p>
             <p className="network">{transNetworkText(token.chainId, isTestNet)}</p>
           </div>

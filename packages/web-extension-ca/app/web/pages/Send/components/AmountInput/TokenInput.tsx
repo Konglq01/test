@@ -1,6 +1,6 @@
 import { ZERO } from '@portkey-wallet/constants/misc';
 import { BaseToken } from '@portkey-wallet/types/types-ca/token';
-import { divDecimals, unitConverter } from '@portkey-wallet/utils/converter';
+import { divDecimals, fixedDecimal } from '@portkey-wallet/utils/converter';
 import { Input } from 'antd';
 import clsx from 'clsx';
 import { handleKeyDown } from 'pages/Send/utils/util.keyDown';
@@ -91,7 +91,7 @@ export default function TokenInput({
             </div>
             <div className="center">
               <p className="symbol">{token?.symbol}</p>
-              <p className="amount">{`${t('Balance_with_colon')} ${unitConverter(
+              <p className="amount">{`${t('Balance_with_colon')} ${fixedDecimal(
                 divDecimals(balance, token.decimals),
               )} ${token?.symbol}`}</p>
             </div>
@@ -119,9 +119,9 @@ export default function TokenInput({
               }}
             />
             {isMain && (
-              <span className="convert">{`$${unitConverter(
+              <span className="convert">{`$${fixedDecimal(
                 // ZERO.plus(amount?.replace(` ${token?.symbol}`, '') || 0)?.multipliedBy(rate?.USDT || 0),
-                ZERO.plus(amount?.replace(` ${token?.symbol}`, '') || 0),
+                ZERO.plus(amount?.replace(` ${token?.symbol}`, '') || 0, 2),
               )}`}</span>
             )}
           </div>
