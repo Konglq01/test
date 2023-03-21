@@ -146,6 +146,8 @@ export default function VerifierAccount() {
       navigate('/login/guardian-approval');
     } else if (state === 'guardians/add' && !userGuardianStatus?.[opGuardian?.key || ''].signature) {
       navigate('/setting/guardians/add', { state: 'back' });
+    } else if (state.indexOf('guardians') !== -1) {
+      navigate('/setting/guardians/guardian-approval', { state: state });
     } else {
       navigate(-1);
     }
