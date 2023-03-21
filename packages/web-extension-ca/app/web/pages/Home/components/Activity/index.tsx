@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getActivityListAsync } from '@portkey-wallet/store/store-ca/activity/action';
 import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
-import { useUserInfo } from 'store/Provider/hooks';
+import { useLoading, useUserInfo } from 'store/Provider/hooks';
 import { transactionTypesForActivityList } from '@portkey-wallet/constants/constants-ca/activity';
 import { IActivitiesApiParams } from '@portkey-wallet/store/store-ca/activity/type';
 import { getCurrentActivityMapKey } from '@portkey-wallet/utils/activity';
@@ -37,6 +37,20 @@ export default function Activity({ chainId, symbol }: ActivityProps) {
   const {
     walletInfo: { caAddressList },
   } = currentWallet;
+
+  const { setLoading } = useLoading();
+  const setL = useCallback(() => {
+    // When there is no transaction and fetching, show loading.
+    if (typeof activity.isLoading === 'boolean' && activity.isLoading && currentActivity.data.length === 0) {
+      setLoading(true, ' ');
+    } else {
+      setLoading(false);
+    }
+  }, [activity.isLoading, currentActivity.data.length, setLoading]);
+
+  useEffect(() => {
+    setL();
+  }, [setL]);
 
   useEffect(() => {
     if (passwordSeed) {
