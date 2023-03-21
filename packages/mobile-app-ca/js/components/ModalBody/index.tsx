@@ -9,6 +9,7 @@ import Touchable from 'components/Touchable';
 import { defaultColors } from 'assets/theme';
 import { TextXL } from 'components/CommonText';
 import Svg from 'components/Svg';
+import GStyles from 'assets/theme/GStyles';
 
 export interface ModalBodyProps extends ViewProps {
   title?: string;
@@ -64,9 +65,9 @@ export const styles = StyleSheet.create({
     textAlign: 'center',
   },
   closeIcon: {
+    ...GStyles.paddingArg(21, 28),
     position: 'absolute',
-    right: pTd(28),
-    top: pTd(21),
+    right: 0,
   },
   headerRow: {
     paddingTop: pTd(14),
