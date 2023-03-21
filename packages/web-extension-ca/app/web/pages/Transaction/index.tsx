@@ -114,7 +114,6 @@ export default function Transaction() {
             <span className="usd">{`${formatWithCommas({
               sign: AmountSign.USD,
               amount: priceInUsd,
-              decimals: 0,
               digits: 2,
             })}`}</span>
           )}

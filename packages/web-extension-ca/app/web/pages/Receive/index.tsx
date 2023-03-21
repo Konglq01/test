@@ -1,13 +1,13 @@
 import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { ChainId } from '@portkey-wallet/types';
-import { SendTokenQRDataType } from '@portkey-wallet/types/types-ca/qrcode';
 import { transNetworkText } from '@portkey-wallet/utils/activity';
+import { QRCodeDataObjType, shrinkSendQrData } from '@portkey-wallet/utils/qrCode';
 import clsx from 'clsx';
 import Copy from 'components/Copy';
 import CustomSvg from 'components/CustomSvg';
 import TitleWrapper from 'components/TitleWrapper';
 import { useIsTestnet } from 'hooks/useNetwork';
-import QRCode from 'qrcode.react';
+import QRCodeCommon from 'pages/components/QRCodeCommon';
 import { useMemo } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import { useWalletInfo } from 'store/Provider/hooks';
@@ -34,7 +34,7 @@ export default function Receive() {
     );
   }, [navigate]);
 
-  const value: SendTokenQRDataType = useMemo(
+  const value: QRCodeDataObjType = useMemo(
     () => ({
       type: 'send',
       sendType: 'token',
@@ -57,7 +57,6 @@ export default function Receive() {
     }),
     [caAddress, currentNetwork, state],
   );
-  console.log('-----qr', value);
 
   return (
     <div className="receive-wrapper">
@@ -71,12 +70,7 @@ export default function Receive() {
           <p className="symbol">{symbol}</p>
           <p className="network">{transNetworkText(state.chainId, isTestNet)}</p>
         </div>
-        <QRCode
-          imageSettings={{ src: 'assets/svgIcon/PortkeyQR.svg', height: 20, width: 20, excavate: true }}
-          value={JSON.stringify(value)}
-          // eslint-disable-next-line no-inline-styles/no-inline-styles
-          style={{ width: 200, height: 200 }}
-        />
+        <QRCodeCommon value={JSON.stringify(shrinkSendQrData(value))} />
         <div className="receive-address">
           <div className="address">{caAddress}</div>
           <Copy className="copy-icon" toCopy={caAddress}></Copy>
