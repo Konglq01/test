@@ -117,7 +117,7 @@ const ActivityDetail = () => {
               <TextM style={[styles.lightGrayFontColor]}>{t('Network')}</TextM>
               <View style={styles.networkInfoContent}>
                 <TextM style={[styles.blackFontColor]}>{`${from} ${isTestNet}`}</TextM>
-                <View style={GStyles.flexRow}>
+                <View style={GStyles.flexRowWrap}>
                   <TextM style={[styles.lightGrayFontColor]}>{` → `}</TextM>
                   <TextM style={[styles.blackFontColor]}>{`${to} ${isTestNet}`}</TextM>
                 </View>
@@ -127,7 +127,7 @@ const ActivityDetail = () => {
           <View style={[styles.flexSpaceBetween, isNetworkShow && styles.marginTop16]}>
             <TextM style={[styles.lightGrayFontColor]}>{t('Transaction ID')}</TextM>
             <View style={GStyles.flex1} />
-            <View style={[GStyles.flexRow, styles.alignItemsEnd]}>
+            <View style={[GStyles.flexRowWrap, styles.alignItemsEnd]}>
               <TextM>{formatStr2EllipsisStr(_transactionId, 10, 'tail')}</TextM>
             </View>
             {CopyIconUI(transactionId)}
@@ -230,7 +230,7 @@ const ActivityDetail = () => {
         {activityItem?.transactionType && !hiddenArr.includes(activityItem?.transactionType) && (
           <>
             <View style={styles.section}>
-              <View style={[GStyles.flexRow]}>
+              <View style={[GStyles.flexRowWrap]}>
                 <TextM style={styles.lightGrayFontColor}>{t('From')}</TextM>
                 <View style={GStyles.flex1} />
                 <View style={[styles.alignItemsEnd, styles.justifyContentCenter]}>
@@ -249,7 +249,7 @@ const ActivityDetail = () => {
         {activityItem?.transactionType && !hiddenArr.includes(activityItem?.transactionType) && (
           <>
             <View style={styles.section}>
-              <View style={[GStyles.flexRow]}>
+              <View style={[GStyles.flexRowWrap]}>
                 <TextM style={[styles.lightGrayFontColor]}>{t('To')}</TextM>
                 <View style={GStyles.flex1} />
                 <View style={[styles.alignItemsEnd, styles.justifyContentCenter]}>
@@ -274,7 +274,7 @@ const ActivityDetail = () => {
       <View style={styles.space} />
       {explorerUrl && (
         <CommonButton
-          containerStyle={[GStyles.marginTop(pTd(8)), styles.bottomButton]}
+          containerStyle={[GStyles.marginTop(8), styles.bottomButton]}
           onPress={() => {
             if (!explorerUrl) return;
             if (!activityItem?.transactionId) return;

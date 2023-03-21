@@ -173,7 +173,7 @@ export default function GuardianItem({
           <Text style={styles.typeText}>Login Account</Text>
         </View>
       )}
-      <View style={[GStyles.flexRow, GStyles.itemCenter, GStyles.flex1]}>
+      <View style={[GStyles.flexRowWrap, GStyles.itemCenter, GStyles.flex1]}>
         <Svg iconStyle={styles.loginTypeIcon} icon={LoginGuardianTypeIcon[guardianItem.guardianType]} size={pTd(32)} />
         <VerifierImage size={pTd(32)} uri={guardianItem.verifier?.imageUrl} style={styles.iconStyle} />
         <TextM numberOfLines={1} style={[styles.nameStyle, GStyles.flex1]}>

@@ -281,8 +281,8 @@ export default function GuardianApproval() {
           {isExpired ? 'Expired' : `Expire after ${VERIFIER_EXPIRATION} hour`}
         </TextM>
         <View style={[styles.verifierBody, GStyles.flex1]}>
-          <View style={[GStyles.itemCenter, GStyles.flexRow, BorderStyles.border6, styles.approvalTitleRow]}>
-            <View style={[GStyles.itemCenter, GStyles.flexRow, styles.approvalRow]}>
+          <View style={[GStyles.itemCenter, GStyles.flexRowWrap, BorderStyles.border6, styles.approvalTitleRow]}>
+            <View style={[GStyles.itemCenter, GStyles.flexRowWrap, styles.approvalRow]}>
               <TextM style={[FontStyles.font3, styles.approvalTitle]}>{`Guardians' approval`}</TextM>
               <Touchable
                 onPress={() =>

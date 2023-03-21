@@ -32,7 +32,7 @@ const Divider: React.FC<DividerProps> = ({
   const textStyle = [FontStyles.font7, styles[`${insetType}Title`], titleStyle];
   if (title && inset)
     return (
-      <View style={[GStyles.flexRow, GStyles.itemCenter, style]}>
+      <View style={[GStyles.flexRowWrap, GStyles.itemCenter, style]}>
         {insetType === 'left' && <TextM style={textStyle}>{title}</TextM>}
         <View style={[GStyles.flex1, linStyle]} />
         {insetType === 'middle' && <TextM style={textStyle}>{title}</TextM>}

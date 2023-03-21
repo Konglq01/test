@@ -292,7 +292,7 @@ const ContactEdit: React.FC = () => {
         label={t('Name')}
         placeholder={t('Enter name')}
         inputStyle={pageStyles.nameInputStyle}
-        labelStyle={pageStyles.nameLableStyle}
+        labelStyle={pageStyles.nameLabelStyle}
         value={editContact.name}
         onChangeText={onNameChange}
         errorMessage={editContact.error.isError ? editContact.error.errorMsg : ''}
@@ -331,7 +331,7 @@ const ContactEdit: React.FC = () => {
               <View>
                 <Touchable onPress={addAddress} style={pageStyles.addAddressBtn}>
                   <Svg icon="add-token" size={pTd(20)} />
-                  <TextM style={[FontStyles.font4, GStyles.marginLeft(8)]}>{t('Add Address')}</TextM>
+                  <TextM style={pageStyles.addAddressText}>{t('Add Address')}</TextM>
                 </Touchable>
               </View>
             )}
@@ -339,12 +339,16 @@ const ContactEdit: React.FC = () => {
         </TouchableWithoutFeedback>
       </KeyboardAwareScrollView>
 
-      <View style={GStyles.paddingTop(16)}>
+      <View style={pageStyles.btnContainer}>
         <CommonButton onPress={onFinish} disabled={isSaveDisable} type="solid">
           {isEdit ? t('Save') : t('Add')}
         </CommonButton>
         {isEdit && (
-          <CommonButton style={GStyles.marginTop(8)} onPress={onDelete} titleStyle={FontStyles.font12} type="clear">
+          <CommonButton
+            style={pageStyles.deleteBtnStyle}
+            onPress={onDelete}
+            titleStyle={FontStyles.font12}
+            type="clear">
             {t('Delete')}
           </CommonButton>
         )}

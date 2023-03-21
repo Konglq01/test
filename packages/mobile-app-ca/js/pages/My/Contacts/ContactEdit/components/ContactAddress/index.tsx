@@ -74,7 +74,7 @@ const ContactAddress: React.FC<ContactAddressProps> = ({
             <Svg icon="testnet" size={pTd(28)} />
           )
         }
-        titleStyle={[GStyles.flexRow, GStyles.itemCenter]}
+        titleStyle={[GStyles.flexRowWrap, GStyles.itemCenter]}
         titleTextStyle={styles.chainSelectTitleStyle}
         style={styles.selectedItem}
         title={chainName}

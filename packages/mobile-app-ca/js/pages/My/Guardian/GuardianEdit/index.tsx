@@ -243,7 +243,7 @@ const GuardianEdit: React.FC = () => {
                   callBack: setSelectedType,
                 });
               }}
-              titleStyle={[GStyles.flexRow, GStyles.itemCenter]}
+              titleStyle={[GStyles.flexRowWrap, GStyles.itemCenter]}
               titleTextStyle={[pageStyles.titleTextStyle, !selectedType && FontStyles.font7]}
               style={pageStyles.typeWrap}
               titleLeftElement={
@@ -335,7 +335,7 @@ const GuardianEdit: React.FC = () => {
               <VerifierImage style={pageStyles.verifierImageStyle} size={pTd(30)} uri={selectedVerifier.imageUrl} />
             )
           }
-          titleStyle={[GStyles.flexRow, GStyles.itemCenter]}
+          titleStyle={[GStyles.flexRowWrap, GStyles.itemCenter]}
           titleTextStyle={[pageStyles.titleTextStyle, !selectedVerifier && FontStyles.font7]}
           style={pageStyles.verifierWrap}
           title={selectedVerifier?.name || t('Select guardian verifiers')}

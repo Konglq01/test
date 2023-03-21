@@ -397,7 +397,7 @@ export const styles = StyleSheet.create({
   topWrap: {
     width: '100%',
     marginTop: pTd(40),
-    ...GStyles.flexRow,
+    ...GStyles.flexRowWrap,
   },
   img: {
     width: pTd(64),

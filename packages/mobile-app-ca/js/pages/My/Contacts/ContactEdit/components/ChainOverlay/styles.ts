@@ -17,10 +17,14 @@ const styles = StyleSheet.create({
   titleInput: {
     fontSize: pTd(14),
   },
+  titleIcon: {
+    marginLeft: pTd(16),
+  },
   itemRow: {
     height: pTd(72),
     flexDirection: 'row',
     alignItems: 'center',
+    paddingLeft: pTd(20),
   },
   itemContent: {
     flex: 1,
