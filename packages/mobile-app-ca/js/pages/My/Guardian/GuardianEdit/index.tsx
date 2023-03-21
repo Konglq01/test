@@ -233,7 +233,7 @@ const GuardianEdit: React.FC = () => {
       <View style={pageStyles.contentWrap}>
         {!isEdit && (
           <>
-            <TextM style={[pageStyles.titleLabel, GStyles.marginArg(0, 0, 8, 8)]}>{t('Guardian Type')}</TextM>
+            <TextM style={pageStyles.titleLabel}>{t('Guardian Type')}</TextM>
             <ListItem
               onPress={() => {
                 GuardianTypeSelectOverlay.showList({
@@ -245,7 +245,7 @@ const GuardianEdit: React.FC = () => {
               }}
               titleStyle={[GStyles.flexRow, GStyles.itemCenter]}
               titleTextStyle={[pageStyles.titleTextStyle, !selectedType && FontStyles.font7]}
-              style={GStyles.marginBottom(24)}
+              style={pageStyles.typeWrap}
               titleLeftElement={
                 selectedType?.icon && <Svg icon={selectedType.icon} size={pTd(28)} iconStyle={pageStyles.typeIcon} />
               }
@@ -320,7 +320,7 @@ const GuardianEdit: React.FC = () => {
           </>
         )}
 
-        <TextM style={[pageStyles.titleLabel, GStyles.marginArg(0, 0, 8, 8)]}>{t('Verifier')}</TextM>
+        <TextM style={pageStyles.titleLabel}>{t('Verifier')}</TextM>
         <ListItem
           onPress={() => {
             VerifierSelectOverlay.showList({
@@ -332,12 +332,12 @@ const GuardianEdit: React.FC = () => {
           }}
           titleLeftElement={
             selectedVerifier && (
-              <VerifierImage style={GStyles.marginRight(12)} size={pTd(30)} uri={selectedVerifier.imageUrl} />
+              <VerifierImage style={pageStyles.verifierImageStyle} size={pTd(30)} uri={selectedVerifier.imageUrl} />
             )
           }
           titleStyle={[GStyles.flexRow, GStyles.itemCenter]}
           titleTextStyle={[pageStyles.titleTextStyle, !selectedVerifier && FontStyles.font7]}
-          style={GStyles.marginBottom(4)}
+          style={pageStyles.verifierWrap}
           title={selectedVerifier?.name || t('Select guardian verifiers')}
           rightElement={<Svg size={pTd(20)} icon="down-arrow" />}
         />
@@ -350,7 +350,11 @@ const GuardianEdit: React.FC = () => {
             <CommonButton disabled={isApprovalDisable} type="primary" onPress={onApproval}>
               {t('Send Request')}
             </CommonButton>
-            <CommonButton style={GStyles.marginTop(8)} type="clear" onPress={onRemove} titleStyle={FontStyles.font12}>
+            <CommonButton
+              style={pageStyles.removeBtnWrap}
+              type="clear"
+              onPress={onRemove}
+              titleStyle={FontStyles.font12}>
               {t('Remove')}
             </CommonButton>
           </>
