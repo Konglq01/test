@@ -26,18 +26,13 @@ import { formatStr2EllipsisStr } from '@portkey-wallet/utils';
 import navigationService from 'utils/navigationService';
 import { pTd } from 'utils/unit';
 import { useIsTestnet } from '@portkey-wallet/hooks/hooks-ca/network';
-
-interface RouterParams {
-  transactionId?: string;
-  blockHash?: string;
-  isReceived?: boolean;
-}
-
-const hiddenArr = [TransactionTypes.SOCIAL_RECOVERY, TransactionTypes.ADD_MANAGER, TransactionTypes.REMOVE_MANAGER];
+import { ChainId } from '@portkey-wallet/types';
+import { HIDDEN_TRANSACTION_TYPES } from '@portkey-wallet/constants/constants-ca/activity';
 
 const ActivityDetail = () => {
   const { t } = useLanguage();
-  const { transactionId = '', blockHash = '', isReceived: isReceivedParams } = useRouterParams<RouterParams>();
+  const activityItemFromRoute = useRouterParams<ActivityItemType>();
+  const { transactionId = '', blockHash = '', isReceived: isReceivedParams } = activityItemFromRoute;
   const caAddresses = useCaAddresses();
   const isTestnet = useIsTestnet();
   const { currentNetwork } = useCurrentWallet();
@@ -101,7 +96,7 @@ const ActivityDetail = () => {
   const networkUI = useMemo(() => {
     const { transactionType, fromChainId, toChainId, transactionId: _transactionId = '' } = activityItem || {};
 
-    const isNetworkShow = transactionType && !hiddenArr.includes(transactionType);
+    const isNetworkShow = transactionType && !HIDDEN_TRANSACTION_TYPES.includes(transactionType);
     return (
       <>
         <View style={styles.section}>
@@ -176,7 +171,7 @@ const ActivityDetail = () => {
       </Text>
 
       {activityItem?.transactionType &&
-        !hiddenArr.includes(activityItem?.transactionType) &&
+        !HIDDEN_TRANSACTION_TYPES.includes(activityItem?.transactionType) &&
         (isNft ? (
           <>
             <View style={styles.topWrap}>
@@ -197,7 +192,7 @@ const ActivityDetail = () => {
         ) : (
           <>
             <Text style={[styles.tokenCount, styles.fontBold]}>
-              {!hiddenArr.includes(activityItem?.transactionType as TransactionTypes) &&
+              {!HIDDEN_TRANSACTION_TYPES.includes(activityItem?.transactionType as TransactionTypes) &&
                 (activityItem?.isReceived ? '+' : '-')}
               {`${unitConverter(divDecimals(activityItem?.amount, activityItem?.decimals))} ${
                 activityItem?.symbol || ''
@@ -220,7 +215,7 @@ const ActivityDetail = () => {
       </View>
       <View style={styles.card}>
         {/* From */}
-        {activityItem?.transactionType && !hiddenArr.includes(activityItem?.transactionType) && (
+        {activityItem?.transactionType && !HIDDEN_TRANSACTION_TYPES.includes(activityItem?.transactionType) && (
           <>
             <View style={styles.section}>
               <View style={[GStyles.flexRow]}>
@@ -239,7 +234,7 @@ const ActivityDetail = () => {
           </>
         )}
         {/* To */}
-        {activityItem?.transactionType && !hiddenArr.includes(activityItem?.transactionType) && (
+        {activityItem?.transactionType && !HIDDEN_TRANSACTION_TYPES.includes(activityItem?.transactionType) && (
           <>
             <View style={styles.section}>
               <View style={[GStyles.flexRow]}>

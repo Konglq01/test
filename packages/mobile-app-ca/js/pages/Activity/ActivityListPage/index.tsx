@@ -55,18 +55,7 @@ const ActivityListPage = () => {
   });
 
   const renderItem = useCallback(({ item }: { item: ActivityItemType }) => {
-    return (
-      <TransferItem
-        item={item}
-        onPress={() =>
-          navigationService.navigate('ActivityDetail', {
-            transactionId: item.transactionId,
-            blockHash: item.blockHash,
-            isReceived: item.isReceived,
-          })
-        }
-      />
-    );
+    return <TransferItem item={item} onPress={() => navigationService.navigate('ActivityDetail', item)} />;
   }, []);
 
   const [refreshing, setRefreshing] = useState(false);

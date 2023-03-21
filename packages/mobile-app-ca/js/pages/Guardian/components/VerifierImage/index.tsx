@@ -1,19 +1,39 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { defaultColors } from 'assets/theme';
-import { Image, StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, View, Text } from 'react-native';
 import { ViewStyleType } from 'types/styles';
 
-export function VerifierImage({ size = 36, uri, style }: { size?: number; uri?: string; style?: ViewStyleType }) {
+export function VerifierImage({
+  size = 36,
+  uri,
+  label = '',
+  style,
+}: {
+  size?: number;
+  uri?: string;
+  label?: string;
+  style?: ViewStyleType;
+}) {
   const iconStyle = useMemo(() => {
     return {
       width: size,
       height: size,
       borderRadius: size / 2,
+      backgroundColor: defaultColors.bg4,
     };
   }, [size]);
+  const [imgLoading, setImgLoading] = useState(true);
   return (
     <View style={[styles.iconBox, iconStyle, style]}>
-      <Image source={{ uri }} style={iconStyle} />
+      {imgLoading && !!label ? <Text style={{ fontSize: 18 }}>{label.charAt(0)}</Text> : null}
+      <Image
+        onLoad={() => {
+          setImgLoading(false);
+        }}
+        source={{ uri }}
+        style={[iconStyle, imgLoading && styles.hiddenStyle]}
+        loadingIndicatorSource={require('../../../../assets/image/pngs/phone.png')}
+      />
     </View>
   );
 }
@@ -21,6 +41,14 @@ export function VerifierImage({ size = 36, uri, style }: { size?: number; uri?: 
 const styles = StyleSheet.create({
   iconBox: {
     borderColor: defaultColors.border2,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  hiddenStyle: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    opacity: 0,
   },
 });
