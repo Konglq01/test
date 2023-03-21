@@ -42,11 +42,11 @@ const RemoveAccount = ({ accountInfo, buttons }: RemoveAccountProps) => {
     <View style={styles.centerBox}>
       <ScrollView alwaysBounceVertical={false}>
         <TextTitle style={GStyles.alignCenter}>{t('Remove Account ?')}</TextTitle>
-        <View style={[styles.accountRow, GStyles.marginTop(pTd(16))]}>
+        <View style={[styles.accountRow, GStyles.marginTop(16)]}>
           <TextL style={fonts.mediumFont}>{accountInfo?.accountName}</TextL>
           <TextM style={styles.addressText}>{addressFormat(accountInfo?.address, chainId, chainType)}</TextM>
         </View>
-        <TextS style={[styles.replaceTip, GStyles.marginTop(pTd(24))]}>
+        <TextS style={[styles.replaceTip, GStyles.marginTop(24)]}>
           {t(
             'This account will be removed from your wallet. Please make sure you have the original Secret Recovery Phrase or private key for this imported account before continuing',
           )}

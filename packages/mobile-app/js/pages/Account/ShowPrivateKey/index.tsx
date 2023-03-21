@@ -65,7 +65,7 @@ export default function ShowPrivateKey() {
                   const isCopy = await setStringAsync(privateKey);
                   isCopy && CommonToast.success(i18n.t('Copy Success'));
                 }}
-                style={[styles.copyRow, GStyles.flexRow, GStyles.itemCenter]}>
+                style={[styles.copyRow, GStyles.flexRowWrap, GStyles.itemCenter]}>
                 <Svg icon="copy" size={pTd(12)} />
                 <TextS style={styles.primaryText}>{t('Copy')}</TextS>
               </Touchable>
@@ -85,7 +85,7 @@ export default function ShowPrivateKey() {
           <TextL style={[styles.tipText, fonts.mediumFont, styles.tipTitle]}>
             {t('DO NOT SHARE THIS KEY WITH ANYONE!')}
           </TextL>
-          <TextM style={[styles.tipText, GStyles.marginTop(pTd(8))]}>
+          <TextM style={[styles.tipText, GStyles.marginTop(8)]}>
             {t('This private key can be used by others to steal your assets')}
           </TextM>
         </View>

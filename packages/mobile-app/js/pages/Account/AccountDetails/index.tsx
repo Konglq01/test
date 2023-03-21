@@ -118,7 +118,7 @@ export default function AccountDetails() {
               </Touchable>
             </View>
           ) : (
-            <View style={[GStyles.flexRow, GStyles.itemCenter, styles.accountRow]}>
+            <View style={[GStyles.flexRowWrap, GStyles.itemCenter, styles.accountRow]}>
               <TextL numberOfLines={1} style={styles.accountNameText}>
                 {account?.accountName}
               </TextL>
@@ -139,7 +139,7 @@ export default function AccountDetails() {
         {blockExplorerURL ? (
           <CommonButton
             onPress={() => Linking.openURL(getExploreLink(blockExplorerURL, accountInfo.address))}
-            containerStyle={GStyles.marginTop(pTd(8))}
+            containerStyle={GStyles.marginTop(8)}
             title={t('View on Explorer')}
             type="clear"
           />
@@ -149,7 +149,7 @@ export default function AccountDetails() {
           <CommonButton
             type="clear"
             title={t('Remove Account')}
-            containerStyle={GStyles.marginTop(pTd(8))}
+            containerStyle={GStyles.marginTop(8)}
             titleStyle={styles.removeTitleStyle}
             onPress={onRemoveAccount}
           />

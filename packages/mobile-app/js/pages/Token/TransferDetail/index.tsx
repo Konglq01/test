@@ -118,7 +118,7 @@ const TransferDetail: React.FC<TransferDetailProps> = ({ route, transfer }) => {
       {blockExplorerURL ? (
         <CommonButton
           onPress={() => Linking.openURL(getExploreLink(blockExplorerURL, currentAccount?.address || ''))}
-          // containerStyle={GStyles.marginTop(pTd(8))}
+          // containerStyle={GStyles.marginTop(8)}
           title={t('View on Explorer')}
           type="clear"
           style={styles.button}
