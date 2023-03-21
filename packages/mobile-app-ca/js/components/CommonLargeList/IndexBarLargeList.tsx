@@ -96,11 +96,15 @@ export default function IndexBarLargeList(props: IndexLargeListProps) {
         renderHeader={showHeader ? renderHeader : undefined}
         onScroll={({
           nativeEvent: {
-            contentOffset: { x, y },
+            contentOffset: { y },
           },
         }) => {
           if (!indexNativeYList.length) return;
           for (let i = 0; i < indexNativeYList.length; i++) {
+            if (y <= 0) {
+              indexBarRef.current?.setSelectIndex(0);
+              return;
+            }
             if (indexNativeYList[i + 1] === undefined || (y >= indexNativeYList[i] && y < indexNativeYList[i + 1])) {
               indexBarRef.current?.setSelectIndex(i);
               return;

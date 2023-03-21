@@ -110,7 +110,7 @@ export default function SelectVerifier() {
             })
           }
           titleLeftElement={<VerifierImage uri={selectedVerifier?.imageUrl} size={30} />}
-          titleStyle={[GStyles.flexRow, GStyles.itemCenter]}
+          titleStyle={[GStyles.flexRowWrap, GStyles.itemCenter]}
           titleTextStyle={styles.titleTextStyle}
           style={[styles.selectedItem, BorderStyles.border1]}
           title={selectedVerifier?.name}

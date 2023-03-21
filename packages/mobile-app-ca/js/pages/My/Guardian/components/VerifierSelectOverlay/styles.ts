@@ -9,6 +9,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: defaultColors.border6,
+    paddingLeft: pTd(24),
+  },
+  verifierImageStyle: {
+    marginRight: pTd(12),
   },
   itemContent: {
     flex: 1,

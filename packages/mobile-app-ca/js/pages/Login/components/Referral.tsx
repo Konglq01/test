@@ -90,7 +90,7 @@ export default function Referral({
       </View>
       {type === PageType.login && (
         <Touchable
-          style={[GStyles.flexRow, GStyles.itemCenter, styles.signUpTip]}
+          style={[GStyles.flexRowWrap, GStyles.itemCenter, styles.signUpTip]}
           onPress={() => navigationService.navigate('SignupPortkey')}>
           <TextL style={FontStyles.font3}>
             No account? <Text style={FontStyles.font4}>Sign up </Text>

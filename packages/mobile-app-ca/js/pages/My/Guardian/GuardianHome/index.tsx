@@ -94,6 +94,6 @@ const pageStyles = StyleSheet.create({
   pageWrap: {
     flex: 1,
     backgroundColor: defaultColors.bg1,
-    ...GStyles.paddingArg(24, 20),
+    ...GStyles.paddingArg(16, 20),
   },
 });

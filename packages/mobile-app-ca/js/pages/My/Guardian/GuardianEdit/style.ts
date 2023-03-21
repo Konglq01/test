@@ -20,9 +20,22 @@ export const pageStyles = StyleSheet.create({
   titleLabel: {
     color: font3,
     lineHeight: pTd(20),
+    ...GStyles.marginArg(0, 0, 8, 8),
+  },
+  typeWrap: {
+    marginBottom: pTd(24),
   },
   titleTextStyle: {
     fontSize: pTd(14),
+  },
+  verifierImageStyle: {
+    marginRight: pTd(12),
+  },
+  verifierWrap: {
+    marginBottom: pTd(4),
+  },
+  removeBtnWrap: {
+    marginTop: pTd(8),
   },
   errorTips: {
     color: error,
