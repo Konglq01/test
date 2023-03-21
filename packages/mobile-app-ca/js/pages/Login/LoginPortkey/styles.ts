@@ -60,9 +60,10 @@ const styles = StyleSheet.create({
     marginTop: 32,
   },
   loading: {
+    top: 0,
     position: 'absolute',
-    width: 200,
-    height: 200,
+    width: 250,
+    height: 250,
     backgroundColor: '#ffffffee',
     zIndex: 999,
     alignItems: 'center',

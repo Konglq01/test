@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
 
   accountCardStyle: {
     marginTop: pTd(40),
-    width: pTd(280),
+    // width: pTd(280),
     alignItems: 'center',
     marginLeft: 'auto',
     marginRight: 'auto',
