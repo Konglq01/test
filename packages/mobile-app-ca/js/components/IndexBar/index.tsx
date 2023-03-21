@@ -43,7 +43,7 @@ interface PopoverInterface {
   setShow: (show?: boolean) => void;
 }
 
-export const Popover = forwardRef((_, _ref) => {
+export const Popover = forwardRef(function Popover(_, _ref) {
   const [show, setShow] = useState<boolean>();
   const [popoverInfo, setPopoverInfo] = useState<PopoverInfo>();
   const marginTop = useRef(new Animated.Value(0)).current;
@@ -65,17 +65,16 @@ export const Popover = forwardRef((_, _ref) => {
   );
   useImperativeHandle(_ref, () => ({ setPopoverInfo: onSetPopoverInfo, setShow }), [onSetPopoverInfo]);
 
-  if (!popoverInfo || !show) return null;
+  if (!popoverInfo || !popoverInfo.text || !show) return null;
   return (
     <Animated.View style={[styles.popover, { marginTop }]}>
       <TextL style={[styles.popoverItem]}>{popoverInfo.text}</TextL>
     </Animated.View>
   );
 });
-Popover.displayName = 'Popover';
 
 const IndexBarItem = memo(
-  ({
+  function IndexBarItem({
     style,
     indexTextStyle,
     indexWrapSelectStyle,
@@ -91,7 +90,7 @@ const IndexBarItem = memo(
     indexWrapStyle?: ViewStyleType;
     text: string;
     isSelected?: boolean;
-  }) => {
+  }) {
     return (
       <View style={[style]}>
         <View style={[indexWrapStyle, isSelected && indexWrapSelectStyle]}>
@@ -102,135 +101,133 @@ const IndexBarItem = memo(
   },
   (prevPros, nextProps) => prevPros.isSelected === nextProps.isSelected,
 );
-IndexBarItem.displayName = 'IndexBarItem';
 
 export type IndexBarInterface = {
   setSelectIndex: (selectIndex: number) => void;
 };
 
-const IndexBar = forwardRef(
-  (
-    { style, data, indexBarItemStyle, indexTextStyle, onPress, showPopover, disableIndexSelect = false }: IndexBarProps,
+const IndexBar = forwardRef(function IndexBar(
+  { style, data, indexBarItemStyle, indexTextStyle, onPress, showPopover, disableIndexSelect = false }: IndexBarProps,
+  forwardedRef,
+) {
+  const indexInfoRef = useRef<IndexInfoType>();
+  const indexRef = useRef<View>(null);
+  const popoverRef = useRef<PopoverInterface>();
+  const prevData = usePrevious(data);
+
+  const [outsideSelectIndex, setOutsideSelectIndex] = useState(0);
+  const [scrollSelectIndex, setScrollSelectIndex] = useState(-1);
+
+  const getIndex = useCallback((nativePageY: number) => {
+    if (!indexInfoRef.current) return;
+    const { pageY, height, indexHeight } = indexInfoRef.current;
+    const nativeClientY = nativePageY - pageY;
+    if (nativeClientY < 0 || nativeClientY > height) return;
+    return Math.floor(nativeClientY / indexHeight);
+  }, []);
+  const selectIndex = useMemo(
+    () => (scrollSelectIndex !== -1 ? scrollSelectIndex : outsideSelectIndex),
+    [outsideSelectIndex, scrollSelectIndex],
+  );
+
+  useImperativeHandle(
     forwardedRef,
-  ) => {
-    const indexInfoRef = useRef<IndexInfoType>();
-    const indexRef = useRef<View>(null);
-    const popoverRef = useRef<PopoverInterface>();
-    const prevData = usePrevious(data);
-    const getIndex = useCallback((nativePageY: number) => {
+    () => ({
+      setSelectIndex: setOutsideSelectIndex,
+    }),
+    [],
+  );
+
+  const setCurrentIndex = useCallback(
+    (nativePageY: number) => {
       if (!indexInfoRef.current) return;
-      const { pageY, height, indexHeight } = indexInfoRef.current;
-      const nativeClientY = nativePageY - pageY;
-      if (nativeClientY < 0 || nativeClientY > height) return;
-      return Math.floor(nativeClientY / indexHeight);
-    }, []);
-    const [outsideSelectIndex, setOutsideSelectIndex] = useState(0);
-    const [scrollSelectIndex, setScrollSelectIndex] = useState(-1);
-    const selectIndex = useMemo(
-      () => (scrollSelectIndex !== -1 ? scrollSelectIndex : outsideSelectIndex),
-      [outsideSelectIndex, scrollSelectIndex],
-    );
+      const { currentIndex, indexHeight } = indexInfoRef.current;
+      const nowIndex = getIndex(nativePageY);
+      if (nowIndex !== undefined && nowIndex !== currentIndex) {
+        indexInfoRef.current.currentIndex = nowIndex;
+        onPress?.(nowIndex);
+        popoverRef.current?.setPopoverInfo({ top: nowIndex * indexHeight, text: data[nowIndex], indexHeight });
+        setScrollSelectIndex(nowIndex);
+      }
+    },
+    [data, getIndex, onPress],
+  );
 
-    useImperativeHandle(
-      forwardedRef,
-      () => ({
-        setSelectIndex: setOutsideSelectIndex,
-      }),
-      [],
-    );
-
-    const setCurrentIndex = useCallback(
-      (nativePageY: number) => {
-        if (!indexInfoRef.current) return;
-        const { currentIndex, indexHeight } = indexInfoRef.current;
-        const nowIndex = getIndex(nativePageY);
-        if (nowIndex !== undefined && nowIndex !== currentIndex) {
-          indexInfoRef.current.currentIndex = nowIndex;
-          onPress?.(nowIndex);
-          popoverRef.current?.setPopoverInfo({ top: nowIndex * indexHeight, text: data[nowIndex], indexHeight });
-          setScrollSelectIndex(nowIndex);
-        }
-      },
-      [data, getIndex, onPress],
-    );
-
-    const onPanResponderStart: PanResponderCallbacks['onPanResponderStart'] = useCallback(
-      async (evt: { nativeEvent: { pageY: any } }) => {
-        const eventPageY = evt.nativeEvent.pageY;
-        if (indexInfoRef.current && (isEqual(data, prevData) || !prevData)) {
-          indexInfoRef.current.currentIndex = -1;
-        } else {
-          const { height, pageX, pageY, indexHeight } = await new Promise<PageLocationType>((resolve, reject) => {
-            if (indexRef.current === null) {
-              reject('no indexRef');
-              return;
-            }
-            indexRef.current.measure((_x, _y, _width, _height, _pageX, _pageY) => {
-              resolve({
-                height: _height,
-                pageX: _pageX,
-                pageY: _pageY,
-                indexHeight: _height / data.length,
-              });
+  const onPanResponderStart: PanResponderCallbacks['onPanResponderStart'] = useCallback(
+    async (evt: { nativeEvent: { pageY: any } }) => {
+      const eventPageY = evt.nativeEvent.pageY;
+      if (indexInfoRef.current && (isEqual(data, prevData) || !prevData)) {
+        indexInfoRef.current.currentIndex = -1;
+      } else {
+        const { height, pageX, pageY, indexHeight } = await new Promise<PageLocationType>((resolve, reject) => {
+          if (indexRef.current === null) {
+            reject('no indexRef');
+            return;
+          }
+          indexRef.current.measure((_x, _y, _width, _height, _pageX, _pageY) => {
+            resolve({
+              height: _height,
+              pageX: _pageX,
+              pageY: _pageY,
+              indexHeight: _height / data.length,
             });
           });
-          indexInfoRef.current = {
-            height,
-            pageX,
-            pageY,
-            indexHeight,
-            currentIndex: 0,
-          };
-        }
-        setCurrentIndex(eventPageY);
-      },
-      [data, prevData, setCurrentIndex],
-    );
-    const panResponder = useMemo(
-      () =>
-        PanResponder.create({
-          onStartShouldSetPanResponder: () => true,
-          onMoveShouldSetPanResponder: () => true,
-          onPanResponderStart,
-          onPanResponderMove: (evt: GestureResponderEvent) => {
-            popoverRef.current?.setShow(true);
-            setCurrentIndex(evt.nativeEvent.pageY);
-          },
-          onPanResponderEnd: () => {
-            popoverRef.current?.setPopoverInfo(undefined);
-            popoverRef.current?.setShow(false);
-            setScrollSelectIndex(-1);
-          },
-        }),
-      [onPanResponderStart, setCurrentIndex],
-    );
-    const indexBarItem = useCallback(
-      (item: string, index: number) => {
-        return (
-          <IndexBarItem
-            key={index}
-            isSelected={!disableIndexSelect && selectIndex === index}
-            style={[styles.indexBarItemStyle, indexBarItemStyle]}
-            indexTextStyle={indexTextStyle}
-            indexWrapStyle={styles.indexWrapStyle}
-            indexWrapSelectStyle={styles.indexWrapSelectStyle}
-            indexTextSelectStyle={styles.indexTextSelectStyle}
-            text={item}
-          />
-        );
-      },
-      [disableIndexSelect, indexBarItemStyle, indexTextStyle, selectIndex],
-    );
-    return (
-      <View style={[styles.barBox, style]} ref={indexRef} {...panResponder.panHandlers}>
-        {showPopover && <Popover ref={popoverRef} />}
-        {data?.map(indexBarItem)}
-      </View>
-    );
-  },
-);
+        });
+        indexInfoRef.current = {
+          height,
+          pageX,
+          pageY,
+          indexHeight,
+          currentIndex: 0,
+        };
+      }
+      setCurrentIndex(eventPageY);
+    },
+    [data, prevData, setCurrentIndex],
+  );
+  const panResponder = useMemo(
+    () =>
+      PanResponder.create({
+        onStartShouldSetPanResponder: () => true,
+        onMoveShouldSetPanResponder: () => true,
+        onPanResponderStart,
+        onPanResponderMove: (evt: GestureResponderEvent) => {
+          popoverRef.current?.setShow(true);
+          setCurrentIndex(evt.nativeEvent.pageY);
+        },
+        onPanResponderEnd: () => {
+          popoverRef.current?.setPopoverInfo(undefined);
+          popoverRef.current?.setShow(false);
+          setScrollSelectIndex(-1);
+        },
+      }),
+    [onPanResponderStart, setCurrentIndex],
+  );
+  const indexBarItem = useCallback(
+    (item: string, index: number) => {
+      return (
+        <IndexBarItem
+          key={index}
+          isSelected={!disableIndexSelect && selectIndex === index}
+          style={[styles.indexBarItemStyle, indexBarItemStyle]}
+          indexTextStyle={indexTextStyle}
+          indexWrapStyle={styles.indexWrapStyle}
+          indexWrapSelectStyle={styles.indexWrapSelectStyle}
+          indexTextSelectStyle={styles.indexTextSelectStyle}
+          text={item}
+        />
+      );
+    },
+    [disableIndexSelect, indexBarItemStyle, indexTextStyle, selectIndex],
+  );
+  return (
+    <View style={[styles.barBox, style]} ref={indexRef} {...panResponder.panHandlers}>
+      {showPopover && <Popover ref={popoverRef} />}
+      {data?.map(indexBarItem)}
+    </View>
+  );
+});
 
-IndexBar.displayName = 'IndexBar';
 export default IndexBar;
 
 const styles = StyleSheet.create({
