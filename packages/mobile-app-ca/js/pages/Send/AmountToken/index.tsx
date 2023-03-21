@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { pTd } from 'utils/unit';
 import { parseInputChange } from '@portkey-wallet/utils/input';
@@ -13,6 +13,7 @@ import { IToSendAssetParamsType } from '@portkey-wallet/types/types-ca/routePara
 import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
 import { FontStyles } from 'assets/theme/styles';
 import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
+import { useFocusEffect } from '@react-navigation/native';
 
 interface AmountTokenProps {
   balanceShow: number | string;
@@ -30,12 +31,18 @@ export default function AmountToken({
   selectedToken,
 }: AmountTokenProps) {
   const { t } = useLanguage();
+  const iptRef = useRef<any>();
 
   const symbolImages = useSymbolImages();
 
   const formatTokenNameToSuffix = (str: string) => {
     return `${str.slice(0, 5)}...`;
   };
+
+  useFocusEffect(() => {
+    if (!iptRef || !iptRef?.current) return;
+    iptRef.current.focus();
+  });
 
   return (
     <View style={styles.amountWrap}>
@@ -67,6 +74,7 @@ export default function AmountToken({
         <View style={styles.bottomRight}>
           <Input
             autoFocus
+            ref={iptRef}
             onFocus={() => {
               if (sendTokenNumber === '0') setSendTokenNumber('');
             }}
@@ -81,14 +89,6 @@ export default function AmountToken({
               setSendTokenNumber(newAmount);
             }}
           />
-          {/* {selectedToken.symbol === 'ELF' && (
-            <TextS style={styles.usdtNumSent}>
-              ${' '}
-              {sendTokenNumber === ' '
-                ? '0.00'
-                : unitConverter(ZERO.plus(sendTokenNumber ? sendTokenNumber : '0').times(rate.USDT), 2)}
-            </TextS>
-          )} */}
         </View>
       </View>
     </View>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { View, StyleSheet, TextInput } from 'react-native';
 import { pTd } from 'utils/unit';
 import { defaultColors } from 'assets/theme';
@@ -6,6 +6,7 @@ import GStyles from 'assets/theme/GStyles';
 import { useLanguage } from 'i18n/hooks';
 import { TextM } from 'components/CommonText';
 import { FontStyles } from 'assets/theme/styles';
+import { useFocusEffect } from '@react-navigation/native';
 
 interface AmountNFT {
   sendNumber: string;
@@ -16,12 +17,20 @@ export default function AmountNFT(props: AmountNFT) {
   const { sendNumber, setSendNumber } = props;
   const { t } = useLanguage();
 
+  const iptRef = useRef<any>();
+
+  useFocusEffect(() => {
+    if (!iptRef || !iptRef?.current) return;
+    iptRef.current.focus();
+  });
+
   return (
     <View style={styles.wrap}>
       <TextM style={styles.title}>Amount</TextM>
       <View style={styles.iptWrap}>
         <TextInput
           autoFocus
+          ref={iptRef}
           style={[styles.inputStyle, sendNumber === '0' && FontStyles.font7]}
           keyboardType="numeric"
           maxLength={18}
