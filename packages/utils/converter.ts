@@ -109,19 +109,25 @@ export function formatAmount({
   return amountTrans;
 }
 
+export interface IFormatWithCommasProps {
+  amount?: string | number;
+  decimals?: string | number;
+  digits?: number;
+  sign?: AmountSign;
+}
 /**
  * formatAmount with prefix and thousand mark, not unit
  * @example $11.1  +11.1  -11.1  9,999.9
  */
 export function formatWithCommas({
   amount = DEFAULT_AMOUNT,
-  decimals = DEFAULT_DECIMAL,
+  decimals,
   digits = DEFAULT_DIGITS,
   sign = AmountSign.EMPTY,
-}: IFormatAmountProps): string {
-  let amountTrans = `${divDecimals(ZERO.plus(amount), decimals || DEFAULT_DECIMAL)
-    .decimalPlaces(digits || DEFAULT_DIGITS)
-    .toFormat()}`;
+}: IFormatWithCommasProps): string {
+  let decimal = decimals || 0;
+  let amountTrans = `${divDecimals(ZERO.plus(amount), decimal).decimalPlaces(digits).toFormat()}`;
+
   if (sign && amountTrans !== '0') {
     return `${sign}${amountTrans}`;
   }
