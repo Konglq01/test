@@ -27,7 +27,7 @@ import { IconType } from 'types/icon';
 
 const guardianTypeList = [
   { label: 'Email', value: LoginType.Email, icon: 'email' },
-  { label: 'Phone', value: LoginType.PhoneNumber, icon: 'email' },
+  { label: 'Phone', value: LoginType.Phone, icon: 'email' },
   { label: 'Google', value: LoginType.Google, icon: 'email' },
   { label: 'Apple', value: LoginType.Apple, icon: 'email' },
 ];

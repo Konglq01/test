@@ -270,7 +270,7 @@ const GuardianEdit: React.FC = () => {
           />
         )}
 
-        {selectedType && selectedType.value === LoginType.PhoneNumber && (
+        {selectedType && selectedType.value === LoginType.Phone && (
           <PhoneInput
             label={t('Guardian Phone')}
             theme="white-bg"
