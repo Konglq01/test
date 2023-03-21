@@ -41,7 +41,7 @@ export default function PhoneInput({ selectCountry, onCountryChange, ...inputPro
       type="general"
       maxLength={30}
       autoCorrect={false}
-      keyboardType="numeric"
+      keyboardType="number-pad"
       placeholder={t('Enter Phone Number')}
       {...inputProps}
     />

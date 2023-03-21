@@ -1,30 +1,39 @@
-import Config from 'react-native-config';
 import * as WebBrowser from 'expo-web-browser';
-import * as Google from 'expo-auth-session/providers/google';
 import { useCallback, useState } from 'react';
 import appleAuthentication from 'utils/appleAuthentication';
 import { AppleAuthenticationCredential } from 'expo-apple-authentication';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { isIos } from '@portkey-wallet/utils/mobile/device';
-GoogleSignin.configure({
-  webClientId: Config.GOOGLE_WEB_CLIENT_ID,
-});
-WebBrowser.maybeCompleteAuthSession();
-
+import * as Google from 'expo-auth-session/providers/google';
+import Config from 'react-native-config';
+if (!isIos) {
+  GoogleSignin.configure({
+    offlineAccess: true,
+    webClientId: Config.GOOGLE_WEB_CLIENT_ID,
+    iosClientId: Config.GOOGLE_IOS_CLIENT_ID,
+  });
+} else {
+  WebBrowser.maybeCompleteAuthSession();
+}
 export function useGoogleAuthentication() {
   const [androidResponse, setResponse] = useState<any>();
-  const [request, response, promptAsync] = Google.useAuthRequest({
+  const [, response, promptAsync] = Google.useAuthRequest({
     iosClientId: Config.GOOGLE_IOS_CLIENT_ID,
-    androidClientId: Config.GOOGLE_IOS_CLIENT_ID,
+    androidClientId: Config.GOOGLE_ANDROID_CLIENT_ID,
   });
   const androidPromptAsync = useCallback(async () => {
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
+      const token = await GoogleSignin.getTokens();
+      console.log(userInfo, token, '========userInfo');
+
       const req = { type: 'success', authentication: userInfo };
       setResponse(req);
       return req;
     } catch (error: any) {
+      console.log(error, '======error');
+
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         return { type: 'cancel' };
       } else if (error.code === statusCodes.IN_PROGRESS) {
@@ -37,7 +46,6 @@ export function useGoogleAuthentication() {
     }
   }, []);
   return {
-    request,
     googleResponse: isIos ? response : androidResponse,
     googleSign: isIos ? promptAsync : androidPromptAsync,
   };

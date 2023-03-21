@@ -69,14 +69,14 @@ export default function SelectCountry() {
         />
       </View>
       <IndexBarLargeList
-        extraHeight={headerHeight + bottomBarHeight + 150}
-        sectionHeight={searchList ? 0 : SectionHeight}
-        indexHeight={IndexHeight}
         data={data}
-        indexBarBoxStyle={styles.indexBarBoxStyle}
-        indexArray={searchList ? undefined : countryCodeIndex.map(item => item[0])}
         renderItem={_renderItem}
+        indexHeight={IndexHeight}
+        indexBarBoxStyle={styles.indexBarBoxStyle}
+        sectionHeight={searchList ? 0 : SectionHeight}
+        extraHeight={headerHeight + bottomBarHeight + 120}
         renderSection={searchList ? undefined : _renderSection}
+        indexArray={searchList ? undefined : countryCodeIndex.map(item => item[0])}
         renderEmpty={() => <NoData topDistance={64} noPic message={'There is no search result.'} />}
       />
     </PageContainer>
