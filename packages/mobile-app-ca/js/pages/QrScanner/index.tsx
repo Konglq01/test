@@ -19,8 +19,6 @@ import { isIos, screenHeight, screenWidth } from '@portkey-wallet/utils/mobile/d
 import { Camera } from 'expo-camera';
 import { expandQrData } from '@portkey-wallet/utils/qrCode';
 
-// import { useAppCASelector } from '@portkey-wallet/hooks';
-
 interface QrScannerProps {
   route?: any;
   type?: 'login' | 'send';

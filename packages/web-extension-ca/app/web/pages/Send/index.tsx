@@ -98,14 +98,15 @@ export default function Send() {
         setErrorMsg(AddressCheckError.recipientAddressIsInvalid);
         return false;
       }
-      if (isEqAddress(state.address, getAelfAddress(toAccount.address)) && suffix === state.chainId) {
+      const selfAddress = wallet[state.chainId].caAddress;
+      if (isEqAddress(selfAddress, getAelfAddress(toAccount.address)) && suffix === state.chainId) {
         setErrorMsg(AddressCheckError.equalIsValid);
         return false;
       }
       setErrorMsg('');
       return true;
     },
-    [chainInfo?.chainId, isValidSuffix, state.address, state.chainId, toAccount.address],
+    [chainInfo, isValidSuffix, state.chainId, toAccount.address, wallet],
   );
 
   const btnDisabled = useMemo(() => {

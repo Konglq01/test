@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { View, Text, Image } from 'react-native';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { getChainListAsync } from '@portkey-wallet/store/store-ca/wallet/actions';
@@ -23,10 +23,12 @@ import { pTd } from 'utils/unit';
 import qrCode from 'assets/image/pngs/QR-code.png';
 import { PageLoginType } from '..';
 import { handleUserGuardiansList } from '@portkey-wallet/utils/guardian';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function LoginEmail({ setLoginType }: { setLoginType: (type: PageLoginType) => void }) {
   const { t } = useLanguage();
   const dispatch = useAppDispatch();
+  const iptRef = useRef<any>();
   const [loading] = useState<boolean>();
   const [loginAccount, setLoginAccount] = useState<string>();
   const [errorMessage, setErrorMessage] = useState<string>();
@@ -66,6 +68,12 @@ export default function LoginEmail({ setLoginType }: { setLoginType: (type: Page
     });
     return () => listener.remove();
   });
+
+  useFocusEffect(() => {
+    if (!iptRef || !iptRef?.current) return;
+    iptRef.current.focus();
+  });
+
   return (
     <View style={[BGStyles.bg1, styles.card]}>
       <Touchable style={styles.iconBox} onPress={() => setLoginType('qr-code')}>
@@ -73,6 +81,7 @@ export default function LoginEmail({ setLoginType }: { setLoginType: (type: Page
       </Touchable>
       <CommonInput
         autoFocus
+        ref={iptRef}
         value={loginAccount}
         label="Email"
         type="general"

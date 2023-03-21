@@ -12,7 +12,7 @@ import ActionSheet from 'components/ActionSheet';
 import useQrScanPermission from 'hooks/useQrScanPermission';
 import { ZERO } from '@portkey-wallet/constants/misc';
 import { customFetch } from '@portkey-wallet/utils/fetch';
-import { getEntireDIDAelfAddress, isAllowAelfAddress, isCrossChain } from '@portkey-wallet/utils/aelf';
+import { getAelfAddress, getEntireDIDAelfAddress, isAllowAelfAddress, isCrossChain } from '@portkey-wallet/utils/aelf';
 import useDebounce from 'hooks/useDebounce';
 import { useLanguage } from 'i18n/hooks';
 import SelectContact from '../SelectContact';
@@ -41,7 +41,7 @@ import {
   AddressError,
   AddressErrorArray,
 } from '@portkey-wallet/constants/constants-ca/send';
-import { addressFormat, getAddressChainId, isSameAddresses } from '@portkey-wallet/utils';
+import { getAddressChainId, isSameAddresses } from '@portkey-wallet/utils';
 
 const SendHome: React.FC = () => {
   const { t } = useLanguage();
@@ -219,16 +219,18 @@ const SendHome: React.FC = () => {
   }, [selectedToContact?.address, sendNumber]);
 
   const checkCanNext = useCallback(() => {
+    const suffix = getAddressChainId(toInfo.address, chainInfo?.chainId || 'AELF');
+
     if (!isAllowAelfAddress(selectedToContact.address)) {
       setErrorMessage([AddressError.INVALID_ADDRESS]);
       return false;
     }
 
+    console.log(wallet?.[assetInfo?.chainId]?.caAddress, getAelfAddress(toInfo.address), suffix, assetInfo?.chainId);
+
     if (
-      isSameAddresses(
-        addressFormat(wallet?.[assetInfo?.chainId]?.caAddress, assetInfo.chainId),
-        selectedToContact.address,
-      )
+      isSameAddresses(wallet?.[assetInfo?.chainId]?.caAddress || '', getAelfAddress(selectedToContact.address)) &&
+      suffix === assetInfo?.chainId
     ) {
       setErrorMessage([AddressError.SAME_ADDRESS]);
       return false;
@@ -246,7 +248,7 @@ const SendHome: React.FC = () => {
     }
 
     return true;
-  }, [assetInfo.chainId, selectedToContact.address, showDialog, isValidChainId, wallet]);
+  }, [toInfo, chainInfo?.chainId, selectedToContact.address, wallet, assetInfo.chainId, isValidChainId, showDialog]);
 
   const nextStep = useCallback(() => {
     if (checkCanNext()) {
@@ -402,6 +404,7 @@ const SendHome: React.FC = () => {
         <To
           step={step}
           setStep={setStep}
+          setErrorMessage={setErrorMessage}
           selectedToContact={selectedToContact}
           setSelectedToContact={setSelectedToContact}
         />

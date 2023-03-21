@@ -34,7 +34,7 @@ export default function ExitWallet({ open, onCancel }: ExitWalletProps) {
       if (!passwordSeed) throw 'Missing pin';
       const privateKey = aes.decrypt(walletInfo.AESEncryptPrivateKey, passwordSeed);
       if (!currentChain?.endPoint || !privateKey) return message.error('error');
-      setLoading(true);
+      setLoading(true, 'Signing out of Portkey...');
       const result = await removeManager({
         rpcUrl: currentChain.endPoint,
         chainType: currentNetwork.walletType,

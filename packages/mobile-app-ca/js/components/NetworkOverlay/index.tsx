@@ -1,8 +1,7 @@
 import React from 'react';
 import { Keyboard, StyleSheet, View } from 'react-native';
-import { TextL, TextXL } from 'components/CommonText';
+import { TextL } from 'components/CommonText';
 import OverlayModal from 'components/OverlayModal';
-import OverlayBody from 'components/OverlayModal/OverlayBody';
 import { useCurrentNetworkInfo, useNetworkList } from '@portkey-wallet/hooks/hooks-ca/network';
 import Touchable from 'components/Touchable';
 import Svg from 'components/Svg';
@@ -11,6 +10,7 @@ import { NetworkItem } from '@portkey-wallet/types/types-ca/network';
 import { BorderStyles } from 'assets/theme/styles';
 import { useChangeNetwork } from 'hooks/network';
 import { ParamListBase, RouteProp } from '@react-navigation/native';
+import { ModalBody } from 'components/ModalBody';
 
 const showSwitchChain = () => {
   console.log('');
@@ -50,12 +50,11 @@ function Network({
 function SwitchNetwork({ route }: { route: RouteProp<ParamListBase> }) {
   const networkList = useNetworkList();
   return (
-    <OverlayBody>
-      <TextXL style={styles.title}>Switch Network</TextXL>
+    <ModalBody modalBodyType="bottom" title={'Switch Network'}>
       {networkList.map((network, index) => (
         <Network route={route} hideBorder={index === networkList.length - 1} network={network} key={network.name} />
       ))}
-    </OverlayBody>
+    </ModalBody>
   );
 }
 

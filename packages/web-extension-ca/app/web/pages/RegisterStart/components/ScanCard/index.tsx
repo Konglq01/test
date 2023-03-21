@@ -1,6 +1,5 @@
 import { WalletInfoType } from '@portkey-wallet/types/wallet';
 import CustomSvg from 'components/CustomSvg';
-import QRCode from 'qrcode.react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import AElf from 'aelf-sdk';
@@ -12,6 +11,7 @@ import { useIntervalQueryCAInfoByAddress } from '@portkey-wallet/hooks/hooks-ca/
 import { setWalletInfoAction } from 'store/reducers/loginCache/actions';
 import './index.less';
 import { DEVICE_TYPE } from 'constants/index';
+import QRCodeCommon from 'pages/components/QRCodeCommon';
 
 export default function ScanCard() {
   const navigate = useNavigate();
@@ -69,10 +69,7 @@ export default function ScanCard() {
         <CustomSvg type="PC" onClick={() => navigate('/register/start')} />
       </h2>
       <p>Please use the portkey Dapp to scan the QR code</p>
-      <div className="login-content">
-        {/* eslint-disable-next-line no-inline-styles/no-inline-styles */}
-        {qrData && <QRCode className="qrc" value={qrData} style={{ width: 170, height: 170 }} />}
-      </div>
+      <div className="login-content">{qrData && <QRCodeCommon value={qrData} />}</div>
     </div>
   );
 }
