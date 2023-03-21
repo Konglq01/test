@@ -2,7 +2,7 @@ import { screenHeight } from '@portkey-wallet/utils/mobile/device';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { View, ViewStyle, TextStyle, StyleSheet } from 'react-native';
 import CommonLargeList, { CommonLargeListProps } from 'components/CommonLargeList';
-import IndexBar from 'components/IndexBar';
+import IndexBar, { IndexBarInterface } from 'components/IndexBar';
 import { LargeList } from 'react-native-largelist';
 export interface IndexLargeListProps extends CommonLargeListProps {
   data: Array<any>;
@@ -17,9 +17,20 @@ export interface IndexLargeListProps extends CommonLargeListProps {
 }
 export default function IndexBarLargeList(props: IndexLargeListProps) {
   const largeListRef = useRef<LargeList>();
+  const indexBarRef = useRef<IndexBarInterface>();
+
   const getOffset = useCallback(
     (key: number) => {
-      const { data, indexHeight, sectionHeight, headerHeight, showHeader } = props;
+      const {
+        data,
+        indexHeight = 0,
+        sectionHeight = 0,
+        headerHeight,
+        showHeader,
+        heightForIndexPath,
+        heightForSection,
+      } = props;
+
       if (Array.isArray(data) && Array.isArray(data[0]?.items)) {
         let [sectionKey, itemKey, hotHeight] = [key, 0, 0];
         if (showHeader) {
@@ -29,7 +40,12 @@ export default function IndexBarLargeList(props: IndexLargeListProps) {
         for (let i = 0; i < sectionKey; i++) {
           if (Array.isArray(data[i]?.items)) itemKey = itemKey + data[i].items.length;
         }
-        return itemKey * indexHeight + sectionKey * sectionHeight + hotHeight;
+
+        return (
+          itemKey * (heightForIndexPath ? heightForIndexPath({ section: sectionKey, row: itemKey }) : indexHeight) +
+          sectionKey * (heightForSection ? heightForSection(sectionKey) : sectionHeight) +
+          hotHeight
+        );
       }
       return 0;
     },
@@ -51,38 +67,60 @@ export default function IndexBarLargeList(props: IndexLargeListProps) {
     },
     [getOffset, maxOffset],
   );
-  const {
-    indexArray,
-    data,
-    sectionHeight,
-    indexHeight,
-    showHeader,
-    renderItem,
-    onLoading,
-    allLoaded,
-    onRefresh,
-    renderSection,
-    renderHeader,
-    indexBarBoxStyle,
-    renderEmpty,
-  } = props;
+  const { indexArray, showHeader, renderHeader, indexBarBoxStyle, ...listProps } = props;
+
+  const indexNativeYList = useMemo(() => {
+    const { data, indexHeight = 0, sectionHeight = 0, heightForIndexPath, heightForSection } = props;
+    if (Array.isArray(data) && Array.isArray(data[0]?.items)) {
+      let preNativeY = 0;
+      return data.map((section, sectionIdx) => {
+        const _preNativeY = preNativeY;
+        preNativeY += heightForSection ? heightForSection(sectionIdx) : sectionHeight;
+        if (Array.isArray(section?.items)) {
+          preNativeY += (section?.items as Array<any>).reduce(
+            (pv, _, cIdx) =>
+              pv + (heightForIndexPath ? heightForIndexPath({ section: sectionIdx, row: cIdx }) : indexHeight),
+            0,
+          );
+        }
+        return _preNativeY;
+      });
+    }
+    return [];
+  }, [props]);
+
   return (
     <View style={styles.box}>
       <CommonLargeList
-        onLoading={onLoading}
-        allLoaded={allLoaded}
-        renderItem={renderItem}
-        renderSection={renderSection}
         ref={largeListRef as any}
-        sectionHeight={sectionHeight}
-        indexHeight={indexHeight}
         renderHeader={showHeader ? renderHeader : undefined}
-        onRefresh={onRefresh}
-        data={data}
-        renderEmpty={renderEmpty}
+        onScroll={({
+          nativeEvent: {
+            contentOffset: { y },
+          },
+        }) => {
+          if (!indexNativeYList.length) return;
+          for (let i = 0; i < indexNativeYList.length; i++) {
+            if (y <= 0) {
+              indexBarRef.current?.setSelectIndex(0);
+              return;
+            }
+            if (indexNativeYList[i + 1] === undefined || (y >= indexNativeYList[i] && y < indexNativeYList[i + 1])) {
+              indexBarRef.current?.setSelectIndex(i);
+              return;
+            }
+          }
+        }}
+        {...listProps}
       />
       {indexArray && (
-        <IndexBar showPopover style={indexBarBoxStyle} data={indexArray} onPress={index => onSectionSelect(index)} />
+        <IndexBar
+          ref={indexBarRef}
+          showPopover
+          style={indexBarBoxStyle}
+          data={indexArray}
+          onPress={index => onSectionSelect(index)}
+        />
       )}
     </View>
   );

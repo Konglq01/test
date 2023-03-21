@@ -38,95 +38,95 @@ const listProps = {
   // removeClippedSubviews: false,
   // legacyImplementation: true
 };
-const ListComponent = forwardRef(
-  ({ onEndReachedThreshold = 0.3, whetherAutomatic = false, ...props }: ListComponentProps<any>, forwardedRef) => {
-    const { upPullRefresh, loadCompleted, showFooter } = props;
+const ListComponent = forwardRef(function ListComponent(
+  { onEndReachedThreshold = 0.3, whetherAutomatic = false, ...props }: ListComponentProps<any>,
+  forwardedRef,
+) {
+  const { upPullRefresh, loadCompleted, showFooter } = props;
 
-    const [bottomLoad, setBottomLoad] = useState<boolean>(false);
-    const [refreshing, setRefreshing] = useState<boolean>(false);
-    const endRefresh = useRef<NodeJS.Timeout>();
-    const canLoadMore = useRef<boolean>();
-    useEffect(() => {
-      return () => {
-        endRefresh.current && clearTimeout(endRefresh.current);
-      };
-    }, []);
-    const onEndReached = useCallback(
-      (info: { distanceFromEnd: number } | true) => {
-        if (info || (canLoadMore && !loadCompleted)) {
-          setBottomLoad(true);
-          props.onEndReached?.();
-          canLoadMore.current = false;
-        }
-      },
-      [loadCompleted, props],
-    );
-    const onRefresh = useCallback(() => {
-      setRefreshing(true);
-      props.upPullRefresh?.();
-    }, [props]);
-    // End pull-down refresh
-    const endUpPullRefresh = () => {
+  const [bottomLoad, setBottomLoad] = useState<boolean>(false);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+  const endRefresh = useRef<NodeJS.Timeout>();
+  const canLoadMore = useRef<boolean>();
+  useEffect(() => {
+    return () => {
       endRefresh.current && clearTimeout(endRefresh.current);
-      endRefresh.current = setTimeout(() => {
-        setRefreshing(false);
-      }, 1000);
     };
-    //End the bottom refresh state
-    const endBottomRefresh = useCallback(() => {
-      setBottomLoad(false);
-    }, []);
-    const onMomentumScrollBegin = useCallback(() => {
-      canLoadMore.current = true;
-    }, []);
-    useImperativeHandle(forwardedRef, () => ({ endUpPullRefresh, endBottomRefresh, onRefresh }), [
-      endBottomRefresh,
-      onRefresh,
-    ]);
-    const ListFooterComponent = useCallback(() => {
-      const { allLoadedTips, bottomLoadTip } = props;
-      if (loadCompleted) {
-        return (
-          <View style={styles.FooterStyles}>
-            <TextM>{allLoadedTips || 'All loaded'}</TextM>
-          </View>
-        );
+  }, []);
+  const onEndReached = useCallback(
+    (info: { distanceFromEnd: number } | true) => {
+      if (info || (canLoadMore && !loadCompleted)) {
+        setBottomLoad(true);
+        props.onEndReached?.();
+        canLoadMore.current = false;
       }
+    },
+    [loadCompleted, props],
+  );
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    props.upPullRefresh?.();
+  }, [props]);
+  // End pull-down refresh
+  const endUpPullRefresh = () => {
+    endRefresh.current && clearTimeout(endRefresh.current);
+    endRefresh.current = setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  };
+  //End the bottom refresh state
+  const endBottomRefresh = useCallback(() => {
+    setBottomLoad(false);
+  }, []);
+  const onMomentumScrollBegin = useCallback(() => {
+    canLoadMore.current = true;
+  }, []);
+  useImperativeHandle(forwardedRef, () => ({ endUpPullRefresh, endBottomRefresh, onRefresh }), [
+    endBottomRefresh,
+    onRefresh,
+  ]);
+  const ListFooterComponent = useCallback(() => {
+    const { allLoadedTips, bottomLoadTip } = props;
+    if (loadCompleted) {
       return (
-        <TouchableOpacity onPress={() => onEndReached(true)} style={styles.FooterStyles}>
-          {bottomLoad ? (
-            <ActivityIndicator size="large" color={defaultColors.primaryColor} />
-          ) : (
-            <TextM>{bottomLoadTip || 'Click to load more'}</TextM>
-          )}
-        </TouchableOpacity>
+        <View style={styles.FooterStyles}>
+          <TextM>{allLoadedTips || 'All loaded'}</TextM>
+        </View>
       );
-    }, [bottomLoad, loadCompleted, onEndReached, props]);
+    }
     return (
-      <FlatList
-        {...listProps}
-        {...props}
-        extraData={bottomLoad && loadCompleted}
-        keyExtractor={(_, index) => index.toString()}
-        onMomentumScrollBegin={onMomentumScrollBegin}
-        ListFooterComponent={!showFooter ? null : ListFooterComponent}
-        onEndReached={whetherAutomatic ? onEndReached : undefined}
-        refreshControl={
-          upPullRefresh ? (
-            <RefreshControl
-              refreshing={refreshing}
-              colors={[defaultColors.primaryColor]}
-              tintColor={defaultColors.primaryColor}
-              onRefresh={onRefresh}
-            />
-          ) : undefined
-        }
-        onEndReachedThreshold={onEndReachedThreshold}
-      />
+      <TouchableOpacity onPress={() => onEndReached(true)} style={styles.FooterStyles}>
+        {bottomLoad ? (
+          <ActivityIndicator size="large" color={defaultColors.primaryColor} />
+        ) : (
+          <TextM>{bottomLoadTip || 'Click to load more'}</TextM>
+        )}
+      </TouchableOpacity>
     );
-  },
-);
-ListComponent.displayName = 'ListComponent';
+  }, [bottomLoad, loadCompleted, onEndReached, props]);
+  return (
+    <FlatList
+      {...listProps}
+      {...props}
+      extraData={bottomLoad && loadCompleted}
+      keyExtractor={(_, index) => index.toString()}
+      onMomentumScrollBegin={onMomentumScrollBegin}
+      ListFooterComponent={!showFooter ? null : ListFooterComponent}
+      onEndReached={whetherAutomatic ? onEndReached : undefined}
+      refreshControl={
+        upPullRefresh ? (
+          <RefreshControl
+            refreshing={refreshing}
+            colors={[defaultColors.primaryColor]}
+            tintColor={defaultColors.primaryColor}
+            onRefresh={onRefresh}
+          />
+        ) : undefined
+      }
+      onEndReachedThreshold={onEndReachedThreshold}
+    />
+  );
+});
 const styles = StyleSheet.create({
   FooterStyles: {
     height: 50,

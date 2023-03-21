@@ -55,7 +55,7 @@ export default function AddGuardian() {
           check = !emailVal;
           break;
         }
-        case LoginType.PhoneNumber: {
+        case LoginType.Phone: {
           check = !phoneValue?.phoneNumber;
           break;
         }
@@ -81,7 +81,7 @@ export default function AddGuardian() {
         key = `${emailVal}&${verifierVal}`;
         break;
       }
-      case LoginType.PhoneNumber: {
+      case LoginType.Phone: {
         key = `${phoneValue?.code}_${phoneValue?.phoneNumber}&${verifierVal}`;
         break;
       }
@@ -178,7 +178,7 @@ export default function AddGuardian() {
         ),
         label: t('Guardian Email'),
       },
-      [LoginType.PhoneNumber]: {
+      [LoginType.Phone]: {
         element: <PhoneInput onChange={handlePhoneInputChange} />,
         label: t('Guardian Phone'),
       },
@@ -299,7 +299,7 @@ export default function AddGuardian() {
   const handleVerify = useCallback(async () => {
     if (guardianType === LoginType.Email) {
       handleCommonVerify(emailVal || '');
-    } else if (guardianType === LoginType.PhoneNumber) {
+    } else if (guardianType === LoginType.Phone) {
       handleCommonVerify(`${phoneValue?.code}_${phoneValue?.phoneNumber}`);
     } else {
       navigate('/setting/guardian/guardian-approval', { state: 'guardians/add' });

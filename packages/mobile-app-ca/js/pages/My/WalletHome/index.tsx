@@ -1,16 +1,15 @@
 import PageContainer from 'components/PageContainer';
 import { useLanguage } from 'i18n/hooks';
 import React, { useCallback, useEffect } from 'react';
-import { pageStyles } from './style';
 import { pTd } from 'utils/unit';
-import { ScrollView, TouchableWithoutFeedback, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import CommonButton from 'components/CommonButton';
 import GStyles from 'assets/theme/GStyles';
 import navigationService from 'utils/navigationService';
 import { BorderStyles, FontStyles } from 'assets/theme/styles';
 import { useWallet } from 'hooks/store';
 import Svg, { IconName } from 'components/Svg';
-import WalletMenuItem from './components/WalletMenuItem';
+import MenuItem from '../components/MenuItem';
 import ExistOverlay from './components/ExistOverlay';
 import Loading from 'components/Loading';
 import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
@@ -20,6 +19,8 @@ import { removeManager } from 'utils/guardian';
 import { useGetCurrentCAContract } from 'hooks/contract';
 import { useAppDispatch } from 'store/hooks';
 import { getWalletNameAsync } from '@portkey-wallet/store/store-ca/wallet/actions';
+import { StyleSheet } from 'react-native';
+import { defaultColors } from 'assets/theme';
 
 interface WalletHomeProps {
   name?: string;
@@ -71,16 +72,32 @@ const WalletHome: React.FC<WalletHomeProps> = () => {
       </View>
       <ScrollView alwaysBounceVertical={false}>
         <View>
-          <WalletMenuItem onPress={() => navigationService.navigate('WalletName')} title={walletName} />
-          <WalletMenuItem onPress={() => navigationService.navigate('AutoLock')} title={t('Auto-Lock')} />
-          <WalletMenuItem onPress={() => navigationService.navigate('SwitchNetworks')} title={t('Switch Networks')} />
-          <WalletMenuItem onPress={() => navigationService.navigate('AboutUs')} title={t('About Us')} />
+          <MenuItem
+            style={pageStyles.menuItem}
+            onPress={() => navigationService.navigate('WalletName')}
+            title={walletName}
+          />
+          <MenuItem
+            style={pageStyles.menuItem}
+            onPress={() => navigationService.navigate('AutoLock')}
+            title={t('Auto-Lock')}
+          />
+          <MenuItem
+            style={pageStyles.menuItem}
+            onPress={() => navigationService.navigate('SwitchNetworks')}
+            title={t('Switch Networks')}
+          />
+          <MenuItem
+            style={pageStyles.menuItem}
+            onPress={() => navigationService.navigate('AboutUs')}
+            title={t('About Us')}
+          />
         </View>
       </ScrollView>
 
       <CommonButton
         type="outline"
-        containerStyle={[GStyles.paddingTop(pTd(16)), GStyles.marginArg(2, 4), BorderStyles.border7]}
+        containerStyle={[GStyles.paddingTop(16), GStyles.marginArg(2, 4), BorderStyles.border7]}
         buttonStyle={[BorderStyles.border7]}
         titleStyle={FontStyles.font12}
         onPress={() => {
@@ -94,3 +111,19 @@ const WalletHome: React.FC<WalletHomeProps> = () => {
   );
 };
 export default WalletHome;
+
+const pageStyles = StyleSheet.create({
+  pageWrap: {
+    flex: 1,
+    backgroundColor: defaultColors.bg4,
+    ...GStyles.paddingArg(0, 16, 18),
+  },
+  avatarWrap: {
+    height: pTd(160),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  menuItem: {
+    marginBottom: pTd(12),
+  },
+});

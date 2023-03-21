@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   topWrap: {
-    ...GStyles.flexRow,
+    ...GStyles.flexRowWrap,
     marginTop: pTd(20),
     height: pTd(38),
     justifyContent: 'center',

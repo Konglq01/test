@@ -40,13 +40,11 @@ type NFTCollectionProps = NFTCollectionItemShowType & {
 //    return nextProps.isCollapsed === prevProps.isCollapsed && nextProps.children.length === prevProps.children.length;
 // }
 
-const NFTCollection: React.FC<NFTCollectionProps> = memo((props: NFTCollectionProps) => {
+const NFTCollection: React.FC<NFTCollectionProps> = memo(function NFTCollection(props: NFTCollectionProps) {
   const { symbol, isCollapsed } = props;
 
   return <NFTCollectionItem key={symbol} collapsed={isCollapsed} {...props} />;
 });
-
-NFTCollection.displayName = 'NFTCollection';
 
 export default function NFTSection() {
   const { t } = useLanguage();

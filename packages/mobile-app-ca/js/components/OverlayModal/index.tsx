@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
   bottomContainerStyle: {
     paddingBottom: bottomBarHeight,
     backgroundColor: defaultColors.bg1,
-    ...GStyles.radiusArg(pTd(10), pTd(10), 0, 0),
+    ...GStyles.radiusArg(10, 10, 0, 0),
     overflow: 'hidden',
   },
 });

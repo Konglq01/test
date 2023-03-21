@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View } from 'react-native';
 import { handleErrorMessage } from '@portkey-wallet/utils';
 import { checkEmail } from '@portkey-wallet/utils/check';
 import { BGStyles } from 'assets/theme/styles';
@@ -7,22 +7,17 @@ import Loading from 'components/Loading';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { useLanguage } from 'i18n/hooks';
 import myEvents from 'utils/deviceEvent';
-import navigationService from 'utils/navigationService';
 import styles from '../styles';
-import Touchable from 'components/Touchable';
-import CommonInput from 'components/CommonInput';
 import CommonButton from 'components/CommonButton';
 import GStyles from 'assets/theme/GStyles';
 import { PageLoginType, PageType } from '../types';
-import { CountryItem } from '@portkey-wallet/constants/constants-ca';
+import { CountryItem } from '@portkey-wallet/types/types-ca/country';
 import TermsServiceButton from './TermsServiceButton';
 import Button from './Button';
 import { pTd } from 'utils/unit';
 import { useOnLogin } from 'hooks/login';
-import Svg from 'components/Svg';
-import { defaultColors } from 'assets/theme';
-
-const DefaultCountry = { country: 'Singapore', code: '65', iso: 'SG' };
+import PhoneInput from 'components/PhoneInput';
+import { DefaultCountry } from '@portkey-wallet/constants/constants-ca/country';
 
 const TitleMap = {
   [PageType.login]: {
@@ -64,42 +59,30 @@ export default function Phone({
       setLoginAccount('');
       setErrorMessage(undefined);
     });
-    const countryListener = myEvents.setCountry.addListener(setCountry);
     return () => {
-      countryListener.remove();
       listener.remove();
     };
   });
   return (
     <View style={[BGStyles.bg1, styles.card, GStyles.itemCenter]}>
       <View style={GStyles.width100}>
-        <View style={[GStyles.flexRow, GStyles.marginBottom(24)]}>
+        <View style={[GStyles.flexRowWrap, GStyles.marginBottom(24)]}>
           <Button
             title="Phone"
             isActive
-            style={GStyles.marginRight(pTd(8))}
+            style={GStyles.marginRight(8)}
             onPress={() => setLoginType(PageLoginType.phone)}
           />
           <Button title="Email" onPress={() => setLoginType(PageLoginType.email)} />
         </View>
-        <CommonInput
-          leftIcon={
-            <Touchable
-              style={pageStyles.countryRow}
-              onPress={() => navigationService.navigate('SelectCountry', { selectCountry: country })}>
-              <Text>+ {country?.code}</Text>
-              <Svg size={12} icon="down-arrow" />
-            </Touchable>
-          }
+
+        <PhoneInput
           value={loginAccount}
-          type="general"
-          maxLength={30}
-          autoCorrect={false}
-          onChangeText={setLoginAccount}
           errorMessage={errorMessage}
-          keyboardType="numeric"
-          placeholder={t('Enter Phone Number')}
           containerStyle={styles.inputContainerStyle}
+          onChangeText={setLoginAccount}
+          selectCountry={country}
+          onCountryChange={setCountry}
         />
 
         <CommonButton
@@ -115,17 +98,3 @@ export default function Phone({
     </View>
   );
 }
-
-const pageStyles = StyleSheet.create({
-  countryRow: {
-    height: '70%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRightColor: defaultColors.border6,
-    borderRightWidth: StyleSheet.hairlineWidth,
-    marginLeft: pTd(16),
-    paddingRight: pTd(10),
-    width: pTd(68),
-    justifyContent: 'space-between',
-  },
-});

@@ -142,12 +142,12 @@ const styles = StyleSheet.create({
   },
 
   topSeries: {
-    ...GStyles.flexRow,
+    ...GStyles.flexRowWrap,
     alignItems: 'center',
     ...GStyles.marginArg(24, 20, 0),
   },
   listWrap: {
-    ...GStyles.flexRow,
+    ...GStyles.flexRowWrap,
     paddingLeft: pTd(44),
     paddingRight: pTd(20),
     marginTop: pTd(16),

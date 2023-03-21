@@ -1,4 +1,4 @@
-@import '~antd/dist/antd.variable.less';
+@import '~antd/dist/antd.css';
 @import '/src/assets/theme/customize.less';
 @import '/src/assets/theme/common-class.less';
 @import '/src/assets/theme/constants.less';
@@ -25,22 +25,17 @@ a {
   box-sizing: border-box;
 }
 .page-component {
-  overflow: scroll;
-  height: calc(100vh - @header-height - @footer-height);
-  background-image: none;
+  overflow: auto;
+  height: 100vh;
 }
 .bg-body {
+  height: 100%;
   background-repeat: no-repeat;
   background-position: center top;
-  background-size: 2200px 1350px;
 }
 @media screen and (max-width: @md-width) {
   .page-component {
     background-repeat: no-repeat;
     background-position: right top;
-    background-size: 240px 240px;
-  }
-  .bg-body {
-    background-image: none;
   }
 }

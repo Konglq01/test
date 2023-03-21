@@ -52,8 +52,8 @@ export default function CreateSuccess() {
   return (
     <PageContainer leftDom titleDom containerStyles={styles.containerStyle}>
       <Image style={[styles.iconStyles, GStyles.alignCenter]} source={successIcon} />
-      <TextXXXL style={[GStyles.alignCenter, GStyles.marginTop(pTd(20))]}>{t('Congratulations!')}</TextXXXL>
-      <TextL style={[GStyles.textAlignCenter, GStyles.marginTop(pTd(24))]}>{t(title)}</TextL>
+      <TextXXXL style={[GStyles.alignCenter, GStyles.marginTop(20)]}>{t('Congratulations!')}</TextXXXL>
+      <TextL style={[GStyles.textAlignCenter, GStyles.marginTop(24)]}>{t(title)}</TextL>
       {tip ? (
         <View style={styles.tipRow}>
           <TextM style={styles.tipText}>{t(tip)}</TextM>

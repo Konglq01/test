@@ -16,7 +16,7 @@ export default function InputInfo({ confirmText, validateEmail, onFinish }: Inpu
   const items: TabsProps['items'] = useMemo(
     () => [
       {
-        key: LoginType[LoginType.PhoneNumber],
+        key: LoginType[LoginType.Phone],
         label: 'Phone',
         children: (
           <PhoneTab
@@ -24,7 +24,7 @@ export default function InputInfo({ confirmText, validateEmail, onFinish }: Inpu
             onFinish={(v) => {
               onFinish({
                 loginType: LoginType.Apple,
-                guardianAccount: `${v.code} ${v.phoneNumber}`,
+                guardianAccount: `+${v.code} ${v.phoneNumber}`,
               });
             }}
           />
@@ -52,7 +52,7 @@ export default function InputInfo({ confirmText, validateEmail, onFinish }: Inpu
 
   return (
     <div className="input-info-wrapper">
-      <Tabs defaultActiveKey={LoginType[LoginType.PhoneNumber]} items={items} />
+      <Tabs defaultActiveKey={LoginType[LoginType.Phone]} items={items} />
     </div>
   );
 }

@@ -7,7 +7,7 @@ import { useLanguage } from 'i18n/hooks';
 
 type CommonInputProps = InputProps & { type?: 'search' | 'general'; theme?: 'white-bg' | 'gray-bg' };
 
-const CommonInput = forwardRef((props: CommonInputProps, forwardedRef: any) => {
+const CommonInput = forwardRef(function CommonInput(props: CommonInputProps, forwardedRef: any) {
   const { t } = useLanguage();
   const {
     placeholder,
@@ -58,5 +58,4 @@ const CommonInput = forwardRef((props: CommonInputProps, forwardedRef: any) => {
     />
   );
 });
-CommonInput.displayName = 'CommonInput';
 export default CommonInput;

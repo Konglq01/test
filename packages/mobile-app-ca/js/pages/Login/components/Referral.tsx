@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useCallback } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { BGStyles, FontStyles } from 'assets/theme/styles';
 import navigationService from 'utils/navigationService';
@@ -16,6 +16,7 @@ import { defaultColors } from 'assets/theme';
 import Divider from 'components/Divider';
 import CommonToast from 'components/CommonToast';
 import { useAppleAuthentication, useGoogleAuthentication } from 'hooks/authentication';
+import { isIos } from '@portkey-wallet/utils/mobile/device';
 
 const TitleMap = {
   [PageType.login]: {
@@ -39,7 +40,26 @@ export default function Referral({
 }) {
   const { appleSign, appleResponse } = useAppleAuthentication();
   const { googleSign, googleResponse } = useGoogleAuthentication();
+  const onAppleSign = useCallback(async () => {
+    try {
+      const info = await appleSign();
+      console.log(info, '=======info');
+    } catch (error) {
+      console.log(error, '======error');
+
+      CommonToast.failError(error);
+    }
+  }, [appleSign]);
+  const onGoogleSign = useCallback(async () => {
+    try {
+      const info = await googleSign();
+      console.log(info, '=======info');
+    } catch (error) {
+      CommonToast.failError(error);
+    }
+  }, [googleSign]);
   console.log(googleResponse, '=====googleResponse');
+  console.log(appleResponse, '=====appleResponse');
   return (
     <View style={[BGStyles.bg1, styles.card, GStyles.itemCenter, GStyles.spaceBetween]}>
       <Touchable style={styles.iconBox} onPress={() => setLoginType(PageLoginType.qrCode)}>
@@ -48,40 +68,29 @@ export default function Referral({
       <View style={GStyles.width100}>
         <CommonButton
           type="outline"
+          onPress={onGoogleSign}
+          title={TitleMap[type].google}
           icon={<Svg icon="google" size={24} />}
           containerStyle={pageStyles.outlineContainerStyle}
-          onPress={async () => {
-            try {
-              const info = await googleSign();
-              console.log(info, '=======info');
-            } catch (error) {
-              CommonToast.failError(error);
-            }
-          }}
           titleStyle={[FontStyles.font3, pageStyles.outlineTitleStyle]}
-          title={TitleMap[type].google}
         />
-        <CommonButton
-          type="outline"
-          icon={<Svg icon="apple" size={24} />}
-          onPress={async () => {
-            try {
-              const info = await appleSign();
-              console.log(info, '=======info');
-            } catch (error) {
-              CommonToast.failError(error);
-            }
-          }}
-          containerStyle={pageStyles.outlineContainerStyle}
-          titleStyle={[FontStyles.font3, pageStyles.outlineTitleStyle]}
-          title={TitleMap[type].apple}
-        />
+        {isIos && (
+          <CommonButton
+            type="outline"
+            onPress={onAppleSign}
+            title={TitleMap[type].apple}
+            icon={<Svg icon="apple" size={24} />}
+            containerStyle={pageStyles.outlineContainerStyle}
+            titleStyle={[FontStyles.font3, pageStyles.outlineTitleStyle]}
+          />
+        )}
+
         <Divider title="OR" inset={true} style={pageStyles.dividerStyle} />
         <CommonButton type="primary" onPress={() => setLoginType(PageLoginType.phone)} title={TitleMap[type].button} />
       </View>
       {type === PageType.login && (
         <Touchable
-          style={[GStyles.flexRow, GStyles.itemCenter, styles.signUpTip]}
+          style={[GStyles.flexRowWrap, GStyles.itemCenter, styles.signUpTip]}
           onPress={() => navigationService.navigate('SignupPortkey')}>
           <TextL style={FontStyles.font3}>
             No account? <Text style={FontStyles.font4}>Sign up </Text>

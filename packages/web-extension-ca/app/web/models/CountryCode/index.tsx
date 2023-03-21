@@ -1,7 +1,7 @@
 import CommonModal from 'components/CommonModal';
 import { useAppDispatch, useCustomModal } from 'store/Provider/hooks';
 import { setCountryModal } from 'store/reducers/modal/slice';
-import { countryCodeFilter } from '@portkey-wallet/constants/constants-ca/countryCode';
+import { countryCodeFilter } from '@portkey-wallet/constants/constants-ca/country';
 import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import BackHeader from 'components/BackHeader';
 import { useTranslation } from 'react-i18next';

@@ -16,8 +16,8 @@ import { useGuardiansInfo } from 'hooks/store';
 import { LOGIN_TYPE_LIST } from '@portkey-wallet/constants/verifier';
 import { ApprovalType, VerificationType, VerifierItem } from '@portkey-wallet/types/verifier';
 import { INIT_HAS_ERROR, INIT_NONE_ERROR } from 'constants/common';
-import GuardianTypeSelectOverlay from 'pages/Guardian/components/GuardianTypeSelectOverlay';
-import VerifierSelectOverlay from 'pages/Guardian/components/VerifierSelectOverlay';
+import GuardianTypeSelectOverlay from '../components/GuardianTypeSelectOverlay';
+import VerifierSelectOverlay from '../components/VerifierSelectOverlay';
 import ActionSheet from 'components/ActionSheet';
 import { ErrorType } from 'types/common';
 import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type';
@@ -32,6 +32,12 @@ import { VerifierImage } from 'pages/Guardian/components/VerifierImage';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verification } from 'utils/api';
 import fonts from 'assets/theme/fonts';
+import PhoneInput from 'components/PhoneInput';
+import { CountryItem } from '@portkey-wallet/types/types-ca/country';
+import { DefaultCountry } from '@portkey-wallet/constants/constants-ca/country';
+import { defaultColors } from 'assets/theme';
+import Touchable from 'components/Touchable';
+import { useAppleAuthentication, useGoogleAuthentication } from 'hooks/authentication';
 
 type RouterParams = {
   guardian?: UserGuardianItem;
@@ -49,29 +55,25 @@ const GuardianEdit: React.FC = () => {
 
   const [selectedType, setSelectedType] = useState<typeof LOGIN_TYPE_LIST[number]>();
   const [selectedVerifier, setSelectedVerifier] = useState<VerifierItem>();
-  const [email, setEmail] = useState<string>();
+  const [account, setAccount] = useState<string>();
   const [guardianTypeError, setGuardianTypeError] = useState<ErrorType>({ ...INIT_HAS_ERROR });
   const [guardianError, setGuardianError] = useState<ErrorType>({ ...INIT_NONE_ERROR });
+  const [country, setCountry] = useState<CountryItem>(DefaultCountry);
+  const { appleSign, appleResponse } = useAppleAuthentication();
+  const { googleSign, googleResponse } = useGoogleAuthentication();
 
   useEffect(() => {
     if (editGuardian) {
       setSelectedType(LOGIN_TYPE_LIST.find(item => item.value === editGuardian?.guardianType));
-      setEmail(editGuardian?.guardianAccount);
+      setAccount(editGuardian?.guardianAccount);
       setSelectedVerifier(verifierList.find(item => item.name === editGuardian?.verifier?.name));
     }
   }, [editGuardian, verifierList]);
 
-  const onEmailTextChange = useCallback(
-    (value: string) => {
-      const _value = value.trim();
-      if (_value === '') {
-        setGuardianTypeError({ ...INIT_HAS_ERROR, errorMsg: t(' Please enter email address') });
-      }
-      setEmail(value);
-      setGuardianTypeError({ ...INIT_NONE_ERROR });
-    },
-    [t],
-  );
+  const onAccountChange = useCallback((value: string) => {
+    setAccount(value);
+    setGuardianTypeError({ ...INIT_NONE_ERROR });
+  }, []);
 
   const onSelectedVerifier = useCallback((item: VerifierItem) => {
     setGuardianError({ ...INIT_NONE_ERROR });
@@ -83,7 +85,7 @@ const GuardianEdit: React.FC = () => {
       userGuardiansList?.findIndex(
         guardian =>
           guardian.guardianType === selectedType?.value &&
-          guardian.guardianAccount === email &&
+          guardian.guardianAccount === account &&
           guardian.verifier?.id === selectedVerifier?.id,
       ) !== -1
     ) {
@@ -91,10 +93,10 @@ const GuardianEdit: React.FC = () => {
     } else {
       return { ...INIT_NONE_ERROR };
     }
-  }, [email, selectedType, selectedVerifier, t, userGuardiansList]);
+  }, [account, selectedType, selectedVerifier, t, userGuardiansList]);
 
   const onConfirm = useCallback(() => {
-    const guardianErrorMsg = checkEmail(email);
+    const guardianErrorMsg = checkEmail(account);
     if (guardianErrorMsg) {
       setGuardianTypeError({
         isError: true,
@@ -113,7 +115,7 @@ const GuardianEdit: React.FC = () => {
       title2: (
         <Text>
           <TextL>{`${selectedVerifier.name} will send a verification code to `}</TextL>
-          <TextL style={fonts.mediumFont}>{email}</TextL>
+          <TextL style={fonts.mediumFont}>{account}</TextL>
           <TextL>{` to verify your email address.`}</TextL>
         </Text>
       ),
@@ -130,7 +132,7 @@ const GuardianEdit: React.FC = () => {
               const req = await verification.sendVerificationCode({
                 params: {
                   type: LoginType[selectedType.value],
-                  guardianIdentifier: email,
+                  guardianIdentifier: account,
                   verifierId: selectedVerifier.id,
                   chainId: DefaultChainId,
                 },
@@ -140,7 +142,7 @@ const GuardianEdit: React.FC = () => {
                   guardianItem: {
                     isLoginAccount: false,
                     verifier: selectedVerifier,
-                    guardianAccount: email,
+                    guardianAccount: account,
                     guardianType: LoginType.Email,
                   },
                   requestCodeResult: {
@@ -159,7 +161,7 @@ const GuardianEdit: React.FC = () => {
         },
       ],
     });
-  }, [checkCurGuardianRepeat, email, selectedType, selectedVerifier, t]);
+  }, [checkCurGuardianRepeat, account, selectedType, selectedVerifier, t]);
 
   const onApproval = useCallback(() => {
     const _guardianError = checkCurGuardianRepeat();
@@ -212,8 +214,8 @@ const GuardianEdit: React.FC = () => {
   }, [editGuardian, t]);
 
   const isConfirmDisable = useMemo(
-    () => !selectedVerifier || !selectedType || !email,
-    [email, selectedType, selectedVerifier],
+    () => !selectedVerifier || !selectedType || !account,
+    [account, selectedType, selectedVerifier],
   );
 
   const isApprovalDisable = useMemo(
@@ -231,7 +233,7 @@ const GuardianEdit: React.FC = () => {
       <View style={pageStyles.contentWrap}>
         {!isEdit && (
           <>
-            <TextM style={[pageStyles.titleLabel, GStyles.marginArg(0, 0, 8, 8)]}>{t('Guardian Type')}</TextM>
+            <TextM style={pageStyles.titleLabel}>{t('Guardian Type')}</TextM>
             <ListItem
               onPress={() => {
                 GuardianTypeSelectOverlay.showList({
@@ -241,11 +243,14 @@ const GuardianEdit: React.FC = () => {
                   callBack: setSelectedType,
                 });
               }}
-              titleStyle={[GStyles.flexRow, GStyles.itemCenter]}
-              titleTextStyle={pageStyles.titleTextStyle}
-              style={GStyles.marginBottom(24)}
+              titleStyle={[GStyles.flexRowWrap, GStyles.itemCenter]}
+              titleTextStyle={[pageStyles.titleTextStyle, !selectedType && FontStyles.font7]}
+              style={pageStyles.typeWrap}
+              titleLeftElement={
+                selectedType?.icon && <Svg icon={selectedType.icon} size={pTd(28)} iconStyle={pageStyles.typeIcon} />
+              }
               title={selectedType?.name || t('Select guardian types')}
-              rightElement={<Svg size={pTd(16)} icon="down-arrow" />}
+              rightElement={<Svg size={pTd(20)} icon="down-arrow" />}
             />
           </>
         )}
@@ -255,17 +260,67 @@ const GuardianEdit: React.FC = () => {
             disabled={isEdit}
             type="general"
             theme="white-bg"
-            label={t("Guardian's email")}
-            value={email}
+            label={t('Guardian email')}
+            value={account}
             placeholder={t('Enter email')}
             maxLength={30}
-            onChangeText={onEmailTextChange}
+            onChangeText={onAccountChange}
             errorMessage={guardianTypeError.isError ? guardianTypeError.errorMsg : ''}
             keyboardType="email-address"
           />
         )}
 
-        <TextM style={[pageStyles.titleLabel, GStyles.marginArg(0, 0, 8, 8)]}>{t('Verifier')}</TextM>
+        {selectedType && selectedType.value === LoginType.Phone && (
+          <PhoneInput
+            label={t('Guardian Phone')}
+            theme="white-bg"
+            value={account}
+            errorMessage={guardianTypeError.isError ? guardianTypeError.errorMsg : ''}
+            onChangeText={onAccountChange}
+            selectCountry={country}
+            onCountryChange={setCountry}
+          />
+        )}
+
+        {selectedType && selectedType.value === LoginType.Google && (
+          <>
+            <TextM style={pageStyles.oAuthLabel}>Guardian Google</TextM>
+            <Touchable
+              onPress={async () => {
+                try {
+                  const info = await googleSign();
+                  console.log(info, '=======info');
+                } catch (error) {
+                  CommonToast.failError(error);
+                }
+              }}>
+              <View style={pageStyles.oAuthBtn}>
+                <TextM style={[FontStyles.font4, fonts.mediumFont]}>Click Add Google Account</TextM>
+              </View>
+            </Touchable>
+          </>
+        )}
+
+        {selectedType && selectedType.value === LoginType.Apple && (
+          <>
+            <TextM style={pageStyles.oAuthLabel}>Guardian Apple</TextM>
+            <Touchable
+              onPress={async () => {
+                try {
+                  const info = await appleSign();
+                  console.log(info, '=======info');
+                } catch (error) {
+                  CommonToast.failError(error);
+                }
+              }}>
+              <View style={pageStyles.oAuthBtn}>
+                <TextM style={[FontStyles.font4, fonts.mediumFont]}>Click Add Apple ID</TextM>
+              </View>
+            </Touchable>
+          </>
+        )}
+
+        <TextM style={pageStyles.titleLabel}>{t('Verifier')}</TextM>
         <ListItem
           onPress={() => {
             VerifierSelectOverlay.showList({
@@ -277,14 +332,14 @@ const GuardianEdit: React.FC = () => {
           }}
           titleLeftElement={
             selectedVerifier && (
-              <VerifierImage style={GStyles.marginRight(12)} size={pTd(30)} uri={selectedVerifier.imageUrl} />
+              <VerifierImage style={pageStyles.verifierImageStyle} size={pTd(30)} uri={selectedVerifier.imageUrl} />
             )
           }
-          titleStyle={[GStyles.flexRow, GStyles.itemCenter]}
-          titleTextStyle={pageStyles.titleTextStyle}
-          style={GStyles.marginBottom(4)}
+          titleStyle={[GStyles.flexRowWrap, GStyles.itemCenter]}
+          titleTextStyle={[pageStyles.titleTextStyle, !selectedVerifier && FontStyles.font7]}
+          style={pageStyles.verifierWrap}
           title={selectedVerifier?.name || t('Select guardian verifiers')}
-          rightElement={<Svg size={pTd(16)} icon="down-arrow" />}
+          rightElement={<Svg size={pTd(20)} icon="down-arrow" />}
         />
         {guardianError.isError && <TextS style={pageStyles.errorTips}>{guardianError.errorMsg || ''}</TextS>}
       </View>
@@ -295,7 +350,11 @@ const GuardianEdit: React.FC = () => {
             <CommonButton disabled={isApprovalDisable} type="primary" onPress={onApproval}>
               {t('Send Request')}
             </CommonButton>
-            <CommonButton style={GStyles.marginTop(8)} type="clear" onPress={onRemove} titleStyle={FontStyles.font12}>
+            <CommonButton
+              style={pageStyles.removeBtnWrap}
+              type="clear"
+              onPress={onRemove}
+              titleStyle={FontStyles.font12}>
               {t('Remove')}
             </CommonButton>
           </>

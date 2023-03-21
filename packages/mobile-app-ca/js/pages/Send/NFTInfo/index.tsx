@@ -38,7 +38,7 @@ export const styles = StyleSheet.create({
   wrap: {
     paddingTop: pTd(12),
     paddingBottom: pTd(16),
-    ...GStyles.flexRow,
+    ...GStyles.flexRowWrap,
     alignItems: 'center',
   },
   avatar: {

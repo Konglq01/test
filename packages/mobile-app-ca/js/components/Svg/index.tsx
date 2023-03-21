@@ -1,6 +1,6 @@
 // Svg.js
 import React from 'react';
-import { ViewStyle, StyleSheet } from 'react-native';
+import { ViewStyle, StyleSheet, StyleProp } from 'react-native';
 import SvgUri from './SvgUri.js';
 import svgs from 'assets/image/svgs';
 
@@ -14,12 +14,12 @@ export interface SvgProps {
   color?: string;
   size?: string | number;
   borderRadius?: string | number;
-  iconStyle?: ViewStyle;
+  iconStyle?: StyleProp<ViewStyle>;
   oblongSize?: [string | number, string | number];
 }
 
 const Svg: React.FC<SvgProps> = (props: SvgProps) => {
-  const { icon, color, size = 24, borderRadius = 0, iconStyle = {}, oblongSize = [] } = props;
+  const { icon, color, size = 24, borderRadius = 0, iconStyle, oblongSize = [] } = props;
   const svgXmlData = (svgs as Svgs)[icon];
 
   if (!svgXmlData) {
@@ -33,7 +33,7 @@ const Svg: React.FC<SvgProps> = (props: SvgProps) => {
       height={oblongSize[1] ?? size}
       svgXmlData={svgXmlData}
       fill={color}
-      style={{ ...defaultStyle.svgWrap, borderRadius, ...iconStyle }}
+      style={[{ ...defaultStyle.svgWrap, borderRadius }, iconStyle]}
     />
   );
 };

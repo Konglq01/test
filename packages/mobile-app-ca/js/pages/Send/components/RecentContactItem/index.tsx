@@ -97,7 +97,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   topWrap: {
-    ...GStyles.flexRow,
+    ...GStyles.flexRowWrap,
     alignItems: 'center',
   },
   contactName: {
