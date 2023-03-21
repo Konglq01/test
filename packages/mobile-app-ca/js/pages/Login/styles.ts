@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   qrCodeBox: {
-    marginTop: 32,
+    marginTop: 48,
   },
   loading: {
     position: 'absolute',

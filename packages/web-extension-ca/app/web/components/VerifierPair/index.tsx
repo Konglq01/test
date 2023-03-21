@@ -19,7 +19,7 @@ export default function VerifierPair({
   return (
     <div className={clsx('flex-row-center icon-pair', wrapperClassName)}>
       <CustomSvg
-        type={guardianType === LoginType.PhoneNumber ? ('phone' as any) : 'email'}
+        type={guardianType === LoginType.Phone ? ('phone' as any) : 'email'}
         style={{ width: size, height: size, fontSize: size }}
       />
       <BaseVerifierIcon width={size} height={size} src={verifierSrc} />

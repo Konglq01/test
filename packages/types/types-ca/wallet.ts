@@ -12,7 +12,7 @@ export type ManagerInfo = {
 
 export enum LoginType {
   Email,
-  PhoneNumber,
+  Phone,
   Google,
   Apple,
 }
