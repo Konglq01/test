@@ -267,6 +267,7 @@ const styles = StyleSheet.create({
     width: pTd(15),
     height: pTd(15),
     borderRadius: pTd(7.5),
+    overflow: 'hidden',
   },
   indexWrapSelectStyle: {
     backgroundColor: defaultColors.bg5,
