@@ -10,7 +10,7 @@ import { FontStyles } from 'assets/theme/styles';
 export default function TermsServiceButton() {
   return (
     <Touchable
-      style={[GStyles.flexRow, GStyles.itemCenter, styles.termsServiceTip]}
+      style={[GStyles.flexRowWrap, GStyles.itemCenter, styles.termsServiceTip]}
       onPress={() =>
         navigationService.navigate('ViewOnWebView', {
           title: 'Terms of Service',

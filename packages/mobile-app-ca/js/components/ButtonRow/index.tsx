@@ -29,7 +29,7 @@ export default function ButtonRow({ buttonStyle: propsButtonStyle, buttons, styl
             titleStyle.push(styles.outlineTitleStyle);
           }
           if (!isLastItem) {
-            containerStyle.push(GStyles.marginRight(pTd(16)));
+            containerStyle.push(GStyles.marginRight(16));
           }
           return (
             <CommonButton

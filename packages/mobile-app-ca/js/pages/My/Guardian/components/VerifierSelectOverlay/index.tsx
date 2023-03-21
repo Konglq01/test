@@ -46,8 +46,8 @@ const SelectList = <ItemType extends ItemTypeBase<ItemValueType>, ItemValueType 
                 OverlayModal.hide();
                 callBack(item);
               }}>
-              <View style={[GStyles.paddingLeft(24), styles.itemRow]}>
-                <VerifierImage style={GStyles.marginRight(12)} size={pTd(36)} uri={item.imageUrl} />
+              <View style={styles.itemRow}>
+                <VerifierImage style={styles.verifierImageStyle} size={pTd(36)} uri={item.imageUrl} />
 
                 <View style={styles.itemContent}>
                   <TextL>{item[labelAttrName]}</TextL>

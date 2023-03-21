@@ -59,6 +59,7 @@ export default function MyMenu() {
             icon={ele?.icon || 'setting'}
             title={t(ele.label)}
             key={ele.name}
+            iconStyle={styles.MenuItemIconStyle}
             onPress={() => navigationService.navigate(ele.name)}
           />
         );
@@ -78,5 +79,8 @@ const styles = StyleSheet.create({
     height: pTd(64),
     borderBottomColor: defaultColors.border6,
     borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  MenuItemIconStyle: {
+    marginRight: pTd(16),
   },
 });
