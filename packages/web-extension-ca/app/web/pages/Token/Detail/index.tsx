@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from 'react-router';
 import './index.less';
 import SettingHeader from 'pages/components/SettingHeader';
 import BalanceCard from 'pages/components/BalanceCard';
-import { divDecimals, fixedDecimal } from '@portkey-wallet/utils/converter';
+import { divDecimals, formatAmountShow } from '@portkey-wallet/utils/converter';
 import Activity from 'pages/Home/components/Activity';
 import { transNetworkText } from '@portkey-wallet/utils/activity';
 import { useIsTestnet } from 'hooks/useNetwork';
@@ -36,11 +36,11 @@ function TokenDetail() {
         <div className="balance">
           <div className="balance-amount">
             <span className="amount">
-              {fixedDecimal(divDecimals(currentToken.balance, currentToken.decimals || 8))} {currentToken.symbol}
+              {formatAmountShow(divDecimals(currentToken.balance, currentToken.decimals || 8))} {currentToken.symbol}
             </span>
             {!isTestNet && (
               <span className="convert">
-                $ {fixedDecimal(divDecimals(currentToken.balanceInUsd, currentToken.decimals || 8), 2)}
+                $ {formatAmountShow(divDecimals(currentToken.balanceInUsd, currentToken.decimals || 8), 2)}
               </span>
             )}
           </div>

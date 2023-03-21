@@ -1,7 +1,7 @@
 import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
 import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
 import { transNetworkText } from '@portkey-wallet/utils/activity';
-import { divDecimals, fixedDecimal } from '@portkey-wallet/utils/converter';
+import { divDecimals, formatAmountShow } from '@portkey-wallet/utils/converter';
 import CustomSvg from 'components/CustomSvg';
 import { useIsTestnet } from 'hooks/useNetwork';
 import { useCallback } from 'react';
@@ -38,12 +38,12 @@ export default function TokenList({ tokenList }: { tokenList: TokenItemShowType[
             <div className="desc">
               <div className="info">
                 <span>{item.symbol}</span>
-                <span>{fixedDecimal(divDecimals(item.balance, item.decimals || 8))}</span>
+                <span>{formatAmountShow(divDecimals(item.balance, item.decimals || 8))}</span>
               </div>
               <div className="amount">
                 <p>{transNetworkText(item.chainId, isTestNet)}</p>
                 {!isTestNet && (
-                  <p className="convert">{`$ ${fixedDecimal(
+                  <p className="convert">{`$ ${formatAmountShow(
                     divDecimals(item.balanceInUsd, item.decimals || 8),
                     2,
                   )}`}</p>
