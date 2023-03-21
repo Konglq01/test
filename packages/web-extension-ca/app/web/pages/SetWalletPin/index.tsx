@@ -143,7 +143,7 @@ export default function SetWalletPin() {
         if (state === 'scan') return createByScan(pin);
         if (!loginAccount?.guardianAccount || !LoginType[loginAccount.loginType])
           return message.error('Missing account!!! Please login/register again');
-        setLoading(true);
+        setLoading(true, 'Creating address on the chain...');
         const _walletInfo = walletInfo.address ? walletInfo : AElf.wallet.createNewWallet();
         console.log(pin, walletInfo.address, 'onCreate==');
 
