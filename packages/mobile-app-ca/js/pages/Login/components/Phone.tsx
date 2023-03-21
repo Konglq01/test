@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { View } from 'react-native';
 import { handleErrorMessage } from '@portkey-wallet/utils';
-import { checkEmail } from '@portkey-wallet/utils/check';
 import { BGStyles } from 'assets/theme/styles';
 import Loading from 'components/Loading';
 import useEffectOnce from 'hooks/useEffectOnce';
@@ -42,17 +41,14 @@ export default function Phone({
   const [country, setCountry] = useState<CountryItem>(DefaultCountry);
   const onLogin = useOnLogin();
   const onPageLogin = useCallback(async () => {
-    const message = checkEmail(loginAccount);
-    setErrorMessage(message);
-    if (message) return;
     Loading.show();
     try {
-      await onLogin(loginAccount as string);
+      await onLogin(`+${country.code} ${loginAccount}` as string, LoginType.Phone);
     } catch (error) {
       setErrorMessage(handleErrorMessage(error));
     }
     Loading.hide();
-  }, [loginAccount, onLogin]);
+  }, [country.code, loginAccount, onLogin]);
 
   useEffectOnce(() => {
     const listener = myEvents[type === PageType.login ? 'clearLoginInput' : 'clearSignupInput'].addListener(() => {
