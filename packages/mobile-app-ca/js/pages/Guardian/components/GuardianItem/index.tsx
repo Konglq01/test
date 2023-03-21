@@ -73,7 +73,7 @@ function GuardianItemButton({
     [guardianItem.key, setGuardianStatus],
   );
   const onSendCode = useDebounceCallback(async () => {
-    Loading.show({ text: t('Processing on the chain...') });
+    Loading.show();
     try {
       const req = await verification.sendVerificationCode({
         params: {
