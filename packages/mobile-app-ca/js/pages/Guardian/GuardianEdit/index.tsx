@@ -126,7 +126,7 @@ const GuardianEdit: React.FC = () => {
           title: t('Confirm'),
           onPress: async () => {
             try {
-              Loading.show();
+              Loading.show({ text: t('Processing on the chain...') });
               const req = await verification.sendVerificationCode({
                 params: {
                   type: LoginType[selectedType.value],

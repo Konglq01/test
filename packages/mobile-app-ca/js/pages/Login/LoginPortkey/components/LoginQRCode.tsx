@@ -23,6 +23,7 @@ import phone from 'assets/image/pngs/phone.png';
 import QRCode from 'react-native-qrcode-svg';
 import { useIsFocused } from '@react-navigation/native';
 import { DEVICE_TYPE } from 'constants/common';
+import CommonQRCodeStyled from 'components/CommonQRCodeStyled';
 
 export default function LoginQRCode({ setLoginType }: { setLoginType: (type: PageLoginType) => void }) {
   const { walletInfo, currentNetwork } = useCurrentWallet();
@@ -31,6 +32,7 @@ export default function LoginQRCode({ setLoginType }: { setLoginType: (type: Pag
   const pin = usePin();
   const caInfo = useIntervalQueryCAInfoByAddress(currentNetwork, newWallet?.address);
   const isFocused = useIsFocused();
+
   useEffect(() => {
     if (!isFocused) return;
     if (caInfo && newWallet) {
@@ -81,6 +83,7 @@ export default function LoginQRCode({ setLoginType }: { setLoginType: (type: Pag
   });
   const qrData = useMemo(() => {
     if (!newWallet) return 'xxx';
+
     const data: LoginQRData = {
       // TODO: ethereum
       chainType: 'aelf',
@@ -99,12 +102,16 @@ export default function LoginQRCode({ setLoginType }: { setLoginType: (type: Pag
       <TextXXXL style={[styles.qrCodeTitle, GStyles.textAlignCenter]}>Scan code to log in</TextXXXL>
       <TextM style={[GStyles.textAlignCenter, FontStyles.font3]}>Please use the Portkey DApp to scan the QR code</TextM>
       <View style={[GStyles.alignCenter, styles.qrCodeBox]}>
-        {!newWallet && (
-          <View style={styles.loading}>
-            <TextL>Updating...</TextL>
-          </View>
+        {newWallet ? (
+          <CommonQRCodeStyled qrData={qrData} />
+        ) : (
+          <>
+            <View style={styles.loading}>
+              <TextL>Updating...</TextL>
+            </View>
+            <QRCode value={qrData} size={250} />
+          </>
         )}
-        <QRCode value={qrData} size={200} />
       </View>
     </View>
   );
