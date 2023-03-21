@@ -30,10 +30,7 @@ export const settingsSlice = createSlice({
       console.log('leaver', Date.now());
       state.leaveTime = Date.now();
     },
-    resetSettings: state => {
-      state.autoLockingTime = LockingTimeType['60s'];
-      state.leaveTime = -Infinity;
-    },
+    resetSettings: state => initialState,
   },
 });
 
