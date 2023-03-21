@@ -58,7 +58,7 @@ export default function MnemonicConfirmation() {
         <View
           style={[
             styles.mnemonicBox,
-            GStyles.flexRow,
+            GStyles.flexRowWrap,
             // eslint-disable-next-line react-native/no-inline-styles
             { height: !mnemonicList || mnemonicList?.length <= 9 ? 190 : undefined },
           ]}>
@@ -77,7 +77,7 @@ export default function MnemonicConfirmation() {
         {completed && inputMnemonic !== mnemonic ? (
           <TextM style={styles.tipText}>{t('Invalid Secret Recovery Phrase')}</TextM>
         ) : null}
-        <View style={[styles.mnemonicBox, styles.sortMnemonicBox, GStyles.flexRow]}>
+        <View style={[styles.mnemonicBox, styles.sortMnemonicBox, GStyles.flexRowWrap]}>
           {sortMnemonic?.map((i, key) => {
             return (
               <Touchable

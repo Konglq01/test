@@ -24,7 +24,7 @@ export function AccountItem({
   const { currentAccount } = useWallet();
   return (
     <Touchable style={styles.accountRow} onPress={onPress}>
-      <View style={GStyles.flexRow}>
+      <View style={GStyles.flexRowWrap}>
         <View style={styles.nameRow}>
           <TextXL numberOfLines={1}>{account.accountName}</TextXL>
           <TextM numberOfLines={1} style={styles.balanceText}>

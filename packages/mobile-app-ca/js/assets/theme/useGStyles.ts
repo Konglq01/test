@@ -9,7 +9,7 @@ export const useGStyles = makeStyles(theme => {
     container: {
       flex: 1,
       backgroundColor: theme.colors.bg1,
-      ...gSTyles.paddingArg(0, pTd(16)),
+      ...gSTyles.paddingArg(0, 16),
     },
     pwTip: {
       marginTop: 3,
