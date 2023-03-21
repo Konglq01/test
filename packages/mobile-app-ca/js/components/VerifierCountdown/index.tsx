@@ -16,7 +16,7 @@ export type VerifierCountdownProps = {
   style?: ViewStyleType;
 };
 
-const VerifierCountdown = forwardRef(({ style, onResend }: VerifierCountdownProps, ref) => {
+const VerifierCountdown = forwardRef(function VerifierCountdown({ style, onResend }: VerifierCountdownProps, ref) {
   const [time, setTime] = useState<number>(0);
   const timer = useRef<NodeJS.Timer>();
   const startTimer = useCallback(() => {
@@ -60,7 +60,6 @@ const VerifierCountdown = forwardRef(({ style, onResend }: VerifierCountdownProp
     </View>
   );
 });
-VerifierCountdown.displayName = 'VerifierCountdown';
 
 export default VerifierCountdown;
 

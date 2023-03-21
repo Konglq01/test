@@ -16,57 +16,53 @@ type PinContainerProps = {
 } & DigitTextProps &
   KeypadPropsType;
 
-const PinContainer = forwardRef(
-  (
-    {
-      title,
-      style,
-      showHeader,
-      onChangeText,
-      onFinish,
-      maxLength,
-      isBiometrics,
-      onBiometricsPress,
-      ...textProps
-    }: PinContainerProps,
-    forwardedRef,
-  ) => {
-    const [value, setValue] = useState('');
+const PinContainer = forwardRef(function PinContainer(
+  {
+    title,
+    style,
+    showHeader,
+    onChangeText,
+    onFinish,
+    maxLength,
+    isBiometrics,
+    onBiometricsPress,
+    ...textProps
+  }: PinContainerProps,
+  forwardedRef,
+) {
+  const [value, setValue] = useState('');
 
-    return (
-      <View style={[styles.container, showHeader && { paddingTop: styles.container.paddingTop - headerHeight }]}>
-        <View>
-          <TextL style={GStyles.textAlignCenter}>{title}</TextL>
-          <DigitText
-            type="pin"
-            secureTextEntry
-            style={[styles.pinStyle, style]}
-            maxLength={maxLength}
-            text={value}
-            {...textProps}
-          />
-        </View>
-
-        <Keypad
-          ref={forwardedRef}
+  return (
+    <View style={[styles.container, showHeader && { paddingTop: styles.container.paddingTop - headerHeight }]}>
+      <View>
+        <TextL style={GStyles.textAlignCenter}>{title}</TextL>
+        <DigitText
+          type="pin"
+          secureTextEntry
+          style={[styles.pinStyle, style]}
           maxLength={maxLength}
-          onChange={_value => {
-            setValue(_value);
-            onChangeText && onChangeText(_value);
-          }}
-          onFinish={onFinish}
-          onRest={() => {
-            setValue('');
-          }}
-          onBiometricsPress={onBiometricsPress}
-          isBiometrics={isBiometrics}
+          text={value}
+          {...textProps}
         />
       </View>
-    );
-  },
-);
 
-PinContainer.displayName = 'PinContainer';
+      <Keypad
+        ref={forwardedRef}
+        maxLength={maxLength}
+        onChange={_value => {
+          setValue(_value);
+          onChangeText && onChangeText(_value);
+        }}
+        onFinish={onFinish}
+        onRest={() => {
+          setValue('');
+        }}
+        onBiometricsPress={onBiometricsPress}
+        isBiometrics={isBiometrics}
+      />
+    </View>
+  );
+});
 
 export default PinContainer;
 

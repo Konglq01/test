@@ -30,7 +30,7 @@ function areEqual(prevProps: ItemProps, nextProps: ItemProps) {
   return nextProps.item.isAdded === prevProps.item.isAdded;
 }
 
-const Item = memo(({ item, onHandleToken }: ItemProps) => {
+const Item = memo(function Item({ item, onHandleToken }: ItemProps) {
   return (
     <TouchableOpacity style={itemStyle.wrap} key={item.symbol}>
       {item.symbol === 'ELF' ? (
@@ -56,7 +56,6 @@ const Item = memo(({ item, onHandleToken }: ItemProps) => {
     </TouchableOpacity>
   );
 }, areEqual);
-Item.displayName = 'Item';
 
 const ManageTokenList: React.FC<ManageTokenListProps> = () => {
   const { t } = useLanguage();
