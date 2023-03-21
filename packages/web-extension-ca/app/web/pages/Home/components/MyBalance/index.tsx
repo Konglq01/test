@@ -9,7 +9,7 @@ import TokenList from '../Tokens';
 import Activity from '../Activity/index';
 import { Transaction } from '@portkey-wallet/types/types-ca/trade';
 import NFT from '../NFT/NFT';
-import { fixedDecimal } from '@portkey-wallet/utils/converter';
+import { formatAmountShow } from '@portkey-wallet/utils/converter';
 import { useAppDispatch, useUserInfo, useWalletInfo, useAssetInfo } from 'store/Provider/hooks';
 import { useCaAddresses, useChainIdList } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { fetchTokenListAsync } from '@portkey-wallet/store/store-ca/assets/slice';
@@ -121,7 +121,7 @@ export default function MyBalance() {
         {isTestNet ? (
           <span className="dev-mode amount">Dev Mode</span>
         ) : (
-          <span className="amount">$ {fixedDecimal(accountBalance, 2)}</span>
+          <span className="amount">$ {formatAmountShow(accountBalance, 2)}</span>
         )}
       </div>
       <BalanceCard

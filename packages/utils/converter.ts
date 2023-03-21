@@ -133,3 +133,9 @@ export function formatWithCommas({
   }
   return amountTrans;
 }
+
+export const formatAmountShow = (count: number | BigNumber | string, decimal = 4) => {
+  const bigCount = BigNumber.isBigNumber(count) ? count : new BigNumber(count || '');
+  if (bigCount.isNaN()) return '0';
+  return bigCount.decimalPlaces(decimal).toFormat();
+};

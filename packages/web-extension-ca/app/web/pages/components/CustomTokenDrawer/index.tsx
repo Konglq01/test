@@ -8,7 +8,7 @@ import { useAppDispatch, useAssetInfo, useTokenInfo, useUserInfo } from 'store/P
 import BaseDrawer from '../BaseDrawer';
 import { fetchAssetAsync } from '@portkey-wallet/store/store-ca/assets/slice';
 import './index.less';
-import { divDecimals, fixedDecimal } from '@portkey-wallet/utils/converter';
+import { divDecimals, formatAmountShow } from '@portkey-wallet/utils/converter';
 import { useCaAddresses, useChainIdList } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { fetchAllTokenListAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
 import { useIsTestnet } from 'hooks/useNetwork';
@@ -78,7 +78,7 @@ export default function CustomTokenDrawer({
             <div className="info">
               <p className="symbol">{`${token.symbol}`}</p>
               <p className="quantity">
-                {fixedDecimal(divDecimals(token.tokenInfo?.balance, token.tokenInfo?.decimals))}
+                {formatAmountShow(divDecimals(token.tokenInfo?.balance, token.tokenInfo?.decimals))}
               </p>
             </div>
             <div className="amount">
@@ -86,7 +86,7 @@ export default function CustomTokenDrawer({
               <p className="convert">
                 {isTestNet
                   ? ''
-                  : `$ ${fixedDecimal(divDecimals(token.tokenInfo?.balanceInUsd, token.tokenInfo?.decimals), 2)}`}
+                  : `$ ${formatAmountShow(divDecimals(token.tokenInfo?.balanceInUsd, token.tokenInfo?.decimals), 2)}`}
               </p>
             </div>
           </div>
