@@ -41,12 +41,16 @@ export default function Activity({ chainId, symbol }: ActivityProps) {
   const { setLoading } = useLoading();
   const setL = useCallback(() => {
     // When there is no transaction and fetching, show loading.
-    if (typeof activity.isLoading === 'boolean' && activity.isLoading && currentActivity.data.length === 0) {
+    if (
+      typeof activity.isLoading === 'boolean' &&
+      activity.isLoading &&
+      (!currentActivity?.data?.length || currentActivity?.data?.length === 0)
+    ) {
       setLoading(true, ' ');
     } else {
       setLoading(false);
     }
-  }, [activity.isLoading, currentActivity.data.length, setLoading]);
+  }, [activity.isLoading, currentActivity?.data?.length, setLoading]);
 
   useEffect(() => {
     setL();
@@ -64,8 +68,7 @@ export default function Activity({ chainId, symbol }: ActivityProps) {
       };
       dispatch(getActivityListAsync(params));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [passwordSeed]);
+  }, [caAddressList, chainId, dispatch, passwordSeed, symbol]);
 
   const loadMoreActivities = useCallback(() => {
     const { data, maxResultCount, skipCount, totalRecordCount } = currentActivity;
