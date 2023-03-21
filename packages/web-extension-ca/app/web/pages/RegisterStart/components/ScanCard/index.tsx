@@ -1,6 +1,5 @@
 import { WalletInfoType } from '@portkey-wallet/types/wallet';
 import CustomSvg from 'components/CustomSvg';
-import QRCode from 'qrcode.react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import AElf from 'aelf-sdk';

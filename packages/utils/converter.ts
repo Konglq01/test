@@ -125,8 +125,8 @@ export function formatWithCommas({
   digits = DEFAULT_DIGITS,
   sign = AmountSign.EMPTY,
 }: IFormatWithCommasProps): string {
-  let decimal = decimals || 0;
-  let amountTrans = `${divDecimals(ZERO.plus(amount), decimal).decimalPlaces(digits).toFormat()}`;
+  const decimal = decimals || 0;
+  const amountTrans = `${divDecimals(ZERO.plus(amount), decimal).decimalPlaces(digits).toFormat()}`;
 
   if (sign && amountTrans !== '0') {
     return `${sign}${amountTrans}`;
