@@ -5,9 +5,9 @@ import Svg from 'components/Svg';
 import { pTd } from 'utils/unit';
 import { defaultColors } from 'assets/theme';
 import { useLanguage } from 'i18n/hooks';
-import { TextL, TextM, TextXXXL } from 'components/CommonText';
+import { TextM, TextXXXL } from 'components/CommonText';
 import * as Application from 'expo-application';
-import WalletMenuItem from '../components/WalletMenuItem';
+import MenuItem from '../../components/MenuItem';
 
 const AboutUs = () => {
   const { t } = useLanguage();
@@ -24,37 +24,25 @@ const AboutUs = () => {
       <TextM style={styles.version}>V {Application.nativeApplicationVersion}</TextM>
 
       <View style={styles.btnContainer}>
-        <WalletMenuItem
-          style={styles.innerBtnWrap}
+        <MenuItem
           icon="twitter"
-          size={28}
           title="Follow us on Twitter"
-          TextComponent={TextL}
-          arrowSize={20}
           onPress={() => {
             //
           }}
         />
-        <WalletMenuItem
-          style={styles.innerBtnWrap}
+        <MenuItem
           icon="discord"
-          size={28}
           title="Join us on Discord"
-          TextComponent={TextL}
-          arrowSize={20}
           onPress={() => {
             //
           }}
         />
       </View>
 
-      <WalletMenuItem
-        style={styles.innerBtnWrap}
+      <MenuItem
         icon="terms"
-        size={28}
         title="Terms of Service"
-        TextComponent={TextL}
-        arrowSize={20}
         onPress={() => {
           //
         }}

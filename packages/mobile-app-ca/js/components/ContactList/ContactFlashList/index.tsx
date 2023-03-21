@@ -1,11 +1,9 @@
 import React, { useCallback, useMemo, useRef } from 'react';
-import { Text, View, GestureResponderEvent } from 'react-native';
-
+import { View } from 'react-native';
 import { styles as contactListStyles } from './style';
 import { ContactIndexType, ContactItemType } from '@portkey-wallet/types/types-ca/contact';
 import { FlashList } from '@shopify/flash-list';
-import { FontStyles } from 'assets/theme/styles';
-import fonts from 'assets/theme/fonts';
+import IndexBar from 'components/IndexBar';
 
 type contactFlatItemType = ContactIndexType | ContactItemType;
 interface ContactsListProps {
@@ -17,16 +15,6 @@ interface ContactsListProps {
   ListFooterComponent?: JSX.Element;
   renderContactItem: (item: ContactItemType) => JSX.Element;
   renderContactIndex: (contactIndex: ContactIndexType) => JSX.Element;
-}
-
-interface PageLocationType {
-  height: number;
-  pageX: number;
-  pageY: number;
-  indexHeight: number;
-}
-interface IndexInfoType extends PageLocationType {
-  currentIndex: number;
 }
 
 const ContactsList: React.FC<ContactsListProps> = ({
@@ -44,67 +32,19 @@ const ContactsList: React.FC<ContactsListProps> = ({
   const onSectionSelect = useCallback(
     (index: number) => {
       flashListRef.current?.scrollToIndex({
-        index: contactIndexList.reduce((pv, cv, idx) => pv + (idx < index ? cv.contacts.length : 0), 0) + index,
+        index: contactIndexList.reduce(
+          (pv, cv, idx) => pv + (idx < index && cv.contacts.length ? cv.contacts.length + 1 : 0),
+          0,
+        ),
       });
     },
     [contactIndexList],
   );
 
-  const indexRef = useRef<View>(null);
-  const indexInfoRef = useRef<IndexInfoType>();
-
-  const setCurrentIndex = useCallback(
-    (nativePageY: number) => {
-      if (!indexInfoRef.current) return;
-      const { pageY, height, currentIndex, indexHeight } = indexInfoRef.current;
-      const nativeClientY = nativePageY - pageY;
-      if (nativeClientY < 0 || nativeClientY > height) return;
-      const nowIndex = Math.floor(nativeClientY / indexHeight);
-      if (currentIndex !== nowIndex) {
-        indexInfoRef.current.currentIndex = nowIndex;
-        onSectionSelect(nowIndex);
-      }
-    },
-    [onSectionSelect],
-  );
-  const panResponder = useMemo(
-    () => ({
-      onStartShouldSetResponder: () => true,
-      onMoveShouldSetResponder: () => true,
-      onResponderStart: async (evt: GestureResponderEvent) => {
-        const eventPageY = evt.nativeEvent.pageY;
-        if (indexInfoRef.current) {
-          indexInfoRef.current.currentIndex = -1;
-        } else {
-          const { height, pageX, pageY, indexHeight } = await new Promise<PageLocationType>((resolve, reject) => {
-            if (indexRef.current === null) {
-              reject('no indexRef');
-              return;
-            }
-            indexRef.current.measure((_x, _y, _width, _height, _pageX, _pageY) => {
-              resolve({
-                height: _height,
-                pageX: _pageX,
-                pageY: _pageY,
-                indexHeight: _height / 27,
-              });
-            });
-          });
-          indexInfoRef.current = {
-            height,
-            pageX,
-            pageY,
-            indexHeight,
-            currentIndex: 0,
-          };
-        }
-        setCurrentIndex(eventPageY);
-      },
-      onResponderMove: (evt: GestureResponderEvent) => {
-        setCurrentIndex(evt.nativeEvent.pageY);
-      },
-    }),
-    [setCurrentIndex],
+  const headerIndex = useMemo(
+    () =>
+      dataArray.map((item, idx) => ((item as ContactItemType).id === undefined ? idx : -1)).filter(idx => idx !== -1),
+    [dataArray],
   );
 
   return (
@@ -117,6 +57,7 @@ const ContactsList: React.FC<ContactsListProps> = ({
         overrideItemLayout={(layout, item) => {
           layout.size = (item as ContactItemType).id === undefined ? sectionHeight : itemHeight;
         }}
+        stickyHeaderIndices={headerIndex}
         renderItem={({ item }) => {
           if ((item as ContactItemType).id === undefined) {
             return renderContactIndex(item as ContactIndexType);
@@ -128,12 +69,13 @@ const ContactsList: React.FC<ContactsListProps> = ({
       />
 
       {isIndexBarShow && (
-        <View ref={indexRef} style={contactListStyles.indexBarWrap} {...panResponder}>
-          {contactIndexList.map(item => (
-            <View key={item.index} style={contactListStyles.indexItemWrap}>
-              <Text style={[contactListStyles.indexItem, FontStyles.font3, fonts.mediumFont]}>{item.index}</Text>
-            </View>
-          ))}
+        <View style={contactListStyles.indexBarWrap}>
+          <IndexBar
+            showPopover
+            data={contactIndexList.map(item => item.index)}
+            onPress={index => onSectionSelect(index)}
+            disableIndexSelect={true}
+          />
         </View>
       )}
     </View>
