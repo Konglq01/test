@@ -10,7 +10,7 @@ export interface CommonLargeListProps
   heightForSection?: (index: number) => number;
 }
 
-const CommonLargeList = forwardRef((props: CommonLargeListProps, forwardedRef: Ref<LargeList>) => {
+const CommonLargeList = forwardRef(function CommonLargeList(props: CommonLargeListProps, forwardedRef: Ref<LargeList>) {
   const {
     data,
     sectionHeight = 0,
@@ -36,5 +36,4 @@ const CommonLargeList = forwardRef((props: CommonLargeListProps, forwardedRef: R
     />
   );
 });
-CommonLargeList.displayName = 'CommonLargeList';
 export default CommonLargeList;

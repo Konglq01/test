@@ -78,8 +78,6 @@ const Item = ({ isTestnet, item, onHandleToken }: ItemProps) => {
     </TouchableOpacity>
   );
 };
-Item.displayName = 'Item';
-
 const ManageTokenList: React.FC<ManageTokenListProps> = () => {
   const { t } = useLanguage();
 
