@@ -14,12 +14,22 @@ interface MenuItemProps {
   TextComponent?: React.FC<TextProps>;
   arrowSize?: number;
   suffix?: string | number;
+  iconStyle?: StyleProp<ViewStyle>;
 }
 
-const MenuItem: React.FC<MenuItemProps> = ({ title, icon, onPress, style, size = 28, arrowSize = 20, suffix }) => {
+const MenuItem: React.FC<MenuItemProps> = ({
+  title,
+  icon,
+  onPress,
+  style,
+  size = 28,
+  arrowSize = 20,
+  suffix,
+  iconStyle,
+}) => {
   return (
     <TouchableOpacity style={[styles.itemWrap, style]} onPress={() => onPress?.()}>
-      {icon && <Svg icon={icon} size={size} iconStyle={styles.menuIcon} />}
+      {icon && <Svg icon={icon} size={size} iconStyle={[styles.menuIcon, iconStyle]} />}
       <TextL style={styles.titleWrap}>{title}</TextL>
       {suffix !== undefined && <TextM style={styles.suffixWrap}>{suffix}</TextM>}
       <Svg icon="right-arrow" size={arrowSize} color={defaultColors.icon1} />
@@ -41,7 +51,7 @@ const styles = StyleSheet.create({
   menuIcon: {
     borderRadius: pTd(6),
     overflow: 'hidden',
-    marginRight: pTd(16),
+    marginRight: pTd(12),
   },
   titleWrap: {
     flex: 1,

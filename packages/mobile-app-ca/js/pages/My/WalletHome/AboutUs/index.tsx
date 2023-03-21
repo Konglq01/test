@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Linking, StyleSheet, View } from 'react-native';
 import PageContainer from 'components/PageContainer';
 import Svg from 'components/Svg';
 import { pTd } from 'utils/unit';
@@ -8,6 +8,9 @@ import { useLanguage } from 'i18n/hooks';
 import { TextM, TextXXXL } from 'components/CommonText';
 import * as Application from 'expo-application';
 import MenuItem from '../../components/MenuItem';
+import Divider from 'components/Divider';
+import navigationService from 'utils/navigationService';
+import { OfficialWebsite } from '@portkey-wallet/constants/constants-ca/network';
 
 const AboutUs = () => {
   const { t } = useLanguage();
@@ -28,14 +31,15 @@ const AboutUs = () => {
           icon="twitter"
           title="Follow us on Twitter"
           onPress={() => {
-            //
+            Linking.openURL('https://twitter.com/Portkey_DID');
           }}
         />
+        <Divider style={styles.dividerStyle} />
         <MenuItem
           icon="discord"
           title="Join us on Discord"
           onPress={() => {
-            //
+            Linking.openURL('https://discord.com/invite/EUBq3rHQhr');
           }}
         />
       </View>
@@ -44,7 +48,10 @@ const AboutUs = () => {
         icon="terms"
         title="Terms of Service"
         onPress={() => {
-          //
+          navigationService.navigate('ViewOnWebView', {
+            title: 'Terms of Service',
+            url: `${OfficialWebsite}/terms-of-service`,
+          });
         }}
       />
     </PageContainer>
@@ -60,6 +67,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     flex: 1,
+    paddingHorizontal: pTd(20),
   },
   logoWrap: {
     width: pTd(80),
@@ -88,5 +96,9 @@ export const styles = StyleSheet.create({
   },
   innerBtnWrap: {
     marginBottom: 0,
+  },
+  dividerStyle: {
+    marginVertical: pTd(4),
+    marginHorizontal: pTd(16),
   },
 });

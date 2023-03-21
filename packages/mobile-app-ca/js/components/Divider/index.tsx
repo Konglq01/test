@@ -28,15 +28,15 @@ const Divider: React.FC<DividerProps> = ({
   inset,
   lineStyle,
 }) => {
-  const linStyle = [GStyles.flex1, { height: width, backgroundColor: color }, lineStyle];
+  const linStyle = [{ height: width, backgroundColor: color }, lineStyle];
   const textStyle = [FontStyles.font7, styles[`${insetType}Title`], titleStyle];
   if (title && inset)
     return (
       <View style={[GStyles.flexRow, GStyles.itemCenter, style]}>
         {insetType === 'left' && <TextM style={textStyle}>{title}</TextM>}
-        <View style={linStyle} />
+        <View style={[GStyles.flex1, linStyle]} />
         {insetType === 'middle' && <TextM style={textStyle}>{title}</TextM>}
-        <View style={linStyle} />
+        <View style={[GStyles.flex1, linStyle]} />
         {insetType === 'right' && <TextM style={textStyle}>{title}</TextM>}
       </View>
     );
