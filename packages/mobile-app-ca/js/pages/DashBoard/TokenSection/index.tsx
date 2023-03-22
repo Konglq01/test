@@ -93,8 +93,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: defaultColors.bg1,
   },
-  iconStyles: {},
-  containerStyle: {},
   addWrap: {
     shadowColor: 'red',
     marginTop: pTd(24),

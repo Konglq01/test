@@ -101,7 +101,7 @@ export default function VerifierDetails() {
     async (code: string) => {
       if (!requestCodeResult || !guardianItem || !code) return;
       try {
-        Loading.show({ text: t('Processing on the chain...') });
+        Loading.show();
         const rst = await request.verify.checkVerificationCode({
           params: {
             type: LoginType[guardianItem?.guardianType as LoginType],

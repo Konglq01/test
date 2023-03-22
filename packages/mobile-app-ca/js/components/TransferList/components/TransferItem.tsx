@@ -186,6 +186,7 @@ const itemStyle = StyleSheet.create({
     width: pTd(32),
     height: pTd(32),
     borderWidth: 0,
+    backgroundColor: defaultColors.bg1,
   },
   center: {
     flex: 1,

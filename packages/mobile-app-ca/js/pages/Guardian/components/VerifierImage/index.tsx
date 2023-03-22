@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { defaultColors } from 'assets/theme';
 import { Image, StyleSheet, View, Text } from 'react-native';
 import { ViewStyleType } from 'types/styles';
+import { pTd } from 'utils/unit';
 
 export function VerifierImage({
   size = 36,
@@ -25,7 +26,7 @@ export function VerifierImage({
   const [imgLoading, setImgLoading] = useState(true);
   return (
     <View style={[styles.iconBox, iconStyle, style]}>
-      {imgLoading && !!label ? <Text style={{ fontSize: 18 }}>{label.charAt(0)}</Text> : null}
+      {imgLoading && !!label ? <Text style={{ fontSize: pTd(18) }}>{label.charAt(0)}</Text> : null}
       <Image
         onLoad={() => {
           setImgLoading(false);
@@ -40,8 +41,8 @@ export function VerifierImage({
 
 const styles = StyleSheet.create({
   iconBox: {
-    borderColor: defaultColors.border2,
-    borderWidth: StyleSheet.hairlineWidth,
+    // borderColor: defaultColors.border2,
+    // borderWidth: StyleSheet.hairlineWidth,
     justifyContent: 'center',
     alignItems: 'center',
   },
