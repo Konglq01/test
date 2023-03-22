@@ -3,6 +3,7 @@ import PromptFrame from 'pages/components/PromptFrame';
 import SettingHeader from 'pages/components/SettingHeader';
 import { useLocation, useNavigate } from 'react-router';
 import { useCommonState } from 'store/Provider/hooks';
+import clsx from 'clsx';
 
 import './index.less';
 
@@ -13,7 +14,7 @@ export default function NFT() {
 
   const mainContent = () => {
     return (
-      <div className="nft-detail">
+      <div className={clsx(['nft-detail', isPrompt ? 'detail-page-prompt' : null])}>
         <SettingHeader leftCallBack={() => navigate(-1)} />
         <div className="picture">{state.imageUrl ? <img src={state.imageUrl} /> : state.symbol?.slice(0, 1)}</div>
         <div className="info">

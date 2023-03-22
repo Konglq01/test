@@ -256,7 +256,7 @@ export default function Transaction() {
 
   const mainContent = () => {
     return (
-      <div className="transaction-detail-modal">
+      <div className={clsx(['transaction-detail-modal', isPrompt ? 'detail-page-prompt' : null])}>
         <div className="header">
           <CustomSvg type="Close2" onClick={onClose} />
         </div>

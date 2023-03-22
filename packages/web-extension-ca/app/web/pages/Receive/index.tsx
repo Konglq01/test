@@ -7,10 +7,11 @@ import Copy from 'components/Copy';
 import CustomSvg from 'components/CustomSvg';
 import TitleWrapper from 'components/TitleWrapper';
 import { useIsTestnet } from 'hooks/useNetwork';
+import PromptFrame from 'pages/components/PromptFrame';
 import QRCode from 'qrcode.react';
 import { useMemo } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router';
-import { useWalletInfo } from 'store/Provider/hooks';
+import { useCommonState, useWalletInfo } from 'store/Provider/hooks';
 import './index.less';
 
 export default function Receive() {
@@ -59,29 +60,34 @@ export default function Receive() {
   );
   console.log('-----qr', value);
 
-  return (
-    <div className="receive-wrapper">
-      <TitleWrapper leftElement rightElement={rightElement} />
-      <div className="receive-content">
-        <div className={clsx(['single-account'])}>
-          <div className="name">My Wallet Address to Receive</div>
-        </div>
-        <div className="token-info">
-          {symbol === 'ELF' ? <CustomSvg type="elf-icon" /> : <div className="icon">{symbol?.[0]}</div>}
-          <p className="symbol">{symbol}</p>
-          <p className="network">{transNetworkText(state.chainId, isTestNet)}</p>
-        </div>
-        <QRCode
-          imageSettings={{ src: 'assets/svgIcon/PortkeyQR.svg', height: 20, width: 20, excavate: true }}
-          value={JSON.stringify(value)}
-          // eslint-disable-next-line no-inline-styles/no-inline-styles
-          style={{ width: 200, height: 200 }}
-        />
-        <div className="receive-address">
-          <div className="address">{caAddress}</div>
-          <Copy className="copy-icon" toCopy={caAddress}></Copy>
+  const { isPrompt } = useCommonState();
+  const mainContent = () => {
+    return (
+      <div className={clsx(['receive-wrapper', isPrompt ? 'detail-page-prompt' : null])}>
+        <TitleWrapper leftElement rightElement={rightElement} />
+        <div className="receive-content">
+          <div className={clsx(['single-account'])}>
+            <div className="name">My Wallet Address to Receive</div>
+          </div>
+          <div className="token-info">
+            {symbol === 'ELF' ? <CustomSvg type="elf-icon" /> : <div className="icon">{symbol?.[0]}</div>}
+            <p className="symbol">{symbol}</p>
+            <p className="network">{transNetworkText(state.chainId, isTestNet)}</p>
+          </div>
+          <QRCode
+            imageSettings={{ src: 'assets/svgIcon/PortkeyQR.svg', height: 20, width: 20, excavate: true }}
+            value={JSON.stringify(value)}
+            // eslint-disable-next-line no-inline-styles/no-inline-styles
+            style={{ width: 200, height: 200 }}
+          />
+          <div className="receive-address">
+            <div className="address">{caAddress}</div>
+            <Copy className="copy-icon" toCopy={caAddress}></Copy>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
+
+  return <>{isPrompt ? <PromptFrame content={mainContent()} /> : mainContent()}</>;
 }

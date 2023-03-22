@@ -15,6 +15,7 @@ import { transNetworkText } from '@portkey-wallet/utils/activity';
 import { useIsTestnet } from 'hooks/useNetwork';
 import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
 import PromptFrame from 'pages/components/PromptFrame';
+import clsx from 'clsx';
 
 export default function AddToken() {
   const { t } = useTranslation();
@@ -100,7 +101,7 @@ export default function AddToken() {
   const { isPrompt } = useCommonState();
   const mainContent = () => {
     return (
-      <div className="add-token">
+      <div className={clsx(['add-token', isPrompt ? 'detail-page-prompt' : null])}>
         <div className="add-token-top">
           <SettingHeader title={t('Add tokens')} leftCallBack={() => navigate(-1)} rightElement={rightElement} />
           <DropdownSearch
@@ -133,5 +134,5 @@ export default function AddToken() {
     );
   };
 
-  return <>{isPrompt ? <PromptFrame content={mainContent()} className="add-token-prompt" /> : mainContent()}</>;
+  return <>{isPrompt ? <PromptFrame content={mainContent()} /> : mainContent()}</>;
 }
