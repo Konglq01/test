@@ -23,8 +23,8 @@ export default function InputInfo({ confirmText, validateEmail, onFinish }: Inpu
             confirmText={confirmText}
             onFinish={(v) => {
               onFinish({
-                loginType: LoginType.Apple,
-                guardianAccount: `+${v.code} ${v.phoneNumber}`,
+                loginType: LoginType.Phone,
+                guardianAccount: `${v.code}-${v.phoneNumber}`,
               });
             }}
           />
