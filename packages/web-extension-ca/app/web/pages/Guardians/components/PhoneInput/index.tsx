@@ -1,7 +1,7 @@
 import PhoneNumberInput from 'components/PhoneNumberInput';
 import { useMemo, useState } from 'react';
 import { useLoginInfo } from 'store/Provider/hooks';
-import { countryCodeFilter } from '@portkey-wallet/constants/constants-ca/countryCode';
+import { countryCodeFilter } from '@portkey-wallet/constants/constants-ca/country';
 import { ISelectCountryCode } from 'store/reducers/loginCache/type';
 
 interface PhoneProps {
