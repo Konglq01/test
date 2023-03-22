@@ -69,13 +69,12 @@ export default function LoginEmail({ setLoginType }: { setLoginType: (type: Page
     return () => listener.remove();
   });
 
-  useFocusEffect(() => {
-    if (!iptRef || !iptRef?.current) return;
-    setTimeout(() => {
-      // android machine must use delay time to show soft keyboard
+  useFocusEffect(
+    useCallback(() => {
+      if (!iptRef || !iptRef?.current) return;
       iptRef.current.focus();
-    }, 200);
-  });
+    }, []),
+  );
 
   return (
     <View style={[BGStyles.bg1, styles.card]}>
