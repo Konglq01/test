@@ -126,10 +126,13 @@ export default class TransformView extends Component<TransformViewProps, Transfo
 
   createPanResponder() {
     this.panResponder = PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
+      onStartShouldSetPanResponder: (evt, gestureState) => {
+        return gestureState.dx !== 0 && gestureState.dy !== 0;
+      },
       onStartShouldSetPanResponderCapture: () => false,
       onMoveShouldSetPanResponder: (evt, gestureState) => {
-        return gestureState.dx !== 0 && gestureState.dy !== 0;
+        const { dx, dy } = gestureState;
+        return dx !== 0 && dy !== 0 && (Math.abs(dx) > 5 || Math.abs(dy) > 5);
       },
       onMoveShouldSetPanResponderCapture: () => false,
       onPanResponderGrant: (e, gestureState) => this.onPanResponderGrant(e, gestureState),
