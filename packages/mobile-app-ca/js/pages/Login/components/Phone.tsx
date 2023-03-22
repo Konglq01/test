@@ -17,6 +17,7 @@ import { pTd } from 'utils/unit';
 import { useOnLogin } from 'hooks/login';
 import PhoneInput from 'components/PhoneInput';
 import { DefaultCountry } from '@portkey-wallet/constants/constants-ca/country';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 
 const TitleMap = {
   [PageType.login]: {
