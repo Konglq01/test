@@ -48,8 +48,8 @@ const SelectList = <ItemType extends ItemTypeBase<ItemValueType>, ItemValueType 
               <View style={[GStyles.paddingLeft(24), styles.itemRow]}>
                 <VerifierImage
                   label={item[labelAttrName]}
-                  style={GStyles.marginRight(12)}
-                  size={pTd(36)}
+                  style={[GStyles.marginRight(12)]}
+                  size={pTd(35.5)}
                   uri={item.imageUrl}
                 />
 

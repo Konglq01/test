@@ -53,6 +53,15 @@ export default function GuardiansView() {
     getGuardianList({ caHash: walletInfo.caHash });
   }, [getGuardianList, walletInfo.caHash]);
 
+  useEffect(() => {
+    const temp = userGuardiansList?.filter((guardian) => guardian.key === opGuardian?.key) || [];
+    if (temp.length > 0) {
+      dispatch(setCurrentGuardianAction(temp[0]));
+      dispatch(setOpGuardianAction(temp[0]));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userGuardiansList]);
+
   const verifyHandler = useCallback(async () => {
     try {
       if (opGuardian?.isLoginAccount) {

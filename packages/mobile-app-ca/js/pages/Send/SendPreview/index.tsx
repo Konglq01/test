@@ -357,14 +357,16 @@ const SendHome: React.FC = () => {
                   <TextM style={[styles.blackFontColor, styles.fontBold, GStyles.alignEnd]}>
                     {ZERO.plus(sendNumber).isLessThanOrEqualTo(ZERO.plus(CROSS_FEE))
                       ? '0'
-                      : unitConverter(ZERO.plus(sendNumber).minus(ZERO.plus(CROSS_FEE)))}{' '}
+                      : formatAmountShow(ZERO.plus(sendNumber).minus(ZERO.plus(CROSS_FEE)))}{' '}
                     {'ELF'}
                   </TextM>
                   {isMainNet(currentNetwork?.networkType ?? 'TESTNET') ? (
                     <TextS
-                      style={[styles.blackFontColor, styles.lightGrayFontColor, GStyles.alignEnd]}>{`$ ${unitConverter(
-                      CROSS_FEE,
-                    )}`}</TextS>
+                      style={[
+                        styles.blackFontColor,
+                        styles.lightGrayFontColor,
+                        GStyles.alignEnd,
+                      ]}>{`$ ${formatAmountShow(CROSS_FEE)}`}</TextS>
                   ) : (
                     <TextM />
                   )}

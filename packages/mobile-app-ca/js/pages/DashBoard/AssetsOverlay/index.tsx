@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import OverlayModal from 'components/OverlayModal';
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, StyleSheet, Text, TouchableOpacity, View, DeviceEventEmitter } from 'react-native';
 import { TextL, TextS } from 'components/CommonText';
 import { ModalBody } from 'components/ModalBody';
 import CommonInput from 'components/CommonInput';
@@ -23,6 +23,8 @@ import { formatChainInfoToShow } from '@portkey-wallet/utils';
 import { ChainId } from '@portkey-wallet/types';
 import { useGStyles } from 'assets/theme/useGStyles';
 import { useIsTestnet } from '@portkey-wallet/hooks/hooks-ca/network';
+import myEvents from 'utils/deviceEvent';
+import { isIos } from 'walletappnew/js/utils/device';
 
 type onFinishSelectTokenType = (tokenItem: any) => void;
 type TokenListProps = {
@@ -191,6 +193,15 @@ const AssetList = ({ account }: TokenListProps) => {
         )
       ) : (
         <FlatList
+          disableScrollViewPanResponder={true}
+          onScroll={({ nativeEvent }) => {
+            const {
+              contentOffset: { y: scrollY },
+            } = nativeEvent;
+            if (scrollY <= 0) {
+              myEvents.nestScrollForPullCloseModal.emit();
+            }
+          }}
           style={styles.flatList}
           data={listShow || []}
           renderItem={renderItem}
@@ -208,6 +219,7 @@ export const showAssetList = (props: TokenListProps) => {
   OverlayModal.show(<AssetList {...props} />, {
     position: 'bottom',
     autoKeyboardInsets: false,
+    enabledNestScrollView: true,
   });
 };
 
