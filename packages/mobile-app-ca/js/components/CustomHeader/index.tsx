@@ -81,13 +81,17 @@ const CustomHeader: React.FC<CustomHeaderProps> = props => {
     const onPress = leftCallback ? leftCallback : () => navigationService.goBack();
     if (type === 'leftBack') {
       return (
-        <TouchableOpacity style={[GStyles.flexRow, GStyles.itemCenter]} onPress={onPress}>
+        <TouchableOpacity style={[GStyles.flexRow, GStyles.itemCenter, { padding: pTd(16) }]} onPress={onPress}>
           {leftIcon}
           <TextL style={styles.leftBackTitle}>{t(backTitle)}</TextL>
         </TouchableOpacity>
       );
     }
-    return <TouchableOpacity onPress={onPress}>{leftIcon}</TouchableOpacity>;
+    return (
+      <TouchableOpacity onPress={onPress} style={{ padding: pTd(16) }}>
+        {leftIcon}
+      </TouchableOpacity>
+    );
   }, [backTitle, isCanGoBack, leftCallback, leftDom, leftIcon, styles.leftBackTitle, t, type]);
 
   const centerElement = useMemo(() => {

@@ -48,8 +48,6 @@ export const blueStyles = StyleSheet.create({
 
 export const whitStyles = StyleSheet.create({
   sectionContainer: {
-    paddingLeft: pTd(16),
-    paddingRight: pTd(16),
     height: pTd(52),
     width: '100%',
     display: 'flex',
