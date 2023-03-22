@@ -24,6 +24,14 @@ import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import myEvents from 'utils/deviceEvent';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verification } from 'utils/api';
+import { AuthenticationInfo, VerificationType } from '@portkey-wallet/types/verifier';
+import { useVerifyToken } from 'hooks/authentication';
+
+export type RouterParams = {
+  loginAccount: string;
+  loginType: LoginType;
+  authenticationInfo?: AuthenticationInfo;
+};
 
 const ScrollViewProps = { disabled: true };
 export default function SelectVerifier() {
@@ -32,9 +40,32 @@ export default function SelectVerifier() {
 
   const [selectedVerifier, setSelectedVerifier] = useState(verifierList[0]);
 
-  const { loginAccount, loginType } = useRouterParams<{ loginAccount?: string; loginType: LoginType }>();
+  const { loginAccount, loginType, authenticationInfo } = useRouterParams<RouterParams>();
+  const verifyToken = useVerifyToken();
 
-  const onConfirm = useCallback(async () => {
+  const onConfirmAuth = useCallback(async () => {
+    try {
+      Loading.show();
+      const rst = await verifyToken(loginType, {
+        accessToken: authenticationInfo?.[loginAccount || ''],
+        id: loginAccount,
+        verifierId: selectedVerifier?.id,
+        chainId: DefaultChainId,
+      });
+      navigationService.navigate('SetPin', {
+        managerInfo: {
+          verificationType: VerificationType.register,
+          loginAccount: loginAccount,
+          type: loginType,
+        },
+        verifierInfo: { ...rst, verifierId: selectedVerifier.id },
+      });
+    } catch (error) {
+      CommonToast.failError(error);
+    }
+    Loading.hide();
+  }, [authenticationInfo, loginAccount, loginType, selectedVerifier.id, verifyToken]);
+  const onDefaultConfirm = useCallback(() => {
     const confirm = async () => {
       try {
         Loading.show();
@@ -46,7 +77,6 @@ export default function SelectVerifier() {
             chainId: DefaultChainId,
           },
         });
-
         if (requestCodeResult.verifierSessionId) {
           navigationService.navigate('VerifierDetails', {
             requestCodeResult,
@@ -85,7 +115,19 @@ export default function SelectVerifier() {
         },
       ],
     });
-  }, [selectedVerifier, loginAccount, t, loginType]);
+  }, [loginAccount, loginType, selectedVerifier, t]);
+  const onConfirm = useCallback(async () => {
+    switch (loginType) {
+      case LoginType.Apple:
+      case LoginType.Google:
+        onConfirmAuth();
+        break;
+      default: {
+        onDefaultConfirm();
+        break;
+      }
+    }
+  }, [loginType, onConfirmAuth, onDefaultConfirm]);
   return (
     <PageContainer
       containerStyles={styles.containerStyles}

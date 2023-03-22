@@ -17,7 +17,10 @@ import Divider from 'components/Divider';
 import CommonToast from 'components/CommonToast';
 import { useAppleAuthentication, useGoogleAuthentication } from 'hooks/authentication';
 import { isIos } from '@portkey-wallet/utils/mobile/device';
-
+import { getGoogleUserInfo, parseAppleIdentityToken } from '@portkey-wallet/utils/authentication';
+import { useOnLogin } from 'hooks/login';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import Loading from 'components/Loading';
 const TitleMap = {
   [PageType.login]: {
     apple: 'Login with Apple',
@@ -38,28 +41,38 @@ export default function Referral({
   setLoginType: (type: PageLoginType) => void;
   type?: PageType;
 }) {
-  const { appleSign, appleResponse } = useAppleAuthentication();
-  const { googleSign, googleResponse } = useGoogleAuthentication();
+  const { appleSign } = useAppleAuthentication();
+  const { googleSign } = useGoogleAuthentication();
+
+  const onLogin = useOnLogin();
   const onAppleSign = useCallback(async () => {
     try {
-      const info = await appleSign();
-      console.log(info, '=======info');
+      Loading.show();
+      const appleInfo = await appleSign();
+      const userInfo = parseAppleIdentityToken(appleInfo.identityToken);
+      if (userInfo) {
+        await onLogin(userInfo.userId, LoginType.Apple, { [userInfo.userId]: appleInfo.identityToken as string });
+      } else {
+        CommonToast.fail('Authorization failed');
+      }
     } catch (error) {
-      console.log(error, '======error');
-
       CommonToast.failError(error);
     }
-  }, [appleSign]);
+    Loading.hide();
+  }, [appleSign, onLogin]);
   const onGoogleSign = useCallback(async () => {
     try {
-      const info = await googleSign();
-      console.log(info, '=======info');
+      Loading.show();
+      const googleInfo = await googleSign();
+      const userInfo = await getGoogleUserInfo(googleInfo.authentication?.accessToken);
+      console.log(userInfo, '========userInfo');
+
+      await onLogin(userInfo.id, LoginType.Google, { [userInfo.id]: googleInfo.authentication?.accessToken as string });
     } catch (error) {
       CommonToast.failError(error);
     }
-  }, [googleSign]);
-  console.log(googleResponse, '=====googleResponse');
-  console.log(appleResponse, '=====appleResponse');
+    Loading.hide();
+  }, [googleSign, onLogin]);
   return (
     <View style={[BGStyles.bg1, styles.card, GStyles.itemCenter, GStyles.spaceBetween]}>
       <Touchable style={styles.iconBox} onPress={() => setLoginType(PageLoginType.qrCode)}>
