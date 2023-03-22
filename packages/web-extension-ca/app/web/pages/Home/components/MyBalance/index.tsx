@@ -10,12 +10,14 @@ import Activity from '../Activity/index';
 import { Transaction } from '@portkey-wallet/types/types-ca/trade';
 import NFT from '../NFT/NFT';
 import { unitConverter } from '@portkey-wallet/utils/converter';
-import { useAppDispatch, useUserInfo, useWalletInfo, useAssetInfo } from 'store/Provider/hooks';
+import { useAppDispatch, useUserInfo, useWalletInfo, useAssetInfo, useCommonState } from 'store/Provider/hooks';
 import { useCaAddresses, useChainIdList } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { fetchTokenListAsync } from '@portkey-wallet/store/store-ca/assets/slice';
 import { fetchAllTokenListAsync, getSymbolImagesAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
 import { getWalletNameAsync } from '@portkey-wallet/store/store-ca/wallet/actions';
 import { useIsTestnet } from 'hooks/useNetwork';
+import CustomTokenModal from 'pages/components/CustomTokenModal';
+import { AccountAssetItem } from '@portkey-wallet/types/types-ca/token';
 
 export interface TransactionResult {
   total: number;
@@ -81,34 +83,70 @@ export default function MyBalance() {
   //   return () => clearInterval(timer);
   // }, [accountTokenList, appDispatch, caAddresses, passwordSeed]);
 
+  const onSelectedToken = useCallback(
+    (v: AccountAssetItem, type: 'token' | 'nft') => {
+      setTokenOpen(false);
+      const state = {
+        chainId: v.chainId,
+        decimals: type === 'nft' ? 0 : v.tokenInfo?.decimals,
+        address: type === 'nft' ? v?.nftInfo?.tokenContractAddress : v?.tokenInfo?.tokenContractAddress,
+        symbol: v.symbol,
+        name: v.symbol,
+        imageUrl: type === 'nft' ? v.nftInfo?.imageUrl : '',
+        alias: type === 'nft' ? v.nftInfo?.alias : '',
+        tokenId: type === 'nft' ? v.nftInfo?.tokenId : '',
+      };
+      navigate(`/${navTarget}/${type}/${v.symbol}`, { state });
+    },
+    [navTarget, navigate],
+  );
+
+  const { isPrompt } = useCommonState();
   const SelectTokenELe = useMemo(() => {
-    return (
-      <CustomTokenDrawer
-        drawerType={navTarget}
+    const title = navTarget === 'receive' ? 'Select Token' : 'Select Assets';
+    const searchPlaceHolder = navTarget === 'receive' ? 'Search Token' : 'Search Assets';
+    // return (
+    //   <CustomTokenDrawer
+    //     open={tokenOpen}
+    //     drawerType={navTarget}
+    //     title={title}
+    //     searchPlaceHolder={searchPlaceHolder}
+    //     height="528"
+    //     maskClosable={true}
+    //     placement="bottom"
+    //     onClose={() => setTokenOpen(false)}
+    //     onChange={(v, type) => {
+    //       onSelectedToken(v, type);
+    //     }}
+    //   />
+    // );
+    return isPrompt ? (
+      <CustomTokenModal
         open={tokenOpen}
-        title={navTarget === 'receive' ? 'Select Token' : 'Select Assets'}
-        searchPlaceHolder={navTarget === 'receive' ? 'Search Token' : 'Search Assets'}
+        drawerType={navTarget}
+        title={title}
+        searchPlaceHolder={searchPlaceHolder}
+        onClose={() => setTokenOpen(false)}
+        onChange={(v, type) => {
+          onSelectedToken(v, type);
+        }}
+      />
+    ) : (
+      <CustomTokenDrawer
+        open={tokenOpen}
+        drawerType={navTarget}
+        title={title}
+        searchPlaceHolder={searchPlaceHolder}
         height="528"
         maskClosable={true}
         placement="bottom"
         onClose={() => setTokenOpen(false)}
         onChange={(v, type) => {
-          setTokenOpen(false);
-          const state = {
-            chainId: v.chainId,
-            decimals: type === 'nft' ? 0 : v.tokenInfo?.decimals,
-            address: type === 'nft' ? v?.nftInfo?.tokenContractAddress : v?.tokenInfo?.tokenContractAddress,
-            symbol: v.symbol,
-            name: v.symbol,
-            imageUrl: type === 'nft' ? v.nftInfo?.imageUrl : '',
-            alias: type === 'nft' ? v.nftInfo?.alias : '',
-            tokenId: type === 'nft' ? v.nftInfo?.tokenId : '',
-          };
-          navigate(`/${navTarget}/${type}/${v.symbol}`, { state });
+          onSelectedToken(v, type);
         }}
       />
     );
-  }, [navTarget, navigate, tokenOpen]);
+  }, [isPrompt, navTarget, onSelectedToken, tokenOpen]);
 
   const onChange = useCallback(async (key: string) => {
     setActiveKey(key);

@@ -15,7 +15,7 @@ import TitleWrapper from 'components/TitleWrapper';
 import { ReactElement, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router';
-import { useAppDispatch, useLoading, useUserInfo, useWalletInfo } from 'store/Provider/hooks';
+import { useAppDispatch, useCommonState, useLoading, useUserInfo, useWalletInfo } from 'store/Provider/hooks';
 import crossChainTransfer, { intervalCrossChainTransfer } from 'utils/sandboxUtil/crossChainTransfer';
 import sameChainTransfer from 'utils/sandboxUtil/sameChainTransfer';
 import AddressSelector from './components/AddressSelector';
@@ -30,6 +30,8 @@ import './index.less';
 import { the2ThFailedActivityItemType } from '@portkey-wallet/types/types-ca/activity';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
 import { CROSS_FEE } from '@portkey-wallet/constants/constants-ca/wallet';
+import PromptFrame from 'pages/components/PromptFrame';
+import clsx from 'clsx';
 
 export type Account = { address: string; name?: string };
 
@@ -414,61 +416,66 @@ export default function Send() {
     ],
   );
 
-  return (
-    <div className="page-send">
-      <TitleWrapper
-        className="page-title"
-        title={`Send ${type === 'token' ? symbol : ''}`}
-        leftCallBack={() => {
-          StageObj[stage].backFun();
-        }}
-        rightElement={<CustomSvg type="Close2" onClick={() => navigate('/')} />}
-      />
-      {stage !== Stage.Preview && (
-        <div className="address-wrap">
-          <div className="item from">
-            <span className="label">{t('From_with_colon')}</span>
-            <div className={'from-wallet control'}>
-              <div className="name">{walletName}</div>
+  const { isPrompt } = useCommonState();
+  const mainContent = () => {
+    return (
+      <div className={clsx(['page-send', isPrompt ? 'detail-page-prompt' : null])}>
+        <TitleWrapper
+          className="page-title"
+          title={`Send ${type === 'token' ? symbol : ''}`}
+          leftCallBack={() => {
+            StageObj[stage].backFun();
+          }}
+          rightElement={<CustomSvg type="Close2" onClick={() => navigate('/')} />}
+        />
+        {stage !== Stage.Preview && (
+          <div className="address-wrap">
+            <div className="item from">
+              <span className="label">{t('From_with_colon')}</span>
+              <div className={'from-wallet control'}>
+                <div className="name">{walletName}</div>
+              </div>
             </div>
-          </div>
-          <div className="item to">
-            <span className="label">{t('To_with_colon')}</span>
-            <div className="control">
-              <ToAccount
-                value={toAccount}
-                onChange={(v) => setToAccount(v)}
-                focus={stage !== Stage.Amount}
-                // onBlur={() => validateToAddress(toAccount)}
-              />
-              {stage === Stage.Amount && (
-                <CustomSvg
-                  type="Close2"
-                  onClick={() => {
-                    setStage(Stage.Address);
-                    setToAccount({ address: '' });
-                  }}
+            <div className="item to">
+              <span className="label">{t('To_with_colon')}</span>
+              <div className="control">
+                <ToAccount
+                  value={toAccount}
+                  onChange={(v) => setToAccount(v)}
+                  focus={stage !== Stage.Amount}
+                  // onBlur={() => validateToAddress(toAccount)}
                 />
-              )}
+                {stage === Stage.Amount && (
+                  <CustomSvg
+                    type="Close2"
+                    onClick={() => {
+                      setStage(Stage.Address);
+                      setToAccount({ address: '' });
+                    }}
+                  />
+                )}
+              </div>
             </div>
+            {errorMsg && <span className="error-msg">{errorMsg}</span>}
           </div>
-          {errorMsg && <span className="error-msg">{errorMsg}</span>}
-        </div>
-      )}
-      <div className="stage-ele">{StageObj[stage].element}</div>
-      {stage === Stage.Preview ? (
-        <div className="btn-wrap">
-          <Button disabled={btnDisabled} className="stage-btn" type="primary" onClick={StageObj[stage].handler}>
-            {StageObj[stage].btnText}
-          </Button>
-        </div>
-      ) : (
-        <p className="btn-wrap">
-          <Button disabled={btnDisabled} className="stage-btn" type="primary" onClick={StageObj[stage].handler}>
-            {StageObj[stage].btnText}
-          </Button>
-        </p>
-      )}
-    </div>
-  );
+        )}
+        <div className="stage-ele">{StageObj[stage].element}</div>
+        {stage === Stage.Preview ? (
+          <div className="btn-wrap">
+            <Button disabled={btnDisabled} className="stage-btn" type="primary" onClick={StageObj[stage].handler}>
+              {StageObj[stage].btnText}
+            </Button>
+          </div>
+        ) : (
+          <p className="btn-wrap">
+            <Button disabled={btnDisabled} className="stage-btn" type="primary" onClick={StageObj[stage].handler}>
+              {StageObj[stage].btnText}
+            </Button>
+          </p>
+        )}
+      </div>
+    );
+  };
+
+  return <>{isPrompt ? <PromptFrame content={mainContent()} /> : mainContent()}</>;
 }
