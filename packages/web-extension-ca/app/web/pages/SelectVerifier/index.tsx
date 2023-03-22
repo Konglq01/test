@@ -117,9 +117,9 @@ export default function SelectVerifier() {
           width={320}
           onCancel={() => setOpen(false)}>
           <p className="modal-content">
-            {`${t('verificationCodeTip', { verifier: selectItem?.name })} `}
+            {`${t('verificationCodeTip1', { verifier: selectItem?.name })} `}
             <span className="bold">{loginAccount.guardianAccount}</span>
-            {` ${t('to verify your email address.')}`}
+            {` ${t('verificationCodeTip2', { type: LoginType[loginAccount.loginType] })}`}
           </p>
           <div className="btn-wrapper">
             <Button onClick={() => setOpen(false)}>{t('Cancel')}</Button>
