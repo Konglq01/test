@@ -7,6 +7,7 @@ import { useLanguage } from 'i18n/hooks';
 import { TextM } from 'components/CommonText';
 import { FontStyles } from 'assets/theme/styles';
 import { useFocusEffect } from '@react-navigation/native';
+import { parseInputIntegerChange } from '@portkey-wallet/utils/input';
 
 interface AmountNFT {
   sendNumber: string;
@@ -40,7 +41,7 @@ export default function AmountNFT(props: AmountNFT) {
           onFocus={() => {
             if (sendNumber === '0') setSendNumber('');
           }}
-          onChangeText={(v: string) => setSendNumber(v.replace(/^(0+)|[^\d]+/g, ''))}
+          onChangeText={(v: string) => setSendNumber(parseInputIntegerChange(v))}
         />
       </View>
     </View>
