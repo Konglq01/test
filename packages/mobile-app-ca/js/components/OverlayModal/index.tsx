@@ -32,14 +32,17 @@ export type OverlayModalProps = {
   type?: 'custom' | 'zoomOut';
   autoKeyboardInsets?: boolean;
   animated?: boolean;
+  enabledNestScrollView?: boolean;
 };
 
 export function OverlayTransformView({
   containerStyle,
   children,
+  enabledNestScrollView,
 }: {
   containerStyle?: ViewStyleType;
   children: ReactNode;
+  enabledNestScrollView?: boolean;
 }) {
   return (
     <TransformView
@@ -49,7 +52,9 @@ export function OverlayTransformView({
       style={styles.flex0}
       containerStyle={containerStyle}
       disableScroll={['up', 'horizontal']}
+      enabledNestScrollView={enabledNestScrollView}
       onDidTransform={(_: number, translateY: number) => {
+        console.log('onDidTransform', translateY);
         translateY > 50 && OverlayModal.hide();
       }}>
       {children}
@@ -59,7 +64,13 @@ export function OverlayTransformView({
 
 export default class OverlayModal extends React.Component {
   static show(component: ReactNode, overlayProps: OverlayModalProps = {}) {
-    const { position, style: propsStyle, containerStyle: propsContainerStyle, ...props } = overlayProps;
+    const {
+      position,
+      style: propsStyle,
+      containerStyle: propsContainerStyle,
+      enabledNestScrollView,
+      ...props
+    } = overlayProps;
     const style: StyleProp<ViewStyle> = [];
     const containerStyle: StyleProp<ViewStyle> = [];
     if (position) {
@@ -78,7 +89,9 @@ export default class OverlayModal extends React.Component {
           containerStyle={[GStyles.flex1, style]}
           ref={(v: OverlayInterface) => elements.push(v)}
           {...props}>
-          <OverlayTransformView containerStyle={containerStyle}>{component}</OverlayTransformView>
+          <OverlayTransformView containerStyle={containerStyle} enabledNestScrollView={!!enabledNestScrollView}>
+            {component}
+          </OverlayTransformView>
         </Overlay.PopView>
       );
       Overlay.show(overlayView);
