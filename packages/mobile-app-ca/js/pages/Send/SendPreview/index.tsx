@@ -23,7 +23,7 @@ import crossChainTransfer, {
 } from 'utils/transfer/crossChainTransfer';
 import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import { useCaAddresses, useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
-import { timesDecimals, unitConverter } from '@portkey-wallet/utils/converter';
+import { formatAmountShow, timesDecimals, unitConverter } from '@portkey-wallet/utils/converter';
 import sameChainTransfer from 'utils/transfer/sameChainTransfer';
 import { addFailedActivity, removeFailedActivity } from '@portkey-wallet/store/store-ca/activity/slice';
 import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
@@ -239,8 +239,6 @@ const SendHome: React.FC = () => {
     return formatChainInfoToShow(chainId);
   };
 
-  console.log('currentNetwork', currentNetwork);
-
   return (
     <PageContainer
       safeAreaColor={['blue', 'white']}
@@ -262,7 +260,7 @@ const SendHome: React.FC = () => {
       ) : (
         <>
           <Text style={[styles.tokenCount, FontStyles.font5, fonts.mediumFont]}>
-            {`- ${sendNumber} ${assetInfo?.symbol}`}{' '}
+            {`- ${formatAmountShow(sendNumber)} ${assetInfo?.symbol}`}
           </Text>
           {/* <TextM style={styles.tokenUSD}>-$ -</TextM> */}
         </>

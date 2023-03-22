@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { View, StyleSheet, TextInput } from 'react-native';
 import { pTd } from 'utils/unit';
 import { defaultColors } from 'assets/theme';
@@ -19,10 +19,12 @@ export default function AmountNFT(props: AmountNFT) {
 
   const iptRef = useRef<any>();
 
-  useFocusEffect(() => {
-    if (!iptRef || !iptRef?.current) return;
-    iptRef.current.focus();
-  });
+  useFocusEffect(
+    useCallback(() => {
+      if (!iptRef || !iptRef?.current) return;
+      iptRef.current.focus();
+    }, []),
+  );
 
   return (
     <View style={styles.wrap}>

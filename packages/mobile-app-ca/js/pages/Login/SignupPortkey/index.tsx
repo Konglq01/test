@@ -74,10 +74,12 @@ function SignupEmail() {
     };
   });
 
-  useFocusEffect(() => {
-    if (!iptRef || !iptRef?.current) return;
-    iptRef.current.focus();
-  });
+  useFocusEffect(
+    useCallback(() => {
+      if (!iptRef || !iptRef?.current) return;
+      iptRef.current.focus();
+    }, []),
+  );
 
   return (
     <View style={[BGStyles.bg1, styles.card]}>

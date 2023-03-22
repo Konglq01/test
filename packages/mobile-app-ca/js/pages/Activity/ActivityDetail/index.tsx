@@ -5,7 +5,7 @@ import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
 import { fetchActivity } from '@portkey-wallet/store/store-ca/activity/api';
 import { ActivityItemType, TransactionStatus } from '@portkey-wallet/types/types-ca/activity';
 import { addressFormat, formatChainInfoToShow, getExploreLink } from '@portkey-wallet/utils';
-import { divDecimals, unitConverter } from '@portkey-wallet/utils/converter';
+import { divDecimals, formatAmountShow } from '@portkey-wallet/utils/converter';
 import { Image } from '@rneui/base';
 import { defaultColors } from 'assets/theme';
 import fonts from 'assets/theme/fonts';
@@ -26,7 +26,6 @@ import { formatStr2EllipsisStr } from '@portkey-wallet/utils';
 import navigationService from 'utils/navigationService';
 import { pTd } from 'utils/unit';
 import { useIsTestnet } from '@portkey-wallet/hooks/hooks-ca/network';
-import { ChainId } from '@portkey-wallet/types';
 import { HIDDEN_TRANSACTION_TYPES } from '@portkey-wallet/constants/constants-ca/activity';
 
 const ActivityDetail = () => {
@@ -139,11 +138,11 @@ const ActivityDetail = () => {
           <View>
             {transactionFees.map((item, index) => (
               <View key={index} style={[styles.transactionFeeItemWrap, index > 0 && styles.marginTop8]}>
-                <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${unitConverter(
+                <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${formatAmountShow(
                   divDecimals(item?.fee ?? 0, ELF_DECIMAL),
                 )} ${item.symbol}`}</TextM>
                 {!isTestnet && (
-                  <TextS style={[styles.lightGrayFontColor, styles.marginTop4]}>{`$ ${unitConverter(
+                  <TextS style={[styles.lightGrayFontColor, styles.marginTop4]}>{`$ ${formatAmountShow(
                     divDecimals(item?.feeInUsd ?? 0, ELF_DECIMAL),
                     2,
                   )}`}</TextS>
@@ -194,12 +193,12 @@ const ActivityDetail = () => {
             <Text style={[styles.tokenCount, styles.fontBold]}>
               {!HIDDEN_TRANSACTION_TYPES.includes(activityItem?.transactionType as TransactionTypes) &&
                 (activityItem?.isReceived ? '+' : '-')}
-              {`${unitConverter(divDecimals(activityItem?.amount, activityItem?.decimals))} ${
+              {`${formatAmountShow(divDecimals(activityItem?.amount, activityItem?.decimals))} ${
                 activityItem?.symbol || ''
               }`}
             </Text>
             {!isTestnet && (
-              <Text style={styles.usdtCount}>{`$ ${unitConverter(activityItem?.priceInUsd ?? 0, 2)}`}</Text>
+              <Text style={styles.usdtCount}>{`$ ${formatAmountShow(activityItem?.priceInUsd ?? 0, 2)}`}</Text>
             )}
           </>
         ))}
