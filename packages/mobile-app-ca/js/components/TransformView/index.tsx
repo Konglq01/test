@@ -129,6 +129,7 @@ export default class TransformView extends Component<TransformViewProps, Transfo
       onStartShouldSetPanResponder: () => true,
       onStartShouldSetPanResponderCapture: () => false,
       onMoveShouldSetPanResponder: (evt, gestureState) => {
+        // evt.nativeEvent.pageY
         return gestureState.dx !== 0 && gestureState.dy !== 0;
       },
       onMoveShouldSetPanResponderCapture: () => false,

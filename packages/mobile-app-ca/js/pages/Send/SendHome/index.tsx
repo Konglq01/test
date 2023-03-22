@@ -219,14 +219,12 @@ const SendHome: React.FC = () => {
   }, [selectedToContact?.address, sendNumber]);
 
   const checkCanNext = useCallback(() => {
-    const suffix = getAddressChainId(toInfo.address, chainInfo?.chainId || 'AELF');
+    const suffix = getAddressChainId(selectedToContact.address, chainInfo?.chainId || 'AELF');
 
     if (!isAllowAelfAddress(selectedToContact.address)) {
       setErrorMessage([AddressError.INVALID_ADDRESS]);
       return false;
     }
-
-    console.log(wallet?.[assetInfo?.chainId]?.caAddress, getAelfAddress(toInfo.address), suffix, assetInfo?.chainId);
 
     if (
       isSameAddresses(wallet?.[assetInfo?.chainId]?.caAddress || '', getAelfAddress(selectedToContact.address)) &&
@@ -243,12 +241,15 @@ const SendHome: React.FC = () => {
 
     if (isCrossChain(selectedToContact.address, assetInfo.chainId)) {
       // TODO: check if  cross chain
-      showDialog('crossChain', () => setStep(2));
+      showDialog('crossChain', () => {
+        setErrorMessage([]);
+        setStep(2);
+      });
       return false;
     }
 
     return true;
-  }, [toInfo, chainInfo?.chainId, selectedToContact.address, wallet, assetInfo.chainId, isValidChainId, showDialog]);
+  }, [chainInfo?.chainId, selectedToContact.address, wallet, assetInfo.chainId, isValidChainId, showDialog]);
 
   const nextStep = useCallback(() => {
     if (checkCanNext()) {
