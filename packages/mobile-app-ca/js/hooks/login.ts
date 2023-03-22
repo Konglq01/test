@@ -147,7 +147,7 @@ export function useOnLogin() {
   const getVerifierServers = useGetVerifierServers();
   const getGuardiansInfo = useGetGuardiansInfo();
   return useCallback(
-    async (loginAccount: string) => {
+    async (loginAccount: string, loginType = LoginType.Email) => {
       try {
         let _chainInfo;
         if (!chainInfo) {
@@ -163,11 +163,11 @@ export function useOnLogin() {
             userGuardiansList: handleUserGuardiansList(holderInfo, verifierServers),
           });
         } else {
-          navigationService.navigate('SelectVerifier', { loginAccount, loginType: LoginType.Email });
+          navigationService.navigate('SelectVerifier', { loginAccount, loginType });
         }
       } catch (error) {
         if (handleErrorCode(error) === '3002') {
-          navigationService.navigate('SelectVerifier', { loginAccount, loginType: LoginType.Email });
+          navigationService.navigate('SelectVerifier', { loginAccount, loginType });
         } else {
           throw error;
         }
