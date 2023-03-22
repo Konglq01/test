@@ -33,6 +33,7 @@ export default function SelectVerifier() {
   const [selectedVerifier, setSelectedVerifier] = useState(verifierList[0]);
 
   const { loginAccount, loginType } = useRouterParams<{ loginAccount?: string; loginType: LoginType }>();
+
   const onConfirm = useCallback(async () => {
     const confirm = async () => {
       try {
@@ -69,7 +70,7 @@ export default function SelectVerifier() {
         <Text>
           <TextL>{`${selectedVerifier.name} will send a verification code to `}</TextL>
           <TextL style={fonts.mediumFont}>{loginAccount}</TextL>
-          <TextL>{` to verify your email address.`}</TextL>
+          <TextL>{` to verify your ${loginType === LoginType.Phone ? 'phone number' : 'email address'}.`}</TextL>
         </Text>
       ),
       buttons: [
