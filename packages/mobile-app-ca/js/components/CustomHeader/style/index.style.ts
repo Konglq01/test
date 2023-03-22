@@ -8,8 +8,6 @@ export const headerHeight = pTd(52);
 
 export const blueStyles = StyleSheet.create({
   sectionContainer: {
-    paddingLeft: pTd(16),
-    paddingRight: pTd(16),
     height: pTd(52),
     width: '100%',
     display: 'flex',
