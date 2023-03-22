@@ -71,7 +71,10 @@ export default function LoginEmail({ setLoginType }: { setLoginType: (type: Page
 
   useFocusEffect(() => {
     if (!iptRef || !iptRef?.current) return;
-    iptRef.current.focus();
+    setTimeout(() => {
+      // android machine must use delay time to show soft keyboard
+      iptRef.current.focus();
+    }, 200);
   });
 
   return (
