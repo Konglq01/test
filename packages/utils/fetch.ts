@@ -84,7 +84,7 @@ export const customFetch: CustomFetchFun = (url, _config) => {
           if (result.type === 'timeout') {
             // Cancel timeout request
             if (control.abort) control.abort();
-            reject('timeout');
+            reject('Unstable network. Please try again later.');
           } else {
             const _result = result as Response;
             if (_result.status === 401) {

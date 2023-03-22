@@ -2,6 +2,7 @@ import PortKeyHeader from 'pages/components/PortKeyHeader';
 import { useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { useCommonState, useLoading } from 'store/Provider/hooks';
+import popupHandler from 'utils/popupHandler';
 import { getLocalStorage } from 'utils/storage/chromeStorage';
 import MyBalance from './components/MyBalance';
 import './index.less';
@@ -19,6 +20,12 @@ export default function Home() {
     try {
       if (!isPopupInit) return;
       setLoading(1);
+      const isExpire = await popupHandler.popupActive();
+      if (isExpire) {
+        setLoading(false);
+        return navigate('/');
+      }
+
       const lastLocationState = await getLocalStorage('lastLocationState');
       setLoading(false);
       if (!lastLocationState?.path) {

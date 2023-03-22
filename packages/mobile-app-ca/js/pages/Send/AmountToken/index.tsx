@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { pTd } from 'utils/unit';
 import { parseInputChange } from '@portkey-wallet/utils/input';
@@ -39,10 +39,12 @@ export default function AmountToken({
     return `${str.slice(0, 5)}...`;
   };
 
-  useFocusEffect(() => {
-    if (!iptRef || !iptRef?.current) return;
-    iptRef.current.focus();
-  });
+  useFocusEffect(
+    useCallback(() => {
+      if (!iptRef || !iptRef?.current) return;
+      iptRef.current.focus();
+    }, []),
+  );
 
   return (
     <View style={styles.amountWrap}>

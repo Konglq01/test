@@ -24,6 +24,7 @@ import { GuardiansStatusItem } from '../types';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network-test2';
 import { request } from '@portkey-wallet/api/api-did';
 import { verification } from 'utils/api';
+import { useLanguage } from 'i18n/hooks';
 
 type RouterParams = {
   guardianItem?: UserGuardianItem;
@@ -57,6 +58,7 @@ export default function VerifierDetails() {
     verificationType,
   } = useRouterParams<RouterParams>();
   console.log(guardianItem, '=====guardianItem');
+  const { t } = useLanguage();
 
   const countdown = useRef<VerifierCountdownInterface>();
   useEffectOnce(() => {
@@ -99,7 +101,7 @@ export default function VerifierDetails() {
     async (code: string) => {
       if (!requestCodeResult || !guardianItem || !code) return;
       try {
-        Loading.show();
+        Loading.show({ text: t('Processing on the chain...') });
         const rst = await request.verify.checkVerificationCode({
           params: {
             type: LoginType[guardianItem?.guardianType as LoginType],
