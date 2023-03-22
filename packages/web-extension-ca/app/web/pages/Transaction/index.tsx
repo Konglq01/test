@@ -210,14 +210,14 @@ export default function Transaction() {
                 <div key={'transactionFee' + idx} className="right-item">
                   <span>{`${formatWithCommas({
                     amount: item.fee,
-                    decimals: isNft ? 8 : activityItem.decimals,
+                    decimals: isNft ? 8 : 8,
                   })} ${item.symbol ?? ''}`}</span>
                   {!isTestNet && (
                     <span className="right-usd">
                       {formatWithCommas({
                         sign: AmountSign.USD,
                         amount: item.feeInUsd,
-                        decimals: activityItem.decimals,
+                        decimals: 8,
                         digits: 2,
                       })}
                     </span>
@@ -228,7 +228,7 @@ export default function Transaction() {
         </span>
       </p>
     );
-  }, [activityItem.decimals, feeInfo, isNft, isTestNet, t]);
+  }, [feeInfo, isNft, isTestNet, t]);
 
   const transactionUI = useCallback(() => {
     return (
