@@ -8,6 +8,7 @@ import SWController from 'controllers/SWController';
 import { getEnvironmentType } from 'utils';
 import { apis } from 'utils/BrowserApis';
 import errorHandler from 'utils/errorHandler';
+import popupHandler from 'utils/popupHandler';
 import { getLocalStorage, setLocalStorage } from 'utils/storage/chromeStorage';
 
 // function onMessage(msg: any, port: any) {
@@ -32,10 +33,12 @@ export default function connectListener() {
     if (portType === 'popup') {
       // Save popup router state
       port.onDisconnect.addListener(async () => {
+        // popup close;
         const state = await getLocalStorage('locationState');
         setLocalStorage({
           lastLocationState: state,
         });
+        popupHandler.closeHandler();
       });
     }
     const isContentConnect = portType === ENVIRONMENT_TYPE_SERVICE_WORKER;
