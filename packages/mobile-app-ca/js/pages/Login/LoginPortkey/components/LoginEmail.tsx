@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { View, Text, Image } from 'react-native';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { getChainListAsync } from '@portkey-wallet/store/store-ca/wallet/actions';
@@ -24,6 +24,8 @@ import qrCode from 'assets/image/pngs/QR-code.png';
 import { PageLoginType } from '..';
 import { handleUserGuardiansList } from '@portkey-wallet/utils/guardian';
 import { useFocusEffect } from '@react-navigation/native';
+
+let timer: string | number | NodeJS.Timeout | undefined;
 
 export default function LoginEmail({ setLoginType }: { setLoginType: (type: PageLoginType) => void }) {
   const { t } = useLanguage();
@@ -72,9 +74,15 @@ export default function LoginEmail({ setLoginType }: { setLoginType: (type: Page
   useFocusEffect(
     useCallback(() => {
       if (!iptRef || !iptRef?.current) return;
-      iptRef.current.focus();
+      timer = setTimeout(() => {
+        iptRef.current.focus();
+      }, 200);
     }, []),
   );
+
+  useEffect(() => {
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <View style={[BGStyles.bg1, styles.card]}>
