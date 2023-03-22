@@ -19,7 +19,7 @@ import { dateFormat } from 'utils';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { addressFormat } from '@portkey-wallet/utils';
 import { useCommonState } from 'store/Provider/hooks';
-import PortKeyHeader from 'pages/components/PortKeyHeader';
+import PromptFrame from 'pages/components/PromptFrame';
 
 export interface ITransactionQuery {
   item: ActivityItemType;
@@ -276,21 +276,8 @@ export default function Transaction() {
       </div>
     );
   };
-  const navigate = useNavigate();
+
   const { isPrompt } = useCommonState();
 
-  const onUserClick = useCallback(() => {
-    navigate(`/setting`);
-  }, [navigate]);
-
-  const promptContent = () => {
-    return (
-      <div className="transaction-detail portkey-prompt">
-        <PortKeyHeader onUserClick={onUserClick} />
-        {mainContent()}
-      </div>
-    );
-  };
-
-  return <>{isPrompt ? promptContent() : mainContent()}</>;
+  return <>{isPrompt ? <PromptFrame content={mainContent()} className="transaction-detail" /> : mainContent()}</>;
 }
