@@ -9,7 +9,6 @@ import GuardianApproval from 'pages/GuardianApproval';
 import Unlock from 'pages/Unlock';
 import QueryPage from 'pages/QueryPage';
 import TestSocket from 'pages/TestSocket';
-import ManageDevices from 'pages/WalletSecurity/ManageDevices';
 import SetPin from 'pages/AccountSetting/SetPin';
 import WalletSecurity from 'pages/WalletSecurity';
 import NotFound from 'pages/NotFound';
@@ -32,6 +31,8 @@ import NFT from 'pages/NFT';
 import Contacts from 'pages/Contacts';
 import Contact from 'pages/Contacts/ContactDetail';
 import AccountSetting from 'pages/AccountSetting';
+import DeviceLists from 'pages/WalletSecurity/ManageDevices/DeviceLists';
+import DeviceDetail from 'pages/WalletSecurity/ManageDevices/DeviceDetail';
 
 export const PageRouter = () =>
   useRoutes([
@@ -153,7 +154,11 @@ export const PageRouter = () =>
     },
     {
       path: '/setting/wallet-security/manage-devices',
-      element: <ManageDevices />,
+      element: <DeviceLists />,
+    },
+    {
+      path: '/setting/wallet-security/manage-devices/:managerAddress',
+      element: <DeviceDetail />,
     },
     {
       path: '/setting/wallet-security/manage-devices/verifier-account',
