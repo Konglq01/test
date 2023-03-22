@@ -210,7 +210,8 @@ export default function Transaction() {
                 <div key={'transactionFee' + idx} className="right-item">
                   <span>{`${formatWithCommas({
                     amount: item.fee,
-                    decimals: isNft ? 8 : 8,
+                    // decimals: isNft ? 8 : 8, TODO
+                    decimals: 8,
                   })} ${item.symbol ?? ''}`}</span>
                   {!isTestNet && (
                     <span className="right-usd">
@@ -228,7 +229,7 @@ export default function Transaction() {
         </span>
       </p>
     );
-  }, [feeInfo, isNft, isTestNet, t]);
+  }, [feeInfo, isTestNet, t]);
 
   const transactionUI = useCallback(() => {
     return (
