@@ -85,6 +85,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   svgStyle: {
-    marginRight: pTd(16),
+    paddingRight: pTd(24),
   },
 });

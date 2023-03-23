@@ -393,7 +393,7 @@ const SendHome: React.FC = () => {
 
               navigationService.navigate('QrScanner', { fromSendPage: true });
             }}>
-            <Svg icon="scan" size={pTd(17.5)} color={defaultColors.font2} />
+            <Svg icon="scan" size={pTd(17.5)} color={defaultColors.font2} iconStyle={styles.iconStyle} />
           </TouchableOpacity>
         ) : undefined
       }
