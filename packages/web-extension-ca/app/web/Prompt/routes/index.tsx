@@ -32,6 +32,7 @@ import Guardians from 'pages/Guardians';
 import Wallet from 'pages/Wallet';
 import Contacts from 'pages/Contacts';
 import WalletSecurity from 'pages/WalletSecurity';
+import SetNewPin from 'pages/AccountSetting/SetNewPin';
 
 export const PageRouter = () =>
   useRoutes([
@@ -98,8 +99,12 @@ export const PageRouter = () =>
           element: <AccountSetting />,
           children: [
             {
-              path: '/setting/account-setting/set-pin',
+              path: '/setting/account-setting/confirm-pin',
               element: <ConfirmPin />,
+            },
+            {
+              path: '/setting/account-setting/set-new-pin',
+              element: <SetNewPin />,
             },
           ],
         },

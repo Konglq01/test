@@ -1,11 +1,16 @@
 @import '../../../assets/theme/color.less';
 
 .account-setting-prompt {
-  .account-setting-body {
-    display: flex;
+  height: 100%;
+  display: flex;
 
-    .menu-list {
-      flex: 1;
+  .account-setting-body {
+    flex: 1;
+    .account-setting-header {
+      border-bottom: 1px solid @border-2;
     }
+  }
+  .confirm-pin-prompt {
+    flex: 1;
   }
 }

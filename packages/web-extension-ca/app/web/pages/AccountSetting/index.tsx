@@ -23,7 +23,7 @@ export default function AccountSetting() {
         label: 'Change Pin',
         key: 1,
         click: () => {
-          navigate('/setting/account-setting/set-pin');
+          navigate('/setting/account-setting/confirm-pin');
         },
       },
     ],

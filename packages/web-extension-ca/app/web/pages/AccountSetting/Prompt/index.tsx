@@ -7,11 +7,12 @@ import { Outlet } from 'react-router';
 export default function AccountSettingPrompt({ headerTitle, menuList }: IAccountSettingProps) {
   return (
     <div className="account-setting-prompt">
-      <SecondPageHeader title={headerTitle} />
       <div className="account-setting-body">
+        <SecondPageHeader className="account-setting-header" title={headerTitle} leftElement={false} />
+
         <MenuList list={menuList} height={64} />
-        <Outlet />
       </div>
+      <Outlet />
     </div>
   );
 }
