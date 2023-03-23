@@ -30,3 +30,6 @@ export const DEVICE_TYPE = (() => {
   }
   return DeviceType.OTHER;
 })();
+
+// NFT
+export const PAGE_SIZE_IN_NFT_ITEM_PROMPT = 6;
