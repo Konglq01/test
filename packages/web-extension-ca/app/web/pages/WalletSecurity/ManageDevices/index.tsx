@@ -19,7 +19,7 @@ export default function ManageDevices() {
   const navigate = useNavigate();
   const { state: manageAddress } = useLocation();
   const [stage, setStage] = useState<Stage>(Stage.DeviceLists);
-  const deviceList = useDeviceList();
+  const { deviceList } = useDeviceList();
   const [curDevice, setCurDevice] = useState<DeviceItemType>(deviceList?.[0]);
   const walletInfo = useCurrentWalletInfo();
 

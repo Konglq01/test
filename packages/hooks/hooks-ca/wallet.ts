@@ -69,7 +69,7 @@ export const useDeviceList = () => {
   const networkInfo = useCurrentNetworkInfo();
   const walletInfo = useCurrentWalletInfo();
   const chainInfo = useCurrentChain();
-  const { data, error } = useCaHolderManagerInfoQuery({
+  const { data, error, refetch } = useCaHolderManagerInfoQuery({
     client: getApolloClient(networkInfo.networkType),
     variables: {
       dto: {
@@ -81,8 +81,7 @@ export const useDeviceList = () => {
     },
     fetchPolicy: 'cache-and-network',
   });
-
-  return useMemo<DeviceItemType[]>(() => {
+  const deviceList = useMemo<DeviceItemType[]>(() => {
     if (error || !data || !data.caHolderManagerInfo || data.caHolderManagerInfo.length < 1) return [];
 
     const caHolderManagerInfo = data.caHolderManagerInfo[0];
@@ -97,6 +96,8 @@ export const useDeviceList = () => {
       })
       .reverse();
   }, [data, error]);
+
+  return { deviceList, refetch };
 };
 
 export const useSetWalletName = () => {
