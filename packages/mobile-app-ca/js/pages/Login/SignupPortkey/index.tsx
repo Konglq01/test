@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import PageContainer, { SafeAreaColorMapKeyUnit } from 'components/PageContainer';
 import { TextXXXL } from 'components/CommonText';
 import { pTd } from 'utils/unit';
@@ -22,12 +22,14 @@ import { getChainListAsync } from '@portkey-wallet/store/store-ca/wallet/actions
 import Loading from 'components/Loading';
 import myEvents from 'utils/deviceEvent';
 import useEffectOnce from 'hooks/useEffectOnce';
+import { useFocusEffect } from '@react-navigation/native';
 const safeAreaColor: SafeAreaColorMapKeyUnit[] = ['transparent', 'transparent'];
 
 const scrollViewProps = { extraHeight: 120 };
 type SignupType = 'email' | 'phone';
 function SignupEmail() {
   const { t } = useLanguage();
+  const iptRef = useRef<any>();
   const [loading] = useState<boolean>();
   const [email, setEmail] = useState<string>();
   const [errorMessage, setErrorMessage] = useState<string>();
@@ -39,7 +41,7 @@ function SignupEmail() {
     const message = checkEmail(email);
     setErrorMessage(message);
     if (message) return;
-    Loading.show();
+    Loading.show({ text: t('Checking account on the chain...') });
     try {
       let _chainInfo;
       if (!chainInfo) {
@@ -61,7 +63,7 @@ function SignupEmail() {
       setErrorMessage(handleErrorMessage(error));
     }
     Loading.hide();
-  }, [chainInfo, dispatch, email, getGuardiansInfo, getVerifierServers]);
+  }, [chainInfo, dispatch, email, getGuardiansInfo, getVerifierServers, t]);
   useEffectOnce(() => {
     const listener = myEvents.clearSignupInput.addListener(() => {
       setEmail('');
@@ -72,9 +74,18 @@ function SignupEmail() {
     };
   });
 
+  useFocusEffect(
+    useCallback(() => {
+      if (!iptRef || !iptRef?.current) return;
+      iptRef.current.focus();
+    }, []),
+  );
+
   return (
     <View style={[BGStyles.bg1, styles.card]}>
       <CommonInput
+        autoFocus
+        ref={iptRef}
         value={email}
         label="Email"
         type="general"

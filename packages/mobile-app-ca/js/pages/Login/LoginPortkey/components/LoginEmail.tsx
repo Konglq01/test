@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { View, Text, Image } from 'react-native';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { getChainListAsync } from '@portkey-wallet/store/store-ca/wallet/actions';
@@ -23,10 +23,14 @@ import { pTd } from 'utils/unit';
 import qrCode from 'assets/image/pngs/QR-code.png';
 import { PageLoginType } from '..';
 import { handleUserGuardiansList } from '@portkey-wallet/utils/guardian';
+import { useFocusEffect } from '@react-navigation/native';
+
+let timer: string | number | NodeJS.Timeout | undefined;
 
 export default function LoginEmail({ setLoginType }: { setLoginType: (type: PageLoginType) => void }) {
   const { t } = useLanguage();
   const dispatch = useAppDispatch();
+  const iptRef = useRef<any>();
   const [loading] = useState<boolean>();
   const [loginAccount, setLoginAccount] = useState<string>();
   const [errorMessage, setErrorMessage] = useState<string>();
@@ -38,7 +42,7 @@ export default function LoginEmail({ setLoginType }: { setLoginType: (type: Page
     const message = checkEmail(loginAccount);
     setErrorMessage(message);
     if (message) return;
-    Loading.show();
+    Loading.show({ text: t('Checking account on the chain...') });
     try {
       let _chainInfo;
       if (!chainInfo) {
@@ -57,7 +61,7 @@ export default function LoginEmail({ setLoginType }: { setLoginType: (type: Page
       setErrorMessage(handleErrorMessage(error));
     }
     Loading.hide();
-  }, [loginAccount, chainInfo, getVerifierServers, getGuardiansInfoWriteStore, dispatch]);
+  }, [loginAccount, t, chainInfo, getVerifierServers, getGuardiansInfoWriteStore, dispatch]);
 
   useEffectOnce(() => {
     const listener = myEvents.clearLoginInput.addListener(() => {
@@ -66,12 +70,28 @@ export default function LoginEmail({ setLoginType }: { setLoginType: (type: Page
     });
     return () => listener.remove();
   });
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!iptRef || !iptRef?.current) return;
+      timer = setTimeout(() => {
+        iptRef.current.focus();
+      }, 200);
+    }, []),
+  );
+
+  useEffect(() => {
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <View style={[BGStyles.bg1, styles.card]}>
       <Touchable style={styles.iconBox} onPress={() => setLoginType('qr-code')}>
         <Image source={qrCode} style={styles.iconStyle} />
       </Touchable>
       <CommonInput
+        autoFocus
+        ref={iptRef}
         value={loginAccount}
         label="Email"
         type="general"

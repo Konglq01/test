@@ -1,22 +1,28 @@
-'use strict';
 import React, { ReactNode } from 'react';
-import Overlay from 'rn-teaset/components/Overlay/Overlay';
 import { StyleProp, StyleSheet, ViewStyle } from 'react-native';
+import Overlay from 'rn-teaset/components/Overlay/Overlay';
 import { bottomBarHeight, screenHeight, screenWidth, statusBarHeight } from '@portkey-wallet/utils/mobile/device';
 import { defaultColors } from 'assets/theme';
 import GStyles from 'assets/theme/GStyles';
 import { pTd } from 'utils/unit';
+import TransformView from 'components/TransformView';
+import { ViewStyleType } from 'types/styles';
 
 export type OverlayInterface = {
   close?: () => void;
 };
 
 let elements: OverlayInterface[] = [];
-const customBounds = {
-  x: 0,
-  y: screenHeight,
-  width: screenWidth,
-  height: 0,
+const DefaultOverlayProps = {
+  modal: false,
+  type: 'custom',
+  overlayOpacity: 0.3,
+  customBounds: {
+    x: 0,
+    y: screenHeight,
+    width: screenWidth,
+    height: 0,
+  },
 };
 export type OverlayModalProps = {
   position?: 'bottom' | 'center';
@@ -26,11 +32,45 @@ export type OverlayModalProps = {
   type?: 'custom' | 'zoomOut';
   autoKeyboardInsets?: boolean;
   animated?: boolean;
+  enabledNestScrollView?: boolean;
 };
+
+export function OverlayTransformView({
+  containerStyle,
+  children,
+  enabledNestScrollView,
+}: {
+  containerStyle?: ViewStyleType;
+  children: ReactNode;
+  enabledNestScrollView?: boolean;
+}) {
+  return (
+    <TransformView
+      maxScale={1}
+      minScale={1}
+      tension={false}
+      style={styles.flex0}
+      containerStyle={containerStyle}
+      disableScroll={['up', 'horizontal']}
+      enabledNestScrollView={enabledNestScrollView}
+      onDidTransform={(_: number, translateY: number) => {
+        console.log('onDidTransform', translateY);
+        translateY > 50 && OverlayModal.hide();
+      }}>
+      {children}
+    </TransformView>
+  );
+}
 
 export default class OverlayModal extends React.Component {
   static show(component: ReactNode, overlayProps: OverlayModalProps = {}) {
-    const { position, style: propsStyle, containerStyle: propsContainerStyle, ...props } = overlayProps;
+    const {
+      position,
+      style: propsStyle,
+      containerStyle: propsContainerStyle,
+      enabledNestScrollView,
+      ...props
+    } = overlayProps;
     const style: StyleProp<ViewStyle> = [];
     const containerStyle: StyleProp<ViewStyle> = [];
     if (position) {
@@ -42,20 +82,32 @@ export default class OverlayModal extends React.Component {
     }
     propsStyle && style.push(propsStyle);
     propsContainerStyle && containerStyle.push(propsContainerStyle);
-    const overlayView = (
-      <Overlay.PopView
-        modal={false}
-        type="custom"
-        ref={(v: OverlayInterface) => elements.push(v)}
-        style={style}
-        overlayOpacity={0.3}
-        containerStyle={containerStyle}
-        customBounds={customBounds}
-        {...props}>
-        {component}
-      </Overlay.PopView>
-    );
-    Overlay.show(overlayView);
+    if (position === 'bottom') {
+      const overlayView = (
+        <Overlay.PopView
+          {...DefaultOverlayProps}
+          containerStyle={[GStyles.flex1, style]}
+          ref={(v: OverlayInterface) => elements.push(v)}
+          {...props}>
+          <OverlayTransformView containerStyle={containerStyle} enabledNestScrollView={!!enabledNestScrollView}>
+            {component}
+          </OverlayTransformView>
+        </Overlay.PopView>
+      );
+      Overlay.show(overlayView);
+    } else {
+      const overlayView = (
+        <Overlay.PopView
+          {...DefaultOverlayProps}
+          style={style}
+          containerStyle={containerStyle}
+          ref={(v: OverlayInterface) => elements.push(v)}
+          {...props}>
+          {component}
+        </Overlay.PopView>
+      );
+      Overlay.show(overlayView);
+    }
   }
 
   static hide() {
@@ -97,6 +149,12 @@ const styles = StyleSheet.create({
     backgroundColor: defaultColors.bg1,
     ...GStyles.radiusArg(pTd(10), pTd(10), 0, 0),
     overflow: 'hidden',
+  },
+  transformViewContainer: {
+    justifyContent: 'flex-start',
+  },
+  flex0: {
+    flex: 0,
   },
 });
 

@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import './index.less';
 import { NetworkItem } from '@portkey-wallet/types/types-ca/network';
 import { ChainItemType } from '@portkey-wallet/store/store-ca/wallet/type';
+import { useLoading } from 'store/Provider/hooks';
 
 interface EmailTabProps {
   onSuccess: (email: string) => void;
@@ -18,15 +19,19 @@ export default function EmailTab({ currentNetwork, currentChain, onSuccess }: Em
   const [val, setVal] = useState<string>();
   const emailInputInstance = useRef<EmailInputInstance>();
   const { t } = useTranslation();
+  const { setLoading } = useLoading();
 
   const onSignUp = useCallback(async () => {
     try {
+      setLoading(true, 'Checking account on the chain...');
       await emailInputInstance?.current?.validateEmail(val, 'registered');
       val && onSuccess(val);
     } catch (error: any) {
       setError(error);
+    } finally {
+      setLoading(false);
     }
-  }, [onSuccess, val]);
+  }, [onSuccess, setLoading, val]);
 
   return (
     <div className="email-sign-wrapper">

@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import OverlayModal from 'components/OverlayModal';
 import { FlatList, StyleSheet } from 'react-native';
-import { TextXL } from 'components/CommonText';
 import { ModalBody } from 'components/ModalBody';
 import CommonInput from 'components/CommonInput';
 import { useAppCASelector } from '@portkey-wallet/hooks/hooks-ca';
@@ -19,6 +18,7 @@ import { useChainIdList } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { fetchAllTokenListAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
 import NoData from 'components/NoData';
 import { useGStyles } from 'assets/theme/useGStyles';
+import myEvents from '../../utils/deviceEvent';
 
 type onFinishSelectTokenType = (tokenItem: TokenItemShowType) => void;
 type TokenListProps = {
@@ -63,8 +63,7 @@ const TokenList = ({ onFinishSelectToken }: TokenListProps) => {
   });
 
   return (
-    <ModalBody modalBodyType="bottom" style={gStyles.overlayStyle}>
-      <TextXL style={styles.title}>{t('Select Token')}</TextXL>
+    <ModalBody modalBodyType="bottom" title={t('Select Token')} style={gStyles.overlayStyle}>
       <CommonInput
         placeholder={t('Token Name')}
         containerStyle={styles.containerStyle}
@@ -77,7 +76,16 @@ const TokenList = ({ onFinishSelectToken }: TokenListProps) => {
       />
       {!!debounceKeyword && !tokenDataShowInMarket.length && <NoData noPic message={t('There is no search result.')} />}
       <FlatList
+        disableScrollViewPanResponder={true}
         style={styles.flatList}
+        onScroll={({ nativeEvent }) => {
+          const {
+            contentOffset: { y: scrollY },
+          } = nativeEvent;
+          if (scrollY <= 0) {
+            myEvents.nestScrollForPullCloseModal.emit();
+          }
+        }}
         data={tokenDataShowInMarket || []}
         renderItem={renderItem}
         keyExtractor={(item: any) => item.id || ''}
@@ -89,6 +97,7 @@ const TokenList = ({ onFinishSelectToken }: TokenListProps) => {
 export const showTokenList = (props: TokenListProps) => {
   OverlayModal.show(<TokenList {...props} />, {
     position: 'bottom',
+    enabledNestScrollView: true,
   });
 };
 

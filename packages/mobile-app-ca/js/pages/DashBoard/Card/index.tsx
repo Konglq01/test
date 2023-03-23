@@ -49,6 +49,7 @@ const Card: React.FC<CardProps> = () => {
       <View style={styles.refreshWrap}>
         <Text style={styles.block} />
         <TouchableOpacity
+          style={styles.svgWrap}
           onPress={async () => {
             if (!(await requestQrPermission())) return showDialog();
             navigationService.navigate('QrScanner');
