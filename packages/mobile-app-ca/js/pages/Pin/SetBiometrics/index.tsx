@@ -75,7 +75,7 @@ export default function SetBiometrics() {
     }
     if (managerInfo) {
       timer.current?.remove();
-      Loading.show({ text: t('Creating your wallet account on-chain...') });
+      Loading.show({ text: t('Creating address on the chain...') });
       timer.current = onIntervalGetResult({
         managerInfo,
         onPass: (info: CAInfo) => {

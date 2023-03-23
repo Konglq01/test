@@ -47,7 +47,7 @@ export function useOnManagerAddressAndQueryResult() {
       verifierInfo?: VerifierInfo;
       guardiansApproved?: GuardiansApproved;
     }) => {
-      Loading.show({ text: t('Creating your wallet account on-chain...') });
+      Loading.show({ text: t('Creating address on the chain...') });
       await sleep(1000);
       const isRecovery = managerInfo.verificationType === VerificationType.communityRecovery;
       try {
@@ -126,7 +126,7 @@ export function useOnManagerAddressAndQueryResult() {
         pinRef?.current?.reset();
       }
     },
-    [biometricsReady, dispatch, onIntervalGetResult],
+    [biometricsReady, dispatch, onIntervalGetResult, t],
   );
 }
 
