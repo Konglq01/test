@@ -70,12 +70,11 @@ const QrScanner: React.FC<QrScannerProps> = () => {
     }
   };
 
-  // TODO: test ui in Mason's Phone
   return (
     <View style={PageStyle.wrapper}>
       {refresh ? null : (
         <Camera
-          // ratio={Camera.getSupportedRatiosAsync()}
+          ratio={'16:9'}
           style={[PageStyle.barCodeScanner, !isIos && PageStyle.barCodeScannerAndroid]}
           onBarCodeScanned={handleBarCodeScanned}>
           <SafeAreaView style={PageStyle.innerView}>
