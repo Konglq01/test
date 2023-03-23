@@ -9,6 +9,7 @@ const EventList = [
   'clearSignupInput',
   'refreshGuardiansList',
   'setCountry',
+  'refreshDeviceList',
 ] as const;
 
 // eslint-disable-next-line no-new-func

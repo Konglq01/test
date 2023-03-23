@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PageContainer from 'components/PageContainer';
 import { StyleSheet } from 'react-native';
 import { defaultColors } from 'assets/theme';
@@ -9,10 +9,20 @@ import DeviceItem from './components/DeviceItem';
 import navigationService from 'utils/navigationService';
 import { FontStyles } from 'assets/theme/styles';
 import { pTd } from 'utils/unit';
+import myEvents from 'utils/deviceEvent';
 
 const DeviceList: React.FC = () => {
-  const deviceList = useDeviceList();
+  const { deviceList, refetch } = useDeviceList();
   const walletInfo = useCurrentWalletInfo();
+
+  useEffect(() => {
+    const listener = myEvents.refreshDeviceList.addListener(() => {
+      refetch();
+    });
+    return () => {
+      listener.remove();
+    };
+  }, [refetch]);
 
   return (
     <PageContainer

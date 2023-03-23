@@ -10,7 +10,7 @@ import './index.less';
 export default function WalletSecurity() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const deviceList = useDeviceList();
+  const { deviceList } = useDeviceList();
 
   const MenuList = useMemo(
     () => [
