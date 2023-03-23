@@ -84,7 +84,7 @@ export default function AmountToken({
             inputContainerStyle={styles.inputContainerStyle}
             inputStyle={[styles.inputStyle, sendTokenNumber === '0' && FontStyles.font7]}
             onChangeText={v => {
-              const newAmount = parseInputChange(v.trim(), ZERO, 4).replace(/^0+\./g, '0.').replace(/^0+/, '0');
+              const newAmount = parseInputChange(v.trim(), ZERO, 4);
               setSendTokenNumber(newAmount);
             }}
           />
