@@ -5,6 +5,7 @@ export type AppleUserInfo = {
   userId: string;
   email: string;
   expirationTime: Date;
+  isPrivate: boolean;
 };
 
 export function parseAppleIdentityToken(identityToken?: string | null) {
@@ -15,7 +16,11 @@ export function parseAppleIdentityToken(identityToken?: string | null) {
   const isExpired = expirationTime < new Date();
   const userId = payload.sub;
   const email = payload.email;
-  return { isExpired, userId, email, expirationTime };
+  const isPrivate =
+    typeof payload.is_private_email === 'string'
+      ? payload.is_private_email === 'true'
+      : payload.is_private_email || !payload.email;
+  return { isExpired, userId, email, expirationTime, isPrivate };
 }
 
 type GoogleUserInfo = {

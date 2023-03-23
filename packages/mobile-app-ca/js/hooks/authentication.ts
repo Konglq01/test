@@ -34,9 +34,11 @@ export type GoogleAuthentication = {
     photo: string;
   };
 };
+
 export type AppleAuthentication = {
   user?: AppleUserInfo & {
     id: string;
+    isPrivate: boolean;
   };
 } & AppleAuthenticationCredential;
 
