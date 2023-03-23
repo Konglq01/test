@@ -105,21 +105,7 @@ export default function MyBalance() {
   const SelectTokenELe = useMemo(() => {
     const title = navTarget === 'receive' ? 'Select Token' : 'Select Assets';
     const searchPlaceHolder = navTarget === 'receive' ? 'Search Token' : 'Search Assets';
-    // return (
-    //   <CustomTokenDrawer
-    //     open={tokenOpen}
-    //     drawerType={navTarget}
-    //     title={title}
-    //     searchPlaceHolder={searchPlaceHolder}
-    //     height="528"
-    //     maskClosable={true}
-    //     placement="bottom"
-    //     onClose={() => setTokenOpen(false)}
-    //     onChange={(v, type) => {
-    //       onSelectedToken(v, type);
-    //     }}
-    //   />
-    // );
+
     return isPrompt ? (
       <CustomTokenModal
         open={tokenOpen}
