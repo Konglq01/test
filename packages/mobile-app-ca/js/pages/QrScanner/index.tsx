@@ -70,18 +70,18 @@ const QrScanner: React.FC<QrScannerProps> = () => {
     }
   };
 
-  // TODO: test ui in Mason's Phone
   return (
     <View style={PageStyle.wrapper}>
       {refresh ? null : (
         <Camera
-          // ratio={Camera.getSupportedRatiosAsync()}
+          ratio={'16:9'}
           style={[PageStyle.barCodeScanner, !isIos && PageStyle.barCodeScannerAndroid]}
           onBarCodeScanned={handleBarCodeScanned}>
           <SafeAreaView style={PageStyle.innerView}>
             <View style={PageStyle.iconWrap}>
               <Text style={PageStyle.leftBlock} />
               <TouchableOpacity
+                style={PageStyle.svgWrap}
                 onPress={() => {
                   navigationService.goBack();
                 }}>
@@ -128,9 +128,8 @@ export const PageStyle = StyleSheet.create({
     height: '100%',
   },
   iconWrap: {
+    marginTop: pTd(16),
     width: '100%',
-    height: pTd(50),
-    marginRight: pTd(25),
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'flex-end',
@@ -138,10 +137,12 @@ export const PageStyle = StyleSheet.create({
   },
   icon: {
     width: pTd(40),
-    marginRight: pTd(5),
+  },
+  svgWrap: {
+    ...GStyles.paddingArg(16, 0, 16, 16),
   },
   scan: {
-    marginTop: pTd(142),
+    marginTop: pTd(136),
     marginLeft: 'auto',
     marginRight: 'auto',
   },
