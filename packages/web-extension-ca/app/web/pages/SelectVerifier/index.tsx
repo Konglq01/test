@@ -55,7 +55,7 @@ export default function SelectVerifier() {
       setLoading(true);
       const result = await verification.sendVerificationCode({
         params: {
-          guardianIdentifier: loginAccount.guardianAccount,
+          guardianIdentifier: loginAccount.guardianAccount.replaceAll(' ', ''),
           type: LoginType[loginAccount.loginType],
           verifierId: selectItem.id,
           chainId: DefaultChainId,
@@ -162,7 +162,9 @@ export default function SelectVerifier() {
           onCancel={() => setOpen(false)}>
           <p className="modal-content">
             {`${t('verificationCodeTip1', { verifier: selectItem?.name })} `}
-            <span className="bold">{loginAccount.guardianAccount}</span>
+            <span className="bold">{`${LoginType.Phone === loginAccount.loginType ? '+ ' : ''}${
+              loginAccount.guardianAccount
+            }`}</span>
             {` ${t('verificationCodeTip2', { type: LoginType[loginAccount.loginType] })}`}
           </p>
           <div className="btn-wrapper">

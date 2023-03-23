@@ -45,12 +45,7 @@ export default function SocialTem({ loginType }: { loginType: ISocialLogin }) {
             {loginType === 'Google' && (
               <LoginSocialGoogle
                 isOnlyGetToken
-                // typeResponse="idToken"
-                // scope="openid email profile"
                 client_id={process.env.NEXT_PUBLIC_GG_APP_ID || ''}
-                onLoginStart={() => {
-                  //
-                }}
                 onResolve={onSuccess}
                 onReject={onError}>
                 <Button className={styles['common-btn']}>
@@ -64,7 +59,7 @@ export default function SocialTem({ loginType }: { loginType: ISocialLogin }) {
               <LoginSocialApple
                 client_id={process.env.NEXT_PUBLIC_APP_APPLE_ID || ''}
                 scope={'name email'}
-                redirect_uri={'https://6bd8-123-113-146-87.jp.ngrok.io/appleAuth'}
+                redirect_uri={process.env.NEXT_PUBLIC_APP_APPLE_REDIRECT_URI || ''}
                 onResolve={onSuccess}
                 onReject={onError}>
                 <Button className={styles['common-btn']}>

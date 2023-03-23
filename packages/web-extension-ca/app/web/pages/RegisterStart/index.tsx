@@ -62,7 +62,7 @@ export default function RegisterStart() {
     try {
       const checkResult = await getHolderInfo({
         paramsOption: {
-          guardianIdentifier: identifier as string,
+          guardianIdentifier: (identifier as string).replaceAll(' ', ''),
         },
       });
       if (checkResult.guardianList?.guardians?.length > 0) {
@@ -117,6 +117,7 @@ export default function RegisterStart() {
 
   const onInputFinish = useCallback(
     (loginInfo: LoginInfo) => {
+      console.log(isHasAccount, 'isHasAccount===3');
       if (isHasAccount?.current) return onLoginFinish(loginInfo);
       return onSignFinish(loginInfo);
     },
@@ -167,11 +168,17 @@ export default function RegisterStart() {
         </div>
         <div>
           {type === 'create' && (
-            <SignCard validateEmail={validateIdentifier} onFinish={onInputFinish} onSocialSignFinish={onSocialFinish} />
+            <SignCard
+              validatePhone={validateIdentifier}
+              validateEmail={validateIdentifier}
+              onFinish={onInputFinish}
+              onSocialSignFinish={onSocialFinish}
+            />
           )}
           {type === 'scan' && <ScanCard />}
           {(!type || type === 'login') && (
             <LoginCard
+              validatePhone={validateIdentifier}
               validateEmail={validateIdentifier}
               onFinish={onInputFinish}
               onSocialLoginFinish={onSocialFinish}
