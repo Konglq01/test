@@ -14,7 +14,10 @@ export default function useLocationChange() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (location.pathname.startsWith('/unlock')) return;
+    if (location.pathname.startsWith('/unlock')) {
+      dispatch(setIsPopupInit(true));
+      return;
+    }
     if (!isPopupInit) return clearTimeout(timer);
     timer = setTimeout(() => {
       clearTimeout(timer);
