@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import OverlayModal from 'components/OverlayModal';
-import { FlatList, StyleSheet } from 'react-native';
+import { DeviceEventEmitter, FlatList, StyleSheet } from 'react-native';
 import { ModalBody } from 'components/ModalBody';
 import CommonInput from 'components/CommonInput';
 import { useAppCASelector } from '@portkey-wallet/hooks/hooks-ca';
@@ -76,6 +76,9 @@ const TokenList = ({ onFinishSelectToken }: TokenListProps) => {
       />
       {!!debounceKeyword && !tokenDataShowInMarket.length && <NoData noPic message={t('There is no search result.')} />}
       <FlatList
+        onLayout={e => {
+          DeviceEventEmitter.emit('nestScrollViewLayout', e.nativeEvent.layout);
+        }}
         disableScrollViewPanResponder={true}
         style={styles.flatList}
         onScroll={({ nativeEvent }) => {
