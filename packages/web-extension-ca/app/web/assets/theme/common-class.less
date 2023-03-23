@@ -173,9 +173,12 @@ td {
   height: 16px;
 }
 
+// =========================================================
+// ============ Large screen adaptation [start] ============
+// =========================================================
 .portkey-prompt {
   width: 100%;
-  min-width: 360px;
+  min-width: @min-width;
   min-height: 100%;
   padding-bottom: 24px !important;
   background-color: @bg-19;
@@ -187,16 +190,22 @@ td {
     margin: 0 auto;
   }
 
-  .portkey-body {
+  .portkey-body,
+  .portkey-home-body {
     min-height: calc(100vh - 96px);
     margin: auto;
   }
+  .portkey-prompt-media();
+}
 
-  @media screen and (min-width: 1820px) {
+.portkey-prompt-media {
+  // screen >= 1820, contentWidth = 1440
+  @media screen and (min-width: @max-screen) {
     .portkey-body,
+    .portkey-home-body,
     .portkey-header {
-      max-width: 1440px;
-      width: 1440px;
+      max-width: @max-width;
+      width: @max-width;
 
       .portkey-header-body {
         padding-left: 0;
@@ -204,50 +213,62 @@ td {
       }
     }
   }
-  @media screen and (max-width: 1819px) and (min-width: 1280px) {
+  // 1280 < screen < 1820, maxContentWidth = 1440, marginLeftAndRight = 190
+  @media screen and (max-width: 1819px) and (min-width: @mid-screen) {
     .portkey-header {
-      width: calc(100vw - 380px);
+      width: calc(100vw - @max-margin * 2);
 
       .portkey-header-body {
         padding-left: 0;
         padding-right: 0;
       }
     }
-    .portkey-body {
-      width: calc(100vw - 380px);
+
+    .portkey-body,
+    .portkey-home-body {
+      width: calc(100vw - @max-margin * 2);
     }
   }
-  @media screen and (max-width: 1279px) and (min-width: 768px) {
+  // 768 < screen < 1280, maxContentWidth = 1024, marginLeftAndRight = 44
+  @media screen and (max-width: 1279px) and (min-width: @min-screen) {
     .portkey-header {
-      max-width: 1024px;
-      width: calc(100vw - 88px);
+      max-width: @mid-width;
+      width: calc(100vw - @min-margin * 2);
       .portkey-header-body {
         padding-left: 0;
         padding-right: 0;
       }
     }
-    .portkey-body {
-      max-width: 1024px;
-      width: calc(100vw - 88px);
+    .portkey-body,
+    .portkey-home-body {
+      max-width: @mid-width;
+      width: calc(100vw - @min-margin * 2);
     }
   }
+  // screen < 768, maxContentWidth = screen, minContentWidth = 360, paddingLeftAndRight = 24
   @media screen and (max-width: 767px) {
     .portkey-header {
       width: 100vw;
-      min-width: 360px;
+      min-width: @min-width;
     }
-    .portkey-body {
+    .portkey-body,
+    .portkey-home-body {
       width: 100vw;
-      min-width: 360px;
+      min-width: @min-width;
       padding-left: 24px;
       padding-right: 24px;
     }
   }
 }
 
+// This style is suitable for detail pages, such as transaction、asset preview page...
 .detail-page-prompt {
   width: inherit;
-  max-width: 440px;
-  min-width: 360px;
+  max-width: @detail-width;
+  min-width: @min-width;
   height: calc(100vh - 96px);
+  max-height: @max-detail-height;
 }
+// =========================================================
+// ============= Large screen adaptation [end] =============
+// =========================================================
