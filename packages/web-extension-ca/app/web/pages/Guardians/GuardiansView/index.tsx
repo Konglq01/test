@@ -89,12 +89,7 @@ export default function GuardiansView() {
           },
         });
         console.log('unSetLoginAccount', result);
-        dispatch(
-          setOpGuardianAction({
-            ...opGuardian,
-            isLoginAccount: false,
-          }),
-        );
+        getGuardianList({ caHash: walletInfo.caHash });
         setLoading(false);
         setTipOpen(false);
       } else {
@@ -145,6 +140,7 @@ export default function GuardiansView() {
     currentGuardian,
     currentNetwork,
     dispatch,
+    getGuardianList,
     navigate,
     opGuardian,
     passwordSeed,
