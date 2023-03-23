@@ -35,7 +35,6 @@ export default function GuardianApproval() {
     return filterVerifiedList;
   }, [opGuardian, preGuardian, state, userGuardianStatus]);
 
-  console.log(userVerifiedList, userGuardianStatus, 'userGuardianStatus==');
   const approvalLength = useMemo(() => {
     return getApprovalCount(userVerifiedList.length);
   }, [userVerifiedList.length]);

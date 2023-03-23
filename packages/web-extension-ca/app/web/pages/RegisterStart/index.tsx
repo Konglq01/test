@@ -19,8 +19,10 @@ import useGuardianList from 'hooks/useGuardianList';
 import { handleErrorCode, handleErrorMessage } from '@portkey-wallet/utils';
 import { message } from 'antd';
 import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
-import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import './index.less';
+import { SocialLoginFinishHandler } from 'types/wallet';
+import { getGoogleUserInfo } from '@portkey-wallet/utils/authentication';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 
 export default function RegisterStart() {
   const { type } = useParams();
@@ -30,7 +32,6 @@ export default function RegisterStart() {
   const navigate = useNavigate();
   const { setLoading } = useLoading();
   const fetchUserVerifier = useGuardianList();
-  const currentChain = useCurrentChain();
 
   const networkList = useNetworkList();
 
@@ -56,34 +57,27 @@ export default function RegisterStart() {
 
   const isHasAccount = useRef<boolean>();
 
-  const validateEmail = useCallback(
-    async (email?: string) => {
-      if (!currentChain) throw 'Could not find chain information';
-      let isLoginAccount = false;
-      try {
-        const checkResult = await getHolderInfo({
-          rpcUrl: currentChain.endPoint,
-          address: currentChain.caContractAddress,
-          chainType: currentNetwork.walletType,
-          paramsOption: {
-            guardianIdentifier: email as string,
-          },
-        });
-        if (checkResult.guardianList?.guardians?.length > 0) {
-          isLoginAccount = true;
-        }
-      } catch (error: any) {
-        const code = handleErrorCode(error);
-        if (code?.toString() === '3002') {
-          isLoginAccount = false;
-        } else {
-          throw handleErrorMessage(error || 'GetHolderInfo error');
-        }
+  const validateIdentifier = useCallback(async (identifier?: string) => {
+    let isLoginAccount = false;
+    try {
+      const checkResult = await getHolderInfo({
+        paramsOption: {
+          guardianIdentifier: identifier as string,
+        },
+      });
+      if (checkResult.guardianList?.guardians?.length > 0) {
+        isLoginAccount = true;
       }
-      isHasAccount.current = isLoginAccount;
-    },
-    [currentChain, currentNetwork.walletType],
-  );
+    } catch (error: any) {
+      const code = handleErrorCode(error);
+      if (code?.toString() === '3002') {
+        isLoginAccount = false;
+      } else {
+        throw handleErrorMessage(error || 'GetHolderInfo error');
+      }
+    }
+    isHasAccount.current = isLoginAccount;
+  }, []);
 
   const saveState = useCallback(
     (data: LoginInfo) => {
@@ -94,22 +88,12 @@ export default function RegisterStart() {
 
   const onSignFinish = useCallback(
     (data: LoginInfo) => {
-      // if(isHasAccount) return onLoginFinish(data)
       saveState(data);
       dispatch(resetGuardiansState());
       navigate('/register/select-verifier');
     },
     [dispatch, navigate, saveState],
   );
-
-  const onSocialSignFinish = useCallback(() => {
-    //
-  }, []);
-
-  const onSocialLoginFinish = useCallback((v: any) => {
-    //
-    console.log(v, 'onSocialLoginFinish====');
-  }, []);
 
   const onLoginFinish = useCallback(
     async (loginInfo: LoginInfo) => {
@@ -139,6 +123,40 @@ export default function RegisterStart() {
     [isHasAccount, onLoginFinish, onSignFinish],
   );
 
+  const onSocialFinish: SocialLoginFinishHandler = useCallback(
+    async ({ type, data }) => {
+      try {
+        if (!data) throw 'Action error';
+        if (type === 'Google') {
+          const userInfo = await getGoogleUserInfo(data?.access_token);
+          if (!userInfo?.id) throw userInfo;
+          await validateIdentifier(userInfo.id);
+          onInputFinish?.({
+            guardianAccount: userInfo.id, // account
+            loginType: LoginType[type],
+            authenticationInfo: { [userInfo.id]: data?.access_token },
+            createType: isHasAccount.current ? 'login' : 'register',
+          });
+        } else if (type === 'Apple') {
+          // const userInfo = await getGoogleUserInfo(data?.accessToken);
+          // await validateIdentifier(userInfo.id);
+          // onInputFinish?.({
+          //   guardianAccount: userInfo.id, // account
+          //   loginType: LoginType[type],
+          //   createType: isHasAccount.current ? 'login' : 'register',
+          // });
+        } else {
+          message.error(`LoginType:${type} is not support`);
+        }
+      } catch (error) {
+        console.log(error, 'error===onSocialSignFinish');
+        const msg = handleErrorMessage(error);
+        message.error(msg);
+      }
+    },
+    [onInputFinish, validateIdentifier],
+  );
+
   return (
     <div>
       <RegisterHeader />
@@ -149,14 +167,14 @@ export default function RegisterStart() {
         </div>
         <div>
           {type === 'create' && (
-            <SignCard validateEmail={validateEmail} onFinish={onInputFinish} onSocialSignFinish={onSocialSignFinish} />
+            <SignCard validateEmail={validateIdentifier} onFinish={onInputFinish} onSocialSignFinish={onSocialFinish} />
           )}
           {type === 'scan' && <ScanCard />}
           {(!type || type === 'login') && (
             <LoginCard
-              validateEmail={validateEmail}
+              validateEmail={validateIdentifier}
               onFinish={onInputFinish}
-              onSocialLoginFinish={onSocialLoginFinish}
+              onSocialLoginFinish={onSocialFinish}
             />
           )}
           <div className="network-list-wrapper">

@@ -13,6 +13,9 @@ import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verification } from 'utils/api';
 import './index.less';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import { handleError } from '@portkey-wallet/utils';
+import { useVerifyToken } from 'hooks/authentication';
+import { setRegisterVerifierAction } from 'store/reducers/loginCache/actions';
 
 export default function SelectVerifier() {
   const { verifierMap } = useGuardiansInfo();
@@ -40,6 +43,8 @@ export default function SelectVerifier() {
   const [selectVal, setSelectVal] = useState<string>(selectOptions?.[0]?.value);
 
   const selectItem = useMemo(() => verifierMap?.[selectVal], [selectVal, verifierMap]);
+
+  const verifyToken = useVerifyToken();
 
   const verifyHandler = useCallback(async () => {
     try {
@@ -86,6 +91,45 @@ export default function SelectVerifier() {
 
   const verifierShow = useMemo(() => Object.values(verifierMap ?? {}).slice(0, 3), [verifierMap]);
 
+  const onConfirmAuth = useCallback(async () => {
+    try {
+      setLoading(true);
+      if (!loginAccount?.loginType) return;
+      const rst = await verifyToken(loginAccount.loginType, {
+        accessToken: loginAccount.authenticationInfo?.[loginAccount.guardianAccount || ''],
+        id: loginAccount.guardianAccount,
+        verifierId: selectItem?.id,
+        chainId: DefaultChainId,
+      });
+      dispatch(
+        setRegisterVerifierAction({
+          verifierId: selectItem?.id as string,
+          verificationDoc: rst.verificationDoc,
+          signature: rst.signature,
+        }),
+      );
+      navigate('/login/set-pin/register');
+    } catch (error) {
+      const msg = handleError(error);
+      message.error(msg);
+    } finally {
+      setLoading(false);
+    }
+  }, [dispatch, loginAccount, navigate, selectItem?.id, setLoading, verifyToken]);
+
+  const onConfirm = useCallback(async () => {
+    switch (loginAccount?.loginType) {
+      case LoginType.Apple:
+      case LoginType.Google:
+        onConfirmAuth();
+        break;
+      default: {
+        setOpen(true);
+        break;
+      }
+    }
+  }, [loginAccount, onConfirmAuth]);
+
   return (
     <div className="common-page select-verifier-wrapper">
       <PortKeyTitle leftElement leftCallBack={() => navigate('/register/start/create')} />
@@ -104,7 +148,7 @@ export default function SelectVerifier() {
             </li>
           ))}
         </ul>
-        <Button className="confirm-btn" type="primary" onClick={() => setOpen(true)}>
+        <Button className="confirm-btn" type="primary" onClick={onConfirm}>
           {t('Confirm')}
         </Button>
       </div>

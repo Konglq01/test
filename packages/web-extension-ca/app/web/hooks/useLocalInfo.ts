@@ -7,7 +7,7 @@ const useLocalInfo = () => {
   const ipInfo = useIpInfo();
   const dispatch = useAppDispatch();
   useEffect(() => {
-    ipInfo &&
+    ipInfo?.country &&
       dispatch(
         setCountryCodeAction({
           index: ipInfo.country[0],

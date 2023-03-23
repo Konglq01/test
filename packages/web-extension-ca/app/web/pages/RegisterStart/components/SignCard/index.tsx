@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 import InputLogin from '../InputLogin';
 import SocialLogin from '../SocialLogin';
 import { LoginInfo } from 'store/reducers/loginCache/type';
-import { ValidateHandler } from 'types/wallet';
+import { SocialLoginFinishHandler, ValidateHandler } from 'types/wallet';
 
 enum STEP {
   socialLogin,
@@ -16,7 +16,7 @@ export default function SignCard({
 }: {
   onFinish: (data: LoginInfo) => void;
   validateEmail?: ValidateHandler;
-  onSocialSignFinish: (data: any) => void;
+  onSocialSignFinish: SocialLoginFinishHandler;
 }) {
   const [step, setStep] = useState<STEP>(STEP.socialLogin);
 
