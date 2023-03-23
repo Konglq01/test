@@ -89,12 +89,13 @@ export default function GuardiansView() {
           },
         });
         console.log('unSetLoginAccount', result);
-        dispatch(
-          setOpGuardianAction({
-            ...opGuardian,
-            isLoginAccount: false,
-          }),
-        );
+        // dispatch(
+        //   setOpGuardianAction({
+        //     ...opGuardian,
+        //     isLoginAccount: false,
+        //   }),
+        // );
+        getGuardianList({ caHash: walletInfo.caHash });
         setLoading(false);
         setTipOpen(false);
       } else {

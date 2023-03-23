@@ -10,7 +10,7 @@ import {
 } from 'store/Provider/hooks';
 import { useCallback, useMemo } from 'react';
 import { message } from 'antd';
-import { setOpGuardianAction, setUserGuardianItemStatus } from '@portkey-wallet/store/store-ca/guardians/actions';
+import { setUserGuardianItemStatus } from '@portkey-wallet/store/store-ca/guardians/actions';
 import { VerifierInfo, VerifyStatus } from '@portkey-wallet/types/verifier';
 import './index.less';
 import PortKeyTitle from 'pages/components/PortKeyTitle';
@@ -26,6 +26,7 @@ import { setRegisterVerifierAction } from 'store/reducers/loginCache/actions';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
 import aes from '@portkey-wallet/utils/aes';
 import { handleVerificationDoc } from '@portkey-wallet/utils/guardian';
+import useGuardianList from 'hooks/useGuardianList';
 
 export default function VerifierAccount() {
   const { loginAccount } = useLoginInfo();
@@ -41,6 +42,7 @@ export default function VerifierAccount() {
   const currentChain = useCurrentChain();
   const { setLoading } = useLoading();
   const { passwordSeed } = useUserInfo();
+  const getGuardianList = useGuardianList();
 
   const onSuccessInGuardian = useCallback(
     async (res: VerifierInfo) => {
@@ -70,13 +72,7 @@ export default function VerifierAccount() {
             },
           });
           console.log('setLoginAccount', result);
-          opGuardian &&
-            dispatch(
-              setOpGuardianAction({
-                ...opGuardian,
-                isLoginAccount: true,
-              }),
-            );
+          getGuardianList({ caHash: walletInfo.caHash });
           setLoading(false);
           navigate('/setting/guardians/view');
         } catch (error: any) {
