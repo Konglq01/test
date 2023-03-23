@@ -2,23 +2,25 @@
 
 import { useCallback, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useEffectOnce } from 'react-use';
 import { useAppDispatch, useCommonState } from 'store/Provider/hooks';
 import { setIsPopupInit } from 'store/reducers/common/slice';
 import { setLocalStorage } from 'utils/storage/chromeStorage';
+let timer: NodeJS.Timeout;
 
 export default function useLocationChange() {
   const location = useLocation();
-  const { isPrompt } = useCommonState();
+  const { isPrompt, isPopupInit } = useCommonState();
 
   const dispatch = useAppDispatch();
 
-  useEffectOnce(() => {
-    const timer = setTimeout(() => {
+  useEffect(() => {
+    if (location.pathname.startsWith('/unlock')) return;
+    if (!isPopupInit) return clearTimeout(timer);
+    timer = setTimeout(() => {
       clearTimeout(timer);
       dispatch(setIsPopupInit(false));
     }, 500);
-  });
+  }, [dispatch, isPopupInit, location.pathname]);
 
   const locationSet = useCallback(async () => {
     let locationState = null;
