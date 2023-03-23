@@ -9,7 +9,7 @@ import navigationService from 'utils/navigationService';
 import MenuItem from '../components/MenuItem';
 
 const WalletSecurity: React.FC = () => {
-  const deviceList = useDeviceList();
+  const { deviceList } = useDeviceList();
 
   return (
     <PageContainer

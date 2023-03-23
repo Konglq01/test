@@ -37,7 +37,7 @@ export default function ContactCard({ user, className, fromRecents = true, onCha
     <Collapse key={user.id} className={clsx('contact-card', className)}>
       <Collapse.Panel header={header} key={user.id}>
         <div className="content">
-          {user.addresses.map((address: RecentAddressItem) => (
+          {user?.addresses?.map((address: RecentAddressItem) => (
             <p
               key={address.address}
               className={isDisabled(address?.transactionTime) ? 'disabled' : ''}

@@ -231,8 +231,9 @@ export default function GuardianApproval() {
         guardiansStatus,
       );
       if (req && !req.error) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
         CommonToast.success('Device Deleted');
-        // myEvents.refreshGuardiansList.emit();
+        myEvents.refreshDeviceList.emit();
         navigationService.navigate('DeviceList');
       } else {
         CommonToast.fail(req?.error?.message || '');

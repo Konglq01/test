@@ -77,7 +77,7 @@ export const useFetchSymbolImages = () => {
 
   useEffect(() => {
     dispatch(getSymbolImagesAsync());
-  });
+  }, []);
 };
 
 export const useSymbolImages = () => {
