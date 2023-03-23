@@ -115,6 +115,24 @@ export function useAppleAuthentication() {
     setResponse(undefined);
     const appleInfo = await appleAuthentication.signInAsync();
     const user = parseAppleIdentityToken(appleInfo.identityToken);
+    if (appleInfo.fullName?.familyName) {
+      try {
+        await request.verify.sendAppleUserExtraInfo({
+          params: {
+            identityToken: appleInfo.identityToken,
+            userInfo: {
+              name: {
+                firstName: appleInfo.fullName?.givenName,
+                lastName: appleInfo.fullName?.familyName,
+              },
+              email: user?.email,
+            },
+          },
+        });
+      } catch (error) {
+        console.log(error, '======error');
+      }
+    }
     const userInfo = { ...appleInfo, user: { ...user, id: user?.userId } } as AppleAuthentication;
     setResponse(userInfo);
     return userInfo;
