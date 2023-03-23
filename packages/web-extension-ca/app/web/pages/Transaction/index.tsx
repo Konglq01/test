@@ -18,6 +18,8 @@ import { useIsTestnet } from 'hooks/useNetwork';
 import { dateFormat } from 'utils';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { addressFormat } from '@portkey-wallet/utils';
+import { useCommonState } from 'store/Provider/hooks';
+import PromptFrame from 'pages/components/PromptFrame';
 
 export interface ITransactionQuery {
   item: ActivityItemType;
@@ -252,24 +254,30 @@ export default function Transaction() {
     );
   }, [openOnExplorer, t]);
 
-  return (
-    <div className="transaction-detail-modal">
-      <div className="header">
-        <CustomSvg type="Close2" onClick={onClose} />
-      </div>
-      <div className="transaction-info">
-        <div className="method-wrap">
-          <p className="method-name">
-            {transactionTypesMap(activityItem.transactionType, activityItem.nftInfo?.nftId)}
-          </p>
-          {isNft ? nftHeaderUI() : tokenHeaderUI()}
+  const mainContent = () => {
+    return (
+      <div className={clsx(['transaction-detail-modal', isPrompt ? 'detail-page-prompt' : null])}>
+        <div className="header">
+          <CustomSvg type="Close2" onClick={onClose} />
         </div>
-        {statusAndDateUI()}
-        {fromToUI()}
-        {networkUI()}
-        {transactionUI()}
-        {viewOnExplorerUI()}
+        <div className="transaction-info">
+          <div className="method-wrap">
+            <p className="method-name">
+              {transactionTypesMap(activityItem.transactionType, activityItem.nftInfo?.nftId)}
+            </p>
+            {isNft ? nftHeaderUI() : tokenHeaderUI()}
+          </div>
+          {statusAndDateUI()}
+          {fromToUI()}
+          {networkUI()}
+          {transactionUI()}
+          {viewOnExplorerUI()}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
+
+  const { isPrompt } = useCommonState();
+
+  return <>{isPrompt ? <PromptFrame content={mainContent()} className="transaction-detail" /> : mainContent()}</>;
 }
