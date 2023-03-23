@@ -43,7 +43,7 @@ export const useRemoveOtherManage = () => {
         },
       });
       setLoading(false);
-      navigate('/setting/wallet-security/manage-devices');
+      navigate('/setting/wallet-security/manage-devices', { state: 'update' });
     } catch (error: any) {
       setLoading(false);
       console.log('---remove-other-manage-error', error);

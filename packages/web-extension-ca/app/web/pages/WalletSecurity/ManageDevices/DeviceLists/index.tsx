@@ -2,18 +2,31 @@ import CustomSvg from 'components/CustomSvg';
 import { useTranslation } from 'react-i18next';
 import { useCurrentWalletInfo, useDeviceList } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { dateFormat } from 'utils';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { DeviceItemType, DeviceType } from '@portkey-wallet/types/types-ca/device';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import { getDeviceIcon } from 'utils/device';
 import BackHeader from 'components/BackHeader';
+import { sleep } from '@portkey-wallet/utils';
 import './index.less';
 
 export default function DeviceLists() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const deviceList = useDeviceList();
+  const { state } = useLocation();
+  const { deviceList, refetch } = useDeviceList();
   const walletInfo = useCurrentWalletInfo();
+
+  const handleRefresh = useCallback(async () => {
+    await sleep(1000);
+    refetch();
+  }, [refetch]);
+
+  useEffect(() => {
+    if (state === 'update') {
+      handleRefresh();
+    }
+  }, [handleRefresh, state]);
 
   const handleClick = useCallback(
     (item: DeviceItemType) => {
@@ -21,7 +34,6 @@ export default function DeviceLists() {
     },
     [navigate],
   );
-  console.log('deviceList', deviceList);
 
   const handleBack = useCallback(() => {
     navigate('/setting/wallet-security');

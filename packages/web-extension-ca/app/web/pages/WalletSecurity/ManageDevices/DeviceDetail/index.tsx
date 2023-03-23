@@ -21,7 +21,7 @@ export default function DeviceDetail() {
   const { managerAddress } = useParams();
   const dispatch = useAppDispatch();
   const userGuardianList = useGuardianList();
-  const deviceList = useDeviceList();
+  const { deviceList } = useDeviceList();
   const { walletInfo } = useCurrentWallet();
   const device = useMemo(
     () => deviceList.filter((d) => d?.managerAddress === managerAddress)?.[0] || {},
