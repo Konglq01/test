@@ -10,6 +10,8 @@ import {
   PanResponderInstance,
   NativeTouchEvent,
   LayoutChangeEvent,
+  DeviceEventEmitter,
+  EmitterSubscription,
 } from 'react-native';
 import { ViewStyleType } from 'types/styles';
 import myEvents from 'utils/deviceEvent';
@@ -86,6 +88,9 @@ export default class TransformView extends Component<TransformViewProps, Transfo
   speedY!: number;
   touchTime?: Date;
   panResponderStatus: boolean | undefined;
+  nestScrollViewLayout: any;
+  currentGestureDirection: string;
+  _listener: EmitterSubscription;
   constructor(props: TransformViewProps) {
     super(props);
     this.createPanResponder();
@@ -101,6 +106,13 @@ export default class TransformView extends Component<TransformViewProps, Transfo
     myEvents.nestScrollForPullCloseModal.addListener(() => {
       this.panResponderStatus = true;
     });
+    this._listener = DeviceEventEmitter.addListener('nestScrollViewLayout', layout => {
+      this.nestScrollViewLayout = layout;
+    });
+  }
+
+  componentWillUnmount() {
+    this._listener.remove();
   }
 
   get contentLayout() {
@@ -143,7 +155,13 @@ export default class TransformView extends Component<TransformViewProps, Transfo
       onStartShouldSetPanResponder: (evt, gestureState) => false,
       onStartShouldSetPanResponderCapture: () => false,
       onMoveShouldSetPanResponder: (evt, gestureState) => {
+        const { pageY } = evt.nativeEvent;
         const { dx, dy } = gestureState;
+        if (isIos) {
+          return (
+            pageY < this.viewLayout.y + this.nestScrollViewLayout.y || (this.panResponderStatus && dx !== 0 && dy > 5)
+          );
+        }
         return this.panResponderStatus && dx !== 0 && dy !== 0 && (Math.abs(dx) > 5 || Math.abs(dy) > 5);
       },
       onMoveShouldSetPanResponderCapture: () => false,
@@ -321,6 +339,7 @@ export default class TransformView extends Component<TransformViewProps, Transfo
     const dx = t1.x - t0.x;
     const dy = t1.y - t0.y;
 
+    this.currentGestureDirection = dy > 0 ? 'down' : 'up';
     const t = touches[0].timestamp - prevTouches[0].timestamp;
     const speedX = t ? dx / t : 0;
     const speedY = t ? dy / t : 0;
