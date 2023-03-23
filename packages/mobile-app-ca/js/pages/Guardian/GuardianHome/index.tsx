@@ -37,9 +37,16 @@ export default function GuardianHome() {
     }
   }, [caHash, getGuardiansInfoWriteStore]);
 
+  const init = useCallback(async () => {
+    try {
+      await getVerifierServers();
+      refreshGuardiansList();
+    } catch (error) {
+      console.log(error, '==error');
+    }
+  }, [getVerifierServers, refreshGuardiansList]);
   useEffectOnce(() => {
-    getVerifierServers();
-    refreshGuardiansList();
+    init();
   });
 
   useEffect(() => {

@@ -24,6 +24,7 @@ export function VerifierImage({
     };
   }, [size]);
   const [imgLoading, setImgLoading] = useState(true);
+
   return (
     <View style={[styles.iconBox, iconStyle, style]}>
       {imgLoading && !!label ? <Text style={{ fontSize: pTd(18) }}>{label.charAt(0)}</Text> : null}
@@ -41,8 +42,8 @@ export function VerifierImage({
 
 const styles = StyleSheet.create({
   iconBox: {
-    // borderColor: defaultColors.border2,
-    // borderWidth: StyleSheet.hairlineWidth,
+    borderColor: defaultColors.border2,
+    borderWidth: StyleSheet.hairlineWidth,
     justifyContent: 'center',
     alignItems: 'center',
   },

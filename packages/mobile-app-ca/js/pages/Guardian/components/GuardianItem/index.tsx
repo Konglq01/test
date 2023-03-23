@@ -166,7 +166,6 @@ export default function GuardianItem({
   isSuccess,
   approvalType = ApprovalType.register,
 }: GuardianAccountItemProps) {
-  // console.log(guardianItem, '=====guardianItem');
   const itemStatus = useMemo(() => guardiansStatus?.[guardianItem.key], [guardianItem.key, guardiansStatus]);
   const disabled = isSuccess && itemStatus?.status !== VerifyStatus.Verified;
   return (
@@ -181,7 +180,7 @@ export default function GuardianItem({
         <VerifierImage
           label={guardianItem?.verifier?.name}
           size={pTd(32)}
-          uri={guardianItem.verifier?.imageUrl}
+          uri={guardianItem?.verifier?.imageUrl}
           style={styles.iconStyle}
         />
         <TextM numberOfLines={1} style={[styles.nameStyle, GStyles.flex1]}>
