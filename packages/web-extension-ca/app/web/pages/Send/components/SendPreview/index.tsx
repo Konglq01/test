@@ -111,7 +111,7 @@ export default function SendPreview({
       {isCross && symbol === 'ELF' && (
         <>
           <div className="fee-preview">
-            <span className="label">Cross chain Transaction fee</span>
+            <span className="label">Cross-chain Transaction fee</span>
             <p className="value">
               <span className="symbol">{`${unitConverter(CROSS_FEE)} ELF`}</span>
             </p>

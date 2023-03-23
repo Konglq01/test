@@ -9,9 +9,7 @@ import GuardianApproval from 'pages/GuardianApproval';
 import Unlock from 'pages/Unlock';
 import QueryPage from 'pages/QueryPage';
 import TestSocket from 'pages/TestSocket';
-// import ManageDevices from 'pages/WalletSecurity/ManageDevices';
 // import SetPin from 'pages/AccountSetting/SetPin';
-// import WalletSecurity from 'pages/WalletSecurity';
 import NotFound from 'pages/NotFound';
 import Example from 'pages/Example';
 import SignUpUI from 'pages/Example/SignUpUI';
@@ -29,6 +27,9 @@ import TokenDetail from 'pages/Token/Detail';
 import Send from 'pages/Send';
 import Receive from 'pages/Receive';
 import NFT from 'pages/NFT';
+// import WalletSecurity from 'pages/WalletSecurity';
+// import DeviceLists from 'pages/WalletSecurity/ManageDevices/DeviceLists';
+// import DeviceDetail from 'pages/WalletSecurity/ManageDevices/DeviceDetail';
 // import Contacts from 'pages/Contacts';
 // import Contact from 'pages/Contacts/ContactDetail';
 // import AccountSetting from 'pages/AccountSetting';
@@ -153,7 +154,11 @@ export const PageRouter = () =>
     // },
     // {
     //   path: '/setting/wallet-security/manage-devices',
-    //   element: <ManageDevices />,
+    //   element: <DeviceLists />,
+    // },
+    // {
+    //   path: '/setting/wallet-security/manage-devices/:managerAddress',
+    //   element: <DeviceDetail />,
     // },
     // {
     //   path: '/setting/wallet-security/manage-devices/verifier-account',
