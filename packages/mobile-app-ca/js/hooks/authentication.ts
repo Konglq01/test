@@ -1,5 +1,5 @@
 import * as WebBrowser from 'expo-web-browser';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import appleAuthentication from 'utils/appleAuthentication';
 import { AppleAuthenticationCredential } from 'expo-apple-authentication';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
@@ -7,32 +7,47 @@ import { isIos } from '@portkey-wallet/utils/mobile/device';
 import * as Google from 'expo-auth-session/providers/google';
 import Config from 'react-native-config';
 import * as Application from 'expo-application';
-import { AccessTokenRequest, makeRedirectUri, TokenResponse } from 'expo-auth-session';
+import { AccessTokenRequest, makeRedirectUri } from 'expo-auth-session';
 import { request } from '@portkey-wallet/api/api-did';
 import { ChainId } from '@portkey-wallet/types';
-import { getGoogleUserInfo, parseAppleIdentityToken } from '@portkey-wallet/utils/authentication';
+import { AppleUserInfo, getGoogleUserInfo, parseAppleIdentityToken } from '@portkey-wallet/utils/authentication';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 
 if (!isIos) {
   GoogleSignin.configure({
     offlineAccess: true,
     webClientId: Config.GOOGLE_WEB_CLIENT_ID,
-    iosClientId: Config.GOOGLE_IOS_CLIENT_ID,
   });
 } else {
   WebBrowser.maybeCompleteAuthSession();
 }
 
-export type GoogleAuthResponse = {
-  type: 'success';
-  authentication: TokenResponse | null;
+export type GoogleAuthentication = {
+  accessToken: string;
+  idToken?: string;
+  user: {
+    email: string;
+    familyName: string;
+    givenName: string;
+    id: string;
+    name: string;
+    photo: string;
+  };
 };
+export type AppleAuthentication = {
+  user?: AppleUserInfo & {
+    id: string;
+  };
+} & AppleAuthenticationCredential;
+
+export type GoogleAuthResponse = GoogleAuthentication;
 export function useGoogleAuthentication() {
   const [androidResponse, setResponse] = useState<any>();
   const [googleRequest, response, promptAsync] = Google.useAuthRequest({
     iosClientId: Config.GOOGLE_IOS_CLIENT_ID,
     androidClientId: Config.GOOGLE_ANDROID_CLIENT_ID,
   });
+
   const iosPromptAsync: () => Promise<GoogleAuthResponse> = useCallback(async () => {
     const info = await promptAsync();
     if (info.type === 'success') {
@@ -47,40 +62,60 @@ export function useGoogleAuthentication() {
         },
       });
       const authentication = await exchangeRequest.performAsync(Google.discovery);
-      return { ...info, authentication } as GoogleAuthResponse;
+
+      const userInfo = await getGoogleUserInfo(authentication?.accessToken);
+      return {
+        user: {
+          ...userInfo,
+          photo: userInfo.picture,
+          familyName: userInfo.family_name,
+          givenName: userInfo.given_name,
+        },
+        ...authentication,
+      } as GoogleAuthResponse;
     }
     const message = info.type === 'cancel' ? 'User cancel' : 'Verified failed';
     throw { ...info, message };
   }, [promptAsync, googleRequest?.codeVerifier]);
+
   const androidPromptAsync = useCallback(async () => {
+    try {
+      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+      // google services are available
+    } catch (err) {
+      throw Error('play services are not available');
+    }
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
       const token = await GoogleSignin.getTokens();
-      console.log(userInfo, token, '========userInfo');
-
-      const req: GoogleAuthResponse = { type: 'success', authentication: userInfo as any };
-      setResponse(req);
-      return req;
+      await GoogleSignin.signOut();
+      const googleResponse = { ...userInfo, ...token } as GoogleAuthResponse;
+      setResponse(googleResponse);
+      return googleResponse;
     } catch (error: any) {
       const message = error.code === statusCodes.SIGN_IN_CANCELLED ? 'User cancel' : 'Verified failed';
-
       throw { ...error, message };
     }
   }, []);
-  return {
-    googleResponse: isIos ? response : androidResponse,
-    googleSign: isIos ? iosPromptAsync : androidPromptAsync,
-  };
+  return useMemo(
+    () => ({
+      googleResponse: isIos ? response : androidResponse,
+      googleSign: isIos ? iosPromptAsync : androidPromptAsync,
+    }),
+    [androidPromptAsync, androidResponse, iosPromptAsync, response],
+  );
 }
 
 export function useAppleAuthentication() {
-  const [response, setResponse] = useState<AppleAuthenticationCredential>();
+  const [response, setResponse] = useState<AppleAuthentication>();
   const promptAsync = useCallback(async () => {
     setResponse(undefined);
-    const req = await appleAuthentication.signInAsync();
-    setResponse(req);
-    return req;
+    const appleInfo = await appleAuthentication.signInAsync();
+    const user = parseAppleIdentityToken(appleInfo.identityToken);
+    const userInfo = { ...appleInfo, user: { ...user, id: user?.userId } } as AppleAuthentication;
+    setResponse(userInfo);
+    return userInfo;
   }, []);
   return { appleResponse: response, appleSign: promptAsync };
 }
@@ -101,16 +136,15 @@ export function useVerifyGoogleToken() {
       if (accessToken) {
         try {
           const { id } = await getGoogleUserInfo(accessToken);
-          if (!id) isRequest = true;
+          if (!id || id !== params.id) isRequest = true;
         } catch (error) {
           isRequest = true;
         }
       }
       if (isRequest) {
-        const googleInfo = await googleSign();
-        accessToken = googleInfo.authentication?.accessToken;
-        const { id } = await getGoogleUserInfo(accessToken as string);
-        if (id !== params.id) throw new Error('Account does not match your guardian');
+        const userInfo = await googleSign();
+        accessToken = userInfo?.accessToken;
+        if (userInfo.user.id !== params.id) throw new Error('Account does not match your guardian');
       }
       return request.verify.verifyGoogleToken({
         params: { ...params, accessToken },

@@ -1,5 +1,12 @@
 import { customFetch } from './fetch';
 
+export type AppleUserInfo = {
+  isExpired: boolean;
+  userId: string;
+  email: string;
+  expirationTime: Date;
+};
+
 export function parseAppleIdentityToken(identityToken?: string | null) {
   if (!identityToken) return;
   const parts = identityToken.split('.');

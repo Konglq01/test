@@ -13,7 +13,6 @@ import { PageLoginType, PageType } from '../types';
 import { CountryItem } from '@portkey-wallet/types/types-ca/country';
 import TermsServiceButton from './TermsServiceButton';
 import Button from './Button';
-import { pTd } from 'utils/unit';
 import { useOnLogin } from 'hooks/login';
 import PhoneInput from 'components/PhoneInput';
 import { DefaultCountry } from '@portkey-wallet/constants/constants-ca/country';
