@@ -86,15 +86,16 @@ export default function MyBalance() {
   const onSelectedToken = useCallback(
     (v: AccountAssetItem, type: 'token' | 'nft') => {
       setTokenOpen(false);
+      const isNFT = type === 'nft';
       const state = {
         chainId: v.chainId,
-        decimals: type === 'nft' ? 0 : v.tokenInfo?.decimals,
-        address: type === 'nft' ? v?.nftInfo?.tokenContractAddress : v?.tokenInfo?.tokenContractAddress,
+        decimals: isNFT ? 0 : v.tokenInfo?.decimals,
+        address: isNFT ? v?.nftInfo?.tokenContractAddress : v?.tokenInfo?.tokenContractAddress,
         symbol: v.symbol,
         name: v.symbol,
-        imageUrl: type === 'nft' ? v.nftInfo?.imageUrl : '',
-        alias: type === 'nft' ? v.nftInfo?.alias : '',
-        tokenId: type === 'nft' ? v.nftInfo?.tokenId : '',
+        imageUrl: isNFT ? v.nftInfo?.imageUrl : '',
+        alias: isNFT ? v.nftInfo?.alias : '',
+        tokenId: isNFT ? v.nftInfo?.tokenId : '',
       };
       navigate(`/${navTarget}/${type}/${v.symbol}`, { state });
     },
