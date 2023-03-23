@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import OverlayModal from 'components/OverlayModal';
 import { DeviceEventEmitter, FlatList, StyleSheet } from 'react-native';
 import { ModalBody } from 'components/ModalBody';
@@ -62,6 +62,10 @@ const TokenList = ({ onFinishSelectToken }: TokenListProps) => {
     dispatch(fetchAllTokenListAsync({ chainIdArray: chainIdList, keyword: debounceKeyword }));
   });
 
+  const noData = useMemo(() => {
+    return debounceKeyword ? <NoData noPic message={t('There is no search result.')} /> : null;
+  }, [debounceKeyword]);
+
   return (
     <ModalBody modalBodyType="bottom" title={t('Select Token')} style={gStyles.overlayStyle}>
       <CommonInput
@@ -74,7 +78,6 @@ const TokenList = ({ onFinishSelectToken }: TokenListProps) => {
           setKeyword(v.trim());
         }}
       />
-      {!!debounceKeyword && !tokenDataShowInMarket.length && <NoData noPic message={t('There is no search result.')} />}
       <FlatList
         onLayout={e => {
           DeviceEventEmitter.emit('nestScrollViewLayout', e.nativeEvent.layout);
@@ -91,6 +94,7 @@ const TokenList = ({ onFinishSelectToken }: TokenListProps) => {
         }}
         data={tokenDataShowInMarket || []}
         renderItem={renderItem}
+        ListEmptyComponent={noData}
         keyExtractor={(item: any) => item.id || ''}
       />
     </ModalBody>

@@ -97,6 +97,7 @@ export default class TransformView extends Component<TransformViewProps, Transfo
     this.prevTouches = [];
     this.viewLayout = { x: 0, y: 0, width: 0, height: 0 };
     this.initContentLayout = { x: 0, y: 0, width: 0, height: 0 };
+    this.nestScrollViewLayout = { x: 0, y: 0, width: 0, height: 0 };
     this.state = {
       translateX: new Animated.Value(0) as AnimatedValue,
       translateY: new Animated.Value(0) as AnimatedValue,
