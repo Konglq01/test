@@ -21,8 +21,14 @@ export default {
   itemCenter: {
     alignItems: 'center',
   },
+  itemEnd: {
+    alignItems: 'end',
+  },
   alignCenter: {
     alignSelf: 'center',
+  },
+  alignEnd: {
+    alignSelf: 'flex-end',
   },
   center: {
     alignItems: 'center',

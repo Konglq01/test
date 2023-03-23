@@ -1,19 +1,17 @@
 import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
-import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
 import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
-import { divDecimals, unitConverter } from '@portkey-wallet/utils/converter';
+import { transNetworkText } from '@portkey-wallet/utils/activity';
+import { divDecimals, formatAmountShow } from '@portkey-wallet/utils/converter';
 import CustomSvg from 'components/CustomSvg';
-import { useCallback, useMemo } from 'react';
+import { useIsTestnet } from 'hooks/useNetwork';
+import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
-import { useWalletInfo } from 'store/Provider/hooks';
 
 export default function TokenList({ tokenList }: { tokenList: TokenItemShowType[] }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { currentNetwork } = useWalletInfo();
-  const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'Testnet' : ''), [currentNetwork]);
-  const symbolImages = useSymbolImages();
+  const isTestNet = useIsTestnet();
 
   const onNavigate = useCallback(
     (tokenInfo: TokenItemShowType) => {
@@ -37,17 +35,20 @@ export default function TokenList({ tokenList }: { tokenList: TokenItemShowType[
             ) : (
               <div className="token-logo custom-word-logo">{item.symbol?.slice(0, 1)}</div>
             )}
-            <div className="info">
-              <span>{item.symbol}</span>
-              <span>
-                {item.chainId.toLowerCase() === 'aelf' ? 'MainChain' : 'SideChain'} {`${item.chainId} ${isTestNet}`}
-              </span>
-            </div>
-            <div className="amount">
-              <p>{unitConverter(divDecimals(item.balance, item.decimals || 8))}</p>
-              {!isTestNet && (
-                <p className="convert">{`$ ${unitConverter(divDecimals(item.balanceInUsd, item.decimals || 8))}`}</p>
-              )}
+            <div className="desc">
+              <div className="info">
+                <span>{item.symbol}</span>
+                <span>{formatAmountShow(divDecimals(item.balance, item.decimals || 8))}</span>
+              </div>
+              <div className="amount">
+                <p>{transNetworkText(item.chainId, isTestNet)}</p>
+                {!isTestNet && (
+                  <p className="convert">{`$ ${formatAmountShow(
+                    divDecimals(item.balanceInUsd, item.decimals || 8),
+                    2,
+                  )}`}</p>
+                )}
+              </div>
             </div>
           </li>
         ))}

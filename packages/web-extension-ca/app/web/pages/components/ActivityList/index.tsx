@@ -1,14 +1,14 @@
 import { TransactionTypes, transactionTypesMap } from '@portkey-wallet/constants/constants-ca/activity';
 import { ActivityItemType, the2ThFailedActivityItemType } from '@portkey-wallet/types/types-ca/activity';
-import { formatStr2EllipsisStr } from '@portkey-wallet/utils/converter';
+import { AmountSign, formatWithCommas, formatStr2EllipsisStr } from '@portkey-wallet/utils/converter';
 import { List } from 'antd-mobile';
 import CustomSvg from 'components/CustomSvg';
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import './index.less';
 import LoadingMore from 'components/LoadingMore/LoadingMore';
-import { useIsTestnet } from 'hooks/useActivity';
-import { AmountSign, formatAmount, transNetworkText } from '@portkey-wallet/utils/activity';
+import { useIsTestnet } from 'hooks/useNetwork';
+import { transNetworkText } from '@portkey-wallet/utils/activity';
 import { Button, Modal } from 'antd';
 import { useAppCASelector } from '@portkey-wallet/hooks/hooks-ca';
 import { dateFormat } from 'utils';
@@ -19,6 +19,7 @@ import { removeFailedActivity } from '@portkey-wallet/store/store-ca/activity/sl
 import { useCurrentChainList } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import aes from '@portkey-wallet/utils/aes';
+import { addressFormat } from '@portkey-wallet/utils';
 
 export interface IActivityListProps {
   data?: ActivityItemType[];
@@ -47,8 +48,6 @@ export default function ActivityList({ data, chainId, hasMore, loadMore }: IActi
   };
 
   const nav = useNavigate();
-  console.log('activity', activity);
-  console.log('activity chainList', chainList);
 
   const navToDetail = useCallback(
     (item: ActivityItemType) => {
@@ -66,7 +65,9 @@ export default function ActivityList({ data, chainId, hasMore, loadMore }: IActi
         <span>
           <span>
             {nftInfo?.nftId && <span>#{nftInfo.nftId}</span>}
-            {!nftInfo?.nftId && <span>{`${formatAmount({ sign, amount, decimals, digits: 4 })} ${symbol ?? ''}`}</span>}
+            {!nftInfo?.nftId && (
+              <span>{`${formatWithCommas({ sign, amount, decimals, digits: 4 })} ${symbol ?? ''}`}</span>
+            )}
           </span>
         </span>
       </p>
@@ -75,13 +76,15 @@ export default function ActivityList({ data, chainId, hasMore, loadMore }: IActi
 
   const fromAndUsdUI = useCallback(
     (item: ActivityItemType) => {
-      const { fromAddress, priceInUsd, nftInfo } = item;
+      const { fromAddress, fromChainId, priceInUsd, nftInfo } = item;
+      const transFromAddress = addressFormat(fromAddress, fromChainId, 'aelf');
+
       return (
         <p className="row-2">
-          <span>From: {formatStr2EllipsisStr(fromAddress, [7, 4])}</span>
+          <span>From: {formatStr2EllipsisStr(transFromAddress, [7, 4])}</span>
           {nftInfo?.nftId && <span className="nft-name">{formatStr2EllipsisStr(nftInfo.alias)}</span>}
           {!isTestNet && !nftInfo?.nftId && (
-            <span>$ {formatAmount({ amount: priceInUsd, decimals: 0, digits: 2 })}</span>
+            <span>{formatWithCommas({ sign: AmountSign.USD, amount: priceInUsd, digits: 2 })}</span>
           )}
         </p>
       );

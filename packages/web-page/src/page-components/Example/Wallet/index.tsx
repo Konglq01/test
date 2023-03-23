@@ -5,7 +5,7 @@ import { AElfContextType } from '@aelf-react/core/dist/types';
 import styles from './../styles.module.less';
 export default function Wallet() {
   const { account, activate, deactivate, connectEagerly, aelfBridges }: AElfContextType = useAElfReact();
-  const [chainStatus, setChainStatus] = useState<any>({ message: '尚未初始化' });
+  const [chainStatus, setChainStatus] = useState<any>({ message: 'No init' });
   // It will evoke login window if logout when using activate.
   useEffect(() => {
     if (!activate && !account) {

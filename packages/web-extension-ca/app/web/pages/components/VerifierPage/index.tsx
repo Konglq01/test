@@ -14,7 +14,6 @@ import { setUserGuardianSessionIdAction } from '@portkey-wallet/store/store-ca/g
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import { useEffectOnce } from 'react-use';
-import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verification } from 'utils/api';
 
@@ -56,7 +55,7 @@ export default function VerifierPage({ currentGuardian, guardianType, isInitStat
           setLoading(true);
 
           const res = await checkVerificationCode({
-            type: LoginStrType[currentGuardian?.guardianType as LoginType],
+            type: LoginType[currentGuardian?.guardianType as LoginType],
             guardianIdentifier: currentGuardian.guardianAccount,
             verifierSessionId: currentGuardian.verifierInfo.sessionId,
             verificationCode: code,
@@ -93,7 +92,7 @@ export default function VerifierPage({ currentGuardian, guardianType, isInitStat
       const res = await verification.sendVerificationCode({
         params: {
           guardianIdentifier: currentGuardian.guardianAccount,
-          type: LoginStrType[guardianType],
+          type: LoginType[guardianType],
           verifierId: currentGuardian.verifier?.id || '',
           chainId: DefaultChainId,
         },
@@ -139,7 +138,11 @@ export default function VerifierPage({ currentGuardian, guardianType, isInitStat
     <div className={clsx('verifier-page-wrapper', isPrompt || 'popup-page')}>
       {currentGuardian?.isLoginAccount && <div className="login-icon">{t('Login Account')}</div>}
       <div className="flex-row-center login-account-wrapper">
-        <VerifierPair guardianType={currentGuardian?.guardianType} verifierSrc={currentGuardian?.verifier?.imageUrl} />
+        <VerifierPair
+          guardianType={currentGuardian?.guardianType}
+          verifierSrc={currentGuardian?.verifier?.imageUrl}
+          verifierName={currentGuardian?.verifier?.name}
+        />
         <span className="login-account">{currentGuardian?.guardianAccount || ''}</span>
       </div>
       <div className="send-tip">

@@ -42,7 +42,7 @@ const initialState: AssetsStateType = {
     isFetching: false,
     skipCount: 0,
     maxResultCount: 10,
-    accountTokenList: [],
+    accountTokenList: NEW_CLIENT_MOCK_ELF_LIST,
     totalRecordCount: 0,
   },
   accountNFT: {

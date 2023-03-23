@@ -4,13 +4,13 @@ import { defaultColors } from 'assets/theme';
 import { FontStyles } from 'assets/theme/styles';
 import GStyles from 'assets/theme/GStyles';
 import Collapsible from 'components/Collapsible';
-import { TextM, TextS, TextXXXL } from 'components/CommonText';
+import { TextM, TextS, TextXXL } from 'components/CommonText';
 import Svg from 'components/Svg';
 import React, { memo, useState } from 'react';
 import { Text, View, TouchableOpacity, StyleSheet } from 'react-native';
-import { formatStr2EllipsisStr } from 'utils';
-// import { formatStr2EllipsisStr } from 'utils';
+import { formatChainInfoToShow, formatStr2EllipsisStr } from '@portkey-wallet/utils';
 import { pTd } from 'utils/unit';
+import { ChainId } from '@portkey-wallet/types';
 
 export interface ItemType {
   contact: RecentContactItemType;
@@ -29,7 +29,7 @@ const RecentContactItem: React.FC<ItemType> = props => {
       <TouchableOpacity style={styles.itemWrap}>
         <TouchableOpacity style={styles.topWrap} onPress={() => setCollapsed(!collapsed)}>
           <View style={styles.itemAvatar}>
-            <TextXXXL>{contact.name.slice(0, 1)}</TextXXXL>
+            <TextXXL>{contact.name.slice(0, 1)}</TextXXL>
           </View>
           <TextM style={styles.contactName}>{contact.name}</TextM>
           <Svg icon={collapsed ? 'down-arrow' : 'up-arrow'} size={pTd(20)} />
@@ -49,9 +49,9 @@ const RecentContactItem: React.FC<ItemType> = props => {
               </Text>
               {/* TODO */}
               <Text style={[styles.address, !!0 && FontStyles.font7]}>
-                {`${ele?.chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${ele?.chainId} ${
-                  currentNetwork === 'TESTNET' && 'Testnet'
-                }`}
+                {/* TODO: delete as  */}
+
+                {formatChainInfoToShow(ele?.chainId as ChainId, currentNetwork)}
               </Text>
             </TouchableOpacity>
           ))}
@@ -68,9 +68,8 @@ const RecentContactItem: React.FC<ItemType> = props => {
       <TextS style={styles.address1}>
         {formatStr2EllipsisStr(`ELF_${contact.addresses?.[0].address}_${contact.addressChainId}`, 10)}
       </TextS>
-      <Text style={styles.chainInfo1}>{`${contact?.addressChainId === 'AELF' ? 'MainChain' : 'SideChain'} ${
-        contact?.addressChainId
-      } ${currentNetwork === 'TESTNET' && 'Testnet'}`}</Text>
+      {/* TODO: delete as  */}
+      <Text style={styles.chainInfo1}>{formatChainInfoToShow(contact?.addressChainId as ChainId, currentNetwork)}</Text>
     </TouchableOpacity>
   );
 };
@@ -82,14 +81,14 @@ export const styles = StyleSheet.create({
     width: '100%',
     ...GStyles.paddingArg(20, 20),
     borderBottomColor: defaultColors.bg7,
-    borderBottomWidth: pTd(1),
+    borderBottomWidth: StyleSheet.hairlineWidth,
     backgroundColor: defaultColors.bg1,
   },
   itemAvatar: {
-    borderWidth: pTd(1),
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: defaultColors.border1,
-    width: pTd(45),
-    height: pTd(45),
+    width: pTd(40),
+    height: pTd(40),
     borderRadius: pTd(23),
     backgroundColor: defaultColors.bg4,
     marginRight: pTd(10),

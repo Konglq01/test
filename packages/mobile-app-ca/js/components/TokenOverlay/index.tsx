@@ -1,18 +1,15 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import OverlayModal from 'components/OverlayModal';
-import { FlatList, StyleSheet } from 'react-native';
-import { TextXL } from 'components/CommonText';
+import { DeviceEventEmitter, FlatList, StyleSheet } from 'react-native';
 import { ModalBody } from 'components/ModalBody';
 import CommonInput from 'components/CommonInput';
 import { useAppCASelector } from '@portkey-wallet/hooks/hooks-ca';
 import { TokenItemShowType } from '@portkey-wallet/types/types-eoa/token';
-import { filterTokenList } from '@portkey-wallet/utils/token';
 import { AccountType } from '@portkey-wallet/types/wallet';
 import TokenListItem from 'components/TokenListItem';
 import { defaultColors } from 'assets/theme';
 import fonts from 'assets/theme/fonts';
 import { pTd } from 'utils/unit';
-import { screenHeight } from '@portkey-wallet/utils/mobile/device';
 import { useLanguage } from 'i18n/hooks';
 import { useAppCommonDispatch } from '@portkey-wallet/hooks';
 import useDebounce from 'hooks/useDebounce';
@@ -20,6 +17,8 @@ import useEffectOnce from 'hooks/useEffectOnce';
 import { useChainIdList } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { fetchAllTokenListAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
 import NoData from 'components/NoData';
+import { useGStyles } from 'assets/theme/useGStyles';
+import myEvents from '../../utils/deviceEvent';
 
 type onFinishSelectTokenType = (tokenItem: TokenItemShowType) => void;
 type TokenListProps = {
@@ -33,6 +32,7 @@ const TokenList = ({ onFinishSelectToken }: TokenListProps) => {
   const { tokenDataShowInMarket } = useAppCASelector(state => state.tokenManagement);
   const dispatch = useAppCommonDispatch();
   const chainIdList = useChainIdList();
+  const gStyles = useGStyles();
 
   const [keyword, setKeyword] = useState('');
 
@@ -63,8 +63,7 @@ const TokenList = ({ onFinishSelectToken }: TokenListProps) => {
   });
 
   return (
-    <ModalBody modalBodyType="bottom" style={styles.modalStyle}>
-      <TextXL style={styles.title}>{t('Select Token')}</TextXL>
+    <ModalBody modalBodyType="bottom" title={t('Select Token')} style={gStyles.overlayStyle}>
       <CommonInput
         placeholder={t('Token Name')}
         containerStyle={styles.containerStyle}
@@ -77,7 +76,19 @@ const TokenList = ({ onFinishSelectToken }: TokenListProps) => {
       />
       {!!debounceKeyword && !tokenDataShowInMarket.length && <NoData noPic message={t('There is no search result.')} />}
       <FlatList
+        onLayout={e => {
+          DeviceEventEmitter.emit('nestScrollViewLayout', e.nativeEvent.layout);
+        }}
+        disableScrollViewPanResponder={true}
         style={styles.flatList}
+        onScroll={({ nativeEvent }) => {
+          const {
+            contentOffset: { y: scrollY },
+          } = nativeEvent;
+          if (scrollY <= 0) {
+            myEvents.nestScrollForPullCloseModal.emit();
+          }
+        }}
         data={tokenDataShowInMarket || []}
         renderItem={renderItem}
         keyExtractor={(item: any) => item.id || ''}
@@ -89,6 +100,7 @@ const TokenList = ({ onFinishSelectToken }: TokenListProps) => {
 export const showTokenList = (props: TokenListProps) => {
   OverlayModal.show(<TokenList {...props} />, {
     position: 'bottom',
+    enabledNestScrollView: true,
   });
 };
 
@@ -97,9 +109,6 @@ export default {
 };
 
 export const styles = StyleSheet.create({
-  modalStyle: {
-    height: screenHeight - pTd(100),
-  },
   title: {
     textAlign: 'center',
     color: defaultColors.font5,

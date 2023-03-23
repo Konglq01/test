@@ -11,7 +11,7 @@ import styles from '../styles';
 import Touchable from 'components/Touchable';
 import GStyles from 'assets/theme/GStyles';
 import { TextL, TextM, TextXXXL } from 'components/CommonText';
-import { LoginType } from '..';
+import { PageLoginType } from '..';
 import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { WalletInfoType } from '@portkey-wallet/types/wallet';
 import { usePin } from 'hooks/store';
@@ -23,14 +23,16 @@ import phone from 'assets/image/pngs/phone.png';
 import QRCode from 'react-native-qrcode-svg';
 import { useIsFocused } from '@react-navigation/native';
 import { DEVICE_TYPE } from 'constants/common';
+import CommonQRCodeStyled from 'components/CommonQRCodeStyled';
 
-export default function LoginQRCode({ setLoginType }: { setLoginType: (type: LoginType) => void }) {
+export default function LoginQRCode({ setLoginType }: { setLoginType: (type: PageLoginType) => void }) {
   const { walletInfo, currentNetwork } = useCurrentWallet();
   const [newWallet, setNewWallet] = useState<WalletInfoType>();
   const dispatch = useAppDispatch();
   const pin = usePin();
   const caInfo = useIntervalQueryCAInfoByAddress(currentNetwork, newWallet?.address);
   const isFocused = useIsFocused();
+
   useEffect(() => {
     if (!isFocused) return;
     if (caInfo && newWallet) {
@@ -81,6 +83,7 @@ export default function LoginQRCode({ setLoginType }: { setLoginType: (type: Log
   });
   const qrData = useMemo(() => {
     if (!newWallet) return 'xxx';
+
     const data: LoginQRData = {
       // TODO: ethereum
       chainType: 'aelf',
@@ -99,12 +102,16 @@ export default function LoginQRCode({ setLoginType }: { setLoginType: (type: Log
       <TextXXXL style={[styles.qrCodeTitle, GStyles.textAlignCenter]}>Scan code to log in</TextXXXL>
       <TextM style={[GStyles.textAlignCenter, FontStyles.font3]}>Please use the Portkey DApp to scan the QR code</TextM>
       <View style={[GStyles.alignCenter, styles.qrCodeBox]}>
-        {!newWallet && (
-          <View style={styles.loading}>
-            <TextL>Updating...</TextL>
-          </View>
+        {newWallet ? (
+          <CommonQRCodeStyled qrData={qrData} />
+        ) : (
+          <>
+            <View style={styles.loading}>
+              <TextL>Updating...</TextL>
+            </View>
+            <QRCode value={qrData} size={250} />
+          </>
         )}
-        <QRCode value={qrData} size={200} />
       </View>
     </View>
   );

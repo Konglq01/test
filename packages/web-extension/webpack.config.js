@@ -1,11 +1,7 @@
-/**
- * @file
- * @author huangzongzhe
- */
 /* eslint-disable */
-const webpack = require('webpack'); // 用于访问内置插件
+const webpack = require('webpack');
 const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin'); // 通过 npm 安装
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');

@@ -21,7 +21,6 @@ import {
 import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { GuardianMth } from 'types/guardians';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
-import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
 import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
@@ -54,6 +53,15 @@ export default function GuardiansView() {
     getGuardianList({ caHash: walletInfo.caHash });
   }, [getGuardianList, walletInfo.caHash]);
 
+  useEffect(() => {
+    const temp = userGuardiansList?.filter((guardian) => guardian.key === opGuardian?.key) || [];
+    if (temp.length > 0) {
+      dispatch(setCurrentGuardianAction(temp[0]));
+      dispatch(setOpGuardianAction(temp[0]));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userGuardiansList]);
+
   const verifyHandler = useCallback(async () => {
     try {
       if (opGuardian?.isLoginAccount) {
@@ -81,12 +89,7 @@ export default function GuardiansView() {
           },
         });
         console.log('unSetLoginAccount', result);
-        dispatch(
-          setOpGuardianAction({
-            ...opGuardian,
-            isLoginAccount: false,
-          }),
-        );
+        getGuardianList({ caHash: walletInfo.caHash });
         setLoading(false);
         setTipOpen(false);
       } else {
@@ -101,7 +104,7 @@ export default function GuardiansView() {
         const result = await verification.sendVerificationCode({
           params: {
             guardianIdentifier: opGuardian?.guardianAccount as string,
-            type: LoginStrType[opGuardian?.guardianType as LoginType],
+            type: LoginType[opGuardian?.guardianType as LoginType],
             verifierId: opGuardian?.verifier?.id || '',
             chainId: DefaultChainId,
           },
@@ -137,6 +140,7 @@ export default function GuardiansView() {
     currentGuardian,
     currentNetwork,
     dispatch,
+    getGuardianList,
     navigate,
     opGuardian,
     passwordSeed,
@@ -222,7 +226,7 @@ export default function GuardiansView() {
           <div className="input-item">
             <div className="label">{t('Verifier')}</div>
             <div className="control">
-              <BaseVerifierIcon width={32} height={32} src={opGuardian?.verifier?.imageUrl} />
+              <BaseVerifierIcon src={opGuardian?.verifier?.imageUrl} fallback={opGuardian?.verifier?.name[0]} />
               <span className="name">{opGuardian?.verifier?.name ?? ''}</span>
             </div>
           </div>
@@ -247,9 +251,11 @@ export default function GuardiansView() {
         </div>
       </div>
       <CommonModal className="verify-confirm-modal" closable={false} open={tipOpen} onCancel={() => setTipOpen(false)}>
-        <p className="modal-content">{`${opGuardian?.verifier?.name ?? ''} will send a verification code to ${
-          opGuardian?.guardianAccount
-        } to verify your email address.`}</p>
+        <p className="modal-content">
+          {`${opGuardian?.verifier?.name ?? ''} will send a verification code to `}
+          <span className="bold">{opGuardian?.guardianAccount}</span>
+          {` to verify your email address.`}
+        </p>
         <div className="btn-wrapper">
           <Button onClick={() => setTipOpen(false)}>{t('Cancel')}</Button>
           <Button type="primary" onClick={verifyHandler}>

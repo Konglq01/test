@@ -1,6 +1,6 @@
 import { CurrentWalletType } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { createWallet, setCAInfo, setManagerInfo } from '@portkey-wallet/store/store-ca/wallet/actions';
-import { CAInfo, ManagerInfo } from '@portkey-wallet/types/types-ca/wallet';
+import { CAInfo, LoginType, ManagerInfo } from '@portkey-wallet/types/types-ca/wallet';
 import { VerificationType, VerifierInfo } from '@portkey-wallet/types/verifier';
 import { sleep } from '@portkey-wallet/utils';
 import Loading from 'components/Loading';
@@ -16,11 +16,12 @@ import CommonToast from 'components/CommonToast';
 import useEffectOnce from './useEffectOnce';
 import { setCredentials } from 'store/user/actions';
 import { DigitInputInterface } from 'components/DigitInput';
-import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
 import { GuardiansApproved } from 'pages/Guardian/types';
 import { DEVICE_TYPE } from 'constants/common';
+import { useLanguage } from 'i18n/hooks';
 
 export function useOnManagerAddressAndQueryResult() {
+  const { t } = useLanguage();
   const dispatch = useAppDispatch();
   const biometricsReady = useBiometricsReady();
   const timer = useRef<TimerResult>();
@@ -46,7 +47,7 @@ export function useOnManagerAddressAndQueryResult() {
       verifierInfo?: VerifierInfo;
       guardiansApproved?: GuardiansApproved;
     }) => {
-      Loading.show();
+      Loading.show({ text: t('Creating address on the chain...') });
       await sleep(1000);
       const isRecovery = managerInfo.verificationType === VerificationType.communityRecovery;
       try {
@@ -70,7 +71,7 @@ export function useOnManagerAddressAndQueryResult() {
           data = {
             ...managerInfo,
             ...verifierInfo,
-            type: LoginStrType[managerInfo.type],
+            type: LoginType[managerInfo.type],
             ...data,
           };
         }
@@ -125,7 +126,7 @@ export function useOnManagerAddressAndQueryResult() {
         pinRef?.current?.reset();
       }
     },
-    [biometricsReady, dispatch, onIntervalGetResult],
+    [biometricsReady, dispatch, onIntervalGetResult, t],
   );
 }
 

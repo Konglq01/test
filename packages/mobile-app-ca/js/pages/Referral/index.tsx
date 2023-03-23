@@ -21,13 +21,16 @@ export default function Referral() {
   const gStyles = useGStyles();
   const { t } = useLanguage();
   const init = useCallback(async () => {
-    if (!isIos) await sleep(200);
-    await SplashScreen.hideAsync();
+    await sleep(200);
     if (address) {
       let name: keyof RootStackParamList = 'SecurityLock';
       if (credentials) name = 'Tab';
       navigationService.reset(name);
     }
+
+    setTimeout(() => {
+      SplashScreen.hideAsync();
+    }, 500);
   }, [credentials, address]);
   useEffect(() => {
     init();

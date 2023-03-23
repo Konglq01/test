@@ -1,17 +1,16 @@
-import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { useCurrentChain, useCurrentChainList, useIsValidSuffix } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
-import { AddressBookError } from '@portkey-wallet/store/addressBook/types';
 import { addFailedActivity, removeFailedActivity } from '@portkey-wallet/store/store-ca/activity/slice';
 import { ContactItemType, IClickAddressProps } from '@portkey-wallet/types/types-ca/contact';
 import { BaseToken } from '@portkey-wallet/types/types-ca/token';
-import { isDIDAddress } from '@portkey-wallet/utils';
+import { getAddressChainId, isDIDAddress } from '@portkey-wallet/utils';
 import {
   getAelfAddress,
   getEntireDIDAelfAddress,
   getWallet,
-  isAelfAddress,
   isCrossChain,
+  isEqAddress,
 } from '@portkey-wallet/utils/aelf';
 import aes from '@portkey-wallet/utils/aes';
 import { timesDecimals } from '@portkey-wallet/utils/converter';
@@ -36,6 +35,8 @@ import { TransactionError } from '@portkey-wallet/constants/constants-ca/assets'
 import './index.less';
 import { the2ThFailedActivityItemType } from '@portkey-wallet/types/types-ca/activity';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
+import { CROSS_FEE } from '@portkey-wallet/constants/constants-ca/wallet';
+import { AddressCheckError } from '@portkey-wallet/store/store-ca/assets/type';
 
 export type Account = { address: string; name?: string };
 
@@ -53,7 +54,7 @@ export default function Send() {
   const navigate = useNavigate();
   const { walletName } = useWalletInfo();
   // TODO need get data from state and wait for BE data structure
-  const { type, symbol, tokenId } = useParams();
+  const { type, symbol } = useParams();
   const { state } = useLocation();
   const chainInfo = useCurrentChain(state.chainId);
   const wallet = useCurrentWalletInfo();
@@ -70,6 +71,7 @@ export default function Send() {
   const [stage, setStage] = useState<Stage>(Stage.Address);
   const [amount, setAmount] = useState('');
   const [balance, setBalance] = useState('');
+  const isValidSuffix = useIsValidSuffix();
 
   const [txFee, setTxFee] = useState<string>();
   const currentChain = useCurrentChain(state.chainId);
@@ -88,39 +90,34 @@ export default function Send() {
     [state],
   );
 
-  const validateToAddress = useCallback((value: { name?: string; address: string } | undefined) => {
-    if (!value) return false;
-    if (!isDIDAddress(value.address)) {
-      setErrorMsg(AddressBookError.recipientAddressIsInvalid);
-      return false;
-    }
-    setErrorMsg('');
-    return true;
-  }, []);
+  const validateToAddress = useCallback(
+    (value: { name?: string; address: string } | undefined) => {
+      if (!value) return false;
+      const suffix = getAddressChainId(toAccount.address, chainInfo?.chainId || 'AELF');
+      if (!isDIDAddress(value.address) || !isValidSuffix(suffix)) {
+        setErrorMsg(AddressCheckError.recipientAddressIsInvalid);
+        return false;
+      }
+      const selfAddress = wallet[state.chainId].caAddress;
+      if (isEqAddress(selfAddress, getAelfAddress(toAccount.address)) && suffix === state.chainId) {
+        setErrorMsg(AddressCheckError.equalIsValid);
+        return false;
+      }
+      setErrorMsg('');
+      return true;
+    },
+    [chainInfo, isValidSuffix, state.chainId, toAccount.address, wallet],
+  );
 
   const btnDisabled = useMemo(() => {
-    if (toAccount.address === '') return true;
+    if (toAccount.address === '' || (stage === Stage.Amount && amount === '')) return true;
     return false;
-  }, [toAccount.address]);
-
-  const getToAddressChainId = useCallback(
-    (toAddress: string) => {
-      if (!toAddress.includes('_')) return chainInfo?.chainId;
-      const arr = toAddress.split('_');
-      const addressChainId = arr[arr.length - 1];
-      // no suffix
-      if (isAelfAddress(addressChainId)) {
-        return chainInfo?.chainId;
-      }
-      return addressChainId;
-    },
-    [chainInfo?.chainId],
-  );
+  }, [amount, stage, toAccount.address]);
 
   useDebounce(
     () => {
       const value = getAelfAddress(toAccount.address);
-      const toAdsChainId = getToAddressChainId(toAccount.address);
+      const toAdsChainId = getAddressChainId(toAccount.address, chainInfo?.chainId || 'AELF');
       const searchResult: ContactItemType[] = [];
       contactIndexList.forEach(({ contacts }) => {
         searchResult.push(
@@ -222,12 +219,17 @@ export default function Send() {
       setLoading(true);
       if (!ZERO.plus(amount).toNumber()) return 'Please input amount';
       if (type === 'token') {
-        if (ZERO.plus(amount).times(`1e${tokenInfo.decimals}`).isGreaterThan(ZERO.plus(balance))) {
-          return TransactionError.TOKEN_NOTE_ENOUGH;
+        if (timesDecimals(amount, tokenInfo.decimals).isGreaterThan(ZERO.plus(balance))) {
+          return TransactionError.TOKEN_NOT_ENOUGH;
+        }
+        if (isCrossChain(toAccount.address, chainInfo?.chainId ?? 'AELF') && symbol === 'ELF') {
+          if (ZERO.plus(CROSS_FEE).isGreaterThanOrEqualTo(ZERO.plus(amount))) {
+            return TransactionError.CROSS_NOT_ENOUGH;
+          }
         }
       } else if (type === 'nft') {
         if (ZERO.plus(amount).isGreaterThan(ZERO.plus(balance))) {
-          return TransactionError.NFT_NOTE_ENOUGH;
+          return TransactionError.NFT_NOT_ENOUGH;
         }
       } else {
         return 'input error';
@@ -237,16 +239,26 @@ export default function Send() {
       if (fee) {
         setTxFee(fee);
       } else {
-        return TransactionError.FEE_NOTE_ENOUGH;
+        return TransactionError.FEE_NOT_ENOUGH;
       }
       return '';
     } catch (error: any) {
       console.log('checkTransactionValue===', error);
-      return TransactionError.FEE_NOTE_ENOUGH;
+      return TransactionError.FEE_NOT_ENOUGH;
     } finally {
       setLoading(false);
     }
-  }, [setLoading, amount, type, getTranslationInfo, tokenInfo.decimals, balance]);
+  }, [
+    setLoading,
+    amount,
+    type,
+    getTranslationInfo,
+    tokenInfo.decimals,
+    balance,
+    toAccount.address,
+    chainInfo?.chainId,
+    symbol,
+  ]);
 
   const sendHandler = useCallback(async () => {
     try {
@@ -332,6 +344,7 @@ export default function Send() {
               width: 320,
               content: t('This is a cross-chain transaction.'),
               className: 'cross-modal delete-modal',
+              autoFocusButton: null,
               icon: null,
               centered: true,
               okText: t('Continue'),
@@ -483,11 +496,19 @@ export default function Send() {
         </div>
       )}
       <div className="stage-ele">{StageObj[stage].element}</div>
-      <div className="btn-wrap">
-        <Button disabled={btnDisabled} className="stage-btn" type="primary" onClick={StageObj[stage].handler}>
-          {StageObj[stage].btnText}
-        </Button>
-      </div>
+      {stage === Stage.Preview ? (
+        <div className="btn-wrap">
+          <Button disabled={btnDisabled} className="stage-btn" type="primary" onClick={StageObj[stage].handler}>
+            {StageObj[stage].btnText}
+          </Button>
+        </div>
+      ) : (
+        <p className="btn-wrap">
+          <Button disabled={btnDisabled} className="stage-btn" type="primary" onClick={StageObj[stage].handler}>
+            {StageObj[stage].btnText}
+          </Button>
+        </p>
+      )}
     </div>
   );
 }

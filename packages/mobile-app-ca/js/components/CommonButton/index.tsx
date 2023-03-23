@@ -24,7 +24,7 @@ const stylesMap: any = {
   primary: {
     buttonStyle: styles.primaryButtonStyle,
     titleStyle: styles.primaryTitleStyle,
-    disabledStyle: [styles.primaryButtonStyle, styles.disabledStyle],
+    disabledStyle: [styles.primaryButtonStyle, styles.disabledStyle, styles.disabledPrimaryStyle],
     disabledTitleStyle: styles.primaryTitleStyle,
   },
 };

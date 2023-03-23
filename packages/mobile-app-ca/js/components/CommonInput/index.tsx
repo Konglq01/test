@@ -26,7 +26,7 @@ const CommonInput = forwardRef((props: CommonInputProps, forwardedRef: any) => {
   if (type === 'search')
     return (
       <Input
-        selectionColor={defaultColors.primaryColor}
+        selectionColor={defaultColors.bg15}
         containerStyle={[searchStyle.containerStyle, containerStyle]}
         inputContainerStyle={[searchStyle.inputContainerStyle, inputContainerStyle]}
         inputStyle={[searchStyle.inputStyle, inputStyle]}
@@ -48,7 +48,7 @@ const CommonInput = forwardRef((props: CommonInputProps, forwardedRef: any) => {
         theme === 'white-bg' && bgWhiteStyles.inputContainerStyle,
         inputContainerStyle,
       ]}
-      selectionColor={defaultColors.primaryColor}
+      selectionColor={defaultColors.bg13}
       inputStyle={[generalStyles.inputStyle, inputStyle]}
       labelStyle={[generalStyles.labelStyle, labelStyle]}
       rightIconContainerStyle={[generalStyles.rightIconContainerStyle, rightIconContainerStyle]}

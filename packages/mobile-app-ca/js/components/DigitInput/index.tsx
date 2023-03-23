@@ -87,12 +87,12 @@ const DigitInput = forwardRef(
         <View>
           <View style={[styles.container, type === 'pin' ? styles.pinContainer : undefined, style]}>
             <TextInput
+              autoFocus
               contextMenuHidden={type === 'pin'}
               style={[styles.inputStyle, styleProps.inputStyle]}
               ref={input}
               value={text}
               maxLength={maxLength}
-              autoFocus={type === 'pin'}
               keyboardType={keyboardType}
               onChangeText={value => {
                 if (value && !isValidPositiveInteger(value)) return;
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
   inputItem: {
     justifyContent: 'center',
     alignItems: 'center',
-    borderBottomWidth: 1,
+    borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: defaultColors.border6,
   },
   iconStyle: {

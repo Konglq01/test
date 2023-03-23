@@ -1,6 +1,6 @@
 import { ZERO } from '@portkey-wallet/constants/misc';
 import { BaseToken } from '@portkey-wallet/types/types-ca/token';
-import { divDecimals, unitConverter } from '@portkey-wallet/utils/converter';
+import { divDecimals, formatAmountShow } from '@portkey-wallet/utils/converter';
 import { Input } from 'antd';
 import clsx from 'clsx';
 import { handleKeyDown } from 'pages/Send/utils/util.keyDown';
@@ -10,7 +10,6 @@ import { getBalance } from 'utils/sandboxUtil/getBalance';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { ChainId } from '@portkey-wallet/types';
 import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
-import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
 import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
 import CustomSvg from 'components/CustomSvg';
 
@@ -34,7 +33,6 @@ export default function TokenInput({
   const { t } = useTranslation();
   const [amount, setAmount] = useState<string>(value ? `${value} ${token.symbol}` : '');
   const [balance, setBalance] = useState<string>('');
-  const symbolImages = useSymbolImages();
 
   const getTokenBalance = useCallback(async () => {
     if (!currentChain) return;
@@ -91,7 +89,7 @@ export default function TokenInput({
             </div>
             <div className="center">
               <p className="symbol">{token?.symbol}</p>
-              <p className="amount">{`${t('Balance_with_colon')} ${unitConverter(
+              <p className="amount">{`${t('Balance_with_colon')} ${formatAmountShow(
                 divDecimals(balance, token.decimals),
               )} ${token?.symbol}`}</p>
             </div>
@@ -115,12 +113,13 @@ export default function TokenInput({
               onBlur={handleAmountBlur}
               onChange={(e) => {
                 setAmount(e.target.value);
+                onChange({ amount: e.target.value, balance });
               }}
             />
             {isMain && (
-              <span className="convert">{`$${unitConverter(
+              <span className="convert">{`$${formatAmountShow(
                 // ZERO.plus(amount?.replace(` ${token?.symbol}`, '') || 0)?.multipliedBy(rate?.USDT || 0),
-                ZERO.plus(amount?.replace(` ${token?.symbol}`, '') || 0),
+                ZERO.plus(amount?.replace(` ${token?.symbol}`, '') || 0, 2),
               )}`}</span>
             )}
           </div>

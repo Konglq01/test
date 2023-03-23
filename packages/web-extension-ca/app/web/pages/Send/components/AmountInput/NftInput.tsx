@@ -7,7 +7,7 @@ import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { ChainId } from '@portkey-wallet/types';
 import { getBalance } from 'utils/sandboxUtil/getBalance';
 import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
-import { divDecimals, unitConverter } from '@portkey-wallet/utils/converter';
+import { divDecimals, formatAmountShow } from '@portkey-wallet/utils/converter';
 
 export default function NftInput({
   toAccount,
@@ -74,12 +74,12 @@ export default function NftInput({
       <div className="item asset nft">
         <div className="avatar">{token.imageUrl ? <img src={token.imageUrl} /> : <p>{token.symbol[0]}</p>}</div>
         <div className="info">
-          <p className="index">
+          <div className="index">
             <p className="alias">{token.alias}</p>
             <p className="token-id">#{token.tokenId}</p>
-          </p>
+          </div>
           <p className="quantity">
-            Balance: <span>{`${unitConverter(divDecimals(balance, token.decimals))}`}</span>
+            Balance: <span>{`${formatAmountShow(divDecimals(balance, token.decimals))}`}</span>
           </p>
         </div>
       </div>
@@ -96,6 +96,7 @@ export default function NftInput({
               onBlur={handleAmountBlur}
               onChange={(e) => {
                 setAmount(e.target.value);
+                onChange({ amount: e.target.value, balance });
               }}
             />
           </div>

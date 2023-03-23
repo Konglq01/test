@@ -31,7 +31,7 @@ export default function EmailLogin() {
       dispatch(
         setLoginAccountAction({
           guardianAccount,
-          loginType: LoginType.email,
+          loginType: LoginType.Email,
           createType: 'login',
         }),
       );
@@ -42,7 +42,7 @@ export default function EmailLogin() {
   const onLogin = useCallback(async () => {
     try {
       if (!val) return message.error('No Account');
-      setLoading(true);
+      setLoading(true, 'Checking account on the chain...');
       await emailInputInstance?.current?.validateEmail(val, 'login');
       loginHandler(val);
       dispatch(resetGuardiansState());
@@ -54,6 +54,8 @@ export default function EmailLogin() {
       setLoading(false);
       console.error(error, 'error====onLogin');
       typeof error === 'string' ? setError(error) : message.error(error);
+    } finally {
+      setLoading(false);
     }
   }, [val, dispatch, fetchUserVerifier, loginHandler, navigate, setLoading]);
 

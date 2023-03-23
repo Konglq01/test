@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useRef } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { pTd } from 'utils/unit';
 import { parseInputChange } from '@portkey-wallet/utils/input';
@@ -6,12 +6,14 @@ import { ZERO } from '@portkey-wallet/constants/misc';
 import { defaultColors } from 'assets/theme';
 import GStyles from 'assets/theme/GStyles';
 import { Input } from '@rneui/themed';
-import { unitConverter } from '@portkey-wallet/utils/converter';
+import { divDecimals, formatAmountShow } from '@portkey-wallet/utils/converter';
 import { useLanguage } from 'i18n/hooks';
 import CommonAvatar from 'components/CommonAvatar';
 import { IToSendAssetParamsType } from '@portkey-wallet/types/types-ca/routeParams';
 import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
+import { FontStyles } from 'assets/theme/styles';
 import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
+import { useFocusEffect } from '@react-navigation/native';
 
 interface AmountTokenProps {
   balanceShow: number | string;
@@ -29,6 +31,7 @@ export default function AmountToken({
   selectedToken,
 }: AmountTokenProps) {
   const { t } = useLanguage();
+  const iptRef = useRef<any>();
 
   const symbolImages = useSymbolImages();
 
@@ -36,28 +39,23 @@ export default function AmountToken({
     return `${str.slice(0, 5)}...`;
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      if (!iptRef || !iptRef?.current) return;
+      iptRef.current.focus();
+    }, []),
+  );
+
   return (
     <View style={styles.amountWrap}>
       <View style={styles.top}>
         <Text style={styles.topTitle}>{t('Amount')}</Text>
-        <Text style={styles.topBalance}>{`${t('Balance')} ${unitConverter(
-          ZERO.plus(balanceShow).div(`1e${selectedToken?.decimals}`),
-        )} ${selectedToken?.symbol ?? '0'}`}</Text>
+        <Text style={styles.topBalance}>
+          {`${t('Balance')} ${formatAmountShow(divDecimals(balanceShow, selectedToken.decimals))}`}
+        </Text>
       </View>
       <View style={styles.bottom}>
         <View style={styles.bottomLeft}>
-          {/* <Svg icon="aelf-avatar" size={pTd(28)} /> */}
-          {/* {symbolImages[selectedToken?.symbol] ? (
-            <CommonAvatar
-              shapeType="circular"
-              imageUrl={symbolImages[selectedToken.symbol] || ''}
-              avatarSize={28}
-              title={''}
-            />
-          ) : (
-            <Text style={styles.imgStyle}>{selectedToken?.symbol?.[0]}</Text>
-          )} */}
-
           {selectedToken.symbol === ELF_SYMBOL ? (
             <CommonAvatar
               shapeType="circular"
@@ -74,6 +72,8 @@ export default function AmountToken({
         </View>
         <View style={styles.bottomRight}>
           <Input
+            autoFocus
+            ref={iptRef}
             onFocus={() => {
               if (sendTokenNumber === '0') setSendTokenNumber('');
             }}
@@ -82,20 +82,12 @@ export default function AmountToken({
             maxLength={18}
             containerStyle={styles.containerStyle}
             inputContainerStyle={styles.inputContainerStyle}
-            inputStyle={styles.inputStyle}
+            inputStyle={[styles.inputStyle, sendTokenNumber === '0' && FontStyles.font7]}
             onChangeText={v => {
               const newAmount = parseInputChange(v.trim(), ZERO, 4);
               setSendTokenNumber(newAmount);
             }}
           />
-          {/* {selectedToken.symbol === 'ELF' && (
-            <TextS style={styles.usdtNumSent}>
-              ${' '}
-              {sendTokenNumber === ' '
-                ? '0.00'
-                : unitConverter(ZERO.plus(sendTokenNumber ? sendTokenNumber : '0').times(rate.USDT), 2)}
-            </TextS>
-          )} */}
         </View>
       </View>
     </View>
@@ -143,7 +135,7 @@ export const styles = StyleSheet.create({
     height: pTd(28),
     lineHeight: pTd(28),
     borderColor: defaultColors.border1,
-    borderWidth: pTd(1),
+    borderWidth: StyleSheet.hairlineWidth,
     borderRadius: pTd(14),
     textAlign: 'center',
   },
@@ -156,7 +148,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     position: 'relative',
     borderBottomColor: defaultColors.border6,
-    borderBottomWidth: pTd(0.5),
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   containerStyle: {
     width: '100%',

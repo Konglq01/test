@@ -9,6 +9,7 @@ import { Image } from 'react-native';
 interface CommonAvatarProps {
   title?: string;
   avatarSize?: string | number;
+  hasBorder?: boolean;
   svgName?: IconName;
   imageUrl?: string;
   shapeType?: 'square' | 'circular';
@@ -17,7 +18,16 @@ interface CommonAvatarProps {
 }
 
 export default function CommonAvatar(props: CommonAvatarProps) {
-  const { title, svgName, avatarSize = pTd(48), style = {}, color, imageUrl, shapeType = 'circular' } = props;
+  const {
+    title,
+    svgName,
+    avatarSize = pTd(48),
+    style = {},
+    color,
+    imageUrl,
+    shapeType = 'circular',
+    hasBorder,
+  } = props;
   const initialsTitle = title?.[0];
 
   const sizeStyle = {
@@ -51,12 +61,18 @@ export default function CommonAvatar(props: CommonAvatarProps) {
     );
 
   return (
-    <Text style={[styles.avatarWrap, shapeType === 'square' && styles.squareStyle, sizeStyle, style]}>
+    <Text
+      style={[
+        styles.avatarWrap,
+        shapeType === 'square' && styles.squareStyle,
+        hasBorder && styles.hasBorder,
+        sizeStyle,
+        style,
+      ]}>
       {initialsTitle}
     </Text>
   );
 }
-
 const styles = StyleSheet.create({
   avatarWrap: {
     width: pTd(48),
@@ -66,9 +82,13 @@ const styles = StyleSheet.create({
     backgroundColor: defaultColors.bg4,
     display: 'flex',
     fontSize: pTd(20),
-    lineHeight: pTd(48),
+    lineHeight: '100%',
     overflow: 'hidden',
     textAlign: 'center',
+  },
+  hasBorder: {
+    borderWidth: pTd(1),
+    borderColor: defaultColors.border1,
   },
   squareStyle: {
     borderRadius: pTd(6),

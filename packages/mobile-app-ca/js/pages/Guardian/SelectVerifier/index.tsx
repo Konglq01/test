@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import PageContainer from 'components/PageContainer';
-import { TextM, TextS, TextXXXL } from 'components/CommonText';
+import { TextL, TextM, TextS, TextXXXL } from 'components/CommonText';
 import GStyles from 'assets/theme/GStyles';
 import Svg from 'components/Svg';
 import Touchable from 'components/Touchable';
@@ -20,9 +20,8 @@ import Loading from 'components/Loading';
 import { useVerifierList } from '@portkey-wallet/hooks/hooks-ca/network';
 import VerifierOverlay from '../components/VerifierOverlay';
 import { VerifierImage } from '../components/VerifierImage';
-import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import { LoginKeyType, LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import myEvents from 'utils/deviceEvent';
-import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network-test2';
 import { verification } from 'utils/api';
 
@@ -41,7 +40,7 @@ export default function SelectVerifier() {
         Loading.show();
         const requestCodeResult = await verification.sendVerificationCode({
           params: {
-            type: LoginStrType[LoginType.email],
+            type: LoginType[LoginType.Email],
             guardianIdentifier: loginAccount,
             verifierId: selectedVerifier.id,
             chainId: DefaultChainId,
@@ -55,7 +54,7 @@ export default function SelectVerifier() {
               isLoginAccount: true,
               verifier: selectedVerifier,
               guardianAccount: loginAccount,
-              guardianType: LoginType.email,
+              guardianType: LoginType.Email,
             },
           });
         } else {
@@ -67,7 +66,13 @@ export default function SelectVerifier() {
       Loading.hide();
     };
     ActionSheet.alert({
-      title2: `${selectedVerifier.name} will send a verification code to ${loginAccount} to verify your email address.`,
+      title2: (
+        <Text>
+          <TextL>{`${selectedVerifier.name} will send a verification code to `}</TextL>
+          <TextL style={fonts.mediumFont}>{loginAccount}</TextL>
+          <TextL>{` to verify your email address.`}</TextL>
+        </Text>
+      ),
       buttons: [
         {
           title: t('Cancel'),
@@ -94,7 +99,9 @@ export default function SelectVerifier() {
       <View>
         <TextXXXL style={GStyles.textAlignCenter}>Select verifier</TextXXXL>
         <TextM style={[GStyles.textAlignCenter, FontStyles.font3, GStyles.marginTop(8)]}>
-          The recovery of decentralized accounts requires approval from your verifiers
+          {t(
+            'Verifiers protect your account and help you recover your assets when they are subject to risks. Please note: The more diversified your verifiers are, the higher security your assets enjoy.',
+          )}
         </TextM>
         <ListItem
           onPress={() =>
@@ -104,7 +111,9 @@ export default function SelectVerifier() {
               callBack: setSelectedVerifier,
             })
           }
-          titleLeftElement={<VerifierImage uri={selectedVerifier?.imageUrl} size={30} />}
+          titleLeftElement={
+            <VerifierImage label={selectedVerifier.name || ''} uri={selectedVerifier?.imageUrl} size={30} />
+          }
           titleStyle={[GStyles.flexRow, GStyles.itemCenter]}
           titleTextStyle={styles.titleTextStyle}
           style={[styles.selectedItem, BorderStyles.border1]}
@@ -116,7 +125,7 @@ export default function SelectVerifier() {
           {verifierList.slice(0, 3).map(item => {
             return (
               <Touchable style={GStyles.center} key={item.name} onPress={() => setSelectedVerifier(item)}>
-                <VerifierImage uri={item.imageUrl} size={42} />
+                <VerifierImage label={item.name} uri={item.imageUrl} size={42} />
                 <TextS style={[FontStyles.font3, styles.verifierTitle]}>{item.name}</TextS>
               </Touchable>
             );

@@ -3,8 +3,8 @@ export enum TransactionTypes {
   CROSS_CHAIN_TRANSFER = 'CrossChainTransfer',
   CROSS_CHAIN_RECEIVE_TOKEN = 'CrossChainReceiveToken',
   SOCIAL_RECOVERY = 'SocialRecovery',
-  REMOVE_MANAGER = 'RemoveManager',
-  ADD_MANAGER = 'AddManager',
+  REMOVE_MANAGER = 'RemoveManagerInfo',
+  ADD_MANAGER = 'AddManagerInfo',
 }
 
 export const transactionTypes = [
@@ -19,7 +19,7 @@ export const transactionTypes = [
 export const transactionTypesForActivityList = [
   TransactionTypes.TRANSFER,
   TransactionTypes.CROSS_CHAIN_TRANSFER,
-  // 'CrossChainReceiveToken', // activityListPage dont need this type
+  // 'CrossChainReceiveToken', // activityListPage do not need this type
   TransactionTypes.SOCIAL_RECOVERY,
   TransactionTypes.ADD_MANAGER,
   TransactionTypes.REMOVE_MANAGER,
@@ -60,8 +60,16 @@ export const DEFAULT_AMOUNT = 0;
 export const DEFAULT_DECIMAL = 8;
 export const DEFAULT_DIGITS = 4;
 
+export const ELF_DECIMAL = 8;
+
 export const MAIN_CHAIN_ID = 'AELF';
 export const MAIN_CHAIN = 'MainChain';
 export const SIDE_CHAIN = 'SideChain';
 export const TESTNET = 'TESTNET';
 export const TEST_NET = 'Testnet';
+
+export const HIDDEN_TRANSACTION_TYPES = [
+  TransactionTypes.SOCIAL_RECOVERY,
+  TransactionTypes.ADD_MANAGER,
+  TransactionTypes.REMOVE_MANAGER,
+];

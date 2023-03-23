@@ -42,7 +42,7 @@ export default function GuardiansEdit() {
         value: item.id,
         children: (
           <div className="flex verifier-option">
-            <BaseVerifierIcon width={32} height={32} src={item.imageUrl} />
+            <BaseVerifierIcon fallback={item.name[0]} src={item.imageUrl} />
             <span className="title">{item.name}</span>
           </div>
         ),

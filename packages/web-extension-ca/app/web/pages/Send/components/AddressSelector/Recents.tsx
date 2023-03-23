@@ -101,7 +101,7 @@ export default function Recents({
         <RecentItem item={item} key={index} onClick={onChange} />
       ))}
       {recentList.length > 0 && (
-        <LoadingMore hasMore={recentList.length < recentTotalNumber} loadMore={fetchMoreRecent} />
+        <LoadingMore className="loading" hasMore={recentList.length < recentTotalNumber} loadMore={fetchMoreRecent} />
       )}
       {recentList.length === 0 && <p className="no-data">{t('There is no recents')}</p>}
     </div>

@@ -30,7 +30,7 @@ const PortKeyHeader = forwardRef(({ onUserClick, customLogoShow = true }: PortKe
     // <div className={isPrompt ? 'prompt-portkey-header' : 'portkey-header'}>
     <div className={'portkey-header'}>
       <div className="portkey-header-body">
-        <div className="porkey-area">
+        <div className="portkey-area">
           <CustomSvg type="PortKey" className="portkey-logo" />
           {isPrompt && <div className="portkey-label">PORTKEY</div>}
         </div>

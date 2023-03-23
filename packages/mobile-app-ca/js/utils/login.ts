@@ -1,4 +1,3 @@
-import { LoginStrType } from '@portkey-wallet/constants/constants-ca/guardian';
 import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type';
 import { resetWallet } from '@portkey-wallet/store/store-ca/wallet/actions';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
@@ -39,7 +38,7 @@ export function handleGuardiansApproved(guardiansStatus: GuardiansStatus, userGu
         ...status?.verifierInfo,
         value: guardian?.guardianAccount,
         guardianType: guardian?.guardianType,
-        type: LoginStrType[guardian?.guardianType as LoginType],
+        type: LoginType[guardian?.guardianType as LoginType],
       };
     })
     .filter(item => item.signature && item.verificationDoc);

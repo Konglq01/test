@@ -6,8 +6,10 @@ import { useWalletInfo } from 'store/Provider/hooks';
 import './index.less';
 import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { CROSS_FEE } from '@portkey-wallet/constants/constants-ca/wallet';
-import { unitConverter } from '@portkey-wallet/utils/converter';
-import { isAelfAddress } from '@portkey-wallet/utils/aelf';
+import { formatAmountShow } from '@portkey-wallet/utils/converter';
+import { getEntireDIDAelfAddress, isAelfAddress } from '@portkey-wallet/utils/aelf';
+import { ChainId } from '@portkey-wallet/types';
+import { chainShowText } from '@portkey-wallet/utils';
 
 export default function SendPreview({
   amount,
@@ -36,14 +38,6 @@ export default function SendPreview({
   const wallet = useCurrentWalletInfo();
   const isTestNet = useMemo(() => currentNetwork === 'TESTNET', [currentNetwork]);
   // const ElfPrice = useTokenPrice(['ELF']);
-  const isMain = useMemo(() => (chainId === 'AELF' ? 'MainChain' : 'SideChain'), [chainId]);
-  const txFee = useMemo(() => {
-    if (isCross && symbol === 'ELF') {
-      return ZERO.plus(CROSS_FEE).plus(transactionFee).toNumber();
-    } else {
-      return transactionFee;
-    }
-  }, [isCross, symbol, transactionFee]);
   const toChain = useMemo(() => {
     const arr = toAccount.address.split('_');
     if (isAelfAddress(arr[arr.length - 1])) {
@@ -51,13 +45,17 @@ export default function SendPreview({
     }
     return arr[arr.length - 1];
   }, [toAccount.address]);
+  const entireFromAddressShow = useMemo(
+    () => getEntireDIDAelfAddress(wallet[chainId].caAddress, undefined, chainId),
+    [chainId, wallet],
+  );
 
   return (
     <div className="send-preview">
       {type !== 'nft' ? (
         <div className="amount-preview">
           <p className="amount">
-            -{unitConverter(amount)} {symbol}
+            -{formatAmountShow(amount)} {symbol}
           </p>
           <p className="convert">{isTestNet ? '' : `$ ${amount}`}</p>
         </div>
@@ -70,7 +68,7 @@ export default function SendPreview({
               <p className="token-id">{`#${tokenId}`}</p>
             </p>
             <p className="quantity">
-              Amount: <span>{unitConverter(amount)}</span>
+              Amount: <span>{formatAmountShow(amount)}</span>
             </p>
           </div>
         </div>
@@ -80,11 +78,7 @@ export default function SendPreview({
           <span className="label">From</span>
           <div className="value">
             <p className="name">{walletName}</p>
-            <p className="address">
-              {wallet[chainId].caAddress.includes('ELF_')
-                ? wallet[chainId].caAddress.replace(/(?<=^\w{9})\w+(?=\w{10})/, '...')
-                : wallet[chainId].caAddress.replace(/(?<=^\w{6})\w+(?=\w{6})/, '...')}
-            </p>
+            <p className="address">{entireFromAddressShow.replace(/(?<=^\w{9})\w+(?=\w{10})/, '...')}</p>
           </div>
         </div>
         <div className={clsx('item', toAccount.name?.length || 'no-name')}>
@@ -101,28 +95,38 @@ export default function SendPreview({
         <div className="item network">
           <span>Network</span>
           <div>
-            <p>{`${isMain} ${chainId}->${toChain === 'AELF' ? 'MainChain' : 'SideChain'} ${toChain}`}</p>
+            <p className="chain">
+              {`${chainShowText(chainId as ChainId)} ${chainId}->${chainShowText(toChain as ChainId)} ${toChain}`}
+            </p>
           </div>
         </div>
       </div>
       <div className="fee-preview">
         <span className="label">Transaction fee</span>
         <p className="value">
-          <span className="symbol">{`${unitConverter(txFee)} ELF`}</span>
+          <span className="symbol">{`${formatAmountShow(transactionFee)} ELF`}</span>
           {/* <span className="usd">{`$ ${ZERO.plus(ElfPrice[0]).times(txFee).toFixed(2)}`}</span> */}
         </p>
       </div>
       {isCross && symbol === 'ELF' && (
-        <div className="fee-preview">
-          <span className="label">Estimated Amount Received</span>
-          <p className="value">
-            <span className="symbol">{`${
-              ZERO.plus(amount).isLessThanOrEqualTo(ZERO.plus(CROSS_FEE))
-                ? '0'
-                : unitConverter(ZERO.plus(amount).minus(ZERO.plus(CROSS_FEE)))
-            } ELF`}</span>
-          </p>
-        </div>
+        <>
+          <div className="fee-preview">
+            <span className="label">Cross chain Transaction fee</span>
+            <p className="value">
+              <span className="symbol">{`${formatAmountShow(CROSS_FEE)} ELF`}</span>
+            </p>
+          </div>
+          <div className="fee-preview">
+            <span className="label">Estimated amount received</span>
+            <p className="value">
+              <span className="symbol">{`${
+                ZERO.plus(amount).isLessThanOrEqualTo(ZERO.plus(CROSS_FEE))
+                  ? '0'
+                  : formatAmountShow(ZERO.plus(amount).minus(ZERO.plus(CROSS_FEE)))
+              } ELF`}</span>
+            </p>
+          </div>
+        </>
       )}
     </div>
   );

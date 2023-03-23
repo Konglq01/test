@@ -24,7 +24,7 @@ import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import { useCaAddresses, useChainIdList, useWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { fetchTokenListAsync } from '@portkey-wallet/store/store-ca/assets/slice';
 import Loading from 'components/Loading';
-import { formatChainInfo } from 'utils';
+import { formatChainInfoToShow } from '@portkey-wallet/utils';
 import { FontStyles } from 'assets/theme/styles';
 import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
 
@@ -43,6 +43,7 @@ const Item = ({ isTestnet, item, onHandleToken }: ItemProps) => {
   return (
     <TouchableOpacity style={itemStyle.wrap} key={`${item.symbol}${item.address}${item.chainId}}`}>
       <CommonAvatar
+        hasBorder
         shapeType="circular"
         title={item.symbol}
         svgName={item.symbol === ELF_SYMBOL ? 'elf-icon' : undefined}
@@ -57,14 +58,21 @@ const Item = ({ isTestnet, item, onHandleToken }: ItemProps) => {
             {item.symbol}
           </TextL>
           <TextS numberOfLines={1} ellipsizeMode={'tail'} style={[FontStyles.font3]}>
-            {`${formatChainInfo(item.chainId)} ${isTestnet && 'Testnet'}`}
+            {`${formatChainInfoToShow(item.chainId)} ${isTestnet && 'Testnet'}`}
           </TextS>
         </View>
 
         {item.isDefault ? (
           <Svg icon="lock" size={pTd(20)} iconStyle={itemStyle.addedStyle} />
         ) : (
-          <CommonSwitch value={!!item.isAdded} onChange={() => onHandleToken(item, item.isAdded ? 'delete' : 'add')} />
+          <TouchableOpacity
+            onPress={() => {
+              onHandleToken(item, item.isAdded ? 'delete' : 'add');
+            }}>
+            <View pointerEvents="none">
+              <CommonSwitch value={!!item.isAdded} />
+            </View>
+          </TouchableOpacity>
         )}
       </View>
     </TouchableOpacity>
@@ -209,7 +217,7 @@ const itemStyle = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderBottomColor: defaultColors.border6,
-    borderBottomWidth: pTd(0.5),
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   addedStyle: {
     marginRight: pTd(14),
