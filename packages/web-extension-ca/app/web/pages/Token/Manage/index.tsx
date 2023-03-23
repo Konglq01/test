@@ -7,13 +7,15 @@ import { useToken } from '@portkey-wallet/hooks/hooks-ca/useToken';
 import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
 import DropdownSearch from 'components/DropdownSearch';
 import { useTranslation } from 'react-i18next';
-import { useAppDispatch, useTokenInfo, useUserInfo } from 'store/Provider/hooks';
+import { useAppDispatch, useCommonState, useTokenInfo, useUserInfo } from 'store/Provider/hooks';
 import { fetchAllTokenListAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
 import { useChainIdList } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import './index.less';
 import { transNetworkText } from '@portkey-wallet/utils/activity';
 import { useIsTestnet } from 'hooks/useNetwork';
 import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
+import PromptFrame from 'pages/components/PromptFrame';
+import clsx from 'clsx';
 
 export default function AddToken() {
   const { t } = useTranslation();
@@ -96,36 +98,41 @@ export default function AddToken() {
     [isTestNet, renderTokenItem],
   );
 
-  return (
-    <div className="add-token">
-      <div className="add-token-top">
-        <SettingHeader title={t('Add tokens')} leftCallBack={() => navigate(-1)} rightElement={rightElement} />
-        <DropdownSearch
-          overlayClassName="empty-dropdown"
-          open={openDrop}
-          overlay={<div className="empty-tip">{t('There is no search result')}</div>}
-          value={filterWord}
-          inputProps={{
-            // onBlur: () => setOpenDrop(false),
-            onFocus: () => {
-              if (filterWord && !tokenDataShowInMarket.length) setOpenDrop(true);
-            },
-            onChange: (e) => {
-              const _value = e.target.value.replaceAll(' ', '');
-              if (!_value) setOpenDrop(false);
+  const { isPrompt } = useCommonState();
+  const mainContent = () => {
+    return (
+      <div className={clsx(['add-token', isPrompt ? 'detail-page-prompt' : null])}>
+        <div className="add-token-top">
+          <SettingHeader title={t('Add tokens')} leftCallBack={() => navigate(-1)} rightElement={rightElement} />
+          <DropdownSearch
+            overlayClassName="empty-dropdown"
+            open={openDrop}
+            overlay={<div className="empty-tip">{t('There is no search result')}</div>}
+            value={filterWord}
+            inputProps={{
+              // onBlur: () => setOpenDrop(false),
+              onFocus: () => {
+                if (filterWord && !tokenDataShowInMarket.length) setOpenDrop(true);
+              },
+              onChange: (e) => {
+                const _value = e.target.value.replaceAll(' ', '');
+                if (!_value) setOpenDrop(false);
 
-              setFilterWord(_value);
-            },
-            placeholder: 'Search token',
-          }}
-        />
+                setFilterWord(_value);
+              },
+              placeholder: 'Search token',
+            }}
+          />
+        </div>
+        {!!tokenDataShowInMarket.length && (
+          <div className="add-token-content">{tokenDataShowInMarket.map((item) => renderList(item))}</div>
+        )}
+        {/* {filterWord && !tokenDataShowInMarket.length && (
+      <div className="flex-center fix-max-content add-token-content-empty">{t('There is no search result.')}</div>
+    )} */}
       </div>
-      {!!tokenDataShowInMarket.length && (
-        <div className="add-token-content">{tokenDataShowInMarket.map((item) => renderList(item))}</div>
-      )}
-      {/* {filterWord && !tokenDataShowInMarket.length && (
-        <div className="flex-center fix-max-content add-token-content-empty">{t('There is no search result.')}</div>
-      )} */}
-    </div>
-  );
+    );
+  };
+
+  return <>{isPrompt ? <PromptFrame content={mainContent()} /> : mainContent()}</>;
 }

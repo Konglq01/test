@@ -1,4 +1,5 @@
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import { IconType } from './icon';
 
 export enum GuardianMth {
   addGuardian = 'AddGuardian',
@@ -8,9 +9,10 @@ export enum GuardianMth {
   UnsetGuardianTypeForLogin = 'UnsetGuardianForLogin',
 }
 
-export interface GuardianType {
-  type: LoginType;
-  guardianType: string;
+export interface IGuardianType {
+  label: string;
+  value: LoginType;
+  icon: IconType;
 }
 
 export interface VerifierType {
@@ -32,26 +34,13 @@ export interface GuardianItem {
   verificationInfo: verificationInfo;
 }
 
-export interface GuardianAddType {
-  caHash: string;
-  guardianToAdd: GuardianItem;
-  guardiansApproved: GuardianItem[];
+export interface IPhoneInput {
+  code: string;
+  phoneNumber: string;
 }
 
-export interface GuardianDelType {
-  caHash: string;
-  guardianToRemove: GuardianType;
-  guardiansApproved: GuardianItem[];
-}
-
-export interface GuardianEditType {
-  caHash: string;
-  guardianToUpdatePre: GuardianType;
-  guardianToUpdateNew: GuardianType;
-  guardiansApproved: GuardianItem[];
-}
-
-export interface GuardianTypeForLoginAccount {
-  caHash: string;
-  guardianType: GuardianType;
+export interface ISocialInput {
+  name: string;
+  value: string;
+  isShow?: boolean;
 }

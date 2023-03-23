@@ -4,7 +4,7 @@ import { IconType } from 'types/icon';
 export const getDeviceInfo = (deviceType: DeviceType): DeviceInfoType => {
   switch (deviceType) {
     case DeviceType.MAC: {
-      return { deviceName: 'MAC', deviceType };
+      return { deviceName: 'macOS', deviceType };
     }
     case DeviceType.WINDOWS: {
       return { deviceName: 'Windows', deviceType };
