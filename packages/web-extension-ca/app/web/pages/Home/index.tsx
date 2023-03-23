@@ -15,7 +15,7 @@ export default function Home() {
   }, [navigate]);
 
   return (
-    <div className={clsx(['portkey-home', isPrompt ? 'portkey-home-prompt' : null])}>
+    <div className={clsx(['portkey-home', isPrompt ? 'portkey-prompt' : null])}>
       <PortKeyHeader onUserClick={onUserClick} />
       <div className="portkey-home-body">
         <MyBalance />
