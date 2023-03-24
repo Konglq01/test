@@ -70,7 +70,7 @@ export default function QRCode({ setLoginType }: { setLoginType: (type: PageLogi
       generateWallet();
     }, 10);
     let timer2: any;
-    myEvents.clearQRWallet.addListener(() => {
+    const listener = myEvents.clearQRWallet.addListener(() => {
       timer2 = setTimeout(() => {
         setNewWallet(undefined);
         timer2 && clearTimeout(timer2);
@@ -82,6 +82,7 @@ export default function QRCode({ setLoginType }: { setLoginType: (type: PageLogi
     return () => {
       timer && clearTimeout(timer);
       timer2 && clearTimeout(timer2);
+      listener.remove();
     };
   });
   const qrData = useMemo(() => {
