@@ -215,7 +215,7 @@ export default function EditContact() {
           }
           appDispatch(fetchContactListAsync());
           navigate('/setting/contacts');
-          message.success(isEdit ? 'Edit Contact successful' : 'Add Contact successful');
+          message.success(isEdit ? 'Edit Contact Successful' : 'Add Contact Successful');
         }
       } catch (e: any) {
         console.log('onFinish==contact error', e);

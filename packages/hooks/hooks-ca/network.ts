@@ -25,3 +25,8 @@ export function useVerifierList() {
   const { verifierMap } = useAppCASelector(state => state.guardians);
   return useMemo(() => (verifierMap ? Object.values(verifierMap) : []), [verifierMap]);
 }
+
+export function useIsTestnet() {
+  const currentNetwork = useCurrentNetworkInfo();
+  return useMemo(() => currentNetwork.networkType === 'TESTNET', [currentNetwork]);
+}

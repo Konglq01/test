@@ -8,6 +8,8 @@ import SWController from 'controllers/SWController';
 import { getEnvironmentType } from 'utils';
 import { apis } from 'utils/BrowserApis';
 import errorHandler from 'utils/errorHandler';
+import popupHandler from 'utils/popupHandler';
+import { getLocalStorage, setLocalStorage } from 'utils/storage/chromeStorage';
 
 // function onMessage(msg: any, port: any) {
 //   console.log('received', msg, 'from', port.sender);
@@ -27,8 +29,19 @@ import errorHandler from 'utils/errorHandler';
 
 export default function connectListener() {
   apis.runtime.onConnect.addListener(async (port: any) => {
-    const isContentConnect = getEnvironmentType(port.sender.url) === ENVIRONMENT_TYPE_SERVICE_WORKER;
-    console.log(isContentConnect, port, 'isContentConnect===');
+    const portType = getEnvironmentType(port.sender.url);
+    if (portType === 'popup') {
+      // Save popup router state
+      port.onDisconnect.addListener(async () => {
+        // popup close;
+        const state = await getLocalStorage('locationState');
+        setLocalStorage({
+          lastLocationState: state,
+        });
+        popupHandler.closeHandler();
+      });
+    }
+    const isContentConnect = portType === ENVIRONMENT_TYPE_SERVICE_WORKER;
     if (isContentConnect) {
       SWController.connectWebAppByTab(port.sender);
       // console.log(port, 'connectListener===port');

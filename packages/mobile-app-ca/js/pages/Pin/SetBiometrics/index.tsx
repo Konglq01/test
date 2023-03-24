@@ -26,8 +26,10 @@ import CommonToast from 'components/CommonToast';
 import { useIntervalGetResult } from 'hooks/login';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { useSetBiometrics } from 'hooks/useBiometrics';
+import { useLanguage } from 'i18n/hooks';
 const ScrollViewProps = { disabled: true };
 export default function SetBiometrics() {
+  const { t } = useLanguage();
   usePreventHardwareBack();
   const dispatch = useAppDispatch();
   const timer = useRef<TimerResult>();
@@ -73,7 +75,7 @@ export default function SetBiometrics() {
     }
     if (managerInfo) {
       timer.current?.remove();
-      Loading.show();
+      Loading.show({ text: t('Creating address on the chain...') });
       timer.current = onIntervalGetResult({
         managerInfo,
         onPass: (info: CAInfo) => {
@@ -91,7 +93,7 @@ export default function SetBiometrics() {
           onResultFail(dispatch, message, managerInfo?.verificationType === VerificationType.communityRecovery, true),
       });
     }
-  }, [caInfo, dispatch, isSyncCAInfo, managerInfo, onIntervalGetResult, pin]);
+  }, [caInfo, dispatch, isSyncCAInfo, managerInfo, onIntervalGetResult, pin, t]);
   const openBiometrics = useCallback(async () => {
     if (!pin) return;
     try {

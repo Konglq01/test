@@ -22,6 +22,7 @@ import { GuardiansStatus, GuardiansStatusItem } from 'pages/Guardian/types';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import useDebounceCallback from 'hooks/useDebounceCallback';
 import { verification } from 'utils/api';
+import { useLanguage } from 'i18n/hooks';
 import { useVerifyToken } from 'hooks/authentication';
 import { RouterParams } from 'pages/Guardian/GuardianApproval';
 import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
@@ -50,6 +51,7 @@ function GuardianItemButton({
 }: GuardianAccountItemProps & {
   disabled?: boolean;
 }) {
+  const { t } = useLanguage();
   const { authenticationInfo } = useRouterParams<RouterParams>();
 
   const itemStatus = useMemo(() => guardiansStatus?.[guardianItem.key], [guardianItem.key, guardiansStatus]);
@@ -209,7 +211,6 @@ export default function GuardianItem({
   isSuccess,
   approvalType = ApprovalType.register,
 }: GuardianAccountItemProps) {
-  // console.log(guardianItem, '=====guardianItem');
   const itemStatus = useMemo(() => guardiansStatus?.[guardianItem.key], [guardianItem.key, guardiansStatus]);
   const disabled = isSuccess && itemStatus?.status !== VerifyStatus.Verified;
   return (
@@ -221,7 +222,12 @@ export default function GuardianItem({
       )}
       <View style={[GStyles.flexRowWrap, GStyles.itemCenter, GStyles.flex1]}>
         <Svg iconStyle={styles.loginTypeIcon} icon={LoginGuardianTypeIcon[guardianItem.guardianType]} size={pTd(32)} />
-        <VerifierImage size={pTd(32)} uri={guardianItem.verifier?.imageUrl} style={styles.iconStyle} />
+        <VerifierImage
+          size={pTd(32)}
+          label={guardianItem?.verifier?.name}
+          uri={guardianItem.verifier?.imageUrl}
+          style={styles.iconStyle}
+        />
         <TextM numberOfLines={1} style={[styles.nameStyle, GStyles.flex1]}>
           {guardianItem.guardianAccount}
         </TextM>

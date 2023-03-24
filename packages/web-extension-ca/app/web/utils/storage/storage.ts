@@ -15,6 +15,11 @@ const storage = {
   reduxStorageName,
   reduxStorageToken,
   reduxStorageWallet,
+
+  // route state cache
+  locationState: 'LOCATION_STATE',
+  lastLocationState: 'LAST_LOCATION_STATE',
+  popupCloseTime: 'POPUP_CLOSE_TIME',
 };
 
 export default storage;

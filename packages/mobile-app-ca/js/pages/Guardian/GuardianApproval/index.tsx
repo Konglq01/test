@@ -139,7 +139,7 @@ export default function GuardianApproval() {
 
   const onAddGuardian = useCallback(async () => {
     if (!managerAddress || !caHash || !verifierInfo || !guardianItem || !guardiansStatus || !userGuardiansList) return;
-    Loading.show();
+    Loading.show({ text: t('Processing on the chain...') });
     try {
       const caContract = await getCurrentCAContract();
       const req = await addGuardian(
@@ -162,11 +162,11 @@ export default function GuardianApproval() {
       CommonToast.failError(error);
     }
     Loading.hide();
-  }, [caHash, getCurrentCAContract, guardianItem, guardiansStatus, managerAddress, userGuardiansList, verifierInfo]);
+  }, [caHash, getCurrentCAContract, guardianItem, guardiansStatus, managerAddress, t, userGuardiansList, verifierInfo]);
 
   const onDeleteGuardian = useCallback(async () => {
     if (!managerAddress || !caHash || !guardianItem || !userGuardiansList || !guardiansStatus) return;
-    Loading.show();
+    Loading.show({ text: t('Processing on the chain...') });
     try {
       const caContract = await getCurrentCAContract();
       const req = await deleteGuardian(
@@ -187,11 +187,11 @@ export default function GuardianApproval() {
       CommonToast.failError(error);
     }
     Loading.hide();
-  }, [caHash, getCurrentCAContract, guardianItem, guardiansStatus, managerAddress, userGuardiansList]);
+  }, [caHash, getCurrentCAContract, guardianItem, guardiansStatus, managerAddress, t, userGuardiansList]);
 
   const onEditGuardian = useCallback(async () => {
     if (!managerAddress || !caHash || !preGuardian || !guardianItem || !userGuardiansList || !guardiansStatus) return;
-    Loading.show();
+    Loading.show({ text: t('Processing on the chain...') });
     try {
       const caContract = await getCurrentCAContract();
       const req = await editGuardian(
@@ -222,6 +222,7 @@ export default function GuardianApproval() {
     guardiansStatus,
     managerAddress,
     preGuardian,
+    t,
     userGuardiansList,
   ]);
 

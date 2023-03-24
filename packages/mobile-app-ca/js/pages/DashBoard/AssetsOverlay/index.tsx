@@ -1,7 +1,7 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import OverlayModal from 'components/OverlayModal';
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { TextL, TextS, TextXL } from 'components/CommonText';
+import { FlatList, StyleSheet, Text, TouchableOpacity, View, DeviceEventEmitter } from 'react-native';
+import { TextL, TextS } from 'components/CommonText';
 import { ModalBody } from 'components/ModalBody';
 import CommonInput from 'components/CommonInput';
 import { AccountType } from '@portkey-wallet/types/wallet';
@@ -22,6 +22,9 @@ import { IToSendHomeParamsType } from '@portkey-wallet/types/types-ca/routeParam
 import { formatChainInfoToShow } from '@portkey-wallet/utils';
 import { ChainId } from '@portkey-wallet/types';
 import { useGStyles } from 'assets/theme/useGStyles';
+import { useIsTestnet } from '@portkey-wallet/hooks/hooks-ca/network';
+import myEvents from 'utils/deviceEvent';
+import { isIos } from 'walletappnew/js/utils/device';
 
 type onFinishSelectTokenType = (tokenItem: any) => void;
 type TokenListProps = {
@@ -32,6 +35,7 @@ type TokenListProps = {
 const AssetItem = (props: { symbol: string; onPress: (item: any) => void; item: IAssetItemType }) => {
   const { symbol, onPress, item } = props;
 
+  const isTestnet = useIsTestnet();
   const { currentNetwork } = useWallet();
 
   if (item.tokenInfo)
@@ -59,20 +63,18 @@ const AssetItem = (props: { symbol: string; onPress: (item: any) => void; item: 
               {`${symbol || 'Name'} #${tokenId}`}
             </TextL>
 
-            {/* TODO: why use currentNetwork   */}
-            {currentNetwork ? (
+            {isTestnet ? (
               <TextS numberOfLines={1} style={[FontStyles.font3, itemStyle.nftItemInfo]}>
                 {formatChainInfoToShow(chainId as ChainId, currentNetwork)}
               </TextS>
             ) : (
-              // TODO: price use witch one
+              // TODO: price use
               <TextL style={[FontStyles.font7]}>$ -</TextL>
             )}
           </View>
 
-          {/* TODO: num of nft use witch one */}
           <View style={itemStyle.balanceWrap}>
-            <TextL style={[itemStyle.token, FontStyles.font5]}>{item.nftInfo.balance}</TextL>
+            <TextL style={[itemStyle.token, FontStyles.font5]}>{item?.nftInfo?.balance}</TextL>
             <TextS style={itemStyle.dollar} />
           </View>
         </View>
@@ -125,7 +127,6 @@ const AssetList = ({ account }: TokenListProps) => {
           setListShow(pre => pre.concat(response.data));
         }
       } catch (err) {
-        // TODO: should show err?
         console.log('fetchAccountAssetsByKeywords err:', err);
       }
       pageInfoRef.current.isLoading = false;
@@ -144,10 +145,6 @@ const AssetList = ({ account }: TokenListProps) => {
     onKeywordChange();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debounceKeyword]);
-
-  // useEffectOnce(() => {
-  //   onKeywordChange();
-  // });
 
   const renderItem = useCallback(({ item }: { item: IAssetItemType }) => {
     return (
@@ -174,10 +171,15 @@ const AssetList = ({ account }: TokenListProps) => {
     );
   }, []);
 
+  const noData = useMemo(() => {
+    return debounceKeyword ? (
+      <NoData noPic message={t('No results found')} />
+    ) : (
+      <NoData noPic message={t('There are currently no assets to send.')} />
+    );
+  }, [debounceKeyword]);
   return (
-    <ModalBody modalBodyType="bottom" style={gStyles.overlayStyle}>
-      <TextXL style={[styles.title, FontStyles.font5]}>{t('Select Assets')}</TextXL>
-
+    <ModalBody modalBodyType="bottom" title={t('Select Assets')} style={gStyles.overlayStyle}>
       {/* no assets in this account  */}
       <CommonInput
         placeholder={t('Search Assets')}
@@ -189,24 +191,28 @@ const AssetList = ({ account }: TokenListProps) => {
           setKeyword(v.trim());
         }}
       />
-
-      {listShow.length === 0 ? (
-        debounceKeyword ? (
-          <NoData noPic message={t('No results found')} />
-        ) : (
-          <NoData noPic message={t('There are currently no assets to send.')} />
-        )
-      ) : (
-        <FlatList
-          style={styles.flatList}
-          data={listShow || []}
-          renderItem={renderItem}
-          keyExtractor={(_item, index) => `${index}`}
-          onEndReached={() => {
-            getList();
-          }}
-        />
-      )}
+      <FlatList
+        disableScrollViewPanResponder={true}
+        onLayout={e => {
+          DeviceEventEmitter.emit('nestScrollViewLayout', e.nativeEvent.layout);
+        }}
+        onScroll={({ nativeEvent }) => {
+          const {
+            contentOffset: { y: scrollY },
+          } = nativeEvent;
+          if (scrollY <= 0) {
+            myEvents.nestScrollForPullCloseModal.emit();
+          }
+        }}
+        style={styles.flatList}
+        data={listShow || []}
+        renderItem={renderItem}
+        keyExtractor={(_item, index) => `${index}`}
+        ListEmptyComponent={noData}
+        onEndReached={() => {
+          getList();
+        }}
+      />
     </ModalBody>
   );
 };
@@ -215,6 +221,7 @@ export const showAssetList = (props: TokenListProps) => {
   OverlayModal.show(<AssetList {...props} />, {
     position: 'bottom',
     autoKeyboardInsets: false,
+    enabledNestScrollView: true,
   });
 };
 
@@ -229,6 +236,7 @@ export const styles = StyleSheet.create({
     lineHeight: pTd(22),
     marginTop: pTd(17),
     marginBottom: pTd(16),
+    fontSize: pTd(20),
   },
   containerStyle: {
     marginLeft: pTd(16),

@@ -1,4 +1,5 @@
 import { isEffectiveNumber, ZERO } from '@portkey-wallet/constants/misc';
+import { DEFAULT_AMOUNT, DEFAULT_DECIMAL, DEFAULT_DIGITS } from '@portkey-wallet/constants/constants-ca/activity';
 import BigNumber from 'bignumber.js';
 import i18n from 'i18next';
 
@@ -73,4 +74,68 @@ export const formatStr2EllipsisStr = (address = '', digits = [10, 10], type: 'mi
   const pre = address.substring(0, digits[0]);
   const suffix = address.substring(len - digits[1]);
   return `${pre}...${suffix}`;
+};
+
+export enum AmountSign {
+  PLUS = '+',
+  MINUS = '-',
+  USD = '$ ',
+  EMPTY = '',
+}
+export interface IFormatAmountProps {
+  amount?: string | number;
+  decimals?: string | number;
+  digits?: number;
+  sign?: AmountSign;
+}
+
+/**
+ * formatAmount with prefix and unit
+ * @example $11.1   11.1K
+ */
+export function formatAmount({
+  amount = DEFAULT_AMOUNT,
+  decimals = DEFAULT_DECIMAL,
+  digits = DEFAULT_DIGITS,
+  sign = AmountSign.EMPTY,
+}: IFormatAmountProps): string {
+  let amountTrans = `${unitConverter(
+    ZERO.plus(amount).div(`1e${decimals || DEFAULT_DECIMAL}`),
+    digits || DEFAULT_DIGITS,
+  )}`;
+  if (sign && amountTrans !== '0') {
+    return `${sign}${amountTrans}`;
+  }
+  return amountTrans;
+}
+
+export interface IFormatWithCommasProps {
+  amount?: string | number;
+  decimals?: string | number;
+  digits?: number;
+  sign?: AmountSign;
+}
+/**
+ * formatAmount with prefix and thousand mark, not unit
+ * @example $11.1  +11.1  -11.1  9,999.9
+ */
+export function formatWithCommas({
+  amount = DEFAULT_AMOUNT,
+  decimals,
+  digits = DEFAULT_DIGITS,
+  sign = AmountSign.EMPTY,
+}: IFormatWithCommasProps): string {
+  const decimal = decimals || 0;
+  const amountTrans = `${divDecimals(ZERO.plus(amount), decimal).decimalPlaces(digits).toFormat()}`;
+
+  if (sign && amountTrans !== '0') {
+    return `${sign}${amountTrans}`;
+  }
+  return amountTrans;
+}
+
+export const formatAmountShow = (count: number | BigNumber | string, decimal = 4) => {
+  const bigCount = BigNumber.isBigNumber(count) ? count : new BigNumber(count || '');
+  if (bigCount.isNaN()) return '0';
+  return bigCount.decimalPlaces(decimal).toFormat();
 };

@@ -41,7 +41,7 @@ const WalletHome: React.FC<WalletHomeProps> = () => {
   const onExitClick = useCallback(
     async (isConfirm: boolean) => {
       if (!isConfirm || !managerAddress || !caHash) return;
-      Loading.show();
+      Loading.show({ text: t('Signing out of Portkey...') });
       try {
         const caContract = await getCurrentCAContract();
         const req = await removeManager(caContract, managerAddress, caHash);
@@ -58,7 +58,7 @@ const WalletHome: React.FC<WalletHomeProps> = () => {
       }
       Loading.hide();
     },
-    [caHash, getCurrentCAContract, logout, managerAddress],
+    [caHash, getCurrentCAContract, logout, managerAddress, t],
   );
 
   return (

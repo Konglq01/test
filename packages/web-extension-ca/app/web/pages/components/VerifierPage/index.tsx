@@ -138,7 +138,11 @@ export default function VerifierPage({ currentGuardian, guardianType, isInitStat
     <div className={clsx('verifier-page-wrapper', isPrompt || 'popup-page')}>
       {currentGuardian?.isLoginAccount && <div className="login-icon">{t('Login Account')}</div>}
       <div className="flex-row-center login-account-wrapper">
-        <VerifierPair guardianType={currentGuardian?.guardianType} verifierSrc={currentGuardian?.verifier?.imageUrl} />
+        <VerifierPair
+          guardianType={currentGuardian?.guardianType}
+          verifierSrc={currentGuardian?.verifier?.imageUrl}
+          verifierName={currentGuardian?.verifier?.name}
+        />
         <span className="login-account">{currentGuardian?.guardianAccount || ''}</span>
       </div>
       <div className="send-tip">

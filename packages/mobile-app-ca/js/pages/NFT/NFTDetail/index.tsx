@@ -1,6 +1,5 @@
 import React from 'react';
-import { Text, StyleSheet, TouchableOpacity, StatusBar } from 'react-native';
-import { Image } from '@rneui/base';
+import { StyleSheet, TouchableOpacity, StatusBar } from 'react-native';
 import { useLanguage } from 'i18n/hooks';
 import CommonButton from 'components/CommonButton';
 import GStyles from 'assets/theme/GStyles';
@@ -14,6 +13,7 @@ import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
 import { IToSendHomeParamsType } from '@portkey-wallet/types/types-ca/routeParams';
 import SafeAreaBox from 'components/SafeAreaBox';
 import Svg from 'components/Svg';
+import CommonAvatar from 'components/CommonAvatar';
 
 export interface TokenDetailProps {
   route?: any;
@@ -45,19 +45,9 @@ const NFTDetail: React.FC<TokenDetailProps> = props => {
       <TextXXL style={styles.title}>{`${alias} #${tokenId}`}</TextXXL>
       <TextM style={[FontStyles.font3, styles.balance]}>{`Balance ${balance}`}</TextM>
 
-      {!imageUrl ? (
-        <Text style={styles.image}>{alias[0]}</Text>
-      ) : (
-        <Image
-          source={{
-            uri: imageUrl,
-          }}
-          style={styles.image1}
-        />
-      )}
+      <CommonAvatar title={alias} style={[imageUrl ? styles.image1 : styles.image]} imageUrl={imageUrl} />
 
       <CommonButton
-        style={{}}
         type="primary"
         onPress={() => {
           navigationService.navigate('SendHome', {

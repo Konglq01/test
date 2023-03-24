@@ -141,7 +141,9 @@ export default function SelectVerifier() {
       <View>
         <TextXXXL style={GStyles.textAlignCenter}>Select verifier</TextXXXL>
         <TextM style={[GStyles.textAlignCenter, FontStyles.font3, GStyles.marginTop(8)]}>
-          The recovery of decentralized accounts requires approval from your verifiers
+          {t(
+            'Verifiers protect your account and help you recover your assets when they are subject to risks. Please note: The more diversified your verifiers are, the higher security your assets enjoy.',
+          )}
         </TextM>
         <ListItem
           onPress={() =>
@@ -151,7 +153,9 @@ export default function SelectVerifier() {
               callBack: setSelectedVerifier,
             })
           }
-          titleLeftElement={<VerifierImage uri={selectedVerifier?.imageUrl} size={30} />}
+          titleLeftElement={
+            <VerifierImage label={selectedVerifier.name || ''} uri={selectedVerifier?.imageUrl} size={30} />
+          }
           titleStyle={[GStyles.flexRowWrap, GStyles.itemCenter]}
           titleTextStyle={styles.titleTextStyle}
           style={[styles.selectedItem, BorderStyles.border1]}
@@ -163,7 +167,7 @@ export default function SelectVerifier() {
           {verifierList.slice(0, 3).map(item => {
             return (
               <Touchable style={GStyles.center} key={item.name} onPress={() => setSelectedVerifier(item)}>
-                <VerifierImage uri={item.imageUrl} size={42} />
+                <VerifierImage label={item.name} uri={item.imageUrl} size={42} />
                 <TextS style={[FontStyles.font3, styles.verifierTitle]}>{item.name}</TextS>
               </Touchable>
             );

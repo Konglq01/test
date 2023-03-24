@@ -54,6 +54,15 @@ export default function GuardiansView() {
     getGuardianList({ caHash: walletInfo.caHash });
   }, [getGuardianList, walletInfo.caHash]);
 
+  useEffect(() => {
+    const temp = userGuardiansList?.filter((guardian) => guardian.key === opGuardian?.key) || [];
+    if (temp.length > 0) {
+      dispatch(setCurrentGuardianAction(temp[0]));
+      dispatch(setOpGuardianAction(temp[0]));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userGuardiansList]);
+
   const verifyHandler = useCallback(async () => {
     try {
       if (opGuardian?.isLoginAccount) {
@@ -78,12 +87,7 @@ export default function GuardiansView() {
           },
         });
         console.log('unSetLoginAccount', result);
-        dispatch(
-          setOpGuardianAction({
-            ...opGuardian,
-            isLoginAccount: false,
-          }),
-        );
+        getGuardianList({ caHash: walletInfo.caHash });
         setLoading(false);
         setTipOpen(false);
       } else {
@@ -134,6 +138,7 @@ export default function GuardiansView() {
     currentGuardian,
     currentNetwork,
     dispatch,
+    getGuardianList,
     navigate,
     opGuardian,
     passwordSeed,
@@ -227,7 +232,7 @@ export default function GuardiansView() {
           <div className="input-item">
             <div className="label">{t('Verifier')}</div>
             <div className="control">
-              <BaseVerifierIcon width={32} height={32} src={opGuardian?.verifier?.imageUrl} />
+              <BaseVerifierIcon src={opGuardian?.verifier?.imageUrl} fallback={opGuardian?.verifier?.name[0]} />
               <span className="name">{opGuardian?.verifier?.name ?? ''}</span>
             </div>
           </div>

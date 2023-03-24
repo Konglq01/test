@@ -20,8 +20,11 @@ export const useAssetInfo = () => useAppSelector((state) => state.assets);
 export const useCustomModal = () => useAppSelector((state) => state.modal);
 export const useCommonState = () => useAppSelector((state) => state.common);
 export const useLoading = () => {
-  const { isLoading } = useAppSelector((state) => state.userInfo);
+  const { loadingInfo } = useAppSelector((state) => state.userInfo);
   const dispatch = useAppDispatch();
-  const setLoading = useCallback((v: boolean | OpacityType) => dispatch(setGlobalLoading(v)), [dispatch]);
-  return useMemo(() => ({ isLoading: !!isLoading, setLoading }), [isLoading, setLoading]);
+  const setLoading = useCallback(
+    (isLoading: boolean | OpacityType, loadingText?: string) => dispatch(setGlobalLoading({ isLoading, loadingText })),
+    [dispatch],
+  );
+  return useMemo(() => ({ isLoading: !!loadingInfo.isLoading, setLoading }), [loadingInfo.isLoading, setLoading]);
 };

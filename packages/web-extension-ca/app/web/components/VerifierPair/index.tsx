@@ -7,6 +7,7 @@ import './index.less';
 interface VerifierPairProps {
   guardianType?: LoginType;
   verifierSrc?: string;
+  verifierName?: string;
   wrapperClassName?: string;
   size?: number;
 }
@@ -22,13 +23,17 @@ export default function VerifierPair({
   guardianType = LoginType.Email,
   size = 32,
   verifierSrc,
+  verifierName,
   wrapperClassName,
 }: VerifierPairProps) {
   return (
     <div className={clsx('flex-row-center icon-pair', wrapperClassName)}>
-      <CustomSvg type={GuardianTypeIcon[guardianType] as any} style={{ width: size, height: size, fontSize: size }} />
+      <CustomSvg
+        type={guardianType === LoginType.Phone ? ('phone' as any) : 'email'}
+        style={{ width: size, height: size, fontSize: size }}
+      />
       <div className="verifier-icon-border">
-        <BaseVerifierIcon width={size} height={size} src={verifierSrc} />
+        <BaseVerifierIcon src={verifierSrc} fallback={verifierName?.[0]} />
       </div>
     </div>
   );
