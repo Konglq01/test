@@ -1,5 +1,4 @@
 import { Verification } from '@portkey-wallet/api/api-did/verification/utils';
-import { BaseAsyncStorage } from './storage';
+import { baseStore } from '@portkey-wallet/utils/mobile/storage';
 
-const store = new BaseAsyncStorage();
-export const verification = new Verification(store);
+export const verification = new Verification(baseStore);

@@ -19,7 +19,6 @@ interface Props {
 
 const JS_SRC = 'https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js';
 const SCRIPT_ID = 'apple-login';
-const _window = window as any;
 
 const LoginSocialApple = ({
   client_id,
@@ -81,6 +80,8 @@ Props) => {
   );
 
   const load = useCallback(() => {
+    const _window = window as any;
+
     if (checkIsExistsSDKScript()) {
       setIsSdkLoaded(true);
     } else {
@@ -99,6 +100,8 @@ Props) => {
   }, [scope, client_id, redirect_uri, insertScript, checkIsExistsSDKScript]);
 
   const loginApple = useCallback(async () => {
+    const _window = window as any;
+
     if (!isSdkLoaded) return;
     if (!_window.AppleID) {
       load();

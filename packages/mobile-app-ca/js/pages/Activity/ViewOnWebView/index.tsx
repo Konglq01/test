@@ -1,7 +1,6 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { defaultColors } from 'assets/theme';
-import { useLanguage } from 'i18n/hooks';
 import WebView from 'react-native-webview';
 import CustomHeader from 'components/CustomHeader';
 import SafeAreaBox from 'components/SafeAreaBox';

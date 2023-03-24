@@ -86,7 +86,6 @@ export function useOnManagerAddressAndQueryResult() {
             ...data,
           };
         }
-        console.log(data, JSON.stringify(data), managerInfo, '====data');
         const req = await fetch({
           data,
         });

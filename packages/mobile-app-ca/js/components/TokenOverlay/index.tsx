@@ -80,7 +80,7 @@ const TokenList = ({ onFinishSelectToken }: TokenListProps) => {
       />
       <FlatList
         onLayout={e => {
-          DeviceEventEmitter.emit('nestScrollViewLayout', e.nativeEvent.layout);
+          myEvents.nestScrollViewLayout.emit(e.nativeEvent.layout);
         }}
         disableScrollViewPanResponder={true}
         style={styles.flatList}
@@ -89,7 +89,7 @@ const TokenList = ({ onFinishSelectToken }: TokenListProps) => {
             contentOffset: { y: scrollY },
           } = nativeEvent;
           if (scrollY <= 0) {
-            myEvents.nestScrollForPullCloseModal.emit();
+            myEvents.nestScrollViewScrolledTop.emit();
           }
         }}
         data={tokenDataShowInMarket || []}
