@@ -6,6 +6,7 @@ import { defaultColors } from 'assets/theme';
 import { Image } from '@rneui/themed';
 import GStyles from 'assets/theme/GStyles';
 import { getAWSUrlWithSize } from '@portkey-wallet/utils/img';
+import { NFT_MIDDLE_SIZE } from '@portkey-wallet/constants/constants-ca/assets';
 
 export type NoDataPropsType = {
   style?: ViewStyle | ViewStyle[];
@@ -35,7 +36,7 @@ const NFTAvatar: React.FC<NoDataPropsType> = props => {
       {imageUrl && (
         <Image
           source={{
-            uri: getAWSUrlWithSize(imageUrl),
+            uri: getAWSUrlWithSize(imageUrl, NFT_MIDDLE_SIZE, NFT_MIDDLE_SIZE),
           }}
           containerStyle={styles.img}
         />

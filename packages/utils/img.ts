@@ -5,7 +5,12 @@ export const getAWSUrlWithSize = (
   width: number = NFT_SMALL_SIZE,
   height: number = NFT_SMALL_SIZE,
 ) => {
-  const sizeStr = `.com/${width}x${width}/`;
-  const urlArr = url.split('.com/');
-  return urlArr.join(sizeStr);
+  const sizeStr = `${width}x${height}`;
+  const urlArr = url.split('/');
+  const len = urlArr.length;
+  return urlArr
+    .slice(0, len - 1)
+    .concat([sizeStr])
+    .concat(urlArr[len - 1])
+    .join('/');
 };
