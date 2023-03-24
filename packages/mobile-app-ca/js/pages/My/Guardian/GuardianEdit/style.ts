@@ -40,7 +40,10 @@ export const pageStyles = StyleSheet.create({
   errorTips: {
     color: error,
   },
-  oAuthLabel: {
+  accountWrap: {
+    marginBottom: pTd(24),
+  },
+  accountLabel: {
     color: font3,
     marginLeft: pTd(8),
     marginBottom: pTd(8),
@@ -55,5 +58,15 @@ export const pageStyles = StyleSheet.create({
   typeIcon: {
     borderRadius: pTd(14),
     marginRight: pTd(12),
+  },
+  firstNameStyle: {
+    marginBottom: pTd(2),
+  },
+  thirdPartAccount: {
+    height: pTd(56),
+    borderRadius: pTd(6),
+    backgroundColor: defaultColors.bg1,
+    paddingHorizontal: pTd(16),
+    justifyContent: 'center',
   },
 });

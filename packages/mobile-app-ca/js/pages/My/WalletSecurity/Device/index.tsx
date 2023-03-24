@@ -31,7 +31,8 @@ const DeviceList: React.FC = () => {
       containerStyles={pageStyles.pageWrap}
       scrollViewProps={{ disabled: true }}>
       <TextM style={[FontStyles.font3, pageStyles.tipsWrap]}>
-        {`You may delete any device from the list, but you'll need to verify your identity through your guardians next time you log in to Portkey from the deleted device.`}
+        {`You can manage your login devices and remove any device. 
+Please note that when you log in again on a removed device, you will need to verify your identity through your guardians.`}
       </TextM>
       {deviceList.map(item => (
         <DeviceItem
