@@ -12,6 +12,7 @@ import { request } from '@portkey-wallet/api/api-did';
 import { ChainId } from '@portkey-wallet/types';
 import { AppleUserInfo, getGoogleUserInfo, parseAppleIdentityToken } from '@portkey-wallet/utils/authentication';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import { useInterface } from 'contexts/useInterface';
 
 if (!isIos) {
   GoogleSignin.configure({
@@ -45,10 +46,7 @@ export type AppleAuthentication = {
 export type GoogleAuthResponse = GoogleAuthentication;
 export function useGoogleAuthentication() {
   const [androidResponse, setResponse] = useState<any>();
-  const [googleRequest, response, promptAsync] = Google.useAuthRequest({
-    iosClientId: Config.GOOGLE_IOS_CLIENT_ID,
-    androidClientId: Config.GOOGLE_ANDROID_CLIENT_ID,
-  });
+  const [{ googleRequest, response, promptAsync }] = useInterface();
 
   const iosPromptAsync: () => Promise<GoogleAuthResponse> = useCallback(async () => {
     const info = await promptAsync();
