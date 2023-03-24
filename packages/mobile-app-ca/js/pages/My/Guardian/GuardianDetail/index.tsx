@@ -1,4 +1,3 @@
-import GStyles from 'assets/theme/GStyles';
 import CommonButton from 'components/CommonButton';
 import { TextL, TextM } from 'components/CommonText';
 import React, { useCallback } from 'react';
@@ -19,13 +18,16 @@ import { VerificationType } from '@portkey-wallet/types/verifier';
 import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import myEvents from 'utils/deviceEvent';
 import { VerifierImage } from 'pages/Guardian/components/VerifierImage';
-import { cancelLoginAccount } from 'utils/guardian';
+import { cancelLoginAccount, setLoginAccount } from 'utils/guardian';
 import { useGetCurrentCAContract } from 'hooks/contract';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verification } from 'utils/api';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import fonts from 'assets/theme/fonts';
+import GuardianAccountItem from '../components/GuardianAccountItem';
+import Divider from 'components/Divider';
+import { useAppleAuthentication, useGoogleAuthentication } from 'hooks/authentication';
 
 type RouterParams = {
   guardian?: UserGuardianItem;
@@ -40,6 +42,8 @@ export default function GuardianDetail() {
   const { userGuardiansList } = useGuardiansInfo();
   const { caHash, address: managerAddress } = useCurrentWalletInfo();
   const getCurrentCAContract = useGetCurrentCAContract();
+  const { appleSign } = useAppleAuthentication();
+  const { googleSign } = useGoogleAuthentication();
 
   const onCancelLoginAccount = useCallback(async () => {
     if (!managerAddress || !caHash || !guardian) return;
@@ -61,7 +65,26 @@ export default function GuardianDetail() {
     Loading.hide();
   }, [caHash, getCurrentCAContract, guardian, managerAddress]);
 
-  const setLoginAccount = useCallback(async () => {
+  const onSetLoginAccount = useCallback(async () => {
+    if (!managerAddress || !caHash || !guardian) return;
+
+    try {
+      const caContract = await getCurrentCAContract();
+      const req = await setLoginAccount(caContract, managerAddress, caHash, guardian);
+      if (req && !req.error) {
+        myEvents.refreshGuardiansList.emit();
+        navigationService.navigate('GuardianDetail', {
+          guardian: { ...guardian, isLoginAccount: true },
+        });
+      } else {
+        CommonToast.fail(req?.error?.message || '');
+      }
+    } catch (error) {
+      CommonToast.failError(error);
+    }
+  }, [caHash, getCurrentCAContract, guardian, managerAddress]);
+
+  const sendLoginAccountVerify = useCallback(async () => {
     if (!guardian) return;
     try {
       Loading.show();
@@ -152,12 +175,31 @@ export default function GuardianDetail() {
         }
       }
 
+      if ([LoginType.Apple, LoginType.Google].includes(guardian.guardianType)) {
+        Loading.show();
+        try {
+          if (guardian.guardianType === LoginType.Apple) {
+            await appleSign();
+          } else {
+            await googleSign();
+          }
+          CommonToast.success('Verified Successfully');
+          await onSetLoginAccount();
+        } catch (error) {
+          CommonToast.failError(error);
+        }
+        Loading.hide();
+        return;
+      }
+
       ActionSheet.alert({
         title2: (
           <Text>
             <TextL>{`${guardian.verifier?.name} will send a verification code to `}</TextL>
             <TextL style={fonts.mediumFont}>{guardian.guardianAccount}</TextL>
-            <TextL>{` to verify your email address.`}</TextL>
+            <TextL>{` to verify your ${
+              guardian.guardianType === LoginType.Phone ? 'phone number' : 'email address'
+            }.`}</TextL>
           </Text>
         ),
         buttons: [
@@ -167,12 +209,22 @@ export default function GuardianDetail() {
           },
           {
             title: t('Confirm'),
-            onPress: setLoginAccount,
+            onPress: sendLoginAccountVerify,
           },
         ],
       });
     },
-    [getGuardiansInfo, guardian, onCancelLoginAccount, setLoginAccount, t, userGuardiansList],
+    [
+      appleSign,
+      getGuardiansInfo,
+      googleSign,
+      guardian,
+      onCancelLoginAccount,
+      onSetLoginAccount,
+      sendLoginAccountVerify,
+      t,
+      userGuardiansList,
+    ],
   );
 
   return (
@@ -183,12 +235,11 @@ export default function GuardianDetail() {
       scrollViewProps={{ disabled: true }}>
       <View style={pageStyles.contentWrap}>
         <View style={pageStyles.guardianInfoWrap}>
-          <View style={pageStyles.guardianTypeWrap}>
-            <TextM>{guardian?.guardianAccount || ''}</TextM>
-          </View>
+          <GuardianAccountItem guardian={guardian} />
+          <Divider style={pageStyles.dividerStyle} />
           <View style={pageStyles.verifierInfoWrap}>
-            <VerifierImage style={GStyles.marginRight(8)} size={pTd(30)} uri={guardian?.verifier?.imageUrl} />
-            <TextM>{guardian?.verifier?.name || ''}</TextM>
+            <VerifierImage style={pageStyles.verifierImageStyle} size={pTd(28)} uri={guardian?.verifier?.imageUrl} />
+            <TextL>{guardian?.verifier?.name || ''}</TextL>
           </View>
         </View>
 

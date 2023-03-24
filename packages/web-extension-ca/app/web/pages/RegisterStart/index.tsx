@@ -21,7 +21,7 @@ import { message } from 'antd';
 import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
 import './index.less';
 import { SocialLoginFinishHandler } from 'types/wallet';
-import { getGoogleUserInfo } from '@portkey-wallet/utils/authentication';
+import { getGoogleUserInfo, parseAppleIdentityToken } from '@portkey-wallet/utils/authentication';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 
 export default function RegisterStart() {
@@ -139,13 +139,18 @@ export default function RegisterStart() {
             createType: isHasAccount.current ? 'login' : 'register',
           });
         } else if (type === 'Apple') {
-          // const userInfo = await getGoogleUserInfo(data?.accessToken);
-          // await validateIdentifier(userInfo.id);
-          // onInputFinish?.({
-          //   guardianAccount: userInfo.id, // account
-          //   loginType: LoginType[type],
-          //   createType: isHasAccount.current ? 'login' : 'register',
-          // });
+          const userInfo = parseAppleIdentityToken(data?.accessToken);
+          if (userInfo) {
+            await validateIdentifier(userInfo.userId);
+            onInputFinish({
+              guardianAccount: userInfo.userId, // account
+              loginType: LoginType.Apple,
+              authenticationInfo: { [userInfo.userId]: data?.access_token },
+              createType: isHasAccount.current ? 'login' : 'register',
+            });
+          } else {
+            throw 'Authorization failed';
+          }
         } else {
           message.error(`LoginType:${type} is not support`);
         }

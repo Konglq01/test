@@ -2,8 +2,8 @@ import { Button } from 'antd';
 import { useCallback, useRef, useState } from 'react';
 import { ValidateHandler } from 'types/wallet';
 import EmailInput, { EmailInputInstance } from '../EmailInput';
-import './index.less';
 import { useLoading } from 'store/Provider/hooks';
+import { handleErrorMessage } from '@portkey-wallet/utils';
 
 interface EmailTabProps {
   confirmText: string;
@@ -22,11 +22,12 @@ export default function EmailTab({ confirmText, validateEmail, onFinish }: Email
       await emailInputInstance?.current?.validateEmail(val);
       val && onFinish?.(val);
     } catch (error: any) {
-      setError(error);
+      const msg = handleErrorMessage(error);
+      setError(msg);
     } finally {
       setLoading(false);
     }
-  }, [onFinish, val]);
+  }, [onFinish, setLoading, val]);
 
   return (
     <div className="email-sign-wrapper">

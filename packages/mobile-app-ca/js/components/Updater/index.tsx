@@ -10,6 +10,8 @@ import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import useLocking from 'hooks/useLocking';
 import { useCaInfoOnChain } from 'hooks/useCaInfoOnChain';
 import { useFetchSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
+import { useCheckManager } from '@portkey-wallet/hooks/hooks-ca/graphql';
+import { useCheckManagerOnLogout } from 'hooks/useLogOut';
 
 export default function Updater() {
   // FIXME: delete language
@@ -21,8 +23,12 @@ export default function Updater() {
   const { apiUrl } = useCurrentNetworkInfo();
   const pin = usePin();
   const onLocking = useLocking();
+  const checkManagerOnLogout = useCheckManagerOnLogout();
   useRefreshTokenConfig(pin);
+
   useCaInfoOnChain();
+  useCheckManager(checkManagerOnLogout);
+
   useFetchSymbolImages();
   useMemo(() => {
     request.set('baseURL', apiUrl);

@@ -375,7 +375,7 @@ class SvgUri extends Component {
 }
 
 SvgUri.propTypes = {
-  style: PropTypes.object,
+  style: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
   width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   svgXmlData: PropTypes.string,
