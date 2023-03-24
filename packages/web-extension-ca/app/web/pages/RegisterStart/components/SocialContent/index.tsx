@@ -20,7 +20,7 @@ export default function SocialContent({ type, onFinish }: GoogleBtnProps) {
         if (result.error) throw result.message ?? result.Error;
         onFinish?.({
           type: v,
-          data: result.data?.data,
+          data: result.data,
         });
       } catch (error) {
         const msg = handleErrorMessage(error);

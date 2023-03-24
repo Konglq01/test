@@ -3,6 +3,7 @@ import { message } from 'antd';
 import InternalMessage from 'messages/InternalMessage';
 import { PortkeyMessageTypes } from 'messages/InternalMessageTypes';
 import { useCallback } from 'react';
+import { SendResponseParams } from 'types';
 import { setLocalStorage } from 'utils/storage/chromeStorage';
 
 export const completeRegistration = async () => {
@@ -36,5 +37,5 @@ export const setPinAction = async (pin: string) => {
 
 const loginUrl = 'http://localhost:3000/extension-login';
 
-export const socialLoginAction = async (type: ISocialLogin) =>
+export const socialLoginAction = async (type: ISocialLogin): Promise<SendResponseParams> =>
   await InternalMessage.payload(PortkeyMessageTypes.SOCIAL_LOGIN, { externalLink: `${loginUrl}/${type}` }).send();
