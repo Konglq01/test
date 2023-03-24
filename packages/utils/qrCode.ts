@@ -23,6 +23,7 @@ export type QrCodeDataArrType = [
   string | number,
   number | undefined,
 ];
+
 export type QRCodeDataObjType = {
   address: string;
   netWorkType: NetworkType;
@@ -53,7 +54,10 @@ export const shrinkSendQrData = (data: QRCodeDataObjType): QrCodeDataArrType => 
   ];
 };
 
-export const expandQrData = (dataArr: QrCodeDataArrType): QRCodeDataObjType => {
+export const expandQrData = (data: QrCodeDataArrType | QRCodeDataObjType): QRCodeDataObjType => {
+  if (!Array.isArray(data)) return data;
+
+  let dataArr = data;
   return {
     address: dataArr[IndexOfQrData.ADDRESS_INDEX],
     netWorkType: dataArr[IndexOfQrData.NETWORK_TYPE_INDEX],

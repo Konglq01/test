@@ -7,6 +7,7 @@ import './index.less';
 interface VerifierPairProps {
   guardianType?: LoginType;
   verifierSrc?: string;
+  verifierName?: string;
   wrapperClassName?: string;
   size?: number;
 }
@@ -14,6 +15,7 @@ export default function VerifierPair({
   guardianType = LoginType.Email,
   size = 32,
   verifierSrc,
+  verifierName,
   wrapperClassName,
 }: VerifierPairProps) {
   return (
@@ -22,7 +24,7 @@ export default function VerifierPair({
         type={guardianType === LoginType.Phone ? ('phone' as any) : 'email'}
         style={{ width: size, height: size, fontSize: size }}
       />
-      <BaseVerifierIcon width={size} height={size} src={verifierSrc} />
+      <BaseVerifierIcon src={verifierSrc} fallback={verifierName?.[0]} />
     </div>
   );
 }

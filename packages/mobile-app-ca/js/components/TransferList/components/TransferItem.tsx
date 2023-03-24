@@ -10,9 +10,7 @@ import { formatChainInfoToShow, formatStr2EllipsisStr } from '@portkey-wallet/ut
 import { pTd } from 'utils/unit';
 import { ActivityItemType } from '@portkey-wallet/types/types-ca/activity';
 import { TransactionTypes, transactionTypesMap } from '@portkey-wallet/constants/constants-ca/activity';
-import { unitConverter } from '@portkey-wallet/utils/converter';
-import { ZERO } from '@portkey-wallet/constants/misc';
-import { SvgUri } from 'react-native-svg';
+import { AmountSign, divDecimals, formatAmountShow, formatWithCommas } from '@portkey-wallet/utils/converter';
 import CommonButton from 'components/CommonButton';
 import { useAppCASelector } from '@portkey-wallet/hooks/hooks-ca';
 import Loading from 'components/Loading';
@@ -44,12 +42,12 @@ const ActivityItem: React.FC<ActivityItemPropsType> = ({ item, onPress }) => {
   const dispatch = useAppDispatch();
 
   const amountString = useMemo(() => {
-    const { amount = '', isReceived, decimals = '', symbol } = item || {};
-    let _amountString = '';
-    if (amount) _amountString += isReceived ? '+' : '-';
-    _amountString += unitConverter(ZERO.plus(amount).div(`1e${decimals}`));
-    _amountString += symbol ? ` ${symbol}` : '';
-    return _amountString;
+    const { amount = '', isReceived, decimals = 8, symbol } = item || {};
+    let prefix = ' ';
+
+    if (amount) prefix = isReceived ? AmountSign.PLUS : AmountSign.MINUS;
+
+    return `${prefix} ${formatAmountShow(divDecimals(amount, Number(decimals)))}${symbol ? ' ' + symbol : ''}`;
   }, [item]);
 
   const showRetry = useCallback(
@@ -188,6 +186,7 @@ const itemStyle = StyleSheet.create({
     width: pTd(32),
     height: pTd(32),
     borderWidth: 0,
+    backgroundColor: defaultColors.bg1,
   },
   center: {
     flex: 1,

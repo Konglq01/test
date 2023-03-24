@@ -100,7 +100,7 @@ export default function AddGuardian() {
         value: item.id,
         children: (
           <div className="flex select-option">
-            <BaseVerifierIcon width={32} height={32} src={item.imageUrl} />
+            <BaseVerifierIcon fallback={item.name[0]} src={item.imageUrl} />
             <span className="title">{item.name}</span>
           </div>
         ),

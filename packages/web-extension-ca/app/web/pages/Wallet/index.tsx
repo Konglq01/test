@@ -76,6 +76,7 @@ export default function Wallet() {
       <div className="wallet-title">
         <BackHeader
           title={t('Wallet')}
+          leftCallBack={() => navigate('/')}
           rightElement={
             <CustomSvg
               type="Close2"

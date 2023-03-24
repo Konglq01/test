@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useRef } from 'react';
 import { View, StyleSheet, TextInput } from 'react-native';
 import { pTd } from 'utils/unit';
 import { defaultColors } from 'assets/theme';
@@ -6,6 +6,8 @@ import GStyles from 'assets/theme/GStyles';
 import { useLanguage } from 'i18n/hooks';
 import { TextM } from 'components/CommonText';
 import { FontStyles } from 'assets/theme/styles';
+import { useFocusEffect } from '@react-navigation/native';
+import { parseInputIntegerChange } from '@portkey-wallet/utils/input';
 
 interface AmountNFT {
   sendNumber: string;
@@ -16,11 +18,22 @@ export default function AmountNFT(props: AmountNFT) {
   const { sendNumber, setSendNumber } = props;
   const { t } = useLanguage();
 
+  const iptRef = useRef<any>();
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!iptRef || !iptRef?.current) return;
+      iptRef.current.focus();
+    }, []),
+  );
+
   return (
     <View style={styles.wrap}>
       <TextM style={styles.title}>Amount</TextM>
       <View style={styles.iptWrap}>
         <TextInput
+          autoFocus
+          ref={iptRef}
           style={[styles.inputStyle, sendNumber === '0' && FontStyles.font7]}
           keyboardType="numeric"
           maxLength={18}
@@ -28,7 +41,7 @@ export default function AmountNFT(props: AmountNFT) {
           onFocus={() => {
             if (sendNumber === '0') setSendNumber('');
           }}
-          onChangeText={(v: string) => setSendNumber(v.replace(/^(0+)|[^\d]+/g, ''))}
+          onChangeText={(v: string) => setSendNumber(parseInputIntegerChange(v))}
         />
       </View>
     </View>

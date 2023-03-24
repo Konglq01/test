@@ -8,6 +8,7 @@ const initialState: ActivityStateType = {
   activityMap: {},
   isFetchingActivities: false,
   failedActivityMap: {},
+  isLoading: false,
 };
 
 //it automatically uses the immer library to let you write simpler immutable updates with normal mutative code
@@ -38,6 +39,14 @@ export const activitySlice = createSlice({
         chainId,
         symbol,
       };
+
+      state.isLoading = false;
+    });
+    builder.addCase(getActivityListAsync.pending, (state, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(getActivityListAsync.rejected, (state, action) => {
+      state.isLoading = false;
     });
   },
 });

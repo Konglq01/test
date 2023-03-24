@@ -1,12 +1,17 @@
-import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { useCurrentChain, useIsValidSuffix } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
-import { AddressBookError } from '@portkey-wallet/store/addressBook/types';
 import { addFailedActivity, removeFailedActivity } from '@portkey-wallet/store/store-ca/activity/slice';
 import { IClickAddressProps } from '@portkey-wallet/types/types-ca/contact';
 import { BaseToken } from '@portkey-wallet/types/types-ca/token';
-import { isDIDAddress } from '@portkey-wallet/utils';
-import { getEntireDIDAelfAddress, getWallet, isCrossChain } from '@portkey-wallet/utils/aelf';
+import { getAddressChainId, isDIDAddress } from '@portkey-wallet/utils';
+import {
+  getAelfAddress,
+  getEntireDIDAelfAddress,
+  getWallet,
+  isCrossChain,
+  isEqAddress,
+} from '@portkey-wallet/utils/aelf';
 import aes from '@portkey-wallet/utils/aes';
 import { timesDecimals } from '@portkey-wallet/utils/converter';
 import { Button, message, Modal } from 'antd';
@@ -32,6 +37,7 @@ import { contractErrorHandler } from 'utils/tryErrorHandler';
 import { CROSS_FEE } from '@portkey-wallet/constants/constants-ca/wallet';
 import PromptFrame from 'pages/components/PromptFrame';
 import clsx from 'clsx';
+import { AddressCheckError } from '@portkey-wallet/store/store-ca/assets/type';
 
 export type Account = { address: string; name?: string };
 
@@ -65,6 +71,7 @@ export default function Send() {
   const [stage, setStage] = useState<Stage>(Stage.Address);
   const [amount, setAmount] = useState('');
   const [balance, setBalance] = useState('');
+  const isValidSuffix = useIsValidSuffix();
 
   const [txFee, setTxFee] = useState<string>();
   const currentChain = useCurrentChain(state.chainId);
@@ -83,15 +90,24 @@ export default function Send() {
     [state],
   );
 
-  const validateToAddress = useCallback((value: { name?: string; address: string } | undefined) => {
-    if (!value) return false;
-    if (!isDIDAddress(value.address)) {
-      setErrorMsg(AddressBookError.recipientAddressIsInvalid);
-      return false;
-    }
-    setErrorMsg('');
-    return true;
-  }, []);
+  const validateToAddress = useCallback(
+    (value: { name?: string; address: string } | undefined) => {
+      if (!value) return false;
+      const suffix = getAddressChainId(toAccount.address, chainInfo?.chainId || 'AELF');
+      if (!isDIDAddress(value.address) || !isValidSuffix(suffix)) {
+        setErrorMsg(AddressCheckError.recipientAddressIsInvalid);
+        return false;
+      }
+      const selfAddress = wallet[state.chainId].caAddress;
+      if (isEqAddress(selfAddress, getAelfAddress(toAccount.address)) && suffix === state.chainId) {
+        setErrorMsg(AddressCheckError.equalIsValid);
+        return false;
+      }
+      setErrorMsg('');
+      return true;
+    },
+    [chainInfo, isValidSuffix, state.chainId, toAccount.address, wallet],
+  );
 
   const btnDisabled = useMemo(() => {
     if (toAccount.address === '' || (stage === Stage.Amount && amount === '')) return true;

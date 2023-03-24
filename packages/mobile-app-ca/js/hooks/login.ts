@@ -27,7 +27,11 @@ import { extraDataEncode } from '@portkey-wallet/utils/device';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { useGetGuardiansInfo, useGetVerifierServers } from './guardian';
 import { handleUserGuardiansList } from '@portkey-wallet/utils/guardian';
+import { DEVICE_TYPE } from 'constants/common';
+import { useLanguage } from 'i18n/hooks';
+
 export function useOnManagerAddressAndQueryResult() {
+  const { t } = useLanguage();
   const dispatch = useAppDispatch();
   const biometricsReady = useBiometricsReady();
   const getDeviceInfo = useGetDeviceInfo();
@@ -54,7 +58,7 @@ export function useOnManagerAddressAndQueryResult() {
       verifierInfo?: VerifierInfo;
       guardiansApproved?: GuardiansApproved;
     }) => {
-      Loading.show();
+      Loading.show({ text: t('Creating address on the chain...') });
       await sleep(1000);
       const isRecovery = managerInfo.verificationType === VerificationType.communityRecovery;
       try {
@@ -133,7 +137,7 @@ export function useOnManagerAddressAndQueryResult() {
         pinRef?.current?.reset();
       }
     },
-    [biometricsReady, dispatch, getDeviceInfo, onIntervalGetResult],
+    [biometricsReady, dispatch, getDeviceInfo, onIntervalGetResult, t],
   );
 }
 

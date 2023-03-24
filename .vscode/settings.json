@@ -1,6 +1,7 @@
 {
   "cSpell.words": [
     "Aelf",
+    "bignumber",
     "Entypo",
     "Passcode",
     "portkey",
@@ -12,7 +13,5 @@
     "svgs",
     "walletappnew"
   ],
-  "cSpell.enableFiletypes": [
-    "typescriptreact"
-  ]
+  "cSpell.enableFiletypes": ["typescriptreact"]
 }
