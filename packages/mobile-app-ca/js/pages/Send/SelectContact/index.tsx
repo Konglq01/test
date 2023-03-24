@@ -16,49 +16,28 @@ import { TextS } from 'components/CommonText';
 import { useAppCommonDispatch } from '@portkey-wallet/hooks';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { fetchContactListAsync } from '@portkey-wallet/store/store-ca/contact/actions';
-import { request } from '@portkey-wallet/api/api-did';
 import { useContact } from '@portkey-wallet/hooks/hooks-ca/contact';
 import { ChainId } from '@portkey-wallet/types';
 import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { useRecent } from '@portkey-wallet/hooks/hooks-ca/useRecent';
 import { fetchRecentListAsync } from '@portkey-wallet/store/store-ca/recent/slice';
 
-interface ApiRecentAddressItemType {
-  caAddress: string;
-  chainId: string;
-  name: string;
-  transactionTime: string;
-  address: string;
-  addressChainId: string;
-}
-
 interface SelectContactProps {
   chainId: ChainId;
   onPress?: (contact: any) => void;
 }
-
-const MAX_RESULT_ACCOUNT = 10;
 
 export default function SelectContact(props: SelectContactProps) {
   const { chainId, onPress } = props;
 
   const { t } = useLanguage();
   const dispatch = useAppCommonDispatch();
-  const { contactMap, contactIndexList } = useContact();
+  const { contactIndexList } = useContact();
   const { walletInfo } = useCurrentWallet();
 
-  const { recentContactList } = useRecent(walletInfo?.[chainId]?.caAddress || '');
+  const caAddress = useMemo(() => walletInfo?.[chainId]?.caAddress || '', [chainId, walletInfo]);
 
-  console.log('recentContactListrecentContactList', recentContactList);
-
-  const [loading, setLoading] = useState<boolean>(false);
-  const [skipCount, setSkipCount] = useState(0);
-  const [recentTotalNumber, setRecentTotalNumber] = useState(0);
-  const [recentList, setRecentList] = useState<RecentContactItemType[]>([]);
-
-  useEffectOnce(() => {
-    dispatch(fetchContactListAsync());
-  });
+  const { recentContactList, totalRecordCount } = useRecent(caAddress || '');
 
   const renderItem = useCallback(
     ({ item }: { item: RecentContactItemType }) => {
@@ -67,81 +46,44 @@ export default function SelectContact(props: SelectContactProps) {
     [onPress],
   );
 
-  const fetchRecents = useCallback(() => {
-    setLoading(true);
-
-    return request.recent.fetchRecentTransactionUsers({
-      params: {
-        caAddresses: [walletInfo?.[chainId]?.caAddress] || [],
-        skipCount,
-        maxResultCount: MAX_RESULT_ACCOUNT,
-      },
-    });
-  }, [chainId, skipCount, walletInfo]);
-
-  const transFormData = useCallback(
-    (data: ApiRecentAddressItemType[]): any[] =>
-      data.map((ele: ApiRecentAddressItemType) => {
-        if (contactMap?.[ele.address]) {
-          return { ...contactMap?.[ele.address]?.[0], transactionTime: ele.transactionTime };
-        }
-        return { ...ele, addresses: [{ address: ele.address, chainId: ele.addressChainId }] };
-      }),
-    [contactMap],
-  );
-
-  // init Recent
-  // init Recent
-  useEffectOnce(() => {
-    fetchRecents().then(res => {
-      const { data, totalRecordCount } = res;
-
-      setSkipCount(MAX_RESULT_ACCOUNT);
-      setLoading(false);
-      setRecentList(transFormData(data as ApiRecentAddressItemType[]));
-      setRecentTotalNumber(totalRecordCount);
-    });
-  });
-
-  // fetchMoreRecent
-  const fetchMoreRecent = useCallback(() => {
-    fetchRecents().then(res => {
-      const { data, totalRecordCount } = res;
-
-      setSkipCount(skipCount + MAX_RESULT_ACCOUNT);
-      setLoading(false);
-      setRecentList([...recentList, ...transFormData(data as ApiRecentAddressItemType[])]);
-      setRecentTotalNumber(totalRecordCount);
-    });
-  }, [skipCount, fetchRecents, recentList, transFormData]);
-
   const isExistContact = useMemo<boolean>(
     () => contactIndexList.reduce((pv, cv) => pv + cv.contacts.length, 0) > 0,
     [contactIndexList],
   );
 
+  const loadMore = useCallback(() => {
+    dispatch(fetchRecentListAsync({ caAddress: caAddress, isFirstTime: false }));
+  }, [caAddress, dispatch]);
+
+  const init = useCallback(() => {
+    dispatch(fetchRecentListAsync({ caAddress: caAddress, isFirstTime: true }));
+    dispatch(fetchContactListAsync());
+  }, [caAddress, dispatch]);
+
+  useEffectOnce(() => {
+    init();
+  });
+
   const tabList = useMemo(() => {
     return [
       {
         name: t('Recents'),
-        tabItemDom:
-          recentList.length === 0 ? (
-            <NoData noPic message={t('There is no recents.')} />
-          ) : (
-            <View style={styles.recentListWrap}>
-              <FlashList
-                data={recentList || []}
-                renderItem={renderItem}
-                ListFooterComponent={<TextS style={styles.footer}>{t('No More Data')}</TextS>}
-                onEndReached={() => {
-                  if (recentTotalNumber <= recentList.length) return;
-                  if (loading) return;
+        tabItemDom: (
+          <View style={styles.recentListWrap}>
+            <FlashList
+              data={recentContactList || []}
+              renderItem={renderItem}
+              ListFooterComponent={<TextS style={styles.footer}>{t('No More Data')}</TextS>}
+              ListEmptyComponent={<NoData noPic message={t('There is no recents.')} />}
+              onEndReached={() => {
+                console.log('====', recentContactList.length, totalRecordCount);
 
-                  fetchMoreRecent();
-                }}
-              />
-            </View>
-          ),
+                if (recentContactList.length >= totalRecordCount) return;
+                loadMore();
+              }}
+            />
+          </View>
+        ),
       },
       {
         name: t('Contacts'),
@@ -149,8 +91,8 @@ export default function SelectContact(props: SelectContactProps) {
           <NoData noPic message={t('There is no contacts.')} />
         ) : (
           <ContactsList
-            style={styles.contactWrap}
             isReadOnly
+            style={styles.contactWrap}
             isIndexBarShow={false}
             isSearchShow={false}
             renderContactItem={(item: ContactItemType) => (
@@ -161,7 +103,7 @@ export default function SelectContact(props: SelectContactProps) {
         ),
       },
     ];
-  }, [fetchMoreRecent, isExistContact, loading, onPress, recentList, recentTotalNumber, renderItem, t]);
+  }, [isExistContact, loadMore, onPress, recentContactList, renderItem, t, totalRecordCount]);
 
   return <CommonTopTab tabList={tabList} />;
 }
