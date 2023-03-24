@@ -54,9 +54,7 @@ export function useCheckManagerOnLogout() {
       const caContract = await getCurrentCAViewContract();
       const info = await caContract?.callViewMethod('GetHolderInfo', { caHash });
       if (info) {
-        const { managerInfos } = info.data as {
-          managerInfos: ManagerInfo[];
-        };
+        const { managerInfos } = info.data as { managerInfos: ManagerInfo[] };
         const isManager = managerInfos?.some(manager => manager?.address === address);
         if (!isManager) logout();
       }
