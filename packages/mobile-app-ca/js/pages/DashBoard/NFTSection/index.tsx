@@ -14,7 +14,7 @@ import { useWallet } from 'hooks/store';
 import Touchable from 'components/Touchable';
 import { ChainId } from '@portkey-wallet/types';
 import { useRoute } from '@react-navigation/native';
-import useLockCallback from 'hooks/useLockCallback';
+import useLockCallback from '@portkey-wallet/hooks/useLockCallback';
 
 export interface OpenCollectionObjType {
   // key = symbol+chainId

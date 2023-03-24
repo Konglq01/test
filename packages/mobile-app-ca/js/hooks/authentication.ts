@@ -76,7 +76,8 @@ export function useGoogleAuthentication() {
         ...authentication,
       } as GoogleAuthResponse;
     }
-    const message = info.type === 'cancel' ? 'User cancel' : 'Verified failed';
+    const message =
+      info.type === 'cancel' ? '' : 'It seems that the authorization with your Google account has failed.';
     throw { ...info, message };
   }, [promptAsync, googleRequest?.codeVerifier]);
 
@@ -96,7 +97,10 @@ export function useGoogleAuthentication() {
       setResponse(googleResponse);
       return googleResponse;
     } catch (error: any) {
-      const message = error.code === statusCodes.SIGN_IN_CANCELLED ? 'User cancel' : 'Verified failed';
+      const message =
+        error.code === statusCodes.SIGN_IN_CANCELLED
+          ? ''
+          : 'It seems that the authorization with your Google account has failed.';
       throw { ...error, message };
     }
   }, []);
@@ -113,11 +117,35 @@ export function useAppleAuthentication() {
   const [response, setResponse] = useState<AppleAuthentication>();
   const promptAsync = useCallback(async () => {
     setResponse(undefined);
-    const appleInfo = await appleAuthentication.signInAsync();
-    const user = parseAppleIdentityToken(appleInfo.identityToken);
-    const userInfo = { ...appleInfo, user: { ...user, id: user?.userId } } as AppleAuthentication;
-    setResponse(userInfo);
-    return userInfo;
+    try {
+      const appleInfo = await appleAuthentication.signInAsync();
+      const user = parseAppleIdentityToken(appleInfo.identityToken);
+      if (appleInfo.fullName?.familyName) {
+        try {
+          await request.verify.sendAppleUserExtraInfo({
+            params: {
+              identityToken: appleInfo.identityToken,
+              userInfo: {
+                name: {
+                  firstName: appleInfo.fullName?.givenName,
+                  lastName: appleInfo.fullName?.familyName,
+                },
+                email: user?.email,
+              },
+            },
+          });
+        } catch (error) {
+          console.log(error, '======error');
+        }
+      }
+      const userInfo = { ...appleInfo, user: { ...user, id: user?.userId } } as AppleAuthentication;
+      setResponse(userInfo);
+      return userInfo;
+    } catch (error: any) {
+      const message =
+        error?.code === 'ERR_CANCELED' ? '' : 'It seems that the authorization with your Apple ID has failed.';
+      throw { ...error, message };
+    }
   }, []);
   return { appleResponse: response, appleSign: promptAsync };
 }
