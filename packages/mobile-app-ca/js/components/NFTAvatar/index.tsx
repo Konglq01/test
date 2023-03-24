@@ -5,6 +5,7 @@ import { TextM, TextS } from 'components/CommonText';
 import { defaultColors } from 'assets/theme';
 import { Image } from '@rneui/themed';
 import GStyles from 'assets/theme/GStyles';
+import { getAWSUrlWithSize } from '@portkey-wallet/utils/img';
 
 export type NoDataPropsType = {
   style?: ViewStyle | ViewStyle[];
@@ -34,7 +35,7 @@ const NFTAvatar: React.FC<NoDataPropsType> = props => {
       {imageUrl && (
         <Image
           source={{
-            uri: imageUrl,
+            uri: getAWSUrlWithSize(imageUrl),
           }}
           containerStyle={styles.img}
         />
