@@ -39,7 +39,7 @@ export function useVerifyAppleToken() {
     }
     const { userId } = parseAppleIdentityToken(accessToken) || {};
     if (userId !== params.id) throw new Error('Account does not match your guardian');
-
+    delete (params as any).id;
     return request.verify.verifyAppleToken({
       params: { ...params, accessToken },
     });

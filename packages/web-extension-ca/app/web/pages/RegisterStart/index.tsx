@@ -105,7 +105,7 @@ export default function RegisterStart() {
         setLoading(false);
         navigate('/login/guardian-approval');
       } catch (error) {
-        console.log(error, '====');
+        console.log(error, 'onLoginFinish====error');
         const errMsg = handleErrorMessage(error, 'login error');
         message.error(errMsg);
       } finally {
@@ -117,7 +117,6 @@ export default function RegisterStart() {
 
   const onInputFinish = useCallback(
     (loginInfo: LoginInfo) => {
-      console.log(isHasAccount, 'isHasAccount===3');
       if (isHasAccount?.current) return onLoginFinish(loginInfo);
       return onSignFinish(loginInfo);
     },
@@ -139,7 +138,8 @@ export default function RegisterStart() {
             createType: isHasAccount.current ? 'login' : 'register',
           });
         } else if (type === 'Apple') {
-          const userInfo = parseAppleIdentityToken(data?.accessToken);
+          const userInfo = parseAppleIdentityToken(data?.access_token);
+          console.log(userInfo, data, 'onSocialSignFinish');
           if (userInfo) {
             await validateIdentifier(userInfo.userId);
             onInputFinish({
