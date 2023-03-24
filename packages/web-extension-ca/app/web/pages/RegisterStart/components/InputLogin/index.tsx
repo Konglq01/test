@@ -10,11 +10,13 @@ export default function InputLogin({
   onBack,
   onFinish,
   validateEmail,
+  validatePhone,
 }: {
   type: RegisterType;
   onBack?: () => void;
   onFinish: InputInfoProps['onFinish'];
   validateEmail?: ValidateHandler;
+  validatePhone?: ValidateHandler;
 }) {
   const { t } = useTranslation();
 
@@ -26,7 +28,7 @@ export default function InputLogin({
         <CustomSvg type="BackLeft" onClick={onBack} />
         <span>{title}</span>
       </h1>
-      <InputInfo validateEmail={validateEmail} confirmText={title} onFinish={onFinish} />
+      <InputInfo validatePhone={validatePhone} validateEmail={validateEmail} confirmText={title} onFinish={onFinish} />
     </div>
   );
 }

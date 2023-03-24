@@ -10,6 +10,14 @@ interface VerifierPairProps {
   wrapperClassName?: string;
   size?: number;
 }
+
+const GuardianTypeIcon = {
+  [LoginType.Email]: 'email',
+  [LoginType.Phone]: 'GuardianPhone',
+  [LoginType.Google]: 'Google',
+  [LoginType.Apple]: 'Apple',
+};
+
 export default function VerifierPair({
   guardianType = LoginType.Email,
   size = 32,
@@ -18,11 +26,10 @@ export default function VerifierPair({
 }: VerifierPairProps) {
   return (
     <div className={clsx('flex-row-center icon-pair', wrapperClassName)}>
-      <CustomSvg
-        type={guardianType === LoginType.Phone ? ('phone' as any) : 'email'}
-        style={{ width: size, height: size, fontSize: size }}
-      />
-      <BaseVerifierIcon width={size} height={size} src={verifierSrc} />
+      <CustomSvg type={GuardianTypeIcon[guardianType] as any} style={{ width: size, height: size, fontSize: size }} />
+      <div className="verifier-icon-border">
+        <BaseVerifierIcon width={size} height={size} src={verifierSrc} />
+      </div>
     </div>
   );
 }

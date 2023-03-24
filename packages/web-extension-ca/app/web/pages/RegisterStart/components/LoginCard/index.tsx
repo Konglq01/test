@@ -11,10 +11,12 @@ enum STEP {
 export default function LoginCard({
   onFinish,
   validateEmail,
+  validatePhone,
   onSocialLoginFinish,
 }: {
   onFinish: (data: LoginInfo) => void;
   validateEmail?: ValidateHandler;
+  validatePhone?: ValidateHandler;
   onSocialLoginFinish: (data: any) => void;
 }) {
   const [step, setStep] = useState<STEP>(STEP.socialLogin);
@@ -25,6 +27,7 @@ export default function LoginCard({
         <InputLogin
           type="Login"
           validateEmail={validateEmail}
+          validatePhone={validatePhone}
           onFinish={onFinish}
           onBack={() => setStep(STEP.socialLogin)}
         />

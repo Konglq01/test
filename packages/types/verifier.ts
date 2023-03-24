@@ -35,3 +35,7 @@ export interface VerifierInfo {
   verificationDoc: string;
   signature: string;
 }
+
+export interface AuthenticationInfo {
+  [userId: string]: string;
+}

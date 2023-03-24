@@ -9,10 +9,11 @@ import './index.less';
 export interface InputInfoProps {
   confirmText: string;
   validateEmail?: ValidateHandler;
+  validatePhone?: ValidateHandler;
   onFinish: (v: { loginType: LoginType; guardianAccount: string }) => void;
 }
 
-export default function InputInfo({ confirmText, validateEmail, onFinish }: InputInfoProps) {
+export default function InputInfo({ confirmText, onFinish, validateEmail, validatePhone }: InputInfoProps) {
   const items: TabsProps['items'] = useMemo(
     () => [
       {
@@ -21,12 +22,13 @@ export default function InputInfo({ confirmText, validateEmail, onFinish }: Inpu
         children: (
           <PhoneTab
             confirmText={confirmText}
-            onFinish={(v) => {
+            validate={validatePhone}
+            onFinish={(v) =>
               onFinish({
-                loginType: LoginType.Apple,
-                guardianAccount: `+${v.code} ${v.phoneNumber}`,
-              });
-            }}
+                loginType: LoginType.Phone,
+                guardianAccount: `${v.code} ${v.phoneNumber}`,
+              })
+            }
           />
         ),
       },
@@ -37,17 +39,17 @@ export default function InputInfo({ confirmText, validateEmail, onFinish }: Inpu
           <EmailTab
             confirmText={confirmText}
             validateEmail={validateEmail}
-            onFinish={(v) => {
+            onFinish={(v) =>
               onFinish({
                 loginType: LoginType.Email,
                 guardianAccount: v,
-              });
-            }}
+              })
+            }
           />
         ),
       },
     ],
-    [onFinish, confirmText, validateEmail],
+    [confirmText, validatePhone, validateEmail, onFinish],
   );
 
   return (
