@@ -43,6 +43,7 @@ import {
 import { sleep } from '@portkey-wallet/utils';
 import { FontStyles } from 'assets/theme/styles';
 import { ChainId } from '@portkey-wallet/types';
+import { getAWSUrlWithSize } from '@portkey-wallet/utils/img';
 
 const SendHome: React.FC = () => {
   const { t } = useLanguage();
@@ -250,7 +251,7 @@ const SendHome: React.FC = () => {
           {!assetInfo?.imageUrl ? (
             <Text style={styles.noImg}>{assetInfo?.alias[0]}</Text>
           ) : (
-            <Image style={styles.img} source={{ uri: assetInfo?.imageUrl }} />
+            <Image style={styles.img} source={{ uri: getAWSUrlWithSize(assetInfo?.imageUrl) }} />
           )}
           <View style={styles.topLeft}>
             <TextL style={[styles.nftTitle, fonts.mediumFont]}>{`${assetInfo.alias} #${assetInfo?.tokenId}`} </TextL>
