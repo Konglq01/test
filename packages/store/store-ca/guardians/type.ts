@@ -11,6 +11,7 @@ export interface BaseGuardianItem {
   key: string; // `${loginGuardianType}&${verifier?.name}`,
   identifierHash: string;
   salt: string;
+  isPrivate?: boolean;
 }
 
 export interface IVerifierInfo {

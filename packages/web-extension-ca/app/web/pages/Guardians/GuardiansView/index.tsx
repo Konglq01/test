@@ -48,6 +48,7 @@ export default function GuardiansView() {
   const { walletInfo } = useCurrentWallet();
   const { passwordSeed } = useUserInfo();
   const editable = useMemo(() => Object.keys(userGuardiansList ?? {}).length > 1, [userGuardiansList]);
+  const isPhoneType = useMemo(() => opGuardian?.guardianType === LoginType.Phone, [opGuardian?.guardianType]);
 
   useEffect(() => {
     getGuardianList({ caHash: walletInfo.caHash });
@@ -253,8 +254,8 @@ export default function GuardiansView() {
       <CommonModal className="verify-confirm-modal" closable={false} open={tipOpen} onCancel={() => setTipOpen(false)}>
         <p className="modal-content">
           {`${opGuardian?.verifier?.name ?? ''} will send a verification code to `}
-          <span className="bold">{opGuardian?.guardianAccount}</span>
-          {` to verify your email address.`}
+          <span className="bold">{`${isPhoneType && '+ '}${opGuardian?.guardianAccount}`}</span>
+          {` to verify your ${isPhoneType ? 'phone number' : 'email address'}.`}
         </p>
         <div className="btn-wrapper">
           <Button onClick={() => setTipOpen(false)}>{t('Cancel')}</Button>

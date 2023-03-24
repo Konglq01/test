@@ -42,6 +42,8 @@ export default function AddGuardian() {
   const [emailErr, setEmailErr] = useState<string>();
   const [visible, setVisible] = useState<boolean>(false);
   const [exist, setExist] = useState<boolean>(false);
+  const [curKey, setCurKey] = useState<string>('');
+  const [accountShow, setAccountShow] = useState<string>('');
   const dispatch = useAppDispatch();
   const { setLoading } = useLoading();
   const { walletInfo } = useCurrentWallet();
@@ -73,27 +75,6 @@ export default function AddGuardian() {
 
   const selectVerifierItem = useMemo(() => verifierMap?.[verifierVal || ''], [verifierMap, verifierVal]);
 
-  const genKey = useMemo(() => {
-    // TODO how to generate key
-    let key = '';
-    switch (guardianType) {
-      case LoginType.Email: {
-        key = `${emailVal}&${verifierVal}`;
-        break;
-      }
-      case LoginType.Phone: {
-        key = `${phoneValue?.code}_${phoneValue?.phoneNumber}&${verifierVal}`;
-        break;
-      }
-      case LoginType.Apple:
-      case LoginType.Google: {
-        key = `${socialValue?.value}&${verifierVal}`;
-        break;
-      }
-    }
-    return key;
-  }, [emailVal, guardianType, phoneValue, socialValue, verifierVal]);
-
   const verifierOptions = useMemo(
     () =>
       Object.values(verifierMap ?? {})?.map((item) => ({
@@ -121,6 +102,33 @@ export default function AddGuardian() {
       })),
     [],
   );
+
+  const isPhoneType = useMemo(() => guardianType === LoginType.Phone, [guardianType]);
+
+  useEffect(() => {
+    let key = '',
+      tempAccount = '';
+    switch (guardianType) {
+      case LoginType.Email: {
+        key = `${emailVal}&${verifierVal}`;
+        tempAccount = `${emailVal}`;
+        break;
+      }
+      case LoginType.Phone: {
+        key = `${phoneValue?.code}${phoneValue?.phoneNumber}&${verifierVal}`;
+        tempAccount = `+${phoneValue?.code} ${phoneValue?.phoneNumber}`;
+        break;
+      }
+      case LoginType.Apple:
+      case LoginType.Google: {
+        key = `${socialValue?.value}&${verifierVal}`;
+        tempAccount = `${socialValue?.value}`;
+        break;
+      }
+    }
+    setAccountShow(tempAccount);
+    setCurKey(key);
+  }, [emailVal, guardianType, phoneValue, socialValue, verifierVal]);
 
   useEffect(() => {
     if (state === 'back' && opGuardian) {
@@ -230,11 +238,11 @@ export default function AddGuardian() {
     if (!selectVerifierItem) return message.error('Can not get the current verifier message');
     const isExist: boolean =
       Object.values(userGuardiansList ?? {})?.some((item) => {
-        return item.key === genKey;
+        return item.key === curKey;
       }) ?? false;
     setExist(isExist);
     !isExist && setVisible(true);
-  }, [emailVal, guardianType, selectVerifierItem, userGuardiansList, genKey]);
+  }, [emailVal, guardianType, selectVerifierItem, userGuardiansList, curKey]);
 
   const handleCommonVerify = useCallback(
     async (guardianAccount: string) => {
@@ -250,7 +258,7 @@ export default function AddGuardian() {
         await userGuardianList({ caHash: walletInfo.caHash });
         const result = await verification.sendVerificationCode({
           params: {
-            guardianIdentifier: emailVal as string,
+            guardianIdentifier: guardianAccount,
             type: LoginType[guardianType as LoginType],
             verifierId: selectVerifierItem?.id || '',
             chainId: DefaultChainId,
@@ -267,7 +275,7 @@ export default function AddGuardian() {
               sessionId: result.verifierSessionId,
               endPoint: result.endPoint,
             },
-            key: genKey,
+            key: curKey,
             isInitStatus: true,
             identifierHash: '',
             salt: '',
@@ -283,24 +291,14 @@ export default function AddGuardian() {
         message.error(_error);
       }
     },
-    [
-      dispatch,
-      emailVal,
-      genKey,
-      guardianType,
-      navigate,
-      selectVerifierItem,
-      setLoading,
-      userGuardianList,
-      walletInfo.caHash,
-    ],
+    [dispatch, curKey, guardianType, navigate, selectVerifierItem, setLoading, userGuardianList, walletInfo.caHash],
   );
 
   const handleVerify = useCallback(async () => {
     if (guardianType === LoginType.Email) {
       handleCommonVerify(emailVal || '');
     } else if (guardianType === LoginType.Phone) {
-      handleCommonVerify(`${phoneValue?.code}_${phoneValue?.phoneNumber}`);
+      handleCommonVerify(`${phoneValue?.code}${phoneValue?.phoneNumber}`);
     } else {
       navigate('/setting/guardian/guardian-approval', { state: 'guardians/add' });
     }
@@ -358,8 +356,8 @@ export default function AddGuardian() {
         onCancel={() => setVisible(false)}>
         <p className="modal-content">
           {`${verifierName} will send a verification code to `}
-          <span className="bold">{emailVal}</span>
-          {` to verify your email address.`}
+          <span className="bold">{accountShow}</span>
+          {` to verify your ${isPhoneType ? 'phone number' : 'email address'}.`}
         </p>
         <div className="btn-wrapper">
           <Button onClick={() => setVisible(false)}>{'Cancel'}</Button>
