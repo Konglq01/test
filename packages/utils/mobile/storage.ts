@@ -12,3 +12,5 @@ export class BaseAsyncStorage implements IStorage {
     return AsyncStorage.removeItem(key);
   }
 }
+
+export const baseStore = new BaseAsyncStorage();
