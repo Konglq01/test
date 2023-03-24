@@ -8,6 +8,7 @@ import { useLocation, useNavigate } from 'react-router';
 import { getDeviceIcon } from 'utils/device';
 import BackHeader from 'components/BackHeader';
 import { sleep } from '@portkey-wallet/utils';
+import { useLoading } from 'store/Provider/hooks';
 import './index.less';
 
 export default function DeviceLists() {
@@ -15,18 +16,21 @@ export default function DeviceLists() {
   const navigate = useNavigate();
   const { state } = useLocation();
   const { deviceList, refetch } = useDeviceList();
+  const { setLoading } = useLoading();
   const walletInfo = useCurrentWalletInfo();
 
   const handleRefresh = useCallback(async () => {
-    await sleep(1000);
+    setLoading(true);
+    await sleep(2000);
+    setLoading(false);
     refetch();
-  }, [refetch]);
+  }, [refetch, setLoading]);
 
   useEffect(() => {
     if (state === 'update') {
       handleRefresh();
     }
-  }, [handleRefresh, state]);
+  }, [handleRefresh, refetch, state]);
 
   const handleClick = useCallback(
     (item: DeviceItemType) => {
