@@ -1,4 +1,3 @@
-import { sleep } from '@portkey-wallet/utils';
 import { Button } from 'antd';
 import { useCallback, useRef, useState } from 'react';
 import { ValidateHandler } from 'types/wallet';

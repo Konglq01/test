@@ -13,7 +13,7 @@ export type GuardiansApproved = GuardianApproved[];
 
 export type GuardiansStatusItem = {
   status: VerifyStatus;
-  requestCodeResult: { verifierSessionId: string };
+  requestCodeResult?: { verifierSessionId: string };
   verifierInfo?: VerifierInfo;
 };
 

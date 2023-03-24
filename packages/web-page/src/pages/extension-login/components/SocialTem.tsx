@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { ISocialLogin } from '@portkey-wallet/types/types-ca/wallet';
 import { Button, Image } from 'antd';
@@ -16,29 +16,11 @@ const SUPPORT_TYPE = ['Google', 'Apple'];
 
 export default function SocialTem({ loginType }: { loginType: ISocialLogin }) {
   const onSuccess = useCallback(async (response: IResolveParams) => {
-    console.log(response, 'onResolve===LoginSocial');
-    if (!response.data) return;
-    const user = await fetch('https://www.googleapis.com/userinfo/v2/me', {
-      headers: { Authorization: `Bearer ${response.data.access_token}` },
-    }).then(res => res.json());
-    console.log(user, 'user===');
-    // user = {
-    //   id: '105383420233267111111798964',
-    //   email: '',
-    //   verified_email: true,
-    //   name: 'name',
-    //   given_name: 'given_name',
-    //   family_name: 'family_name',
-    //   picture: '',
-    //   locale: '',
-    // };
+    console.log(response, 'response====');
     window.portkey_did?.request({
       method: 'portkey_socialLogin',
       params: {
-        response: {
-          ...response,
-          user,
-        },
+        response,
       },
     });
   }, []);
@@ -62,13 +44,8 @@ export default function SocialTem({ loginType }: { loginType: ISocialLogin }) {
 
             {loginType === 'Google' && (
               <LoginSocialGoogle
-                // isOnlyGetToken
-                // typeResponse="idToken"
-                // scope="openid email profile"
+                isOnlyGetToken
                 client_id={process.env.NEXT_PUBLIC_GG_APP_ID || ''}
-                onLoginStart={() => {
-                  //
-                }}
                 onResolve={onSuccess}
                 onReject={onError}>
                 <Button className={styles['common-btn']}>
@@ -82,7 +59,7 @@ export default function SocialTem({ loginType }: { loginType: ISocialLogin }) {
               <LoginSocialApple
                 client_id={process.env.NEXT_PUBLIC_APP_APPLE_ID || ''}
                 scope={'name email'}
-                redirect_uri={'https://6bd8-123-113-146-87.jp.ngrok.io/appleAuth'}
+                redirect_uri={process.env.NEXT_PUBLIC_APP_APPLE_REDIRECT_URI || ''}
                 onResolve={onSuccess}
                 onReject={onError}>
                 <Button className={styles['common-btn']}>
