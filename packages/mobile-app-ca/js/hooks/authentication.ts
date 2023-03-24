@@ -86,7 +86,7 @@ export function useGoogleAuthentication() {
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
       // google services are available
     } catch (err) {
-      throw Error('play services are not available');
+      throw Error('Portkey‘s services are not available in your device.');
     }
     try {
       await GoogleSignin.hasPlayServices();
