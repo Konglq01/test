@@ -50,7 +50,7 @@ export default function ScanLogin() {
       leftCallback={() => navigationService.navigate('Tab')}
       rightDom={
         <Touchable onPress={() => navigationService.navigate('Tab')}>
-          <Svg size={pTd(14)} color={FontStyles.font3.color} icon="close" />
+          <Svg size={pTd(14)} color={FontStyles.font3.color} icon="close" iconStyle={styles.svgStyle} />
         </Touchable>
       }>
       <View style={GStyles.itemCenter}>
@@ -87,5 +87,8 @@ const styles = StyleSheet.create({
   cancelButtonStyle: {
     marginTop: 8,
     backgroundColor: 'transparent',
+  },
+  svgStyle: {
+    paddingRight: pTd(24),
   },
 });

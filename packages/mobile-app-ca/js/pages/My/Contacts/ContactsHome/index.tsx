@@ -19,6 +19,7 @@ const ContactsHome: React.FC = () => {
       safeAreaColor={['blue', 'white']}
       rightDom={
         <TouchableOpacity
+          style={{ padding: pTd(16) }}
           onPress={() => {
             navigationService.navigate('ContactEdit');
           }}>

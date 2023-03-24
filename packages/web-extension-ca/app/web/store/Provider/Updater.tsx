@@ -10,6 +10,8 @@ import { useUserInfo } from './hooks';
 import { request } from '@portkey-wallet/api/api-did';
 import useLocking from 'hooks/useLocking';
 import { useActiveLockStatus } from 'hooks/useActiveLockStatus';
+import useLocationChange from 'hooks/useLocationChange';
+import useLocalInfo from 'hooks/useLocalInfo';
 
 keepAliveOnPages({});
 
@@ -18,9 +20,10 @@ export default function Updater() {
   const { passwordSeed } = useUserInfo();
   useVerifierList();
   useUpdateRedux();
+  useLocationChange();
   useChainListFetch();
   useRefreshTokenConfig(passwordSeed);
-
+  useLocalInfo();
   const apiUrl = useCurrentApiUrl();
 
   useMemo(() => {

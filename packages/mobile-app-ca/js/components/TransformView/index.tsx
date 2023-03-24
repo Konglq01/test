@@ -10,8 +10,13 @@ import {
   PanResponderInstance,
   NativeTouchEvent,
   LayoutChangeEvent,
+  DeviceEventEmitter,
+  EmitterSubscription,
 } from 'react-native';
 import { ViewStyleType } from 'types/styles';
+import myEvents from 'utils/deviceEvent';
+import { isIos } from '@portkey-wallet/utils/mobile/device';
+
 type ScrollType = 'up' | 'down' | 'left' | 'right' | 'vertical' | 'horizontal';
 type PanResponderCallback = (e: GestureResponderEvent, gestureState: PanResponderGestureState) => void;
 type TransformCallBackType = (translateX: number, translateY: number, scale: number) => void;
@@ -50,6 +55,7 @@ export interface TransformViewProps {
   onLayout?: (e: LayoutChangeEvent) => void;
   style?: ViewStyleType;
   children: ReactNode;
+  enabledNestScrollView: boolean;
 }
 
 interface AnimatedValue extends Animated.Value {
@@ -67,6 +73,7 @@ export default class TransformView extends Component<TransformViewProps, Transfo
     magnetic: true,
     tension: true,
     tensionFactor: 3,
+    enabledNestScrollView: false,
   };
   viewLayout: { x: number; y: number; width: number; height: number };
   prevTouches: NativeTouchEvent[];
@@ -80,17 +87,33 @@ export default class TransformView extends Component<TransformViewProps, Transfo
   speedX!: number;
   speedY!: number;
   touchTime?: Date;
+  panResponderStatus: boolean | undefined;
+  nestScrollViewLayout: any;
+  currentGestureDirection: string;
+  _listener: EmitterSubscription;
   constructor(props: TransformViewProps) {
     super(props);
     this.createPanResponder();
     this.prevTouches = [];
     this.viewLayout = { x: 0, y: 0, width: 0, height: 0 };
     this.initContentLayout = { x: 0, y: 0, width: 0, height: 0 };
+    this.nestScrollViewLayout = { x: 0, y: 0, width: 0, height: 0 };
     this.state = {
       translateX: new Animated.Value(0) as AnimatedValue,
       translateY: new Animated.Value(0) as AnimatedValue,
       scale: new Animated.Value(1) as AnimatedValue,
     };
+    this.initResponderStatus();
+    myEvents.nestScrollForPullCloseModal.addListener(() => {
+      this.panResponderStatus = true;
+    });
+    this._listener = DeviceEventEmitter.addListener('nestScrollViewLayout', layout => {
+      this.nestScrollViewLayout = layout;
+    });
+  }
+
+  componentWillUnmount() {
+    this._listener.remove();
   }
 
   get contentLayout() {
@@ -105,6 +128,10 @@ export default class TransformView extends Component<TransformViewProps, Transfo
     const scaleY = scaleOriginY - scaleHeight / 2;
     const contentLayout = { x: scaleX, y: scaleY, width: scaleWidth, height: scaleHeight };
     return contentLayout;
+  }
+
+  initResponderStatus() {
+    this.panResponderStatus = isIos ? !this.props.enabledNestScrollView : true;
   }
 
   setupLongPressTimer(e: GestureResponderEvent) {
@@ -126,10 +153,17 @@ export default class TransformView extends Component<TransformViewProps, Transfo
 
   createPanResponder() {
     this.panResponder = PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
+      onStartShouldSetPanResponder: (evt, gestureState) => false,
       onStartShouldSetPanResponderCapture: () => false,
       onMoveShouldSetPanResponder: (evt, gestureState) => {
-        return gestureState.dx !== 0 && gestureState.dy !== 0;
+        const { pageY } = evt.nativeEvent;
+        const { dx, dy } = gestureState;
+        if (isIos) {
+          return (
+            pageY < this.viewLayout.y + this.nestScrollViewLayout.y || (this.panResponderStatus && dx !== 0 && dy > 5)
+          );
+        }
+        return this.panResponderStatus && dx !== 0 && dy !== 0 && (Math.abs(dx) > 5 || Math.abs(dy) > 5);
       },
       onMoveShouldSetPanResponderCapture: () => false,
       onPanResponderGrant: (e, gestureState) => this.onPanResponderGrant(e, gestureState),
@@ -263,6 +297,7 @@ export default class TransformView extends Component<TransformViewProps, Transfo
   };
 
   onPanResponderRelease: PanResponderCallback = e => {
+    this.initResponderStatus();
     this.removeLongPressTimer();
     this.prevTouches = [];
     this.handleRelease();
@@ -305,6 +340,7 @@ export default class TransformView extends Component<TransformViewProps, Transfo
     const dx = t1.x - t0.x;
     const dy = t1.y - t0.y;
 
+    this.currentGestureDirection = dy > 0 ? 'down' : 'up';
     const t = touches[0].timestamp - prevTouches[0].timestamp;
     const speedX = t ? dx / t : 0;
     const speedY = t ? dy / t : 0;
@@ -420,7 +456,6 @@ export default class TransformView extends Component<TransformViewProps, Transfo
     this.viewLayout = e.nativeEvent.layout;
     this.props.onLayout?.(e);
   }
-
   render() {
     const { style, children, containerStyle } = this.props;
     const { translateX, translateY, scale } = this.state;

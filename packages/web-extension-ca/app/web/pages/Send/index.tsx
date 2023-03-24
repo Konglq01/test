@@ -1,12 +1,17 @@
-import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { useCurrentChain, useIsValidSuffix } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
-import { AddressBookError } from '@portkey-wallet/store/addressBook/types';
 import { addFailedActivity, removeFailedActivity } from '@portkey-wallet/store/store-ca/activity/slice';
 import { IClickAddressProps } from '@portkey-wallet/types/types-ca/contact';
 import { BaseToken } from '@portkey-wallet/types/types-ca/token';
-import { isDIDAddress } from '@portkey-wallet/utils';
-import { getEntireDIDAelfAddress, getWallet, isCrossChain } from '@portkey-wallet/utils/aelf';
+import { getAddressChainId, isDIDAddress } from '@portkey-wallet/utils';
+import {
+  getAelfAddress,
+  getEntireDIDAelfAddress,
+  getWallet,
+  isCrossChain,
+  isEqAddress,
+} from '@portkey-wallet/utils/aelf';
 import aes from '@portkey-wallet/utils/aes';
 import { timesDecimals } from '@portkey-wallet/utils/converter';
 import { Button, message, Modal } from 'antd';
@@ -15,7 +20,7 @@ import TitleWrapper from 'components/TitleWrapper';
 import { ReactElement, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router';
-import { useAppDispatch, useLoading, useUserInfo, useWalletInfo } from 'store/Provider/hooks';
+import { useAppDispatch, useCommonState, useLoading, useUserInfo, useWalletInfo } from 'store/Provider/hooks';
 import crossChainTransfer, { intervalCrossChainTransfer } from 'utils/sandboxUtil/crossChainTransfer';
 import sameChainTransfer from 'utils/sandboxUtil/sameChainTransfer';
 import AddressSelector from './components/AddressSelector';
@@ -30,6 +35,9 @@ import './index.less';
 import { the2ThFailedActivityItemType } from '@portkey-wallet/types/types-ca/activity';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
 import { CROSS_FEE } from '@portkey-wallet/constants/constants-ca/wallet';
+import PromptFrame from 'pages/components/PromptFrame';
+import clsx from 'clsx';
+import { AddressCheckError } from '@portkey-wallet/store/store-ca/assets/type';
 
 export type Account = { address: string; name?: string };
 
@@ -63,6 +71,7 @@ export default function Send() {
   const [stage, setStage] = useState<Stage>(Stage.Address);
   const [amount, setAmount] = useState('');
   const [balance, setBalance] = useState('');
+  const isValidSuffix = useIsValidSuffix();
 
   const [txFee, setTxFee] = useState<string>();
   const currentChain = useCurrentChain(state.chainId);
@@ -81,15 +90,24 @@ export default function Send() {
     [state],
   );
 
-  const validateToAddress = useCallback((value: { name?: string; address: string } | undefined) => {
-    if (!value) return false;
-    if (!isDIDAddress(value.address)) {
-      setErrorMsg(AddressBookError.recipientAddressIsInvalid);
-      return false;
-    }
-    setErrorMsg('');
-    return true;
-  }, []);
+  const validateToAddress = useCallback(
+    (value: { name?: string; address: string } | undefined) => {
+      if (!value) return false;
+      const suffix = getAddressChainId(toAccount.address, chainInfo?.chainId || 'AELF');
+      if (!isDIDAddress(value.address) || !isValidSuffix(suffix)) {
+        setErrorMsg(AddressCheckError.recipientAddressIsInvalid);
+        return false;
+      }
+      const selfAddress = wallet[state.chainId].caAddress;
+      if (isEqAddress(selfAddress, getAelfAddress(toAccount.address)) && suffix === state.chainId) {
+        setErrorMsg(AddressCheckError.equalIsValid);
+        return false;
+      }
+      setErrorMsg('');
+      return true;
+    },
+    [chainInfo, isValidSuffix, state.chainId, toAccount.address, wallet],
+  );
 
   const btnDisabled = useMemo(() => {
     if (toAccount.address === '' || (stage === Stage.Amount && amount === '')) return true;
@@ -414,61 +432,66 @@ export default function Send() {
     ],
   );
 
-  return (
-    <div className="page-send">
-      <TitleWrapper
-        className="page-title"
-        title={`Send ${type === 'token' ? symbol : ''}`}
-        leftCallBack={() => {
-          StageObj[stage].backFun();
-        }}
-        rightElement={<CustomSvg type="Close2" onClick={() => navigate('/')} />}
-      />
-      {stage !== Stage.Preview && (
-        <div className="address-wrap">
-          <div className="item from">
-            <span className="label">{t('From_with_colon')}</span>
-            <div className={'from-wallet control'}>
-              <div className="name">{walletName}</div>
+  const { isPrompt } = useCommonState();
+  const mainContent = () => {
+    return (
+      <div className={clsx(['page-send', isPrompt ? 'detail-page-prompt' : null])}>
+        <TitleWrapper
+          className="page-title"
+          title={`Send ${type === 'token' ? symbol : ''}`}
+          leftCallBack={() => {
+            StageObj[stage].backFun();
+          }}
+          rightElement={<CustomSvg type="Close2" onClick={() => navigate('/')} />}
+        />
+        {stage !== Stage.Preview && (
+          <div className="address-wrap">
+            <div className="item from">
+              <span className="label">{t('From_with_colon')}</span>
+              <div className={'from-wallet control'}>
+                <div className="name">{walletName}</div>
+              </div>
             </div>
-          </div>
-          <div className="item to">
-            <span className="label">{t('To_with_colon')}</span>
-            <div className="control">
-              <ToAccount
-                value={toAccount}
-                onChange={(v) => setToAccount(v)}
-                focus={stage !== Stage.Amount}
-                // onBlur={() => validateToAddress(toAccount)}
-              />
-              {stage === Stage.Amount && (
-                <CustomSvg
-                  type="Close2"
-                  onClick={() => {
-                    setStage(Stage.Address);
-                    setToAccount({ address: '' });
-                  }}
+            <div className="item to">
+              <span className="label">{t('To_with_colon')}</span>
+              <div className="control">
+                <ToAccount
+                  value={toAccount}
+                  onChange={(v) => setToAccount(v)}
+                  focus={stage !== Stage.Amount}
+                  // onBlur={() => validateToAddress(toAccount)}
                 />
-              )}
+                {stage === Stage.Amount && (
+                  <CustomSvg
+                    type="Close2"
+                    onClick={() => {
+                      setStage(Stage.Address);
+                      setToAccount({ address: '' });
+                    }}
+                  />
+                )}
+              </div>
             </div>
+            {errorMsg && <span className="error-msg">{errorMsg}</span>}
           </div>
-          {errorMsg && <span className="error-msg">{errorMsg}</span>}
-        </div>
-      )}
-      <div className="stage-ele">{StageObj[stage].element}</div>
-      {stage === Stage.Preview ? (
-        <div className="btn-wrap">
-          <Button disabled={btnDisabled} className="stage-btn" type="primary" onClick={StageObj[stage].handler}>
-            {StageObj[stage].btnText}
-          </Button>
-        </div>
-      ) : (
-        <p className="btn-wrap">
-          <Button disabled={btnDisabled} className="stage-btn" type="primary" onClick={StageObj[stage].handler}>
-            {StageObj[stage].btnText}
-          </Button>
-        </p>
-      )}
-    </div>
-  );
+        )}
+        <div className="stage-ele">{StageObj[stage].element}</div>
+        {stage === Stage.Preview ? (
+          <div className="btn-wrap">
+            <Button disabled={btnDisabled} className="stage-btn" type="primary" onClick={StageObj[stage].handler}>
+              {StageObj[stage].btnText}
+            </Button>
+          </div>
+        ) : (
+          <p className="btn-wrap">
+            <Button disabled={btnDisabled} className="stage-btn" type="primary" onClick={StageObj[stage].handler}>
+              {StageObj[stage].btnText}
+            </Button>
+          </p>
+        )}
+      </div>
+    );
+  };
+
+  return <>{isPrompt ? <PromptFrame content={mainContent()} /> : mainContent()}</>;
 }

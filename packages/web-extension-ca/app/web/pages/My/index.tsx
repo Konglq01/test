@@ -82,7 +82,7 @@ export default function My() {
           {MenuList.map((item) => (
             <MenuItem
               key={item.label}
-              height={53}
+              height={56}
               icon={<CustomSvg type={item.icon || 'Aelf'} />}
               onClick={() => {
                 navigate(item.router);

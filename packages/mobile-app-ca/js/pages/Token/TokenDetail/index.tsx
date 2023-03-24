@@ -23,11 +23,12 @@ import { ActivityItemType } from '@portkey-wallet/types/types-ca/activity';
 import { getActivityListAsync } from '@portkey-wallet/store/store-ca/activity/action';
 import { getCurrentActivityMapKey } from '@portkey-wallet/utils/activity';
 import { IActivitiesApiParams } from '@portkey-wallet/store/store-ca/activity/type';
-import { unitConverter } from '@portkey-wallet/utils/converter';
+import { divDecimals, formatAmountShow, unitConverter } from '@portkey-wallet/utils/converter';
 import { ZERO } from '@portkey-wallet/constants/misc';
 import { transactionTypesForActivityList as transactionList } from '@portkey-wallet/constants/constants-ca/activity';
 import fonts from 'assets/theme/fonts';
 import { fetchTokenListAsync } from '@portkey-wallet/store/store-ca/assets/slice';
+import { formatChainInfoToShow } from '@portkey-wallet/utils';
 
 interface RouterParams {
   tokenInfo: TokenItemShowType;
@@ -100,7 +101,10 @@ const TokenDetail: React.FC = () => {
     setFreshing(false);
   }, [getActivityList]);
 
-  const balanceShow = `${unitConverter(ZERO.plus(currentToken?.balance || 0).div(`1e${currentToken?.decimals && 8}`))}`;
+  const balanceShow = useMemo(
+    () => `${formatAmountShow(divDecimals(currentToken?.balance || '0', currentToken?.decimals))}`,
+    [currentToken?.balance, currentToken?.decimals],
+  );
 
   useEffectOnce(() => {
     getActivityList(true);
@@ -117,9 +121,9 @@ const TokenDetail: React.FC = () => {
       titleDom={
         <View>
           <TextXL style={[GStyles.textAlignCenter, FontStyles.font2, fonts.mediumFont]}>{tokenInfo.symbol}</TextXL>
-          <Text style={[GStyles.textAlignCenter, FontStyles.font2, styles.subTitle]}>{`${
-            tokenInfo.chainId === 'AELF' ? 'MainChain' : 'SideChain'
-          } ${tokenInfo.chainId}`}</Text>
+          <Text style={[GStyles.textAlignCenter, FontStyles.font2, styles.subTitle]}>
+            {formatChainInfoToShow(tokenInfo.chainId)}
+          </Text>
         </View>
       }
       safeAreaColor={['blue', 'white']}
@@ -145,18 +149,7 @@ const TokenDetail: React.FC = () => {
         keyExtractor={(_item, index) => `${index}`}
         ListEmptyComponent={<NoData noPic message="You have no transactions." />}
         renderItem={({ item }: { item: ActivityItemType }) => {
-          return (
-            <TransferItem
-              item={item}
-              onPress={() =>
-                navigationService.navigate('ActivityDetail', {
-                  transactionId: item.transactionId,
-                  blockHash: item.blockHash,
-                  isReceived: item.isReceived,
-                })
-              }
-            />
-          );
+          return <TransferItem item={item} onPress={() => navigationService.navigate('ActivityDetail', item)} />;
         }}
         onRefresh={() => {
           onRefreshList();

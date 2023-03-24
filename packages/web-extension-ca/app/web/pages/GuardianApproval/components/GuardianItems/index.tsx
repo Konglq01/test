@@ -1,6 +1,6 @@
 import { setCurrentGuardianAction, setUserGuardianItemStatus } from '@portkey-wallet/store/store-ca/guardians/actions';
 import { UserGuardianItem, UserGuardianStatus } from '@portkey-wallet/store/store-ca/guardians/type';
-import { VerifyStatus } from '@portkey-wallet/types/verifier';
+import { VerifierInfo, VerifyStatus } from '@portkey-wallet/types/verifier';
 import { Button, message } from 'antd';
 import clsx from 'clsx';
 import VerifierPair from 'components/VerifierPair';
@@ -14,8 +14,8 @@ import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
 import { verification } from 'utils/api';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
-import socialVerify from 'pages/GuardianApproval/utils/socialVerify';
 import { handleErrorMessage } from '@portkey-wallet/utils';
+import { useVerifyToken } from 'hooks/authentication';
 
 interface GuardianItemProps {
   disabled?: boolean;
@@ -138,13 +138,27 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
     [state, loginAccount, setLoading, guardianSendCode, dispatch, navigate],
   );
 
+  const verifyToken = useVerifyToken();
+
   const socialVerifyHandler = useCallback(
     async (item: UserGuardianItem) => {
-      //
       try {
         setLoading(true);
-        const result = await socialVerify(item);
-        // dispatch()
+        const result = await verifyToken(item.guardianType, {
+          accessToken: loginAccount?.authenticationInfo?.[item.guardianAccount],
+          id: item.guardianAccount,
+          verifierId: item.verifier?.id,
+          chainId: DefaultChainId,
+        });
+        const verifierInfo: VerifierInfo = { ...result, verifierId: item?.verifier?.id };
+        dispatch(
+          setUserGuardianItemStatus({
+            key: item.key,
+            signature: verifierInfo.signature,
+            verificationDoc: verifierInfo.verificationDoc,
+            status: VerifyStatus.Verified,
+          }),
+        );
       } catch (error) {
         const msg = handleErrorMessage(error);
         message.error(msg);
@@ -152,7 +166,7 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
         setLoading(false);
       }
     },
-    [setLoading],
+    [dispatch, loginAccount, setLoading, verifyToken],
   );
 
   const verifyingHandler = useCallback(
@@ -174,7 +188,11 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
     <li className={clsx('flex-between-center verifier-item', disabled && 'verifier-item-disabled')}>
       {item.isLoginAccount && <div className="login-icon">{t('Login Account')}</div>}
       <div className="flex-between-center">
-        <VerifierPair guardianType={item.guardianType} verifierSrc={item.verifier?.imageUrl} />
+        <VerifierPair
+          guardianType={item.guardianType}
+          verifierSrc={item.verifier?.imageUrl}
+          verifierName={item?.verifier?.name}
+        />
         <span className="account-text">{item.guardianAccount}</span>
       </div>
       {isExpired && item.status !== VerifyStatus.Verified ? (

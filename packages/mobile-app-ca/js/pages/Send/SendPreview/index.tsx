@@ -6,13 +6,13 @@ import { pTd } from 'utils/unit';
 import { TextM, TextS, TextL } from 'components/CommonText';
 import CommonButton from 'components/CommonButton';
 import ActionSheet from 'components/ActionSheet';
-import { formatChainInfoToShow, formatStr2EllipsisStr, isMainNet } from '@portkey-wallet/utils';
+import { addressFormat, formatChainInfoToShow, formatStr2EllipsisStr, isMainNet } from '@portkey-wallet/utils';
 import { isCrossChain } from '@portkey-wallet/utils/aelf';
 import { useLanguage } from 'i18n/hooks';
 import { useAppCommonDispatch } from '@portkey-wallet/hooks';
 import GStyles from 'assets/theme/GStyles';
 import fonts from 'assets/theme/fonts';
-import { Image, ScreenHeight } from '@rneui/base';
+import { Image } from '@rneui/base';
 import { getContractBasic } from '@portkey-wallet/contracts/utils';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { usePin, useWallet } from 'hooks/store';
@@ -23,7 +23,7 @@ import crossChainTransfer, {
 } from 'utils/transfer/crossChainTransfer';
 import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import { useCaAddresses, useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
-import { timesDecimals, unitConverter } from '@portkey-wallet/utils/converter';
+import { formatAmountShow, timesDecimals, unitConverter } from '@portkey-wallet/utils/converter';
 import sameChainTransfer from 'utils/transfer/sameChainTransfer';
 import { addFailedActivity, removeFailedActivity } from '@portkey-wallet/store/store-ca/activity/slice';
 import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
@@ -42,12 +42,9 @@ import {
 } from '@portkey-wallet/store/store-ca/assets/slice';
 import { sleep } from '@portkey-wallet/utils';
 import { FontStyles } from 'assets/theme/styles';
+import { ChainId } from '@portkey-wallet/types';
 
-export interface SendHomeProps {
-  route?: any;
-}
-
-const SendHome: React.FC<SendHomeProps> = props => {
+const SendHome: React.FC = () => {
   const { t } = useLanguage();
 
   const { sendType, assetInfo, toInfo, transactionFee, sendNumber } = useRouterParams<IToSendPreviewParamsType>();
@@ -238,11 +235,9 @@ const SendHome: React.FC<SendHomeProps> = props => {
   };
 
   const networkInfoShow = (address: string) => {
-    const chainId = address.split('_')[2];
-    return chainId === 'AELF' ? 'MainChain AELF' : `SideChain ${chainId} `;
+    const chainId = address.split('_')[2] as ChainId;
+    return formatChainInfoToShow(chainId);
   };
-
-  console.log('currentNetwork', currentNetwork);
 
   return (
     <PageContainer
@@ -265,7 +260,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
       ) : (
         <>
           <Text style={[styles.tokenCount, FontStyles.font5, fonts.mediumFont]}>
-            {`- ${sendNumber} ${assetInfo?.symbol}`}{' '}
+            {`- ${formatAmountShow(sendNumber)} ${assetInfo?.symbol}`}
           </Text>
           {/* <TextM style={styles.tokenUSD}>-$ -</TextM> */}
         </>
@@ -281,7 +276,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
             <View style={[styles.flexSpaceBetween]}>
               <TextM style={styles.lightGrayFontColor} />
               <TextS style={styles.lightGrayFontColor}>
-                {formatStr2EllipsisStr(`ELF_${wallet?.[assetInfo?.chainId]?.caAddress}_${assetInfo.chainId}`)}
+                {formatStr2EllipsisStr(addressFormat(wallet?.[assetInfo?.chainId]?.caAddress, assetInfo.chainId))}
               </TextS>
             </View>
           </View>
@@ -362,14 +357,16 @@ const SendHome: React.FC<SendHomeProps> = props => {
                   <TextM style={[styles.blackFontColor, styles.fontBold, GStyles.alignEnd]}>
                     {ZERO.plus(sendNumber).isLessThanOrEqualTo(ZERO.plus(CROSS_FEE))
                       ? '0'
-                      : unitConverter(ZERO.plus(sendNumber).minus(ZERO.plus(CROSS_FEE)))}{' '}
+                      : formatAmountShow(ZERO.plus(sendNumber).minus(ZERO.plus(CROSS_FEE)))}{' '}
                     {'ELF'}
                   </TextM>
                   {isMainNet(currentNetwork?.networkType ?? 'TESTNET') ? (
                     <TextS
-                      style={[styles.blackFontColor, styles.lightGrayFontColor, GStyles.alignEnd]}>{`$ ${unitConverter(
-                      CROSS_FEE,
-                    )}`}</TextS>
+                      style={[
+                        styles.blackFontColor,
+                        styles.lightGrayFontColor,
+                        GStyles.alignEnd,
+                      ]}>{`$ ${formatAmountShow(CROSS_FEE)}`}</TextS>
                   ) : (
                     <TextM />
                   )}

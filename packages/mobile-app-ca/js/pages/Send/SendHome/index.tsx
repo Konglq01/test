@@ -12,18 +12,17 @@ import ActionSheet from 'components/ActionSheet';
 import useQrScanPermission from 'hooks/useQrScanPermission';
 import { ZERO } from '@portkey-wallet/constants/misc';
 import { customFetch } from '@portkey-wallet/utils/fetch';
-import { getEntireDIDAelfAddress, isAllowAelfAddress, isCrossChain } from '@portkey-wallet/utils/aelf';
+import { getAelfAddress, getEntireDIDAelfAddress, isAllowAelfAddress, isCrossChain } from '@portkey-wallet/utils/aelf';
 import useDebounce from 'hooks/useDebounce';
 import { useLanguage } from 'i18n/hooks';
 import SelectContact from '../SelectContact';
 import AmountToken from '../AmountToken';
 import AmountNFT from '../AmountNFT';
 import NFTInfo from '../NFTInfo';
-import GStyles from 'assets/theme/GStyles';
 import CommonButton from 'components/CommonButton';
 import { getContractBasic } from '@portkey-wallet/contracts/utils';
 import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
-import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { useCurrentChain, useIsValidSuffix } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { getManagerAccount } from 'utils/redux';
 import { usePin } from 'hooks/store';
 import { timesDecimals, unitConverter } from '@portkey-wallet/utils/converter';
@@ -36,20 +35,18 @@ import Loading from 'components/Loading';
 import { DEFAULT_DECIMAL } from '@portkey-wallet/constants/constants-ca/activity';
 import { CROSS_FEE } from '@portkey-wallet/constants/constants-ca/wallet';
 
-export interface SendHomeProps {
-  route?: any;
-}
-enum ErrorMessage {
-  RecipientAddressIsInvalid = 'Recipient address is invalid',
-  NoCorrespondingNetwork = 'No corresponding network',
-  InsufficientFunds = 'Insufficient funds',
-  InsufficientQuantity = 'Insufficient quantity',
-  InsufficientFundsForTransactionFee = 'Insufficient funds for transaction fee',
-  InsufficientFundsForCrossChain = 'Insufficient funds for cross chain transaction fee',
-}
+import {
+  TransactionError,
+  TransactionErrorArray,
+  AddressError,
+  AddressErrorArray,
+} from '@portkey-wallet/constants/constants-ca/send';
+import { getAddressChainId, isSameAddresses } from '@portkey-wallet/utils';
 
-const SendHome: React.FC<SendHomeProps> = props => {
+const SendHome: React.FC = () => {
   const { t } = useLanguage();
+
+  const isValidChainId = useIsValidSuffix();
 
   const {
     params: { sendType = 'token', toInfo, assetInfo },
@@ -222,19 +219,37 @@ const SendHome: React.FC<SendHomeProps> = props => {
   }, [selectedToContact?.address, sendNumber]);
 
   const checkCanNext = useCallback(() => {
+    const suffix = getAddressChainId(selectedToContact.address, chainInfo?.chainId || 'AELF');
+
     if (!isAllowAelfAddress(selectedToContact.address)) {
-      setErrorMessage([ErrorMessage.RecipientAddressIsInvalid]);
+      setErrorMessage([AddressError.INVALID_ADDRESS]);
       return false;
     }
 
-    // TODO: check if  cross chain
+    if (
+      isSameAddresses(wallet?.[assetInfo?.chainId]?.caAddress || '', getAelfAddress(selectedToContact.address)) &&
+      suffix === assetInfo?.chainId
+    ) {
+      setErrorMessage([AddressError.SAME_ADDRESS]);
+      return false;
+    }
+
+    if (!isValidChainId(getAddressChainId(selectedToContact.address, assetInfo.chainId))) {
+      setErrorMessage([AddressError.INVALID_ADDRESS]);
+      return false;
+    }
+
     if (isCrossChain(selectedToContact.address, assetInfo.chainId)) {
-      showDialog('crossChain', () => setStep(2));
+      // TODO: check if  cross chain
+      showDialog('crossChain', () => {
+        setErrorMessage([]);
+        setStep(2);
+      });
       return false;
     }
 
     return true;
-  }, [assetInfo.chainId, selectedToContact.address, showDialog]);
+  }, [chainInfo?.chainId, selectedToContact.address, wallet, assetInfo.chainId, isValidChainId, showDialog]);
 
   const nextStep = useCallback(() => {
     if (checkCanNext()) {
@@ -264,25 +279,25 @@ const SendHome: React.FC<SendHomeProps> = props => {
       if (assetInfo.symbol === 'ELF') {
         // ELF
         if (sendBigNumber.isGreaterThanOrEqualTo(assetBalanceBigNumber)) {
-          setErrorMessage([ErrorMessage.InsufficientFunds]);
+          setErrorMessage([TransactionError.TOKEN_NOT_ENOUGH]);
           return { status: false };
         }
 
         if (isCross && sendBigNumber.isLessThanOrEqualTo(timesDecimals(CROSS_FEE, DEFAULT_DECIMAL))) {
-          setErrorMessage([ErrorMessage.InsufficientFundsForCrossChain]);
+          setErrorMessage([TransactionError.CROSS_NOT_ENOUGH]);
           return { status: false };
         }
       } else {
         //Other Token
         if (sendBigNumber.isGreaterThan(assetBalanceBigNumber)) {
-          setErrorMessage([ErrorMessage.InsufficientFunds]);
+          setErrorMessage([TransactionError.TOKEN_NOT_ENOUGH]);
           return { status: false };
         }
       }
     } else {
       // nft
       if (sendBigNumber.isGreaterThan(assetBalanceBigNumber)) {
-        setErrorMessage([ErrorMessage.InsufficientQuantity]);
+        setErrorMessage([TransactionError.NFT_NOT_ENOUGH]);
         return { status: false };
       }
     }
@@ -295,7 +310,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
       setTransactionFee(fee || '0');
     } catch (err: any) {
       if (err?.code === 500) {
-        setErrorMessage([ErrorMessage.InsufficientFundsForTransactionFee]);
+        setErrorMessage([TransactionError.FEE_NOT_ENOUGH]);
         Loading.hide();
 
         return { status: false };
@@ -378,7 +393,7 @@ const SendHome: React.FC<SendHomeProps> = props => {
 
               navigationService.navigate('QrScanner', { fromSendPage: true });
             }}>
-            <Svg icon="scan" size={pTd(17.5)} color={defaultColors.font2} />
+            <Svg icon="scan" size={pTd(17.5)} color={defaultColors.font2} iconStyle={styles.iconStyle} />
           </TouchableOpacity>
         ) : undefined
       }
@@ -390,13 +405,16 @@ const SendHome: React.FC<SendHomeProps> = props => {
         <To
           step={step}
           setStep={setStep}
+          setErrorMessage={setErrorMessage}
           selectedToContact={selectedToContact}
           setSelectedToContact={setSelectedToContact}
         />
       </View>
-      {errorMessage.includes(ErrorMessage.RecipientAddressIsInvalid) && (
-        <Text style={styles.errorMessage}>{t(ErrorMessage.RecipientAddressIsInvalid)}</Text>
-      )}
+      {AddressErrorArray.filter(ele => errorMessage.includes(ele)).map(err => (
+        <Text key={err} style={[styles.errorMessage]}>
+          {t(err)}
+        </Text>
+      ))}
 
       {/* Group 2 token */}
       {sendType === 'token' && step === 2 && (
@@ -414,36 +432,21 @@ const SendHome: React.FC<SendHomeProps> = props => {
 
       {/* Group 2 nft */}
       {sendType === 'nft' && step === 2 && (
-        <View style={styles.group}>
-          <NFTInfo nftItem={assetInfo} />
-        </View>
+        <>
+          <View style={styles.group}>
+            <NFTInfo nftItem={assetInfo} />
+          </View>
+          <View style={styles.group}>
+            <AmountNFT sendNumber={sendNumber} setSendNumber={setSendNumber} />
+          </View>
+        </>
       )}
 
-      {sendType === 'nft' && step === 2 && (
-        <View style={styles.group}>
-          <AmountNFT sendNumber={sendNumber} setSendNumber={setSendNumber} />
-        </View>
-      )}
-
-      {errorMessage.includes(ErrorMessage.InsufficientFunds) && (
-        <Text style={[styles.errorMessage, sendType === 'nft' && styles.nftErrorMessage]}>
-          {t(ErrorMessage.InsufficientFunds)}
+      {TransactionErrorArray.filter(ele => errorMessage.includes(ele)).map(err => (
+        <Text key={err} style={[styles.errorMessage, sendType === 'nft' && styles.nftErrorMessage]}>
+          {t(err)}
         </Text>
-      )}
-
-      {errorMessage.includes(ErrorMessage.InsufficientFundsForTransactionFee) && (
-        <Text style={[styles.errorMessage, sendType === 'nft' && styles.nftErrorMessage]}>
-          {t(ErrorMessage.InsufficientFundsForTransactionFee)}
-        </Text>
-      )}
-
-      {errorMessage.includes(ErrorMessage.InsufficientFundsForCrossChain) && (
-        <Text style={[styles.errorMessage]}>{t(ErrorMessage.InsufficientFundsForCrossChain)}</Text>
-      )}
-
-      {errorMessage.includes(ErrorMessage.InsufficientQuantity) && (
-        <Text style={[styles.errorMessage, styles.nftErrorMessage]}>{t(ErrorMessage.InsufficientQuantity)}</Text>
-      )}
+      ))}
 
       {/* Group 3 contact */}
       <View style={styles.space} />
