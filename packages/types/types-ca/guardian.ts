@@ -9,6 +9,10 @@ export interface Guardian {
   salt: string;
   type: LoginKeyType;
   verifierId: string;
+  thirdPartyEmail?: string;
+  isPrivate?: boolean;
+  firstName?: string;
+  lastName?: string;
 }
 
 export interface GuardianAccount {
