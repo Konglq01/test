@@ -15,6 +15,10 @@ import { request } from '@portkey-wallet/api/api-did';
 import { clearRecent } from '@portkey-wallet/store/store-ca/recent/slice';
 
 import { clearActivity } from '@portkey-wallet/store/store-ca/activity/slice';
+import { useGetCurrentCAViewContract } from './contract';
+import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import useLockCallback from '@portkey-wallet/hooks/useLockCallback';
+import { ManagerInfo } from '@portkey-wallet/graphql/contract/__generated__/types';
 
 export default function useLogOut() {
   const dispatch = useAppDispatch();
@@ -39,4 +43,25 @@ export default function useLogOut() {
       console.log(error, '====error');
     }
   }, [dispatch]);
+}
+
+export function useCheckManagerOnLogout() {
+  const getCurrentCAViewContract = useGetCurrentCAViewContract();
+  const { caHash, address } = useCurrentWalletInfo();
+  const logout = useLogOut();
+  return useLockCallback(async () => {
+    try {
+      const caContract = await getCurrentCAViewContract();
+      const info = await caContract?.callViewMethod('GetHolderInfo', { caHash });
+      if (info) {
+        const { managerInfos } = info.data as {
+          managerInfos: ManagerInfo[];
+        };
+        const isManager = managerInfos?.some(manager => manager?.address === address);
+        if (!isManager) logout();
+      }
+    } catch (error) {
+      console.log(error, '======error');
+    }
+  }, [address, caHash, getCurrentCAViewContract, logout]);
 }
