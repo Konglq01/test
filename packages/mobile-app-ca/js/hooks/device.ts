@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { DeviceInfoType, UpdateNotify } from '@portkey-wallet/types/types-ca/device';
+import { DeviceInfoType, UpdateNotify, VersionDeviceType } from '@portkey-wallet/types/types-ca/device';
 import { DEVICE_TYPE } from 'constants/common';
 import { DEVICE_TYPE_INFO } from '@portkey-wallet/constants/constants-ca/device';
 import useLockCallback from '@portkey-wallet/hooks/useLockCallback';
@@ -7,7 +7,7 @@ import * as Application from 'expo-application';
 import { request } from '@portkey-wallet/api/api-did';
 import { compareVersions } from 'utils';
 import { ButtonRowProps } from 'components/ButtonRow';
-import { Linking } from 'react-native';
+import { Linking, Platform } from 'react-native';
 import OverlayModal from 'components/OverlayModal';
 import ActionSheet from 'components/ActionSheet';
 
@@ -29,7 +29,7 @@ export function useCheckUpdate() {
         method: 'POST',
         params: {
           deviceId: 'deviceId',
-          deviceType: 0,
+          deviceType: Platform.OS === 'android' ? VersionDeviceType.Android : VersionDeviceType.iOS,
           appVersion: currentVersion,
           appId: '10001',
         },
