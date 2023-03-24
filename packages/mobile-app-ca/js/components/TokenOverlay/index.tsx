@@ -1,6 +1,6 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import OverlayModal from 'components/OverlayModal';
-import { FlatList, StyleSheet } from 'react-native';
+import { DeviceEventEmitter, FlatList, StyleSheet } from 'react-native';
 import { ModalBody } from 'components/ModalBody';
 import CommonInput from 'components/CommonInput';
 import { useAppCASelector } from '@portkey-wallet/hooks/hooks-ca';
@@ -62,6 +62,10 @@ const TokenList = ({ onFinishSelectToken }: TokenListProps) => {
     dispatch(fetchAllTokenListAsync({ chainIdArray: chainIdList, keyword: debounceKeyword }));
   });
 
+  const noData = useMemo(() => {
+    return debounceKeyword ? <NoData noPic message={t('There is no search result.')} /> : null;
+  }, [debounceKeyword]);
+
   return (
     <ModalBody modalBodyType="bottom" title={t('Select Token')} style={gStyles.overlayStyle}>
       <CommonInput
@@ -74,8 +78,10 @@ const TokenList = ({ onFinishSelectToken }: TokenListProps) => {
           setKeyword(v.trim());
         }}
       />
-      {!!debounceKeyword && !tokenDataShowInMarket.length && <NoData noPic message={t('There is no search result.')} />}
       <FlatList
+        onLayout={e => {
+          myEvents.nestScrollViewLayout.emit(e.nativeEvent.layout);
+        }}
         disableScrollViewPanResponder={true}
         style={styles.flatList}
         onScroll={({ nativeEvent }) => {
@@ -83,11 +89,12 @@ const TokenList = ({ onFinishSelectToken }: TokenListProps) => {
             contentOffset: { y: scrollY },
           } = nativeEvent;
           if (scrollY <= 0) {
-            myEvents.nestScrollForPullCloseModal.emit();
+            myEvents.nestScrollViewScrolledTop.emit();
           }
         }}
         data={tokenDataShowInMarket || []}
         renderItem={renderItem}
+        ListEmptyComponent={noData}
         keyExtractor={(item: any) => item.id || ''}
       />
     </ModalBody>

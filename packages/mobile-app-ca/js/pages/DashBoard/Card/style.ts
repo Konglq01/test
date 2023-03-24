@@ -19,15 +19,17 @@ export const styles = StyleSheet.create({
     width: screenWidth,
     display: 'flex',
     flexDirection: 'row',
-    paddingRight: pTd(16),
     justifyContent: 'flex-end',
   },
   block: {
     flex: 1,
   },
+  svgWrap: {
+    marginTop: -pTd(16),
+    padding: pTd(16),
+  },
   usdtBalance: {
     ...fonts.mediumFont,
-    marginTop: pTd(14),
     fontSize: pTd(30),
     lineHeight: pTd(34),
     color: font2,

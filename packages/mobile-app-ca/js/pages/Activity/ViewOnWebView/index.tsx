@@ -1,10 +1,10 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { defaultColors } from 'assets/theme';
-import { useLanguage } from 'i18n/hooks';
 import WebView from 'react-native-webview';
 import CustomHeader from 'components/CustomHeader';
 import SafeAreaBox from 'components/SafeAreaBox';
+import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
 
 const safeAreaColorMap = {
   white: defaultColors.bg1,
@@ -19,14 +19,12 @@ interface ViewOnWebViewPropsType {
   route?: any;
 }
 
-const ViewOnWebView: React.FC<ViewOnWebViewPropsType> = ({ route }) => {
-  const { t } = useLanguage();
-  const { params } = route;
-
+const ViewOnWebView: React.FC<ViewOnWebViewPropsType> = () => {
+  const { title = 'AELF Block Explorer', url } = useRouterParams<{ url: string; title?: string }>();
   return (
     <SafeAreaBox edges={['top', 'right', 'left']} style={[{ backgroundColor: safeAreaColorMap.blue }]}>
-      <CustomHeader themeType={'blue'} titleDom={'AELF Block Explorer'} />
-      <WebView style={pageStyles.webView} source={{ uri: params?.url ?? '' }} />
+      <CustomHeader themeType={'blue'} titleDom={title} />
+      <WebView style={pageStyles.webView} source={{ uri: url ?? '' }} />
     </SafeAreaBox>
   );
 };

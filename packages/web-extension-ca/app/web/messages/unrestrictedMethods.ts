@@ -65,7 +65,7 @@ export const unrestrictedMethods = Object.freeze([
   PortkeyMessageTypes.CLOSE_PROMPT,
   PortkeyMessageTypes.REGISTER_WALLET,
   PortkeyMessageTypes.LOCK_WALLET,
-  PortkeyMessageTypes.THREE_WAY_LOGIN,
+  PortkeyMessageTypes.SOCIAL_LOGIN,
   MethodMessageTypes.GET_WALLET_STATE,
   AelfMessageTypes.INIT_AELF_CONTRACT,
   AelfMessageTypes.GET_SIGNATURE,
@@ -76,7 +76,7 @@ export const unrestrictedMethods = Object.freeze([
   WalletMessageTypes.SWITCH_CHAIN,
   WalletMessageTypes.DISCONNECT,
   WalletMessageTypes.SET_RECAPTCHA_CODE_V2,
-  WalletMessageTypes.THREE_WAY_LOGIN,
+  WalletMessageTypes.SOCIAL_LOGIN,
 ]);
 
 export const authorizationList = [WalletMessageTypes.SWITCH_CHAIN];

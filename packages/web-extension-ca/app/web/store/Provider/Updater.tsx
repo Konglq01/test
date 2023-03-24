@@ -11,19 +11,26 @@ import { request } from '@portkey-wallet/api/api-did';
 import useLocking from 'hooks/useLocking';
 import { useActiveLockStatus } from 'hooks/useActiveLockStatus';
 import useLocationChange from 'hooks/useLocationChange';
+import useLocalInfo from 'hooks/useLocalInfo';
+import { useCheckManagerOnLogout } from 'hooks/useLogout';
+import { useCheckManager } from '@portkey-wallet/hooks/hooks-ca/graphql';
 
 keepAliveOnPages({});
 
 export default function Updater() {
   const onLocking = useLocking();
   const { passwordSeed } = useUserInfo();
+  const checkManagerOnLogout = useCheckManagerOnLogout();
+
   useVerifierList();
   useUpdateRedux();
   useLocationChange();
   useChainListFetch();
   useRefreshTokenConfig(passwordSeed);
-
+  useLocalInfo();
   const apiUrl = useCurrentApiUrl();
+
+  useCheckManager(checkManagerOnLogout);
 
   useMemo(() => {
     request.set('baseURL', apiUrl);

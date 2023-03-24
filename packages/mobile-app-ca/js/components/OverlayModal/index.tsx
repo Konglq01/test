@@ -4,7 +4,6 @@ import Overlay from 'rn-teaset/components/Overlay/Overlay';
 import { bottomBarHeight, screenHeight, screenWidth, statusBarHeight } from '@portkey-wallet/utils/mobile/device';
 import { defaultColors } from 'assets/theme';
 import GStyles from 'assets/theme/GStyles';
-import { pTd } from 'utils/unit';
 import TransformView from 'components/TransformView';
 import { ViewStyleType } from 'types/styles';
 
@@ -147,7 +146,7 @@ const styles = StyleSheet.create({
   bottomContainerStyle: {
     paddingBottom: bottomBarHeight,
     backgroundColor: defaultColors.bg1,
-    ...GStyles.radiusArg(pTd(10), pTd(10), 0, 0),
+    ...GStyles.radiusArg(10, 10, 0, 0),
     overflow: 'hidden',
   },
   transformViewContainer: {

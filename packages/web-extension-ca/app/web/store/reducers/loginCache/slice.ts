@@ -1,8 +1,20 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { setLoginAccountAction, resetLoginInfoAction, setWalletInfoAction, setRegisterVerifierAction } from './actions';
+import {
+  setLoginAccountAction,
+  resetLoginInfoAction,
+  setWalletInfoAction,
+  setRegisterVerifierAction,
+  setCountryCodeAction,
+} from './actions';
 import { LoginState } from './type';
 
-const initialState: LoginState = {};
+const initialState: LoginState = {
+  countryCode: {
+    index: 'S',
+    country: { country: 'Singapore', code: '65', iso: 'SG' },
+  },
+};
+
 export const loginSlice = createSlice({
   name: 'loginCache',
   initialState,
@@ -20,7 +32,9 @@ export const loginSlice = createSlice({
       .addCase(setRegisterVerifierAction, (state, action) => {
         state.registerVerifier = action.payload;
       })
-
-      .addCase(resetLoginInfoAction, () => initialState);
+      .addCase(setCountryCodeAction, (state, action) => {
+        state.countryCode = action.payload;
+      })
+      .addCase(resetLoginInfoAction, (state) => ({ ...initialState, countryCode: state.countryCode }));
   },
 });

@@ -1,8 +1,8 @@
-import { useCurrentChain, useCurrentChainList, useIsValidSuffix } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { useCurrentChain, useIsValidSuffix } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { addFailedActivity, removeFailedActivity } from '@portkey-wallet/store/store-ca/activity/slice';
-import { ContactItemType, IClickAddressProps } from '@portkey-wallet/types/types-ca/contact';
+import { IClickAddressProps } from '@portkey-wallet/types/types-ca/contact';
 import { BaseToken } from '@portkey-wallet/types/types-ca/token';
 import { getAddressChainId, isDIDAddress } from '@portkey-wallet/utils';
 import {
@@ -20,8 +20,7 @@ import TitleWrapper from 'components/TitleWrapper';
 import { ReactElement, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router';
-import { useDebounce } from 'react-use';
-import { useAppDispatch, useContact, useLoading, useUserInfo, useWalletInfo } from 'store/Provider/hooks';
+import { useAppDispatch, useCommonState, useLoading, useUserInfo, useWalletInfo } from 'store/Provider/hooks';
 import crossChainTransfer, { intervalCrossChainTransfer } from 'utils/sandboxUtil/crossChainTransfer';
 import sameChainTransfer from 'utils/sandboxUtil/sameChainTransfer';
 import AddressSelector from './components/AddressSelector';
@@ -36,6 +35,8 @@ import './index.less';
 import { the2ThFailedActivityItemType } from '@portkey-wallet/types/types-ca/activity';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
 import { CROSS_FEE } from '@portkey-wallet/constants/constants-ca/wallet';
+import PromptFrame from 'pages/components/PromptFrame';
+import clsx from 'clsx';
 import { AddressCheckError } from '@portkey-wallet/store/store-ca/assets/type';
 
 export type Account = { address: string; name?: string };
@@ -63,7 +64,6 @@ export default function Send() {
   console.log(wallet, 'wallet===');
   const { setLoading } = useLoading();
   const dispatch = useAppDispatch();
-  const { contactIndexList } = useContact();
   const { t } = useTranslation();
   const [errorMsg, setErrorMsg] = useState('');
   const [tipMsg, setTipMsg] = useState('');
@@ -113,28 +113,6 @@ export default function Send() {
     if (toAccount.address === '' || (stage === Stage.Amount && amount === '')) return true;
     return false;
   }, [amount, stage, toAccount.address]);
-
-  useDebounce(
-    () => {
-      const value = getAelfAddress(toAccount.address);
-      const toAdsChainId = getAddressChainId(toAccount.address, chainInfo?.chainId || 'AELF');
-      const searchResult: ContactItemType[] = [];
-      contactIndexList.forEach(({ contacts }) => {
-        searchResult.push(
-          ...contacts.filter(
-            (contact) =>
-              contact.name.toLowerCase() === value.toLowerCase() ||
-              contact.addresses.some((ads) => ads.address === value && ads.chainId === toAdsChainId),
-          ),
-        );
-      });
-      if (searchResult[0] && searchResult[0].name) {
-        setToAccount((v) => ({ ...v, name: searchResult[0].name }));
-      }
-    },
-    300,
-    [contactIndexList, toAccount.address],
-  );
 
   const retryCrossChain = useCallback(
     async ({ transactionId, params }: the2ThFailedActivityItemType) => {
@@ -454,61 +432,66 @@ export default function Send() {
     ],
   );
 
-  return (
-    <div className="page-send">
-      <TitleWrapper
-        className="page-title"
-        title={`Send ${type === 'token' ? symbol : ''}`}
-        leftCallBack={() => {
-          StageObj[stage].backFun();
-        }}
-        rightElement={<CustomSvg type="Close2" onClick={() => navigate('/')} />}
-      />
-      {stage !== Stage.Preview && (
-        <div className="address-wrap">
-          <div className="item from">
-            <span className="label">{t('From_with_colon')}</span>
-            <div className={'from-wallet control'}>
-              <div className="name">{walletName}</div>
+  const { isPrompt } = useCommonState();
+  const mainContent = () => {
+    return (
+      <div className={clsx(['page-send', isPrompt ? 'detail-page-prompt' : null])}>
+        <TitleWrapper
+          className="page-title"
+          title={`Send ${type === 'token' ? symbol : ''}`}
+          leftCallBack={() => {
+            StageObj[stage].backFun();
+          }}
+          rightElement={<CustomSvg type="Close2" onClick={() => navigate('/')} />}
+        />
+        {stage !== Stage.Preview && (
+          <div className="address-wrap">
+            <div className="item from">
+              <span className="label">{t('From_with_colon')}</span>
+              <div className={'from-wallet control'}>
+                <div className="name">{walletName}</div>
+              </div>
             </div>
-          </div>
-          <div className="item to">
-            <span className="label">{t('To_with_colon')}</span>
-            <div className="control">
-              <ToAccount
-                value={toAccount}
-                onChange={(v) => setToAccount(v)}
-                focus={stage !== Stage.Amount}
-                // onBlur={() => validateToAddress(toAccount)}
-              />
-              {stage === Stage.Amount && (
-                <CustomSvg
-                  type="Close2"
-                  onClick={() => {
-                    setStage(Stage.Address);
-                    setToAccount({ address: '' });
-                  }}
+            <div className="item to">
+              <span className="label">{t('To_with_colon')}</span>
+              <div className="control">
+                <ToAccount
+                  value={toAccount}
+                  onChange={(v) => setToAccount(v)}
+                  focus={stage !== Stage.Amount}
+                  // onBlur={() => validateToAddress(toAccount)}
                 />
-              )}
+                {stage === Stage.Amount && (
+                  <CustomSvg
+                    type="Close2"
+                    onClick={() => {
+                      setStage(Stage.Address);
+                      setToAccount({ address: '' });
+                    }}
+                  />
+                )}
+              </div>
             </div>
+            {errorMsg && <span className="error-msg">{errorMsg}</span>}
           </div>
-          {errorMsg && <span className="error-msg">{errorMsg}</span>}
-        </div>
-      )}
-      <div className="stage-ele">{StageObj[stage].element}</div>
-      {stage === Stage.Preview ? (
-        <div className="btn-wrap">
-          <Button disabled={btnDisabled} className="stage-btn" type="primary" onClick={StageObj[stage].handler}>
-            {StageObj[stage].btnText}
-          </Button>
-        </div>
-      ) : (
-        <p className="btn-wrap">
-          <Button disabled={btnDisabled} className="stage-btn" type="primary" onClick={StageObj[stage].handler}>
-            {StageObj[stage].btnText}
-          </Button>
-        </p>
-      )}
-    </div>
-  );
+        )}
+        <div className="stage-ele">{StageObj[stage].element}</div>
+        {stage === Stage.Preview ? (
+          <div className="btn-wrap">
+            <Button disabled={btnDisabled} className="stage-btn" type="primary" onClick={StageObj[stage].handler}>
+              {StageObj[stage].btnText}
+            </Button>
+          </div>
+        ) : (
+          <p className="btn-wrap">
+            <Button disabled={btnDisabled} className="stage-btn" type="primary" onClick={StageObj[stage].handler}>
+              {StageObj[stage].btnText}
+            </Button>
+          </p>
+        )}
+      </div>
+    );
+  };
+
+  return <>{isPrompt ? <PromptFrame content={mainContent()} /> : mainContent()}</>;
 }

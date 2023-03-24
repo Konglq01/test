@@ -11,7 +11,13 @@ import { BorderStyles, FontStyles } from 'assets/theme/styles';
 import Svg from 'components/Svg';
 import { pTd } from 'utils/unit';
 import { getApprovalCount } from '@portkey-wallet/utils/guardian';
-import { ApprovalType, VerificationType, VerifierInfo, VerifyStatus } from '@portkey-wallet/types/verifier';
+import {
+  ApprovalType,
+  AuthenticationInfo,
+  VerificationType,
+  VerifierInfo,
+  VerifyStatus,
+} from '@portkey-wallet/types/verifier';
 import GuardianItem from '../components/GuardianItem';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type';
@@ -26,18 +32,21 @@ import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import CommonToast from 'components/CommonToast';
 import { useAppDispatch } from 'store/hooks';
 import { setPreGuardianAction } from '@portkey-wallet/store/store-ca/guardians/actions';
-import { addGuardian, deleteGuardian, editGuardian } from 'utils/guardian';
+import { addGuardian, deleteGuardian, editGuardian, removeOtherManager } from 'utils/guardian';
 import { useGetCurrentCAContract } from 'hooks/contract';
 import { GuardiansStatus, GuardiansStatusItem } from '../types';
 import { handleGuardiansApproved } from 'utils/login';
 
-type RouterParams = {
+export type RouterParams = {
   loginAccount?: string;
   userGuardiansList?: UserGuardianItem[];
   approvalType: ApprovalType;
   guardianItem?: UserGuardianItem;
   verifierInfo?: VerifierInfo;
   verifiedTime?: number;
+  removeManagerAddress?: string;
+  loginType?: LoginType;
+  authenticationInfo?: AuthenticationInfo;
 };
 export default function GuardianApproval() {
   const {
@@ -47,6 +56,8 @@ export default function GuardianApproval() {
     guardianItem,
     verifierInfo,
     verifiedTime,
+    removeManagerAddress,
+    loginType,
   } = useRouterParams<RouterParams>();
   const dispatch = useAppDispatch();
 
@@ -72,14 +83,6 @@ export default function GuardianApproval() {
   const approvedList = useMemo(() => {
     return Object.values(guardiansStatus || {}).filter(guardian => guardian.status === VerifyStatus.Verified);
   }, [guardiansStatus]);
-
-  const isGuardianOpt = useMemo(
-    () =>
-      approvalType === ApprovalType.addGuardian ||
-      approvalType === ApprovalType.deleteGuardian ||
-      approvalType === ApprovalType.editGuardian,
-    [approvalType],
-  );
 
   const setGuardianStatus = useCallback((key: string, status: GuardiansStatusItem) => {
     if (key === 'resetGuardianApproval') {
@@ -125,14 +128,14 @@ export default function GuardianApproval() {
       managerInfo: {
         verificationType: VerificationType.communityRecovery,
         loginAccount,
-        type: LoginType.Email,
+        type: loginType,
       } as ManagerInfo,
       guardiansApproved: handleGuardiansApproved(
         guardiansStatus as GuardiansStatus,
         userGuardiansList as UserGuardianItem[],
       ),
     });
-  }, [guardiansStatus, loginAccount, userGuardiansList]);
+  }, [guardiansStatus, loginAccount, loginType, userGuardiansList]);
 
   const onAddGuardian = useCallback(async () => {
     if (!managerAddress || !caHash || !verifierInfo || !guardianItem || !guardiansStatus || !userGuardiansList) return;
@@ -223,6 +226,32 @@ export default function GuardianApproval() {
     userGuardiansList,
   ]);
 
+  const onRemoveOtherManager = useCallback(async () => {
+    if (!removeManagerAddress || !caHash || !guardiansStatus || !userGuardiansList) return;
+    Loading.show();
+    try {
+      const caContract = await getCurrentCAContract();
+      const req = await removeOtherManager(
+        caContract,
+        removeManagerAddress,
+        caHash,
+        userGuardiansList,
+        guardiansStatus,
+      );
+      if (req && !req.error) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        CommonToast.success('Device Deleted');
+        myEvents.refreshDeviceList.emit();
+        navigationService.navigate('DeviceList');
+      } else {
+        CommonToast.fail(req?.error?.message || '');
+      }
+    } catch (error) {
+      CommonToast.failError(error);
+    }
+    Loading.hide();
+  }, [caHash, getCurrentCAContract, guardiansStatus, removeManagerAddress, userGuardiansList]);
+
   const onFinish = useCallback(async () => {
     switch (approvalType) {
       case ApprovalType.register:
@@ -237,10 +266,13 @@ export default function GuardianApproval() {
       case ApprovalType.editGuardian:
         onEditGuardian();
         break;
+      case ApprovalType.removeOtherManager:
+        onRemoveOtherManager();
+        break;
       default:
         break;
     }
-  }, [onAddGuardian, approvalType, onDeleteGuardian, onEditGuardian, registerAccount]);
+  }, [approvalType, registerAccount, onAddGuardian, onDeleteGuardian, onEditGuardian, onRemoveOtherManager]);
 
   return (
     <PageContainer
@@ -258,8 +290,8 @@ export default function GuardianApproval() {
           {isExpired ? 'Expired' : `Expire after ${VERIFIER_EXPIRATION} hour`}
         </TextM>
         <View style={[styles.verifierBody, GStyles.flex1]}>
-          <View style={[GStyles.itemCenter, GStyles.flexRow, BorderStyles.border6, styles.approvalTitleRow]}>
-            <View style={[GStyles.itemCenter, GStyles.flexRow, styles.approvalRow]}>
+          <View style={[GStyles.itemCenter, GStyles.flexRowWrap, BorderStyles.border6, styles.approvalTitleRow]}>
+            <View style={[GStyles.itemCenter, GStyles.flexRowWrap, styles.approvalRow]}>
               <TextM style={[FontStyles.font3, styles.approvalTitle]}>{`Guardians' approval`}</TextM>
               <Touchable
                 onPress={() =>
@@ -313,7 +345,6 @@ const styles = StyleSheet.create({
   approvalTitleRow: {
     justifyContent: 'space-between',
     borderBottomWidth: StyleSheet.hairlineWidth,
-    marginBottom: 8,
   },
   approvalRow: {
     paddingBottom: 12,

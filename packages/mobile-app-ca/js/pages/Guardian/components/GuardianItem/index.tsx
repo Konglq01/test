@@ -12,17 +12,23 @@ import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type'
 import Loading from 'components/Loading';
 import CommonToast from 'components/CommonToast';
 import { sleep } from '@portkey-wallet/utils';
-import { ApprovalType, VerificationType, VerifyStatus } from '@portkey-wallet/types/verifier';
+import { ApprovalType, VerificationType, VerifierInfo, VerifyStatus } from '@portkey-wallet/types/verifier';
 import { BGStyles, FontStyles } from 'assets/theme/styles';
 import { isIOS } from '@rneui/base';
 import { LoginGuardianTypeIcon } from 'constants/misc';
-import { LoginKeyType, LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import { VerifierImage } from '../VerifierImage';
 import { GuardiansStatus, GuardiansStatusItem } from 'pages/Guardian/types';
-import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network-test2';
+import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import useDebounceCallback from 'hooks/useDebounceCallback';
 import { verification } from 'utils/api';
 import { useLanguage } from 'i18n/hooks';
+import { useVerifyToken } from 'hooks/authentication';
+import { RouterParams } from 'pages/Guardian/GuardianApproval';
+import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
+import { PRIVATE_GUARDIAN_ACCOUNT } from '@portkey-wallet/constants/constants-ca/guardian';
+
+export const AuthTypes = [LoginType.Apple, LoginType.Google];
 
 interface GuardianAccountItemProps {
   guardianItem: UserGuardianItem;
@@ -47,11 +53,12 @@ function GuardianItemButton({
   disabled?: boolean;
 }) {
   const { t } = useLanguage();
+  const { authenticationInfo } = useRouterParams<RouterParams>();
 
   const itemStatus = useMemo(() => guardiansStatus?.[guardianItem.key], [guardianItem.key, guardiansStatus]);
 
   const { status, requestCodeResult } = itemStatus || {};
-
+  const verifyToken = useVerifyToken();
   const guardianInfo = useMemo(() => {
     let _verificationType = VerificationType.communityRecovery;
     if (
@@ -104,12 +111,48 @@ function GuardianItemButton({
     }
     Loading.hide();
   }, [onSetGuardianStatus, guardianInfo]);
-  const onVerifier = useDebounceCallback(() => {
-    navigationService.push('VerifierDetails', {
-      ...guardianInfo,
-      requestCodeResult,
-      startResend: true,
-    });
+  const onVerifierAuth = useCallback(async () => {
+    try {
+      Loading.show();
+      const rst = await verifyToken(guardianItem.guardianType, {
+        accessToken: authenticationInfo?.[guardianItem.guardianAccount],
+        id: guardianItem.guardianAccount,
+        verifierId: guardianItem.verifier?.id,
+        chainId: DefaultChainId,
+      });
+      CommonToast.success('Verified Successfully');
+      const verifierInfo: VerifierInfo = { ...rst, verifierId: guardianItem?.verifier?.id };
+      onSetGuardianStatus({
+        status: VerifyStatus.Verified,
+        verifierInfo,
+      });
+    } catch (error) {
+      CommonToast.failError(error);
+    }
+    Loading.hide();
+  }, [
+    authenticationInfo,
+    guardianItem.guardianAccount,
+    guardianItem.guardianType,
+    guardianItem.verifier?.id,
+    onSetGuardianStatus,
+    verifyToken,
+  ]);
+  const onVerifier = useDebounceCallback(async () => {
+    switch (guardianItem.guardianType) {
+      case LoginType.Apple:
+      case LoginType.Google:
+        onVerifierAuth();
+        break;
+      default: {
+        navigationService.push('VerifierDetails', {
+          ...guardianInfo,
+          requestCodeResult,
+          startResend: true,
+        });
+        break;
+      }
+    }
   }, [guardianInfo, requestCodeResult]);
   const buttonProps: CommonButtonProps = useMemo(() => {
     // expired
@@ -122,16 +165,19 @@ function GuardianItemButton({
         disabledTitleStyle: FontStyles.font7,
       };
     }
+    if (
+      status === VerifyStatus.Verifying ||
+      (AuthTypes.includes(guardianItem.guardianType) && (!status || status === VerifyStatus.NotVerified))
+    ) {
+      return {
+        onPress: onVerifier,
+        title: 'Verify',
+      };
+    }
     if (!status || status === VerifyStatus.NotVerified) {
       return {
         onPress: onSendCode,
         title: 'Send',
-      };
-    }
-    if (status === VerifyStatus.Verifying) {
-      return {
-        onPress: onVerifier,
-        title: 'Verify',
       };
     }
     return {
@@ -141,7 +187,7 @@ function GuardianItemButton({
       disabledStyle: styles.confirmedButtonStyle,
       disabled: true,
     };
-  }, [isExpired, onSendCode, onVerifier, status]);
+  }, [guardianItem.guardianType, isExpired, onSendCode, onVerifier, status]);
   return (
     <CommonButton
       type="primary"
@@ -166,9 +212,35 @@ export default function GuardianItem({
   isSuccess,
   approvalType = ApprovalType.register,
 }: GuardianAccountItemProps) {
-  // console.log(guardianItem, '=====guardianItem');
   const itemStatus = useMemo(() => guardiansStatus?.[guardianItem.key], [guardianItem.key, guardiansStatus]);
   const disabled = isSuccess && itemStatus?.status !== VerifyStatus.Verified;
+
+  const guardianAccount = useMemo(() => {
+    if (![LoginType.Apple, LoginType.Google].includes(guardianItem.guardianType)) {
+      return guardianItem.guardianAccount;
+    }
+    if (guardianItem.isPrivate) return PRIVATE_GUARDIAN_ACCOUNT;
+    return guardianItem.thirdPartyEmail || '';
+  }, [guardianItem]);
+
+  const renderGuardianAccount = useCallback(() => {
+    if (!guardianItem.firstName) {
+      return (
+        <TextM numberOfLines={1} style={[styles.nameStyle, GStyles.flex1]}>
+          {guardianAccount}
+        </TextM>
+      );
+    }
+    return (
+      <View style={[styles.nameStyle, GStyles.flex1]}>
+        <TextM style={styles.firstNameStyle}>{guardianItem.firstName}</TextM>
+        <TextM style={FontStyles.font3} numberOfLines={1}>
+          {guardianAccount}
+        </TextM>
+      </View>
+    );
+  }, [guardianAccount, guardianItem.firstName]);
+
   return (
     <View style={[styles.itemRow, isBorderHide && styles.itemWithoutBorder, disabled && styles.disabledStyle]}>
       {guardianItem.isLoginAccount && (
@@ -176,17 +248,15 @@ export default function GuardianItem({
           <Text style={styles.typeText}>Login Account</Text>
         </View>
       )}
-      <View style={[GStyles.flexRow, GStyles.itemCenter, GStyles.flex1]}>
-        <Svg icon={LoginGuardianTypeIcon[guardianItem.guardianType] as any} size={pTd(32)} />
+      <View style={[GStyles.flexRowWrap, GStyles.itemCenter, GStyles.flex1]}>
+        <Svg iconStyle={styles.loginTypeIcon} icon={LoginGuardianTypeIcon[guardianItem.guardianType]} size={pTd(32)} />
         <VerifierImage
-          label={guardianItem?.verifier?.name}
           size={pTd(32)}
+          label={guardianItem?.verifier?.name}
           uri={guardianItem.verifier?.imageUrl}
           style={styles.iconStyle}
         />
-        <TextM numberOfLines={1} style={[styles.nameStyle, GStyles.flex1]}>
-          {guardianItem.guardianAccount}
-        </TextM>
+        {renderGuardianAccount()}
       </View>
       {!isButtonHide && (
         <GuardianItemButton
@@ -206,6 +276,7 @@ export default function GuardianItem({
 const styles = StyleSheet.create({
   itemRow: {
     height: pTd(80),
+    marginTop: 8,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: defaultColors.border6,
     justifyContent: 'space-between',
@@ -228,7 +299,6 @@ const styles = StyleSheet.create({
     width: 'auto',
     paddingHorizontal: pTd(6),
     backgroundColor: defaultColors.bg11,
-    // borderRadius: pTd(6),
     borderTopLeftRadius: pTd(6),
     borderBottomRightRadius: pTd(6),
   },
@@ -237,6 +307,9 @@ const styles = StyleSheet.create({
   },
   nameStyle: {
     marginLeft: pTd(12),
+  },
+  firstNameStyle: {
+    marginBottom: pTd(2),
   },
   buttonStyle: {
     height: 24,
@@ -261,5 +334,8 @@ const styles = StyleSheet.create({
   },
   disabledItemStyle: {
     opacity: 1,
+  },
+  loginTypeIcon: {
+    borderRadius: pTd(16),
   },
 });

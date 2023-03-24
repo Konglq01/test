@@ -15,6 +15,7 @@ import { loginSlice } from 'store/reducers/loginCache/slice';
 import { contactSlice } from '@portkey-wallet/store/store-ca/contact/slice';
 import { guardiansSlice } from '@portkey-wallet/store/store-ca/guardians/slice';
 import activitySlice from '@portkey-wallet/store/store-ca/activity/slice';
+import recentSlice from '@portkey-wallet/store/store-ca/recent/slice';
 
 interface ThunkOptions<E = any> {
   extraArgument: E;
@@ -42,6 +43,11 @@ export const activityPersistConfig = {
   key: activitySlice.name,
   storage: localStorage,
   // whitelist: ['failedActivityMap'],
+};
+
+export const recentPersistConfig = {
+  key: recentSlice.name,
+  storage: localStorage,
 };
 
 export const walletPersistConfig = {

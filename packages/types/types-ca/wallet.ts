@@ -12,14 +12,16 @@ export type ManagerInfo = {
 
 export enum LoginType {
   Email,
-  PhoneNumber,
+  Phone,
   Google,
   Apple,
 }
 
 export type LoginKeyType = string;
 
-export type ThreeWayLogin = 'Google' | 'Apple';
+export type LoginKey = keyof typeof LoginType;
+
+export type ISocialLogin = LoginKey;
 
 export interface CAInfo {
   caAddress: string;
@@ -67,23 +69,4 @@ export interface CaAccountRegisterResult {
 export interface CaAccountRecoverResult {
   requestId: string;
   body: RecoverBody;
-}
-
-export enum DeviceType {
-  other,
-  mac,
-  ios,
-  windows,
-  android,
-}
-
-export interface DeviceTypeInfo {
-  name: string;
-  icon: string;
-}
-export interface DeviceItemType {
-  deviceType: DeviceType;
-  managerAddress?: string | null;
-  loginTime?: number;
-  deviceTypeInfo: DeviceTypeInfo;
 }

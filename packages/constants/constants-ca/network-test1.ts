@@ -6,9 +6,9 @@ export const NetworkList: NetworkItem[] = [
     walletType: 'aelf',
     networkType: 'TESTNET',
     isActive: true,
-    apiUrl: 'http://192.168.66.38:5577',
-    graphqlUrl: 'http://192.168.66.150:8083/AElfIndexer_DApp/PortKeyIndexerCASchema/graphql',
-    connectUrl: 'http://192.168.66.38:8080',
+    apiUrl: 'http://192.168.66.240:15577',
+    graphqlUrl: 'http://192.168.67.172:8083/AElfIndexer_DApp/PortKeyIndexerCASchema/graphql',
+    connectUrl: 'http://192.168.66.240:8080',
   },
   {
     name: 'aelf Mainnet',
@@ -21,3 +21,5 @@ export const NetworkList: NetworkItem[] = [
 ];
 
 export const DefaultChainId = 'AELF';
+
+export const OfficialWebsite = 'https://portkey.finance';

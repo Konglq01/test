@@ -106,7 +106,7 @@ export default function SecurityLock() {
           containerStyle={styles.button}
         />
       </View>
-      <Touchable style={[GStyles.alignCenter, GStyles.flexRow, GStyles.itemCenter]} onPress={onLogOut}>
+      <Touchable style={[GStyles.alignCenter, GStyles.flexRowWrap, GStyles.itemCenter]} onPress={onLogOut}>
         <Svg size={pTd(16)} icon="reload" />
         <PrimaryText style={styles.resetText}>{t('Reset Wallet')}</PrimaryText>
       </Touchable>

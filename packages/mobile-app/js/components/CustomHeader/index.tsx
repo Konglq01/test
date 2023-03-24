@@ -49,7 +49,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = props => {
     const onPress = leftCallback ? leftCallback : () => navigationService.goBack();
     if (type === 'leftBack') {
       return (
-        <TouchableOpacity style={[GStyles.flexRow, GStyles.itemCenter]} onPress={onPress}>
+        <TouchableOpacity style={[GStyles.flexRowWrap, GStyles.itemCenter]} onPress={onPress}>
           <Svg color={styles.leftBackTitle.color} icon="left-arrow" size={pTd(20)} />
           <TextL style={styles.leftBackTitle}>{backTitle || t('Back')}</TextL>
         </TouchableOpacity>

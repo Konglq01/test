@@ -5,13 +5,18 @@ export default {
     marginTop: 3,
     color: 'red',
   },
+  flex0: {
+    flex: 0,
+  },
   flex1: {
     flex: 1,
   },
-  flexRow: {
-    display: 'flex',
+  flexRowWrap: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+  },
+  flexRow: {
+    flexDirection: 'row',
   },
   flexCol: {
     display: 'flex',
@@ -30,6 +35,9 @@ export default {
   alignEnd: {
     alignSelf: 'flex-end',
   },
+  flexEnd: {
+    justifyContent: 'flex-end',
+  },
   center: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -42,6 +50,9 @@ export default {
   },
   spaceAround: {
     justifyContent: 'space-around',
+  },
+  width100: {
+    width: '100%',
   },
   containerSpaceBetween: {
     minHeight: '100%',
@@ -146,27 +157,27 @@ export default {
     }
   },
   paddingTop: function (n: number) {
-    return { paddingTop: n };
+    return { paddingTop: pTd(n) };
   },
   paddingBottom: function (n: number) {
-    return { paddingBottom: n };
+    return { paddingBottom: pTd(n) };
   },
   paddingLeft: function (n: number) {
-    return { paddingLeft: n };
+    return { paddingLeft: pTd(n) };
   },
   paddingRight: function (n: number) {
-    return { paddingRight: n };
+    return { paddingRight: pTd(n) };
   },
   marginTop: function (n: number) {
-    return { marginTop: n };
+    return { marginTop: pTd(n) };
   },
   marginBottom: function (n: number) {
-    return { marginBottom: n };
+    return { marginBottom: pTd(n) };
   },
   marginLeft: function (n: number) {
-    return { marginLeft: n };
+    return { marginLeft: pTd(n) };
   },
   marginRight: function (n: number) {
-    return { marginRight: n };
+    return { marginRight: pTd(n) };
   },
 } as const;

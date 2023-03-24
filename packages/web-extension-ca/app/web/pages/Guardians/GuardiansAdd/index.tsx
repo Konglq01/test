@@ -20,16 +20,13 @@ import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
 import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type';
 import { useTranslation } from 'react-i18next';
-import './index.less';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verification } from 'utils/api';
-
-const guardianTypeList = [{ label: 'Email', value: LoginType.Email }];
-
-enum EmailError {
-  noEmail = 'Please enter Email address',
-  invalidEmail = 'Invalid email address',
-}
+import PhoneInput from '../components/PhoneInput';
+import { EmailError } from '@portkey-wallet/utils/check';
+import { guardianTypeList, phoneInit, socialInit } from 'constants/guardians';
+import { IPhoneInput, ISocialInput } from 'types/guardians';
+import './index.less';
 
 export default function AddGuardian() {
   const navigate = useNavigate();
@@ -40,7 +37,9 @@ export default function AddGuardian() {
   const [verifierVal, setVerifierVal] = useState<string>();
   const [verifierName, setVerifierName] = useState<string>();
   const [emailVal, setEmailVal] = useState<string>();
-  const [inputErr, setInputErr] = useState<string>();
+  const [phoneValue, setPhoneValue] = useState<IPhoneInput>();
+  const [socialValue, setSocialVale] = useState<ISocialInput>();
+  const [emailErr, setEmailErr] = useState<string>();
   const [visible, setVisible] = useState<boolean>(false);
   const [exist, setExist] = useState<boolean>(false);
   const dispatch = useAppDispatch();
@@ -48,9 +47,52 @@ export default function AddGuardian() {
   const { walletInfo } = useCurrentWallet();
   const userGuardianList = useGuardianList();
 
-  const disabled = useMemo(() => !emailVal || exist || !!inputErr, [emailVal, exist, inputErr]);
+  const disabled = useMemo(() => {
+    let check = true;
+    if (verifierVal) {
+      switch (guardianType) {
+        case LoginType.Email: {
+          check = !emailVal;
+          break;
+        }
+        case LoginType.Phone: {
+          check = !phoneValue?.phoneNumber;
+          break;
+        }
+        case LoginType.Apple:
+        case LoginType.Google: {
+          check = !socialValue?.value;
+          break;
+        }
+        default:
+          check = true;
+      }
+    }
+    return check || exist || !!emailErr;
+  }, [guardianType, verifierVal, exist, emailErr, emailVal, phoneValue?.phoneNumber, socialValue?.value]);
 
   const selectVerifierItem = useMemo(() => verifierMap?.[verifierVal || ''], [verifierMap, verifierVal]);
+
+  const genKey = useMemo(() => {
+    // TODO how to generate key
+    let key = '';
+    switch (guardianType) {
+      case LoginType.Email: {
+        key = `${emailVal}&${verifierVal}`;
+        break;
+      }
+      case LoginType.Phone: {
+        key = `${phoneValue?.code}_${phoneValue?.phoneNumber}&${verifierVal}`;
+        break;
+      }
+      case LoginType.Apple:
+      case LoginType.Google: {
+        key = `${socialValue?.value}&${verifierVal}`;
+        break;
+      }
+    }
+    return key;
+  }, [emailVal, guardianType, phoneValue, socialValue, verifierVal]);
 
   const verifierOptions = useMemo(
     () =>
@@ -70,7 +112,12 @@ export default function AddGuardian() {
     () =>
       guardianTypeList?.map((item) => ({
         value: item.value,
-        children: item.label,
+        children: (
+          <div className="flex select-option">
+            <CustomSvg type={item.icon} />
+            <span className="title">{item.label}</span>
+          </div>
+        ),
       })),
     [],
   );
@@ -87,6 +134,10 @@ export default function AddGuardian() {
   const guardianTypeChange = useCallback((value: LoginType) => {
     setExist(false);
     setGuardianType(value);
+    setEmailVal('');
+    setPhoneValue(phoneInit);
+    setSocialVale(socialInit);
+    setEmailErr('');
   }, []);
 
   const verifierChange = useCallback(
@@ -98,72 +149,162 @@ export default function AddGuardian() {
     [verifierMap],
   );
 
-  const handleInputChange = useCallback((v: string) => {
-    setInputErr('');
+  const handleEmailInputChange = useCallback((v: string) => {
+    setEmailErr('');
     setExist(false);
     setEmailVal(v);
   }, []);
 
+  const handlePhoneInputChange = useCallback(({ code, phoneNumber }: IPhoneInput) => {
+    setPhoneValue({ code, phoneNumber });
+  }, []);
+
+  const handleSocialVerify = useCallback(() => {
+    // TODO: store opGuardian
+  }, []);
+
+  const renderGuardianAccount = useMemo(
+    () => ({
+      [LoginType.Email]: {
+        element: (
+          <Input
+            className="login-input"
+            value={emailVal}
+            placeholder={t('Enter email')}
+            onChange={(e) => {
+              handleEmailInputChange(e.target.value);
+            }}
+          />
+        ),
+        label: t('Guardian Email'),
+      },
+      [LoginType.Phone]: {
+        element: <PhoneInput onChange={handlePhoneInputChange} />,
+        label: t('Guardian Phone'),
+      },
+      [LoginType.Google]: {
+        element: (
+          <div className="social">
+            {socialValue?.value ? (
+              <div className="flex-column social-input detail">
+                <span className="name">{socialValue.name}</span>
+                <span className="email">{socialValue.value}</span>
+              </div>
+            ) : (
+              <div className="flex social-input click" onClick={handleSocialVerify}>
+                <span className="click-text">Click Add Google Account</span>
+              </div>
+            )}
+          </div>
+        ),
+        label: t('Guardian Google'),
+      },
+      [LoginType.Apple]: {
+        element: (
+          <div className="social">
+            {socialValue?.value ? (
+              <div className="flex-column social-input detail">
+                <span className="name">{socialValue.name}</span>
+                <span className="email">{socialValue.value}</span>
+              </div>
+            ) : (
+              <div className="flex social-input click" onClick={handleSocialVerify}>
+                <span className="click-text">Click Add Apple Account</span>
+              </div>
+            )}
+          </div>
+        ),
+        label: t('Guardian Apple'),
+      },
+    }),
+    [emailVal, handleEmailInputChange, handlePhoneInputChange, handleSocialVerify, socialValue, t],
+  );
+
   const handleCheck = useCallback(() => {
-    if (!EmailReg.test(emailVal as string)) {
-      setInputErr(EmailError.invalidEmail);
-      return;
+    if (guardianType === LoginType.Email) {
+      if (!EmailReg.test(emailVal as string)) {
+        setEmailErr(EmailError.invalidEmail);
+        return;
+      }
     }
     if (!selectVerifierItem) return message.error('Can not get the current verifier message');
     const isExist: boolean =
       Object.values(userGuardiansList ?? {})?.some((item) => {
-        return item.key === `${emailVal}&${verifierVal}`;
+        return item.key === genKey;
       }) ?? false;
     setExist(isExist);
     !isExist && setVisible(true);
-  }, [emailVal, selectVerifierItem, userGuardiansList, verifierVal]);
+  }, [emailVal, guardianType, selectVerifierItem, userGuardiansList, genKey]);
+
+  const handleCommonVerify = useCallback(
+    async (guardianAccount: string) => {
+      try {
+        dispatch(
+          setLoginAccountAction({
+            guardianAccount,
+            loginType: guardianType as LoginType,
+          }),
+        );
+        setLoading(true);
+        dispatch(resetUserGuardianStatus());
+        await userGuardianList({ caHash: walletInfo.caHash });
+        const result = await verification.sendVerificationCode({
+          params: {
+            guardianIdentifier: emailVal as string,
+            type: LoginType[guardianType as LoginType],
+            verifierId: selectVerifierItem?.id || '',
+            chainId: DefaultChainId,
+          },
+        });
+        setLoading(false);
+        if (result.verifierSessionId) {
+          const newGuardian: UserGuardianItem = {
+            isLoginAccount: false,
+            verifier: selectVerifierItem,
+            guardianAccount,
+            guardianType: guardianType as LoginType,
+            verifierInfo: {
+              sessionId: result.verifierSessionId,
+              endPoint: result.endPoint,
+            },
+            key: genKey,
+            isInitStatus: true,
+            identifierHash: '',
+            salt: '',
+          };
+          dispatch(setCurrentGuardianAction(newGuardian));
+          dispatch(setOpGuardianAction(newGuardian));
+          navigate('/setting/guardians/verifier-account', { state: 'guardians/add' });
+        }
+      } catch (error) {
+        setLoading(false);
+        console.log('---add-guardian-send-code', error);
+        const _error = verifyErrorHandler(error);
+        message.error(_error);
+      }
+    },
+    [
+      dispatch,
+      emailVal,
+      genKey,
+      guardianType,
+      navigate,
+      selectVerifierItem,
+      setLoading,
+      userGuardianList,
+      walletInfo.caHash,
+    ],
+  );
 
   const handleVerify = useCallback(async () => {
-    try {
-      dispatch(
-        setLoginAccountAction({
-          guardianAccount: emailVal as string,
-          loginType: guardianType as LoginType,
-        }),
-      );
-      setLoading(true);
-      dispatch(resetUserGuardianStatus());
-      await userGuardianList({ caHash: walletInfo.caHash });
-      const result = await verification.sendVerificationCode({
-        params: {
-          guardianIdentifier: emailVal as string,
-          type: LoginType[guardianType as LoginType],
-          verifierId: selectVerifierItem?.id || '',
-          chainId: DefaultChainId,
-        },
-      });
-      setLoading(false);
-      if (result.verifierSessionId) {
-        const newGuardian: UserGuardianItem = {
-          isLoginAccount: false,
-          verifier: selectVerifierItem,
-          guardianAccount: emailVal as string,
-          guardianType: guardianType as LoginType,
-          verifierInfo: {
-            sessionId: result.verifierSessionId,
-            endPoint: result.endPoint,
-          },
-          key: `${emailVal}&${selectVerifierItem?.id}`,
-          isInitStatus: true,
-          identifierHash: '',
-          salt: '',
-        };
-        dispatch(setCurrentGuardianAction(newGuardian));
-        dispatch(setOpGuardianAction(newGuardian));
-        navigate('/setting/guardians/verifier-account', { state: 'guardians/add' });
-      }
-    } catch (error) {
-      setLoading(false);
-      console.log('---add-guardian-send-code', error);
-      const _error = verifyErrorHandler(error);
-      message.error(_error);
+    if (guardianType === LoginType.Email) {
+      handleCommonVerify(emailVal || '');
+    } else if (guardianType === LoginType.Phone) {
+      handleCommonVerify(`${phoneValue?.code}_${phoneValue?.phoneNumber}`);
+    } else {
+      navigate('/setting/guardian/guardian-approval', { state: 'guardians/add' });
     }
-  }, [dispatch, emailVal, guardianType, navigate, selectVerifierItem, setLoading, userGuardianList, walletInfo.caHash]);
+  }, [emailVal, guardianType, handleCommonVerify, navigate, phoneValue?.code, phoneValue?.phoneNumber]);
 
   return (
     <div className="add-guardians-page">
@@ -186,18 +327,11 @@ export default function AddGuardian() {
           items={guardianTypeOptions}
         />
       </div>
-      {guardianType === LoginType.Email && (
+      {guardianType !== undefined && (
         <div className="input-item">
-          <p className="label">{t("Guardian's email")}</p>
-          <Input
-            className="login-input"
-            value={emailVal}
-            placeholder={t('Enter email')}
-            onChange={(e) => {
-              handleInputChange(e.target.value);
-            }}
-          />
-          {inputErr && <span className="err-text">{inputErr}</span>}
+          <p className="label">{renderGuardianAccount[guardianType].label}</p>
+          {renderGuardianAccount[guardianType].element}
+          {emailErr && <span className="err-text">{emailErr}</span>}
         </div>
       )}
       <div className="input-item">

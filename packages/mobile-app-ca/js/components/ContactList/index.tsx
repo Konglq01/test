@@ -15,7 +15,7 @@ import { defaultColors } from 'assets/theme';
 import { BGStyles, FontStyles } from 'assets/theme/styles';
 import GStyles from 'assets/theme/GStyles';
 import { ViewStyleType } from 'types/styles';
-import { getAddressInfo, getAelfAddress } from '@portkey-wallet/utils/aelf';
+import { getAddressInfo } from '@portkey-wallet/utils/aelf';
 import { transContactsToIndexes } from '@portkey-wallet/store/store-ca/contact/utils';
 import { useContact } from '@portkey-wallet/hooks/hooks-ca/contact';
 
@@ -104,8 +104,8 @@ const ContactsList: React.FC<ContactsListProps> = ({
 
   const _renderSection = (contactIndex: ContactIndexType) => {
     return (
-      <TouchableOpacity>
-        <TextL style={contactListStyles.sectionIndex}>{contactIndex.index}</TextL>
+      <TouchableOpacity style={contactListStyles.sectionIndexWrap}>
+        <TextL style={[contactListStyles.sectionIndex, FontStyles.font7]}>{contactIndex.index}</TextL>
       </TouchableOpacity>
     );
   };
@@ -125,6 +125,8 @@ const ContactsList: React.FC<ContactsListProps> = ({
 
   const isExistContact = useMemo<boolean>(() => list.reduce((pv, cv) => pv + cv.contacts.length, 0) > 0, [list]);
 
+  const indexList = useMemo(() => contactIndexList.filter(item => item.contacts.length), [contactIndexList]);
+
   return (
     <View style={[contactListStyles.listWrap, style]}>
       {isSearchShow && (
@@ -142,7 +144,7 @@ const ContactsList: React.FC<ContactsListProps> = ({
       {isExistContact && (
         <ContactFlashList
           dataArray={flashListData}
-          contactIndexList={contactIndexList}
+          contactIndexList={indexList}
           sectionHeight={contactListStyles.sectionIndex.height}
           itemHeight={itemHeight || contactItemStyles.itemWrap.height}
           renderContactIndex={_renderSection}

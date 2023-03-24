@@ -6,7 +6,6 @@ export default function GoogleLoginCom() {
   const login = useGoogleLogin({
     onSuccess: tokenResponse => console.log(tokenResponse, 'GoogleLogin=='),
     onError: err => console.log(err, 'err==='),
-    flow: 'auth-code',
   });
 
   useGoogleOneTapLogin({

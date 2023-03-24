@@ -1,26 +1,17 @@
 import { useAppCASelector } from '.';
 import { useMemo, useCallback } from 'react';
 import { WalletInfoType } from '@portkey-wallet/types/wallet';
-import {
-  CAInfo,
-  CAInfoType,
-  DeviceItemType,
-  DeviceType,
-  LoginType,
-  RegisterStatus,
-} from '@portkey-wallet/types/types-ca/wallet';
+import { CAInfoType } from '@portkey-wallet/types/types-ca/wallet';
 import { WalletState } from '@portkey-wallet/store/store-ca/wallet/type';
-import { VerificationType } from '@portkey-wallet/types/verifier';
-import { fetchCreateWalletResult, requestCreateWallet } from '@portkey-wallet/api/api-did/utils/wallet';
-import { sleep } from '@portkey-wallet/utils';
 import { useCurrentNetworkInfo } from './network';
 import { useCurrentChain } from './chainList';
 import { useCaHolderManagerInfoQuery } from '@portkey-wallet/graphql/contract/__generated__/hooks/caHolderManagerInfo';
 import { getApolloClient } from '@portkey-wallet/graphql/contract/apollo';
-import { DEVICE_TYPE_INFO } from '@portkey-wallet/constants/constants-ca/wallet';
 import { request } from '@portkey-wallet/api/api-did';
 import { useAppCommonDispatch } from '../index';
 import { setWalletNameAction } from '@portkey-wallet/store/store-ca/wallet/actions';
+import { DeviceItemType } from '@portkey-wallet/types/types-ca/device';
+import { extraDataDecode } from '@portkey-wallet/utils/device';
 
 export interface CurrentWalletType extends WalletInfoType, CAInfoType {
   caHash?: string;
@@ -66,11 +57,19 @@ export const useCurrentWallet = () => {
   }, [wallet]);
 };
 
+export const useCurrentWalletDetails = () => {
+  const { walletInfo, currentNetwork } = useWallet() || {};
+
+  return useMemo(() => {
+    return getCurrentWalletInfo(walletInfo, currentNetwork);
+  }, [walletInfo, currentNetwork]);
+};
+
 export const useDeviceList = () => {
   const networkInfo = useCurrentNetworkInfo();
   const walletInfo = useCurrentWalletInfo();
   const chainInfo = useCurrentChain();
-  const { data, error } = useCaHolderManagerInfoQuery({
+  const { data, error, refetch } = useCaHolderManagerInfoQuery({
     client: getApolloClient(networkInfo.networkType),
     variables: {
       dto: {
@@ -82,44 +81,23 @@ export const useDeviceList = () => {
     },
     fetchPolicy: 'cache-and-network',
   });
-
-  return useMemo<DeviceItemType[]>(() => {
+  const deviceList = useMemo<DeviceItemType[]>(() => {
     if (error || !data || !data.caHolderManagerInfo || data.caHolderManagerInfo.length < 1) return [];
 
     const caHolderManagerInfo = data.caHolderManagerInfo[0];
     const managers = caHolderManagerInfo?.managerInfos || [];
     return managers
       .map(item => {
-        // TODO: extraData need decode
-        const extraDataArray = (item?.extraData || '').split(',').map(item => Number(item));
-        let deviceType: DeviceType = 0,
-          loginTime: number | undefined = undefined;
-        const firstNum = extraDataArray[0];
-        if (firstNum !== undefined && !isNaN(firstNum)) {
-          if (DeviceType[firstNum] !== undefined) {
-            deviceType = firstNum;
-          } else if (!isNaN(new Date(firstNum).getTime())) {
-            loginTime = firstNum;
-          }
-        }
-        const secondNum = extraDataArray[1];
-        if (
-          loginTime === undefined &&
-          secondNum !== undefined &&
-          !isNaN(secondNum) &&
-          !isNaN(new Date(firstNum).getTime())
-        ) {
-          loginTime = secondNum;
-        }
+        const extraData = extraDataDecode(item?.extraData || '');
         return {
-          deviceType,
-          loginTime,
-          deviceTypeInfo: DEVICE_TYPE_INFO[deviceType],
+          ...extraData,
           managerAddress: item?.address,
         };
       })
       .reverse();
   }, [data, error]);
+
+  return { deviceList, refetch };
 };
 
 export const useSetWalletName = () => {

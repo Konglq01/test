@@ -10,7 +10,7 @@ import {
 } from 'store/Provider/hooks';
 import { useCallback, useMemo } from 'react';
 import { message } from 'antd';
-import { setOpGuardianAction, setUserGuardianItemStatus } from '@portkey-wallet/store/store-ca/guardians/actions';
+import { setUserGuardianItemStatus } from '@portkey-wallet/store/store-ca/guardians/actions';
 import { VerifierInfo, VerifyStatus } from '@portkey-wallet/types/verifier';
 import './index.less';
 import PortKeyTitle from 'pages/components/PortKeyTitle';
@@ -26,6 +26,7 @@ import { setRegisterVerifierAction } from 'store/reducers/loginCache/actions';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
 import aes from '@portkey-wallet/utils/aes';
 import { handleVerificationDoc } from '@portkey-wallet/utils/guardian';
+import useGuardianList from 'hooks/useGuardianList';
 
 export default function VerifierAccount() {
   const { loginAccount } = useLoginInfo();
@@ -41,6 +42,7 @@ export default function VerifierAccount() {
   const currentChain = useCurrentChain();
   const { setLoading } = useLoading();
   const { passwordSeed } = useUserInfo();
+  const getGuardianList = useGuardianList();
 
   const onSuccessInGuardian = useCallback(
     async (res: VerifierInfo) => {
@@ -62,21 +64,12 @@ export default function VerifierAccount() {
                   type: currentGuardian?.guardianType,
                   verifierId: currentGuardian?.verifier?.id,
                   identifierHash: currentGuardian?.identifierHash,
-                  salt: currentGuardian?.salt,
-                  value: currentGuardian?.guardianAccount,
-                  isLoginGuardian: false,
                 },
               },
             },
           });
           console.log('setLoginAccount', result);
-          opGuardian &&
-            dispatch(
-              setOpGuardianAction({
-                ...opGuardian,
-                isLoginAccount: true,
-              }),
-            );
+          getGuardianList({ caHash: walletInfo.caHash });
           setLoading(false);
           navigate('/setting/guardians/view');
         } catch (error: any) {
@@ -104,13 +97,31 @@ export default function VerifierAccount() {
       currentGuardian,
       currentNetwork.walletType,
       dispatch,
+      getGuardianList,
       navigate,
-      opGuardian,
       passwordSeed,
       setLoading,
       state,
       walletInfo,
     ],
+  );
+
+  const onSuccessInRemoveOtherManage = useCallback(
+    (res: VerifierInfo) => {
+      if (!currentGuardian) return;
+      const { guardianIdentifier } = handleVerificationDoc(res.verificationDoc);
+      dispatch(
+        setUserGuardianItemStatus({
+          key: currentGuardian.key,
+          status: VerifyStatus.Verified,
+          signature: res.signature,
+          verificationDoc: res.verificationDoc,
+          identifierHash: guardianIdentifier,
+        }),
+      );
+      navigate('/setting/wallet-security/manage-devices/guardian-approval', { state: state });
+    },
+    [currentGuardian, dispatch, navigate, state],
   );
 
   const onSuccess = useCallback(
@@ -132,11 +143,13 @@ export default function VerifierAccount() {
       } else if (state?.indexOf('guardians') !== -1) {
         onSuccessInGuardian(res);
         message.success('Verified Successful');
+      } else if (state?.indexOf('removeManage') !== -1) {
+        onSuccessInRemoveOtherManage(res);
       } else {
         message.error('Router state error');
       }
     },
-    [state, navigate, currentGuardian, dispatch, onSuccessInGuardian],
+    [state, dispatch, navigate, currentGuardian, onSuccessInGuardian, onSuccessInRemoveOtherManage],
   );
 
   const handleBack = useCallback(() => {

@@ -10,6 +10,7 @@ import {
   PanResponderInstance,
   NativeTouchEvent,
   LayoutChangeEvent,
+  EmitterSubscription,
 } from 'react-native';
 import { ViewStyleType } from 'types/styles';
 import myEvents from 'utils/deviceEvent';
@@ -86,20 +87,27 @@ export default class TransformView extends Component<TransformViewProps, Transfo
   speedY!: number;
   touchTime?: Date;
   panResponderStatus: boolean | undefined;
+  nestScrollViewLayout: any;
+  listenerList: EmitterSubscription[] = [];
   constructor(props: TransformViewProps) {
     super(props);
     this.createPanResponder();
     this.prevTouches = [];
     this.viewLayout = { x: 0, y: 0, width: 0, height: 0 };
     this.initContentLayout = { x: 0, y: 0, width: 0, height: 0 };
+    this.nestScrollViewLayout = { x: 0, y: 0, width: 0, height: 0 };
     this.state = {
       translateX: new Animated.Value(0) as AnimatedValue,
       translateY: new Animated.Value(0) as AnimatedValue,
       scale: new Animated.Value(1) as AnimatedValue,
     };
     this.initResponderStatus();
-    myEvents.nestScrollForPullCloseModal.addListener(() => {
-      this.panResponderStatus = true;
+    this.initListeners();
+  }
+
+  componentWillUnmount() {
+    this.listenerList.forEach(listener => {
+      listener.remove();
     });
   }
 
@@ -119,6 +127,15 @@ export default class TransformView extends Component<TransformViewProps, Transfo
 
   initResponderStatus() {
     this.panResponderStatus = isIos ? !this.props.enabledNestScrollView : true;
+  }
+  initListeners() {
+    const listener1 = myEvents.nestScrollViewScrolledTop.addListener(() => {
+      this.panResponderStatus = true;
+    });
+    const listener2 = myEvents.nestScrollViewLayout.addListener(layout => {
+      this.nestScrollViewLayout = layout;
+    });
+    this.listenerList = [listener1, listener2];
   }
 
   setupLongPressTimer(e: GestureResponderEvent) {
@@ -140,11 +157,16 @@ export default class TransformView extends Component<TransformViewProps, Transfo
 
   createPanResponder() {
     this.panResponder = PanResponder.create({
-      onStartShouldSetPanResponder: (evt, gestureState) => false,
+      onStartShouldSetPanResponder: () => false,
       onStartShouldSetPanResponderCapture: () => false,
       onMoveShouldSetPanResponder: (evt, gestureState) => {
+        const { pageY } = evt.nativeEvent;
         const { dx, dy } = gestureState;
-        return this.panResponderStatus && dx !== 0 && dy !== 0 && (Math.abs(dx) > 5 || Math.abs(dy) > 5);
+        if (isIos) {
+          const isNotNestScrollViewArea = pageY < this.viewLayout.y + this.nestScrollViewLayout.y;
+          return isNotNestScrollViewArea || (!!this.panResponderStatus && dx !== 0 && dy > 5);
+        }
+        return !!this.panResponderStatus && dx !== 0 && dy !== 0 && (Math.abs(dx) > 5 || Math.abs(dy) > 5);
       },
       onMoveShouldSetPanResponderCapture: () => false,
       onPanResponderGrant: (e, gestureState) => this.onPanResponderGrant(e, gestureState),
