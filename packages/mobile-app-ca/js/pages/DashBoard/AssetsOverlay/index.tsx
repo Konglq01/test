@@ -194,14 +194,14 @@ const AssetList = ({ account }: TokenListProps) => {
       <FlatList
         disableScrollViewPanResponder={true}
         onLayout={e => {
-          DeviceEventEmitter.emit('nestScrollViewLayout', e.nativeEvent.layout);
+          myEvents.nestScrollViewLayout.emit(e.nativeEvent.layout);
         }}
         onScroll={({ nativeEvent }) => {
           const {
             contentOffset: { y: scrollY },
           } = nativeEvent;
           if (scrollY <= 0) {
-            myEvents.nestScrollForPullCloseModal.emit();
+            myEvents.nestScrollViewScrolledTop.emit();
           }
         }}
         style={styles.flatList}
