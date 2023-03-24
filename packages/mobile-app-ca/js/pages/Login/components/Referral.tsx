@@ -17,7 +17,6 @@ import Divider from 'components/Divider';
 import CommonToast from 'components/CommonToast';
 import { useAppleAuthentication, useGoogleAuthentication } from 'hooks/authentication';
 import { isIos } from '@portkey-wallet/utils/mobile/device';
-import { getGoogleUserInfo, parseAppleIdentityToken } from '@portkey-wallet/utils/authentication';
 import { useOnLogin } from 'hooks/login';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import Loading from 'components/Loading';
@@ -48,13 +47,8 @@ export default function Referral({
   const onAppleSign = useCallback(async () => {
     try {
       Loading.show();
-      const appleInfo = await appleSign();
-      const userInfo = parseAppleIdentityToken(appleInfo.identityToken);
-      if (userInfo) {
-        await onLogin(userInfo.userId, LoginType.Apple, { [userInfo.userId]: appleInfo.identityToken as string });
-      } else {
-        CommonToast.fail('Authorization failed');
-      }
+      const userInfo = await appleSign();
+      await onLogin(userInfo.user.id, LoginType.Apple, { [userInfo.user.id]: userInfo.identityToken as string });
     } catch (error) {
       CommonToast.failError(error);
     }
@@ -63,11 +57,10 @@ export default function Referral({
   const onGoogleSign = useCallback(async () => {
     try {
       Loading.show();
-      const googleInfo = await googleSign();
-      const userInfo = await getGoogleUserInfo(googleInfo.authentication?.accessToken);
-      console.log(userInfo, '========userInfo');
-
-      await onLogin(userInfo.id, LoginType.Google, { [userInfo.id]: googleInfo.authentication?.accessToken as string });
+      const userInfo = await googleSign();
+      await onLogin(userInfo.user.id, LoginType.Google, {
+        [userInfo.user.id]: userInfo.accessToken,
+      });
     } catch (error) {
       CommonToast.failError(error);
     }

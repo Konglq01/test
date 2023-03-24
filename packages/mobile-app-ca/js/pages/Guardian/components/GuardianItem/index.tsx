@@ -26,6 +26,7 @@ import { useLanguage } from 'i18n/hooks';
 import { useVerifyToken } from 'hooks/authentication';
 import { RouterParams } from 'pages/Guardian/GuardianApproval';
 import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
+import { PRIVATE_GUARDIAN_ACCOUNT } from '@portkey-wallet/constants/constants-ca/guardian';
 
 export const AuthTypes = [LoginType.Apple, LoginType.Google];
 
@@ -213,6 +214,33 @@ export default function GuardianItem({
 }: GuardianAccountItemProps) {
   const itemStatus = useMemo(() => guardiansStatus?.[guardianItem.key], [guardianItem.key, guardiansStatus]);
   const disabled = isSuccess && itemStatus?.status !== VerifyStatus.Verified;
+
+  const guardianAccount = useMemo(() => {
+    if (![LoginType.Apple, LoginType.Google].includes(guardianItem.guardianType)) {
+      return guardianItem.guardianAccount;
+    }
+    if (guardianItem.isPrivate) return PRIVATE_GUARDIAN_ACCOUNT;
+    return guardianItem.thirdPartyEmail || '';
+  }, [guardianItem]);
+
+  const renderGuardianAccount = useCallback(() => {
+    if (!guardianItem.firstName) {
+      return (
+        <TextM numberOfLines={1} style={[styles.nameStyle, GStyles.flex1]}>
+          {guardianAccount}
+        </TextM>
+      );
+    }
+    return (
+      <View style={[styles.nameStyle, GStyles.flex1]}>
+        <TextM style={styles.firstNameStyle}>{guardianItem.firstName}</TextM>
+        <TextM style={FontStyles.font3} numberOfLines={1}>
+          {guardianAccount}
+        </TextM>
+      </View>
+    );
+  }, [guardianAccount, guardianItem.firstName]);
+
   return (
     <View style={[styles.itemRow, isBorderHide && styles.itemWithoutBorder, disabled && styles.disabledStyle]}>
       {guardianItem.isLoginAccount && (
@@ -228,9 +256,7 @@ export default function GuardianItem({
           uri={guardianItem.verifier?.imageUrl}
           style={styles.iconStyle}
         />
-        <TextM numberOfLines={1} style={[styles.nameStyle, GStyles.flex1]}>
-          {guardianItem.guardianAccount}
-        </TextM>
+        {renderGuardianAccount()}
       </View>
       {!isButtonHide && (
         <GuardianItemButton
@@ -273,7 +299,6 @@ const styles = StyleSheet.create({
     width: 'auto',
     paddingHorizontal: pTd(6),
     backgroundColor: defaultColors.bg11,
-    // borderRadius: pTd(6),
     borderTopLeftRadius: pTd(6),
     borderBottomRightRadius: pTd(6),
   },
@@ -282,6 +307,9 @@ const styles = StyleSheet.create({
   },
   nameStyle: {
     marginLeft: pTd(12),
+  },
+  firstNameStyle: {
+    marginBottom: pTd(2),
   },
   buttonStyle: {
     height: 24,

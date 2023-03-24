@@ -17,20 +17,23 @@ export const pageStyles = StyleSheet.create({
   },
   guardianInfoWrap: {
     backgroundColor: bg1,
-    paddingHorizontal: pTd(16),
     marginBottom: pTd(24),
     borderRadius: pTd(6),
   },
+  dividerStyle: {
+    ...GStyles.marginArg(4, 16),
+  },
   guardianTypeWrap: {
     height: pTd(56),
-    justifyContent: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   verifierInfoWrap: {
-    borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: border6,
     height: pTd(56),
     flexDirection: 'row',
     alignItems: 'center',
+    paddingHorizontal: pTd(16),
   },
   loginSwitchWrap: {
     flexDirection: 'row',
@@ -45,5 +48,12 @@ export const pageStyles = StyleSheet.create({
   tips: {
     color: font3,
     lineHeight: pTd(20),
+  },
+  loginTypeIcon: {
+    borderRadius: pTd(14),
+    marginRight: pTd(12),
+  },
+  verifierImageStyle: {
+    marginRight: pTd(12),
   },
 });
