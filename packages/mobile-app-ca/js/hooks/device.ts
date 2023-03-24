@@ -5,11 +5,11 @@ import { DEVICE_TYPE_INFO } from '@portkey-wallet/constants/constants-ca/device'
 import useLockCallback from '@portkey-wallet/hooks/useLockCallback';
 import * as Application from 'expo-application';
 import { request } from '@portkey-wallet/api/api-did';
-import { compareVersions } from 'utils';
 import { ButtonRowProps } from 'components/ButtonRow';
 import { Linking, Platform } from 'react-native';
 import OverlayModal from 'components/OverlayModal';
 import ActionSheet from 'components/ActionSheet';
+import { compareVersions } from '@portkey-wallet/utils/device';
 
 export const useGetDeviceInfo = () => {
   return useCallback(
