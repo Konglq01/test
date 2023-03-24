@@ -1,11 +1,12 @@
 import { CountryItem } from '@portkey-wallet/types/types-ca/country';
 import { CAInfoType, LoginType } from '@portkey-wallet/types/types-ca/wallet';
-import { VerifierInfo } from '@portkey-wallet/types/verifier';
+import { AuthenticationInfo, VerifierInfo } from '@portkey-wallet/types/verifier';
 
 export interface LoginInfo {
   guardianAccount: string; // account
   loginType: LoginType;
   createType?: 'register' | 'login' | 'scan';
+  authenticationInfo?: AuthenticationInfo;
 }
 
 export interface ISelectCountryCode {

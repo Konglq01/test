@@ -6,7 +6,7 @@ import {
   setManagerInfo,
 } from '@portkey-wallet/store/store-ca/wallet/actions';
 import { CAInfo, LoginType, ManagerInfo } from '@portkey-wallet/types/types-ca/wallet';
-import { VerificationType, VerifierInfo } from '@portkey-wallet/types/verifier';
+import { AuthenticationInfo, VerificationType, VerifierInfo } from '@portkey-wallet/types/verifier';
 import { handleErrorCode, sleep } from '@portkey-wallet/utils';
 import Loading from 'components/Loading';
 import AElf from 'aelf-sdk';
@@ -151,7 +151,7 @@ export function useOnLogin() {
   const getVerifierServers = useGetVerifierServers();
   const getGuardiansInfo = useGetGuardiansInfo();
   return useCallback(
-    async (loginAccount: string, loginType = LoginType.Email) => {
+    async (loginAccount: string, loginType = LoginType.Email, authenticationInfo?: AuthenticationInfo) => {
       try {
         let _chainInfo;
         if (!chainInfo) {
@@ -165,13 +165,14 @@ export function useOnLogin() {
           navigationService.navigate('GuardianApproval', {
             loginAccount,
             userGuardiansList: handleUserGuardiansList(holderInfo, verifierServers),
+            authenticationInfo,
           });
         } else {
-          navigationService.navigate('SelectVerifier', { loginAccount, loginType });
+          navigationService.navigate('SelectVerifier', { loginAccount, loginType, authenticationInfo });
         }
       } catch (error) {
         if (handleErrorCode(error) === '3002') {
-          navigationService.navigate('SelectVerifier', { loginAccount, loginType });
+          navigationService.navigate('SelectVerifier', { loginAccount, loginType, authenticationInfo });
         } else {
           throw error;
         }

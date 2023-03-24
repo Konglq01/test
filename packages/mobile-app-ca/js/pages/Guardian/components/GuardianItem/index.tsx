@@ -12,7 +12,7 @@ import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type'
 import Loading from 'components/Loading';
 import CommonToast from 'components/CommonToast';
 import { sleep } from '@portkey-wallet/utils';
-import { ApprovalType, VerificationType, VerifyStatus } from '@portkey-wallet/types/verifier';
+import { ApprovalType, VerificationType, VerifierInfo, VerifyStatus } from '@portkey-wallet/types/verifier';
 import { BGStyles, FontStyles } from 'assets/theme/styles';
 import { isIOS } from '@rneui/base';
 import { LoginGuardianTypeIcon } from 'constants/misc';
@@ -23,6 +23,11 @@ import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import useDebounceCallback from 'hooks/useDebounceCallback';
 import { verification } from 'utils/api';
 import { useLanguage } from 'i18n/hooks';
+import { useVerifyToken } from 'hooks/authentication';
+import { RouterParams } from 'pages/Guardian/GuardianApproval';
+import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
+
+export const AuthTypes = [LoginType.Apple, LoginType.Google];
 
 interface GuardianAccountItemProps {
   guardianItem: UserGuardianItem;
@@ -47,11 +52,12 @@ function GuardianItemButton({
   disabled?: boolean;
 }) {
   const { t } = useLanguage();
+  const { authenticationInfo } = useRouterParams<RouterParams>();
 
   const itemStatus = useMemo(() => guardiansStatus?.[guardianItem.key], [guardianItem.key, guardiansStatus]);
 
   const { status, requestCodeResult } = itemStatus || {};
-
+  const verifyToken = useVerifyToken();
   const guardianInfo = useMemo(() => {
     let _verificationType = VerificationType.communityRecovery;
     if (
@@ -104,12 +110,48 @@ function GuardianItemButton({
     }
     Loading.hide();
   }, [onSetGuardianStatus, guardianInfo]);
-  const onVerifier = useDebounceCallback(() => {
-    navigationService.push('VerifierDetails', {
-      ...guardianInfo,
-      requestCodeResult,
-      startResend: true,
-    });
+  const onVerifierAuth = useCallback(async () => {
+    try {
+      Loading.show();
+      const rst = await verifyToken(guardianItem.guardianType, {
+        accessToken: authenticationInfo?.[guardianItem.guardianAccount],
+        id: guardianItem.guardianAccount,
+        verifierId: guardianItem.verifier?.id,
+        chainId: DefaultChainId,
+      });
+      CommonToast.success('Verified Successfully');
+      const verifierInfo: VerifierInfo = { ...rst, verifierId: guardianItem?.verifier?.id };
+      onSetGuardianStatus({
+        status: VerifyStatus.Verified,
+        verifierInfo,
+      });
+    } catch (error) {
+      CommonToast.failError(error);
+    }
+    Loading.hide();
+  }, [
+    authenticationInfo,
+    guardianItem.guardianAccount,
+    guardianItem.guardianType,
+    guardianItem.verifier?.id,
+    onSetGuardianStatus,
+    verifyToken,
+  ]);
+  const onVerifier = useDebounceCallback(async () => {
+    switch (guardianItem.guardianType) {
+      case LoginType.Apple:
+      case LoginType.Google:
+        onVerifierAuth();
+        break;
+      default: {
+        navigationService.push('VerifierDetails', {
+          ...guardianInfo,
+          requestCodeResult,
+          startResend: true,
+        });
+        break;
+      }
+    }
   }, [guardianInfo, requestCodeResult]);
   const buttonProps: CommonButtonProps = useMemo(() => {
     // expired
@@ -122,16 +164,19 @@ function GuardianItemButton({
         disabledTitleStyle: FontStyles.font7,
       };
     }
+    if (
+      status === VerifyStatus.Verifying ||
+      (AuthTypes.includes(guardianItem.guardianType) && (!status || status === VerifyStatus.NotVerified))
+    ) {
+      return {
+        onPress: onVerifier,
+        title: 'Verify',
+      };
+    }
     if (!status || status === VerifyStatus.NotVerified) {
       return {
         onPress: onSendCode,
         title: 'Send',
-      };
-    }
-    if (status === VerifyStatus.Verifying) {
-      return {
-        onPress: onVerifier,
-        title: 'Verify',
       };
     }
     return {
@@ -141,7 +186,7 @@ function GuardianItemButton({
       disabledStyle: styles.confirmedButtonStyle,
       disabled: true,
     };
-  }, [isExpired, onSendCode, onVerifier, status]);
+  }, [guardianItem.guardianType, isExpired, onSendCode, onVerifier, status]);
   return (
     <CommonButton
       type="primary"

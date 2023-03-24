@@ -11,7 +11,13 @@ import { BorderStyles, FontStyles } from 'assets/theme/styles';
 import Svg from 'components/Svg';
 import { pTd } from 'utils/unit';
 import { getApprovalCount } from '@portkey-wallet/utils/guardian';
-import { ApprovalType, VerificationType, VerifierInfo, VerifyStatus } from '@portkey-wallet/types/verifier';
+import {
+  ApprovalType,
+  AuthenticationInfo,
+  VerificationType,
+  VerifierInfo,
+  VerifyStatus,
+} from '@portkey-wallet/types/verifier';
 import GuardianItem from '../components/GuardianItem';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type';
@@ -31,7 +37,7 @@ import { useGetCurrentCAContract } from 'hooks/contract';
 import { GuardiansStatus, GuardiansStatusItem } from '../types';
 import { handleGuardiansApproved } from 'utils/login';
 
-type RouterParams = {
+export type RouterParams = {
   loginAccount?: string;
   userGuardiansList?: UserGuardianItem[];
   approvalType: ApprovalType;
@@ -40,6 +46,7 @@ type RouterParams = {
   verifiedTime?: number;
   removeManagerAddress?: string;
   loginType?: LoginType;
+  authenticationInfo?: AuthenticationInfo;
 };
 export default function GuardianApproval() {
   const {

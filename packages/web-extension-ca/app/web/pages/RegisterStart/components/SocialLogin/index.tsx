@@ -3,7 +3,7 @@ import CustomSvg from 'components/CustomSvg';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
-import { RegisterType } from 'types/wallet';
+import { RegisterType, SocialLoginFinishHandler } from 'types/wallet';
 import DividerCenter from '../DividerCenter';
 import SocialContent from '../SocialContent';
 import TermsOfServiceItem from '../TermsOfServiceItem';
@@ -17,7 +17,7 @@ export default function SocialLogin({
 }: {
   type: RegisterType;
   onBack?: () => void;
-  onFinish: (v: any) => void;
+  onFinish: SocialLoginFinishHandler;
   switchLogin?: () => void;
 }) {
   const navigate = useNavigate();

@@ -56,7 +56,7 @@ export default function VerifierPage({ currentGuardian, guardianType, isInitStat
 
           const res = await checkVerificationCode({
             type: LoginType[currentGuardian?.guardianType as LoginType],
-            guardianIdentifier: currentGuardian.guardianAccount,
+            guardianIdentifier: currentGuardian.guardianAccount.replaceAll(' ', ''),
             verifierSessionId: currentGuardian.verifierInfo.sessionId,
             verificationCode: code,
             verifierId: currentGuardian.verifier?.id || '',
@@ -91,7 +91,7 @@ export default function VerifierPage({ currentGuardian, guardianType, isInitStat
       setLoading(true);
       const res = await verification.sendVerificationCode({
         params: {
-          guardianIdentifier: currentGuardian.guardianAccount,
+          guardianIdentifier: currentGuardian.guardianAccount.replaceAll(' ', ''),
           type: LoginType[guardianType],
           verifierId: currentGuardian.verifier?.id || '',
           chainId: DefaultChainId,
@@ -148,7 +148,9 @@ export default function VerifierPage({ currentGuardian, guardianType, isInitStat
       <div className="send-tip">
         {isPrompt || 'Please contact your guardians, and enter '}
         <span>{t('sendCodeTip1', { codeCount: DIGIT_CODE.length })}</span>
-        <span className="account">{currentGuardian?.guardianAccount}</span>
+        <span className="account">{`${LoginType.Phone === currentGuardian?.guardianType ? '+ ' : ''}${
+          currentGuardian?.guardianAccount
+        }`}</span>
         <br />
         {t('sendCodeTip2', { minute: DIGIT_CODE.expiration })}
       </div>

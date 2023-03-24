@@ -54,7 +54,7 @@ export default function SetWalletPin() {
       if (!registerVerifier) throw 'Missing Verifier Server';
       const result = await registerDIDWallet({
         type: LoginType[loginAccount.loginType],
-        loginGuardianIdentifier: loginAccount.guardianAccount,
+        loginGuardianIdentifier: loginAccount.guardianAccount.replaceAll(' ', ''),
         manager: managerAddress,
         extraData, //navigator.userAgent,
         chainId: DefaultChainId,
@@ -93,7 +93,7 @@ export default function SetWalletPin() {
       const guardiansApproved = getGuardiansApproved();
       const requestId = randomId();
       const result = await recoveryDIDWallet({
-        loginGuardianIdentifier: loginAccount.guardianAccount,
+        loginGuardianIdentifier: loginAccount.guardianAccount.replaceAll(' ', ''),
         manager: managerAddress,
         extraData, //navigator.userAgent,
         chainId: DefaultChainId,

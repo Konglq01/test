@@ -1,3 +1,5 @@
+import { ISocialLogin } from '@portkey-wallet/types/types-ca/wallet';
+
 export type CreateType = 'Import' | 'Create';
 export type InfoActionType = 'add' | 'update' | 'remove';
 export type RegisterType = 'Login' | 'Sign up';
@@ -10,3 +12,11 @@ export interface AESEncryptWalletParam {
 }
 
 export type ValidateHandler = (data?: any) => Promise<any>;
+
+export type SocialLoginFinishHandler = (value: {
+  type: ISocialLogin;
+  data?: {
+    assess_token: string;
+    [x: string]: any;
+  };
+}) => void;
