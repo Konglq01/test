@@ -63,6 +63,7 @@ export const recentSlice = createSlice({
 
       if (isFirstTime) {
         // first Page
+        targetData.skipCount = RECENT_LIST_PAGE_SIZE;
         targetData.recentContactList = response.data;
       } else {
         targetData.recentContactList = [...targetData.recentContactList, ...response.data];

@@ -27,6 +27,7 @@ import navigationService from 'utils/navigationService';
 import { pTd } from 'utils/unit';
 import { useIsTestnet } from '@portkey-wallet/hooks/hooks-ca/network';
 import { HIDDEN_TRANSACTION_TYPES } from '@portkey-wallet/constants/constants-ca/activity';
+import { getAWSUrlWithSize } from '@portkey-wallet/utils/img';
 
 const ActivityDetail = () => {
   const { t } = useLanguage();
@@ -175,7 +176,7 @@ const ActivityDetail = () => {
           <>
             <View style={styles.topWrap}>
               {activityItem?.nftInfo?.imageUrl ? (
-                <Image style={styles.img} source={{ uri: activityItem?.nftInfo?.imageUrl || '' }} />
+                <Image style={styles.img} source={{ uri: getAWSUrlWithSize(activityItem?.nftInfo?.imageUrl || '') }} />
               ) : (
                 <Text style={styles.noImg}>{activityItem?.nftInfo?.alias?.slice(0, 1)}</Text>
               )}
