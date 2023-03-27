@@ -130,11 +130,12 @@ const GuardianEdit: React.FC = () => {
     }
 
     if ([LoginType.Apple, LoginType.Google].includes(selectedType.value)) {
+      const guardianAccount = isEdit ? editGuardian?.guardianAccount : thirdPartyInfoRef.current?.id;
       if (
         userGuardiansList?.findIndex(
           guardian =>
             guardian.guardianType === selectedType?.value &&
-            guardian.guardianAccount === thirdPartyInfoRef.current?.id &&
+            guardian.guardianAccount === guardianAccount &&
             guardian.verifier?.id === selectedVerifier?.id,
         ) !== -1
       ) {
@@ -144,7 +145,7 @@ const GuardianEdit: React.FC = () => {
       }
     }
     return { ...INIT_NONE_ERROR };
-  }, [account, selectedType, selectedVerifier, t, userGuardiansList]);
+  }, [account, editGuardian?.guardianAccount, isEdit, selectedType, selectedVerifier?.id, t, userGuardiansList]);
 
   const thirdPartyConfirm = useCallback(
     async (
@@ -346,7 +347,6 @@ const GuardianEdit: React.FC = () => {
         id: userInfo.user.id,
         accessToken: userInfo.identityToken || '',
       };
-      console.log('userInfo', userInfo);
     } catch (error) {
       CommonToast.failError(error);
       Loading.hide();

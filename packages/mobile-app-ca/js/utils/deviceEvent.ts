@@ -12,6 +12,7 @@ const EventList = [
   'refreshDeviceList',
   'nestScrollViewScrolledTop',
   'nestScrollViewLayout',
+  'setAuthenticationInfo',
 ] as const;
 
 // eslint-disable-next-line no-new-func
