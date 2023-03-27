@@ -15,7 +15,7 @@ import SafeAreaBox from 'components/SafeAreaBox';
 import Svg from 'components/Svg';
 import CommonAvatar from 'components/CommonAvatar';
 import { getAWSUrlWithSize } from '@portkey-wallet/utils/img';
-import { NFT_BIG_SIZE } from '@portkey-wallet/constants/constants-ca/assets';
+import { NFT_LARGE_SIZE } from '@portkey-wallet/constants/constants-ca/assets';
 
 export interface TokenDetailProps {
   route?: any;
@@ -50,7 +50,7 @@ const NFTDetail: React.FC<TokenDetailProps> = props => {
       <CommonAvatar
         title={alias}
         style={[imageUrl ? styles.image1 : styles.image]}
-        imageUrl={getAWSUrlWithSize(imageUrl, NFT_BIG_SIZE, NFT_BIG_SIZE)}
+        imageUrl={getAWSUrlWithSize(imageUrl, NFT_LARGE_SIZE, NFT_LARGE_SIZE)}
       />
 
       <CommonButton
