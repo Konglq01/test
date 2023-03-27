@@ -35,7 +35,7 @@ export const setPinAction = async (pin: string) => {
   await InternalMessage.payload(PortkeyMessageTypes.SET_SEED, pin).send();
 };
 
-const loginUrl = 'http://localhost:3000/extension-login';
+const loginUrl = 'https://portkey-website-auth.vercel.app/join'; //'http://localhost:3000/join';
 
 export const socialLoginAction = async (type: ISocialLogin): Promise<SendResponseParams> =>
   await InternalMessage.payload(PortkeyMessageTypes.SOCIAL_LOGIN, { externalLink: `${loginUrl}/${type}` }).send();

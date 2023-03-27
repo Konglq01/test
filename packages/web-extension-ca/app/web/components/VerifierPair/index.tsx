@@ -2,6 +2,7 @@ import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import clsx from 'clsx';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
 import CustomSvg from 'components/CustomSvg';
+import { IconType } from 'types/icon';
 import './index.less';
 
 interface VerifierPairProps {
@@ -12,11 +13,11 @@ interface VerifierPairProps {
   size?: number;
 }
 
-const GuardianTypeIcon = {
+const GuardianTypeIcon: Record<LoginType, IconType> = {
   [LoginType.Email]: 'email',
   [LoginType.Phone]: 'GuardianPhone',
-  [LoginType.Google]: 'Google',
-  [LoginType.Apple]: 'Apple',
+  [LoginType.Google]: 'GuardianGoogle',
+  [LoginType.Apple]: 'GuardianApple',
 };
 
 export default function VerifierPair({
@@ -28,10 +29,7 @@ export default function VerifierPair({
 }: VerifierPairProps) {
   return (
     <div className={clsx('flex-row-center icon-pair', wrapperClassName)}>
-      <CustomSvg
-        type={guardianType === LoginType.Phone ? ('phone' as any) : 'email'}
-        style={{ width: size, height: size, fontSize: size }}
-      />
+      <CustomSvg type={GuardianTypeIcon[guardianType]} style={{ width: size, height: size, fontSize: size }} />
       <div className="verifier-icon-border">
         <BaseVerifierIcon src={verifierSrc} fallback={verifierName?.[0]} />
       </div>

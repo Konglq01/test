@@ -15,11 +15,11 @@ import Example from 'pages/Example';
 import SignUpUI from 'pages/Example/SignUpUI';
 import Login from 'pages/Example/login';
 import Home from 'pages/Home';
-// import My from 'pages/My';
-// import Guardians from 'pages/Guardians';
-// import AddGuardian from 'pages/Guardians/GuardiansAdd';
-// import GuardiansEdit from 'pages/Guardians/GuardiansEdit';
-// import GuardiansView from 'pages/Guardians/GuardiansView';
+import My from 'pages/My';
+import Guardians from 'pages/Guardians';
+import AddGuardian from 'pages/Guardians/GuardiansAdd';
+import GuardiansEdit from 'pages/Guardians/GuardiansEdit';
+import GuardiansView from 'pages/Guardians/GuardiansView';
 // import Wallet from 'pages/Wallet';
 import AddToken from 'pages/Token/Manage';
 import Transaction from 'pages/Transaction';
@@ -76,34 +76,34 @@ export const PageRouter = () =>
       path: '/login/verifier-account',
       element: <VerifierAccount />,
     },
-    // {
-    //   path: '/setting',
-    //   element: <My />,
-    // },
-    // {
-    //   path: '/setting/guardians',
-    //   element: <Guardians />,
-    // },
-    // {
-    //   path: '/setting/guardians/add',
-    //   element: <AddGuardian />,
-    // },
-    // {
-    //   path: '/setting/guardians/edit',
-    //   element: <GuardiansEdit />,
-    // },
-    // {
-    //   path: '/setting/guardians/view',
-    //   element: <GuardiansView />,
-    // },
-    // {
-    //   path: '/setting/guardians/verifier-account',
-    //   element: <VerifierAccount />,
-    // },
-    // {
-    //   path: '/setting/guardians/guardian-approval',
-    //   element: <GuardianApproval />,
-    // },
+    {
+      path: '/setting',
+      element: <My />,
+    },
+    {
+      path: '/setting/guardians',
+      element: <Guardians />,
+    },
+    {
+      path: '/setting/guardians/add',
+      element: <AddGuardian />,
+    },
+    {
+      path: '/setting/guardians/edit',
+      element: <GuardiansEdit />,
+    },
+    {
+      path: '/setting/guardians/view',
+      element: <GuardiansView />,
+    },
+    {
+      path: '/setting/guardians/verifier-account',
+      element: <VerifierAccount />,
+    },
+    {
+      path: '/setting/guardians/guardian-approval',
+      element: <GuardianApproval />,
+    },
     // {
     //   path: '/setting/wallet',
     //   element: <Wallet />,

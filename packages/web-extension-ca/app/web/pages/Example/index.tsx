@@ -1,7 +1,6 @@
 import { Button, Input } from 'antd';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useAppDispatch, useLoginInfo } from 'store/Provider/hooks';
-import { setCountryCodeAction } from 'store/reducers/loginCache/actions';
 import { setCountryModal } from 'store/reducers/modal/slice';
 
 export default function Example() {
