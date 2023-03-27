@@ -99,7 +99,7 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
         const result = await verification.sendVerificationCode({
           params: {
             guardianIdentifier: item?.guardianAccount,
-            type: LoginType[loginAccount.loginType],
+            type: LoginType[item.guardianType],
             verifierId: item.verifier?.id || '',
             chainId: DefaultChainId,
           },
