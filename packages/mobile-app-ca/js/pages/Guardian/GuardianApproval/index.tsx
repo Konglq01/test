@@ -58,6 +58,7 @@ export default function GuardianApproval() {
     verifiedTime,
     removeManagerAddress,
     loginType,
+    authenticationInfo: _authenticationInfo,
   } = useRouterParams<RouterParams>();
   const dispatch = useAppDispatch();
 
@@ -74,10 +75,21 @@ export default function GuardianApproval() {
   const { t } = useLanguage();
   const { caHash, address: managerAddress } = useCurrentWalletInfo();
   const getCurrentCAContract = useGetCurrentCAContract();
+  const [authenticationInfo, setAuthenticationInfo] = useState<AuthenticationInfo>(_authenticationInfo || {});
+  useEffectOnce(() => {
+    const listener = myEvents.setAuthenticationInfo.addListener((item: AuthenticationInfo) => {
+      setAuthenticationInfo(preAuthenticationInfo => ({
+        ...preAuthenticationInfo,
+        ...item,
+      }));
+    });
+    return () => {
+      listener.remove();
+    };
+  });
 
   const [guardiansStatus, setApproved] = useState<GuardiansStatus>();
   const [isExpired, setIsExpired] = useState<boolean>();
-  console.log(guardiansStatus, '==guardiansStatus');
 
   const guardianExpiredTime = useRef<number>();
   const approvedList = useMemo(() => {
@@ -319,6 +331,7 @@ export default function GuardianApproval() {
                     isExpired={isExpired}
                     isSuccess={isSuccess}
                     approvalType={approvalType}
+                    authenticationInfo={authenticationInfo}
                   />
                 );
               })}

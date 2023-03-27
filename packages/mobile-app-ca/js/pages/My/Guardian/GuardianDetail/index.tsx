@@ -178,11 +178,8 @@ export default function GuardianDetail() {
       if ([LoginType.Apple, LoginType.Google].includes(guardian.guardianType)) {
         Loading.show();
         try {
-          if (guardian.guardianType === LoginType.Apple) {
-            await appleSign();
-          } else {
-            await googleSign();
-          }
+          const userInfo = await (guardian.guardianType === LoginType.Apple ? appleSign : googleSign)();
+          if (userInfo.user.id !== guardian.guardianAccount) throw new Error('Account does not match your guardian');
           CommonToast.success('Verified Successfully');
           await onSetLoginAccount();
         } catch (error) {

@@ -4,7 +4,8 @@ import SettingHeader from 'pages/components/SettingHeader';
 import { useLocation, useNavigate } from 'react-router';
 import { useCommonState } from 'store/Provider/hooks';
 import clsx from 'clsx';
-
+import { getAWSUrlWithSize } from '@portkey-wallet/utils/img';
+import { NFT_LARGE_SIZE } from '@portkey-wallet/constants/constants-ca/assets';
 import './index.less';
 
 export default function NFT() {
@@ -16,7 +17,13 @@ export default function NFT() {
     return (
       <div className={clsx(['nft-detail', isPrompt ? 'detail-page-prompt' : null])}>
         <SettingHeader leftCallBack={() => navigate(-1)} />
-        <div className="picture">{state.imageUrl ? <img src={state.imageUrl} /> : state.symbol?.slice(0, 1)}</div>
+        <div className="picture">
+          {state.imageUrl ? (
+            <img src={getAWSUrlWithSize(state.imageUrl, NFT_LARGE_SIZE, NFT_LARGE_SIZE)} />
+          ) : (
+            state.symbol?.slice(0, 1)
+          )}
+        </div>
         <div className="info">
           <div className="title flex">
             <p className="title-alias">{state.alias}&nbsp;</p>
