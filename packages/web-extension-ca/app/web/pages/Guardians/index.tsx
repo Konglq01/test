@@ -34,12 +34,23 @@ export default function Guardians() {
   const accountShow = useCallback((guardian: UserGuardianItem) => {
     switch (guardian.guardianType) {
       case LoginType.Email:
-      case LoginType.Google:
-        return guardian.guardianAccount;
+        return <div className="account-text">{guardian.guardianAccount}</div>;
       case LoginType.Phone:
-        return `+${guardian.guardianAccount}`;
+        return <div className="account-text">{`+${guardian.guardianAccount}`}</div>;
+      case LoginType.Google:
+        return (
+          <div className="account-text">
+            <div className="name">{guardian.firstName}</div>
+            <div className="detail">{guardian.thirdPartyEmail}</div>
+          </div>
+        );
       case LoginType.Apple:
-        return guardian.isPrivate ? '******' : guardian.guardianAccount;
+        return (
+          <div className="account-text">
+            <div className="name">{guardian.firstName}</div>
+            <div className="detail">{guardian.isPrivate ? '******' : guardian.thirdPartyEmail}</div>
+          </div>
+        );
     }
   }, []);
 
@@ -78,7 +89,7 @@ export default function Guardians() {
                       verifierSrc={item.verifier?.imageUrl}
                       verifierName={item?.verifier?.name}
                     />
-                    <span className="account-text">{accountShow(item)}</span>
+                    {accountShow(item)}
                   </div>
                 </div>
                 <div>
