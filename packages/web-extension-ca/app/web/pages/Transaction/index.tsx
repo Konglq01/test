@@ -20,6 +20,8 @@ import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { addressFormat } from '@portkey-wallet/utils';
 import { useCommonState } from 'store/Provider/hooks';
 import PromptFrame from 'pages/components/PromptFrame';
+import { getAWSUrlWithSize } from '@portkey-wallet/utils/img';
+import { NFT_LARGE_SIZE } from '@portkey-wallet/constants/constants-ca/assets';
 
 export interface ITransactionQuery {
   item: ActivityItemType;
@@ -86,12 +88,12 @@ export default function Transaction() {
     const { nftInfo, amount } = activityItem;
     return (
       <div className="nft-amount">
-        <div
-          className="assets"
-          style={{
-            backgroundImage: `url(${nftInfo?.imageUrl})`,
-          }}>
-          <p>{!nftInfo?.imageUrl ? nftInfo?.alias?.slice(0, 1) : ''}</p>
+        <div className="assets">
+          {nftInfo?.imageUrl ? (
+            <img className="assets-img" src={getAWSUrlWithSize(nftInfo?.imageUrl, NFT_LARGE_SIZE, NFT_LARGE_SIZE)} />
+          ) : (
+            <p>{nftInfo?.alias?.slice(0, 1)}</p>
+          )}
         </div>
         <div className="info">
           <p className="index">
@@ -212,15 +214,14 @@ export default function Transaction() {
                 <div key={'transactionFee' + idx} className="right-item">
                   <span>{`${formatWithCommas({
                     amount: item.fee,
-                    // decimals: isNft ? 8 : 8, TODO
-                    decimals: 8,
+                    decimals: item?.decimals || 8,
                   })} ${item.symbol ?? ''}`}</span>
                   {!isTestNet && (
                     <span className="right-usd">
                       {formatWithCommas({
                         sign: AmountSign.USD,
                         amount: item.feeInUsd,
-                        decimals: 8,
+                        decimals: item?.decimals || 8,
                         digits: 2,
                       })}
                     </span>
