@@ -174,9 +174,14 @@ export function useVerifyGoogleToken() {
         accessToken = userInfo?.accessToken;
         if (userInfo.user.id !== params.id) throw new Error('Account does not match your guardian');
       }
-      return request.verify.verifyGoogleToken({
+      const rst = await request.verify.verifyGoogleToken({
         params: { ...params, accessToken },
       });
+
+      return {
+        ...rst,
+        accessToken,
+      };
     },
     [googleSign],
   );
@@ -195,9 +200,14 @@ export function useVerifyAppleToken() {
       const { userId } = parseAppleIdentityToken(accessToken) || {};
       if (userId !== params.id) throw new Error('Account does not match your guardian');
 
-      return request.verify.verifyAppleToken({
+      const rst = await request.verify.verifyAppleToken({
         params: { ...params, accessToken },
       });
+
+      return {
+        ...rst,
+        accessToken,
+      };
     },
     [appleSign],
   );

@@ -12,7 +12,13 @@ import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type'
 import Loading from 'components/Loading';
 import CommonToast from 'components/CommonToast';
 import { sleep } from '@portkey-wallet/utils';
-import { ApprovalType, VerificationType, VerifierInfo, VerifyStatus } from '@portkey-wallet/types/verifier';
+import {
+  ApprovalType,
+  AuthenticationInfo,
+  VerificationType,
+  VerifierInfo,
+  VerifyStatus,
+} from '@portkey-wallet/types/verifier';
 import { BGStyles, FontStyles } from 'assets/theme/styles';
 import { isIOS } from '@rneui/base';
 import { LoginGuardianTypeIcon } from 'constants/misc';
@@ -24,9 +30,8 @@ import useDebounceCallback from 'hooks/useDebounceCallback';
 import { verification } from 'utils/api';
 import { useLanguage } from 'i18n/hooks';
 import { useVerifyToken } from 'hooks/authentication';
-import { RouterParams } from 'pages/Guardian/GuardianApproval';
-import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
 import { PRIVATE_GUARDIAN_ACCOUNT } from '@portkey-wallet/constants/constants-ca/guardian';
+import myEvents from 'utils/deviceEvent';
 
 export const AuthTypes = [LoginType.Apple, LoginType.Google];
 
@@ -40,6 +45,7 @@ interface GuardianAccountItemProps {
   isExpired?: boolean;
   isSuccess?: boolean;
   approvalType?: ApprovalType;
+  authenticationInfo?: AuthenticationInfo;
 }
 
 function GuardianItemButton({
@@ -49,11 +55,11 @@ function GuardianItemButton({
   isExpired,
   approvalType,
   disabled,
+  authenticationInfo,
 }: GuardianAccountItemProps & {
   disabled?: boolean;
 }) {
   const { t } = useLanguage();
-  const { authenticationInfo } = useRouterParams<RouterParams>();
 
   const itemStatus = useMemo(() => guardiansStatus?.[guardianItem.key], [guardianItem.key, guardiansStatus]);
 
@@ -111,6 +117,7 @@ function GuardianItemButton({
     }
     Loading.hide();
   }, [onSetGuardianStatus, guardianInfo]);
+
   const onVerifierAuth = useCallback(async () => {
     try {
       Loading.show();
@@ -120,6 +127,13 @@ function GuardianItemButton({
         verifierId: guardianItem.verifier?.id,
         chainId: DefaultChainId,
       });
+
+      if (rst.accessToken) {
+        myEvents.setAuthenticationInfo.emit({
+          [guardianItem.guardianAccount]: rst.accessToken,
+        });
+      }
+
       CommonToast.success('Verified Successfully');
       const verifierInfo: VerifierInfo = { ...rst, verifierId: guardianItem?.verifier?.id };
       onSetGuardianStatus({
@@ -153,7 +167,7 @@ function GuardianItemButton({
         break;
       }
     }
-  }, [guardianInfo, requestCodeResult]);
+  }, [guardianInfo, requestCodeResult, onVerifierAuth]);
   const buttonProps: CommonButtonProps = useMemo(() => {
     // expired
     if (isExpired && status !== VerifyStatus.Verified) {
@@ -211,6 +225,7 @@ export default function GuardianItem({
   isExpired,
   isSuccess,
   approvalType = ApprovalType.register,
+  authenticationInfo,
 }: GuardianAccountItemProps) {
   const itemStatus = useMemo(() => guardiansStatus?.[guardianItem.key], [guardianItem.key, guardiansStatus]);
   const disabled = isSuccess && itemStatus?.status !== VerifyStatus.Verified;
@@ -266,6 +281,7 @@ export default function GuardianItem({
           guardiansStatus={guardiansStatus}
           setGuardianStatus={setGuardianStatus}
           approvalType={approvalType}
+          authenticationInfo={authenticationInfo}
         />
       )}
       {renderBtn && renderBtn(guardianItem)}
