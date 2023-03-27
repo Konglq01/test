@@ -14,7 +14,7 @@ import { AppleUserInfo, getGoogleUserInfo, parseAppleIdentityToken } from '@port
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import { useInterface } from 'contexts/useInterface';
 import { checkNetwork } from 'utils';
-import { handleErrorMessage } from '@portkey-wallet/utils';
+import { handleErrorMessage, sleep } from '@portkey-wallet/utils';
 import { changeCanLock } from 'utils/LockManager';
 
 if (!isIos) {
@@ -53,6 +53,7 @@ export function useGoogleAuthentication() {
 
   const iosPromptAsync: () => Promise<GoogleAuthResponse> = useCallback(async () => {
     await checkNetwork();
+    await sleep(2000);
     const info = await promptAsync();
     if (info.type === 'success') {
       const exchangeRequest = new AccessTokenRequest({
