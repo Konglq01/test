@@ -8,7 +8,6 @@ import { useLoading, useUserInfo } from 'store/Provider/hooks';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { removeManager } from 'utils/sandboxUtil/removeManager';
 import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
-import { clearLocalStorage } from 'utils/storage/chromeStorage';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
 import useLogOut from 'hooks/useLogout';
 import { DEVICE_TYPE } from 'constants/index';
@@ -50,7 +49,6 @@ export default function ExitWallet({ open, onCancel }: ExitWalletProps) {
       });
       console.log('removeManager', 'removeManager==result', result);
       logout();
-      clearLocalStorage();
       setLoading(false);
     } catch (error: any) {
       setLoading(false);

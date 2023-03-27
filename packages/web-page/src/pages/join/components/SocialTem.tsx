@@ -1,14 +1,15 @@
 import { useCallback } from 'react';
 import dynamic from 'next/dynamic';
-import { ISocialLogin } from '@portkey-wallet/types/types-ca/wallet';
 import { Button } from 'antd';
 import type { IResolveParams } from 'reactjs-social-login';
 import styles from './styles.module.less';
 import { PortkeyLogo, Google, Apple } from 'assets/images';
+import { ISocialLogin } from '@portkey-wallet/types/types-ca/wallet';
 
-const _LoginSocialGoogle = import('reactjs-social-login').then(i => i.LoginSocialGoogle);
-
-const LoginSocialGoogle = dynamic(_LoginSocialGoogle, { ssr: false });
+const LoginSocialGoogle = dynamic<any>(
+  import('reactjs-social-login').then(module => module.LoginSocialGoogle),
+  { ssr: false },
+);
 const LoginSocialApple = dynamic(import('components/LoginSocialApple'), { ssr: false });
 
 const SUPPORT_TYPE = ['Google', 'Apple'];
@@ -35,10 +36,12 @@ export default function SocialTem({ loginType }: { loginType: ISocialLogin }) {
   return (
     <div className={styles['social-login-wrapper']}>
       <div className={styles['social-login-inner']}>
+        <div className={styles['social-login-logo']}>
+          <img className={styles['portkey-logo']} src={PortkeyLogo.src} />
+        </div>
+
         {SUPPORT_TYPE.includes(loginType) ? (
           <>
-            <img className={styles['portkey-logo']} src={PortkeyLogo.src} />
-
             <p className={styles['description']}>{`Click below to join Portkey using your ${loginType} account`}</p>
 
             {loginType === 'Google' && (
@@ -51,6 +54,7 @@ export default function SocialTem({ loginType }: { loginType: ISocialLogin }) {
                 onResolve={onSuccess}
                 onReject={onError}>
                 <Button className={styles['common-btn']}>
+                  {/* <Image alt="Google Logo" className={styles['btn-logo']} src={Google.src} /> */}
                   <img className={styles['btn-logo']} src={Google.src} />
                   Join with Google
                 </Button>
@@ -71,7 +75,7 @@ export default function SocialTem({ loginType }: { loginType: ISocialLogin }) {
             )}
           </>
         ) : (
-          <>NO CONTENT</>
+          <div className={styles['no-content']}>NO CONTENT</div>
         )}
       </div>
     </div>

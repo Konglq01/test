@@ -23,6 +23,7 @@ export const countryCodeIndex = getCountryCodeIndex(countryCodeList);
 
 export const countryCodeFilter = (filterFelid: string) => {
   if (!filterFelid) return countryCodeList;
+  filterFelid = filterFelid.toLocaleLowerCase();
   if (/\d/.test(filterFelid)) {
     // all numbers
     const numStr = filterFelid.match(/\d+/g)?.join('').trim();

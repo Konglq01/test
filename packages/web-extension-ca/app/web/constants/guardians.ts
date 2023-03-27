@@ -14,7 +14,9 @@ export const phoneInit: IPhoneInput = {
 };
 
 export const socialInit: ISocialInput = {
+  accessToken: '',
+  id: '',
   name: '',
   value: '',
-  isShow: false,
+  isPrivate: false,
 };

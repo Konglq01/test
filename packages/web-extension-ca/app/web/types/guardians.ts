@@ -40,7 +40,9 @@ export interface IPhoneInput {
 }
 
 export interface ISocialInput {
+  id: string;
   name: string;
   value: string;
-  isShow?: boolean;
+  accessToken: string;
+  isPrivate?: boolean;
 }
