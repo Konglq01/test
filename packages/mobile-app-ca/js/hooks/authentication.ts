@@ -15,6 +15,7 @@ import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import { useInterface } from 'contexts/useInterface';
 import { checkNetwork } from 'utils';
 import { handleErrorMessage } from '@portkey-wallet/utils';
+import { changeCanLock } from 'utils/LockManager';
 
 if (!isIos) {
   GoogleSignin.configure({
@@ -102,12 +103,22 @@ export function useGoogleAuthentication() {
       throw { ...error, message };
     }
   }, []);
+
+  const googleSign = useCallback(async () => {
+    changeCanLock(false);
+    try {
+      return await (isIos ? iosPromptAsync : androidPromptAsync)();
+    } finally {
+      changeCanLock(true);
+    }
+  }, [androidPromptAsync, iosPromptAsync]);
+
   return useMemo(
     () => ({
       googleResponse: isIos ? response : androidResponse,
-      googleSign: isIos ? iosPromptAsync : androidPromptAsync,
+      googleSign,
     }),
-    [androidPromptAsync, androidResponse, iosPromptAsync, response],
+    [androidResponse, googleSign, response],
   );
 }
 
@@ -145,7 +156,17 @@ export function useAppleAuthentication() {
       throw { ...error, message };
     }
   }, []);
-  return { appleResponse: response, appleSign: promptAsync };
+
+  const appleSign = useCallback(async () => {
+    changeCanLock(false);
+    try {
+      return await promptAsync();
+    } finally {
+      changeCanLock(true);
+    }
+  }, [promptAsync]);
+
+  return { appleResponse: response, appleSign };
 }
 
 export type VerifyTokenParams = {
