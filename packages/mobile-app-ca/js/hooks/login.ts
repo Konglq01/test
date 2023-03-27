@@ -27,7 +27,6 @@ import { extraDataEncode } from '@portkey-wallet/utils/device';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { useGetGuardiansInfo, useGetVerifierServers } from './guardian';
 import { handleUserGuardiansList } from '@portkey-wallet/utils/guardian';
-import { DEVICE_TYPE } from 'constants/common';
 import { useLanguage } from 'i18n/hooks';
 
 export function useOnManagerAddressAndQueryResult() {
@@ -127,7 +126,7 @@ export function useOnManagerAddressAndQueryResult() {
               );
               navigationService.reset('Tab');
             },
-            onFail: (message: string) => onResultFail(dispatch, message, isRecovery),
+            onFail: (message: string) => onResultFail(dispatch, message, isRecovery, true),
           });
         }
       } catch (error) {
