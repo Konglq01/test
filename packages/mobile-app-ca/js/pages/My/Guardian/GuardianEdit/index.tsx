@@ -46,6 +46,9 @@ import {
 import GuardianAccountItem from '../components/GuardianAccountItem';
 import { request } from '@portkey-wallet/api/api-did';
 import verificationApiConfig from '@portkey-wallet/api/api-did/verification';
+import { DEVICE_TYPE } from 'constants/common';
+import { DeviceType } from '@portkey-wallet/types/types-ca/device';
+
 type RouterParams = {
   guardian?: UserGuardianItem;
   isEdit?: boolean;
@@ -66,6 +69,11 @@ const GuardianEdit: React.FC = () => {
 
   const { verifierMap, userGuardiansList } = useGuardiansInfo();
   const verifierList = useMemo(() => (verifierMap ? Object.values(verifierMap) : []), [verifierMap]);
+
+  const loginTypeList = useMemo(() => {
+    if (DEVICE_TYPE !== DeviceType.ANDROID) return LOGIN_TYPE_LIST;
+    return LOGIN_TYPE_LIST.filter(item => item.value !== LoginType.Apple);
+  }, []);
 
   const [selectedType, setSelectedType] = useState<TypeItemType>();
   const [selectedVerifier, setSelectedVerifier] = useState<VerifierItem>();
@@ -160,13 +168,13 @@ const GuardianEdit: React.FC = () => {
           verifier: verifierInfo,
           guardianAccount,
           guardianType,
-          authenticationInfo: { [thirdPartyInfo.id]: thirdPartyInfo.accessToken },
         },
         verifierInfo: {
           ...rst,
           verifierId: verifierInfo.id,
         },
         verifiedTime: Date.now(),
+        authenticationInfo: { [thirdPartyInfo.id]: thirdPartyInfo.accessToken },
       });
     },
     [verifyToken],
@@ -378,8 +386,8 @@ const GuardianEdit: React.FC = () => {
   }, [appleSign]);
 
   const onGoogleSign = useCallback(async () => {
+    Loading.show();
     try {
-      Loading.show();
       const userInfo = await googleSign();
       setAccount(userInfo.user.email);
       setFirstName(userInfo.user.givenName || undefined);
@@ -513,7 +521,7 @@ const GuardianEdit: React.FC = () => {
             <ListItem
               onPress={() => {
                 GuardianTypeSelectOverlay.showList({
-                  list: LOGIN_TYPE_LIST,
+                  list: loginTypeList,
                   labelAttrName: 'name',
                   value: selectedType?.value,
                   callBack: onChooseType,
