@@ -128,7 +128,7 @@ export function useAppleAuthentication() {
                   firstName: appleInfo.fullName?.givenName,
                   lastName: appleInfo.fullName?.familyName,
                 },
-                email: user?.email,
+                email: user?.email || appleInfo.email,
               },
             },
           });
