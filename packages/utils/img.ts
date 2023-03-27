@@ -2,8 +2,8 @@ import { NFT_SMALL_SIZE } from '@portkey-wallet/constants/constants-ca/assets';
 
 export const getAWSUrlWithSize = (
   url: string = '',
-  width: number = NFT_SMALL_SIZE,
-  height: number = NFT_SMALL_SIZE,
+  width: number | string = NFT_SMALL_SIZE,
+  height: number | string = 'AUTO',
 ) => {
   const sizeStr = `${width}x${height}`;
   const urlArr = url.split('/');
