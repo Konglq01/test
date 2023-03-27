@@ -184,6 +184,29 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
     [dispatch, isSocialLogin, navigate, socialVerifyHandler, state],
   );
 
+  const accountShow = useCallback((guardian: UserGuardianItem) => {
+    switch (guardian.guardianType) {
+      case LoginType.Email:
+        return <div className="account-text">{guardian.guardianAccount}</div>;
+      case LoginType.Phone:
+        return <div className="account-text">{`+${guardian.guardianAccount}`}</div>;
+      case LoginType.Google:
+        return (
+          <div className="account-text">
+            <div className="name">{guardian.firstName}</div>
+            <div className="detail">{guardian.thirdPartyEmail}</div>
+          </div>
+        );
+      case LoginType.Apple:
+        return (
+          <div className="account-text">
+            <div className="name">{guardian.firstName}</div>
+            <div className="detail">{guardian.isPrivate ? '******' : guardian.thirdPartyEmail}</div>
+          </div>
+        );
+    }
+  }, []);
+
   return (
     <li className={clsx('flex-between-center verifier-item', disabled && 'verifier-item-disabled')}>
       {item.isLoginAccount && <div className="login-icon">{t('Login Account')}</div>}
@@ -193,7 +216,7 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
           verifierSrc={item.verifier?.imageUrl}
           verifierName={item?.verifier?.name}
         />
-        <span className="account-text">{item.guardianAccount}</span>
+        {accountShow(item)}
       </div>
       {isExpired && item.status !== VerifyStatus.Verified ? (
         <Button className="expired" type="text" disabled>
