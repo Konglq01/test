@@ -8,6 +8,8 @@ import { ChainId } from '@portkey-wallet/types';
 import { getBalance } from 'utils/sandboxUtil/getBalance';
 import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import { divDecimals, formatAmountShow } from '@portkey-wallet/utils/converter';
+import { getAWSUrlWithSize } from '@portkey-wallet/utils/img';
+import { NFT_MIDDLE_SIZE } from '@portkey-wallet/constants/constants-ca/assets';
 
 export default function NftInput({
   toAccount,
@@ -72,7 +74,13 @@ export default function NftInput({
   return (
     <div className="amount-wrap">
       <div className="item asset nft">
-        <div className="avatar">{token.imageUrl ? <img src={token.imageUrl} /> : <p>{token.symbol[0]}</p>}</div>
+        <div className="avatar">
+          {token.imageUrl ? (
+            <img src={getAWSUrlWithSize(token.imageUrl, NFT_MIDDLE_SIZE, NFT_MIDDLE_SIZE)} />
+          ) : (
+            <p>{token.symbol[0]}</p>
+          )}
+        </div>
         <div className="info">
           <div className="index">
             <p className="alias">{token.alias}</p>

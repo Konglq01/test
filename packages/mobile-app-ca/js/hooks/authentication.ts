@@ -13,6 +13,9 @@ import { ChainId } from '@portkey-wallet/types';
 import { AppleUserInfo, getGoogleUserInfo, parseAppleIdentityToken } from '@portkey-wallet/utils/authentication';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import { useInterface } from 'contexts/useInterface';
+import { checkNetwork } from 'utils';
+import { handleErrorMessage } from '@portkey-wallet/utils';
+import { changeCanLock } from 'utils/LockManager';
 
 if (!isIos) {
   GoogleSignin.configure({
@@ -49,6 +52,7 @@ export function useGoogleAuthentication() {
   const [{ googleRequest, response, promptAsync }] = useInterface();
 
   const iosPromptAsync: () => Promise<GoogleAuthResponse> = useCallback(async () => {
+    await checkNetwork();
     const info = await promptAsync();
     if (info.type === 'success') {
       const exchangeRequest = new AccessTokenRequest({
@@ -87,7 +91,6 @@ export function useGoogleAuthentication() {
       throw Error('Portkey‘s services are not available in your device.');
     }
     try {
-      await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
       const token = await GoogleSignin.getTokens();
       await GoogleSignin.signOut();
@@ -95,19 +98,27 @@ export function useGoogleAuthentication() {
       setResponse(googleResponse);
       return googleResponse;
     } catch (error: any) {
-      const message =
-        error.code === statusCodes.SIGN_IN_CANCELLED
-          ? ''
-          : 'It seems that the authorization with your Google account has failed.';
+      const message = error.code === statusCodes.SIGN_IN_CANCELLED ? '' : handleErrorMessage(error);
+      // : 'It seems that the authorization with your Google account has failed.';
       throw { ...error, message };
     }
   }, []);
+
+  const googleSign = useCallback(async () => {
+    changeCanLock(false);
+    try {
+      return await (isIos ? iosPromptAsync : androidPromptAsync)();
+    } finally {
+      changeCanLock(true);
+    }
+  }, [androidPromptAsync, iosPromptAsync]);
+
   return useMemo(
     () => ({
       googleResponse: isIos ? response : androidResponse,
-      googleSign: isIos ? iosPromptAsync : androidPromptAsync,
+      googleSign,
     }),
-    [androidPromptAsync, androidResponse, iosPromptAsync, response],
+    [androidResponse, googleSign, response],
   );
 }
 
@@ -140,12 +151,22 @@ export function useAppleAuthentication() {
       setResponse(userInfo);
       return userInfo;
     } catch (error: any) {
-      const message =
-        error?.code === 'ERR_CANCELED' ? '' : 'It seems that the authorization with your Apple ID has failed.';
+      const message = error?.code === 'ERR_CANCELED' ? '' : handleErrorMessage(error);
+      // : 'It seems that the authorization with your Apple ID has failed.';
       throw { ...error, message };
     }
   }, []);
-  return { appleResponse: response, appleSign: promptAsync };
+
+  const appleSign = useCallback(async () => {
+    changeCanLock(false);
+    try {
+      return await promptAsync();
+    } finally {
+      changeCanLock(true);
+    }
+  }, [promptAsync]);
+
+  return { appleResponse: response, appleSign };
 }
 
 export type VerifyTokenParams = {

@@ -10,8 +10,9 @@ import { useCaAddresses, useChainIdList } from '@portkey-wallet/hooks/hooks-ca/w
 import { fetchAllTokenListAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
 import { useIsTestnet } from 'hooks/useNetwork';
 import { transNetworkText } from '@portkey-wallet/utils/activity';
-import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
+import { ELF_SYMBOL, NFT_MIDDLE_SIZE } from '@portkey-wallet/constants/constants-ca/assets';
 import './index.less';
+import { getAWSUrlWithSize } from '@portkey-wallet/utils/img';
 
 export interface ICustomTokenListProps {
   onChange?: (v: AccountAssetItem, type: 'token' | 'nft') => void;
@@ -143,7 +144,11 @@ export default function CustomTokenList({
           className="item protocol"
           onClick={onChange?.bind(undefined, token, 'nft')}>
           <div className="avatar">
-            {token.nftInfo?.imageUrl ? <img src={token.nftInfo.imageUrl} /> : token.nftInfo?.alias?.slice(0, 1)}
+            {token.nftInfo?.imageUrl ? (
+              <img src={getAWSUrlWithSize(token.nftInfo.imageUrl, NFT_MIDDLE_SIZE, NFT_MIDDLE_SIZE)} />
+            ) : (
+              token.nftInfo?.alias?.slice(0, 1)
+            )}
           </div>
           <div className="info">
             <p className="alias">{`${token.nftInfo?.alias} #${token.nftInfo?.tokenId}`}</p>

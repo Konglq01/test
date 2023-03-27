@@ -46,6 +46,7 @@ export default function Provider({ children }: { children: React.ReactNode }) {
   const [googleRequest, response, promptAsync] = Google.useAuthRequest({
     iosClientId: Config.GOOGLE_IOS_CLIENT_ID,
     androidClientId: Config.GOOGLE_ANDROID_CLIENT_ID,
+    shouldAutoExchangeCode: false,
   });
   useEffect(() => {
     if (currentNetwork.chainType === 'aelf') {

@@ -10,6 +10,8 @@ import { formatAmountShow } from '@portkey-wallet/utils/converter';
 import { getEntireDIDAelfAddress, isAelfAddress } from '@portkey-wallet/utils/aelf';
 import { ChainId } from '@portkey-wallet/types';
 import { chainShowText } from '@portkey-wallet/utils';
+import { getAWSUrlWithSize } from '@portkey-wallet/utils/img';
+import { NFT_MIDDLE_SIZE } from '@portkey-wallet/constants/constants-ca/assets';
 
 export default function SendPreview({
   amount,
@@ -61,7 +63,13 @@ export default function SendPreview({
         </div>
       ) : (
         <div className="amount-preview nft">
-          <div className="avatar">{imageUrl ? <img src={imageUrl} /> : <p>{symbol?.slice(0, 1)}</p>}</div>
+          <div className="avatar">
+            {imageUrl ? (
+              <img src={getAWSUrlWithSize(imageUrl, NFT_MIDDLE_SIZE, NFT_MIDDLE_SIZE)} />
+            ) : (
+              <p>{symbol?.slice(0, 1)}</p>
+            )}
+          </div>
           <div className="info">
             <p className="index flex">
               <p className="alias">{alias}</p>

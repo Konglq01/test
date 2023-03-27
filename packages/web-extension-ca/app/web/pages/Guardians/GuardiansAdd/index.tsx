@@ -2,6 +2,7 @@ import {
   resetUserGuardianStatus,
   setCurrentGuardianAction,
   setOpGuardianAction,
+  setUserGuardianItemStatus,
 } from '@portkey-wallet/store/store-ca/guardians/actions';
 import { Input, Button, message } from 'antd';
 import { useNavigate, useLocation } from 'react-router';
@@ -11,14 +12,14 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import CommonModal from 'components/CommonModal';
 import { useAppDispatch, useGuardiansInfo, useLoading } from 'store/Provider/hooks';
 import { EmailReg } from '@portkey-wallet/utils/reg';
-import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import { ISocialLogin, LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import CustomSelect from 'pages/components/CustomSelect';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
 import useGuardianList from 'hooks/useGuardianList';
 import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
 import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
-import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type';
+import { StoreUserGuardianItem, UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type';
 import { useTranslation } from 'react-i18next';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verification } from 'utils/api';
@@ -26,6 +27,13 @@ import PhoneInput from '../components/PhoneInput';
 import { EmailError } from '@portkey-wallet/utils/check';
 import { guardianTypeList, phoneInit, socialInit } from 'constants/guardians';
 import { IPhoneInput, ISocialInput } from 'types/guardians';
+import { socialLoginAction } from 'utils/lib/serviceWorkerAction';
+import { getGoogleUserInfo, parseAppleIdentityToken } from '@portkey-wallet/utils/authentication';
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { request } from '@portkey-wallet/api/api-did';
+import { handleErrorMessage } from '@portkey-wallet/utils';
+import { handleVerificationDoc } from '@portkey-wallet/utils/guardian';
+import { VerifyStatus } from '@portkey-wallet/types/verifier';
 import './index.less';
 
 export default function AddGuardian() {
@@ -42,10 +50,13 @@ export default function AddGuardian() {
   const [emailErr, setEmailErr] = useState<string>();
   const [visible, setVisible] = useState<boolean>(false);
   const [exist, setExist] = useState<boolean>(false);
+  const [curKey, setCurKey] = useState<string>('');
+  const [accountShow, setAccountShow] = useState<string>('');
   const dispatch = useAppDispatch();
   const { setLoading } = useLoading();
   const { walletInfo } = useCurrentWallet();
   const userGuardianList = useGuardianList();
+  const currentChain = useCurrentChain();
 
   const disabled = useMemo(() => {
     let check = true;
@@ -69,30 +80,9 @@ export default function AddGuardian() {
       }
     }
     return check || exist || !!emailErr;
-  }, [guardianType, verifierVal, exist, emailErr, emailVal, phoneValue?.phoneNumber, socialValue?.value]);
+  }, [guardianType, verifierVal, exist, emailErr, emailVal, phoneValue, socialValue]);
 
   const selectVerifierItem = useMemo(() => verifierMap?.[verifierVal || ''], [verifierMap, verifierVal]);
-
-  const genKey = useMemo(() => {
-    // TODO how to generate key
-    let key = '';
-    switch (guardianType) {
-      case LoginType.Email: {
-        key = `${emailVal}&${verifierVal}`;
-        break;
-      }
-      case LoginType.Phone: {
-        key = `${phoneValue?.code}_${phoneValue?.phoneNumber}&${verifierVal}`;
-        break;
-      }
-      case LoginType.Apple:
-      case LoginType.Google: {
-        key = `${socialValue?.value}&${verifierVal}`;
-        break;
-      }
-    }
-    return key;
-  }, [emailVal, guardianType, phoneValue, socialValue, verifierVal]);
 
   const verifierOptions = useMemo(
     () =>
@@ -122,12 +112,51 @@ export default function AddGuardian() {
     [],
   );
 
+  const isPhoneType = useMemo(() => guardianType === LoginType.Phone, [guardianType]);
+
   useEffect(() => {
-    if (state === 'back' && opGuardian) {
+    let key = '',
+      tempAccount = '';
+    switch (guardianType) {
+      case LoginType.Email: {
+        key = `${emailVal}&${verifierVal}`;
+        tempAccount = `${emailVal}`;
+        break;
+      }
+      case LoginType.Phone: {
+        key = `${phoneValue?.code}${phoneValue?.phoneNumber}&${verifierVal}`;
+        tempAccount = `+${phoneValue?.code} ${phoneValue?.phoneNumber}`;
+        break;
+      }
+      case LoginType.Apple:
+      case LoginType.Google: {
+        key = `${socialValue?.id}&${verifierVal}`;
+        tempAccount = `${socialValue?.value}`;
+        break;
+      }
+    }
+    setAccountShow(tempAccount);
+    setCurKey(key);
+  }, [emailVal, guardianType, phoneValue, socialValue, verifierVal]);
+
+  useEffect(() => {
+    if (opGuardian) {
       setGuardianType(opGuardian.guardianType);
-      setEmailVal(opGuardian.guardianAccount);
       setVerifierVal(opGuardian.verifier?.id);
       setVerifierName(opGuardian.verifier?.name);
+
+      switch (opGuardian.guardianType) {
+        case LoginType.Email:
+          setEmailVal(opGuardian.guardianAccount);
+          break;
+        case LoginType.Phone:
+          setPhoneValue(opGuardian.phone || phoneInit);
+          break;
+        case LoginType.Google:
+        case LoginType.Apple:
+          setSocialVale(opGuardian.social);
+          break;
+      }
     }
   }, [state, opGuardian]);
 
@@ -159,9 +188,59 @@ export default function AddGuardian() {
     setPhoneValue({ code, phoneNumber });
   }, []);
 
-  const handleSocialVerify = useCallback(() => {
-    // TODO: store opGuardian
-  }, []);
+  const handleSocialAuth = useCallback(
+    async (v: ISocialLogin) => {
+      const newGuardian: StoreUserGuardianItem = {
+        isLoginAccount: false,
+        verifier: selectVerifierItem,
+        guardianAccount: '',
+        guardianType: guardianType as LoginType,
+        key: curKey,
+        isInitStatus: true,
+        identifierHash: '',
+        salt: '',
+      };
+      try {
+        const result = await socialLoginAction(v);
+        const data = result.data;
+        if (!data) throw 'Action error';
+        if (v === 'Google') {
+          const userInfo = await getGoogleUserInfo(data?.access_token);
+          const { firstName, email, id } = userInfo;
+          newGuardian.guardianAccount = id;
+          newGuardian.social = {
+            id,
+            name: firstName,
+            value: email,
+            accessToken: data?.access_token,
+          };
+          dispatch(setOpGuardianAction(newGuardian));
+          setSocialVale({ name: firstName, value: email, id, accessToken: data?.access_token });
+        } else if (v === 'Apple') {
+          const userInfo = parseAppleIdentityToken(data?.access_token);
+          if (userInfo) {
+            const { email, userId } = userInfo;
+            newGuardian.guardianAccount = userId;
+            newGuardian.social = {
+              id: userId,
+              name: 'apple name',
+              value: email,
+              accessToken: data?.access_token,
+            };
+            dispatch(setOpGuardianAction(newGuardian));
+            setSocialVale({ name: 'apple name', value: email, id: userId, accessToken: data?.access_token });
+          }
+        } else {
+          message.error(`LoginType:${v} is not support`);
+        }
+        if (result.error) throw result.message ?? result.Error;
+      } catch (error) {
+        const msg = handleErrorMessage(error);
+        message.error(msg);
+      }
+    },
+    [curKey, dispatch, guardianType, selectVerifierItem],
+  );
 
   const renderGuardianAccount = useMemo(
     () => ({
@@ -191,7 +270,7 @@ export default function AddGuardian() {
                 <span className="email">{socialValue.value}</span>
               </div>
             ) : (
-              <div className="flex social-input click" onClick={handleSocialVerify}>
+              <div className="flex social-input click" onClick={() => handleSocialAuth('Google')}>
                 <span className="click-text">Click Add Google Account</span>
               </div>
             )}
@@ -208,7 +287,7 @@ export default function AddGuardian() {
                 <span className="email">{socialValue.value}</span>
               </div>
             ) : (
-              <div className="flex social-input click" onClick={handleSocialVerify}>
+              <div className="flex social-input click" onClick={() => handleSocialAuth('Apple')}>
                 <span className="click-text">Click Add Apple Account</span>
               </div>
             )}
@@ -217,24 +296,8 @@ export default function AddGuardian() {
         label: t('Guardian Apple'),
       },
     }),
-    [emailVal, handleEmailInputChange, handlePhoneInputChange, handleSocialVerify, socialValue, t],
+    [emailVal, handleEmailInputChange, handlePhoneInputChange, handleSocialAuth, socialValue, t],
   );
-
-  const handleCheck = useCallback(() => {
-    if (guardianType === LoginType.Email) {
-      if (!EmailReg.test(emailVal as string)) {
-        setEmailErr(EmailError.invalidEmail);
-        return;
-      }
-    }
-    if (!selectVerifierItem) return message.error('Can not get the current verifier message');
-    const isExist: boolean =
-      Object.values(userGuardiansList ?? {})?.some((item) => {
-        return item.key === genKey;
-      }) ?? false;
-    setExist(isExist);
-    !isExist && setVisible(true);
-  }, [emailVal, guardianType, selectVerifierItem, userGuardiansList, genKey]);
 
   const handleCommonVerify = useCallback(
     async (guardianAccount: string) => {
@@ -250,10 +313,10 @@ export default function AddGuardian() {
         await userGuardianList({ caHash: walletInfo.caHash });
         const result = await verification.sendVerificationCode({
           params: {
-            guardianIdentifier: emailVal as string,
+            guardianIdentifier: guardianAccount,
             type: LoginType[guardianType as LoginType],
             verifierId: selectVerifierItem?.id || '',
-            chainId: DefaultChainId,
+            chainId: currentChain?.chainId || DefaultChainId,
           },
         });
         setLoading(false);
@@ -267,7 +330,7 @@ export default function AddGuardian() {
               sessionId: result.verifierSessionId,
               endPoint: result.endPoint,
             },
-            key: genKey,
+            key: curKey,
             isInitStatus: true,
             identifierHash: '',
             salt: '',
@@ -285,36 +348,134 @@ export default function AddGuardian() {
     },
     [
       dispatch,
-      emailVal,
-      genKey,
       guardianType,
-      navigate,
-      selectVerifierItem,
       setLoading,
       userGuardianList,
-      walletInfo.caHash,
+      walletInfo,
+      selectVerifierItem,
+      currentChain,
+      curKey,
+      navigate,
     ],
   );
+
+  const handleSocialVerify = useCallback(async () => {
+    try {
+      dispatch(resetUserGuardianStatus());
+      await userGuardianList({ caHash: walletInfo.caHash });
+      dispatch(
+        setLoginAccountAction({
+          guardianAccount: walletInfo.managerInfo?.loginAccount || '',
+          loginType: walletInfo.managerInfo?.type || LoginType.Email,
+        }),
+      );
+      setLoading(true);
+      const newGuardian: StoreUserGuardianItem = {
+        isLoginAccount: false,
+        verifier: selectVerifierItem,
+        guardianAccount: socialValue?.id || '',
+        guardianType: guardianType as LoginType,
+        firstName: socialValue?.name,
+        thirdPartyEmail: socialValue?.value,
+        key: curKey,
+        isInitStatus: true,
+        identifierHash: '',
+        salt: '',
+        phone: phoneValue,
+        social: socialValue,
+      };
+      dispatch(setCurrentGuardianAction(newGuardian));
+      dispatch(setOpGuardianAction(newGuardian));
+      const params = {
+        verifierId: verifierVal,
+        chainId: currentChain?.chainId || DefaultChainId,
+        accessToken: socialValue?.accessToken,
+      };
+      let res;
+      if (guardianType === LoginType.Apple) {
+        res = await request.verify.verifyAppleToken({
+          params,
+        });
+      } else if (guardianType === LoginType.Google) {
+        res = await request.verify.verifyGoogleToken({
+          params,
+        });
+      }
+      const { guardianIdentifier } = handleVerificationDoc(res.verificationDoc);
+      dispatch(
+        setUserGuardianItemStatus({
+          key: curKey,
+          status: VerifyStatus.Verified,
+          signature: res.signature,
+          verificationDoc: res.verificationDoc,
+          identifierHash: guardianIdentifier,
+        }),
+      );
+      navigate('/setting/guardians/guardian-approval', { state: 'guardians/add' });
+    } catch (error) {
+      const msg = handleErrorMessage(error);
+      message.error(msg);
+    } finally {
+      setLoading(false);
+    }
+  }, [
+    curKey,
+    currentChain,
+    dispatch,
+    guardianType,
+    navigate,
+    phoneValue,
+    selectVerifierItem,
+    setLoading,
+    socialValue,
+    userGuardianList,
+    verifierVal,
+    walletInfo,
+  ]);
+
+  const handleCheck = useCallback(() => {
+    if (guardianType === LoginType.Email) {
+      if (!EmailReg.test(emailVal as string)) {
+        setEmailErr(EmailError.invalidEmail);
+        return;
+      }
+    }
+    if (!selectVerifierItem) return message.error('Can not get the current verifier message');
+    const isExist: boolean =
+      Object.values(userGuardiansList ?? {})?.some((item) => {
+        return item.key === curKey;
+      }) ?? false;
+    setExist(isExist);
+    if (isExist) return;
+    if ([LoginType.Google, LoginType.Apple].includes(guardianType as LoginType)) {
+      handleSocialVerify();
+    } else {
+      setVisible(true);
+    }
+  }, [guardianType, selectVerifierItem, userGuardiansList, emailVal, curKey, handleSocialVerify]);
 
   const handleVerify = useCallback(async () => {
     if (guardianType === LoginType.Email) {
       handleCommonVerify(emailVal || '');
     } else if (guardianType === LoginType.Phone) {
-      handleCommonVerify(`${phoneValue?.code}_${phoneValue?.phoneNumber}`);
+      handleCommonVerify(`${phoneValue?.code}${phoneValue?.phoneNumber}`);
     } else {
-      navigate('/setting/guardian/guardian-approval', { state: 'guardians/add' });
+      message.info('router error');
     }
-  }, [emailVal, guardianType, handleCommonVerify, navigate, phoneValue?.code, phoneValue?.phoneNumber]);
+  }, [emailVal, guardianType, handleCommonVerify, phoneValue]);
+
+  const handleBack = useCallback(() => {
+    dispatch(setOpGuardianAction());
+    navigate('/setting/guardians');
+  }, [dispatch, navigate]);
 
   return (
     <div className="add-guardians-page">
       <div className="add-guardians-title">
         <SettingHeader
           title={t('Add Guardians')}
-          leftCallBack={() => {
-            navigate('/setting/guardians');
-          }}
-          rightElement={<CustomSvg type="Close2" onClick={() => navigate('/setting/guardians')} />}
+          leftCallBack={handleBack}
+          rightElement={<CustomSvg type="Close2" onClick={handleBack} />}
         />
       </div>
       <div className="input-item">
@@ -358,8 +519,8 @@ export default function AddGuardian() {
         onCancel={() => setVisible(false)}>
         <p className="modal-content">
           {`${verifierName} will send a verification code to `}
-          <span className="bold">{emailVal}</span>
-          {` to verify your email address.`}
+          <span className="bold">{accountShow}</span>
+          {` to verify your ${isPhoneType ? 'phone number' : 'email address'}.`}
         </p>
         <div className="btn-wrapper">
           <Button onClick={() => setVisible(false)}>{'Cancel'}</Button>

@@ -32,6 +32,8 @@ type GoogleUserInfo = {
   name: string;
   picture: string;
   verified_email: boolean;
+  firstName: string;
+  lastName: string;
 };
 
 const TmpUserInfo: { [key: string]: GoogleUserInfo } = {};
@@ -41,5 +43,10 @@ export async function getGoogleUserInfo(accessToken = ''): Promise<GoogleUserInf
     TmpUserInfo[accessToken] = await customFetch('https://www.googleapis.com/userinfo/v2/me', {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
-  return TmpUserInfo[accessToken];
+
+  return {
+    ...TmpUserInfo[accessToken],
+    firstName: TmpUserInfo[accessToken].given_name,
+    lastName: TmpUserInfo[accessToken].family_name,
+  };
 }
