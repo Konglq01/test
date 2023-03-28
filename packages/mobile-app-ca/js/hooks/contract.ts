@@ -1,5 +1,5 @@
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
-import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { useCurrentWalletInfo, useOriginChainId } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { ChainId } from '@portkey-wallet/types';
 import aes from '@portkey-wallet/utils/aes';
 import { useInterface } from 'contexts/useInterface';
@@ -12,7 +12,9 @@ import { usePin } from './store';
 import { ContractBasic } from '@portkey-wallet/contracts/utils/ContractBasic';
 import { ChainItemType } from '@portkey-wallet/store/store-ca/wallet/type';
 
-export function useGetCurrentCAViewContract(chainId: ChainId = 'AELF') {
+export function useGetCurrentCAViewContract(_chainId?: ChainId) {
+  const originChainId = useOriginChainId();
+  const chainId = useMemo(() => _chainId || originChainId, [_chainId, originChainId]);
   const chainInfo = useCurrentChain(chainId);
   const [{ viewContracts }, dispatch] = useInterface();
 
@@ -37,7 +39,9 @@ export function useGetCurrentCAViewContract(chainId: ChainId = 'AELF') {
   );
 }
 
-export function useGetCurrentCAContract(chainId: ChainId = 'AELF') {
+export function useGetCurrentCAContract(_chainId?: ChainId) {
+  const originChainId = useOriginChainId();
+  const chainId = useMemo(() => _chainId || originChainId, [_chainId, originChainId]);
   const chainInfo = useCurrentChain(chainId);
   const pin = usePin();
   const { AESEncryptPrivateKey, address } = useCurrentWalletInfo();

@@ -3,7 +3,7 @@ import { customFetch } from '@portkey-wallet/utils/fetch';
 import { stringify } from 'query-string';
 import AElf from 'aelf-sdk';
 import { request } from '../index';
-import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
+import { ChainId } from '@portkey-wallet/types';
 export type RefreshTokenConfig = {
   grant_type: 'signature';
   client_id: 'CAServer_App';
@@ -13,13 +13,14 @@ export type RefreshTokenConfig = {
   timestamp: number;
   ca_hash: string;
   connectUrl: string;
+  chainId: ChainId;
 };
 export const queryAuthorization = async (config: RefreshTokenConfig) => {
   const { connectUrl, ..._config } = config;
   const { access_token } = await customFetch(config.connectUrl + '/connect/token', {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     method: 'POST',
-    body: stringify({ ..._config, chain_id: DefaultChainId }),
+    body: stringify({ ..._config, chain_id: config.chainId }),
   });
   console.log(access_token, '====access_token');
 
@@ -37,10 +38,12 @@ export function setRefreshTokenConfig({
   account,
   caHash,
   connectUrl,
+  chainId,
 }: {
   account: AElfWallet;
   caHash: string;
   connectUrl: string;
+  chainId: ChainId;
 }) {
   const timestamp = new Date().getTime();
   const message = Buffer.from(`${account.address}-${timestamp}`).toString('hex');
@@ -57,5 +60,6 @@ export function setRefreshTokenConfig({
     timestamp,
     ca_hash,
     connectUrl,
+    chainId,
   });
 }

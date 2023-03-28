@@ -12,6 +12,7 @@ import { useAppCommonDispatch } from '../index';
 import { setWalletNameAction } from '@portkey-wallet/store/store-ca/wallet/actions';
 import { DeviceItemType } from '@portkey-wallet/types/types-ca/device';
 import { extraDataDecode } from '@portkey-wallet/utils/device';
+import { ChainId } from '@portkey-wallet/types';
 
 export interface CurrentWalletType extends WalletInfoType, CAInfoType {
   caHash?: string;
@@ -22,11 +23,12 @@ export interface CurrentWalletType extends WalletInfoType, CAInfoType {
 function getCurrentWalletInfo(
   walletInfo: WalletState['walletInfo'],
   currentNetwork: WalletState['currentNetwork'],
+  originChainId: ChainId,
 ): CurrentWalletType {
   const currentCAInfo = walletInfo?.caInfo?.[currentNetwork];
 
   const tmpWalletInfo: any = Object.assign({}, walletInfo, currentCAInfo, {
-    caHash: currentCAInfo?.AELF?.caHash,
+    caHash: currentCAInfo?.[originChainId]?.caHash,
     caAddressList: Object.values(currentCAInfo || {})
       ?.filter((info: any) => !!info?.caAddress)
       ?.map((i: any) => i?.caAddress),
@@ -41,17 +43,19 @@ export const useWallet = () => useAppCASelector(state => state.wallet);
 
 export const useCurrentWalletInfo = () => {
   const { currentNetwork, walletInfo } = useWallet();
-  return useMemo(() => getCurrentWalletInfo(walletInfo, currentNetwork), [walletInfo, currentNetwork]);
+  const originChainId = useOriginChainId();
+  return useMemo(() => getCurrentWalletInfo(walletInfo, currentNetwork, originChainId), [walletInfo, currentNetwork]);
 };
 
 export const useCurrentWallet = () => {
   const wallet = useWallet();
+  const originChainId = useOriginChainId();
 
   return useMemo(() => {
     const { walletInfo, currentNetwork, chainInfo } = wallet;
     return {
       ...wallet,
-      walletInfo: getCurrentWalletInfo(walletInfo, currentNetwork),
+      walletInfo: getCurrentWalletInfo(walletInfo, currentNetwork, originChainId),
       chainList: chainInfo?.[currentNetwork],
     };
   }, [wallet]);
@@ -59,9 +63,10 @@ export const useCurrentWallet = () => {
 
 export const useCurrentWalletDetails = () => {
   const { walletInfo, currentNetwork } = useWallet() || {};
+  const originChainId = useOriginChainId();
 
   return useMemo(() => {
-    return getCurrentWalletInfo(walletInfo, currentNetwork);
+    return getCurrentWalletInfo(walletInfo, currentNetwork, originChainId);
   }, [walletInfo, currentNetwork]);
 };
 
@@ -140,4 +145,9 @@ export const useChainIdList = () => {
     () => Object.keys(currentCAInfo || {})?.filter((info: any) => info !== 'managerInfo'),
     [currentCAInfo],
   );
+};
+
+export const useOriginChainId = () => {
+  const { originChainId } = useWallet();
+  return useMemo(() => originChainId || 'tDVV', []);
 };

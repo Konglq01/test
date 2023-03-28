@@ -30,7 +30,6 @@ import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import { useAppDispatch } from 'store/hooks';
 import { setPreGuardianAction } from '@portkey-wallet/store/store-ca/guardians/actions';
 import { VerifierImage } from 'pages/Guardian/components/VerifierImage';
-import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verification } from 'utils/api';
 import fonts from 'assets/theme/fonts';
 import PhoneInput from 'components/PhoneInput';
@@ -48,6 +47,7 @@ import { request } from '@portkey-wallet/api/api-did';
 import verificationApiConfig from '@portkey-wallet/api/api-did/verification';
 import { DEVICE_TYPE } from 'constants/common';
 import { DeviceType } from '@portkey-wallet/types/types-ca/device';
+import { useOriginChainId } from '@portkey-wallet/hooks/hooks-ca/wallet';
 
 type RouterParams = {
   guardian?: UserGuardianItem;
@@ -64,6 +64,7 @@ type TypeItemType = typeof LOGIN_TYPE_LIST[number];
 const GuardianEdit: React.FC = () => {
   const { t } = useLanguage();
   const dispatch = useAppDispatch();
+  const originChainId = useOriginChainId();
 
   const { guardian: editGuardian, isEdit = false } = useRouterParams<RouterParams>();
 
@@ -158,7 +159,7 @@ const GuardianEdit: React.FC = () => {
         accessToken: thirdPartyInfo.accessToken,
         id: thirdPartyInfo.id,
         verifierId: verifierInfo.id,
-        chainId: DefaultChainId,
+        chainId: originChainId,
       });
       Loading.hide();
 
@@ -178,7 +179,7 @@ const GuardianEdit: React.FC = () => {
         authenticationInfo: { [thirdPartyInfo.id]: thirdPartyInfo.accessToken },
       });
     },
-    [verifyToken],
+    [verifyToken, originChainId],
   );
 
   const onConfirm = useCallback(async () => {
@@ -240,7 +241,7 @@ const GuardianEdit: React.FC = () => {
                     type: LoginType[guardianType],
                     guardianIdentifier: guardianAccount,
                     verifierId: selectedVerifier.id,
-                    chainId: DefaultChainId,
+                    chainId: originChainId,
                   },
                 });
                 if (req.verifierSessionId) {
@@ -268,7 +269,16 @@ const GuardianEdit: React.FC = () => {
         },
       ],
     });
-  }, [selectedVerifier, selectedType, account, checkCurGuardianRepeat, t, country.code, thirdPartyConfirm]);
+  }, [
+    selectedVerifier,
+    selectedType,
+    account,
+    checkCurGuardianRepeat,
+    t,
+    country.code,
+    thirdPartyConfirm,
+    originChainId,
+  ]);
 
   const onApproval = useCallback(() => {
     const _guardianError = checkCurGuardianRepeat();

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, Image } from 'react-native';
 import AElf from 'aelf-sdk';
-import { setCAInfoType } from '@portkey-wallet/store/store-ca/wallet/actions';
+import { setCAInfoType, setOriginChainId } from '@portkey-wallet/store/store-ca/wallet/actions';
 import { BGStyles, FontStyles } from 'assets/theme/styles';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { useAppDispatch } from 'store/hooks';
@@ -31,12 +31,13 @@ export default function QRCode({ setLoginType }: { setLoginType: (type: PageLogi
   const [newWallet, setNewWallet] = useState<WalletInfoType>();
   const dispatch = useAppDispatch();
   const pin = usePin();
-  const caInfo = useIntervalQueryCAInfoByAddress(currentNetwork, newWallet?.address);
+  const caWalletInfo = useIntervalQueryCAInfoByAddress(currentNetwork, newWallet?.address);
   const isFocused = useIsFocused();
 
   useEffect(() => {
     if (!isFocused) return;
-    if (caInfo && newWallet) {
+    const { caInfo, originChainId } = caWalletInfo || {};
+    if (caInfo && newWallet && originChainId) {
       if (pin) {
         try {
           dispatch(setCAInfoType({ caInfo, pin }));
@@ -45,6 +46,7 @@ export default function QRCode({ setLoginType }: { setLoginType: (type: PageLogi
           CommonToast.failError(error);
         }
       } else {
+        dispatch(setOriginChainId(originChainId));
         navigationService.navigate('SetPin', {
           caInfo,
           walletInfo: handleWalletInfo(newWallet),
@@ -54,7 +56,7 @@ export default function QRCode({ setLoginType }: { setLoginType: (type: PageLogi
       setNewWallet(undefined);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [caInfo, dispatch, isFocused, newWallet]);
+  }, [caWalletInfo, dispatch, isFocused, newWallet]);
   const generateWallet = useCallback(() => {
     try {
       const wallet = walletInfo?.address ? walletInfo : AElf.wallet.createNewWallet();

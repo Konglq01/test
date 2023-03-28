@@ -15,12 +15,11 @@ import { useGetGuardiansInfo } from 'hooks/guardian';
 import Loading from 'components/Loading';
 import CommonToast from 'components/CommonToast';
 import { VerificationType } from '@portkey-wallet/types/verifier';
-import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { useCurrentWalletInfo, useOriginChainId } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import myEvents from 'utils/deviceEvent';
 import { VerifierImage } from 'pages/Guardian/components/VerifierImage';
 import { cancelLoginAccount, setLoginAccount } from 'utils/guardian';
 import { useGetCurrentCAContract } from 'hooks/contract';
-import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verification } from 'utils/api';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
@@ -44,6 +43,7 @@ export default function GuardianDetail() {
   const getCurrentCAContract = useGetCurrentCAContract();
   const { appleSign } = useAppleAuthentication();
   const { googleSign } = useGoogleAuthentication();
+  const originChainId = useOriginChainId();
 
   const onCancelLoginAccount = useCallback(async () => {
     if (!managerAddress || !caHash || !guardian) return;
@@ -93,7 +93,7 @@ export default function GuardianDetail() {
           type: LoginType[guardian.guardianType],
           guardianIdentifier: guardian.guardianAccount,
           verifierId: guardian.verifier?.id,
-          chainId: DefaultChainId,
+          chainId: originChainId,
         },
       });
       if (req.verifierSessionId) {
@@ -111,7 +111,7 @@ export default function GuardianDetail() {
       CommonToast.failError(error);
     }
     Loading.hide();
-  }, [guardian]);
+  }, [guardian, originChainId]);
 
   const onLoginAccountChange = useCallback(
     async (value: boolean) => {

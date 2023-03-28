@@ -11,9 +11,12 @@ import SafeAreaBox from 'components/SafeAreaBox';
 import { BGStyles } from 'assets/theme/styles';
 import { useGetGuardiansInfoWriteStore } from 'hooks/guardian';
 import { useCurrentWalletInfo, useDeviceList } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { useWallet } from 'hooks/store';
 
 const DashBoard: React.FC = () => {
   const dispatch = useAppCommonDispatch();
+  const wallet = useWallet();
+  console.log(wallet, '===wallet');
 
   const getCurrentCAViewContract = useGetCurrentCAViewContract();
   const { caHash } = useCurrentWalletInfo();

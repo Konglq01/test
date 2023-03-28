@@ -16,15 +16,13 @@ import CommonToast from 'components/CommonToast';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type';
 import myEvents from 'utils/deviceEvent';
-import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { useCurrentWalletInfo, useOriginChainId } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { useGetCurrentCAContract } from 'hooks/contract';
 import { setLoginAccount } from 'utils/guardian';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import { GuardiansStatusItem } from '../types';
-import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { request } from '@portkey-wallet/api/api-did';
 import { verification } from 'utils/api';
-import { useLanguage } from 'i18n/hooks';
 
 type RouterParams = {
   guardianItem?: UserGuardianItem;
@@ -58,7 +56,7 @@ export default function VerifierDetails() {
     verificationType,
   } = useRouterParams<RouterParams>();
   console.log(guardianItem, '=====guardianItem');
-  const { t } = useLanguage();
+  const originChainId = useOriginChainId();
 
   const countdown = useRef<VerifierCountdownInterface>();
   useEffectOnce(() => {
@@ -109,7 +107,7 @@ export default function VerifierDetails() {
             guardianIdentifier: guardianItem.guardianAccount,
             ...requestCodeResult,
             verifierId: guardianItem?.verifier?.id,
-            chainId: DefaultChainId,
+            chainId: originChainId,
           },
         });
         CommonToast.success('Verified Successfully');
@@ -160,7 +158,7 @@ export default function VerifierDetails() {
       }
       Loading.hide();
     },
-    [requestCodeResult, verificationType, setGuardianStatus, onSetLoginAccount, guardianItem],
+    [requestCodeResult, guardianItem, originChainId, verificationType, setGuardianStatus, onSetLoginAccount],
   );
   const resendCode = useCallback(async () => {
     Loading.show();
@@ -170,7 +168,7 @@ export default function VerifierDetails() {
           type: LoginType[guardianItem?.guardianType as LoginType],
           guardianIdentifier: guardianItem?.guardianAccount,
           verifierId: guardianItem?.verifier?.id,
-          chainId: DefaultChainId,
+          chainId: originChainId,
         },
       });
       if (req.verifierSessionId) {
@@ -186,7 +184,13 @@ export default function VerifierDetails() {
     }
     digitInput.current?.reset();
     Loading.hide();
-  }, [guardianItem?.guardianAccount, guardianItem?.guardianType, guardianItem?.verifier?.id, setGuardianStatus]);
+  }, [
+    guardianItem?.guardianAccount,
+    guardianItem?.guardianType,
+    guardianItem?.verifier?.id,
+    originChainId,
+    setGuardianStatus,
+  ]);
   return (
     <PageContainer type="leftBack" titleDom containerStyles={styles.containerStyles}>
       {guardianItem ? <GuardianItem guardianItem={guardianItem} isButtonHide /> : null}

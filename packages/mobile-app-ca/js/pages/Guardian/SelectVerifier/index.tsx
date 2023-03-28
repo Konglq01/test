@@ -22,10 +22,10 @@ import VerifierOverlay from '../components/VerifierOverlay';
 import { VerifierImage } from '../components/VerifierImage';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import myEvents from 'utils/deviceEvent';
-import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verification } from 'utils/api';
 import { AuthenticationInfo, VerificationType } from '@portkey-wallet/types/verifier';
 import { useVerifyToken } from 'hooks/authentication';
+import { useOriginChainId } from '@portkey-wallet/hooks/hooks-ca/wallet';
 
 export type RouterParams = {
   loginAccount: string;
@@ -42,6 +42,7 @@ export default function SelectVerifier() {
 
   const { loginAccount, loginType, authenticationInfo } = useRouterParams<RouterParams>();
   const verifyToken = useVerifyToken();
+  const originChainId = useOriginChainId();
 
   const onConfirmAuth = useCallback(async () => {
     try {
@@ -50,7 +51,7 @@ export default function SelectVerifier() {
         accessToken: authenticationInfo?.[loginAccount || ''],
         id: loginAccount,
         verifierId: selectedVerifier?.id,
-        chainId: DefaultChainId,
+        chainId: originChainId,
       });
       navigationService.navigate('SetPin', {
         managerInfo: {
@@ -64,7 +65,7 @@ export default function SelectVerifier() {
       CommonToast.failError(error);
     }
     Loading.hide();
-  }, [authenticationInfo, loginAccount, loginType, selectedVerifier.id, verifyToken]);
+  }, [authenticationInfo, loginAccount, loginType, originChainId, selectedVerifier.id, verifyToken]);
   const onDefaultConfirm = useCallback(() => {
     const confirm = async () => {
       try {
@@ -74,7 +75,7 @@ export default function SelectVerifier() {
             type: LoginType[loginType],
             guardianIdentifier: loginAccount,
             verifierId: selectedVerifier.id,
-            chainId: DefaultChainId,
+            chainId: originChainId,
           },
         });
         if (requestCodeResult.verifierSessionId) {
@@ -115,7 +116,7 @@ export default function SelectVerifier() {
         },
       ],
     });
-  }, [loginAccount, loginType, selectedVerifier, t]);
+  }, [loginAccount, loginType, originChainId, selectedVerifier, t]);
   const onConfirm = useCallback(async () => {
     switch (loginType) {
       case LoginType.Apple:
