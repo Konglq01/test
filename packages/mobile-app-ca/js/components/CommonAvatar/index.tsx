@@ -55,8 +55,11 @@ export default function CommonAvatar(props: CommonAvatarProps) {
   if (imageUrl)
     return (
       <Image
+        resizeMode={'contain'}
         style={[styles.avatarWrap, shapeType === 'square' && styles.squareStyle, sizeStyle, style]}
-        source={{ uri: imageUrl }}
+        source={{
+          uri: imageUrl,
+        }}
       />
     );
 

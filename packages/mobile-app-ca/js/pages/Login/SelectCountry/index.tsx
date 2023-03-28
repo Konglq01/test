@@ -68,17 +68,19 @@ export default function SelectCountry() {
           onChangeText={s => setSearchList(!s ? undefined : countryCodeFilter(s))}
         />
       </View>
-      <IndexBarLargeList
-        data={data}
-        renderItem={_renderItem}
-        indexHeight={IndexHeight}
-        indexBarBoxStyle={styles.indexBarBoxStyle}
-        sectionHeight={searchList ? 0 : SectionHeight}
-        extraHeight={headerHeight + bottomBarHeight + 120}
-        renderSection={searchList ? undefined : _renderSection}
-        indexArray={searchList ? undefined : countryCodeIndex.map(item => item[0])}
-        renderEmpty={() => <NoData topDistance={64} noPic message={'There is no search result.'} />}
-      />
+      <View style={styles.indexBarRow}>
+        <IndexBarLargeList
+          data={data}
+          renderItem={_renderItem}
+          indexHeight={IndexHeight}
+          indexBarBoxStyle={styles.indexBarBoxStyle}
+          sectionHeight={searchList ? 0 : SectionHeight}
+          extraHeight={headerHeight + bottomBarHeight + 120}
+          renderSection={searchList ? undefined : _renderSection}
+          indexArray={searchList ? undefined : countryCodeIndex.map(item => item[0])}
+          renderEmpty={() => <NoData topDistance={64} noPic message={'There is no search result.'} />}
+        />
+      </View>
     </PageContainer>
   );
 }
@@ -104,4 +106,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: pTd(20),
   },
   indexBarBoxStyle: { top: 20, bottom: screenHeight > 850 ? 100 : 60 },
+  indexBarRow: {
+    overflow: 'hidden',
+    flex: 1,
+  },
 });

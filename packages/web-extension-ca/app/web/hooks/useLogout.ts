@@ -18,6 +18,7 @@ import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import { ManagerInfo } from '@portkey-wallet/graphql/contract/__generated__/types';
 import { handleErrorMessage } from '@portkey-wallet/utils';
 import { message } from 'antd';
+import { clearLocalStorage } from 'utils/storage/chromeStorage';
 
 export default function useLogOut() {
   const dispatch = useAppDispatch();
@@ -31,6 +32,8 @@ export default function useLogOut() {
       dispatch(resetLoginInfoAction());
       dispatch(clearAssets());
       dispatch(resetContactAction());
+      // TODO: main side network
+      clearLocalStorage();
       request.initService();
       setTimeout(() => {
         request.initService();

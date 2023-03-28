@@ -25,7 +25,6 @@ export default function Receive() {
     () => `ELF_${wallet?.[state.chainId || 'AELF']?.caAddress}_${state.chainId}`,
     [state, wallet],
   );
-  console.log('---receive', state);
 
   const rightElement = useMemo(() => {
     return (

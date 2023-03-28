@@ -50,7 +50,7 @@ const NFTDetail: React.FC<TokenDetailProps> = props => {
       <CommonAvatar
         title={alias}
         style={[imageUrl ? styles.image1 : styles.image]}
-        imageUrl={getAWSUrlWithSize(imageUrl, NFT_LARGE_SIZE, NFT_LARGE_SIZE)}
+        imageUrl={getAWSUrlWithSize(imageUrl, NFT_LARGE_SIZE)}
       />
 
       <CommonButton

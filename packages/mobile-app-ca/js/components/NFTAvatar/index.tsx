@@ -36,7 +36,7 @@ const NFTAvatar: React.FC<NoDataPropsType> = props => {
       {imageUrl && (
         <Image
           source={{
-            uri: getAWSUrlWithSize(imageUrl, NFT_MIDDLE_SIZE, NFT_MIDDLE_SIZE),
+            uri: getAWSUrlWithSize(imageUrl, NFT_MIDDLE_SIZE),
           }}
           containerStyle={styles.img}
         />
