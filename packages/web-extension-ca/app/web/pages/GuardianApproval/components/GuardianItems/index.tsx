@@ -145,6 +145,7 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
       try {
         setLoading(true);
         const result = await verifyToken(item.guardianType, {
+          accessToken: loginAccount?.authenticationInfo?.[item.guardianAccount],
           id: item.guardianAccount,
           verifierId: item.verifier?.id,
           chainId: DefaultChainId,
@@ -165,7 +166,7 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
         setLoading(false);
       }
     },
-    [dispatch, setLoading, verifyToken],
+    [dispatch, loginAccount?.authenticationInfo, setLoading, verifyToken],
   );
 
   const verifyingHandler = useCallback(
