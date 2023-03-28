@@ -5158,9 +5158,9 @@
     warn-once "^0.1.0"
 
 "@react-oauth/google@^0.8.0":
-  version "0.8.0"
-  resolved "https://registry.npmjs.org/@react-oauth/google/-/google-0.8.0.tgz#e95c9e2ef28f0da6d5de223e48c391a12eb4f821"
-  integrity sha512-xmIhYvvaBSblOzo3Fqv762lqub92SOFR8eRR7QpPyFPZEXZcOymaMuEkRSUKUrbu+9wfB8qtOaGMRJzrN7U2PA==
+  version "0.8.1"
+  resolved "https://registry.npmjs.org/@react-oauth/google/-/google-0.8.1.tgz#6fd62daa2a2c91e642d93a11cc00b8a80a060bda"
+  integrity sha512-pPzZ9ScbTq3FaRU3/uC0d50FgWSGCBBYnW3+aocV1A6YzOMKqyBi5KLCBjh4Gy/yhkHBlKdlN0RIRWapaAGj5g==
 
 "@react-spring/animated@~9.5.5":
   version "9.5.5"
