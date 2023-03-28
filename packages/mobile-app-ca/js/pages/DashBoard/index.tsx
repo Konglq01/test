@@ -11,6 +11,7 @@ import SafeAreaBox from 'components/SafeAreaBox';
 import { BGStyles } from 'assets/theme/styles';
 import { useGetGuardiansInfoWriteStore } from 'hooks/guardian';
 import { useCurrentWalletInfo, useDeviceList } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { fetchFiatListAsync } from '@portkey-wallet/store/store-ca/payment/actions';
 
 const DashBoard: React.FC = () => {
   const dispatch = useAppCommonDispatch();
@@ -28,6 +29,7 @@ const DashBoard: React.FC = () => {
     dispatch(fetchTokenListAsync({ caAddresses: [] }));
     dispatch(getWalletNameAsync());
     dispatch(getSymbolImagesAsync());
+    dispatch(fetchFiatListAsync());
     getGuardiansInfoWriteStore({
       caHash,
     });

@@ -11,3 +11,5 @@ export const useSettings = () => useAppSelector(state => state.settings);
 export const useGuardiansInfo = () => useAppSelector(state => state.guardians);
 
 export const usePin = () => useAppSelector(state => state.user.credentials?.pin);
+
+export const usePayment = () => useAppSelector(state => state.payment);

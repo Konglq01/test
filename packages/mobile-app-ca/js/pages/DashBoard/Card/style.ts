@@ -41,12 +41,11 @@ export const styles = StyleSheet.create({
   },
   buttonGroupWrap: {
     marginTop: pTd(24),
+    paddingHorizontal: pTd(42),
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'center',
+    width: '100%',
+    justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  space: {
-    width: pTd(50),
   },
 });

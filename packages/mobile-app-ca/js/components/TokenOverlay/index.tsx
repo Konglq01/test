@@ -64,7 +64,7 @@ const TokenList = ({ onFinishSelectToken }: TokenListProps) => {
 
   const noData = useMemo(() => {
     return debounceKeyword ? <NoData noPic message={t('There is no search result.')} /> : null;
-  }, [debounceKeyword]);
+  }, [debounceKeyword, t]);
 
   return (
     <ModalBody modalBodyType="bottom" title={t('Select Token')} style={gStyles.overlayStyle}>

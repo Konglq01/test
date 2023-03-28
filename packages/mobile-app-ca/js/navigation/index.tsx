@@ -18,6 +18,7 @@ import Receive from 'pages/Receive';
 import NFTDetail from 'pages/NFT/NFTDetail';
 import QrScanner from 'pages/QrScanner';
 import MyNav from 'pages/My/router';
+import BuyNav from 'pages/Buy';
 
 const Stack = createStackNavigator();
 export const stackNav = [
@@ -38,6 +39,7 @@ export const stackNav = [
   ...SendNav,
   ...PinNav,
   ...MyNav,
+  ...BuyNav,
 ] as const;
 
 export type RootStackParamList = {

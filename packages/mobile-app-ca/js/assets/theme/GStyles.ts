@@ -27,7 +27,7 @@ export default {
     alignItems: 'center',
   },
   itemEnd: {
-    alignItems: 'end',
+    alignItems: 'flex-end',
   },
   alignCenter: {
     alignSelf: 'center',
