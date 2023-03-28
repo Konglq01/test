@@ -7,6 +7,7 @@ import { useLanguage } from 'i18n/hooks';
 import MyMenu from 'pages/My';
 import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import useLogOut from 'hooks/useLogOut';
+import DiscoverHome from 'pages/Discover/DiscoverHome';
 
 const Tab = createBottomTabNavigator();
 
@@ -14,6 +15,7 @@ type tabMenuIcon = typeof tabMenuList[number]['icon'];
 
 export const tabMenuList = [
   { name: 'Wallet', label: 'Wallet', index: 0, icon: 'logo-icon', component: DashBoard },
+  { name: 'Discover', label: 'Discover', index: 1, icon: 'discover', component: DiscoverHome },
   { name: 'Settings', label: 'My', index: 2, icon: 'my', component: MyMenu },
 ] as const;
 
