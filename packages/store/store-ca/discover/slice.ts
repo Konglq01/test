@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { the2ThFailedActivityItemType } from '@portkey-wallet/types/types-ca/activity';
 import { IRecordsItemType } from '@portkey-wallet/types/types-ca/discover';
 
 interface DiscoverStateType {
