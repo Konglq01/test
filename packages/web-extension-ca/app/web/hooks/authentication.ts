@@ -19,8 +19,9 @@ export function useVerifyGoogleToken() {
     }
     if (isRequest) {
       const googleInfo = await socialLoginAction('Google');
-      accessToken = googleInfo?.data?.accessToken;
+      accessToken = googleInfo?.data?.access_token;
       const { id } = await getGoogleUserInfo(accessToken as string);
+      console.log(id, params, googleInfo, 'socialVerifyHandler===id');
       if (id !== params.id) throw new Error('Account does not match your guardian');
     }
     return request.verify.verifyGoogleToken({
