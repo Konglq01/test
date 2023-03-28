@@ -15,6 +15,7 @@ export type CaHolderManagerInfoQuery = {
     chainId?: string | null;
     caHash?: string | null;
     caAddress?: string | null;
+    originChainId?: string | null;
     managerInfos?: Array<{
       __typename?: 'ManagerInfo';
       address?: string | null;
@@ -34,6 +35,7 @@ export const CaHolderManagerInfoDocument = gql`
         address
         extraData
       }
+      originChainId
     }
   }
 `;

@@ -8,5 +8,6 @@ query caHolderManagerInfo($dto: GetCAHolderManagerInfoDto){
             address
             extraData
         }
+        originChainId
     }
 }

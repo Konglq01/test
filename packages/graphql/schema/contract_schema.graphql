@@ -3,7 +3,11 @@ type Query {
   caHolderTransaction(
     dto: GetCAHolderTransactionDto
   ): CAHolderTransactionPageResultDto
+  caHolderTransactionInfo(
+    dto: GetCAHolderTransactionDto
+  ): CAHolderTransactionPageResultDto
   caHolderManagerInfo(dto: GetCAHolderManagerInfoDto): [CAHolderManagerDto]
+  caHolderInfo(dto: GetCAHolderInfoDto): [CAHolderInfoDto]
   loginGuardianInfo(dto: GetLoginGuardianInfoDto): [LoginGuardianDto]
   caHolderNFTCollectionBalanceInfo(
     dto: GetCAHolderNFTCollectionInfoDto
@@ -143,6 +147,7 @@ type CAHolderManagerDto {
   caHash: String
   caAddress: String
   managerInfos: [ManagerInfo]
+  originChainId: String
 }
 
 type ManagerInfo {
@@ -155,6 +160,37 @@ input GetCAHolderManagerInfoDto {
   caHash: String
   caAddresses: [String]
   manager: String
+  skipCount: Int!
+  maxResultCount: Int!
+}
+
+type CAHolderInfoDto {
+  id: String
+  chainId: String
+  caHash: String
+  caAddress: String
+  managerInfos: [ManagerInfo]
+  originChainId: String
+  guardianList: GuardianList
+}
+
+type GuardianList {
+  guardians: [Guardian]
+}
+
+type Guardian {
+  type: Int!
+  verifierId: String
+  identifierHash: String
+  salt: String
+  isLoginGuardian: Boolean!
+}
+
+input GetCAHolderInfoDto {
+  chainId: String
+  caHash: String
+  caAddress: [String]
+  loginGuardianIdentifierHash: String
   skipCount: Int!
   maxResultCount: Int!
 }
