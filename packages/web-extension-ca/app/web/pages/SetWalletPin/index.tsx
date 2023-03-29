@@ -18,7 +18,6 @@ import CommonModal from 'components/CommonModal';
 import AElf from 'aelf-sdk';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { randomId } from '@portkey-wallet/utils';
-import './index.less';
 import useFetchDidWallet from 'hooks/useFetchDidWallet';
 import { setPasswordSeed } from 'store/reducers/user/slice';
 import { DEVICE_TYPE } from 'constants/index';
@@ -27,6 +26,8 @@ import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import { extraDataEncode } from '@portkey-wallet/utils/device';
 import { getDeviceInfo } from 'utils/device';
+import { sendScanLoginSuccess } from '@portkey-wallet/api/api-did/message/utils';
+import './index.less';
 
 export default function SetWalletPin() {
   const [form] = Form.useForm();
@@ -131,6 +132,7 @@ export default function SetWalletPin() {
         registerStatus: 'Registered',
       });
       dispatch(setPasswordSeed(pin));
+      scanWallet?.address && sendScanLoginSuccess({ targetClientId: scanWallet.address });
       await setPinAction(pin);
       navigate(`/success-page/${state}`);
     },
