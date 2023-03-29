@@ -6,6 +6,7 @@ import { divDecimals, formatAmountShow } from '@portkey-wallet/utils/converter';
 import Activity from 'pages/Home/components/Activity';
 import { transNetworkText } from '@portkey-wallet/utils/activity';
 import { useIsTestnet } from 'hooks/useNetwork';
+import { useCallback, useMemo } from 'react';
 
 export enum TokenTransferStatus {
   CONFIRMED = 'Confirmed',
@@ -16,6 +17,11 @@ function TokenDetail() {
   const navigate = useNavigate();
   const { state: currentToken } = useLocation();
   const isTestNet = useIsTestnet();
+  const isShowBuy = useMemo(() => currentToken.symbol === 'ELF' && currentToken.chainId === 'AELF', [currentToken]);
+
+  const handleBuy = useCallback(() => {
+    navigate('/buy');
+  }, [navigate]);
 
   console.log(currentToken, 'currentToken===');
 
@@ -46,6 +52,8 @@ function TokenDetail() {
           </div>
           <BalanceCard
             amount={currentToken?.balanceInUsd}
+            isShowBuy={isShowBuy}
+            onBuy={handleBuy}
             onSend={() => {
               navigate(`/send/token/${currentToken?.symbol}`, {
                 state: { ...currentToken, address: currentToken?.tokenContractAddress },

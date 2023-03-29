@@ -139,6 +139,10 @@ export default function MyBalance() {
     setActiveKey(key);
   }, []);
 
+  const handleBuy = useCallback(() => {
+    navigate('/buy');
+  }, [navigate]);
+
   return (
     <div className="balance">
       <div className="wallet-name">{walletName}</div>
@@ -151,6 +155,8 @@ export default function MyBalance() {
       </div>
       <BalanceCard
         amount={accountBalance}
+        isShowBuy={true}
+        onBuy={handleBuy}
         onSend={() => {
           setNavTarget('send');
           return setTokenOpen(true);

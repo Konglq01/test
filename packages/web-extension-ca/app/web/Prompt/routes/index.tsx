@@ -33,6 +33,8 @@ import NFT from 'pages/NFT';
 // import Contacts from 'pages/Contacts';
 // import Contact from 'pages/Contacts/ContactDetail';
 // import AccountSetting from 'pages/AccountSetting';
+import Buy from 'pages/Buy';
+import BuyPreview from 'pages/Buy/Preview';
 
 export const PageRouter = () =>
   useRoutes([
@@ -127,6 +129,14 @@ export const PageRouter = () =>
     {
       path: '/receive/:type/:symbol',
       element: <Receive />,
+    },
+    {
+      path: '/buy',
+      element: <Buy />,
+    },
+    {
+      path: '/buy/preview',
+      element: <BuyPreview />,
     },
     {
       path: '/nft',
