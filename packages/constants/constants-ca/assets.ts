@@ -27,6 +27,6 @@ export const PAGE_SIZE_IN_NFT_ITEM = 9;
 
 export const ELF_SYMBOL = 'ELF';
 
-export const NFT_SMALL_SIZE = 30;
-export const NFT_MIDDLE_SIZE = 150;
-export const NFT_LARGE_SIZE = 500;
+export const NFT_SMALL_SIZE = 144;
+export const NFT_MIDDLE_SIZE = 294;
+export const NFT_LARGE_SIZE = 1008;
