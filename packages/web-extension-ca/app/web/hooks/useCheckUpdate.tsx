@@ -36,6 +36,7 @@ export function useCheckUpdate() {
             centered: true,
             autoFocusButton: null,
             okButtonProps: { style: { width: '100%' } },
+            okText: 'Update',
             onOk: () => {
               window.open(req.downloadUrl);
               return Promise.reject();
