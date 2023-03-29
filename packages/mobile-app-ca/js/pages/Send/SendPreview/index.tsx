@@ -424,7 +424,7 @@ export const styles = StyleSheet.create({
     marginBottom: pTd(4),
   },
   tokenCount: {
-    marginTop: pTd(60),
+    marginTop: pTd(40),
     fontSize: pTd(28),
     width: '100%',
     textAlign: 'center',
