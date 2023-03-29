@@ -62,7 +62,7 @@ export default function Phone({
   return (
     <View style={[BGStyles.bg1, styles.card, GStyles.itemCenter]}>
       <View style={GStyles.width100}>
-        <View style={[GStyles.flexRowWrap, GStyles.marginBottom(24)]}>
+        <View style={[GStyles.flexRowWrap, GStyles.marginBottom(20)]}>
           <Button
             title="Phone"
             isActive
