@@ -1,5 +1,5 @@
 import React, { ReactElement, useCallback, useEffect, useMemo, useRef } from 'react';
-import LockManager from 'utils/LockManager';
+import LockManager, { canLock } from 'utils/LockManager';
 import useEffectOnce from 'hooks/useEffectOnce';
 import usePrevious from 'hooks/usePrevious';
 import { useSettings } from 'hooks/store';
@@ -7,7 +7,8 @@ import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { isIos } from '@portkey-wallet/utils/mobile/device';
 import { AppState, AppStateStatus } from 'react-native';
 import { useCheckUpdate } from 'hooks/device';
-let changeTime = Date.now();
+let appState = 'active',
+  changeTime = Date.now();
 interface AppListenerProps {
   children: ReactElement;
 }
@@ -32,11 +33,12 @@ const AppListener: React.FC<AppListenerProps> = props => {
   const handleAppStateChange = useCallback(
     (nextAppState: AppStateStatus) => {
       const currentTime = Date.now();
-      if (nextAppState === 'active') {
-        if (currentTime > changeTime + 1000) checkUpdate();
-      }
+      if (nextAppState === 'active' && appState === 'background' && currentTime > changeTime + 1000) checkUpdate();
       if (nextAppState === 'background') {
+        if (canLock) appState = nextAppState;
         changeTime = currentTime;
+      } else {
+        appState = nextAppState;
       }
     },
     [checkUpdate],

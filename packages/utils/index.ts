@@ -225,3 +225,11 @@ export const getAddressChainId = (toAddress: string, defaultChainId: ChainId) =>
  * @returns
  */
 export const isSameAddresses = (address1: string, address2: string): boolean => address1.trim() === address2.trim();
+
+export function handlePhoneNumber(str?: string) {
+  if (str) {
+    str = str.replace(/\s/g, '');
+    if (str[0] !== '+') str = '+' + str;
+  }
+  return str || '';
+}
