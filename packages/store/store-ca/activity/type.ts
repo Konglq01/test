@@ -29,6 +29,8 @@ export interface IActivitiesApiParams {
   transactionTypes?: TransactionTypes[];
   chainId?: string;
   symbol?: string;
+  width?: number;
+  height?: number;
 }
 
 export interface IActivitiesApiResponse {
