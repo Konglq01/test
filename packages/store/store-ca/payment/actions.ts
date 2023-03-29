@@ -1,37 +1,41 @@
+import { request } from '@portkey-wallet/api/api-did';
 import { createAsyncThunk, createAction } from '@reduxjs/toolkit';
 import { FiatType } from './type';
 
-export const fetchFiatListAsync = createAsyncThunk<FiatType[]>('contact/fetchContactListAsync', async () => {
-  return [
-    {
-      currency: 'USD',
-      country: 'US',
-      payWayCode: '10001',
-      payWayName: 'Credit Card',
-      fixedFee: 0.3,
-      rateFee: 0.051,
-      payMin: 30.0,
-      payMax: 2000.0,
+export const fetchBuyFiatListAsync = createAsyncThunk<FiatType[]>('payment/fetchBuyFiatListAsync', async () => {
+  const rst: { data: FiatType[] } = await request.payment.getFiatList({
+    params: {
+      type: 'BUY',
     },
-    {
-      currency: 'EUR',
-      country: 'US',
-      payWayCode: '10001',
-      payWayName: 'Credit Card',
-      fixedFee: 0.3,
-      rateFee: 0.051,
-      payMin: 30.0,
-      payMax: 2000.0,
+  });
+  const { data } = rst;
+  const fiatMap: Record<string, FiatType> = {};
+  data.forEach(item => {
+    const { currency, country } = item;
+    const key = `${currency}-${country}`;
+    if (!fiatMap[key]) {
+      fiatMap[key] = item;
+    }
+  });
+
+  return Object.values(fiatMap);
+});
+
+export const fetchSellFiatListAsync = createAsyncThunk<FiatType[]>('payment/fetchSellFiatListAsync', async () => {
+  const rst: { data: FiatType[] } = await request.payment.getFiatList({
+    params: {
+      type: 'SELL',
     },
-    {
-      currency: 'GBP',
-      country: 'GB',
-      payWayCode: '10001',
-      payWayName: 'Credit Card',
-      fixedFee: 0.3,
-      rateFee: 0.051,
-      payMin: 30.0,
-      payMax: 2000.0,
-    },
-  ];
+  });
+  const { data } = rst;
+  const fiatMap: Record<string, FiatType> = {};
+  data.forEach(item => {
+    const { currency, country } = item;
+    const key = `${currency}-${country}`;
+    if (!fiatMap[key]) {
+      fiatMap[key] = item;
+    }
+  });
+
+  return Object.values(fiatMap);
 });

@@ -1,9 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { fetchFiatListAsync } from './actions';
+import { fetchBuyFiatListAsync, fetchSellFiatListAsync } from './actions';
 import { PaymentStateType } from './type';
 
 const initialState: PaymentStateType = {
-  fiatList: [],
+  buyFiatList: [],
+  sellFiatList: [],
 };
 export const paymentSlice = createSlice({
   name: 'payment',
@@ -11,11 +12,17 @@ export const paymentSlice = createSlice({
   reducers: {},
   extraReducers: builder => {
     builder
-      .addCase(fetchFiatListAsync.fulfilled, (state, action) => {
-        state.fiatList = action.payload;
+      .addCase(fetchBuyFiatListAsync.fulfilled, (state, action) => {
+        state.buyFiatList = action.payload;
       })
-      .addCase(fetchFiatListAsync.rejected, (state, action) => {
-        console.log('fetchFiatListAsync.rejected: error', action.error.message);
+      .addCase(fetchBuyFiatListAsync.rejected, (state, action) => {
+        console.log('fetchBuyFiatListAsync.rejected: error', action.error.message);
+      })
+      .addCase(fetchSellFiatListAsync.fulfilled, (state, action) => {
+        state.sellFiatList = action.payload;
+      })
+      .addCase(fetchSellFiatListAsync.rejected, (state, action) => {
+        console.log('fetchSellFiatListAsync.rejected: error', action.error.message);
       });
   },
 });

@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import OverlayModal from 'components/OverlayModal';
-import { Image, Keyboard, ScrollView, StyleSheet, View } from 'react-native';
+import { FlatList, Image, Keyboard, StyleSheet, View } from 'react-native';
 import Touchable from 'components/Touchable';
 import Svg from 'components/Svg';
 import { TextL } from 'components/CommonText';
@@ -13,7 +13,7 @@ import { defaultColors } from 'assets/theme';
 import { FiatType } from '@portkey-wallet/store/store-ca/payment/type';
 
 type SelectListProps = {
-  value?: FiatType['currency'];
+  value?: string; // `${country}_${currency}`
   list: Array<FiatType>;
   callBack: (item: FiatType) => void;
 };
@@ -25,8 +25,35 @@ const SelectCurrency = ({ list, callBack, value }: SelectListProps) => {
 
   const _list = useMemo(() => {
     const _keyWord = keyWord?.trim();
-    return _keyWord === '' ? list : list.filter(item => item.currency === _keyWord);
+    return _keyWord === '' ? list : list.filter(item => item.currency === _keyWord || item.country === _keyWord);
   }, [keyWord, list]);
+
+  const renderItem = useCallback(
+    ({ item }: { item: FiatType }) => {
+      return (
+        <Touchable
+          onPress={() => {
+            OverlayModal.hide();
+            callBack(item);
+          }}>
+          <View style={styles.itemRow}>
+            <Image
+              style={styles.fiatIconStyle}
+              source={{ uri: `https://static.alchemypay.org/alchemypay/flag/${item.country}.png` }}
+            />
+            <View style={styles.itemContent}>
+              <TextL>{item.currency}</TextL>
+
+              {value !== undefined && value === item.currency && (
+                <Svg iconStyle={styles.itemIcon} icon="selected" size={pTd(24)} />
+              )}
+            </View>
+          </View>
+        </Touchable>
+      );
+    },
+    [callBack, value],
+  );
 
   return (
     <ModalBody style={gStyle.overlayStyle} title={t('Select Currency')} modalBodyType="bottom">
@@ -41,36 +68,13 @@ const SelectCurrency = ({ list, callBack, value }: SelectListProps) => {
           onChangeText={setKeyWord}
         />
       </View>
-      {_list.length ? (
-        <ScrollView alwaysBounceVertical={false}>
-          {_list.map(item => {
-            return (
-              <Touchable
-                key={item.currency}
-                onPress={() => {
-                  OverlayModal.hide();
-                  callBack(item);
-                }}>
-                <View style={styles.itemRow}>
-                  <Image
-                    style={styles.fiatIconStyle}
-                    source={{ uri: `https://static.alchemypay.org/alchemypay/flag/${item.country}.png` }}
-                  />
-                  <View style={styles.itemContent}>
-                    <TextL>{item.currency}</TextL>
-
-                    {value !== undefined && value === item.currency && (
-                      <Svg iconStyle={styles.itemIcon} icon="selected" size={pTd(24)} />
-                    )}
-                  </View>
-                </View>
-              </Touchable>
-            );
-          })}
-        </ScrollView>
-      ) : (
-        <TextL style={styles.noResult}>{t('No results found')}</TextL>
-      )}
+      <FlatList
+        disableScrollViewPanResponder={true}
+        data={_list}
+        renderItem={renderItem}
+        ListEmptyComponent={<TextL style={styles.noResult}>{t('No results found')}</TextL>}
+        keyExtractor={item => `${item.country}_${item.currency}`}
+      />
     </ModalBody>
   );
 };

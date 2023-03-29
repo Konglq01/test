@@ -30,11 +30,11 @@ const list = [
 
 export default function BuyForm() {
   const { t } = useLanguage();
-  const { fiatList } = usePayment();
+  const { sellFiatList } = usePayment();
   const [fiat, setFiat] = useState<FiatType>();
   const [token, setToken] = useState<any>();
   useEffectOnce(() => {
-    const defaultFiat = fiatList.find(item => item.currency === 'USD');
+    const defaultFiat = sellFiatList.find(item => item.currency === 'USD');
     if (defaultFiat) {
       setFiat(defaultFiat);
     }
@@ -78,7 +78,7 @@ export default function BuyForm() {
               onPress={() => {
                 SelectCurrency.showList({
                   value: fiat?.currency,
-                  list: fiatList,
+                  list: sellFiatList,
                   callBack: setFiat,
                 });
               }}>

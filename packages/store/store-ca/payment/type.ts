@@ -10,5 +10,6 @@ export interface FiatType {
 }
 
 export interface PaymentStateType {
-  fiatList: FiatType[];
+  buyFiatList: FiatType[];
+  sellFiatList: FiatType[];
 }
