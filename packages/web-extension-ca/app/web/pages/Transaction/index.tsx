@@ -266,7 +266,9 @@ export default function Transaction() {
     );
   }, [openOnExplorer, t]);
 
-  const mainContent = () => {
+  const { isPrompt } = useCommonState();
+
+  const mainContent = useCallback(() => {
     return (
       <div className={clsx(['transaction-detail-modal', isPrompt ? 'detail-page-prompt' : null])}>
         <div className="header">
@@ -287,9 +289,20 @@ export default function Transaction() {
         </div>
       </div>
     );
-  };
-
-  const { isPrompt } = useCommonState();
+  }, [
+    activityItem.nftInfo?.nftId,
+    activityItem.transactionType,
+    fromToUI,
+    isNft,
+    isPrompt,
+    networkUI,
+    nftHeaderUI,
+    onClose,
+    statusAndDateUI,
+    tokenHeaderUI,
+    transactionUI,
+    viewOnExplorerUI,
+  ]);
 
   return <>{isPrompt ? <PromptFrame content={mainContent()} className="transaction-detail" /> : mainContent()}</>;
 }

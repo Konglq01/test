@@ -195,8 +195,7 @@ td {
     }
   }
 
-  .portkey-body,
-  .portkey-home-body {
+  .portkey-body {
     min-height: calc(100vh - 96px);
     margin: auto;
   }
@@ -207,7 +206,6 @@ td {
   // screen >= 1820, contentWidth = 1440
   @media screen and (min-width: @max-screen) {
     .portkey-body,
-    .portkey-home-body,
     .portkey-header {
       max-width: @max-width;
       width: @max-width;
@@ -228,9 +226,7 @@ td {
         padding-right: 0;
       }
     }
-
-    .portkey-body,
-    .portkey-home-body {
+    .portkey-body {
       width: calc(100vw - @max-margin * 2);
     }
   }
@@ -244,8 +240,7 @@ td {
         padding-right: 0;
       }
     }
-    .portkey-body,
-    .portkey-home-body {
+    .portkey-body {
       max-width: @mid-width;
       width: calc(100vw - @min-margin * 2);
     }
@@ -256,12 +251,9 @@ td {
       width: 100vw;
       min-width: @min-width;
     }
-    .portkey-body,
-    .portkey-home-body {
+    .portkey-body {
       width: 100vw;
       min-width: @min-width;
-      padding-left: 24px;
-      padding-right: 24px;
     }
   }
 }
