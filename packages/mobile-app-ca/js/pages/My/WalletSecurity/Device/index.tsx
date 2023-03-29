@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import PageContainer from 'components/PageContainer';
-import { ScrollView, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { defaultColors } from 'assets/theme';
 import GStyles from 'assets/theme/GStyles';
 import { TextM } from 'components/CommonText';
