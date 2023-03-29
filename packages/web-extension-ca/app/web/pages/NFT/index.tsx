@@ -7,13 +7,14 @@ import clsx from 'clsx';
 import { getAWSUrlWithSize } from '@portkey-wallet/utils/img';
 import { NFT_LARGE_SIZE } from '@portkey-wallet/constants/constants-ca/assets';
 import './index.less';
+import { useCallback } from 'react';
 
 export default function NFT() {
   const navigate = useNavigate();
   const { state } = useLocation();
   const { isPrompt } = useCommonState();
 
-  const mainContent = () => {
+  const mainContent = useCallback(() => {
     return (
       <div className={clsx(['nft-detail', isPrompt ? 'detail-page-prompt' : null])}>
         <SettingHeader leftCallBack={() => navigate(-1)} />
@@ -40,7 +41,7 @@ export default function NFT() {
         </div>
       </div>
     );
-  };
+  }, [isPrompt, navigate, state]);
 
   return <>{isPrompt ? <PromptFrame content={mainContent()} className="nft-detail-prompt" /> : mainContent()}</>;
 }

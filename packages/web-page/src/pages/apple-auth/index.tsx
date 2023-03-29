@@ -1,8 +1,9 @@
-import { useCallback, useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import qs from 'query-string';
+import { message } from 'antd';
 
 export default function AppleAuth() {
-  const onSuccess = useCallback(async () => {
+  const handler = useCallback(() => {
     const { id_token } = qs.parse(location.search);
     const response = {
       access_token: id_token,
@@ -14,8 +15,18 @@ export default function AppleAuth() {
       },
     });
   }, []);
+
   useEffect(() => {
-    onSuccess();
-  }, []);
+    if (!window.portkey_did) {
+      const ids = setTimeout(() => {
+        clearTimeout(ids);
+        if (!window.portkey_did) message.error('Timeout, please download and install the Portkey did extension');
+        handler();
+      }, 500);
+      return;
+    }
+    handler();
+  }, [handler]);
+
   return <div></div>;
 }

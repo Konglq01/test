@@ -3,8 +3,6 @@ import CustomSvg from 'components/CustomSvg';
 import PortKeyTitle from 'pages/components/PortKeyTitle';
 import { useTranslation } from 'react-i18next';
 import { SuccessPageType } from 'types/UI';
-import Tip1 from './images/tip1.png';
-import Tip2 from './images/tip2.png';
 import './index.less';
 
 export default function SuccessPageUI({ type, onConfirm }: { type?: SuccessPageType; onConfirm?: () => void }) {
@@ -27,11 +25,11 @@ export default function SuccessPageUI({ type, onConfirm }: { type?: SuccessPageT
         <div className="created-tip-content">
           <div className="tip-wrapper tip1">
             <div className="tip-title">Click the browser extension icon</div>
-            <img src={Tip1} />
+            <CustomSvg type="SuccessTip1" />
           </div>
           <div className="tip-wrapper tip2">
             <div className="tip-title">Pin Portkey</div>
-            <img src={Tip2} />
+            <CustomSvg type="SuccessTip2" />
           </div>
           <div className="tip3">Pin Portkey on the top right of your browser for easy access.</div>
         </div>
