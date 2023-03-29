@@ -1,3 +1,4 @@
+/* eslint-disable no-inline-styles/no-inline-styles */
 import { request } from '@portkey-wallet/api/api-did';
 import useLockCallback from '@portkey-wallet/hooks/useLockCallback';
 import { UpdateNotify, VersionDeviceType } from '@portkey-wallet/types/types-ca/device';
@@ -27,9 +28,8 @@ export function useCheckUpdate() {
             className: 'cross-modal delete-modal',
             content: (
               <>
-                {/* eslint-disable-next-line no-inline-styles/no-inline-styles */}
-                <div style={{ fontWeight: 500 }}>{req.title}</div>
-                <div>{req.content}</div>
+                <div style={{ fontWeight: 500, paddingBottom: '24px' }}>{req.title}</div>
+                <div style={{ whiteSpace: 'pre-line' }}>{req.content}</div>
               </>
             ),
             closable: false,
