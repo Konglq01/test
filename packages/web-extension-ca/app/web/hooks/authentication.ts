@@ -19,8 +19,9 @@ export function useVerifyGoogleToken() {
     }
     if (isRequest) {
       const googleInfo = await socialLoginAction('Google');
-      accessToken = googleInfo?.data?.accessToken;
+      accessToken = googleInfo?.data?.access_token;
       const { id } = await getGoogleUserInfo(accessToken as string);
+      console.log(id, params, googleInfo, 'socialVerifyHandler===id');
       if (id !== params.id) throw new Error('Account does not match your guardian');
     }
     return request.verify.verifyGoogleToken({
@@ -35,7 +36,7 @@ export function useVerifyAppleToken() {
     const { isExpired: tokenIsExpired } = parseAppleIdentityToken(accessToken) || {};
     if (!accessToken || tokenIsExpired) {
       const info = await socialLoginAction('Apple');
-      accessToken = info?.data?.accessToken || undefined;
+      accessToken = info?.data?.access_token || undefined;
     }
     const { userId } = parseAppleIdentityToken(accessToken) || {};
     if (userId !== params.id) throw new Error('Account does not match your guardian');
