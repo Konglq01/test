@@ -41,7 +41,7 @@ interface GuardianAccountItemProps {
   renderBtn?: (item: UserGuardianItem) => JSX.Element;
   isBorderHide?: boolean;
   guardiansStatus?: GuardiansStatus;
-  setGuardianStatus?: (key: string, status: GuardiansStatusItem) => void;
+  setGuardianStatus?: (data: { key: string; status: GuardiansStatusItem }) => void;
   isExpired?: boolean;
   isSuccess?: boolean;
   approvalType?: ApprovalType;
@@ -81,7 +81,7 @@ function GuardianItemButton({
   }, [approvalType, guardianItem]);
   const onSetGuardianStatus = useCallback(
     (guardianStatus: GuardiansStatusItem) => {
-      setGuardianStatus?.(guardianItem.key, guardianStatus);
+      setGuardianStatus?.({ key: guardianItem.key, status: guardianStatus });
     },
     [guardianItem.key, setGuardianStatus],
   );
