@@ -17,11 +17,10 @@ import CustomSelect from 'pages/components/CustomSelect';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
 import useGuardianList from 'hooks/useGuardianList';
 import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
-import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { useCurrentWallet, useOriginChainId } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
 import { StoreUserGuardianItem, UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type';
 import { useTranslation } from 'react-i18next';
-import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verification } from 'utils/api';
 import PhoneInput from '../components/PhoneInput';
 import { EmailError } from '@portkey-wallet/utils/check';
@@ -56,7 +55,9 @@ export default function AddGuardian() {
   const { setLoading } = useLoading();
   const { walletInfo } = useCurrentWallet();
   const userGuardianList = useGuardianList();
-  const currentChain = useCurrentChain();
+
+  const originChainId = useOriginChainId();
+  const currentChain = useCurrentChain(originChainId);
 
   const disabled = useMemo(() => {
     let check = true;
@@ -316,7 +317,7 @@ export default function AddGuardian() {
             guardianIdentifier: guardianAccount,
             type: LoginType[guardianType as LoginType],
             verifierId: selectVerifierItem?.id || '',
-            chainId: currentChain?.chainId || DefaultChainId,
+            chainId: currentChain?.chainId || originChainId,
           },
         });
         setLoading(false);
@@ -348,6 +349,7 @@ export default function AddGuardian() {
     },
     [
       dispatch,
+      originChainId,
       guardianType,
       setLoading,
       userGuardianList,
@@ -388,7 +390,7 @@ export default function AddGuardian() {
       dispatch(setOpGuardianAction(newGuardian));
       const params = {
         verifierId: verifierVal,
-        chainId: currentChain?.chainId || DefaultChainId,
+        chainId: currentChain?.chainId || originChainId,
         accessToken: socialValue?.accessToken,
       };
       let res;
@@ -419,6 +421,7 @@ export default function AddGuardian() {
       setLoading(false);
     }
   }, [
+    originChainId,
     curKey,
     currentChain,
     dispatch,

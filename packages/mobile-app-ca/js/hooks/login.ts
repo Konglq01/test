@@ -23,11 +23,12 @@ import { DigitInputInterface } from 'components/DigitInput';
 import { GuardiansApproved } from 'pages/Guardian/types';
 import { useGetDeviceInfo } from './device';
 import { extraDataEncode } from '@portkey-wallet/utils/device';
-import { useGetGuardiansInfo, useGetRegisterInfo, useGetVerifierServers } from './guardian';
+import { useGetGuardiansInfo, useGetVerifierServers } from './guardian';
 import { handleUserGuardiansList } from '@portkey-wallet/utils/guardian';
 import { useLanguage } from 'i18n/hooks';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { useGetChainInfo } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { useGetRegisterInfo } from '@portkey-wallet/hooks/hooks-ca/guardian';
 
 export function useOnManagerAddressAndQueryResult() {
   const { t } = useLanguage();

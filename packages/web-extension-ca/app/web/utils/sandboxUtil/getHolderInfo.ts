@@ -1,21 +1,10 @@
 import { request } from '@portkey-wallet/api/api-did';
-import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
-import { ChainType } from '@portkey-wallet/types';
+import { ChainId, ChainType } from '@portkey-wallet/types';
 import { SandboxErrorCode, SandboxEventService, SandboxEventTypes } from '@portkey-wallet/utils/sandboxService';
 
-export const getHolderInfo = async ({
-  paramsOption,
-}: {
-  rpcUrl?: string;
-  address?: string;
-  chainType?: ChainType;
-  paramsOption: {
-    guardianIdentifier?: string;
-    caHash?: string;
-  };
-}) =>
+export const getHolderInfo = async (params: { chainId: ChainId; guardianIdentifier?: string; caHash?: string }) =>
   request.wallet.guardianIdentifiers({
-    params: { chainId: DefaultChainId, ...paramsOption },
+    params,
   });
 
 export const getHolderInfoByContract = async ({

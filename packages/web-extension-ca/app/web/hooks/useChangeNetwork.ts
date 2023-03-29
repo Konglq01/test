@@ -1,5 +1,5 @@
 import { NetworkItem } from '@portkey-wallet/types/types-ca/network';
-import { useWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { useOriginChainId, useWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { changeNetworkType } from '@portkey-wallet/store/store-ca/wallet/actions';
 import InternalMessage from 'messages/InternalMessage';
 import { PortkeyMessageTypes } from 'messages/InternalMessageTypes';
@@ -12,13 +12,14 @@ export function useChangeNetwork() {
   const { walletInfo } = useWallet();
   const navigate = useNavigate();
   const { isPrompt } = useCommonState();
+  const originChainId = useOriginChainId();
 
   return useCallback(
     (network: NetworkItem) => {
       const { caInfo } = walletInfo || {};
       const tmpCaInfo = caInfo?.[network.networkType];
 
-      if (tmpCaInfo?.managerInfo && tmpCaInfo.AELF?.caAddress) {
+      if (tmpCaInfo?.managerInfo && tmpCaInfo?.[originChainId]?.caAddress) {
         if (!isPrompt) {
           navigate('/');
         } else {
@@ -34,6 +35,6 @@ export function useChangeNetwork() {
 
       dispatch(changeNetworkType(network.networkType));
     },
-    [dispatch, isPrompt, navigate, walletInfo],
+    [walletInfo, isPrompt, originChainId, navigate, dispatch],
   );
 }

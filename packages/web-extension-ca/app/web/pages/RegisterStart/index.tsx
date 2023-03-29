@@ -7,7 +7,7 @@ import SignCard from './components/SignCard';
 import { useCurrentNetworkInfo, useNetworkList } from '@portkey-wallet/hooks/hooks-ca/network';
 import { useCallback, useMemo, useRef } from 'react';
 import { useAppDispatch, useLoading } from 'store/Provider/hooks';
-import { changeNetworkType } from '@portkey-wallet/store/store-ca/wallet/actions';
+import { changeNetworkType, setOriginChainId } from '@portkey-wallet/store/store-ca/wallet/actions';
 import { NetworkType } from '@portkey-wallet/types';
 import CommonSelect from 'components/CommonSelect1';
 import { useChangeNetwork } from 'hooks/useChangeNetwork';
@@ -19,10 +19,12 @@ import useGuardianList from 'hooks/useGuardianList';
 import { handleErrorCode, handleErrorMessage } from '@portkey-wallet/utils';
 import { message } from 'antd';
 import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
-import './index.less';
 import { SocialLoginFinishHandler } from 'types/wallet';
 import { getGoogleUserInfo, parseAppleIdentityToken } from '@portkey-wallet/utils/authentication';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import { useGetRegisterInfo } from '@portkey-wallet/hooks/hooks-ca/guardian';
+import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network-test1';
+import './index.less';
 
 export default function RegisterStart() {
   const { type } = useParams();
@@ -57,27 +59,34 @@ export default function RegisterStart() {
 
   const isHasAccount = useRef<boolean>();
 
-  const validateIdentifier = useCallback(async (identifier?: string) => {
-    let isLoginAccount = false;
-    try {
-      const checkResult = await getHolderInfo({
-        paramsOption: {
+  const getRegisterInfo = useGetRegisterInfo();
+
+  const validateIdentifier = useCallback(
+    async (identifier?: string) => {
+      let isLoginAccount = false;
+      try {
+        const { originChainId } = await getRegisterInfo({
+          loginGuardianIdentifier: identifier,
+        });
+        const checkResult = await getHolderInfo({
+          chainId: originChainId,
           guardianIdentifier: (identifier as string).replaceAll(' ', ''),
-        },
-      });
-      if (checkResult.guardianList?.guardians?.length > 0) {
-        isLoginAccount = true;
+        });
+        if (checkResult.guardianList?.guardians?.length > 0) {
+          isLoginAccount = true;
+        }
+      } catch (error: any) {
+        const code = handleErrorCode(error);
+        if (code?.toString() === '3002') {
+          isLoginAccount = false;
+        } else {
+          throw handleErrorMessage(error || 'GetHolderInfo error');
+        }
       }
-    } catch (error: any) {
-      const code = handleErrorCode(error);
-      if (code?.toString() === '3002') {
-        isLoginAccount = false;
-      } else {
-        throw handleErrorMessage(error || 'GetHolderInfo error');
-      }
-    }
-    isHasAccount.current = isLoginAccount;
-  }, []);
+      isHasAccount.current = isLoginAccount;
+    },
+    [getRegisterInfo],
+  );
 
   const saveState = useCallback(
     (data: LoginInfo) => {
@@ -116,11 +125,18 @@ export default function RegisterStart() {
   );
 
   const onInputFinish = useCallback(
-    (loginInfo: LoginInfo) => {
-      if (isHasAccount?.current) return onLoginFinish(loginInfo);
+    async (loginInfo: LoginInfo) => {
+      if (isHasAccount?.current) {
+        const { originChainId } = await getRegisterInfo({
+          loginGuardianIdentifier: loginInfo.guardianAccount,
+        });
+        dispatch(setOriginChainId(originChainId));
+        return onLoginFinish(loginInfo);
+      }
+      dispatch(setOriginChainId(DefaultChainId));
       return onSignFinish(loginInfo);
     },
-    [isHasAccount, onLoginFinish, onSignFinish],
+    [dispatch, getRegisterInfo, onLoginFinish, onSignFinish],
   );
 
   const onSocialFinish: SocialLoginFinishHandler = useCallback(

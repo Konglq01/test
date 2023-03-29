@@ -9,13 +9,13 @@ import BaseVerifierIcon from 'components/BaseVerifierIcon';
 import CommonSelect from 'components/CommonSelect1';
 import { useTranslation } from 'react-i18next';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
-import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verification } from 'utils/api';
-import './index.less';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import { handleError } from '@portkey-wallet/utils';
 import { useVerifyToken } from 'hooks/authentication';
 import { setRegisterVerifierAction } from 'store/reducers/loginCache/actions';
+import { useOriginChainId } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import './index.less';
 
 export default function SelectVerifier() {
   const { verifierMap } = useGuardiansInfo();
@@ -25,6 +25,7 @@ export default function SelectVerifier() {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const { setLoading } = useLoading();
+  const originChainId = useOriginChainId();
 
   const handleChange = useCallback((value: string) => {
     setSelectVal(value);
@@ -58,7 +59,7 @@ export default function SelectVerifier() {
           guardianIdentifier: loginAccount.guardianAccount.replaceAll(' ', ''),
           type: LoginType[loginAccount.loginType],
           verifierId: selectItem.id,
-          chainId: DefaultChainId,
+          chainId: originChainId,
         },
       });
       setLoading(false);
@@ -87,7 +88,7 @@ export default function SelectVerifier() {
       const _error = verifyErrorHandler(error);
       message.error(_error);
     }
-  }, [dispatch, loginAccount, navigate, selectItem, setLoading]);
+  }, [dispatch, loginAccount, navigate, originChainId, selectItem, setLoading]);
 
   const verifierShow = useMemo(() => Object.values(verifierMap ?? {}).slice(0, 3), [verifierMap]);
 
@@ -99,7 +100,7 @@ export default function SelectVerifier() {
         accessToken: loginAccount.authenticationInfo?.[loginAccount.guardianAccount || ''],
         id: loginAccount.guardianAccount,
         verifierId: selectItem?.id,
-        chainId: DefaultChainId,
+        chainId: originChainId,
       });
       dispatch(
         setRegisterVerifierAction({
@@ -115,7 +116,7 @@ export default function SelectVerifier() {
     } finally {
       setLoading(false);
     }
-  }, [dispatch, loginAccount, navigate, selectItem?.id, setLoading, verifyToken]);
+  }, [dispatch, loginAccount, navigate, originChainId, selectItem?.id, setLoading, verifyToken]);
 
   const onConfirm = useCallback(async () => {
     switch (loginAccount?.loginType) {
