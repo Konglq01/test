@@ -151,6 +151,7 @@ export const fetchNFTAsync = createAsyncThunk(
 
     const { skipCount, maxResultCount, totalRecordCount, children } = targetNFTCollection;
 
+    // has cache data
     if ((pageNum + 1) * maxResultCount <= children.length) return;
 
     if (totalRecordCount === 0 || totalRecordCount > children.length) {

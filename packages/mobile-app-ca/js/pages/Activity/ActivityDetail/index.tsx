@@ -176,7 +176,11 @@ const ActivityDetail = () => {
           <>
             <View style={styles.topWrap}>
               {activityItem?.nftInfo?.imageUrl ? (
-                <Image style={styles.img} source={{ uri: getAWSUrlWithSize(activityItem?.nftInfo?.imageUrl || '') }} />
+                <Image
+                  resizeMode={'contain'}
+                  style={styles.img}
+                  source={{ uri: getAWSUrlWithSize(activityItem?.nftInfo?.imageUrl || '') }}
+                />
               ) : (
                 <Text style={styles.noImg}>{activityItem?.nftInfo?.alias?.slice(0, 1)}</Text>
               )}
