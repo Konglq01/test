@@ -187,6 +187,7 @@ td {
   align-items: center;
 
   .portkey-header {
+    background-color: @bg-20;
     margin: 0 auto;
     .portkey-header-body {
       .custom-logo {
@@ -197,7 +198,7 @@ td {
 
   .portkey-body {
     min-height: calc(100vh - 96px);
-    margin: auto;
+    margin: 0 auto;
   }
   .portkey-prompt-media();
 }
@@ -247,6 +248,7 @@ td {
   }
   // screen < 768, maxContentWidth = screen, minContentWidth = 360, paddingLeftAndRight = 24
   @media screen and (max-width: 767px) {
+    padding-bottom: 0 !important;
     .portkey-header {
       width: 100vw;
       min-width: @min-width;
@@ -254,6 +256,7 @@ td {
     .portkey-body {
       width: 100vw;
       min-width: @min-width;
+      min-height: calc(100vh - 72px);
     }
   }
 }
