@@ -29,7 +29,7 @@ const DeviceList: React.FC = () => {
       titleDom={'Login Devices'}
       safeAreaColor={['blue', 'gray']}
       containerStyles={pageStyles.pageWrap}
-      scrollViewProps={{ disabled: true }}>
+      scrollViewProps={{ disabled: false }}>
       <TextM style={[FontStyles.font3, pageStyles.tipsWrap]}>
         {`You can manage your login devices and remove any device. 
 Please note that when you log in again on a removed device, you will need to verify your identity through your guardians.`}
@@ -50,7 +50,6 @@ Please note that when you log in again on a removed device, you will need to ver
 
 const pageStyles = StyleSheet.create({
   pageWrap: {
-    flex: 1,
     backgroundColor: defaultColors.bg4,
     ...GStyles.paddingArg(24, 20, 18),
   },
