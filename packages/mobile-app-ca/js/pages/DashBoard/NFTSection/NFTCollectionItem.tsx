@@ -15,7 +15,6 @@ import { NFTCollectionItemShowType } from '@portkey-wallet/types/types-ca/assets
 import Touchable from 'components/Touchable';
 import { OpenCollectionObjType } from './index';
 import { ChainId } from '@portkey-wallet/types';
-import { getAWSUrlWithSize } from '@portkey-wallet/utils/img';
 
 export enum NoDataMessage {
   CustomNetWorkNoData = 'No transaction records accessible from the current custom network',
@@ -86,12 +85,7 @@ export default function NFTItem(props: NFTItemPropsType) {
           color={defaultColors.font3}
           iconStyle={styles.touchIcon}
         />
-        <CommonAvatar
-          imageUrl={getAWSUrlWithSize(imageUrl)}
-          title={collectionName}
-          shapeType={'square'}
-          style={styles.avatarStyle}
-        />
+        <CommonAvatar imageUrl={imageUrl} title={collectionName} shapeType={'square'} style={styles.avatarStyle} />
         <View style={styles.topSeriesCenter}>
           <TextL style={styles.nftSeriesName} ellipsizeMode="tail">
             {collectionName}
