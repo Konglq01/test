@@ -7,6 +7,7 @@ import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { isIos } from '@portkey-wallet/utils/mobile/device';
 import { AppState, AppStateStatus } from 'react-native';
 import { useCheckUpdate } from 'hooks/device';
+let changeTime = Date.now();
 interface AppListenerProps {
   children: ReactElement;
 }
@@ -30,7 +31,13 @@ const AppListener: React.FC<AppListenerProps> = props => {
 
   const handleAppStateChange = useCallback(
     (nextAppState: AppStateStatus) => {
-      if (nextAppState === 'active') checkUpdate();
+      const currentTime = Date.now();
+      if (nextAppState === 'active') {
+        if (currentTime > changeTime + 1000) checkUpdate();
+      }
+      if (nextAppState === 'background') {
+        changeTime = currentTime;
+      }
     },
     [checkUpdate],
   );
