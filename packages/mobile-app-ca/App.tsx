@@ -24,8 +24,8 @@ import Updater from 'components/Updater';
 import CodePush from 'react-native-code-push'; // 引入code-push
 
 const codePushOptions = {
-  updateDialog: true,
-  installMode: CodePush.InstallMode.IMMEDIATE,
+  updateDialog: false,
+  installMode: CodePush.InstallMode.ON_NEXT_RESTART,
   checkFrequency: CodePush.CheckFrequency.ON_APP_RESUME,
 };
 
