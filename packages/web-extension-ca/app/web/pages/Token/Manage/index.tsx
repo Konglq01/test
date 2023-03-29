@@ -99,7 +99,7 @@ export default function AddToken() {
   );
 
   const { isPrompt } = useCommonState();
-  const mainContent = () => {
+  const mainContent = useCallback(() => {
     return (
       <div className={clsx(['add-token', isPrompt ? 'detail-page-prompt' : null])}>
         <div className="add-token-top">
@@ -132,7 +132,7 @@ export default function AddToken() {
     )} */}
       </div>
     );
-  };
+  }, [filterWord, isPrompt, navigate, openDrop, renderList, rightElement, t, tokenDataShowInMarket]);
 
   return <>{isPrompt ? <PromptFrame content={mainContent()} /> : mainContent()}</>;
 }

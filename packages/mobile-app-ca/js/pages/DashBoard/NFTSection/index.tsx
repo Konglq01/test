@@ -36,8 +36,7 @@ type NFTCollectionProps = NFTCollectionItemShowType & {
 
 // TODO make the list fluently
 // function areEqual(prevProps: NFTCollectionProps, nextProps: NFTCollectionProps) {
-//   return false;
-//    return nextProps.isCollapsed === prevProps.isCollapsed && nextProps.children.length === prevProps.children.length;
+//   return nextProps.isCollapsed === prevProps.isCollapsed;
 // }
 
 const NFTCollection: React.FC<NFTCollectionProps> = memo(function NFTCollection(props: NFTCollectionProps) {
@@ -113,19 +112,35 @@ export default function NFTSection() {
   );
 
   const loadMoreItem = useCallback(
-    (symbol: string, chainId: ChainId, pageNum = 0) => {
+    async (symbol: string, chainId: ChainId, pageNum = 0) => {
       const currentCaAddress = walletInfo?.caInfo?.[currentNetwork]?.[chainId]?.caAddress;
 
-      dispatch(
+      const key = `${symbol}${chainId}`;
+      const currentOpenObj = openCollectionObj?.[key];
+      const currentCollectionObj = accountNFTList.find(item => item.symbol === symbol && item.chainId === chainId);
+      console.log('=====', pageNum, currentOpenObj, currentCollectionObj);
+
+      await dispatch(
         fetchNFTAsync({
           symbol,
           chainId,
           caAddresses: [currentCaAddress || ''],
-          pageNum: pageNum + 1,
+          pageNum: pageNum,
         }),
       );
+      // }
+
+      const newObj = {
+        ...openCollectionObj,
+        [key]: {
+          ...currentOpenObj,
+          pageNum,
+        },
+      };
+
+      setOpenCollectionObj(newObj);
     },
-    [currentNetwork, dispatch, walletInfo?.caInfo],
+    [accountNFTList, currentNetwork, dispatch, openCollectionObj, walletInfo?.caInfo],
   );
 
   return (

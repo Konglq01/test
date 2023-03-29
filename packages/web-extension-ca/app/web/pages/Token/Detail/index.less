@@ -16,7 +16,6 @@
     align-items: center;
     border: none;
     background-color: @bg-11;
-    // z-index: 11;
 
     .title-left-col {
       width: 16px;
@@ -88,5 +87,15 @@
     display: flex;
     justify-content: center;
     margin-top: 60px;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .portkey-prompt {
+    .token-detail {
+      .setting-header-wrapper {
+        padding: 0 24px;
+      }
+    }
   }
 }

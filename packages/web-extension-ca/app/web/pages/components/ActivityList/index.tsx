@@ -209,7 +209,7 @@ export default function ActivityList({ data, chainId, hasMore, loadMore }: IActi
           </List.Item>
         ))}
       </List>
-      <LoadingMore hasMore={hasMore} loadMore={loadMore} />
+      <LoadingMore hasMore={hasMore} loadMore={loadMore} className="load-more" />
     </div>
   );
 }
