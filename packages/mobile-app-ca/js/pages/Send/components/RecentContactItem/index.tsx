@@ -14,11 +14,12 @@ import { ChainId } from '@portkey-wallet/types';
 
 export interface ItemType {
   contact: RecentContactItemType;
+  isContacts?: boolean;
   onPress?: (item: any) => void;
 }
 
 const RecentContactItem: React.FC<ItemType> = props => {
-  const { contact, onPress } = props;
+  const { isContacts, contact, onPress } = props;
 
   const { currentNetwork } = useWallet();
   const [collapsed, setCollapsed] = useState(true);
@@ -36,20 +37,19 @@ const RecentContactItem: React.FC<ItemType> = props => {
 
         <Collapsible collapsed={collapsed} style={styles.addressListWrap}>
           {contact?.addresses?.map((ele, index) =>
-            ele?.transactionTime ? (
+            isContacts || ele?.transactionTime ? (
               <TouchableOpacity
                 style={[index !== 0 && styles.addressItemWrap]}
                 key={`${ele?.address}${ele?.chainId}`}
                 onPress={() => {
                   const { address, chainId } = ele;
-
                   onPress?.({ address: `ELF_${address}_${chainId}`, name: contact.name });
                 }}>
-                <Text style={[styles.address, !ele?.transactionTime && FontStyles.font7]}>
+                <Text style={[styles.address, !isContacts && !ele?.transactionTime && FontStyles.font7]}>
                   {formatStr2EllipsisStr(`ELF_${ele?.address}_${ele.chainId}`, 10)}
                 </Text>
                 {/* TODO */}
-                <Text style={[styles.address, !ele?.transactionTime && FontStyles.font7]}>
+                <Text style={[styles.address, !isContacts && !ele?.transactionTime && FontStyles.font7]}>
                   {formatChainInfoToShow(ele?.chainId as ChainId, currentNetwork)}
                 </Text>
               </TouchableOpacity>
