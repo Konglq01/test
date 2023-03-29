@@ -11,6 +11,7 @@ import { useGStyles } from 'assets/theme/useGStyles';
 import { ModalBody } from 'components/ModalBody';
 import { defaultColors } from 'assets/theme';
 import { FiatType } from '@portkey-wallet/store/store-ca/payment/type';
+import { countryCodeMap } from '@portkey-wallet/constants/constants-ca/payment';
 
 type SelectListProps = {
   value?: string; // `${country}_${currency}`
@@ -37,12 +38,9 @@ const SelectCurrency = ({ list, callBack, value }: SelectListProps) => {
             callBack(item);
           }}>
           <View style={styles.itemRow}>
-            <Image
-              style={styles.fiatIconStyle}
-              source={{ uri: `https://static.alchemypay.org/alchemypay/flag/${item.country}.png` }}
-            />
+            <Image style={styles.fiatIconStyle} source={{ uri: countryCodeMap[item.country]?.icon || '' }} />
             <View style={styles.itemContent}>
-              <TextL>{item.currency}</TextL>
+              <TextL>{`${countryCodeMap[item.country]?.country || ''} - ${item.currency}`}</TextL>
 
               {value !== undefined && value === item.currency && (
                 <Svg iconStyle={styles.itemIcon} icon="selected" size={pTd(24)} />

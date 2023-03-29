@@ -1,5 +1,5 @@
 import { defaultColors } from 'assets/theme';
-import React, { useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { pTd } from 'utils/unit';
 import { useLanguage } from 'i18n/hooks';
@@ -19,6 +19,8 @@ import useEffectOnce from 'hooks/useEffectOnce';
 import { FontStyles } from 'assets/theme/styles';
 import CommonButton from 'components/CommonButton';
 import navigationService from 'utils/navigationService';
+import { countryCodeMap } from '@portkey-wallet/constants/constants-ca/payment';
+import { fetchOrderQuote } from '@portkey-wallet/api/api-did/payment/util';
 
 const list = [
   {
@@ -33,6 +35,33 @@ export default function BuyForm() {
   const { buyFiatList } = usePayment();
   const [fiat, setFiat] = useState<FiatType>();
   const [token, setToken] = useState<any>();
+
+  const rateRefreshTimeRef = useRef(12);
+  const [rateRefreshTime, setRateRefreshTime] = useState<number>(12);
+
+  const refreshRate = useCallback(() => {
+    try {
+      // const rst = fetchOrderQuote({});
+    } catch (error) {
+      //
+    }
+  }, []);
+
+  useEffectOnce(() => {
+    refreshRate();
+    const timer = setInterval(() => {
+      rateRefreshTimeRef.current = --rateRefreshTimeRef.current;
+      if (rateRefreshTimeRef.current === 0) {
+        refreshRate();
+        rateRefreshTimeRef.current = 12;
+      }
+      setRateRefreshTime(rateRefreshTimeRef.current);
+    }, 1000);
+    return () => {
+      clearInterval(timer);
+    };
+  });
+
   useEffectOnce(() => {
     const defaultFiat = buyFiatList.find(item => item.currency === 'USD' && item.country === 'US');
     if (defaultFiat) {
@@ -57,10 +86,7 @@ export default function BuyForm() {
                   callBack: setFiat,
                 });
               }}>
-              <Image
-                style={styles.unitIconStyle}
-                source={{ uri: `https://static.alchemypay.org/alchemypay/flag/${fiat?.country}.png` }}
-              />
+              <Image style={styles.unitIconStyle} source={{ uri: countryCodeMap[fiat?.country || '']?.icon || '' }} />
               <TextL style={[GStyles.flex1, fonts.mediumFont]}>{fiat?.currency}</TextL>
               <Svg size={16} icon="down-arrow" color={defaultColors.icon1} />
             </Touchable>
@@ -101,7 +127,7 @@ export default function BuyForm() {
           <TextM style={[GStyles.flex1, FontStyles.font3]}>1 ELF ≈ 0.2874 USD</TextM>
           <View style={[GStyles.flexRow, GStyles.alignCenter]}>
             <Svg size={16} icon="time" />
-            <TextS style={styles.refreshLabel}>6s</TextS>
+            <TextS style={styles.refreshLabel}>{rateRefreshTime}s</TextS>
           </View>
         </View>
       </View>
