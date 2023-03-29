@@ -5,7 +5,7 @@ import { ReactNode, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAssetInfo, useTokenInfo, useUserInfo } from 'store/Provider/hooks';
 import { fetchAssetAsync } from '@portkey-wallet/store/store-ca/assets/slice';
-import { divDecimals, unitConverter } from '@portkey-wallet/utils/converter';
+import { divDecimals, formatAmountShow } from '@portkey-wallet/utils/converter';
 import { useCaAddresses, useChainIdList } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { fetchAllTokenListAsync } from '@portkey-wallet/store/store-ca/tokenManagement/action';
 import { useIsTestnet } from 'hooks/useNetwork';
@@ -84,12 +84,12 @@ export default function CustomTokenList({
           </div>
           <div className="amount">
             <p className="quantity">
-              {unitConverter(divDecimals(token.tokenInfo?.balance, token.tokenInfo?.decimals))}
+              {formatAmountShow(divDecimals(token.tokenInfo?.balance, token.tokenInfo?.decimals))}
             </p>
             <p className="convert">
               {isTestNet
                 ? ''
-                : `$ ${unitConverter(divDecimals(token.tokenInfo?.balanceInUsd, token.tokenInfo?.decimals))}`}
+                : `$ ${formatAmountShow(divDecimals(token.tokenInfo?.balanceInUsd, token.tokenInfo?.decimals))}`}
             </p>
           </div>
         </div>
