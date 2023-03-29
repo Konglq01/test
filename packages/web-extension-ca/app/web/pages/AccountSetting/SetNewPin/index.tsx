@@ -42,8 +42,9 @@ export default function SetNewPin() {
       }),
     );
     await setPinAction(newPin);
+    message.success(t('Modified Successfully'));
     navigate('/setting/account-setting');
-  }, [dispatch, form, navigate, pin]);
+  }, [dispatch, form, navigate, pin, t]);
 
   const onFinishFailed = useCallback((errorInfo: any) => {
     console.error(errorInfo, 'onFinishFailed==');
