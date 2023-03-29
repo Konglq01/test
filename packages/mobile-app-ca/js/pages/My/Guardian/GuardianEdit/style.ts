@@ -47,6 +47,7 @@ export const pageStyles = StyleSheet.create({
     color: font3,
     marginLeft: pTd(8),
     marginBottom: pTd(8),
+    lineHeight: pTd(20),
   },
   oAuthBtn: {
     height: pTd(56),
@@ -54,6 +55,7 @@ export const pageStyles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: bg1,
     marginBottom: pTd(24),
+    borderRadius: pTd(6),
   },
   typeIcon: {
     borderRadius: pTd(14),
@@ -68,5 +70,6 @@ export const pageStyles = StyleSheet.create({
     backgroundColor: defaultColors.bg1,
     paddingHorizontal: pTd(16),
     justifyContent: 'center',
+    marginBottom: pTd(24),
   },
 });

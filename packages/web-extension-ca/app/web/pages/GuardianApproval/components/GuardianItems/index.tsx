@@ -16,6 +16,7 @@ import { verification } from 'utils/api';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import { handleErrorMessage } from '@portkey-wallet/utils';
 import { useVerifyToken } from 'hooks/authentication';
+import { handleVerificationDoc } from '@portkey-wallet/utils/guardian';
 
 interface GuardianItemProps {
   disabled?: boolean;
@@ -145,17 +146,20 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
       try {
         setLoading(true);
         const result = await verifyToken(item.guardianType, {
+          accessToken: loginAccount?.authenticationInfo?.[item.guardianAccount],
           id: item.guardianAccount,
           verifierId: item.verifier?.id,
           chainId: DefaultChainId,
         });
         const verifierInfo: VerifierInfo = { ...result, verifierId: item?.verifier?.id };
+        const { guardianIdentifier } = handleVerificationDoc(verifierInfo.verificationDoc);
         dispatch(
           setUserGuardianItemStatus({
             key: item.key,
             signature: verifierInfo.signature,
             verificationDoc: verifierInfo.verificationDoc,
             status: VerifyStatus.Verified,
+            identifierHash: guardianIdentifier,
           }),
         );
       } catch (error) {
@@ -165,7 +169,7 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
         setLoading(false);
       }
     },
-    [dispatch, setLoading, verifyToken],
+    [dispatch, loginAccount?.authenticationInfo, setLoading, verifyToken],
   );
 
   const verifyingHandler = useCallback(

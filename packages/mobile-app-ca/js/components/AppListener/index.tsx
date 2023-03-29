@@ -16,7 +16,6 @@ const AppListener: React.FC<AppListenerProps> = props => {
   const lockManager = useRef<LockManager>();
   const { walletInfo } = useCurrentWallet();
   const { autoLockingTime } = useSettings();
-
   const lockingTime = useMemo(() => {
     if (!walletInfo?.address || (walletInfo.address && !walletInfo.AELF)) return AutoLockUpTime;
     if (autoLockingTime === 0 && !isIos) return 0.5;
@@ -35,12 +34,12 @@ const AppListener: React.FC<AppListenerProps> = props => {
     },
     [checkUpdate],
   );
-
   useEffectOnce(() => {
-    checkUpdate();
+    const timer = setTimeout(checkUpdate, 1000);
     const listener = AppState.addEventListener('change', handleAppStateChange);
     lockManager.current = new LockManager(lockingTime * 1000);
     return () => {
+      timer && clearTimeout(timer);
       lockManager.current?.stopListening();
       listener.remove();
     };

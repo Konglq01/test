@@ -15,6 +15,7 @@ import {
 } from './actions';
 import { GuardiansState } from './type';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import { GUARDIAN_EXPIRED_TIME } from '@portkey-wallet/constants/misc';
 
 const initialState: GuardiansState = {};
 export const guardiansSlice = createSlice({
@@ -109,7 +110,7 @@ export const guardiansSlice = createSlice({
         state.userGuardianStatus[key]['verificationDoc'] = verificationDoc;
         state.userGuardianStatus[key]['identifierHash'] = identifierHash || '';
         if (!state.guardianExpiredTime && status === VerifyStatus.Verified) {
-          state.guardianExpiredTime = moment().add(1, 'h').subtract(2, 'minute').valueOf();
+          state.guardianExpiredTime = moment().add(GUARDIAN_EXPIRED_TIME, 'ms').valueOf();
         }
       })
       .addCase(resetUserGuardianStatus, state => {

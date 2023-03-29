@@ -23,7 +23,7 @@ const Divider: React.FC<DividerProps> = ({
   width = StyleSheet.hairlineWidth,
   insetType = 'middle',
   title,
-  color = defaultColors.border1,
+  color = defaultColors.border6,
   titleStyle,
   inset,
   lineStyle,

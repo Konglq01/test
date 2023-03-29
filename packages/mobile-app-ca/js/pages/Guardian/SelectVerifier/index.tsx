@@ -166,7 +166,10 @@ export default function SelectVerifier() {
         <View style={styles.verifierRow}>
           {verifierList.slice(0, 3).map(item => {
             return (
-              <Touchable style={GStyles.center} key={item.name} onPress={() => setSelectedVerifier(item)}>
+              <Touchable
+                style={[GStyles.center, GStyles.flex1]}
+                key={item.name}
+                onPress={() => setSelectedVerifier(item)}>
                 <VerifierImage label={item.name} uri={item.imageUrl} size={42} />
                 <TextS style={[FontStyles.font3, styles.verifierTitle]}>{item.name}</TextS>
               </Touchable>
@@ -187,7 +190,7 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   selectedItem: {
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     paddingVertical: 13,
     marginTop: 24,
     marginBottom: 48,

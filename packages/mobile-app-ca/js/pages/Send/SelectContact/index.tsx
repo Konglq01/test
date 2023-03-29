@@ -96,7 +96,7 @@ export default function SelectContact(props: SelectContactProps) {
             isIndexBarShow={false}
             isSearchShow={false}
             renderContactItem={(item: ContactItemType) => (
-              <RecentContactItem contact={item as RecentContactItemType} onPress={onPress} />
+              <RecentContactItem isContacts={true} contact={item as RecentContactItemType} onPress={onPress} />
             )}
             ListFooterComponent={<View style={styles.footer} />}
           />

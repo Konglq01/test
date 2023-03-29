@@ -15,7 +15,6 @@ import { NFTCollectionItemShowType } from '@portkey-wallet/types/types-ca/assets
 import Touchable from 'components/Touchable';
 import { OpenCollectionObjType } from './index';
 import { ChainId } from '@portkey-wallet/types';
-import { getAWSUrlWithSize } from '@portkey-wallet/utils/img';
 
 export enum NoDataMessage {
   CustomNetWorkNoData = 'No transaction records accessible from the current custom network',
@@ -59,7 +58,7 @@ export default function NFTItem(props: NFTItemPropsType) {
   }, [children, collapsed, openCollectionInfo]);
 
   const showChildren = useMemo(
-    () => (children.length > 9 ? children.slice(0, (openCollectionInfo?.pageNum ?? 0 + 1) * 9) : children),
+    () => (children.length > 9 ? children.slice(0, ((openCollectionInfo?.pageNum ?? 0) + 1) * 9) : children),
     [children, openCollectionInfo?.pageNum],
   );
 
@@ -86,12 +85,7 @@ export default function NFTItem(props: NFTItemPropsType) {
           color={defaultColors.font3}
           iconStyle={styles.touchIcon}
         />
-        <CommonAvatar
-          imageUrl={getAWSUrlWithSize(imageUrl)}
-          title={collectionName}
-          shapeType={'square'}
-          style={styles.avatarStyle}
-        />
+        <CommonAvatar imageUrl={imageUrl} title={collectionName} shapeType={'square'} style={styles.avatarStyle} />
         <View style={styles.topSeriesCenter}>
           <TextL style={styles.nftSeriesName} ellipsizeMode="tail">
             {collectionName}
@@ -125,7 +119,7 @@ export default function NFTItem(props: NFTItemPropsType) {
         {hasMore && (
           <Touchable
             style={[styles.loadMore]}
-            onPress={() => loadMoreItem?.(symbol, chainId, openCollectionInfo?.pageNum)}>
+            onPress={() => loadMoreItem?.(symbol, chainId, openCollectionInfo?.pageNum + 1)}>
             <TextM style={FontStyles.font4}>More</TextM>
             <Svg icon="down-arrow" size={pTd(16)} color={defaultColors.primaryColor} iconStyle={styles.downArrow} />
           </Touchable>
