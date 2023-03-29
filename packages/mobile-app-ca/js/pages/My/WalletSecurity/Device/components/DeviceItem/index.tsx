@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { defaultColors } from 'assets/theme';
-import { TextL, TextM, TextS, TextXL } from 'components/CommonText';
+import { TextL, TextM, TextS } from 'components/CommonText';
 import Touchable from 'components/Touchable';
 import { pTd } from 'utils/unit';
 import { FontStyles } from 'assets/theme/styles';
@@ -21,9 +21,10 @@ interface DeviceItemProps {
   onPress?: (e: any) => void;
   isCurrent?: boolean;
   deviceItem: DeviceItemType;
+  isShowArrow?: boolean;
 }
 
-const DeviceItemRender = ({ onPress, isCurrent, deviceItem }: DeviceItemProps) => {
+const DeviceItemRender = ({ onPress, isCurrent, deviceItem, isShowArrow = true }: DeviceItemProps) => {
   return (
     <Touchable onPress={onPress}>
       <View style={styles.deviceItemWrap}>
@@ -38,14 +39,18 @@ const DeviceItemRender = ({ onPress, isCurrent, deviceItem }: DeviceItemProps) =
         <View style={styles.deviceItemInfoWrap}>
           <View style={styles.deviceItemInfo}>
             <TextL>{deviceItem.deviceInfo.deviceName}</TextL>
-            {isCurrent && <TextS style={styles.currentWrap}>Current</TextS>}
+            {isCurrent && (
+              <View style={styles.currentWrap}>
+                <TextS style={FontStyles.font3}>Current</TextS>
+              </View>
+            )}
           </View>
           <TextM style={FontStyles.font7}>
             {deviceItem.transactionTime ? formatTransferTime(deviceItem.transactionTime) : ''}
           </TextM>
         </View>
 
-        <Svg icon={'right-arrow'} size={pTd(20)} color={defaultColors.icon1} />
+        {isShowArrow && <Svg icon={'right-arrow'} size={pTd(20)} color={defaultColors.icon1} />}
       </View>
     </Touchable>
   );
@@ -82,11 +87,10 @@ const styles = StyleSheet.create({
   currentWrap: {
     marginLeft: pTd(12),
     height: pTd(20),
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: defaultColors.border6,
-    borderRadius: pTd(11),
-    paddingHorizontal: pTd(10),
-    lineHeight: pTd(18),
-    color: defaultColors.font3,
+    borderRadius: pTd(10),
+    paddingHorizontal: pTd(9),
+    justifyContent: 'center',
   },
 });
