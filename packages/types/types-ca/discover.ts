@@ -1,8 +1,9 @@
 export interface IGameListItemType {
-  id?: string;
-  name?: string;
-  img?: string;
-  introduction?: string;
+  label: string;
+  name: string;
+  icon: string;
+  introduction: string;
+  url: string;
 }
 
 export interface IRecordsItemType {

@@ -6,6 +6,9 @@ import { BGStyles } from 'assets/theme/styles';
 import PageContainer from 'components/PageContainer';
 import navigationService from 'utils/navigationService';
 import { useLanguage } from 'i18n/hooks';
+import { GamesList } from './GameData';
+import { CommonSection } from '../components/CommonSection';
+import GameItem from '../components/GameItem';
 
 export default function DiscoverHome() {
   const { t } = useLanguage();
@@ -17,10 +20,15 @@ export default function DiscoverHome() {
   }, []);
 
   return (
-    <PageContainer hideHeader safeAreaColor={['blue', 'white']} containerStyles={styles.container}>
+    <PageContainer
+      hideHeader
+      safeAreaColor={['blue', 'white']}
+      containerStyles={styles.container}
+      scrollViewProps={{ disabled: true }}>
       <View style={[BGStyles.bg5, styles.inputContainer]}>
         <CommonInput placeholder={t('Enter URL to explore')} onFocus={() => navigateToSearch()} />
       </View>
+      <CommonSection headerTitle="Games" data={GamesList} renderItem={itemData => <GameItem {...itemData} />} />
     </PageContainer>
   );
 }

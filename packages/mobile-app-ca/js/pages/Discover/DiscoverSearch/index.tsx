@@ -10,6 +10,9 @@ import { pTd } from 'utils/unit';
 import { TextM } from 'components/CommonText';
 import { useFocusEffect } from '@react-navigation/native';
 import Svg from 'components/Svg';
+import { CommonSection } from '../components/CommonSection';
+import RecordItem from '../components/RecordItem';
+import NoData from 'components/NoData';
 
 export default function DiscoverSearch() {
   const { t } = useLanguage();
@@ -57,6 +60,15 @@ export default function DiscoverSearch() {
           <TextM style={[FontStyles.font2, styles.cancelButton]}>{t('Cancel')}</TextM>
         </TouchableOpacity>
       </View>
+      {/* <NoData noPic message="There is no search result." /> */}
+      <CommonSection
+        headerTitle="Records"
+        data={[1]}
+        clearCallback={() => {
+          console.log('clear');
+        }}
+        renderItem={item => <RecordItem {...item} />}
+      />
     </PageContainer>
   );
 }
