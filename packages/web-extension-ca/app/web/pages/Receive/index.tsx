@@ -9,7 +9,7 @@ import TitleWrapper from 'components/TitleWrapper';
 import { useIsTestnet } from 'hooks/useNetwork';
 import PromptFrame from 'pages/components/PromptFrame';
 import QRCodeCommon from 'pages/components/QRCodeCommon';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import { useCommonState, useWalletInfo } from 'store/Provider/hooks';
 import './index.less';
@@ -59,7 +59,7 @@ export default function Receive() {
   );
 
   const { isPrompt } = useCommonState();
-  const mainContent = () => {
+  const mainContent = useCallback(() => {
     return (
       <div className={clsx(['receive-wrapper', isPrompt ? 'detail-page-prompt' : null])}>
         <TitleWrapper leftElement rightElement={rightElement} />
@@ -80,7 +80,7 @@ export default function Receive() {
         </div>
       </div>
     );
-  };
+  }, [caAddress, isPrompt, isTestNet, rightElement, state.chainId, symbol, value]);
 
   return <>{isPrompt ? <PromptFrame content={mainContent()} /> : mainContent()}</>;
 }
