@@ -1,4 +1,4 @@
-import { screenHeight, screenWidth, windowHeight } from '@portkey-wallet/utils/mobile/device';
+import { screenHeight, screenWidth, windowHeight, windowWidth } from '@portkey-wallet/utils/mobile/device';
 import { StyleSheet } from 'react-native';
 import { pTd } from 'utils/unit';
 
@@ -58,10 +58,12 @@ const styles = StyleSheet.create({
   },
   loading: {
     top: 0,
+    left: 0,
     position: 'absolute',
-    width: 250,
-    height: 250,
-    backgroundColor: '#ffffffee',
+    width: screenWidth - 32 - 40 - 32,
+    height: '100%',
+    backgroundColor: '#ffffff',
+    opacity: 0.96,
     zIndex: 999,
     alignItems: 'center',
     justifyContent: 'center',
