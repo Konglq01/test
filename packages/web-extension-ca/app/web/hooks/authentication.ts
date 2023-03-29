@@ -36,7 +36,7 @@ export function useVerifyAppleToken() {
     const { isExpired: tokenIsExpired } = parseAppleIdentityToken(accessToken) || {};
     if (!accessToken || tokenIsExpired) {
       const info = await socialLoginAction('Apple');
-      accessToken = info?.data?.accessToken || undefined;
+      accessToken = info?.data?.access_token || undefined;
     }
     const { userId } = parseAppleIdentityToken(accessToken) || {};
     if (userId !== params.id) throw new Error('Account does not match your guardian');
