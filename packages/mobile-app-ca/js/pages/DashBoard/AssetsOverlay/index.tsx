@@ -24,7 +24,6 @@ import { ChainId } from '@portkey-wallet/types';
 import { useGStyles } from 'assets/theme/useGStyles';
 import { useIsTestnet } from '@portkey-wallet/hooks/hooks-ca/network';
 import myEvents from 'utils/deviceEvent';
-import { getAWSUrlWithSize } from '@portkey-wallet/utils/img';
 
 type onFinishSelectTokenType = (tokenItem: any) => void;
 type TokenListProps = {
@@ -53,7 +52,7 @@ const AssetItem = (props: { symbol: string; onPress: (item: any) => void; item: 
     return (
       <TouchableOpacity style={itemStyle.wrap} onPress={() => onPress?.(item)}>
         {item.nftInfo.imageUrl ? (
-          <Image style={[itemStyle.left]} source={{ uri: getAWSUrlWithSize(item.nftInfo.imageUrl) }} />
+          <Image resizeMode={'contain'} style={[itemStyle.left]} source={{ uri: item?.nftInfo?.imageUrl }} />
         ) : (
           <Text style={[itemStyle.left, itemStyle.noPic]}>{item.symbol[0]}</Text>
         )}
