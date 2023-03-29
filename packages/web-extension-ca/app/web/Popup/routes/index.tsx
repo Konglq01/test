@@ -18,10 +18,11 @@ import GuardiansView from 'pages/Guardians/GuardiansView';
 import VerifierAccount from 'pages/VerifierAccount';
 import Unlock from 'pages/Unlock';
 import Contact from 'pages/Contacts/ContactDetail';
-import ManageDevices from 'pages/WalletSecurity/ManageDevices';
 import ConfirmPin from 'pages/AccountSetting/ConfirmPin';
 import WalletSecurity from 'pages/WalletSecurity';
 import SetNewPin from 'pages/AccountSetting/SetNewPin';
+import DeviceLists from 'pages/WalletSecurity/ManageDevices/DeviceLists';
+import DeviceDetail from 'pages/WalletSecurity/ManageDevices/DeviceDetail';
 
 export const PageRouter = () =>
   useRoutes([
@@ -111,7 +112,11 @@ export const PageRouter = () =>
     },
     {
       path: '/setting/wallet-security/manage-devices',
-      element: <ManageDevices />,
+      element: <DeviceLists />,
+    },
+    {
+      path: '/setting/wallet-security/manage-devices/:managerAddress',
+      element: <DeviceDetail />,
     },
     {
       path: '/setting/wallet-security/manage-devices/verifier-account',

@@ -8,7 +8,7 @@ import BackHeader from 'components/BackHeader';
 import PortKeyHeader from 'pages/components/PortKeyHeader';
 import { useLockWallet } from 'utils/lib/serviceWorkerAction';
 import { IconType } from 'types/icon';
-import { useCommonState } from 'store/Provider/hooks';
+// import { useCommonState } from 'store/Provider/hooks';
 import './index.less';
 
 interface MenuItemInfo {
@@ -21,7 +21,7 @@ export default function My() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const lockWallet = useLockWallet();
-  const { isPrompt } = useCommonState();
+  // const { isPrompt } = useCommonState();
 
   const MenuList: MenuItemInfo[] = useMemo(
     () => [
@@ -59,9 +59,9 @@ export default function My() {
     navigate('/unlock');
   }, [lockWallet, navigate]);
 
-  const handleExpandView = useCallback(() => {
-    // TODO
-  }, []);
+  // const handleExpandView = useCallback(() => {
+  //   // TODO
+  // }, []);
 
   return (
     <div className="flex-column my-frame">
@@ -82,7 +82,7 @@ export default function My() {
           {MenuList.map((item) => (
             <MenuItem
               key={item.label}
-              height={53}
+              height={56}
               icon={<CustomSvg type={item.icon || 'Aelf'} />}
               onClick={() => {
                 navigate(item.router);
@@ -91,7 +91,7 @@ export default function My() {
             </MenuItem>
           ))}
         </div>
-        {!isPrompt && (
+        {/* {!isPrompt && (
           <div className="btn flex-center">
             <Button type="link" onClick={handleExpandView}>
               <div className="flex-center">
@@ -101,7 +101,7 @@ export default function My() {
               </div>
             </Button>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

@@ -1,13 +1,16 @@
 import React, { memo } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Linking, StyleSheet, View } from 'react-native';
 import PageContainer from 'components/PageContainer';
 import Svg from 'components/Svg';
 import { pTd } from 'utils/unit';
 import { defaultColors } from 'assets/theme';
 import { useLanguage } from 'i18n/hooks';
-import { TextL, TextM, TextXXXL } from 'components/CommonText';
+import { TextM, TextXXXL } from 'components/CommonText';
 import * as Application from 'expo-application';
-import WalletMenuItem from '../components/WalletMenuItem';
+import MenuItem from '../../components/MenuItem';
+import Divider from 'components/Divider';
+import navigationService from 'utils/navigationService';
+import { OfficialWebsite } from '@portkey-wallet/constants/constants-ca/network';
 
 const AboutUs = () => {
   const { t } = useLanguage();
@@ -24,39 +27,31 @@ const AboutUs = () => {
       <TextM style={styles.version}>V {Application.nativeApplicationVersion}</TextM>
 
       <View style={styles.btnContainer}>
-        <WalletMenuItem
-          style={styles.innerBtnWrap}
+        <MenuItem
           icon="twitter"
-          size={28}
           title="Follow us on Twitter"
-          TextComponent={TextL}
-          arrowSize={20}
           onPress={() => {
-            //
+            Linking.openURL('https://twitter.com/Portkey_DID');
           }}
         />
-        <WalletMenuItem
-          style={styles.innerBtnWrap}
+        <Divider style={styles.dividerStyle} />
+        <MenuItem
           icon="discord"
-          size={28}
           title="Join us on Discord"
-          TextComponent={TextL}
-          arrowSize={20}
           onPress={() => {
-            //
+            Linking.openURL('https://discord.com/invite/EUBq3rHQhr');
           }}
         />
       </View>
 
-      <WalletMenuItem
-        style={styles.innerBtnWrap}
+      <MenuItem
         icon="terms"
-        size={28}
         title="Terms of Service"
-        TextComponent={TextL}
-        arrowSize={20}
         onPress={() => {
-          //
+          navigationService.navigate('ViewOnWebView', {
+            title: 'Terms of Service',
+            url: `${OfficialWebsite}/terms-of-service`,
+          });
         }}
       />
     </PageContainer>
@@ -72,6 +67,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     flex: 1,
+    paddingHorizontal: pTd(20),
   },
   logoWrap: {
     width: pTd(80),
@@ -100,5 +96,9 @@ export const styles = StyleSheet.create({
   },
   innerBtnWrap: {
     marginBottom: 0,
+  },
+  dividerStyle: {
+    marginVertical: pTd(4),
+    marginHorizontal: pTd(16),
   },
 });

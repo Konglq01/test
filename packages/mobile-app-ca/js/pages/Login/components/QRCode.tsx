@@ -24,6 +24,7 @@ import RQRCode from 'react-native-qrcode-svg';
 import { useIsFocused } from '@react-navigation/native';
 import { useGetDeviceInfo } from 'hooks/device';
 import { DEVICE_INFO_VERSION } from '@portkey-wallet/constants/constants-ca/device';
+import CommonQRCodeStyled from 'components/CommonQRCodeStyled';
 
 export default function QRCode({ setLoginType }: { setLoginType: (type: PageLoginType) => void }) {
   const { walletInfo, currentNetwork } = useCurrentWallet();
@@ -32,6 +33,7 @@ export default function QRCode({ setLoginType }: { setLoginType: (type: PageLogi
   const pin = usePin();
   const caInfo = useIntervalQueryCAInfoByAddress(currentNetwork, newWallet?.address);
   const isFocused = useIsFocused();
+
   useEffect(() => {
     if (!isFocused) return;
     if (caInfo && newWallet) {
@@ -68,7 +70,7 @@ export default function QRCode({ setLoginType }: { setLoginType: (type: PageLogi
       generateWallet();
     }, 10);
     let timer2: any;
-    myEvents.clearQRWallet.addListener(() => {
+    const listener = myEvents.clearQRWallet.addListener(() => {
       timer2 = setTimeout(() => {
         setNewWallet(undefined);
         timer2 && clearTimeout(timer2);
@@ -80,10 +82,13 @@ export default function QRCode({ setLoginType }: { setLoginType: (type: PageLogi
     return () => {
       timer && clearTimeout(timer);
       timer2 && clearTimeout(timer2);
+      listener.remove();
     };
   });
   const qrData = useMemo(() => {
-    if (!newWallet) return 'xxx';
+    if (!newWallet)
+      return '{"chainType":"aelf","type":"login","address":"2Aj8aTMsmgp1YyrVeCvB2dp9DbrLz5zgmAVmKNXsLnxhqzA69L","netWorkType":"TESTNET","extraData":{"deviceInfo":{"deviceType":2,"deviceName":"iOS"},"version":"1.0.0"}}';
+
     const data: LoginQRData = {
       // TODO: ethereum
       chainType: 'aelf',
@@ -95,8 +100,10 @@ export default function QRCode({ setLoginType }: { setLoginType: (type: PageLogi
         version: DEVICE_INFO_VERSION,
       },
     };
+
     return JSON.stringify(data);
   }, [currentNetwork, getDeviceInfo, newWallet]);
+
   return (
     <View style={[BGStyles.bg1, styles.card]}>
       <Touchable style={styles.iconBox} onPress={() => setLoginType(PageLoginType.referral)}>
@@ -110,7 +117,7 @@ export default function QRCode({ setLoginType }: { setLoginType: (type: PageLogi
             <TextL>Updating...</TextL>
           </View>
         )}
-        <RQRCode value={qrData} size={200} />
+        <CommonQRCodeStyled qrData={qrData} />
       </View>
     </View>
   );

@@ -24,6 +24,7 @@ import { GuardiansStatusItem } from '../types';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { request } from '@portkey-wallet/api/api-did';
 import { verification } from 'utils/api';
+import { useLanguage } from 'i18n/hooks';
 
 type RouterParams = {
   guardianItem?: UserGuardianItem;
@@ -57,6 +58,7 @@ export default function VerifierDetails() {
     verificationType,
   } = useRouterParams<RouterParams>();
   console.log(guardianItem, '=====guardianItem');
+  const { t } = useLanguage();
 
   const countdown = useRef<VerifierCountdownInterface>();
   useEffectOnce(() => {

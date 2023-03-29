@@ -12,7 +12,7 @@ import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type'
 import { useTranslation } from 'react-i18next';
 import { setUserGuardianSessionIdAction } from '@portkey-wallet/store/store-ca/guardians/actions';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
-import { LoginKeyType, LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import { useEffectOnce } from 'react-use';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verification } from 'utils/api';
@@ -56,7 +56,7 @@ export default function VerifierPage({ currentGuardian, guardianType, isInitStat
 
           const res = await checkVerificationCode({
             type: LoginType[currentGuardian?.guardianType as LoginType],
-            guardianIdentifier: currentGuardian.guardianAccount,
+            guardianIdentifier: currentGuardian.guardianAccount.replaceAll(' ', ''),
             verifierSessionId: currentGuardian.verifierInfo.sessionId,
             verificationCode: code,
             verifierId: currentGuardian.verifier?.id || '',
@@ -91,7 +91,7 @@ export default function VerifierPage({ currentGuardian, guardianType, isInitStat
       setLoading(true);
       const res = await verification.sendVerificationCode({
         params: {
-          guardianIdentifier: currentGuardian.guardianAccount,
+          guardianIdentifier: currentGuardian.guardianAccount.replaceAll(' ', ''),
           type: LoginType[guardianType],
           verifierId: currentGuardian.verifier?.id || '',
           chainId: DefaultChainId,
@@ -138,13 +138,19 @@ export default function VerifierPage({ currentGuardian, guardianType, isInitStat
     <div className={clsx('verifier-page-wrapper', isPrompt || 'popup-page')}>
       {currentGuardian?.isLoginAccount && <div className="login-icon">{t('Login Account')}</div>}
       <div className="flex-row-center login-account-wrapper">
-        <VerifierPair guardianType={currentGuardian?.guardianType} verifierSrc={currentGuardian?.verifier?.imageUrl} />
+        <VerifierPair
+          guardianType={currentGuardian?.guardianType}
+          verifierSrc={currentGuardian?.verifier?.imageUrl}
+          verifierName={currentGuardian?.verifier?.name}
+        />
         <span className="login-account">{currentGuardian?.guardianAccount || ''}</span>
       </div>
       <div className="send-tip">
         {isPrompt || 'Please contact your guardians, and enter '}
-        {t('sendCodeTip1', { codeCount: DIGIT_CODE.length })}&nbsp;
-        <span className="account">{currentGuardian?.guardianAccount}</span>
+        <span>{t('sendCodeTip1', { codeCount: DIGIT_CODE.length })}</span>
+        <span className="account">{`${LoginType.Phone === currentGuardian?.guardianType ? '+ ' : ''}${
+          currentGuardian?.guardianAccount
+        }`}</span>
         <br />
         {t('sendCodeTip2', { minute: DIGIT_CODE.expiration })}
       </div>

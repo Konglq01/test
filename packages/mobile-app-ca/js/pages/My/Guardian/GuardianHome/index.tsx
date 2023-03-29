@@ -37,9 +37,16 @@ export default function GuardianHome() {
     }
   }, [caHash, getGuardiansInfoWriteStore]);
 
+  const init = useCallback(async () => {
+    try {
+      await getVerifierServers();
+      refreshGuardiansList();
+    } catch (error) {
+      console.log(error, '==error');
+    }
+  }, [getVerifierServers, refreshGuardiansList]);
   useEffectOnce(() => {
-    getVerifierServers();
-    refreshGuardiansList();
+    init();
   });
 
   useEffect(() => {
@@ -64,6 +71,7 @@ export default function GuardianHome() {
       scrollViewProps={{ disabled: false }}
       rightDom={
         <TouchableOpacity
+          style={{ padding: pTd(16) }}
           onPress={() => {
             navigationService.navigate('GuardianEdit');
           }}>
@@ -94,6 +102,6 @@ const pageStyles = StyleSheet.create({
   pageWrap: {
     flex: 1,
     backgroundColor: defaultColors.bg1,
-    ...GStyles.paddingArg(24, 20),
+    ...GStyles.paddingArg(16, 20),
   },
 });

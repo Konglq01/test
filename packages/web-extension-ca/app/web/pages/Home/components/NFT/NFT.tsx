@@ -1,21 +1,25 @@
 import { useCaAddresses, useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
-import { clearNftItem, fetchNFTAsync, fetchNFTCollectionsAsync } from '@portkey-wallet/store/store-ca/assets/slice';
+import { fetchNFTAsync, fetchNFTCollectionsAsync } from '@portkey-wallet/store/store-ca/assets/slice';
 import { ChainId } from '@portkey-wallet/types';
 import { NFTCollectionItemShowType, NFTItemBaseType } from '@portkey-wallet/types/types-ca/assets';
 import { Collapse } from 'antd';
 import { List } from 'antd-mobile';
 import CustomSvg from 'components/CustomSvg';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import clsx from 'clsx';
-import { useAppDispatch, useAssetInfo } from 'store/Provider/hooks';
+import { useAppDispatch, useAssetInfo, useCommonState } from 'store/Provider/hooks';
 import './index.less';
 import { transNetworkText } from '@portkey-wallet/utils/activity';
 import { useIsTestnet } from 'hooks/useNetwork';
+import { NFT_MIDDLE_SIZE, PAGE_SIZE_IN_NFT_ITEM } from '@portkey-wallet/constants/constants-ca/assets';
+import { PAGE_SIZE_IN_NFT_ITEM_PROMPT } from 'constants/index';
+import { getAWSUrlWithSize } from '@portkey-wallet/utils/img';
 
 export default function NFT() {
   const nav = useNavigate();
   const [openPanel, setOpenPanel] = useState<string[]>([]);
+  const [nftNum, setNftNum] = useState<Record<string, number>>({});
   const isTestNet = useIsTestnet();
   const {
     accountNFT: { accountNFTList },
@@ -23,20 +27,24 @@ export default function NFT() {
   const dispatch = useAppDispatch();
   const caAddresses = useCaAddresses();
   const wallet = useCurrentWalletInfo();
+  const { isPrompt } = useCommonState();
+  const maxNftNum = useMemo(() => (isPrompt ? PAGE_SIZE_IN_NFT_ITEM_PROMPT : PAGE_SIZE_IN_NFT_ITEM), [isPrompt]);
 
   const getMore = useCallback(
     (symbol: string, chainId: string) => {
-      let pageNum = 0;
-      accountNFTList.forEach((nft) => {
-        if (nft.symbol === symbol) {
-          pageNum = nft.children.length;
-        }
-      });
+      const nftColKey = `${symbol}_${chainId}`;
+      const curNftNum = nftNum[nftColKey];
       dispatch(
-        fetchNFTAsync({ symbol, chainId: chainId as ChainId, caAddresses: [wallet[chainId].caAddress], pageNum }),
+        fetchNFTAsync({
+          symbol,
+          chainId: chainId as ChainId,
+          caAddresses: [wallet[chainId].caAddress],
+          pageNum: curNftNum,
+        }),
       );
+      setNftNum({ ...nftNum, [nftColKey]: curNftNum + 1 });
     },
-    [accountNFTList, dispatch, wallet],
+    [dispatch, nftNum, wallet],
   );
 
   const handleChange = useCallback(
@@ -44,7 +52,7 @@ export default function NFT() {
       const openArr = typeof arr === 'string' ? [arr] : arr;
       openPanel.forEach((prev: string) => {
         if (!openArr.some((cur: string) => cur === prev)) {
-          dispatch(clearNftItem({ symbol: prev.split('_')[0], chainId: prev.split('_')[1] }));
+          setNftNum({ ...nftNum, [prev]: 0 });
         }
       });
       openArr.forEach((cur: string) => {
@@ -58,26 +66,28 @@ export default function NFT() {
               pageNum: 0,
             }),
           );
+          setNftNum({ ...nftNum, [cur]: 1 });
         }
       });
       setOpenPanel(openArr);
     },
-    [dispatch, openPanel, wallet],
+    [dispatch, nftNum, openPanel, wallet],
   );
 
   useEffect(() => {
-    dispatch(fetchNFTCollectionsAsync({ caAddresses }));
-  }, [caAddresses, dispatch]);
+    dispatch(fetchNFTCollectionsAsync({ caAddresses, maxNFTCount: maxNftNum }));
+  }, [caAddresses, dispatch, maxNftNum]);
 
   const renderItem = useCallback(
     (nft: NFTCollectionItemShowType) => {
+      const nftColKey = `${nft.symbol}_${nft.chainId}`;
       return (
         <Collapse.Panel
-          key={`${nft.symbol}_${nft.chainId}`}
+          key={nftColKey}
           header={
             <div className="protocol">
               <div className="avatar">
-                {nft.imageUrl ? <img src={nft.imageUrl} /> : nft.collectionName?.slice(0, 1)}
+                {nft.imageUrl ? <img src={getAWSUrlWithSize(nft.imageUrl)} /> : nft.collectionName?.slice(0, 1)}
               </div>
               <div className="info">
                 <p className="alias">{nft.collectionName}</p>
@@ -87,26 +97,33 @@ export default function NFT() {
             </div>
           }>
           <div className="list">
-            {nft.children.length > 0 &&
-              nft.children.map((nftItem: NFTItemBaseType) => {
+            {!!nftNum[nftColKey] &&
+              nft.children.map((nftItem: NFTItemBaseType, index: number) => {
+                const curNftNum = nftNum[nftColKey] ?? 0;
                 return (
-                  <div
-                    key={`${nft.symbol}-${nftItem.symbol}`}
-                    style={{
-                      backgroundImage: `url('${nftItem.imageUrl}')`,
-                    }}
-                    className={clsx(['item', nftItem.imageUrl ? 'item-img' : ''])}
-                    onClick={() => {
-                      nav('/nft', { state: { ...nftItem, address: nftItem.tokenContractAddress, decimals: 0 } });
-                    }}>
-                    <div className="mask">
-                      <p className="alias">{nftItem.alias}</p>
-                      <p className="token-id">#{nftItem.tokenId}</p>
+                  index < curNftNum * maxNftNum && (
+                    <div
+                      key={`${nft.symbol}-${nftItem.symbol}`}
+                      style={{
+                        backgroundImage: `url('${getAWSUrlWithSize(
+                          nftItem.imageUrl,
+                          NFT_MIDDLE_SIZE,
+                          NFT_MIDDLE_SIZE,
+                        )}')`,
+                      }}
+                      className={clsx(['item', nftItem.imageUrl ? 'item-img' : ''])}
+                      onClick={() => {
+                        nav('/nft', { state: { ...nftItem, address: nftItem.tokenContractAddress, decimals: 0 } });
+                      }}>
+                      <div className="mask">
+                        <p className="alias">{nftItem.alias}</p>
+                        <p className="token-id">#{nftItem.tokenId}</p>
+                      </div>
                     </div>
-                  </div>
+                  )
                 );
               })}
-            {nft.totalRecordCount > nft.children.length && (
+            {!!nftNum[nftColKey] && nft.totalRecordCount > nftNum[nftColKey] * maxNftNum && (
               <div
                 className="load-more"
                 onClick={() => {
@@ -119,7 +136,7 @@ export default function NFT() {
         </Collapse.Panel>
       );
     },
-    [getMore, isTestNet, nav],
+    [getMore, isTestNet, maxNftNum, nav, nftNum],
   );
 
   return (

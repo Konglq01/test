@@ -3,7 +3,7 @@ import GStyles from 'assets/theme/GStyles';
 import { TextM } from 'components/CommonText';
 import Svg from 'components/Svg';
 import { useLanguage } from 'i18n/hooks';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { View, StyleSheet, TextInput } from 'react-native';
 import { TouchableOpacity } from 'react-native';
 import { formatStr2EllipsisStr } from '@portkey-wallet/utils';
@@ -15,10 +15,17 @@ interface ToProps {
   setSelectedToContact: (contact: any) => void;
   step: 1 | 2;
   setStep: (step: 1 | 2) => void;
+  setErrorMessage: any;
 }
 
-export default function To({ selectedToContact, setSelectedToContact, step, setStep }: ToProps) {
+export default function To({ setErrorMessage, selectedToContact, setSelectedToContact, step, setStep }: ToProps) {
   const { t } = useLanguage();
+
+  const clearInput = useCallback(() => {
+    setStep(1);
+    setSelectedToContact({ address: '', name: '' });
+    setErrorMessage?.([]);
+  }, [setErrorMessage, setSelectedToContact, setStep]);
 
   return (
     <View style={styles.toWrap}>
@@ -36,12 +43,7 @@ export default function To({ selectedToContact, setSelectedToContact, step, setS
           />
 
           {!!selectedToContact?.address && (
-            <TouchableOpacity
-              style={styles.iconWrap}
-              onPress={() => {
-                setStep(1);
-                setSelectedToContact({ address: '', title: '' });
-              }}>
+            <TouchableOpacity style={styles.iconWrap} onPress={() => clearInput()}>
               <Svg icon="clear2" size={pTd(16)} />
             </TouchableOpacity>
           )}
@@ -50,12 +52,7 @@ export default function To({ selectedToContact, setSelectedToContact, step, setS
         <View style={styles.middle}>
           <TextM style={styles.middleTitle}>{selectedToContact?.name || 'xxxx'}</TextM>
           <TextM style={styles.middleAddress}>{formatStr2EllipsisStr(selectedToContact?.address, 15)}</TextM>
-          <TouchableOpacity
-            style={styles.iconWrap}
-            onPress={() => {
-              setStep(1);
-              setSelectedToContact({ address: '', name: '' });
-            }}>
+          <TouchableOpacity style={styles.iconWrap} onPress={() => clearInput()}>
             <Svg icon="clear2" size={pTd(16)} />
           </TouchableOpacity>
         </View>
@@ -111,7 +108,7 @@ export const styles = StyleSheet.create({
   inputStyle: {
     color: defaultColors.font5,
     paddingRight: pTd(30),
-    fontSize: pTd(14),
+    fontSize: pTd(12),
   },
   right: {
     width: pTd(16),

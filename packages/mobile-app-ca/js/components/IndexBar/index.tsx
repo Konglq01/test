@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import React, { forwardRef, memo, useCallback, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import {
   StyleSheet,
   PanResponder,
@@ -11,7 +11,7 @@ import {
 import { TextL, TextS } from 'components/CommonText';
 import usePrevious from 'hooks/usePrevious';
 import isEqual from 'lodash/isEqual';
-import { ViewStyleType } from 'types/styles';
+import { TextStyleType, ViewStyleType } from 'types/styles';
 import { defaultColors } from 'assets/theme';
 import { pTd } from 'utils/unit';
 export interface IndexBarProps {
@@ -21,6 +21,7 @@ export interface IndexBarProps {
   indexTextStyle?: TextStyle;
   onPress?: (index: number) => void;
   showPopover?: boolean;
+  disableIndexSelect?: boolean;
 }
 interface PageLocationType {
   height: number;
@@ -42,7 +43,7 @@ interface PopoverInterface {
   setShow: (show?: boolean) => void;
 }
 
-export const Popover = forwardRef((_, _ref) => {
+export const Popover = forwardRef(function Popover(_, _ref) {
   const [show, setShow] = useState<boolean>();
   const [popoverInfo, setPopoverInfo] = useState<PopoverInfo>();
   const marginTop = useRef(new Animated.Value(0)).current;
@@ -64,27 +65,59 @@ export const Popover = forwardRef((_, _ref) => {
   );
   useImperativeHandle(_ref, () => ({ setPopoverInfo: onSetPopoverInfo, setShow }), [onSetPopoverInfo]);
 
-  if (!popoverInfo || !show) return null;
+  if (!popoverInfo || !popoverInfo.text || !show) return null;
   return (
     <Animated.View style={[styles.popover, { marginTop }]}>
       <TextL style={[styles.popoverItem]}>{popoverInfo.text}</TextL>
     </Animated.View>
   );
 });
-Popover.displayName = 'Popover';
 
-export default function IndexBar({
-  style,
-  data,
-  indexBarItemStyle,
-  indexTextStyle,
-  onPress,
-  showPopover,
-}: IndexBarProps) {
+const IndexBarItem = memo(
+  function IndexBarItem({
+    style,
+    indexTextStyle,
+    indexWrapSelectStyle,
+    indexTextSelectStyle,
+    indexWrapStyle,
+    text,
+    isSelected = false,
+  }: {
+    style?: ViewStyleType;
+    indexTextStyle?: TextStyleType;
+    indexWrapSelectStyle?: ViewStyleType;
+    indexTextSelectStyle?: TextStyleType;
+    indexWrapStyle?: ViewStyleType;
+    text: string;
+    isSelected?: boolean;
+  }) {
+    return (
+      <View style={[style]}>
+        <View style={[indexWrapStyle, isSelected && indexWrapSelectStyle]}>
+          <TextS style={[styles.indexTextStyle, indexTextStyle, isSelected && indexTextSelectStyle]}>{text}</TextS>
+        </View>
+      </View>
+    );
+  },
+  (prevPros, nextProps) => prevPros.isSelected === nextProps.isSelected,
+);
+
+export type IndexBarInterface = {
+  setSelectIndex: (selectIndex: number) => void;
+};
+
+const IndexBar = forwardRef(function IndexBar(
+  { style, data, indexBarItemStyle, indexTextStyle, onPress, showPopover, disableIndexSelect = false }: IndexBarProps,
+  forwardedRef,
+) {
   const indexInfoRef = useRef<IndexInfoType>();
   const indexRef = useRef<View>(null);
   const popoverRef = useRef<PopoverInterface>();
   const prevData = usePrevious(data);
+
+  const [outsideSelectIndex, setOutsideSelectIndex] = useState(0);
+  const [scrollSelectIndex, setScrollSelectIndex] = useState(-1);
+
   const getIndex = useCallback((nativePageY: number) => {
     if (!indexInfoRef.current) return;
     const { pageY, height, indexHeight } = indexInfoRef.current;
@@ -92,6 +125,18 @@ export default function IndexBar({
     if (nativeClientY < 0 || nativeClientY > height) return;
     return Math.floor(nativeClientY / indexHeight);
   }, []);
+  const selectIndex = useMemo(
+    () => (scrollSelectIndex !== -1 ? scrollSelectIndex : outsideSelectIndex),
+    [outsideSelectIndex, scrollSelectIndex],
+  );
+
+  useImperativeHandle(
+    forwardedRef,
+    () => ({
+      setSelectIndex: setOutsideSelectIndex,
+    }),
+    [],
+  );
 
   const setCurrentIndex = useCallback(
     (nativePageY: number) => {
@@ -102,6 +147,7 @@ export default function IndexBar({
         indexInfoRef.current.currentIndex = nowIndex;
         onPress?.(nowIndex);
         popoverRef.current?.setPopoverInfo({ top: nowIndex * indexHeight, text: data[nowIndex], indexHeight });
+        setScrollSelectIndex(nowIndex);
       }
     },
     [data, getIndex, onPress],
@@ -152,6 +198,7 @@ export default function IndexBar({
         onPanResponderEnd: () => {
           popoverRef.current?.setPopoverInfo(undefined);
           popoverRef.current?.setShow(false);
+          setScrollSelectIndex(-1);
         },
       }),
     [onPanResponderStart, setCurrentIndex],
@@ -159,12 +206,19 @@ export default function IndexBar({
   const indexBarItem = useCallback(
     (item: string, index: number) => {
       return (
-        <View key={index} style={[styles.indexBarItemStyle, indexBarItemStyle]}>
-          <TextS style={[styles.indexTextStyle, indexTextStyle]}>{item}</TextS>
-        </View>
+        <IndexBarItem
+          key={index}
+          isSelected={!disableIndexSelect && selectIndex === index}
+          style={[styles.indexBarItemStyle, indexBarItemStyle]}
+          indexTextStyle={indexTextStyle}
+          indexWrapStyle={styles.indexWrapStyle}
+          indexWrapSelectStyle={styles.indexWrapSelectStyle}
+          indexTextSelectStyle={styles.indexTextSelectStyle}
+          text={item}
+        />
       );
     },
-    [indexBarItemStyle, indexTextStyle],
+    [disableIndexSelect, indexBarItemStyle, indexTextStyle, selectIndex],
   );
   return (
     <View style={[styles.barBox, style]} ref={indexRef} {...panResponder.panHandlers}>
@@ -172,11 +226,17 @@ export default function IndexBar({
       {data?.map(indexBarItem)}
     </View>
   );
-}
+});
+
+export default IndexBar;
 
 const styles = StyleSheet.create({
   indexTextStyle: {
     color: defaultColors.font3,
+    width: pTd(15),
+    height: pTd(15),
+    lineHeight: pTd(15),
+    textAlign: 'center',
   },
   indexBarItemStyle: {
     flex: 1,
@@ -199,5 +259,17 @@ const styles = StyleSheet.create({
   barBox: {
     position: 'absolute',
     right: pTd(4),
+  },
+  indexWrapStyle: {
+    width: pTd(15),
+    height: pTd(15),
+    borderRadius: pTd(7.5),
+    overflow: 'hidden',
+  },
+  indexWrapSelectStyle: {
+    backgroundColor: defaultColors.bg5,
+  },
+  indexTextSelectStyle: {
+    color: defaultColors.font11,
   },
 });

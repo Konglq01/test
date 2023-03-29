@@ -33,10 +33,13 @@ const DeviceDetail: React.FC = () => {
       containerStyles={pageStyles.pageWrap}
       scrollViewProps={{ disabled: true }}>
       <View>
-        {deviceItem && <DeviceItem deviceItem={deviceItem} isCurrent={isCurrent} />}
-        <TextM style={[FontStyles.font3, pageStyles.tipsWrap]}>
-          {`Your account is logged in on this device. You may delete this device to remove its access to your account. You'll need to verify your identity through your guardians next time you log in to Portkey from this device.`}
-        </TextM>
+        {deviceItem && <DeviceItem deviceItem={deviceItem} isCurrent={isCurrent} isShowArrow={false} />}
+        {!isCurrent && (
+          <TextM style={[FontStyles.font3, pageStyles.tipsWrap]}>
+            {`Your account is logged in on this device and you can remove it to revoke its access to your account.
+Please note that after removing this device, you will need to verify your identity through your guardians when you log in again.`}
+          </TextM>
+        )}
       </View>
       {!isCurrent && (
         <CommonButton
@@ -49,7 +52,7 @@ const DeviceDetail: React.FC = () => {
               removeManagerAddress: deviceItem?.managerAddress,
             });
           }}>
-          Delete Device
+          Remove Device
         </CommonButton>
       )}
     </PageContainer>

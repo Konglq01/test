@@ -9,7 +9,6 @@ import GuardianApproval from 'pages/GuardianApproval';
 import Unlock from 'pages/Unlock';
 import QueryPage from 'pages/QueryPage';
 import TestSocket from 'pages/TestSocket';
-import ManageDevices from 'pages/WalletSecurity/ManageDevices';
 import ConfirmPin from 'pages/AccountSetting/ConfirmPin';
 import NotFound from 'pages/NotFound';
 import Example from 'pages/Example';
@@ -138,10 +137,6 @@ export const PageRouter = () =>
           path: '/setting/security',
           element: <WalletSecurity />,
           children: [
-            {
-              path: '/setting/security/manage-devices',
-              element: <ManageDevices />,
-            },
             {
               path: '/setting/security/manage-devices/verifier-account',
               element: <VerifierAccount />,

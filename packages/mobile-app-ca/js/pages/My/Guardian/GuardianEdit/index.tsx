@@ -2,7 +2,7 @@ import GStyles from 'assets/theme/GStyles';
 import CommonButton from 'components/CommonButton';
 import { TextL, TextM, TextS } from 'components/CommonText';
 import Svg from 'components/Svg';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Text, View } from 'react-native';
 import { pTd } from 'utils/unit';
 import navigationService from 'utils/navigationService';
@@ -14,10 +14,11 @@ import CommonInput from 'components/CommonInput';
 import { checkEmail } from '@portkey-wallet/utils/check';
 import { useGuardiansInfo } from 'hooks/store';
 import { LOGIN_TYPE_LIST } from '@portkey-wallet/constants/verifier';
+import { PRIVATE_GUARDIAN_ACCOUNT } from '@portkey-wallet/constants/constants-ca/guardian';
 import { ApprovalType, VerificationType, VerifierItem } from '@portkey-wallet/types/verifier';
 import { INIT_HAS_ERROR, INIT_NONE_ERROR } from 'constants/common';
-import GuardianTypeSelectOverlay from 'pages/Guardian/components/GuardianTypeSelectOverlay';
-import VerifierSelectOverlay from 'pages/Guardian/components/VerifierSelectOverlay';
+import GuardianTypeSelectOverlay from '../components/GuardianTypeSelectOverlay';
+import VerifierSelectOverlay from '../components/VerifierSelectOverlay';
 import ActionSheet from 'components/ActionSheet';
 import { ErrorType } from 'types/common';
 import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type';
@@ -25,18 +26,40 @@ import { FontStyles } from 'assets/theme/styles';
 import Loading from 'components/Loading';
 import CommonToast from 'components/CommonToast';
 import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
-import { LoginKeyType, LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import { useAppDispatch } from 'store/hooks';
 import { setPreGuardianAction } from '@portkey-wallet/store/store-ca/guardians/actions';
 import { VerifierImage } from 'pages/Guardian/components/VerifierImage';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verification } from 'utils/api';
 import fonts from 'assets/theme/fonts';
+import PhoneInput from 'components/PhoneInput';
+import { CountryItem } from '@portkey-wallet/types/types-ca/country';
+import { DefaultCountry } from '@portkey-wallet/constants/constants-ca/country';
+import Touchable from 'components/Touchable';
+import {
+  AppleAuthentication,
+  useAppleAuthentication,
+  useGoogleAuthentication,
+  useVerifyToken,
+} from 'hooks/authentication';
+import GuardianAccountItem from '../components/GuardianAccountItem';
+import { request } from '@portkey-wallet/api/api-did';
+import verificationApiConfig from '@portkey-wallet/api/api-did/verification';
+import { DEVICE_TYPE } from 'constants/common';
+import { DeviceType } from '@portkey-wallet/types/types-ca/device';
 
 type RouterParams = {
   guardian?: UserGuardianItem;
   isEdit?: boolean;
 };
+
+type thirdPartyInfoType = {
+  id: string;
+  accessToken: string;
+};
+
+type TypeItemType = typeof LOGIN_TYPE_LIST[number];
 
 const GuardianEdit: React.FC = () => {
   const { t } = useLanguage();
@@ -47,74 +70,158 @@ const GuardianEdit: React.FC = () => {
   const { verifierMap, userGuardiansList } = useGuardiansInfo();
   const verifierList = useMemo(() => (verifierMap ? Object.values(verifierMap) : []), [verifierMap]);
 
-  const [selectedType, setSelectedType] = useState<typeof LOGIN_TYPE_LIST[number]>();
+  const loginTypeList = useMemo(() => {
+    if (DEVICE_TYPE !== DeviceType.ANDROID) return LOGIN_TYPE_LIST;
+    return LOGIN_TYPE_LIST.filter(item => item.value !== LoginType.Apple);
+  }, []);
+
+  const [selectedType, setSelectedType] = useState<TypeItemType>();
   const [selectedVerifier, setSelectedVerifier] = useState<VerifierItem>();
-  const [email, setEmail] = useState<string>();
+  const [account, setAccount] = useState<string>();
   const [guardianTypeError, setGuardianTypeError] = useState<ErrorType>({ ...INIT_HAS_ERROR });
   const [guardianError, setGuardianError] = useState<ErrorType>({ ...INIT_NONE_ERROR });
+  const [country, setCountry] = useState<CountryItem>(DefaultCountry);
+  const { appleSign } = useAppleAuthentication();
+  const { googleSign } = useGoogleAuthentication();
+  const verifyToken = useVerifyToken();
+  const [firstName, setFirstName] = useState<string>();
+
+  const thirdPartyInfoRef = useRef<thirdPartyInfoType>();
 
   useEffect(() => {
     if (editGuardian) {
       setSelectedType(LOGIN_TYPE_LIST.find(item => item.value === editGuardian?.guardianType));
-      setEmail(editGuardian?.guardianAccount);
+      if ([LoginType.Apple, LoginType.Google].includes(editGuardian.guardianType)) {
+        setAccount(editGuardian.isPrivate ? PRIVATE_GUARDIAN_ACCOUNT : editGuardian.thirdPartyEmail);
+      } else {
+        setAccount(editGuardian.guardianAccount);
+      }
       setSelectedVerifier(verifierList.find(item => item.name === editGuardian?.verifier?.name));
     }
   }, [editGuardian, verifierList]);
 
-  const onEmailTextChange = useCallback(
-    (value: string) => {
-      const _value = value.trim();
-      if (_value === '') {
-        setGuardianTypeError({ ...INIT_HAS_ERROR, errorMsg: t(' Please enter email address') });
-      }
-      setEmail(value);
-      setGuardianTypeError({ ...INIT_NONE_ERROR });
-    },
-    [t],
-  );
+  const onAccountChange = useCallback((value: string) => {
+    setAccount(value);
+    setGuardianTypeError({ ...INIT_NONE_ERROR });
+  }, []);
 
-  const onSelectedVerifier = useCallback((item: VerifierItem) => {
+  const onChooseVerifier = useCallback((item: VerifierItem) => {
     setGuardianError({ ...INIT_NONE_ERROR });
     setSelectedVerifier(item);
   }, []);
 
   const checkCurGuardianRepeat = useCallback(() => {
-    if (
-      userGuardiansList?.findIndex(
-        guardian =>
-          guardian.guardianType === selectedType?.value &&
-          guardian.guardianAccount === email &&
-          guardian.verifier?.id === selectedVerifier?.id,
-      ) !== -1
-    ) {
-      return { ...INIT_HAS_ERROR, errorMsg: t('This guardian already exists') };
-    } else {
-      return { ...INIT_NONE_ERROR };
+    if (!selectedType) {
+      return { ...INIT_HAS_ERROR };
     }
-  }, [email, selectedType, selectedVerifier, t, userGuardiansList]);
+    if (selectedType.value === LoginType.Email) {
+      if (
+        userGuardiansList?.findIndex(
+          guardian =>
+            guardian.guardianType === selectedType?.value &&
+            guardian.guardianAccount === account &&
+            guardian.verifier?.id === selectedVerifier?.id,
+        ) !== -1
+      ) {
+        return { ...INIT_HAS_ERROR, errorMsg: t('This guardian already exists') };
+      } else {
+        return { ...INIT_NONE_ERROR };
+      }
+    }
 
-  const onConfirm = useCallback(() => {
-    const guardianErrorMsg = checkEmail(email);
-    if (guardianErrorMsg) {
-      setGuardianTypeError({
-        isError: true,
-        errorMsg: guardianErrorMsg,
+    if ([LoginType.Apple, LoginType.Google].includes(selectedType.value)) {
+      const guardianAccount = isEdit ? editGuardian?.guardianAccount : thirdPartyInfoRef.current?.id;
+      if (
+        userGuardiansList?.findIndex(
+          guardian =>
+            guardian.guardianType === selectedType?.value &&
+            guardian.guardianAccount === guardianAccount &&
+            guardian.verifier?.id === selectedVerifier?.id,
+        ) !== -1
+      ) {
+        return { ...INIT_HAS_ERROR, errorMsg: t('This guardian already exists') };
+      } else {
+        return { ...INIT_NONE_ERROR };
+      }
+    }
+    return { ...INIT_NONE_ERROR };
+  }, [account, editGuardian?.guardianAccount, isEdit, selectedType, selectedVerifier?.id, t, userGuardiansList]);
+
+  const thirdPartyConfirm = useCallback(
+    async (
+      guardianAccount: string,
+      thirdPartyInfo: thirdPartyInfoType,
+      verifierInfo: VerifierItem,
+      guardianType: LoginType,
+    ) => {
+      const rst = await verifyToken(guardianType, {
+        accessToken: thirdPartyInfo.accessToken,
+        id: thirdPartyInfo.id,
+        verifierId: verifierInfo.id,
+        chainId: DefaultChainId,
       });
-      setGuardianError({ ...INIT_NONE_ERROR });
-      return;
+      Loading.hide();
+
+      navigationService.navigate('GuardianApproval', {
+        approvalType: ApprovalType.addGuardian,
+        guardianItem: {
+          isLoginAccount: false,
+          verifier: verifierInfo,
+          guardianAccount,
+          guardianType,
+        },
+        verifierInfo: {
+          ...rst,
+          verifierId: verifierInfo.id,
+        },
+        verifiedTime: Date.now(),
+        authenticationInfo: { [thirdPartyInfo.id]: thirdPartyInfo.accessToken },
+      });
+    },
+    [verifyToken],
+  );
+
+  const onConfirm = useCallback(async () => {
+    if (selectedVerifier === undefined || selectedType === undefined) return;
+    const guardianType = selectedType.value;
+    let guardianAccount = account;
+    if (guardianType === LoginType.Phone) {
+      guardianAccount = `+${country.code} ${account}`;
+    }
+    if (guardianType === LoginType.Email) {
+      const guardianErrorMsg = checkEmail(account);
+      if (guardianErrorMsg) {
+        setGuardianTypeError({
+          isError: true,
+          errorMsg: guardianErrorMsg,
+        });
+        setGuardianError({ ...INIT_NONE_ERROR });
+        return;
+      }
     }
 
     const _guardianError = checkCurGuardianRepeat();
     setGuardianError(_guardianError);
     if (_guardianError.isError) return;
-    if (selectedVerifier === undefined || selectedType === undefined) return;
+
+    if ([LoginType.Apple, LoginType.Google].includes(guardianType)) {
+      if (!thirdPartyInfoRef.current) return;
+      try {
+        Loading.show();
+        await thirdPartyConfirm(guardianAccount || '', thirdPartyInfoRef.current, selectedVerifier, guardianType);
+      } catch (error) {
+        CommonToast.failError(error);
+      }
+      Loading.hide();
+      return;
+    }
 
     ActionSheet.alert({
       title2: (
         <Text>
           <TextL>{`${selectedVerifier.name} will send a verification code to `}</TextL>
-          <TextL style={fonts.mediumFont}>{email}</TextL>
-          <TextL>{` to verify your email address.`}</TextL>
+          <TextL style={fonts.mediumFont}>{guardianAccount}</TextL>
+          <TextL>{` to verify your ${guardianType === LoginType.Phone ? 'phone number' : 'email address'}.`}</TextL>
         </Text>
       ),
       buttons: [
@@ -127,29 +234,31 @@ const GuardianEdit: React.FC = () => {
           onPress: async () => {
             try {
               Loading.show();
-              const req = await verification.sendVerificationCode({
-                params: {
-                  type: LoginType[selectedType.value],
-                  guardianIdentifier: email,
-                  verifierId: selectedVerifier.id,
-                  chainId: DefaultChainId,
-                },
-              });
-              if (req.verifierSessionId) {
-                navigationService.navigate('VerifierDetails', {
-                  guardianItem: {
-                    isLoginAccount: false,
-                    verifier: selectedVerifier,
-                    guardianAccount: email,
-                    guardianType: LoginType.Email,
+              if ([LoginType.Email, LoginType.Phone].includes(guardianType)) {
+                const req = await verification.sendVerificationCode({
+                  params: {
+                    type: LoginType[guardianType],
+                    guardianIdentifier: guardianAccount,
+                    verifierId: selectedVerifier.id,
+                    chainId: DefaultChainId,
                   },
-                  requestCodeResult: {
-                    verifierSessionId: req.verifierSessionId,
-                  },
-                  verificationType: VerificationType.addGuardian,
                 });
-              } else {
-                throw new Error('send fail');
+                if (req.verifierSessionId) {
+                  navigationService.navigate('VerifierDetails', {
+                    guardianItem: {
+                      isLoginAccount: false,
+                      verifier: selectedVerifier,
+                      guardianAccount,
+                      guardianType: guardianType,
+                    },
+                    requestCodeResult: {
+                      verifierSessionId: req.verifierSessionId,
+                    },
+                    verificationType: VerificationType.addGuardian,
+                  });
+                } else {
+                  throw new Error('send fail');
+                }
               }
             } catch (error) {
               CommonToast.failError(error);
@@ -159,7 +268,7 @@ const GuardianEdit: React.FC = () => {
         },
       ],
     });
-  }, [checkCurGuardianRepeat, email, selectedType, selectedVerifier, t]);
+  }, [selectedVerifier, selectedType, account, checkCurGuardianRepeat, t, country.code, thirdPartyConfirm]);
 
   const onApproval = useCallback(() => {
     const _guardianError = checkCurGuardianRepeat();
@@ -212,14 +321,191 @@ const GuardianEdit: React.FC = () => {
   }, [editGuardian, t]);
 
   const isConfirmDisable = useMemo(
-    () => !selectedVerifier || !selectedType || !email,
-    [email, selectedType, selectedVerifier],
+    () => !selectedVerifier || !selectedType || !account,
+    [account, selectedType, selectedVerifier],
   );
 
   const isApprovalDisable = useMemo(
     () => selectedVerifier?.id === editGuardian?.verifier?.id,
     [editGuardian, selectedVerifier],
   );
+
+  const onChooseType = useCallback((_type: TypeItemType) => {
+    setSelectedType(_type);
+    setAccount(undefined);
+    setFirstName(undefined);
+    thirdPartyInfoRef.current = undefined;
+    setGuardianError({ ...INIT_NONE_ERROR });
+  }, []);
+
+  const onAppleSign = useCallback(async () => {
+    Loading.show();
+    let userInfo: AppleAuthentication;
+    try {
+      userInfo = await appleSign();
+      thirdPartyInfoRef.current = {
+        id: userInfo.user.id,
+        accessToken: userInfo.identityToken || '',
+      };
+    } catch (error) {
+      CommonToast.failError(error);
+      Loading.hide();
+      return;
+    }
+
+    Loading.show();
+    try {
+      const appleUserExtraInfo: {
+        email: string;
+        firstName: string | null;
+        fullName: string | null;
+        guardianType: string;
+        id: string;
+        isPrivate: boolean;
+        lastName: string | null;
+      } = await request.verify.getAppleUserExtraInfo({
+        url: `${verificationApiConfig.getAppleUserExtraInfo.target}/${userInfo.user.id}`,
+      });
+
+      setFirstName(appleUserExtraInfo.firstName || undefined);
+      if (appleUserExtraInfo.isPrivate) {
+        setAccount(PRIVATE_GUARDIAN_ACCOUNT);
+      } else {
+        setAccount(appleUserExtraInfo.email);
+      }
+    } catch (error) {
+      if (!userInfo) return;
+      setFirstName(userInfo.fullName?.givenName || undefined);
+      if (userInfo.user.isPrivate) {
+        setAccount(PRIVATE_GUARDIAN_ACCOUNT);
+      } else {
+        setAccount(userInfo.user.email);
+      }
+    }
+    Loading.hide();
+  }, [appleSign]);
+
+  const onGoogleSign = useCallback(async () => {
+    Loading.show();
+    try {
+      const userInfo = await googleSign();
+      setAccount(userInfo.user.email);
+      setFirstName(userInfo.user.givenName || undefined);
+      thirdPartyInfoRef.current = {
+        id: userInfo.user.id,
+        accessToken: userInfo.accessToken,
+      };
+    } catch (error) {
+      CommonToast.failError(error);
+    }
+    Loading.hide();
+  }, [googleSign]);
+
+  const renderGoogleAccount = useCallback(() => {
+    return (
+      <>
+        <TextM style={pageStyles.accountLabel}>Guardian Google</TextM>
+        {account ? (
+          <View style={pageStyles.thirdPartAccount}>
+            {firstName && <TextM style={pageStyles.firstNameStyle}>{firstName}</TextM>}
+            <TextM style={[!!firstName && FontStyles.font3]} numberOfLines={1}>
+              {account}
+            </TextM>
+          </View>
+        ) : (
+          <Touchable onPress={onGoogleSign}>
+            <View style={pageStyles.oAuthBtn}>
+              <TextM style={[FontStyles.font4, fonts.mediumFont]}>Click Add Google Account</TextM>
+            </View>
+          </Touchable>
+        )}
+      </>
+    );
+  }, [account, firstName, onGoogleSign]);
+
+  const renderAppleAccount = useCallback(() => {
+    return (
+      <>
+        <TextM style={pageStyles.accountLabel}>Guardian Apple</TextM>
+        {account ? (
+          <View style={pageStyles.thirdPartAccount}>
+            {firstName && <TextM style={pageStyles.firstNameStyle}>{firstName}</TextM>}
+            <TextM style={[!!firstName && FontStyles.font3]} numberOfLines={1}>
+              {account}
+            </TextM>
+          </View>
+        ) : (
+          <Touchable onPress={onAppleSign}>
+            <View style={pageStyles.oAuthBtn}>
+              <TextM style={[FontStyles.font4, fonts.mediumFont]}>Click Add Apple ID</TextM>
+            </View>
+          </Touchable>
+        )}
+      </>
+    );
+  }, [account, firstName, onAppleSign]);
+
+  const renderGuardianAccount = useCallback(() => {
+    if (isEdit) {
+      return (
+        <View style={pageStyles.accountWrap}>
+          <TextM style={pageStyles.accountLabel}>Guardian Apple</TextM>
+          <GuardianAccountItem guardian={editGuardian} />
+        </View>
+      );
+    }
+
+    if (!selectedType) return <></>;
+
+    switch (selectedType.value) {
+      case LoginType.Email:
+        return (
+          <CommonInput
+            disabled={isEdit}
+            type="general"
+            theme="white-bg"
+            label={t('Guardian email')}
+            value={account}
+            placeholder={t('Enter email')}
+            maxLength={30}
+            onChangeText={onAccountChange}
+            errorMessage={guardianTypeError.isError ? guardianTypeError.errorMsg : ''}
+            keyboardType="email-address"
+          />
+        );
+      case LoginType.Phone:
+        return (
+          <PhoneInput
+            label={t('Guardian Phone')}
+            theme="white-bg"
+            value={account}
+            errorMessage={guardianTypeError.isError ? guardianTypeError.errorMsg : ''}
+            onChangeText={onAccountChange}
+            selectCountry={country}
+            onCountryChange={setCountry}
+          />
+        );
+      case LoginType.Google:
+        return renderGoogleAccount();
+      case LoginType.Apple:
+        return renderAppleAccount();
+      default:
+        break;
+    }
+    return <></>;
+  }, [
+    account,
+    country,
+    editGuardian,
+    guardianTypeError.errorMsg,
+    guardianTypeError.isError,
+    isEdit,
+    onAccountChange,
+    renderAppleAccount,
+    renderGoogleAccount,
+    selectedType,
+    t,
+  ]);
 
   return (
     <PageContainer
@@ -231,60 +517,50 @@ const GuardianEdit: React.FC = () => {
       <View style={pageStyles.contentWrap}>
         {!isEdit && (
           <>
-            <TextM style={[pageStyles.titleLabel, GStyles.marginArg(0, 0, 8, 8)]}>{t('Guardian Type')}</TextM>
+            <TextM style={pageStyles.titleLabel}>{t('Guardian Type')}</TextM>
             <ListItem
               onPress={() => {
                 GuardianTypeSelectOverlay.showList({
-                  list: LOGIN_TYPE_LIST,
+                  list: loginTypeList,
                   labelAttrName: 'name',
                   value: selectedType?.value,
-                  callBack: setSelectedType,
+                  callBack: onChooseType,
                 });
               }}
-              titleStyle={[GStyles.flexRow, GStyles.itemCenter]}
-              titleTextStyle={pageStyles.titleTextStyle}
-              style={GStyles.marginBottom(24)}
+              titleStyle={[GStyles.flexRowWrap, GStyles.itemCenter]}
+              titleTextStyle={[pageStyles.titleTextStyle, !selectedType && FontStyles.font7]}
+              style={pageStyles.typeWrap}
+              titleLeftElement={
+                selectedType?.icon && <Svg icon={selectedType.icon} size={pTd(28)} iconStyle={pageStyles.typeIcon} />
+              }
               title={selectedType?.name || t('Select guardian types')}
-              rightElement={<Svg size={pTd(16)} icon="down-arrow" />}
+              rightElement={<Svg size={pTd(20)} icon="down-arrow" />}
             />
           </>
         )}
 
-        {selectedType && selectedType.value === LoginType.Email && (
-          <CommonInput
-            disabled={isEdit}
-            type="general"
-            theme="white-bg"
-            label={t("Guardian's email")}
-            value={email}
-            placeholder={t('Enter email')}
-            maxLength={30}
-            onChangeText={onEmailTextChange}
-            errorMessage={guardianTypeError.isError ? guardianTypeError.errorMsg : ''}
-            keyboardType="email-address"
-          />
-        )}
+        {renderGuardianAccount()}
 
-        <TextM style={[pageStyles.titleLabel, GStyles.marginArg(0, 0, 8, 8)]}>{t('Verifier')}</TextM>
+        <TextM style={pageStyles.titleLabel}>{t('Verifier')}</TextM>
         <ListItem
           onPress={() => {
             VerifierSelectOverlay.showList({
               id: selectedVerifier?.id,
               labelAttrName: 'name',
               list: verifierList,
-              callBack: onSelectedVerifier,
+              callBack: onChooseVerifier,
             });
           }}
           titleLeftElement={
             selectedVerifier && (
-              <VerifierImage style={GStyles.marginRight(12)} size={pTd(30)} uri={selectedVerifier.imageUrl} />
+              <VerifierImage style={pageStyles.verifierImageStyle} size={pTd(30)} uri={selectedVerifier.imageUrl} />
             )
           }
-          titleStyle={[GStyles.flexRow, GStyles.itemCenter]}
-          titleTextStyle={pageStyles.titleTextStyle}
-          style={GStyles.marginBottom(4)}
+          titleStyle={[GStyles.flexRowWrap, GStyles.itemCenter]}
+          titleTextStyle={[pageStyles.titleTextStyle, !selectedVerifier && FontStyles.font7]}
+          style={pageStyles.verifierWrap}
           title={selectedVerifier?.name || t('Select guardian verifiers')}
-          rightElement={<Svg size={pTd(16)} icon="down-arrow" />}
+          rightElement={<Svg size={pTd(20)} icon="down-arrow" />}
         />
         {guardianError.isError && <TextS style={pageStyles.errorTips}>{guardianError.errorMsg || ''}</TextS>}
       </View>
@@ -295,7 +571,11 @@ const GuardianEdit: React.FC = () => {
             <CommonButton disabled={isApprovalDisable} type="primary" onPress={onApproval}>
               {t('Send Request')}
             </CommonButton>
-            <CommonButton style={GStyles.marginTop(8)} type="clear" onPress={onRemove} titleStyle={FontStyles.font12}>
+            <CommonButton
+              style={pageStyles.removeBtnWrap}
+              type="clear"
+              onPress={onRemove}
+              titleStyle={FontStyles.font12}>
               {t('Remove')}
             </CommonButton>
           </>

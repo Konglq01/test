@@ -5,6 +5,7 @@ export type ActivityStateType = {
   activityMap: ActivityStateMap;
   isFetchingActivities: boolean;
   failedActivityMap: { [transactionId: string]: the2ThFailedActivityItemType };
+  isLoading?: boolean;
 };
 
 export type ActivityStateMap = {

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect, useRef } from 'react';
 import { View } from 'react-native';
 import { handleErrorMessage } from '@portkey-wallet/utils';
 import { checkEmail } from '@portkey-wallet/utils/check';
@@ -15,7 +15,9 @@ import { PageLoginType, PageType } from '../types';
 import { useOnLogin } from 'hooks/login';
 import TermsServiceButton from './TermsServiceButton';
 import Button from './Button';
-import { pTd } from 'utils/unit';
+import { useFocusEffect } from '@react-navigation/native';
+
+let timer: string | number | NodeJS.Timeout | undefined;
 
 const TitleMap = {
   [PageType.login]: {
@@ -34,6 +36,8 @@ export default function Email({
   type?: PageType;
 }) {
   const { t } = useLanguage();
+  const iptRef = useRef<any>();
+
   const [loading] = useState<boolean>();
   const [loginAccount, setLoginAccount] = useState<string>();
   const [errorMessage, setErrorMessage] = useState<string>();
@@ -58,14 +62,29 @@ export default function Email({
     });
     return () => listener.remove();
   });
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!iptRef || !iptRef?.current) return;
+      timer = setTimeout(() => {
+        iptRef.current.focus();
+      }, 200);
+    }, []),
+  );
+
+  useEffect(() => {
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <View style={[BGStyles.bg1, styles.card, GStyles.itemCenter]}>
       <View style={GStyles.width100}>
-        <View style={[GStyles.flexRow, GStyles.marginBottom(24)]}>
-          <Button title="Phone" style={GStyles.marginRight(pTd(8))} onPress={() => setLoginType(PageLoginType.phone)} />
+        <View style={[GStyles.flexRowWrap, GStyles.marginBottom(20)]}>
+          <Button title="Phone" style={GStyles.marginRight(8)} onPress={() => setLoginType(PageLoginType.phone)} />
           <Button isActive title="Email" onPress={() => setLoginType(PageLoginType.email)} />
         </View>
         <CommonInput
+          ref={iptRef}
           value={loginAccount}
           type="general"
           maxLength={30}

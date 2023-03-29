@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import CustomSvg from 'components/CustomSvg';
 import { useTranslation } from 'react-i18next';
 import useGuardianList from 'hooks/useGuardianList';
@@ -8,8 +8,10 @@ import { useAppDispatch, useGuardiansInfo } from 'store/Provider/hooks';
 import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { setCurrentGuardianAction, setOpGuardianAction } from '@portkey-wallet/store/store-ca/guardians/actions';
 import VerifierPair from 'components/VerifierPair';
-import './index.less';
 import { Button } from 'antd';
+import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import './index.less';
 
 export default function Guardians() {
   const { t } = useTranslation();
@@ -28,6 +30,29 @@ export default function Guardians() {
   useEffect(() => {
     getGuardianList({ caHash: walletInfo.caHash });
   }, [getGuardianList, walletInfo]);
+
+  const accountShow = useCallback((guardian: UserGuardianItem) => {
+    switch (guardian.guardianType) {
+      case LoginType.Email:
+        return <div className="account-text">{guardian.guardianAccount}</div>;
+      case LoginType.Phone:
+        return <div className="account-text">{`+${guardian.guardianAccount}`}</div>;
+      case LoginType.Google:
+        return (
+          <div className="account-text">
+            <div className="name">{guardian.firstName}</div>
+            <div className="detail">{guardian.thirdPartyEmail}</div>
+          </div>
+        );
+      case LoginType.Apple:
+        return (
+          <div className="account-text">
+            <div className="name">{guardian.firstName}</div>
+            <div className="detail">{guardian.isPrivate ? '******' : guardian.thirdPartyEmail}</div>
+          </div>
+        );
+    }
+  }, []);
 
   return (
     <div className="my-guardians-frame">
@@ -59,8 +84,12 @@ export default function Guardians() {
                 <div>
                   {item.isLoginAccount && <div className="login-icon">{t('Login Account')}</div>}
                   <div className="flex-between-center">
-                    <VerifierPair guardianType={item.guardianType} verifierSrc={item.verifier?.imageUrl} />
-                    <span className="account-text">{item.guardianAccount}</span>
+                    <VerifierPair
+                      guardianType={item.guardianType}
+                      verifierSrc={item.verifier?.imageUrl}
+                      verifierName={item?.verifier?.name}
+                    />
+                    {accountShow(item)}
                   </div>
                 </div>
                 <div>

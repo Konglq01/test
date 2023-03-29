@@ -3,15 +3,14 @@ import OverlayModal from 'components/OverlayModal';
 import { Keyboard, ScrollView, View } from 'react-native';
 import Touchable from 'components/Touchable';
 import styles from './styles';
-import GStyles from 'assets/theme/GStyles';
 import Svg from 'components/Svg';
 import { TextL, TextXL } from 'components/CommonText';
 import { pTd } from 'utils/unit';
 import { useLanguage } from 'i18n/hooks';
 import CommonInput from 'components/CommonInput';
-import OverlayBody from 'components/OverlayModal/OverlayBody';
 import { MAIN_CHAIN_ID } from '@portkey-wallet/constants/constants-ca/activity';
 import { useGStyles } from 'assets/theme/useGStyles';
+import { ModalBody } from 'components/ModalBody';
 
 type ValueType = string | number;
 type DefaultValueType = string;
@@ -44,14 +43,13 @@ const SelectList = <ItemType extends ItemTypeBase<ItemValueType>, ItemValueType 
   }, [keyWord, labelAttrName, list]);
 
   return (
-    <OverlayBody style={gStyle.overlayStyle}>
+    <ModalBody style={gStyle.overlayStyle} title={t('Select Network')} modalBodyType="bottom">
       <View style={styles.titleWrap}>
-        <TextXL style={styles.titleLabel}>{t('Select Network')}</TextXL>
         <CommonInput
           containerStyle={styles.titleInputWrap}
           inputContainerStyle={styles.titleInputWrap}
           inputStyle={styles.titleInput}
-          leftIconContainerStyle={GStyles.marginLeft(16)}
+          leftIconContainerStyle={styles.titleIcon}
           value={keyWord}
           placeholder={t('Search network')}
           onChangeText={setKeyWord}
@@ -67,7 +65,7 @@ const SelectList = <ItemType extends ItemTypeBase<ItemValueType>, ItemValueType 
                   OverlayModal.hide();
                   callBack(item);
                 }}>
-                <View style={[GStyles.paddingLeft(20), styles.itemRow]}>
+                <View style={styles.itemRow}>
                   {item.chainId === MAIN_CHAIN_ID ? (
                     <Svg icon="mainnet" size={pTd(40)} />
                   ) : (
@@ -87,7 +85,7 @@ const SelectList = <ItemType extends ItemTypeBase<ItemValueType>, ItemValueType 
       ) : (
         <TextL style={styles.noResult}>{t('No results found')}</TextL>
       )}
-    </OverlayBody>
+    </ModalBody>
   );
 };
 

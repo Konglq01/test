@@ -1,5 +1,5 @@
-import { CountryItem } from '@portkey-wallet/constants/constants-ca';
-import { countryCodeFilter, countryCodeList } from '@portkey-wallet/constants/constants-ca/countryCode';
+import { CountryItem } from '@portkey-wallet/types/types-ca/country';
+import { countryCodeFilter, countryCodeList } from '@portkey-wallet/constants/constants-ca/country';
 import { Input } from 'antd';
 import clsx from 'clsx';
 import CustomSvg from 'components/CustomSvg';

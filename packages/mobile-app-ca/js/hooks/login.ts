@@ -6,7 +6,7 @@ import {
   setManagerInfo,
 } from '@portkey-wallet/store/store-ca/wallet/actions';
 import { CAInfo, LoginType, ManagerInfo } from '@portkey-wallet/types/types-ca/wallet';
-import { VerificationType, VerifierInfo } from '@portkey-wallet/types/verifier';
+import { AuthenticationInfo, VerificationType, VerifierInfo } from '@portkey-wallet/types/verifier';
 import { handleErrorCode, sleep } from '@portkey-wallet/utils';
 import Loading from 'components/Loading';
 import AElf from 'aelf-sdk';
@@ -27,7 +27,10 @@ import { extraDataEncode } from '@portkey-wallet/utils/device';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { useGetGuardiansInfo, useGetVerifierServers } from './guardian';
 import { handleUserGuardiansList } from '@portkey-wallet/utils/guardian';
+import { useLanguage } from 'i18n/hooks';
+
 export function useOnManagerAddressAndQueryResult() {
+  const { t } = useLanguage();
   const dispatch = useAppDispatch();
   const biometricsReady = useBiometricsReady();
   const getDeviceInfo = useGetDeviceInfo();
@@ -54,7 +57,7 @@ export function useOnManagerAddressAndQueryResult() {
       verifierInfo?: VerifierInfo;
       guardiansApproved?: GuardiansApproved;
     }) => {
-      Loading.show();
+      Loading.show({ text: t('Creating address on the chain...') });
       await sleep(1000);
       const isRecovery = managerInfo.verificationType === VerificationType.communityRecovery;
       try {
@@ -82,7 +85,6 @@ export function useOnManagerAddressAndQueryResult() {
             ...data,
           };
         }
-        console.log(data, JSON.stringify(data), managerInfo, '====data');
         const req = await fetch({
           data,
         });
@@ -124,7 +126,7 @@ export function useOnManagerAddressAndQueryResult() {
               );
               navigationService.reset('Tab');
             },
-            onFail: (message: string) => onResultFail(dispatch, message, isRecovery),
+            onFail: (message: string) => onResultFail(dispatch, message, isRecovery, true),
           });
         }
       } catch (error) {
@@ -133,7 +135,7 @@ export function useOnManagerAddressAndQueryResult() {
         pinRef?.current?.reset();
       }
     },
-    [biometricsReady, dispatch, getDeviceInfo, onIntervalGetResult],
+    [biometricsReady, dispatch, getDeviceInfo, onIntervalGetResult, t],
   );
 }
 
@@ -147,7 +149,7 @@ export function useOnLogin() {
   const getVerifierServers = useGetVerifierServers();
   const getGuardiansInfo = useGetGuardiansInfo();
   return useCallback(
-    async (loginAccount: string) => {
+    async (loginAccount: string, loginType = LoginType.Email, authenticationInfo?: AuthenticationInfo) => {
       try {
         let _chainInfo;
         if (!chainInfo) {
@@ -161,13 +163,14 @@ export function useOnLogin() {
           navigationService.navigate('GuardianApproval', {
             loginAccount,
             userGuardiansList: handleUserGuardiansList(holderInfo, verifierServers),
+            authenticationInfo,
           });
         } else {
-          navigationService.navigate('SelectVerifier', { loginAccount, loginType: LoginType.Email });
+          navigationService.navigate('SelectVerifier', { loginAccount, loginType, authenticationInfo });
         }
       } catch (error) {
         if (handleErrorCode(error) === '3002') {
-          navigationService.navigate('SelectVerifier', { loginAccount, loginType: LoginType.Email });
+          navigationService.navigate('SelectVerifier', { loginAccount, loginType, authenticationInfo });
         } else {
           throw error;
         }

@@ -9,8 +9,17 @@ import { FontStyles } from 'assets/theme/styles';
 
 let elements: number[] = [];
 let timer: NodeJS.Timeout | null = null;
+type IconType = 'loading';
 
-function LoadingBody({ text = 'Loading...' }: { text?: string }) {
+type ShowOptionsType = {
+  text?: string;
+  iconType?: IconType;
+  isMaskTransparent?: boolean;
+  overlayProps?: any;
+  duration?: number;
+};
+
+function LoadingBody({ text, iconType }: { text?: string; iconType: IconType }) {
   return (
     <View style={GStyles.center}>
       <Spinner type="Circle" color={FontStyles.font11.color} size={40} />
@@ -20,12 +29,18 @@ function LoadingBody({ text = 'Loading...' }: { text?: string }) {
 }
 
 export default class Loading extends React.Component {
-  static show(text?: string, overlayProps?: any, duration = 2000000) {
+  static show(options?: ShowOptionsType) {
+    const { text = 'Loading...', iconType = 'loading', isMaskTransparent = true, overlayProps = {} } = options || {};
     Keyboard.dismiss();
     Loading.hide();
     const overlayView = (
-      <Overlay.PopView modal={true} type="zoomIn" style={styles.container} overlayOpacity={0} {...overlayProps}>
-        <LoadingBody text={text} />
+      <Overlay.PopView
+        modal={true}
+        type="zoomIn"
+        style={[styles.container, isMaskTransparent && styles.maskTransparent]}
+        overlayOpacity={0}
+        {...overlayProps}>
+        <LoadingBody text={text} iconType={iconType} />
       </Overlay.PopView>
     );
     elements.push(Overlay.show(overlayView));
@@ -58,6 +73,9 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: defaultColors.bg1,
+  },
+  maskTransparent: {
     backgroundColor: '#00000030',
   },
   textStyles: {

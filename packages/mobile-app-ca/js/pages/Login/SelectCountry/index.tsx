@@ -3,11 +3,11 @@ import React, { useMemo, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import Touchable from 'components/Touchable';
 import PageContainer from 'components/PageContainer';
-import { countryCodeIndex, countryCodeFilter } from '@portkey-wallet/constants/constants-ca/countryCode';
+import { countryCodeIndex, countryCodeFilter } from '@portkey-wallet/constants/constants-ca/country';
 import GStyles from 'assets/theme/GStyles';
 import IndexBarLargeList from 'components/CommonLargeList/IndexBarLargeList';
 import CommonInput from 'components/CommonInput';
-import { CountryItem } from '@portkey-wallet/constants/constants-ca';
+import { CountryItem } from '@portkey-wallet/types/types-ca/country';
 import myEvents from 'utils/deviceEvent';
 import navigationService from 'utils/navigationService';
 import { defaultColors } from 'assets/theme';
@@ -57,28 +57,30 @@ export default function SelectCountry() {
   };
   return (
     <PageContainer
-      titleDom="Select country/region"
+      titleDom="Country/Region"
       safeAreaColor={['blue', 'white']}
       containerStyles={styles.containerStyles}
       scrollViewProps={{ disabled: true }}>
       <View style={styles.inputContainerStyle}>
         <CommonInput
-          placeholder="Search countries and region"
+          placeholder="Search countries and regions"
           type="search"
           onChangeText={s => setSearchList(!s ? undefined : countryCodeFilter(s))}
         />
       </View>
-      <IndexBarLargeList
-        extraHeight={headerHeight + bottomBarHeight + 150}
-        sectionHeight={searchList ? 0 : SectionHeight}
-        indexHeight={IndexHeight}
-        data={data}
-        indexBarBoxStyle={styles.indexBarBoxStyle}
-        indexArray={searchList ? undefined : countryCodeIndex.map(item => item[0])}
-        renderItem={_renderItem}
-        renderSection={searchList ? undefined : _renderSection}
-        renderEmpty={() => <NoData topDistance={64} noPic message={'There is no search result.'} />}
-      />
+      <View style={styles.indexBarRow}>
+        <IndexBarLargeList
+          data={data}
+          renderItem={_renderItem}
+          indexHeight={IndexHeight}
+          indexBarBoxStyle={styles.indexBarBoxStyle}
+          sectionHeight={searchList ? 0 : SectionHeight}
+          extraHeight={headerHeight + bottomBarHeight + 120}
+          renderSection={searchList ? undefined : _renderSection}
+          indexArray={searchList ? undefined : countryCodeIndex.map(item => item[0])}
+          renderEmpty={() => <NoData topDistance={64} noPic message={'There is no search result.'} />}
+        />
+      </View>
     </PageContainer>
   );
 }
@@ -104,4 +106,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: pTd(20),
   },
   indexBarBoxStyle: { top: 20, bottom: screenHeight > 850 ? 100 : 60 },
+  indexBarRow: {
+    overflow: 'hidden',
+    flex: 1,
+  },
 });

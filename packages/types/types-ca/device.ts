@@ -30,6 +30,12 @@ export enum DeviceType {
   ANDROID,
 }
 
+export enum VersionDeviceType {
+  Android,
+  iOS,
+  Extension,
+}
+
 // version 0.0.1
 // extraData: string
 // format: deviceType:DeviceType,transactionTime:number,transactionTime?:number
@@ -44,3 +50,11 @@ export enum DeviceType {
 // interface DeviceInfoType {
 //   deviceName: string;
 // }
+
+export type UpdateNotify = {
+  content: string;
+  downloadUrl: string;
+  isForceUpdate: boolean;
+  targetVersion: string;
+  title: string;
+};

@@ -2,12 +2,14 @@ import useInterval from '../useInterval';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { contractQueries } from '@portkey-wallet/graphql/index';
 import { NetworkType } from '@portkey-wallet/types';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { CAInfoType, ManagerInfo } from '@portkey-wallet/types/types-ca/wallet';
 import { VerificationType } from '@portkey-wallet/types/verifier';
 import { useAppCommonDispatch } from '../index';
 import { useCurrentChain } from './chainList';
 import { getChainListAsync } from '@portkey-wallet/store/store-ca/wallet/actions';
+import { useCurrentWallet } from './wallet';
+import useLockCallback from '../useLockCallback';
 export function useIntervalQueryCAInfoByAddress(network: NetworkType, address?: string) {
   const [info, setInfo] = useState<{ [address: string]: CAInfoType }>();
   const dispatch = useAppCommonDispatch();
@@ -45,4 +47,47 @@ export function useIntervalQueryCAInfoByAddress(network: NetworkType, address?: 
     [caInfo, network, address, chainInfo],
   );
   return caInfo;
+}
+
+export function useCheckManager(callBack: () => void) {
+  const { walletInfo, currentNetwork } = useCurrentWallet();
+  const { caHash, address } = walletInfo || {};
+  const checkManager = useLockCallback(async () => {
+    try {
+      if (!caHash) return;
+      const info = await contractQueries.getCAHolderManagerInfo(currentNetwork, {
+        dto: {
+          caHash,
+          maxResultCount: 1,
+          skipCount: 0,
+          chainId: DefaultChainId,
+        },
+      });
+      const { caHolderManagerInfo } = info.data || {};
+      if (caHolderManagerInfo) {
+        const { managerInfos } = caHolderManagerInfo[0] || {};
+        const isManager = managerInfos?.some(manager => manager?.address === address);
+        if (!isManager) callBack();
+      }
+    } catch (error) {
+      console.log(error, '=====error');
+    }
+  }, [caHash, address]);
+
+  const interval = useInterval(
+    () => {
+      console.log('interval');
+
+      checkManager();
+    },
+    5000,
+    [checkManager],
+  );
+  useEffect(() => {
+    if (!caHash || !address) {
+      interval.remove();
+    } else {
+      interval.start();
+    }
+  }, [caHash, address]);
 }

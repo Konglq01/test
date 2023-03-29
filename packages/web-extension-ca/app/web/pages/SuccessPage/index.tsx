@@ -1,7 +1,7 @@
 import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { usePreventHardwareBack } from 'hooks/useHardwareBack';
-import { useMemo } from 'react';
-import { useParams } from 'react-router';
+import { useCallback, useMemo } from 'react';
+import { useNavigate, useParams } from 'react-router';
 import { useEffectOnce } from 'react-use';
 import { useAppDispatch } from 'store/Provider/hooks';
 import { resetLoginInfoAction } from 'store/reducers/loginCache/actions';
@@ -11,6 +11,7 @@ import SuccessPageUI from './SuccessPageUI';
 export default function SuccessPage() {
   const { type: state } = useParams<{ type: 'login' | 'scan' | 'register' }>();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const wallet = useCurrentWallet();
   console.log(wallet, 'wallet===');
   const type = useMemo(() => {
@@ -23,11 +24,13 @@ export default function SuccessPage() {
     }
   }, [state]);
 
+  const onConfirm = useCallback(() => navigate('/'), [navigate]);
+
   usePreventHardwareBack();
 
   useEffectOnce(() => {
     dispatch(resetLoginInfoAction());
   });
 
-  return <SuccessPageUI type={type} />;
+  return <SuccessPageUI type={type} onConfirm={onConfirm} />;
 }

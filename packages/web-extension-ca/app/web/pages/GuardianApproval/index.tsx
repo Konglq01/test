@@ -35,7 +35,6 @@ export default function GuardianApproval() {
     return filterVerifiedList;
   }, [opGuardian, preGuardian, state, userGuardianStatus]);
 
-  console.log(userVerifiedList, userGuardianStatus, 'userGuardianStatus==');
   const approvalLength = useMemo(() => {
     return getApprovalCount(userVerifiedList.length);
   }, [userVerifiedList.length]);
@@ -83,7 +82,7 @@ export default function GuardianApproval() {
       }
     } else if (state && state.indexOf('removeManage') !== -1) {
       const manageAddress = state.split('_')[1];
-      navigate('/setting/wallet-security/manage-devices', { state: manageAddress });
+      navigate(`/setting/wallet-security/manage-devices/${manageAddress}`);
     } else {
       navigate('/register/start');
     }

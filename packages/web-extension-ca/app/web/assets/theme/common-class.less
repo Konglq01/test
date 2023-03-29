@@ -177,3 +177,100 @@ td {
   width: 16px;
   height: 16px;
 }
+
+// =========================================================
+// ============ Large screen adaptation [start] ============
+// =========================================================
+.portkey-prompt {
+  width: 100%;
+  min-width: @min-width;
+  min-height: 100%;
+  padding-bottom: 24px !important;
+  background-color: @bg-20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .portkey-header {
+    margin: 0 auto;
+    .portkey-header-body {
+      .custom-logo {
+        display: none;
+      }
+    }
+  }
+
+  .portkey-body {
+    min-height: calc(100vh - 96px);
+    margin: auto;
+  }
+  .portkey-prompt-media();
+}
+
+.portkey-prompt-media {
+  // screen >= 1820, contentWidth = 1440
+  @media screen and (min-width: @max-screen) {
+    .portkey-body,
+    .portkey-header {
+      max-width: @max-width;
+      width: @max-width;
+
+      .portkey-header-body {
+        padding-left: 0;
+        padding-right: 0;
+      }
+    }
+  }
+  // 1280 < screen < 1820, maxContentWidth = 1440, marginLeftAndRight = 190
+  @media screen and (max-width: 1819px) and (min-width: @mid-screen) {
+    .portkey-header {
+      width: calc(100vw - @max-margin * 2);
+
+      .portkey-header-body {
+        padding-left: 0;
+        padding-right: 0;
+      }
+    }
+    .portkey-body {
+      width: calc(100vw - @max-margin * 2);
+    }
+  }
+  // 768 < screen < 1280, maxContentWidth = 1024, marginLeftAndRight = 44
+  @media screen and (max-width: 1279px) and (min-width: @min-screen) {
+    .portkey-header {
+      max-width: @mid-width;
+      width: calc(100vw - @min-margin * 2);
+      .portkey-header-body {
+        padding-left: 0;
+        padding-right: 0;
+      }
+    }
+    .portkey-body {
+      max-width: @mid-width;
+      width: calc(100vw - @min-margin * 2);
+    }
+  }
+  // screen < 768, maxContentWidth = screen, minContentWidth = 360, paddingLeftAndRight = 24
+  @media screen and (max-width: 767px) {
+    .portkey-header {
+      width: 100vw;
+      min-width: @min-width;
+    }
+    .portkey-body {
+      width: 100vw;
+      min-width: @min-width;
+    }
+  }
+}
+
+// This style is suitable for detail pages, such as transaction、asset preview page...
+.detail-page-prompt {
+  width: inherit;
+  max-width: @detail-width;
+  min-width: @min-width;
+  height: calc(100vh - 96px);
+  max-height: @max-detail-height;
+}
+// =========================================================
+// ============= Large screen adaptation [end] =============
+// =========================================================

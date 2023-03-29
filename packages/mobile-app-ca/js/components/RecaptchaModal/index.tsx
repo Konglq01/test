@@ -52,165 +52,161 @@ export type RecaptchaProps = {
   action?: string;
 };
 
-const Recaptcha = forwardRef(
-  (
-    {
-      headerComponent,
-      footerComponent,
-      loadingComponent,
-      webViewProps,
-      modalProps,
-      onVerify,
-      onExpire,
-      onError,
-      onClose,
-      onLoad,
-      theme,
-      size,
-      siteKey,
-      baseUrl,
-      lang,
-      style,
+const Recaptcha = forwardRef(function Recaptcha(
+  {
+    headerComponent,
+    footerComponent,
+    loadingComponent,
+    webViewProps,
+    modalProps,
+    onVerify,
+    onExpire,
+    onError,
+    onClose,
+    onLoad,
+    theme,
+    size,
+    siteKey,
+    baseUrl,
+    lang,
+    style,
+    enterprise,
+    recaptchaDomain,
+    gstaticDomain,
+    hideBadge,
+    action,
+  }: RecaptchaProps,
+  ref,
+) {
+  const isClosed = useRef(true);
+  const webViewRef = useRef<any>();
+  const [visible, setVisible] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const isInvisibleSize = size === 'invisible';
+
+  const html = useMemo(() => {
+    return getTemplate(
+      {
+        siteKey,
+        size,
+        theme,
+        lang,
+        action,
+      },
       enterprise,
       recaptchaDomain,
       gstaticDomain,
       hideBadge,
-      action,
-    }: RecaptchaProps,
-    ref,
-  ) => {
-    const isClosed = useRef(true);
-    const webViewRef = useRef<any>();
-    const [visible, setVisible] = useState(false);
-    const [loading, setLoading] = useState(true);
+    );
+  }, [siteKey, size, theme, lang, action, enterprise, recaptchaDomain, gstaticDomain, hideBadge]);
 
-    const isInvisibleSize = size === 'invisible';
+  const handleLoad = useCallback(
+    (...args: any[]) => {
+      onLoad?.(...args);
 
-    const html = useMemo(() => {
-      return getTemplate(
-        {
-          siteKey,
-          size,
-          theme,
-          lang,
-          action,
-        },
-        enterprise,
-        recaptchaDomain,
-        gstaticDomain,
-        hideBadge,
-      );
-    }, [siteKey, size, theme, lang, action, enterprise, recaptchaDomain, gstaticDomain, hideBadge]);
-
-    const handleLoad = useCallback(
-      (...args: any[]) => {
-        onLoad?.(...args);
-
-        if (isInvisibleSize) {
-          webViewRef.current?.injectJavaScript(`
+      if (isInvisibleSize) {
+        webViewRef.current?.injectJavaScript(`
                 window.rnRecaptcha.execute();
             `);
+      }
+
+      setLoading(false);
+    },
+    [onLoad, isInvisibleSize],
+  );
+
+  const handleClose = useCallback(
+    (...args: any[]) => {
+      if (isClosed.current) return;
+      isClosed.current = true;
+      setVisible(false);
+      onClose?.(...args);
+    },
+    [onClose],
+  );
+
+  const handleMessage = useCallback(
+    (content: WebViewMessageEvent) => {
+      try {
+        const payload = JSON.parse(content.nativeEvent.data);
+        if (payload.close && isInvisibleSize) {
+          handleClose();
         }
-
-        setLoading(false);
-      },
-      [onLoad, isInvisibleSize],
-    );
-
-    const handleClose = useCallback(
-      (...args: any[]) => {
-        if (isClosed.current) return;
-        isClosed.current = true;
-        setVisible(false);
-        onClose?.(...args);
-      },
-      [onClose],
-    );
-
-    const handleMessage = useCallback(
-      (content: WebViewMessageEvent) => {
-        try {
-          const payload = JSON.parse(content.nativeEvent.data);
-          if (payload.close && isInvisibleSize) {
-            handleClose();
-          }
-          if (payload.load) {
-            handleLoad(...payload.load);
-          }
-          if (payload.expire) {
-            onExpire?.(payload.expire);
-          }
-          if (payload.error) {
-            handleClose();
-            onError?.(payload.error[0]);
-          }
-          if (payload.verify) {
-            handleClose();
-            onVerify?.(payload.verify[0]);
-          }
-        } catch (err) {
-          console.warn(err);
+        if (payload.load) {
+          handleLoad(...payload.load);
         }
+        if (payload.expire) {
+          onExpire?.(payload.expire);
+        }
+        if (payload.error) {
+          handleClose();
+          onError?.(payload.error[0]);
+        }
+        if (payload.verify) {
+          handleClose();
+          onVerify?.(payload.verify[0]);
+        }
+      } catch (err) {
+        console.warn(err);
+      }
+    },
+    [onVerify, onExpire, onError, handleClose, handleLoad, isInvisibleSize],
+  );
+
+  const source = useMemo(
+    () => ({
+      html,
+      baseUrl,
+    }),
+    [html, baseUrl],
+  );
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      open: () => {
+        setVisible(true);
+        setLoading(true);
+        isClosed.current = false;
       },
-      [onVerify, onExpire, onError, handleClose, handleLoad, isInvisibleSize],
-    );
+      close: handleClose,
+    }),
+    [handleClose],
+  );
 
-    const source = useMemo(
-      () => ({
-        html,
-        baseUrl,
-      }),
-      [html, baseUrl],
-    );
+  const webViewStyles = useMemo(() => [styles.webView, style], [style]);
 
-    useImperativeHandle(
-      ref,
-      () => ({
-        open: () => {
-          setVisible(true);
-          setLoading(true);
-          isClosed.current = false;
-        },
-        close: handleClose,
-      }),
-      [handleClose],
-    );
+  const renderLoading = () => {
+    if (!loading && source) return null;
+    return <View style={styles.loadingContainer}>{loadingComponent || <ActivityIndicator size="large" />}</View>;
+  };
 
-    const webViewStyles = useMemo(() => [styles.webView, style], [style]);
-
-    const renderLoading = () => {
-      if (!loading && source) return null;
-      return <View style={styles.loadingContainer}>{loadingComponent || <ActivityIndicator size="large" />}</View>;
-    };
-
-    return (
-      <Modal transparent {...modalProps} visible={visible} onRequestClose={handleClose}>
-        {headerComponent}
-        <WebView
-          ref={webViewRef}
-          bounces={false}
-          // allowsBackForwardNavigationGestures={false}
-          originWhitelist={originWhitelist}
-          onShouldStartLoadWithRequest={event => {
-            // prevent navigation on iOS
-            return event.navigationType === 'other';
-          }}
-          onNavigationStateChange={() => {
-            // prevent navigation on Android
-            if (!loading) webViewRef.current?.stopLoading();
-          }}
-          {...webViewProps}
-          source={source}
-          style={webViewStyles}
-          onMessage={handleMessage}
-        />
-        {footerComponent}
-        {renderLoading()}
-      </Modal>
-    );
-  },
-);
-
-Recaptcha.displayName = 'Recaptcha';
+  return (
+    <Modal transparent {...modalProps} visible={visible} onRequestClose={handleClose}>
+      {headerComponent}
+      <WebView
+        ref={webViewRef}
+        bounces={false}
+        // allowsBackForwardNavigationGestures={false}
+        originWhitelist={originWhitelist}
+        onShouldStartLoadWithRequest={event => {
+          // prevent navigation on iOS
+          return event.navigationType === 'other';
+        }}
+        onNavigationStateChange={() => {
+          // prevent navigation on Android
+          if (!loading) webViewRef.current?.stopLoading();
+        }}
+        {...webViewProps}
+        source={source}
+        style={webViewStyles}
+        onMessage={handleMessage}
+      />
+      {footerComponent}
+      {renderLoading()}
+    </Modal>
+  );
+});
 
 export default Recaptcha;

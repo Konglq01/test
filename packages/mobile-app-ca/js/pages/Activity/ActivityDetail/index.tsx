@@ -1,16 +1,11 @@
-import {
-  DEFAULT_DECIMAL,
-  TransactionTypes,
-  transactionTypesMap,
-} from '@portkey-wallet/constants/constants-ca/activity';
-import { ZERO } from '@portkey-wallet/constants/misc';
+import { ELF_DECIMAL, TransactionTypes, transactionTypesMap } from '@portkey-wallet/constants/constants-ca/activity';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { useCaAddresses, useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
 import { fetchActivity } from '@portkey-wallet/store/store-ca/activity/api';
 import { ActivityItemType, TransactionStatus } from '@portkey-wallet/types/types-ca/activity';
-import { addressFormat, getExploreLink } from '@portkey-wallet/utils';
-import { unitConverter } from '@portkey-wallet/utils/converter';
+import { addressFormat, formatChainInfoToShow, getExploreLink } from '@portkey-wallet/utils';
+import { divDecimals, formatAmountShow } from '@portkey-wallet/utils/converter';
 import { Image } from '@rneui/base';
 import { defaultColors } from 'assets/theme';
 import fonts from 'assets/theme/fonts';
@@ -30,26 +25,21 @@ import { formatTransferTime } from 'utils';
 import { formatStr2EllipsisStr } from '@portkey-wallet/utils';
 import navigationService from 'utils/navigationService';
 import { pTd } from 'utils/unit';
-
-interface RouterParams {
-  transactionId?: string;
-  blockHash?: string;
-  isReceived?: boolean;
-}
-
-const hiddenArr = [TransactionTypes.SOCIAL_RECOVERY, TransactionTypes.ADD_MANAGER, TransactionTypes.REMOVE_MANAGER];
+import { useIsTestnet } from '@portkey-wallet/hooks/hooks-ca/network';
+import { HIDDEN_TRANSACTION_TYPES } from '@portkey-wallet/constants/constants-ca/activity';
+import { getAWSUrlWithSize } from '@portkey-wallet/utils/img';
 
 const ActivityDetail = () => {
   const { t } = useLanguage();
-  const { transactionId = '', blockHash = '', isReceived: isReceivedParams } = useRouterParams<RouterParams>();
+  const activityItemFromRoute = useRouterParams<ActivityItemType>();
+  const { transactionId = '', blockHash = '', isReceived: isReceivedParams } = activityItemFromRoute;
   const caAddresses = useCaAddresses();
+  const isTestnet = useIsTestnet();
   const { currentNetwork } = useCurrentWallet();
-
-  const isTestNet = useMemo(() => (currentNetwork === 'TESTNET' ? 'TESTNET' : ''), [currentNetwork]);
 
   const [activityItem, setActivityItem] = useState<ActivityItemType>();
 
-  const { explorerUrl } = useCurrentChain(activityItem?.fromChainId) as { explorerUrl: string };
+  const { explorerUrl } = useCurrentChain(activityItem?.fromChainId) ?? {};
 
   useEffectOnce(() => {
     const params = {
@@ -105,10 +95,8 @@ const ActivityDetail = () => {
 
   const networkUI = useMemo(() => {
     const { transactionType, fromChainId, toChainId, transactionId: _transactionId = '' } = activityItem || {};
-    const from = fromChainId === 'AELF' ? 'MainChain AELF' : `SideChain ${fromChainId}`;
-    const to = toChainId === 'AELF' ? 'MainChain AELF' : `SideChain ${toChainId}`;
 
-    const isNetworkShow = transactionType && !hiddenArr.includes(transactionType);
+    const isNetworkShow = transactionType && !HIDDEN_TRANSACTION_TYPES.includes(transactionType);
     return (
       <>
         <View style={styles.section}>
@@ -116,10 +104,10 @@ const ActivityDetail = () => {
             <View style={[styles.flexSpaceBetween]}>
               <TextM style={[styles.lightGrayFontColor]}>{t('Network')}</TextM>
               <View style={styles.networkInfoContent}>
-                <TextM style={[styles.blackFontColor]}>{`${from} ${isTestNet}`}</TextM>
-                <View style={GStyles.flexRow}>
+                <TextM style={[styles.blackFontColor]}>{formatChainInfoToShow(fromChainId, currentNetwork)}</TextM>
+                <View style={GStyles.flexRowWrap}>
                   <TextM style={[styles.lightGrayFontColor]}>{` → `}</TextM>
-                  <TextM style={[styles.blackFontColor]}>{`${to} ${isTestNet}`}</TextM>
+                  <TextM style={[styles.blackFontColor]}>{formatChainInfoToShow(toChainId, currentNetwork)}</TextM>
                 </View>
               </View>
             </View>
@@ -127,7 +115,7 @@ const ActivityDetail = () => {
           <View style={[styles.flexSpaceBetween, isNetworkShow && styles.marginTop16]}>
             <TextM style={[styles.lightGrayFontColor]}>{t('Transaction ID')}</TextM>
             <View style={GStyles.flex1} />
-            <View style={[GStyles.flexRow, styles.alignItemsEnd]}>
+            <View style={[GStyles.flexRowWrap, styles.alignItemsEnd]}>
               <TextM>{formatStr2EllipsisStr(_transactionId, 10, 'tail')}</TextM>
             </View>
             {CopyIconUI(transactionId)}
@@ -136,7 +124,7 @@ const ActivityDetail = () => {
         <Text style={[styles.divider, styles.marginTop0]} />
       </>
     );
-  }, [CopyIconUI, activityItem, isTestNet, t, transactionId]);
+  }, [CopyIconUI, activityItem, currentNetwork, t, transactionId]);
 
   const feeUI = useMemo(() => {
     const transactionFees =
@@ -151,12 +139,12 @@ const ActivityDetail = () => {
           <View>
             {transactionFees.map((item, index) => (
               <View key={index} style={[styles.transactionFeeItemWrap, index > 0 && styles.marginTop8]}>
-                <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${unitConverter(
-                  ZERO.plus(item?.fee ?? 0).div(`1e${DEFAULT_DECIMAL}`),
+                <TextM style={[styles.blackFontColor, styles.fontBold]}>{`${formatAmountShow(
+                  divDecimals(item?.fee ?? 0, ELF_DECIMAL),
                 )} ${item.symbol}`}</TextM>
-                {!isTestNet && (
-                  <TextS style={[styles.lightGrayFontColor, styles.marginTop4]}>{`$ ${unitConverter(
-                    ZERO.plus(item?.feeInUsd ?? 0).div(`1e${DEFAULT_DECIMAL}`),
+                {!isTestnet && (
+                  <TextS style={[styles.lightGrayFontColor, styles.marginTop4]}>{`$ ${formatAmountShow(
+                    divDecimals(item?.feeInUsd ?? 0, ELF_DECIMAL),
                     2,
                   )}`}</TextS>
                 )}
@@ -166,7 +154,7 @@ const ActivityDetail = () => {
         </View>
       </View>
     );
-  }, [activityItem?.transactionFees, isTestNet, t]);
+  }, [activityItem?.transactionFees, isTestnet, t]);
 
   return (
     <PageContainer
@@ -183,12 +171,16 @@ const ActivityDetail = () => {
       </Text>
 
       {activityItem?.transactionType &&
-        !hiddenArr.includes(activityItem?.transactionType) &&
+        !HIDDEN_TRANSACTION_TYPES.includes(activityItem?.transactionType) &&
         (isNft ? (
           <>
             <View style={styles.topWrap}>
               {activityItem?.nftInfo?.imageUrl ? (
-                <Image style={styles.img} source={{ uri: activityItem?.nftInfo?.imageUrl || '' }} />
+                <Image
+                  resizeMode={'contain'}
+                  style={styles.img}
+                  source={{ uri: getAWSUrlWithSize(activityItem?.nftInfo?.imageUrl || '') }}
+                />
               ) : (
                 <Text style={styles.noImg}>{activityItem?.nftInfo?.alias?.slice(0, 1)}</Text>
               )}
@@ -204,14 +196,14 @@ const ActivityDetail = () => {
         ) : (
           <>
             <Text style={[styles.tokenCount, styles.fontBold]}>
-              {!hiddenArr.includes(activityItem?.transactionType as TransactionTypes) &&
+              {!HIDDEN_TRANSACTION_TYPES.includes(activityItem?.transactionType as TransactionTypes) &&
                 (activityItem?.isReceived ? '+' : '-')}
-              {`${unitConverter(
-                ZERO.plus(activityItem?.amount || 0).div(`1e${activityItem?.decimals || DEFAULT_DECIMAL}`),
-              )} ${activityItem?.symbol || ''}`}
+              {`${formatAmountShow(divDecimals(activityItem?.amount, activityItem?.decimals))} ${
+                activityItem?.symbol || ''
+              }`}
             </Text>
-            {!isTestNet && (
-              <Text style={styles.usdtCount}>{`$ ${unitConverter(ZERO.plus(activityItem?.priceInUsd ?? 0), 2)}`}</Text>
+            {!isTestnet && (
+              <Text style={styles.usdtCount}>{`$ ${formatAmountShow(activityItem?.priceInUsd ?? 0, 2)}`}</Text>
             )}
           </>
         ))}
@@ -227,10 +219,10 @@ const ActivityDetail = () => {
       </View>
       <View style={styles.card}>
         {/* From */}
-        {activityItem?.transactionType && !hiddenArr.includes(activityItem?.transactionType) && (
+        {activityItem?.transactionType && !HIDDEN_TRANSACTION_TYPES.includes(activityItem?.transactionType) && (
           <>
             <View style={styles.section}>
-              <View style={[GStyles.flexRow]}>
+              <View style={[GStyles.flexRowWrap]}>
                 <TextM style={styles.lightGrayFontColor}>{t('From')}</TextM>
                 <View style={GStyles.flex1} />
                 <View style={[styles.alignItemsEnd, styles.justifyContentCenter]}>
@@ -246,10 +238,10 @@ const ActivityDetail = () => {
           </>
         )}
         {/* To */}
-        {activityItem?.transactionType && !hiddenArr.includes(activityItem?.transactionType) && (
+        {activityItem?.transactionType && !HIDDEN_TRANSACTION_TYPES.includes(activityItem?.transactionType) && (
           <>
             <View style={styles.section}>
-              <View style={[GStyles.flexRow]}>
+              <View style={[GStyles.flexRowWrap]}>
                 <TextM style={[styles.lightGrayFontColor]}>{t('To')}</TextM>
                 <View style={GStyles.flex1} />
                 <View style={[styles.alignItemsEnd, styles.justifyContentCenter]}>
@@ -274,9 +266,8 @@ const ActivityDetail = () => {
       <View style={styles.space} />
       {explorerUrl && (
         <CommonButton
-          containerStyle={[GStyles.marginTop(pTd(8)), styles.bottomButton]}
+          containerStyle={[GStyles.marginTop(8), styles.bottomButton]}
           onPress={() => {
-            if (!explorerUrl) return;
             if (!activityItem?.transactionId) return;
 
             navigationService.navigate('ViewOnWebView', {

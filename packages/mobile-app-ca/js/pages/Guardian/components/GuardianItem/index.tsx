@@ -1,7 +1,7 @@
 import { defaultColors } from 'assets/theme';
 import GStyles from 'assets/theme/GStyles';
 import CommonButton, { CommonButtonProps } from 'components/CommonButton';
-import { TextM } from 'components/CommonText';
+import { TextM, TextS } from 'components/CommonText';
 import Svg from 'components/Svg';
 import React, { useCallback, useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
@@ -12,7 +12,13 @@ import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type'
 import Loading from 'components/Loading';
 import CommonToast from 'components/CommonToast';
 import { sleep } from '@portkey-wallet/utils';
-import { ApprovalType, VerificationType, VerifyStatus } from '@portkey-wallet/types/verifier';
+import {
+  ApprovalType,
+  AuthenticationInfo,
+  VerificationType,
+  VerifierInfo,
+  VerifyStatus,
+} from '@portkey-wallet/types/verifier';
 import { BGStyles, FontStyles } from 'assets/theme/styles';
 import { isIOS } from '@rneui/base';
 import { LoginGuardianTypeIcon } from 'constants/misc';
@@ -22,6 +28,12 @@ import { GuardiansStatus, GuardiansStatusItem } from 'pages/Guardian/types';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import useDebounceCallback from 'hooks/useDebounceCallback';
 import { verification } from 'utils/api';
+import { useLanguage } from 'i18n/hooks';
+import { useVerifyToken } from 'hooks/authentication';
+import { PRIVATE_GUARDIAN_ACCOUNT } from '@portkey-wallet/constants/constants-ca/guardian';
+import myEvents from 'utils/deviceEvent';
+
+export const AuthTypes = [LoginType.Apple, LoginType.Google];
 
 interface GuardianAccountItemProps {
   guardianItem: UserGuardianItem;
@@ -29,10 +41,11 @@ interface GuardianAccountItemProps {
   renderBtn?: (item: UserGuardianItem) => JSX.Element;
   isBorderHide?: boolean;
   guardiansStatus?: GuardiansStatus;
-  setGuardianStatus?: (key: string, status: GuardiansStatusItem) => void;
+  setGuardianStatus?: (data: { key: string; status: GuardiansStatusItem }) => void;
   isExpired?: boolean;
   isSuccess?: boolean;
   approvalType?: ApprovalType;
+  authenticationInfo?: AuthenticationInfo;
 }
 
 function GuardianItemButton({
@@ -42,13 +55,16 @@ function GuardianItemButton({
   isExpired,
   approvalType,
   disabled,
+  authenticationInfo,
 }: GuardianAccountItemProps & {
   disabled?: boolean;
 }) {
+  const { t } = useLanguage();
+
   const itemStatus = useMemo(() => guardiansStatus?.[guardianItem.key], [guardianItem.key, guardiansStatus]);
 
   const { status, requestCodeResult } = itemStatus || {};
-
+  const verifyToken = useVerifyToken();
   const guardianInfo = useMemo(() => {
     let _verificationType = VerificationType.communityRecovery;
     if (
@@ -65,7 +81,7 @@ function GuardianItemButton({
   }, [approvalType, guardianItem]);
   const onSetGuardianStatus = useCallback(
     (guardianStatus: GuardiansStatusItem) => {
-      setGuardianStatus?.(guardianItem.key, guardianStatus);
+      setGuardianStatus?.({ key: guardianItem.key, status: guardianStatus });
     },
     [guardianItem.key, setGuardianStatus],
   );
@@ -101,13 +117,57 @@ function GuardianItemButton({
     }
     Loading.hide();
   }, [onSetGuardianStatus, guardianInfo]);
-  const onVerifier = useDebounceCallback(() => {
-    navigationService.push('VerifierDetails', {
-      ...guardianInfo,
-      requestCodeResult,
-      startResend: true,
-    });
-  }, [guardianInfo, requestCodeResult]);
+
+  const onVerifierAuth = useCallback(async () => {
+    try {
+      Loading.show();
+      const rst = await verifyToken(guardianItem.guardianType, {
+        accessToken: authenticationInfo?.[guardianItem.guardianAccount],
+        id: guardianItem.guardianAccount,
+        verifierId: guardianItem.verifier?.id,
+        chainId: DefaultChainId,
+      });
+
+      if (rst.accessToken) {
+        myEvents.setAuthenticationInfo.emit({
+          [guardianItem.guardianAccount]: rst.accessToken,
+        });
+      }
+
+      CommonToast.success('Verified Successfully');
+      const verifierInfo: VerifierInfo = { ...rst, verifierId: guardianItem?.verifier?.id };
+      onSetGuardianStatus({
+        status: VerifyStatus.Verified,
+        verifierInfo,
+      });
+    } catch (error) {
+      CommonToast.failError(error);
+    }
+    Loading.hide();
+  }, [
+    authenticationInfo,
+    guardianItem.guardianAccount,
+    guardianItem.guardianType,
+    guardianItem.verifier?.id,
+    onSetGuardianStatus,
+    verifyToken,
+  ]);
+  const onVerifier = useDebounceCallback(async () => {
+    switch (guardianItem.guardianType) {
+      case LoginType.Apple:
+      case LoginType.Google:
+        onVerifierAuth();
+        break;
+      default: {
+        navigationService.push('VerifierDetails', {
+          ...guardianInfo,
+          requestCodeResult,
+          startResend: true,
+        });
+        break;
+      }
+    }
+  }, [guardianInfo, requestCodeResult, onVerifierAuth]);
   const buttonProps: CommonButtonProps = useMemo(() => {
     // expired
     if (isExpired && status !== VerifyStatus.Verified) {
@@ -119,16 +179,19 @@ function GuardianItemButton({
         disabledTitleStyle: FontStyles.font7,
       };
     }
+    if (
+      status === VerifyStatus.Verifying ||
+      (AuthTypes.includes(guardianItem.guardianType) && (!status || status === VerifyStatus.NotVerified))
+    ) {
+      return {
+        onPress: onVerifier,
+        title: 'Verify',
+      };
+    }
     if (!status || status === VerifyStatus.NotVerified) {
       return {
         onPress: onSendCode,
         title: 'Send',
-      };
-    }
-    if (status === VerifyStatus.Verifying) {
-      return {
-        onPress: onVerifier,
-        title: 'Verify',
       };
     }
     return {
@@ -138,7 +201,7 @@ function GuardianItemButton({
       disabledStyle: styles.confirmedButtonStyle,
       disabled: true,
     };
-  }, [isExpired, onSendCode, onVerifier, status]);
+  }, [guardianItem.guardianType, isExpired, onSendCode, onVerifier, status]);
   return (
     <CommonButton
       type="primary"
@@ -162,10 +225,37 @@ export default function GuardianItem({
   isExpired,
   isSuccess,
   approvalType = ApprovalType.register,
+  authenticationInfo,
 }: GuardianAccountItemProps) {
-  // console.log(guardianItem, '=====guardianItem');
   const itemStatus = useMemo(() => guardiansStatus?.[guardianItem.key], [guardianItem.key, guardiansStatus]);
   const disabled = isSuccess && itemStatus?.status !== VerifyStatus.Verified;
+
+  const guardianAccount = useMemo(() => {
+    if (![LoginType.Apple, LoginType.Google].includes(guardianItem.guardianType)) {
+      return guardianItem.guardianAccount;
+    }
+    if (guardianItem.isPrivate) return PRIVATE_GUARDIAN_ACCOUNT;
+    return guardianItem.thirdPartyEmail || '';
+  }, [guardianItem]);
+
+  const renderGuardianAccount = useCallback(() => {
+    if (!guardianItem.firstName) {
+      return (
+        <TextM numberOfLines={1} style={[styles.nameStyle, GStyles.flex1]}>
+          {guardianAccount}
+        </TextM>
+      );
+    }
+    return (
+      <View style={[styles.nameStyle, GStyles.flex1]}>
+        <TextM style={styles.firstNameStyle}>{guardianItem.firstName}</TextM>
+        <TextS style={FontStyles.font3} numberOfLines={1}>
+          {guardianAccount}
+        </TextS>
+      </View>
+    );
+  }, [guardianAccount, guardianItem.firstName]);
+
   return (
     <View style={[styles.itemRow, isBorderHide && styles.itemWithoutBorder, disabled && styles.disabledStyle]}>
       {guardianItem.isLoginAccount && (
@@ -173,12 +263,15 @@ export default function GuardianItem({
           <Text style={styles.typeText}>Login Account</Text>
         </View>
       )}
-      <View style={[GStyles.flexRow, GStyles.itemCenter, GStyles.flex1]}>
-        <Svg icon={LoginGuardianTypeIcon[guardianItem.guardianType] as any} size={pTd(32)} />
-        <VerifierImage size={pTd(32)} uri={guardianItem.verifier?.imageUrl} style={styles.iconStyle} />
-        <TextM numberOfLines={1} style={[styles.nameStyle, GStyles.flex1]}>
-          {guardianItem.guardianAccount}
-        </TextM>
+      <View style={[GStyles.flexRowWrap, GStyles.itemCenter, GStyles.flex1]}>
+        <Svg iconStyle={styles.loginTypeIcon} icon={LoginGuardianTypeIcon[guardianItem.guardianType]} size={pTd(32)} />
+        <VerifierImage
+          size={pTd(32)}
+          label={guardianItem?.verifier?.name}
+          uri={guardianItem.verifier?.imageUrl}
+          style={styles.iconStyle}
+        />
+        {renderGuardianAccount()}
       </View>
       {!isButtonHide && (
         <GuardianItemButton
@@ -188,6 +281,7 @@ export default function GuardianItem({
           guardiansStatus={guardiansStatus}
           setGuardianStatus={setGuardianStatus}
           approvalType={approvalType}
+          authenticationInfo={authenticationInfo}
         />
       )}
       {renderBtn && renderBtn(guardianItem)}
@@ -198,6 +292,7 @@ export default function GuardianItem({
 const styles = StyleSheet.create({
   itemRow: {
     height: pTd(80),
+    marginTop: 8,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: defaultColors.border6,
     justifyContent: 'space-between',
@@ -220,7 +315,6 @@ const styles = StyleSheet.create({
     width: 'auto',
     paddingHorizontal: pTd(6),
     backgroundColor: defaultColors.bg11,
-    // borderRadius: pTd(6),
     borderTopLeftRadius: pTd(6),
     borderBottomRightRadius: pTd(6),
   },
@@ -229,6 +323,9 @@ const styles = StyleSheet.create({
   },
   nameStyle: {
     marginLeft: pTd(12),
+  },
+  firstNameStyle: {
+    marginBottom: pTd(2),
   },
   buttonStyle: {
     height: 24,
@@ -253,5 +350,8 @@ const styles = StyleSheet.create({
   },
   disabledItemStyle: {
     opacity: 1,
+  },
+  loginTypeIcon: {
+    borderRadius: pTd(16),
   },
 });

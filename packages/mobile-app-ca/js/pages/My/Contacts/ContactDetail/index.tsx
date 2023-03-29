@@ -73,7 +73,7 @@ const ContactDetail: React.FC = () => {
 
       <CommonButton
         type="solid"
-        containerStyle={GStyles.paddingTop(pTd(16))}
+        containerStyle={GStyles.paddingTop(16)}
         onPress={() => {
           navigationService.navigate('ContactEdit', { contact });
         }}>

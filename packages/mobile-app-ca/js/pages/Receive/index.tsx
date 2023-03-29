@@ -17,6 +17,7 @@ import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
 import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
 import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
+import { formatChainInfoToShow } from '@portkey-wallet/utils';
 
 export default function Receive() {
   const { t } = useLanguage();
@@ -44,9 +45,7 @@ export default function Receive() {
         />
         <View>
           <TextL>{symbol}</TextL>
-          <TextS>
-            {chainId === 'AELF' ? 'MainChain ' : 'SideChain '} {chainId} {currentNetwork === 'TESTNET' && 'Testnet'}
-          </TextS>
+          <TextS>{formatChainInfoToShow(chainId, currentNetwork)}</TextS>
         </View>
       </View>
 
@@ -83,7 +82,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   topWrap: {
-    ...GStyles.flexRow,
+    ...GStyles.flexRowWrap,
     marginTop: pTd(20),
     height: pTd(38),
     justifyContent: 'center',
@@ -96,7 +95,7 @@ const styles = StyleSheet.create({
 
   accountCardStyle: {
     marginTop: pTd(40),
-    width: pTd(280),
+    // width: pTd(280),
     alignItems: 'center',
     marginLeft: 'auto',
     marginRight: 'auto',

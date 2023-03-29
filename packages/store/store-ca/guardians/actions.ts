@@ -2,23 +2,9 @@ import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { VerifierItem, VerifyStatus } from '@portkey-wallet/types/verifier';
 import { GuardiansInfo } from '@portkey-wallet/types/types-ca/guardian';
 
-import { IVerifierInfo, UserGuardianItem, UserGuardianStatus } from './type';
+import { IVerifierInfo, StoreUserGuardianItem, UserGuardianItem, UserGuardianStatus } from './type';
 
 export const resetGuardiansState = createAction('verifier/resetGuardiansState');
-
-// TODO Will delete
-/** @deprecated */
-export const fetchVerifierListAsync = createAsyncThunk('verifier/fetchVerifierListAsync', async () => {
-  // const response: any = await fetchVerifierList();
-  // return response;
-});
-
-// TODO Will delete
-/** @deprecated */
-export const fetchGuardianListAsync = createAsyncThunk('verifier/fetchGuardianListAsync', async () => {
-  // const response: GuardiansInfo = await fetchGuardiansList();
-  // return response;
-});
 
 export const setVerifierListAction = createAction<VerifierItem[] | null>('verifier/setVerifierList');
 
@@ -42,5 +28,5 @@ export const resetUserGuardianStatus = createAction('verifier/resetUserGuardianS
 export const setUserGuardianSessionIdAction = createAction<{ key: string; verifierInfo: IVerifierInfo }>(
   'verifier/setUserGuardianSessionId',
 );
-export const setOpGuardianAction = createAction<UserGuardianItem | undefined>('verifier/setOpGuardian');
-export const setPreGuardianAction = createAction<UserGuardianItem | undefined>('verifier/setPreGuardian');
+export const setOpGuardianAction = createAction<StoreUserGuardianItem | undefined>('verifier/setOpGuardian');
+export const setPreGuardianAction = createAction<StoreUserGuardianItem | undefined>('verifier/setPreGuardian');

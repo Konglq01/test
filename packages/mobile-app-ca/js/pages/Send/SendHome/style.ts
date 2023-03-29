@@ -11,6 +11,10 @@ export const styles = StyleSheet.create({
     paddingLeft: 0,
     paddingRight: 0,
   },
+  iconStyle: {
+    paddingRight: pTd(24),
+    paddingLeft: pTd(24),
+  },
   group: {
     backgroundColor: defaultColors.bg1,
     marginTop: pTd(24),

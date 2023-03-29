@@ -48,7 +48,7 @@ new Inject();
  * 'Portkey_did#initialized' event on window.
  */
 export function setGlobalProvider(providerInstance: PortKeyProvider): void {
-  console.log('first');
+  console.log('dispatchEvent', 'Portkey_did#initialized');
   (window as Record<string, any>).portkey_did = providerInstance;
   document.dispatchEvent(
     new CustomEvent('Portkey_did#initialized', {

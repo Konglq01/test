@@ -12,7 +12,7 @@ import { getHolderInfo } from 'utils/sandboxUtil/getHolderInfo';
 import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
-import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import { ISocialLogin, LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import {
   setCurrentGuardianAction,
   setOpGuardianAction,
@@ -27,6 +27,10 @@ import { contractErrorHandler } from 'utils/tryErrorHandler';
 import useGuardianList from 'hooks/useGuardianList';
 import { verification } from 'utils/api';
 import aes from '@portkey-wallet/utils/aes';
+import { IconType } from 'types/icon';
+import { socialLoginAction } from 'utils/lib/serviceWorkerAction';
+import { getGoogleUserInfo, parseAppleIdentityToken } from '@portkey-wallet/utils/authentication';
+import { request } from '@portkey-wallet/api/api-did';
 
 enum SwitchFail {
   default = 0,
@@ -48,10 +52,82 @@ export default function GuardiansView() {
   const { walletInfo } = useCurrentWallet();
   const { passwordSeed } = useUserInfo();
   const editable = useMemo(() => Object.keys(userGuardiansList ?? {}).length > 1, [userGuardiansList]);
+  const isPhoneType = useMemo(() => opGuardian?.guardianType === LoginType.Phone, [opGuardian?.guardianType]);
 
   useEffect(() => {
     getGuardianList({ caHash: walletInfo.caHash });
   }, [getGuardianList, walletInfo.caHash]);
+
+  useEffect(() => {
+    const temp = userGuardiansList?.filter((guardian) => guardian.key === opGuardian?.key) || [];
+    if (temp.length > 0) {
+      dispatch(setCurrentGuardianAction(temp[0]));
+      dispatch(setOpGuardianAction(temp[0]));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userGuardiansList]);
+
+  const handleSocialVerify = useCallback(
+    async (v: ISocialLogin) => {
+      const result = await socialLoginAction(v);
+      const data = result.data;
+      if (!data) throw 'Action error';
+      const verifySocialParams = {
+        verifierId: opGuardian?.verifier?.id,
+        chainId: currentChain?.chainId || DefaultChainId,
+        accessToken: data?.access_token,
+      };
+      if (v === 'Google') {
+        const userInfo = await getGoogleUserInfo(data?.access_token);
+        setLoading(true);
+        // const { firstName, email, id } = userInfo;
+        const res = await request.verify.verifyGoogleToken({
+          params: verifySocialParams,
+        });
+      } else if (v === 'Apple') {
+        const userInfo = parseAppleIdentityToken(data?.access_token);
+        // const { email, userId } = userInfo;
+        setLoading(true);
+        const res = await request.verify.verifyAppleToken({
+          params: verifySocialParams,
+        });
+      }
+
+      const privateKey = aes.decrypt(walletInfo.AESEncryptPrivateKey, passwordSeed);
+      if (!currentChain?.endPoint || !privateKey) return message.error('unset login account error');
+      const curRes = await handleGuardian({
+        rpcUrl: currentChain.endPoint,
+        chainType: currentNetwork.walletType,
+        address: currentChain.caContractAddress,
+        privateKey: privateKey,
+        paramsOption: {
+          method: GuardianMth.SetGuardianTypeForLogin,
+          params: {
+            caHash: walletInfo?.AELF?.caHash,
+            guardian: {
+              type: currentGuardian?.guardianType,
+              verifierId: currentGuardian?.verifier?.id,
+              identifierHash: currentGuardian?.identifierHash,
+            },
+          },
+        },
+      });
+      console.log('SetLoginAccount', curRes);
+      getGuardianList({ caHash: walletInfo.caHash });
+      setLoading(false);
+      // setTipOpen(false);
+    },
+    [
+      currentChain,
+      currentGuardian,
+      currentNetwork.walletType,
+      getGuardianList,
+      opGuardian?.verifier?.id,
+      passwordSeed,
+      setLoading,
+      walletInfo,
+    ],
+  );
 
   const verifyHandler = useCallback(async () => {
     try {
@@ -77,12 +153,7 @@ export default function GuardiansView() {
           },
         });
         console.log('unSetLoginAccount', result);
-        dispatch(
-          setOpGuardianAction({
-            ...opGuardian,
-            isLoginAccount: false,
-          }),
-        );
+        getGuardianList({ caHash: walletInfo.caHash });
         setLoading(false);
         setTipOpen(false);
       } else {
@@ -92,6 +163,13 @@ export default function GuardiansView() {
             loginType: opGuardian?.guardianType as LoginType,
           }),
         );
+        if (LoginType.Apple === opGuardian?.guardianType) {
+          handleSocialVerify('Apple');
+          return;
+        } else if (LoginType.Google === opGuardian?.guardianType) {
+          handleSocialVerify('Google');
+          return;
+        }
         setLoading(true);
 
         const result = await verification.sendVerificationCode({
@@ -130,14 +208,26 @@ export default function GuardiansView() {
     }
   }, [
     currentChain,
-    currentGuardian,
-    currentNetwork,
+    currentGuardian?.guardianType,
+    currentGuardian?.identifierHash,
+    currentGuardian?.verifier?.id,
+    currentNetwork.walletType,
     dispatch,
+    getGuardianList,
+    handleSocialVerify,
     navigate,
-    opGuardian,
+    opGuardian?.guardianAccount,
+    opGuardian?.guardianType,
+    opGuardian?.identifierHash,
+    opGuardian?.isLoginAccount,
+    opGuardian?.key,
+    opGuardian?.salt,
+    opGuardian?.verifier,
     passwordSeed,
     setLoading,
-    walletInfo,
+    walletInfo?.AELF?.caHash,
+    walletInfo.AESEncryptPrivateKey,
+    walletInfo.caHash,
   ]);
 
   const handleSwitch = useCallback(
@@ -162,7 +252,13 @@ export default function GuardiansView() {
           setSwitchFail(SwitchFail.openFail);
         } catch (error: any) {
           if (error?.error?.code?.toString() === '3002') {
-            setTipOpen(true);
+            if (opGuardian?.guardianType === LoginType.Apple) {
+              handleSocialVerify('Apple');
+            } else if (opGuardian?.guardianType === LoginType.Google) {
+              handleSocialVerify('Google');
+            } else {
+              setTipOpen(true);
+            }
           } else {
             const _err = error?.error?.message || 'GetHolderInfo error';
             message.error(_err);
@@ -181,15 +277,38 @@ export default function GuardiansView() {
         }
       }
     },
-    [
-      currentChain,
-      currentGuardian?.guardianAccount,
-      currentNetwork.walletType,
-      opGuardian,
-      userGuardiansList,
-      verifyHandler,
-    ],
+    [currentChain, currentGuardian, currentNetwork, handleSocialVerify, opGuardian, userGuardiansList, verifyHandler],
   );
+
+  const accountShow = useMemo(() => {
+    switch (opGuardian?.guardianType) {
+      case LoginType.Email:
+        return <div className="name account">{opGuardian?.guardianAccount}</div>;
+      case LoginType.Phone:
+        return <div className="name account">+ {opGuardian?.guardianAccount}</div>;
+      case LoginType.Google:
+      case LoginType.Apple:
+        return (
+          <div className="name account flex-column">
+            <span>{opGuardian.firstName || 'name'}</span>
+            <span className="account">{opGuardian.isPrivate ? '******' : opGuardian?.thirdPartyEmail}</span>
+          </div>
+        );
+    }
+  }, [opGuardian]);
+
+  const getGuardianIcon = useCallback((v: LoginType): IconType => {
+    switch (v) {
+      case LoginType.Email:
+        return 'email';
+      case LoginType.Phone:
+        return 'GuardianPhone';
+      case LoginType.Apple:
+        return 'GuardianApple';
+      case LoginType.Google:
+        return 'GuardianGoogle';
+    }
+  }, []);
 
   return (
     <div className="guardian-view-frame">
@@ -214,19 +333,14 @@ export default function GuardiansView() {
           <div className="input-item">
             <p className="label">{`Guardian ${LoginType[opGuardian?.guardianType || 0]}`}</p>
             <p className="control">
-              <CustomSvg type="email" />
-              <div className="name account">{opGuardian?.guardianAccount}</div>
-              {/* TODO */}
-              {/* <div className="name account flex-column">
-                <span>Goria</span>
-                <span className="account">{opGuardian?.guardianAccount}</span>
-              </div> */}
+              <CustomSvg type={getGuardianIcon(opGuardian?.guardianType || 0)} />
+              {accountShow}
             </p>
           </div>
           <div className="input-item">
             <div className="label">{t('Verifier')}</div>
             <div className="control">
-              <BaseVerifierIcon width={32} height={32} src={opGuardian?.verifier?.imageUrl} />
+              <BaseVerifierIcon src={opGuardian?.verifier?.imageUrl} fallback={opGuardian?.verifier?.name[0]} />
               <span className="name">{opGuardian?.verifier?.name ?? ''}</span>
             </div>
           </div>
@@ -253,8 +367,8 @@ export default function GuardiansView() {
       <CommonModal className="verify-confirm-modal" closable={false} open={tipOpen} onCancel={() => setTipOpen(false)}>
         <p className="modal-content">
           {`${opGuardian?.verifier?.name ?? ''} will send a verification code to `}
-          <span className="bold">{opGuardian?.guardianAccount}</span>
-          {` to verify your email address.`}
+          <span className="bold">{`${isPhoneType && '+ '}${opGuardian?.guardianAccount}`}</span>
+          {` to verify your ${isPhoneType ? 'phone number' : 'email address'}.`}
         </p>
         <div className="btn-wrapper">
           <Button onClick={() => setTipOpen(false)}>{t('Cancel')}</Button>

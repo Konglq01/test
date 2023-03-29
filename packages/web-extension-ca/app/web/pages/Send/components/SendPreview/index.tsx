@@ -6,10 +6,12 @@ import { useWalletInfo } from 'store/Provider/hooks';
 import './index.less';
 import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { CROSS_FEE } from '@portkey-wallet/constants/constants-ca/wallet';
-import { unitConverter } from '@portkey-wallet/utils/converter';
+import { formatAmountShow } from '@portkey-wallet/utils/converter';
 import { getEntireDIDAelfAddress, isAelfAddress } from '@portkey-wallet/utils/aelf';
 import { ChainId } from '@portkey-wallet/types';
 import { chainShowText } from '@portkey-wallet/utils';
+import { getAWSUrlWithSize } from '@portkey-wallet/utils/img';
+import { NFT_MIDDLE_SIZE } from '@portkey-wallet/constants/constants-ca/assets';
 
 export default function SendPreview({
   amount,
@@ -55,20 +57,26 @@ export default function SendPreview({
       {type !== 'nft' ? (
         <div className="amount-preview">
           <p className="amount">
-            -{unitConverter(amount)} {symbol}
+            -{formatAmountShow(amount)} {symbol}
           </p>
           <p className="convert">{isTestNet ? '' : `$ ${amount}`}</p>
         </div>
       ) : (
         <div className="amount-preview nft">
-          <div className="avatar">{imageUrl ? <img src={imageUrl} /> : <p>{symbol?.slice(0, 1)}</p>}</div>
+          <div className="avatar">
+            {imageUrl ? (
+              <img src={getAWSUrlWithSize(imageUrl, NFT_MIDDLE_SIZE, NFT_MIDDLE_SIZE)} />
+            ) : (
+              <p>{symbol?.slice(0, 1)}</p>
+            )}
+          </div>
           <div className="info">
             <p className="index flex">
               <p className="alias">{alias}</p>
               <p className="token-id">{`#${tokenId}`}</p>
             </p>
             <p className="quantity">
-              Amount: <span>{unitConverter(amount)}</span>
+              Amount: <span>{formatAmountShow(amount)}</span>
             </p>
           </div>
         </div>
@@ -104,16 +112,16 @@ export default function SendPreview({
       <div className="fee-preview">
         <span className="label">Transaction fee</span>
         <p className="value">
-          <span className="symbol">{`${unitConverter(transactionFee)} ELF`}</span>
+          <span className="symbol">{`${formatAmountShow(transactionFee)} ELF`}</span>
           {/* <span className="usd">{`$ ${ZERO.plus(ElfPrice[0]).times(txFee).toFixed(2)}`}</span> */}
         </p>
       </div>
       {isCross && symbol === 'ELF' && (
         <>
           <div className="fee-preview">
-            <span className="label">Cross chain Transaction fee</span>
+            <span className="label">Cross-chain Transaction fee</span>
             <p className="value">
-              <span className="symbol">{`${unitConverter(CROSS_FEE)} ELF`}</span>
+              <span className="symbol">{`${formatAmountShow(CROSS_FEE)} ELF`}</span>
             </p>
           </div>
           <div className="fee-preview">
@@ -122,7 +130,7 @@ export default function SendPreview({
               <span className="symbol">{`${
                 ZERO.plus(amount).isLessThanOrEqualTo(ZERO.plus(CROSS_FEE))
                   ? '0'
-                  : unitConverter(ZERO.plus(amount).minus(ZERO.plus(CROSS_FEE)))
+                  : formatAmountShow(ZERO.plus(amount).minus(ZERO.plus(CROSS_FEE)))
               } ELF`}</span>
             </p>
           </div>

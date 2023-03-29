@@ -3,21 +3,20 @@ import { StyleSheet } from 'react-native';
 import PageContainer from 'components/PageContainer';
 import { useLanguage } from 'i18n/hooks';
 import navigationService from 'utils/navigationService';
-import { makeStyles } from '@rneui/themed';
 import { TextM } from 'components/CommonText';
-import GStyles from 'assets/theme/GStyles';
 import { defaultColors } from 'assets/theme';
 import MenuItem from './components/MenuItem';
 import { RootStackName } from 'navigation';
 import { IconName } from 'components/Svg';
+import { pTd } from 'utils/unit';
 
-interface MenuItem {
+interface MenuItemType {
   name: RootStackName;
   label: string;
   icon: IconName;
 }
 
-const MenuList: Array<MenuItem> = [
+const MenuList: Array<MenuItemType> = [
   {
     name: 'WalletHome',
     label: 'Wallet',
@@ -47,19 +46,20 @@ const MenuList: Array<MenuItem> = [
 
 export default function MyMenu() {
   const { t } = useLanguage();
-  const styles = useStyles();
   return (
     <PageContainer
       leftDom={<TextM />}
       titleDom={t('My')}
       safeAreaColor={['blue', 'white']}
-      containerStyles={styles.wrap}>
+      containerStyles={styles.container}>
       {MenuList.map(ele => {
         return (
           <MenuItem
+            style={styles.menuItemWrap}
             icon={ele?.icon || 'setting'}
             title={t(ele.label)}
             key={ele.name}
+            iconStyle={styles.MenuItemIconStyle}
             onPress={() => navigationService.navigate(ele.name)}
           />
         );
@@ -68,21 +68,22 @@ export default function MyMenu() {
   );
 }
 
-const useStyles = makeStyles(theme => {
-  return {
-    wrap: {
-      flex: 1,
-      backgroundColor: defaultColors.bg1,
-      ...GStyles.paddingArg(8, 0, 0),
-    },
-    mnemonicItemDisabled: {
-      backgroundColor: theme.colors.bg6,
-      color: theme.colors.font3,
-      borderColor: theme.colors.bg6,
-    },
-    sortMnemonicItem: {
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: theme.colors.border1,
-    },
-  };
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: defaultColors.bg1,
+    paddingTop: pTd(9),
+    paddingHorizontal: 0,
+  },
+  menuItemWrap: {
+    height: pTd(63),
+    borderBottomColor: defaultColors.border6,
+    borderRadius: 0,
+    paddingHorizontal: pTd(20),
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    marginBottom: pTd(1),
+  },
+  MenuItemIconStyle: {
+    marginRight: pTd(16),
+  },
 });

@@ -9,24 +9,26 @@ import './index.less';
 export interface InputInfoProps {
   confirmText: string;
   validateEmail?: ValidateHandler;
+  validatePhone?: ValidateHandler;
   onFinish: (v: { loginType: LoginType; guardianAccount: string }) => void;
 }
 
-export default function InputInfo({ confirmText, validateEmail, onFinish }: InputInfoProps) {
+export default function InputInfo({ confirmText, onFinish, validateEmail, validatePhone }: InputInfoProps) {
   const items: TabsProps['items'] = useMemo(
     () => [
       {
-        key: LoginType[LoginType.PhoneNumber],
+        key: LoginType[LoginType.Phone],
         label: 'Phone',
         children: (
           <PhoneTab
             confirmText={confirmText}
-            onFinish={(v) => {
+            validate={validatePhone}
+            onFinish={(v) =>
               onFinish({
-                loginType: LoginType.Apple,
+                loginType: LoginType.Phone,
                 guardianAccount: `${v.code} ${v.phoneNumber}`,
-              });
-            }}
+              })
+            }
           />
         ),
       },
@@ -37,22 +39,22 @@ export default function InputInfo({ confirmText, validateEmail, onFinish }: Inpu
           <EmailTab
             confirmText={confirmText}
             validateEmail={validateEmail}
-            onFinish={(v) => {
+            onFinish={(v) =>
               onFinish({
                 loginType: LoginType.Email,
                 guardianAccount: v,
-              });
-            }}
+              })
+            }
           />
         ),
       },
     ],
-    [onFinish, confirmText, validateEmail],
+    [confirmText, validatePhone, validateEmail, onFinish],
   );
 
   return (
     <div className="input-info-wrapper">
-      <Tabs defaultActiveKey={LoginType[LoginType.PhoneNumber]} items={items} />
+      <Tabs defaultActiveKey={LoginType[LoginType.Phone]} items={items} />
     </div>
   );
 }

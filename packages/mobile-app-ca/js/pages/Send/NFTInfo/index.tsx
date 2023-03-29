@@ -9,6 +9,7 @@ import { useLanguage } from 'i18n/hooks';
 import { TextL, TextS } from 'components/CommonText';
 import CommonAvatar from 'components/CommonAvatar';
 import { FontStyles } from 'assets/theme/styles';
+import { getAWSUrlWithSize } from '@portkey-wallet/utils/img';
 
 interface AmountNFT {
   nftItem: any;
@@ -21,7 +22,7 @@ export default function NFTInfo({ nftItem = { alias: '', balance: 0 } }: AmountN
     <View style={styles.wrap}>
       <CommonAvatar
         shapeType="square"
-        imageUrl={nftItem.imageUrl}
+        imageUrl={getAWSUrlWithSize(nftItem.imageUrl)}
         title={nftItem?.alias || ''}
         avatarSize={pTd(56)}
         style={styles.avatar}
@@ -38,7 +39,7 @@ export const styles = StyleSheet.create({
   wrap: {
     paddingTop: pTd(12),
     paddingBottom: pTd(16),
-    ...GStyles.flexRow,
+    ...GStyles.flexRowWrap,
     alignItems: 'center',
   },
   avatar: {

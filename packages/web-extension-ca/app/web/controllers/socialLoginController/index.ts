@@ -1,7 +1,7 @@
 import { apis } from 'utils/BrowserApis';
 
 const GOOGLE_OAUTH2_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
-const APPLE_OAUTH2_URL = 'https://appleid.apple.com/auth/authorize';
+// const APPLE_OAUTH2_URL = 'https://appleid.apple.com/auth/authorize';
 const alarmsName = 'SocialLoginTimer';
 
 export default class SocialLoginController {
@@ -42,6 +42,6 @@ export default class SocialLoginController {
   }
 
   isOAuthTabs(url: string) {
-    return !url.includes(GOOGLE_OAUTH2_URL) || !url.includes(APPLE_OAUTH2_URL);
+    return !url.includes(GOOGLE_OAUTH2_URL); //|| !url.includes(APPLE_OAUTH2_URL);
   }
 }

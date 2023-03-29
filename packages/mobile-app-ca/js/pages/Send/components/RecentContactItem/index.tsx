@@ -8,8 +8,9 @@ import { TextM, TextS, TextXXL } from 'components/CommonText';
 import Svg from 'components/Svg';
 import React, { memo, useState } from 'react';
 import { Text, View, TouchableOpacity, StyleSheet } from 'react-native';
-import { formatStr2EllipsisStr } from '@portkey-wallet/utils';
+import { formatChainInfoToShow, formatStr2EllipsisStr } from '@portkey-wallet/utils';
 import { pTd } from 'utils/unit';
+import { ChainId } from '@portkey-wallet/types';
 
 export interface ItemType {
   contact: RecentContactItemType;
@@ -20,7 +21,6 @@ const RecentContactItem: React.FC<ItemType> = props => {
   const { contact, onPress } = props;
 
   const { currentNetwork } = useWallet();
-
   const [collapsed, setCollapsed] = useState(true);
 
   if (contact?.name)
@@ -35,25 +35,36 @@ const RecentContactItem: React.FC<ItemType> = props => {
         </TouchableOpacity>
 
         <Collapsible collapsed={collapsed} style={styles.addressListWrap}>
-          {contact?.addresses?.map((ele, index) => (
-            <TouchableOpacity
-              style={[index !== 0 && styles.addressItemWrap]}
-              key={`${ele?.address}${ele?.chainId}`}
-              onPress={() => {
-                const { address, chainId } = contact.addresses?.[index];
-                onPress?.({ address: `ELF_${address}_${chainId}`, name: contact.name });
-              }}>
-              <Text style={[styles.address, !!0 && FontStyles.font7]}>
-                {formatStr2EllipsisStr(`ELF_${ele?.address}_${ele.chainId}`, 10)}
-              </Text>
-              {/* TODO */}
-              <Text style={[styles.address, !!0 && FontStyles.font7]}>
-                {`${ele?.chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${ele?.chainId} ${
-                  currentNetwork === 'TESTNET' && 'Testnet'
-                }`}
-              </Text>
-            </TouchableOpacity>
-          ))}
+          {contact?.addresses?.map((ele, index) =>
+            ele?.transactionTime ? (
+              <TouchableOpacity
+                style={[index !== 0 && styles.addressItemWrap]}
+                key={`${ele?.address}${ele?.chainId}`}
+                onPress={() => {
+                  const { address, chainId } = ele;
+
+                  onPress?.({ address: `ELF_${address}_${chainId}`, name: contact.name });
+                }}>
+                <Text style={[styles.address, !ele?.transactionTime && FontStyles.font7]}>
+                  {formatStr2EllipsisStr(`ELF_${ele?.address}_${ele.chainId}`, 10)}
+                </Text>
+                {/* TODO */}
+                <Text style={[styles.address, !ele?.transactionTime && FontStyles.font7]}>
+                  {formatChainInfoToShow(ele?.chainId as ChainId, currentNetwork)}
+                </Text>
+              </TouchableOpacity>
+            ) : (
+              <View style={[index !== 0 && styles.addressItemWrap]} key={`${ele?.address}${ele?.chainId}`}>
+                <Text style={[styles.address, !ele?.transactionTime && FontStyles.font7]}>
+                  {formatStr2EllipsisStr(`ELF_${ele?.address}_${ele.chainId}`, 10)}
+                </Text>
+                {/* TODO */}
+                <Text style={[styles.address, !ele?.transactionTime && FontStyles.font7]}>
+                  {formatChainInfoToShow(ele?.chainId as ChainId, currentNetwork)}
+                </Text>
+              </View>
+            ),
+          )}
         </Collapsible>
       </TouchableOpacity>
     );
@@ -62,14 +73,12 @@ const RecentContactItem: React.FC<ItemType> = props => {
     <TouchableOpacity
       style={styles.itemWrap}
       onPress={() => {
-        onPress?.({ address: `ELF_${contact.addresses?.[0].address}_${contact.addresses?.[0].chainId}`, name: '' });
+        onPress?.({ address: `ELF_${contact.address}_${contact.chainId}`, name: '' });
       }}>
       <TextS style={styles.address1}>
-        {formatStr2EllipsisStr(`ELF_${contact.addresses?.[0].address}_${contact.addressChainId}`, 10)}
+        {formatStr2EllipsisStr(`ELF_${contact.address}_${contact?.addressChainId}`, 10)}
       </TextS>
-      <Text style={styles.chainInfo1}>{`${contact?.addressChainId === 'AELF' ? 'MainChain' : 'SideChain'} ${
-        contact?.addressChainId
-      } ${currentNetwork === 'TESTNET' && 'Testnet'}`}</Text>
+      <Text style={styles.chainInfo1}>{formatChainInfoToShow(contact?.addressChainId as ChainId, currentNetwork)}</Text>
     </TouchableOpacity>
   );
 };
@@ -97,7 +106,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   topWrap: {
-    ...GStyles.flexRow,
+    ...GStyles.flexRowWrap,
     alignItems: 'center',
   },
   contactName: {
