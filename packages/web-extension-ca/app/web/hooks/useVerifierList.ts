@@ -4,11 +4,13 @@ import { setVerifierListAction } from '@portkey-wallet/store/store-ca/guardians/
 import { getVerifierList } from 'utils/sandboxUtil/getVerifierList';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
-import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
+import { useOriginChainId } from '@portkey-wallet/hooks/hooks-ca/wallet';
 
 const useVerifierList = () => {
   const dispatch = useAppDispatch();
-  const currentChain = useCurrentChain(DefaultChainId);
+
+  const originChainId = useOriginChainId();
+  const currentChain = useCurrentChain(originChainId);
   const currentNetwork = useCurrentNetworkInfo();
   useEffect(() => {
     console.log(currentChain, 'currentChain===');

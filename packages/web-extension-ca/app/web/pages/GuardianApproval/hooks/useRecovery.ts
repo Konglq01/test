@@ -1,6 +1,6 @@
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
-import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { useCurrentWallet, useOriginChainId } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import {
   resetUserGuardianStatus,
   setOpGuardianAction,
@@ -29,7 +29,9 @@ export const useRecovery = () => {
   const { setLoading } = useLoading();
   const { walletInfo } = useCurrentWallet();
   const { passwordSeed } = useUserInfo();
-  const currentChain = useCurrentChain();
+
+  const originChainId = useOriginChainId();
+  const currentChain = useCurrentChain(originChainId);
   const { state } = useLocation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -55,7 +57,7 @@ export const useRecovery = () => {
         default:
           value = {};
       }
-      const result = await handleGuardian({
+      await handleGuardian({
         rpcUrl: currentChain.endPoint,
         chainType: currentNetwork.walletType,
         address: currentChain.caContractAddress,
@@ -63,7 +65,7 @@ export const useRecovery = () => {
         paramsOption: {
           method: MethodType[state],
           params: {
-            caHash: walletInfo?.AELF?.caHash,
+            caHash: walletInfo?.caHash,
             ...value,
           },
         },

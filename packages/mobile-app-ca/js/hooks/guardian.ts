@@ -56,20 +56,6 @@ export const useGetGuardiansInfo = () => {
   );
 };
 
-export const useGetRegisterInfo = () => {
-  return useCallback(async (info: { loginGuardianIdentifier?: string; caHash?: string }) => {
-    try {
-      return await request.wallet.getRegisterInfo({
-        params: info,
-      });
-    } catch (error: any) {
-      const code = handleErrorCode(error);
-      const message = handleErrorMessage(error);
-      throw { message: checkHolderError(message, code), code };
-    }
-  }, []);
-};
-
 export const useGetGuardiansInfoWriteStore = () => {
   const dispatch = useAppDispatch();
   const getGetGuardiansInfo = useGetGuardiansInfo();

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useCallback } from 'react';
 import { useAppCommonDispatch } from '../index';
 import { getChainListAsync } from '@portkey-wallet/store/store-ca/wallet/actions';
-import { useCurrentWallet } from './wallet';
+import { useCurrentWallet, useOriginChainId } from './wallet';
 import { ChainId } from '@portkey-wallet/types';
 
 export function useChainListFetch() {
@@ -16,7 +16,9 @@ export function useCurrentChainList() {
   return useMemo(() => chainInfo?.[currentNetwork], [chainInfo, currentNetwork]);
 }
 
-export function useCurrentChain(chainId: ChainId = 'AELF') {
+export function useCurrentChain(_chainId?: ChainId) {
+  const originChainId = useOriginChainId();
+  const chainId = useMemo(() => _chainId || originChainId, [_chainId, originChainId]);
   const currentChainList = useCurrentChainList();
   return useMemo(() => currentChainList?.find(chain => chain.chainId === chainId), [currentChainList, chainId]);
 }

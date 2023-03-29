@@ -73,7 +73,8 @@ export const useCurrentWalletDetails = () => {
 export const useDeviceList = () => {
   const networkInfo = useCurrentNetworkInfo();
   const walletInfo = useCurrentWalletInfo();
-  const chainInfo = useCurrentChain();
+  const originChainId = useOriginChainId();
+  const chainInfo = useCurrentChain(originChainId);
   const { data, error, refetch } = useCaHolderManagerInfoQuery({
     client: getApolloClient(networkInfo.networkType),
     variables: {

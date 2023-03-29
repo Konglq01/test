@@ -10,12 +10,12 @@ import { useLocation, useNavigate } from 'react-router';
 import { useAppDispatch, useLoading } from 'store/Provider/hooks';
 import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
 import { LoginInfo } from 'store/reducers/loginCache/type';
-import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
 import { verification } from 'utils/api';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import { handleErrorMessage } from '@portkey-wallet/utils';
 import { useVerifyToken } from 'hooks/authentication';
+import { useOriginChainId } from '@portkey-wallet/hooks/hooks-ca/wallet';
 
 interface GuardianItemProps {
   disabled?: boolean;
@@ -29,6 +29,7 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
   const { state } = useLocation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const originChainId = useOriginChainId();
 
   const isSocialLogin = useMemo(
     () => item.guardianType === LoginType.Google || item.guardianType === LoginType.Apple,
@@ -50,7 +51,7 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
             guardianIdentifier: item?.guardianAccount,
             type: LoginType[item.guardianType],
             verifierId: item?.verifier?.id || '',
-            chainId: DefaultChainId,
+            chainId: originChainId,
           },
         });
         setLoading(false);
@@ -79,7 +80,7 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
         message.error(verifyErrorHandler(error));
       }
     },
-    [setLoading, dispatch, navigate, state],
+    [setLoading, dispatch, navigate, state, originChainId],
   );
 
   const SendCode = useCallback(
@@ -101,7 +102,7 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
             guardianIdentifier: item?.guardianAccount,
             type: LoginType[item.guardianType],
             verifierId: item.verifier?.id || '',
-            chainId: DefaultChainId,
+            chainId: originChainId,
           },
         });
         setLoading(false);
@@ -135,7 +136,7 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
         message.error(_error);
       }
     },
-    [state, loginAccount, setLoading, guardianSendCode, dispatch, navigate],
+    [state, loginAccount, originChainId, setLoading, guardianSendCode, dispatch, navigate],
   );
 
   const verifyToken = useVerifyToken();
@@ -148,7 +149,7 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
           accessToken: loginAccount?.authenticationInfo?.[item.guardianAccount],
           id: item.guardianAccount,
           verifierId: item.verifier?.id,
-          chainId: DefaultChainId,
+          chainId: originChainId,
         });
         const verifierInfo: VerifierInfo = { ...result, verifierId: item?.verifier?.id };
         dispatch(
@@ -166,7 +167,7 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
         setLoading(false);
       }
     },
-    [dispatch, loginAccount?.authenticationInfo, setLoading, verifyToken],
+    [dispatch, loginAccount, originChainId, setLoading, verifyToken],
   );
 
   const verifyingHandler = useCallback(
