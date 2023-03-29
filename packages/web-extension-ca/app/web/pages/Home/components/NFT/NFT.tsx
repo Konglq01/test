@@ -12,9 +12,8 @@ import { useAppDispatch, useAssetInfo, useCommonState } from 'store/Provider/hoo
 import './index.less';
 import { transNetworkText } from '@portkey-wallet/utils/activity';
 import { useIsTestnet } from 'hooks/useNetwork';
-import { NFT_MIDDLE_SIZE, PAGE_SIZE_IN_NFT_ITEM } from '@portkey-wallet/constants/constants-ca/assets';
+import { PAGE_SIZE_IN_NFT_ITEM } from '@portkey-wallet/constants/constants-ca/assets';
 import { PAGE_SIZE_IN_NFT_ITEM_PROMPT } from 'constants/index';
-import { getAWSUrlWithSize } from '@portkey-wallet/utils/img';
 
 export default function NFT() {
   const nav = useNavigate();
@@ -87,7 +86,7 @@ export default function NFT() {
           header={
             <div className="protocol">
               <div className="avatar">
-                {nft.imageUrl ? <img src={getAWSUrlWithSize(nft.imageUrl)} /> : nft.collectionName?.slice(0, 1)}
+                {nft.imageUrl ? <img src={nft.imageUrl} /> : nft.collectionName?.slice(0, 1)}
               </div>
               <div className="info">
                 <p className="alias">{nft.collectionName}</p>
@@ -105,11 +104,7 @@ export default function NFT() {
                     <div
                       key={`${nft.symbol}-${nftItem.symbol}`}
                       style={{
-                        backgroundImage: `url('${getAWSUrlWithSize(
-                          nftItem.imageUrl,
-                          NFT_MIDDLE_SIZE,
-                          NFT_MIDDLE_SIZE,
-                        )}')`,
+                        backgroundImage: `url('${nftItem.imageUrl}')`,
                       }}
                       className={clsx(['item', nftItem.imageUrl ? 'item-img' : ''])}
                       onClick={() => {
