@@ -35,6 +35,7 @@ const NFTAvatar: React.FC<NoDataPropsType> = props => {
     <TouchableOpacity style={[styles.wrap, ...outStyles]} onPress={onPress}>
       {imageUrl && (
         <Image
+          resizeMode={'contain'}
           source={{
             uri: getAWSUrlWithSize(imageUrl, NFT_MIDDLE_SIZE),
           }}

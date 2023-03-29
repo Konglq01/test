@@ -251,7 +251,7 @@ const SendHome: React.FC = () => {
           {!assetInfo?.imageUrl ? (
             <Text style={styles.noImg}>{assetInfo?.alias[0]}</Text>
           ) : (
-            <Image style={styles.img} source={{ uri: getAWSUrlWithSize(assetInfo?.imageUrl) }} />
+            <Image resizeMode={'contain'} style={styles.img} source={{ uri: getAWSUrlWithSize(assetInfo?.imageUrl) }} />
           )}
           <View style={styles.topLeft}>
             <TextL style={[styles.nftTitle, fonts.mediumFont]}>{`${assetInfo.alias} #${assetInfo?.tokenId}`} </TextL>
