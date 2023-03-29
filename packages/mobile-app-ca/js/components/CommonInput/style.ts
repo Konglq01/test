@@ -40,7 +40,8 @@ export const generalStyles = StyleSheet.create({
   },
   inputContainerStyle: {
     borderColor: border1,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderBottomWidth: StyleSheet.hairlineWidth,
     height: pTd(56),
     borderRadius: pTd(6),
   },

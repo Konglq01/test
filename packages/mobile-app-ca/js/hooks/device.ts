@@ -43,7 +43,7 @@ export function useCheckUpdate() {
               onPress: () => Linking.openURL(req.downloadUrl),
             },
           ];
-          if (!req.isForceUpdate) buttons.push({ type: 'outline', title: 'Cancel' });
+          if (!req.isForceUpdate) buttons.push({ type: 'outline', title: 'Cancel', onPress: OverlayModal.hide });
           OverlayModal.destroy();
           ActionSheet.alert({
             title: req.title,
