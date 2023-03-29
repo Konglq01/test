@@ -112,12 +112,7 @@ export default function QRCode({ setLoginType }: { setLoginType: (type: PageLogi
       <TextXXXL style={[styles.qrCodeTitle, GStyles.textAlignCenter]}>Scan code to log in</TextXXXL>
       <TextM style={[GStyles.textAlignCenter, FontStyles.font3]}>Please use the Portkey DApp to scan the QR code</TextM>
       <View style={[GStyles.alignCenter, styles.qrCodeBox]}>
-        {!newWallet && (
-          <View style={styles.loading}>
-            <TextL>Updating...</TextL>
-          </View>
-        )}
-        <CommonQRCodeStyled qrData={qrData} />
+        <CommonQRCodeStyled qrData={qrData} hasMask={!newWallet} />
       </View>
     </View>
   );
