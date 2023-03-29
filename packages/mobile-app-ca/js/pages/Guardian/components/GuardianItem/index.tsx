@@ -1,7 +1,7 @@
 import { defaultColors } from 'assets/theme';
 import GStyles from 'assets/theme/GStyles';
 import CommonButton, { CommonButtonProps } from 'components/CommonButton';
-import { TextM } from 'components/CommonText';
+import { TextM, TextS } from 'components/CommonText';
 import Svg from 'components/Svg';
 import React, { useCallback, useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
@@ -249,9 +249,9 @@ export default function GuardianItem({
     return (
       <View style={[styles.nameStyle, GStyles.flex1]}>
         <TextM style={styles.firstNameStyle}>{guardianItem.firstName}</TextM>
-        <TextM style={FontStyles.font3} numberOfLines={1}>
+        <TextS style={FontStyles.font3} numberOfLines={1}>
           {guardianAccount}
-        </TextM>
+        </TextS>
       </View>
     );
   }, [guardianAccount, guardianItem.firstName]);

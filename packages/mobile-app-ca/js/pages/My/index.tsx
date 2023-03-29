@@ -73,11 +73,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: defaultColors.bg1,
     paddingTop: pTd(8),
-    paddingHorizontal: pTd(4),
+    paddingHorizontal: 0,
   },
   menuItemWrap: {
     height: pTd(64),
     borderBottomColor: defaultColors.border6,
+    borderRadius: 0,
+    paddingHorizontal: pTd(20),
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   MenuItemIconStyle: {
