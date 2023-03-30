@@ -42,7 +42,7 @@ export default function SetWalletPin() {
   const getWalletCAAddressResult = useFetchDidWallet();
   const network = useCurrentNetworkInfo();
   const { userGuardianStatus } = useGuardiansInfo();
-  const extraData = useMemo(() => extraDataEncode(getDeviceInfo(DEVICE_TYPE)), []);
+
   console.log(walletInfo, state, scanWalletInfo, scanCaWalletInfo, 'walletInfo===caWallet');
 
   const requestRegisterDIDWallet = useCallback(
@@ -52,6 +52,7 @@ export default function SetWalletPin() {
         throw 'Missing account!!! Please login/register again';
       const requestId = randomId();
       if (!registerVerifier) throw 'Missing Verifier Server';
+      const extraData = await extraDataEncode(getDeviceInfo(DEVICE_TYPE));
       const result = await registerDIDWallet({
         type: LoginType[loginAccount.loginType],
         loginGuardianIdentifier: loginAccount.guardianAccount.replaceAll(' ', ''),
@@ -71,7 +72,7 @@ export default function SetWalletPin() {
         sessionId: result.sessionId,
       };
     },
-    [extraData, loginAccount, registerVerifier],
+    [loginAccount, registerVerifier],
   );
 
   const getGuardiansApproved: () => GuardiansApprovedType[] = useCallback(() => {
@@ -92,6 +93,7 @@ export default function SetWalletPin() {
         throw 'Missing account!!! Please login/register again';
       const guardiansApproved = getGuardiansApproved();
       const requestId = randomId();
+      const extraData = await extraDataEncode(getDeviceInfo(DEVICE_TYPE));
       const result = await recoveryDIDWallet({
         loginGuardianIdentifier: loginAccount.guardianAccount.replaceAll(' ', ''),
         manager: managerAddress,
@@ -109,7 +111,7 @@ export default function SetWalletPin() {
         sessionId: result.sessionId,
       };
     },
-    [loginAccount, getGuardiansApproved, extraData],
+    [loginAccount, getGuardiansApproved],
   );
 
   const createByScan = useCallback(

@@ -62,10 +62,11 @@ export function useOnManagerAddressAndQueryResult() {
       const isRecovery = managerInfo.verificationType === VerificationType.communityRecovery;
       try {
         const tmpWalletInfo = walletInfo?.address ? walletInfo : AElf.wallet.createNewWallet();
+        const extraData = await extraDataEncode(getDeviceInfo());
         let data: any = {
           loginGuardianIdentifier: managerInfo.loginAccount,
           manager: tmpWalletInfo.address,
-          extraData: extraDataEncode(getDeviceInfo()),
+          extraData,
           context: {
             clientId: tmpWalletInfo.address,
             requestId: tmpWalletInfo.address,

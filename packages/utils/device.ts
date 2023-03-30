@@ -1,3 +1,4 @@
+import { request } from '@portkey-wallet/api/api-did';
 import { DEVICE_TYPE_INFO, DEVICE_INFO_VERSION } from '@portkey-wallet/constants/constants-ca/device';
 import {
   DeviceInfoType,
@@ -24,37 +25,93 @@ export const getDeviceInfoFromQR = (qrExtraData?: QRExtraDataType, deviceType?: 
   return DEVICE_TYPE_INFO[deviceType];
 };
 
-export const extraDataEncode = (deviceInfo: DeviceInfoType): string => {
+export const extraDataEncode = async (deviceInfo: DeviceInfoType, isNeedEncrypt = false): Promise<string> => {
+  if (!isNeedEncrypt) {
+    return JSON.stringify({
+      transactionTime: Date.now(),
+      deviceInfo: JSON.stringify(deviceInfo),
+      version: DEVICE_INFO_VERSION,
+    });
+  }
+
+  let deviceInfoJSON = JSON.stringify(deviceInfo);
+  try {
+    const rst = await request.device.fetchEncrypt({
+      params: {
+        data: {
+          deviceInfo: deviceInfoJSON,
+        },
+      },
+    });
+    const resultMap = rst.result;
+    deviceInfoJSON = resultMap?.deviceInfo || '';
+  } catch (error) {
+    deviceInfoJSON = '';
+    console.log(error);
+  }
+
   return JSON.stringify({
     transactionTime: Date.now(),
-    deviceInfo: JSON.stringify(deviceInfo),
+    deviceInfo: deviceInfoJSON,
     version: DEVICE_INFO_VERSION,
   });
 };
 
-export const extraDataDecode = (extraDataStr: string): ExtraDataDecodeType => {
-  let version = '0.0.1';
-  let extraEncodeData: ExtraDataType | string = extraDataStr;
+export const extraDataListDecode = async (extraDataStrList: string[]) => {
+  const extraDataList = extraDataStrList.map(extraDataStr => {
+    // let version = '0.0.1';
+    let extraEncodeData: ExtraDataType;
+    try {
+      extraEncodeData = JSON.parse(extraDataStr) as ExtraDataType;
+      if (!extraEncodeData.deviceInfo) extraEncodeData.deviceInfo = '';
+      if (typeof extraEncodeData.version !== 'string') extraEncodeData.version = '0.0.1';
+      if (typeof extraEncodeData.transactionTime !== 'number' || !checkDateNumber(extraEncodeData.transactionTime)) {
+        extraEncodeData.transactionTime = 0;
+      }
+    } catch (error) {
+      extraEncodeData = {
+        deviceInfo: extraDataStr,
+        transactionTime: 0,
+        version: '0.0.1',
+      };
+    }
+    return extraEncodeData;
+  });
 
+  const decryptData: Record<string, string> = {};
+  extraDataList.forEach((item, idx) => {
+    if (!item.deviceInfo || item.version !== '2.0.0') return;
+    decryptData[`${idx}`] = item.deviceInfo;
+  });
   try {
-    extraEncodeData = JSON.parse(extraDataStr) as ExtraDataType;
-    version = extraEncodeData.version;
+    const rst = await request.device.fetchDecrypt({
+      params: {
+        data: decryptData,
+      },
+    });
+    const resultMap = rst.result;
+    for (const key in resultMap) {
+      extraDataList[Number(key)].deviceInfo = resultMap[key];
+    }
   } catch (error) {
-    // version = '0.0.1';
+    console.log('fetchDecrypt: error', error);
   }
 
-  const extraData: ExtraDataDecodeType = {
-    version,
-    transactionTime: 0,
+  return extraDataList.map(item => extraDataDecode(item));
+};
+
+export const extraDataDecode = (_extraData: ExtraDataType): ExtraDataDecodeType => {
+  const extraData = {
+    ..._extraData,
     deviceInfo: {
       ...DEVICE_TYPE_INFO[DeviceType.OTHER],
     },
   };
 
-  switch (version) {
+  const deviceInfoStr = _extraData.deviceInfo;
+  switch (_extraData.version) {
     case '0.0.1':
-      if (typeof extraEncodeData !== 'string') break;
-      const extraDataArray = extraEncodeData.split(',').map(itemValue => Number(itemValue));
+      const extraDataArray = deviceInfoStr.split(',').map(itemValue => Number(itemValue));
 
       let deviceType: DeviceType = DeviceType.OTHER,
         transactionTime: number | undefined = undefined;
@@ -70,24 +127,23 @@ export const extraDataDecode = (extraDataStr: string): ExtraDataDecodeType => {
       if (transactionTime === undefined && secondNum !== undefined && checkDateNumber(secondNum)) {
         transactionTime = secondNum;
       }
-      extraData.deviceInfo = DEVICE_TYPE_INFO[deviceType];
+      if (!DEVICE_TYPE_INFO[deviceType] === undefined) {
+        extraData.deviceInfo = DEVICE_TYPE_INFO[deviceType];
+      }
       if (transactionTime) {
         extraData.transactionTime = transactionTime;
       }
       break;
 
     case '1.0.0':
-      if (typeof extraEncodeData === 'string') break;
+    case '2.0.0':
       try {
         extraData.deviceInfo = {
           ...extraData.deviceInfo,
-          ...JSON.parse(extraEncodeData.deviceInfo),
+          ...JSON.parse(deviceInfoStr),
         };
       } catch (error) {
         // extraData.deviceInfo = DEVICE_TYPE_INFO[DeviceType.OTHER];
-      }
-      if (checkDateNumber(extraEncodeData.transactionTime)) {
-        extraData.transactionTime = extraEncodeData.transactionTime;
       }
       break;
 
