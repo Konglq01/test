@@ -1,6 +1,5 @@
-import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
-import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
+import { useOriginChainId } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { useFetchWalletCAAddress } from '@portkey-wallet/hooks/hooks-ca/wallet-result';
 import { resetWallet, setCAInfo } from '@portkey-wallet/store/store-ca/wallet/actions';
 import { VerificationType } from '@portkey-wallet/types/verifier';
@@ -15,8 +14,9 @@ import { contractErrorHandler } from 'utils/tryErrorHandler';
 export default function useFetchDidWallet() {
   const fetchWalletResult = useFetchWalletCAAddress();
   const dispatch = useAppDispatch();
-  const currentChain = useCurrentChain();
-  const currentNetwork = useCurrentNetworkInfo();
+
+  const originChainId = useOriginChainId();
+  const currentChain = useCurrentChain(originChainId);
   const navigate = useNavigate();
 
   const fetch = useCallback(
@@ -61,12 +61,8 @@ export default function useFetchDidWallet() {
         if (!pwd) throw PinErrorMessage.invalidPin;
         try {
           const result = await getHolderInfo({
-            rpcUrl: currentChain.endPoint,
-            address: currentChain.caContractAddress,
-            chainType: currentNetwork.walletType,
-            paramsOption: {
-              caHash: walletResult.caHash,
-            },
+            chainId: originChainId,
+            caHash: walletResult.caHash,
           });
 
           console.log(result, 'result===');
@@ -82,7 +78,7 @@ export default function useFetchDidWallet() {
                 caHash: walletResult.caHash,
               },
               pin: pwd,
-              chainId: DefaultChainId,
+              chainId: originChainId,
             }),
           );
           await setLocalStorage({
@@ -95,7 +91,7 @@ export default function useFetchDidWallet() {
         }
       }
     },
-    [currentChain, currentNetwork, dispatch, fetchWalletResult, navigate],
+    [currentChain, dispatch, fetchWalletResult, navigate, originChainId],
   );
   return fetch;
 }

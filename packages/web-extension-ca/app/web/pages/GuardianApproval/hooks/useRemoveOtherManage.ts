@@ -1,6 +1,6 @@
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
-import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { useCurrentWallet, useOriginChainId } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import aes from '@portkey-wallet/utils/aes';
 import { message } from 'antd';
 import { DEVICE_TYPE } from 'constants/index';
@@ -15,7 +15,9 @@ export const useRemoveOtherManage = () => {
   const { setLoading } = useLoading();
   const { walletInfo } = useCurrentWallet();
   const { passwordSeed } = useUserInfo();
-  const currentChain = useCurrentChain();
+
+  const originChainId = useOriginChainId();
+  const currentChain = useCurrentChain(originChainId);
   const { state } = useLocation();
   const navigate = useNavigate();
   const currentNetwork = useCurrentNetworkInfo();

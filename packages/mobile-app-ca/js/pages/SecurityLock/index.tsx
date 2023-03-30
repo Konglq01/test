@@ -9,14 +9,13 @@ import { PIN_SIZE } from '@portkey-wallet/constants/misc';
 import { checkPin } from 'utils/redux';
 import { useNavigation } from '@react-navigation/native';
 import navigationService from 'utils/navigationService';
-import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { useCurrentWalletInfo, useOriginChainId } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import Loading from 'components/Loading';
 import useBiometricsReady from 'hooks/useBiometrics';
 import { usePreventHardwareBack } from '@portkey-wallet/hooks/mobile';
 import { onResultFail, TimerResult } from 'utils/wallet';
 import { setCAInfo } from '@portkey-wallet/store/store-ca/wallet/actions';
 import { CAInfo } from '@portkey-wallet/types/types-ca/wallet';
-import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { VerificationType } from '@portkey-wallet/types/verifier';
 import useEffectOnce from 'hooks/useEffectOnce';
 import PinContainer from 'components/PinContainer';
@@ -38,6 +37,7 @@ export default function SecurityLock() {
   const isSyncCAInfo = useMemo(() => address && managerInfo && !caHash, [address, caHash, managerInfo]);
   const navigation = useNavigation();
   const onIntervalGetResult = useIntervalGetResult();
+  const originChainId = useOriginChainId();
 
   useEffect(() => {
     if (isSyncCAInfo) {
@@ -90,7 +90,7 @@ export default function SecurityLock() {
               setCAInfo({
                 caInfo: info,
                 pin: pwd,
-                chainId: DefaultChainId,
+                chainId: originChainId,
               }),
             );
             Loading.hide();
@@ -105,13 +105,13 @@ export default function SecurityLock() {
           setCAInfo({
             caInfo,
             pin: pwd,
-            chainId: DefaultChainId,
+            chainId: originChainId,
           }),
         );
       }
       handleRouter(pwd);
     },
-    [caInfo, dispatch, handleRouter, isSyncCAInfo, managerInfo, onIntervalGetResult],
+    [caInfo, dispatch, handleRouter, isSyncCAInfo, managerInfo, onIntervalGetResult, originChainId],
   );
 
   const verifyBiometrics = useDebounceCallback(

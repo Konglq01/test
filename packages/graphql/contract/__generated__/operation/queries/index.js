@@ -3,7 +3,9 @@ const path = require('path');
 
 module.exports.tokenInfo = fs.readFileSync(path.join(__dirname, 'tokenInfo.gql'), 'utf8');
 module.exports.caHolderTransaction = fs.readFileSync(path.join(__dirname, 'caHolderTransaction.gql'), 'utf8');
+module.exports.caHolderTransactionInfo = fs.readFileSync(path.join(__dirname, 'caHolderTransactionInfo.gql'), 'utf8');
 module.exports.caHolderManagerInfo = fs.readFileSync(path.join(__dirname, 'caHolderManagerInfo.gql'), 'utf8');
+module.exports.caHolderInfo = fs.readFileSync(path.join(__dirname, 'caHolderInfo.gql'), 'utf8');
 module.exports.loginGuardianInfo = fs.readFileSync(path.join(__dirname, 'loginGuardianInfo.gql'), 'utf8');
 module.exports.caHolderNFTCollectionBalanceInfo = fs.readFileSync(
   path.join(__dirname, 'caHolderNFTCollectionBalanceInfo.gql'),

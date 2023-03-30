@@ -4,11 +4,10 @@ import { ScrollView } from 'react-native-gesture-handler';
 import navigationService from '../../utils/navigationService';
 import SafeAreaBox from 'components/SafeAreaBox';
 import ActionSheet from 'components/ActionSheet';
-import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { useCurrentWalletInfo, useOriginChainId } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { CrashTest } from 'Test/CrashTest';
 import Loading from 'components/Loading';
 import { contractQueries } from '@portkey-wallet/graphql/index';
-import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { getManagerAccount } from 'utils/redux';
 import { useGuardiansInfo, usePin } from 'hooks/store';
@@ -22,8 +21,6 @@ import { useGetHolderInfo } from 'hooks/guardian';
 import { useAppCommonDispatch } from '@portkey-wallet/hooks';
 import { useAppCASelector } from '@portkey-wallet/hooks/hooks-ca';
 import { fetchTokensPriceAsync } from '@portkey-wallet/store/store-ca/assets/slice';
-import AppleTest from 'Test/AppleTest';
-import GoogleTest from 'Test/GoogleTest';
 import { extraDataEncode } from '@portkey-wallet/utils/device';
 import { useGetDeviceInfo } from 'hooks/device';
 import * as Network from 'expo-network';
@@ -36,7 +33,8 @@ export default function HomeScreen() {
 
   const pin = usePin();
   const getDeviceInfo = useGetDeviceInfo();
-  const chainInfo = useCurrentChain('AELF');
+  const originChainId = useOriginChainId();
+  const chainInfo = useCurrentChain(originChainId);
   const getHolderInfo = useGetHolderInfo();
   const { userGuardiansList } = useGuardiansInfo();
   console.log(userGuardiansList, '=====userGuardiansList');
@@ -45,8 +43,6 @@ export default function HomeScreen() {
     <SafeAreaBox>
       <ScrollView>
         <Text>Test Screen</Text>
-        <AppleTest />
-        <GoogleTest />
         <Button title="ActionSheet show" onPress={() => ActionSheet.show([{ title: '123' }, { title: '123' }])} />
         <Button
           title="loading show"
@@ -63,7 +59,6 @@ export default function HomeScreen() {
           onPress={async () => {
             try {
               const { caHolderManagerInfo } = await contractQueries.getCAHolderByManager('TESTNET', {
-                chainId: DefaultChainId,
                 manager: wallet.address,
               });
               console.log(caHolderManagerInfo, '=====caHolderManagerInfo');
@@ -84,7 +79,7 @@ export default function HomeScreen() {
               account,
             });
             const req = await contract?.callSendMethod('ManagerForwardCall', '', {
-              caHash: wallet.AELF?.caHash,
+              caHash: wallet[originChainId]?.caHash,
               contractAddress: 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE',
               methodName: 'Transfer',
               args: {
@@ -113,7 +108,7 @@ export default function HomeScreen() {
               'ManagerForwardCall',
               '',
               {
-                caHash: wallet.AELF?.caHash,
+                caHash: wallet[originChainId]?.caHash,
                 contractAddress: 'JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE',
                 methodName: 'Transfer',
                 args: {
@@ -161,7 +156,7 @@ export default function HomeScreen() {
               });
               console.log(holderInfo, '===holderInfo');
 
-              if (!chainInfo || !pin || !wallet.AELF?.caHash) return;
+              if (!chainInfo || !pin || !wallet[originChainId]?.caHash) return;
               const req = await request.contact.addContact({
                 params: {
                   name: 'xxx',

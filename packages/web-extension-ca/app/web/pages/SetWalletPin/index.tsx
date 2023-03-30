@@ -6,7 +6,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { useAppDispatch, useGuardiansInfo, useLoading, useLoginInfo } from 'store/Provider/hooks';
 import { setPinAction } from 'utils/lib/serviceWorkerAction';
-import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { useCurrentWallet, useOriginChainId } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { setLocalStorage } from 'utils/storage/chromeStorage';
 import { createWallet, setManagerInfo } from '@portkey-wallet/store/store-ca/wallet/actions';
 import { useTranslation } from 'react-i18next';
@@ -16,7 +16,6 @@ import { isWalletError } from '@portkey-wallet/store/wallet/utils';
 import { useHardwareBack } from 'hooks/useHardwareBack';
 import CommonModal from 'components/CommonModal';
 import AElf from 'aelf-sdk';
-import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { randomId } from '@portkey-wallet/utils';
 import useFetchDidWallet from 'hooks/useFetchDidWallet';
 import { setPasswordSeed } from 'store/reducers/user/slice';
@@ -44,6 +43,8 @@ export default function SetWalletPin() {
   const network = useCurrentNetworkInfo();
   const { userGuardianStatus } = useGuardiansInfo();
   const extraData = useMemo(() => extraDataEncode(getDeviceInfo(DEVICE_TYPE)), []);
+  const originChainId = useOriginChainId();
+
   console.log(walletInfo, state, scanWalletInfo, scanCaWalletInfo, 'walletInfo===caWallet');
 
   const requestRegisterDIDWallet = useCallback(
@@ -58,7 +59,7 @@ export default function SetWalletPin() {
         loginGuardianIdentifier: loginAccount.guardianAccount.replaceAll(' ', ''),
         manager: managerAddress,
         extraData, //navigator.userAgent,
-        chainId: DefaultChainId,
+        chainId: originChainId,
         verifierId: registerVerifier.verifierId,
         verificationDoc: registerVerifier.verificationDoc,
         signature: registerVerifier.signature,
@@ -72,7 +73,7 @@ export default function SetWalletPin() {
         sessionId: result.sessionId,
       };
     },
-    [extraData, loginAccount, registerVerifier],
+    [extraData, loginAccount, originChainId, registerVerifier],
   );
 
   const getGuardiansApproved: () => GuardiansApprovedType[] = useCallback(() => {
@@ -97,7 +98,7 @@ export default function SetWalletPin() {
         loginGuardianIdentifier: loginAccount.guardianAccount.replaceAll(' ', ''),
         manager: managerAddress,
         extraData, //navigator.userAgent,
-        chainId: DefaultChainId,
+        chainId: originChainId,
         guardiansApproved,
         context: {
           clientId: managerAddress,
@@ -110,7 +111,7 @@ export default function SetWalletPin() {
         sessionId: result.sessionId,
       };
     },
-    [loginAccount, getGuardiansApproved, extraData],
+    [loginAccount, getGuardiansApproved, extraData, originChainId],
   );
 
   const createByScan = useCallback(

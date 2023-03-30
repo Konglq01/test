@@ -14,7 +14,7 @@ interface GraphqlRequestCommonType {
 type GraphqlCommonOption<T> = T extends GraphqlRequestCommonType ? PartialOption<T, 'skipCount' | 'maxResultCount'> : T;
 
 //getCAHolderByManager
-export type GetCAHolderByManagerParamsType = Required<Pick<GetCaHolderManagerInfoDto, 'manager' | 'chainId'>>;
+export type GetCAHolderByManagerParamsType = Required<Pick<GetCaHolderManagerInfoDto, 'manager'>>;
 
 export type CaHolderWithGuardian = CaHolderManagerDto & {
   loginGuardianInfo: Array<LoginGuardianDto | null>;

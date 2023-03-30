@@ -1,6 +1,6 @@
 import * as WebBrowser from 'expo-web-browser';
 import { useCallback, useMemo, useState } from 'react';
-import appleAuthentication from 'utils/appleAuthentication';
+import * as appleAuthentication from 'utils/appleAuthentication';
 import { AppleAuthenticationCredential } from 'expo-apple-authentication';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { isIos } from '@portkey-wallet/utils/mobile/device';

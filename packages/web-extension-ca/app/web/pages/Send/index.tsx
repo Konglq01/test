@@ -266,7 +266,7 @@ export default function Send() {
           chainType: currentNetwork.walletType,
           privateKey,
           tokenInfo,
-          caHash: wallet.AELF?.caHash || '',
+          caHash: wallet?.caHash || '',
           amount: timesDecimals(amount, tokenInfo.decimals).toNumber(),
           toAddress: toAccount.address,
         });
@@ -302,10 +302,7 @@ export default function Send() {
     toAccount.address,
     tokenInfo,
     txFee,
-    wallet.AELF?.caHash,
-    wallet.AESEncryptPrivateKey,
-    wallet.address,
-    wallet?.caHash,
+    wallet,
   ]);
 
   const StageObj: TypeStageObj = useMemo(
