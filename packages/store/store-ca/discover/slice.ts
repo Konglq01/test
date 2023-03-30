@@ -14,7 +14,7 @@ export const discoverSlice = createSlice({
   reducers: {
     addRecordsItem: (state, { payload }: { payload: IRecordsItemType }) => {
       const targetItem = state.recordsList.find(item => item.url === payload.url);
-      debugger;
+
       if (targetItem) {
         const arr = state.recordsList.filter(item => item.url !== payload.url);
         arr.push(targetItem);
