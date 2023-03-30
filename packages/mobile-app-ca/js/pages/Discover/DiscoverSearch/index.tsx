@@ -10,7 +10,6 @@ import { pTd } from 'utils/unit';
 import { TextM } from 'components/CommonText';
 import { useFocusEffect } from '@react-navigation/native';
 import Svg from 'components/Svg';
-import NoData from 'components/NoData';
 import fonts from 'assets/theme/fonts';
 import RecordSection from '../components/RecordSection';
 import GameSection from '../components/GameSection';
@@ -43,9 +42,10 @@ export default function DiscoverSearch() {
   const onSearch = useCallback(() => {
     const newValue = value.trim().replace(' ', '');
     // if URL is valid, navigate to webview
+
     if (isValidUrl(newValue)) {
       dispatch(addRecordsItem({ name: newValue, url: newValue }));
-      navigationService.navigate('ViewOnWebView', { url: newValue });
+      navigationService.navigate('ViewOnWebView', { url: newValue, webViewPageType: 'discover' });
       setShowRecord(true);
     } else {
       // else search in game list

@@ -1,13 +1,13 @@
 export interface IGameListItemType {
   label: string;
   name: string;
+  title: string;
   icon: string;
   introduction: string;
   url: string;
 }
 
 export interface IRecordsItemType {
-  img?: string;
-  name?: string;
+  title?: string;
   url?: string;
 }

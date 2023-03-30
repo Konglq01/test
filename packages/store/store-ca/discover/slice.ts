@@ -14,18 +14,24 @@ export const discoverSlice = createSlice({
   reducers: {
     addRecordsItem: (state, { payload }: { payload: IRecordsItemType }) => {
       const targetItem = state.recordsList.find(item => item.url === payload.url);
-
+      debugger;
       if (targetItem) {
         const arr = state.recordsList.filter(item => item.url !== payload.url);
         arr.push(targetItem);
         state.recordsList = arr;
       } else {
-        state.recordsList.push(payload);
+        state.recordsList.push({ ...payload });
       }
     },
     upDateRecordsItem: (state, { payload }: { payload: IRecordsItemType }) => {
+      console.log('store', [
+        ...state.recordsList.map(item => {
+          return item.url === payload.url ? { ...item, ...payload } : item;
+        }),
+      ]);
+
       state.recordsList = state.recordsList.map(item => {
-        return item.url === payload.url ? payload : item;
+        return item.url === payload.url ? { ...item, ...payload } : item;
       });
     },
     clearRecordsList: state => {

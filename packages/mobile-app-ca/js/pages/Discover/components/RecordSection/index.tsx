@@ -4,12 +4,12 @@ import GStyles from 'assets/theme/GStyles';
 import { FontStyles } from 'assets/theme/styles';
 import { useLanguage } from 'i18n/hooks';
 import { pTd } from 'utils/unit';
-import { TextL, TextM, TextS } from 'components/CommonText';
+import { TextL, TextS } from 'components/CommonText';
 import fonts from 'assets/theme/fonts';
 import { useAppCASelector } from '@portkey-wallet/hooks/hooks-ca';
 import { useAppCommonDispatch } from '@portkey-wallet/hooks';
 import RecordItem from '../RecordItem';
-import { addRecordsItem, clearRecordsList, upDateRecordsItem } from '@portkey-wallet/store/store-ca/discover/slice';
+import { addRecordsItem, clearRecordsList } from '@portkey-wallet/store/store-ca/discover/slice';
 import navigationService from 'utils/navigationService';
 
 export default function RecordSection() {
@@ -28,6 +28,8 @@ export default function RecordSection() {
 
   if (recordsList?.length === 0) return null;
 
+  console.log('showRecordList', showRecordList);
+
   return (
     <ScrollView style={styles.sectionWrap}>
       <View style={[styles.headerWrap, GStyles.flexRow, GStyles.spaceBetween]}>
@@ -41,7 +43,11 @@ export default function RecordSection() {
           key={index}
           item={item}
           onPress={() => {
-            navigationService.navigate('ViewOnWebView', { url: item.url, title: item?.name ?? '' });
+            navigationService.navigate('ViewOnWebView', {
+              url: item?.url,
+              title: item?.title ?? '',
+              webViewPageType: 'discover',
+            });
             dispatch(addRecordsItem({ ...item }));
           }}
         />

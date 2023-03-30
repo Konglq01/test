@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
 import { StyleSheet, View, ScrollView } from 'react-native';
 import GStyles from 'assets/theme/GStyles';
-import navigationService from 'utils/navigationService';
 import { useLanguage } from 'i18n/hooks';
 import GameItem from '../GameItem';
 import { TextL } from 'components/CommonText';
@@ -9,6 +8,9 @@ import { pTd } from 'utils/unit';
 import fonts from 'assets/theme/fonts';
 import NoData from 'components/NoData';
 import { IGameListItemType } from '@portkey-wallet/types/types-ca/discover';
+import { addRecordsItem } from '@portkey-wallet/store/store-ca/discover/slice';
+import navigationService from 'utils/navigationService';
+import { useAppCommonDispatch } from '@portkey-wallet/hooks';
 
 interface GameSectionPropsType {
   data: IGameListItemType[];
@@ -18,9 +20,19 @@ export default function GameSection(props: GameSectionPropsType) {
   const { t } = useLanguage();
   const { data } = props;
 
-  const navigateToSearch = useCallback((item: { url: string; name: string }) => {
-    return navigationService.navigate('ViewOnWebView', { url: item.url, title: item.name });
-  }, []);
+  const dispatch = useAppCommonDispatch();
+
+  const navigateToSearch = useCallback(
+    (item: { url: string; title: string }) => {
+      dispatch(addRecordsItem({ ...item }));
+      return navigationService.navigate('ViewOnWebView', {
+        url: item.url,
+        title: item?.title,
+        webViewPageType: 'discover',
+      });
+    },
+    [dispatch],
+  );
 
   if (data.length === 0) return <NoData noPic message={t('There is no search result.')} />;
 

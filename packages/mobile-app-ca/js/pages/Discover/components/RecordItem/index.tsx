@@ -6,6 +6,7 @@ import React, { memo } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { pTd } from 'utils/unit';
 import { IRecordsItemType } from '@portkey-wallet/types/types-ca/discover';
+import { getFaviconUrl } from 'utils';
 interface TokenListItemType {
   item: IRecordsItemType;
   onPress?: () => void;
@@ -16,14 +17,14 @@ const RecordItem: React.FC<TokenListItemType> = props => {
 
   return (
     <TouchableOpacity style={itemStyle.wrap} onPress={() => onPress?.()}>
-      <CommonAvatar hasBorder avatarSize={pTd(32)} svgName={'default_record'} imageUrl={item?.img || ''} />
+      <CommonAvatar hasBorder avatarSize={pTd(32)} imageUrl={getFaviconUrl(item?.url || '')} />
       <View style={itemStyle.right}>
         <View style={itemStyle.infoWrap}>
           <TextM numberOfLines={1} ellipsizeMode={'tail'} style={itemStyle.gameName}>
-            {item?.name || 'title'}
+            {item?.title || item?.url}
           </TextM>
           <TextS numberOfLines={1} style={[FontStyles.font3, itemStyle.gameInfo]}>
-            {item?.url || 'wwww.baidu.com'}
+            {item?.url || ''}
           </TextS>
         </View>
       </View>
