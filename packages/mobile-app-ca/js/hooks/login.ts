@@ -7,7 +7,7 @@ import {
 } from '@portkey-wallet/store/store-ca/wallet/actions';
 import { CAInfo, LoginType, ManagerInfo } from '@portkey-wallet/types/types-ca/wallet';
 import { AuthenticationInfo, VerificationType, VerifierInfo } from '@portkey-wallet/types/verifier';
-import { handleErrorCode, handlePhoneNumber, sleep } from '@portkey-wallet/utils';
+import { handleErrorCode, sleep } from '@portkey-wallet/utils';
 import Loading from 'components/Loading';
 import AElf from 'aelf-sdk';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
@@ -72,18 +72,11 @@ export function useOnManagerAddressAndQueryResult() {
           },
           chainId: DefaultChainId,
         };
+
         let fetch = request.verify.registerRequest;
         if (isRecovery) {
           fetch = request.verify.recoveryRequest;
-          data.guardiansApproved = guardiansApproved?.map(i => {
-            let _value = i.value;
-            if (i.type === 'Phone') {
-              _value = handlePhoneNumber(_value);
-            }
-            return { identifier: _value, ...i, value: _value };
-          });
-          if (data.loginGuardianIdentifier?.includes('+'))
-            data.loginGuardianIdentifier = handlePhoneNumber(data.loginGuardianIdentifier);
+          data.guardiansApproved = guardiansApproved?.map(i => ({ identifier: i.value, ...i }));
         } else {
           data = {
             ...managerInfo,
@@ -91,10 +84,6 @@ export function useOnManagerAddressAndQueryResult() {
             type: LoginType[managerInfo.type],
             ...data,
           };
-          if (data.type === 'Phone') {
-            data.loginGuardianIdentifier = handlePhoneNumber(data.loginGuardianIdentifier);
-            data.loginAccount = handlePhoneNumber(data.loginAccount);
-          }
         }
         console.log(data, '====data');
 
@@ -156,13 +145,21 @@ export function useIntervalGetResult() {
   return useCallback((params: IntervalGetResultParams) => intervalGetResult(params), []);
 }
 
+type LoginParams = {
+  loginAccount: string;
+  loginType?: LoginType;
+  authenticationInfo?: AuthenticationInfo;
+  showLoginAccount?: string;
+};
+
 export function useOnLogin() {
   const chainInfo = useCurrentChain('AELF');
   const dispatch = useAppDispatch();
   const getVerifierServers = useGetVerifierServers();
   const getGuardiansInfo = useGetGuardiansInfo();
   return useCallback(
-    async (loginAccount: string, loginType = LoginType.Email, authenticationInfo?: AuthenticationInfo) => {
+    async (params: LoginParams) => {
+      const { loginAccount, loginType = LoginType.Email, authenticationInfo, showLoginAccount } = params;
       try {
         let _chainInfo;
         if (!chainInfo) {
@@ -179,11 +176,21 @@ export function useOnLogin() {
             authenticationInfo,
           });
         } else {
-          navigationService.navigate('SelectVerifier', { loginAccount, loginType, authenticationInfo });
+          navigationService.navigate('SelectVerifier', {
+            showLoginAccount: showLoginAccount || loginAccount,
+            loginAccount,
+            loginType,
+            authenticationInfo,
+          });
         }
       } catch (error) {
         if (handleErrorCode(error) === '3002') {
-          navigationService.navigate('SelectVerifier', { loginAccount, loginType, authenticationInfo });
+          navigationService.navigate('SelectVerifier', {
+            showLoginAccount: showLoginAccount || loginAccount,
+            loginAccount,
+            loginType,
+            authenticationInfo,
+          });
         } else {
           throw error;
         }
