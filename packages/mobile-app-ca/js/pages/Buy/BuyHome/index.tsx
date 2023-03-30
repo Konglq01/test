@@ -9,7 +9,7 @@ import { TextM } from 'components/CommonText';
 import fonts from 'assets/theme/fonts';
 import { FontStyles } from 'assets/theme/styles';
 import BuyForm from './components/BuyForm';
-import SellForm from './components/SellForm';
+
 import { TypeEnum } from '../types';
 
 const tabList = [
@@ -21,13 +21,12 @@ const tabList = [
   {
     name: 'Sell',
     type: TypeEnum.SELL,
-    component: <SellForm />,
+    component: <></>,
   },
 ];
 
 export default function BuyHome() {
   const { t } = useLanguage();
-
   const [selectTab, setSelectTab] = useState<TypeEnum>(TypeEnum.BUY);
 
   return (
@@ -42,6 +41,10 @@ export default function BuyHome() {
             <TouchableOpacity
               key={tabItem.name}
               onPress={() => {
+                if (tabItem.type === TypeEnum.SELL) {
+                  // TODO: Toast
+                  return;
+                }
                 setSelectTab(tabItem.type);
               }}>
               <View style={[styles.tabWrap, selectTab === tabItem.type && styles.selectTabStyle]}>

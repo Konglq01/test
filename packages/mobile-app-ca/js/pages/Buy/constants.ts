@@ -7,3 +7,6 @@ export const tokenList: CryptoInfoType[] = [
     networkName: 'AELF',
   },
 ];
+
+export const MAX_REFRESH_TIME = 15;
+export const INIT_BUY_AMOUNT = '200';

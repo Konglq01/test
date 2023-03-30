@@ -1,5 +1,5 @@
 import { defaultColors } from 'assets/theme';
-import React, { useMemo } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { pTd } from 'utils/unit';
 import PageContainer from 'components/PageContainer';
@@ -15,6 +15,9 @@ import ActionSheet from 'components/ActionSheet';
 import { CryptoInfoType, TypeEnum } from '../types';
 import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
 import { FiatType } from '@portkey-wallet/store/store-ca/payment/type';
+import useEffectOnce from 'hooks/useEffectOnce';
+import { MAX_REFRESH_TIME } from '../constants';
+import { fetchOrderQuote } from '@portkey-wallet/api/api-did/payment/util';
 
 interface RouterParams {
   type?: TypeEnum;
@@ -27,7 +30,7 @@ interface RouterParams {
 
 export default function BuyPreview() {
   const {
-    type,
+    type = TypeEnum.BUY,
     token,
     fiat,
     amount,
@@ -37,8 +40,45 @@ export default function BuyPreview() {
 
   const { t } = useLanguage();
 
-  const receiveAmount = useMemo(() => receiveAmountProps, [receiveAmountProps]);
-  const rate = useMemo(() => rateProps, [rateProps]);
+  const [rate, setRate] = useState<string>(rateProps || '');
+  const [receiveAmount, setReceiveAmount] = useState<string>(receiveAmountProps || '');
+
+  const refreshReceive = useCallback(async () => {
+    if (fiat === undefined || token === undefined || amount === undefined) return;
+
+    try {
+      const rst = await fetchOrderQuote({
+        crypto: token.crypto,
+        network: token.network,
+        fiat: fiat.currency,
+        country: fiat.country,
+        amount,
+        side: 'BUY',
+      });
+
+      const _rate = (1 / Number(rst.cryptoPrice)).toFixed(2) + '';
+      const _receiveAmount = rst.cryptoQuantity;
+      setRate(_rate);
+      setReceiveAmount(_receiveAmount);
+    } catch (error) {
+      console.log('error', error);
+    }
+  }, [amount, fiat, token]);
+
+  const rateRefreshTimeRef = useRef(MAX_REFRESH_TIME);
+
+  useEffectOnce(() => {
+    const timer = setInterval(() => {
+      rateRefreshTimeRef.current = --rateRefreshTimeRef.current;
+      if (rateRefreshTimeRef.current === 0) {
+        refreshReceive();
+        rateRefreshTimeRef.current = MAX_REFRESH_TIME;
+      }
+    }, 1000);
+    return () => {
+      clearInterval(timer);
+    };
+  });
 
   return (
     <PageContainer

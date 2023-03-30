@@ -25,18 +25,17 @@ import { ErrorType } from 'types/common';
 import { INIT_HAS_ERROR, INIT_NONE_ERROR } from 'constants/common';
 import { CryptoInfoType } from '@portkey-wallet/api/api-did/payment/type';
 import { LimitType, TypeEnum } from 'pages/Buy/types';
-import { tokenList } from 'pages/Buy/constants';
-
-const MAX_REFRESH_TIME = 12;
+import { INIT_BUY_AMOUNT, MAX_REFRESH_TIME, tokenList } from 'pages/Buy/constants';
+import Loading from 'components/Loading';
 
 export default function BuyForm() {
   const { t } = useLanguage();
-  const { buyFiatList } = usePayment();
+  const { buyFiatList: fiatList } = usePayment();
   const [fiat, setFiat] = useState<FiatType | undefined>(
-    buyFiatList.find(item => item.currency === 'USD' && item.country === 'US'),
+    fiatList.find(item => item.currency === 'USD' && item.country === 'US'),
   );
   const [token, setToken] = useState<any>(tokenList[0]);
-  const [amount, setAmount] = useState<string>('100');
+  const [amount, setAmount] = useState<string>(INIT_BUY_AMOUNT);
   const [amountError, setAmountError] = useState<ErrorType>(INIT_NONE_ERROR);
   const [receiveAmount, setReceiveAmount] = useState<string>('');
   const [rate, setRate] = useState<string>('');
@@ -46,6 +45,136 @@ export default function BuyForm() {
   const limitAmountRef = useRef<LimitType>();
   const refreshReceiveRef = useRef<() => void>();
   const cryptoListRef = useRef<CryptoInfoType[]>();
+  const refreshReceiveTimerRef = useRef<NodeJS.Timer>();
+  const isRefreshReceiveValid = useRef<boolean>(false);
+
+  const isAllowAmount = useMemo(() => {
+    const reg = /^\d+(\.\d+)?$/;
+    if (amount === '' || !reg.test(amount)) return false;
+    return true;
+  }, [amount]);
+
+  const registerRefreshReceive = useCallback(() => {
+    rateRefreshTimeRef.current = MAX_REFRESH_TIME;
+    setRateRefreshTime(MAX_REFRESH_TIME);
+    const timer = setInterval(() => {
+      rateRefreshTimeRef.current = --rateRefreshTimeRef.current;
+      if (rateRefreshTimeRef.current === 0) {
+        refreshReceiveRef.current?.();
+        rateRefreshTimeRef.current = MAX_REFRESH_TIME;
+      }
+      setRateRefreshTime(rateRefreshTimeRef.current);
+    }, 1000);
+
+    refreshReceiveTimerRef.current = timer;
+  }, []);
+
+  const refreshReceive = useCallback(
+    async (isInit = false) => {
+      if (fiat === undefined || token === undefined || limitAmountRef.current === undefined || !isAllowAmount) return;
+
+      const { min, max } = limitAmountRef.current;
+      const amountNum = Number(amount);
+
+      if (amountNum < min || amountNum > max) {
+        setAmountError({
+          ...INIT_HAS_ERROR,
+          errorMsg: `Limit Amount ${min}-${max} ${fiat?.currency}`,
+        });
+        setRate('');
+        setReceiveAmount('');
+        clearInterval(refreshReceiveTimerRef.current);
+        return;
+      }
+
+      try {
+        const rst = await fetchOrderQuote({
+          crypto: token.crypto,
+          network: token.network,
+          fiat: fiat.currency,
+          country: fiat.country,
+          amount,
+          side: 'BUY',
+        });
+        if (isInit) {
+          clearInterval(refreshReceiveTimerRef.current);
+          registerRefreshReceive();
+        }
+
+        isRefreshReceiveValid.current = true;
+        const _rate = (1 / Number(rst.cryptoPrice)).toFixed(2) + '';
+        const _receiveAmount = rst.cryptoQuantity;
+        setRate(_rate);
+        setReceiveAmount(_receiveAmount);
+        return {
+          rate: _rate,
+          receiveAmount: _receiveAmount,
+        };
+      } catch (error) {
+        if (isInit) clearInterval(refreshReceiveTimerRef.current);
+        console.log('error', error);
+        CommonToast.failError(error);
+      }
+    },
+    [amount, fiat, isAllowAmount, registerRefreshReceive, token],
+  );
+  refreshReceiveRef.current = refreshReceive;
+
+  useEffectOnce(() => {
+    registerRefreshReceive();
+    return () => {
+      clearInterval(refreshReceiveTimerRef.current);
+    };
+  });
+
+  const onAmountInput = useCallback((text: string) => {
+    isRefreshReceiveValid.current = false;
+    setAmountError(INIT_NONE_ERROR);
+    const reg = /^(0|[1-9]\d*)(\.\d*)?$/;
+
+    if (text === '') {
+      setAmount('');
+      return;
+    }
+    if (!reg.test(text)) return;
+    setAmount(text);
+  }, []);
+
+  const onNext = useCallback(async () => {
+    if (limitAmountRef.current === undefined) return;
+    const amountNum = Number(amount);
+    const { min, max } = limitAmountRef.current;
+    if (amountNum < min || amountNum > max) {
+      setAmountError({
+        ...INIT_HAS_ERROR,
+        errorMsg: `Limit Amount ${min}-${max} ${fiat?.currency}`,
+      });
+      return;
+    }
+    let _rate = rate,
+      _receiveAmount = receiveAmount;
+
+    if (isRefreshReceiveValid.current === false) {
+      Loading.show();
+      const rst = await refreshReceive();
+      Loading.hide();
+      if (rst === undefined) return;
+      _rate = rst.rate;
+      _receiveAmount = rst.receiveAmount;
+    }
+    navigationService.navigate('BuyPreview', {
+      amount,
+      fiat,
+      token,
+      type: TypeEnum.BUY,
+      receiveAmount: _receiveAmount,
+      rate: _rate,
+    });
+  }, [amount, fiat, rate, receiveAmount, refreshReceive, token]);
+
+  const onAmountBlur = useCallback(() => {
+    refreshReceive(true);
+  }, [refreshReceive]);
 
   const setLimitAmount = useCallback(async () => {
     limitAmountRef.current = undefined;
@@ -67,106 +196,11 @@ export default function BuyForm() {
     if (cryptoInfo === undefined || cryptoInfo.minPurchaseAmount === null || cryptoInfo.maxPurchaseAmount === null)
       return;
 
-    console.log('cryptoInfo', cryptoInfo);
     limitAmountRef.current = {
       min: cryptoInfo.minPurchaseAmount,
       max: cryptoInfo.maxPurchaseAmount,
     };
   }, [fiat, token]);
-
-  const isAllowAmount = useMemo(() => {
-    const reg = /^\d+(\.\d+)?$/;
-    if (amount === '' || !reg.test(amount)) return false;
-    return true;
-  }, [amount]);
-
-  const refreshReceive = useCallback(async () => {
-    if (fiat === undefined || token === undefined || limitAmountRef.current === undefined || !isAllowAmount) return;
-
-    const { min, max } = limitAmountRef.current;
-    const amountNum = Number(amount);
-    let _amount = amount;
-    let isOnlySetRate = false;
-
-    if (amountNum < min || amountNum > max) {
-      setAmountError({
-        ...INIT_HAS_ERROR,
-        errorMsg: `Limit Amount ${min}-${max} ${fiat?.currency}`,
-      });
-      setReceiveAmount('');
-      isOnlySetRate = true;
-      _amount = min + '';
-    }
-
-    try {
-      const rst = await fetchOrderQuote({
-        crypto: token.crypto,
-        network: token.network,
-        fiat: fiat.currency,
-        country: fiat.country,
-        amount: _amount,
-        side: 'BUY',
-      });
-
-      setRate((1 / Number(rst.cryptoPrice)).toFixed(2) + '');
-      if (!isOnlySetRate) setReceiveAmount(rst.cryptoQuantity);
-    } catch (error) {
-      console.log('error', error);
-      CommonToast.failError(error);
-    }
-  }, [amount, fiat, isAllowAmount, token]);
-  refreshReceiveRef.current = refreshReceive;
-
-  useEffectOnce(() => {
-    const timer = setInterval(() => {
-      rateRefreshTimeRef.current = --rateRefreshTimeRef.current;
-      if (rateRefreshTimeRef.current === 0) {
-        refreshReceiveRef.current?.();
-        rateRefreshTimeRef.current = MAX_REFRESH_TIME;
-      }
-      setRateRefreshTime(rateRefreshTimeRef.current);
-    }, 1000);
-    return () => {
-      clearInterval(timer);
-    };
-  });
-
-  const onAmountInput = useCallback((text: string) => {
-    setAmountError(INIT_NONE_ERROR);
-    const reg = /^(0|[1-9]\d*)(\.\d*)?$/;
-
-    if (text === '') {
-      setAmount('');
-      return;
-    }
-    if (!reg.test(text)) return;
-    setAmount(text);
-  }, []);
-
-  const onNext = useCallback(() => {
-    if (limitAmountRef.current === undefined) return;
-    const amountNum = Number(amount);
-    const { min, max } = limitAmountRef.current;
-    if (amountNum < min || amountNum > max) {
-      setAmountError({
-        ...INIT_HAS_ERROR,
-        errorMsg: `Limit Amount ${min}-${max} ${fiat?.currency}`,
-      });
-      return;
-    }
-    navigationService.navigate('BuyPreview', {
-      amount,
-      fiat,
-      token,
-      type: TypeEnum.BUY,
-      receiveAmount,
-      rate,
-    });
-  }, [amount, fiat, rate, receiveAmount, token]);
-
-  const onAmountBlur = useCallback(() => {
-    refreshReceive();
-  }, [refreshReceive]);
 
   const onChooseChange = useCallback(async () => {
     await setLimitAmount();
@@ -191,7 +225,7 @@ export default function BuyForm() {
               onPress={() => {
                 SelectCurrency.showList({
                   value: `${fiat?.country}_${fiat?.currency}`,
-                  list: buyFiatList,
+                  list: fiatList,
                   callBack: setFiat,
                 });
               }}>
@@ -237,15 +271,15 @@ export default function BuyForm() {
           placeholder=" "
         />
 
-        <View style={styles.rateWrap}>
-          <TextM style={[GStyles.flex1, FontStyles.font3]}>
-            {rate === '' ? '' : `1 ${token?.crypto} ≈ ${rate} ${fiat?.currency}`}
-          </TextM>
-          <View style={[GStyles.flexRow, GStyles.alignCenter]}>
-            <Svg size={16} icon="time" />
-            <TextS style={styles.refreshLabel}>{rateRefreshTime}s</TextS>
+        {rate !== '' && (
+          <View style={styles.rateWrap}>
+            <TextM style={[GStyles.flex1, FontStyles.font3]}>{`1 ${token?.crypto} ≈ ${rate} ${fiat?.currency}`}</TextM>
+            <View style={[GStyles.flexRow, GStyles.alignCenter]}>
+              <Svg size={16} icon="time" />
+              <TextS style={styles.refreshLabel}>{rateRefreshTime}s</TextS>
+            </View>
           </View>
-        </View>
+        )}
       </View>
 
       <CommonButton type="primary" disabled={!isAllowAmount} onPress={onNext}>
