@@ -21,7 +21,7 @@ import InterfaceProvider from 'contexts/useInterface';
 import GlobalStyleHandler from 'components/GlobalStyleHandler';
 import { lockScreenOrientation } from 'utils/screenOrientation';
 import Updater from 'components/Updater';
-import CodePush from 'react-native-code-push'; // 引入code-push
+import CodePush from 'react-native-code-push';
 
 const codePushOptions = {
   updateDialog: false,
