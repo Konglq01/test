@@ -8,7 +8,7 @@ import { VerifierItem } from '@portkey-wallet/types/verifier';
 import { ChainItemType } from '@portkey-wallet/store/store-ca/wallet/type';
 import { request } from '@portkey-wallet/api/api-did';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
-import { handleErrorMessage, handleErrorCode, handlePhoneNumber } from '@portkey-wallet/utils';
+import { handleErrorMessage, handleErrorCode } from '@portkey-wallet/utils';
 
 export const useGetHolderInfoByViewContract = () => {
   const getCurrentCAViewContract = useGetCurrentCAViewContract();
@@ -32,9 +32,6 @@ export const useGetHolderInfo = () => {
       params: {
         chainId: DefaultChainId,
         ...loginInfo,
-        guardianIdentifier: loginInfo.guardianIdentifier?.includes('+')
-          ? handlePhoneNumber(loginInfo.guardianIdentifier)
-          : loginInfo.guardianIdentifier,
       },
     });
   }, []);
