@@ -283,9 +283,8 @@ export default function GuardiansView() {
   const accountShow = useMemo(() => {
     switch (opGuardian?.guardianType) {
       case LoginType.Email:
-        return <div className="name account">{opGuardian?.guardianAccount}</div>;
       case LoginType.Phone:
-        return <div className="name account">+ {opGuardian?.guardianAccount}</div>;
+        return <div className="name account">{opGuardian?.guardianAccount}</div>;
       case LoginType.Google:
       case LoginType.Apple:
         return (
@@ -367,7 +366,7 @@ export default function GuardiansView() {
       <CommonModal className="verify-confirm-modal" closable={false} open={tipOpen} onCancel={() => setTipOpen(false)}>
         <p className="modal-content">
           {`${opGuardian?.verifier?.name ?? ''} will send a verification code to `}
-          <span className="bold">{`${isPhoneType && '+ '}${opGuardian?.guardianAccount}`}</span>
+          <span className="bold">{opGuardian?.guardianAccount}</span>
           {` to verify your ${isPhoneType ? 'phone number' : 'email address'}.`}
         </p>
         <div className="btn-wrapper">

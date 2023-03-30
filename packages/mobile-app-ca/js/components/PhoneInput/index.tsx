@@ -56,7 +56,7 @@ export default function PhoneInput({ selectCountry, onCountryChange, ...inputPro
           style={inputStyles.countryRow}
           onPress={() => navigationService.navigate('SelectCountry', { selectCountry })}>
           <TextM>+ {selectCountry?.code}</TextM>
-          <Svg size={12} icon="down-arrow" />
+          <Svg color={defaultColors.font3} size={12} icon="down-arrow" />
         </Touchable>
       }
       type="general"

@@ -120,22 +120,15 @@ export default function NFTSection() {
       const currentCollectionObj = accountNFTList.find(item => item.symbol === symbol && item.chainId === chainId);
       console.log('=====', pageNum, currentOpenObj, currentCollectionObj);
 
-      // has cache
-      if (
-        currentCollectionObj?.children?.length &&
-        (currentOpenObj.pageNum + 1) * currentOpenObj.pageSize < currentCollectionObj?.children?.length
-      ) {
-      } else {
-        // no cache
-        await dispatch(
-          fetchNFTAsync({
-            symbol,
-            chainId,
-            caAddresses: [currentCaAddress || ''],
-            pageNum: pageNum,
-          }),
-        );
-      }
+      await dispatch(
+        fetchNFTAsync({
+          symbol,
+          chainId,
+          caAddresses: [currentCaAddress || ''],
+          pageNum: pageNum,
+        }),
+      );
+      // }
 
       const newObj = {
         ...openCollectionObj,
