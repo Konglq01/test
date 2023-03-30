@@ -53,7 +53,6 @@ export function OverlayTransformView({
       disableScroll={['up', 'horizontal']}
       enabledNestScrollView={enabledNestScrollView}
       onDidTransform={(_: number, translateY: number) => {
-        console.log('onDidTransform', translateY);
         translateY > 50 && OverlayModal.hide();
       }}>
       {children}

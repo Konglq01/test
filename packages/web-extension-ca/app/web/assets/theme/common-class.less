@@ -185,8 +185,11 @@ td {
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow: overlay;
 
   .portkey-header {
+    position: relative;
+    background-color: @bg-20;
     margin: 0 auto;
     .portkey-header-body {
       .custom-logo {
@@ -195,10 +198,9 @@ td {
     }
   }
 
-  .portkey-body,
-  .portkey-home-body {
+  .portkey-body {
     min-height: calc(100vh - 96px);
-    margin: auto;
+    margin: 0 auto;
   }
   .portkey-prompt-media();
 }
@@ -207,7 +209,6 @@ td {
   // screen >= 1820, contentWidth = 1440
   @media screen and (min-width: @max-screen) {
     .portkey-body,
-    .portkey-home-body,
     .portkey-header {
       max-width: @max-width;
       width: @max-width;
@@ -228,9 +229,7 @@ td {
         padding-right: 0;
       }
     }
-
-    .portkey-body,
-    .portkey-home-body {
+    .portkey-body {
       width: calc(100vw - @max-margin * 2);
     }
   }
@@ -244,24 +243,22 @@ td {
         padding-right: 0;
       }
     }
-    .portkey-body,
-    .portkey-home-body {
+    .portkey-body {
       max-width: @mid-width;
       width: calc(100vw - @min-margin * 2);
     }
   }
   // screen < 768, maxContentWidth = screen, minContentWidth = 360, paddingLeftAndRight = 24
   @media screen and (max-width: 767px) {
+    padding-bottom: 0 !important;
     .portkey-header {
       width: 100vw;
       min-width: @min-width;
     }
-    .portkey-body,
-    .portkey-home-body {
+    .portkey-body {
       width: 100vw;
       min-width: @min-width;
-      padding-left: 24px;
-      padding-right: 24px;
+      min-height: calc(100vh - 72px);
     }
   }
 }
@@ -273,6 +270,11 @@ td {
   min-width: @min-width;
   height: calc(100vh - 96px);
   max-height: @max-detail-height;
+  min-height: @min-detail-height;
+
+  @media screen and (max-width: 767px) {
+    min-height: calc(100vh - 72px);
+  }
 }
 // =========================================================
 // ============= Large screen adaptation [end] =============

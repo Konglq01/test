@@ -9,7 +9,7 @@
     font-size: 16px;
     text-align: center;
     font-weight: 500;
-    padding: 21px 0;
+    padding: 21px 24px;
     border-bottom: 1px solid @border-2;
   }
   .balance-amount {
@@ -82,8 +82,12 @@
       cursor: pointer;
       display: flex;
       align-items: center;
-      padding: 25px 16px 24px;
+      padding: 24px 16px;
       border-bottom: 1px solid @border-2;
+
+      @media screen and (min-width: 768px) {
+        padding: 24px;
+      }
 
       .token-logo {
         margin-right: 16px;
@@ -124,10 +128,10 @@
           justify-content: space-between;
           gap: 4px;
           & > span {
-              font-size: 18px;
-              color: @font-11;
-              height: 22px;
-              line-height: 22px;
+            font-size: 18px;
+            color: @font-11;
+            height: 22px;
+            line-height: 22px;
           }
         }
         .amount {
@@ -153,6 +157,10 @@
     align-items: center;
     text-align: center;
     cursor: pointer;
+
+    @media screen and (min-width: 768px) {
+      margin-bottom: 40px;
+    }
 
     div.custom-svg {
       margin-right: 8px;

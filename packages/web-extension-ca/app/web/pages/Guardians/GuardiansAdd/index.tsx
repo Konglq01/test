@@ -33,6 +33,7 @@ import { request } from '@portkey-wallet/api/api-did';
 import { handleErrorMessage } from '@portkey-wallet/utils';
 import { handleVerificationDoc } from '@portkey-wallet/utils/guardian';
 import { VerifyStatus } from '@portkey-wallet/types/verifier';
+import verificationApiConfig from '@portkey-wallet/api/api-did/verification';
 import './index.less';
 
 export default function AddGuardian() {
@@ -125,7 +126,7 @@ export default function AddGuardian() {
         break;
       }
       case LoginType.Phone: {
-        key = `${phoneValue?.code}${phoneValue?.phoneNumber}&${verifierVal}`;
+        key = `+${phoneValue?.code}${phoneValue?.phoneNumber}&${verifierVal}`;
         tempAccount = `+${phoneValue?.code} ${phoneValue?.phoneNumber}`;
         break;
       }
@@ -141,7 +142,7 @@ export default function AddGuardian() {
   }, [emailVal, guardianType, phoneValue, socialValue, verifierVal]);
 
   useEffect(() => {
-    if (opGuardian) {
+    if (state === 'back' && opGuardian) {
       setGuardianType(opGuardian.guardianType);
       setVerifierVal(opGuardian.verifier?.id);
       setVerifierName(opGuardian.verifier?.name);
@@ -189,58 +190,57 @@ export default function AddGuardian() {
     setPhoneValue({ code, phoneNumber });
   }, []);
 
-  const handleSocialAuth = useCallback(
-    async (v: ISocialLogin) => {
-      const newGuardian: StoreUserGuardianItem = {
-        isLoginAccount: false,
-        verifier: selectVerifierItem,
-        guardianAccount: '',
-        guardianType: guardianType as LoginType,
-        key: curKey,
-        isInitStatus: true,
-        identifierHash: '',
-        salt: '',
-      };
-      try {
-        const result = await socialLoginAction(v);
-        const data = result.data;
-        if (!data) throw 'Action error';
-        if (v === 'Google') {
-          const userInfo = await getGoogleUserInfo(data?.access_token);
-          const { firstName, email, id } = userInfo;
-          newGuardian.guardianAccount = id;
-          newGuardian.social = {
-            id,
-            name: firstName,
+  const handleSocialAuth = useCallback(async (v: ISocialLogin) => {
+    try {
+      const result = await socialLoginAction(v);
+      const data = result.data;
+      if (!data) throw 'auth error';
+      if (v === 'Google') {
+        const userInfo = await getGoogleUserInfo(data?.access_token);
+        const { firstName, email, id } = userInfo;
+        setSocialVale({ name: firstName, value: email, id, accessToken: data?.access_token });
+      } else if (v === 'Apple') {
+        const userInfo = parseAppleIdentityToken(data?.access_token);
+        if (userInfo) {
+          const appleUserExtraInfo = await request.verify.getAppleUserExtraInfo({
+            url: `${verificationApiConfig.getAppleUserExtraInfo.target}/${userInfo.userId}`,
+          });
+          const { email, userId } = userInfo;
+          const { firstName, isPrivate } = appleUserExtraInfo;
+          setSocialVale({
+            name: firstName || 'apple',
             value: email,
+            id: userId,
             accessToken: data?.access_token,
-          };
-          dispatch(setOpGuardianAction(newGuardian));
-          setSocialVale({ name: firstName, value: email, id, accessToken: data?.access_token });
-        } else if (v === 'Apple') {
-          const userInfo = parseAppleIdentityToken(data?.access_token);
-          if (userInfo) {
-            const { email, userId } = userInfo;
-            newGuardian.guardianAccount = userId;
-            newGuardian.social = {
-              id: userId,
-              name: 'apple name',
-              value: email,
-              accessToken: data?.access_token,
-            };
-            dispatch(setOpGuardianAction(newGuardian));
-            setSocialVale({ name: 'apple name', value: email, id: userId, accessToken: data?.access_token });
-          }
-        } else {
-          message.error(`LoginType:${v} is not support`);
+            isPrivate: isPrivate,
+          });
         }
-        if (result.error) throw result.message ?? result.Error;
-      } catch (error) {
-        const msg = handleErrorMessage(error);
-        message.error(msg);
+      } else {
+        message.error(`type:${v} is not support`);
       }
-    },
-    [curKey, dispatch, guardianType, selectVerifierItem],
+      if (result.error) throw result.message ?? result.Error;
+    } catch (error) {
+      const msg = handleErrorMessage(error);
+      message.error(msg);
+    }
+  }, []);
+
+  const renderSocialGuardianAccount = useCallback(
+    (v: ISocialLogin) => (
+      <div className="social">
+        {socialValue?.value ? (
+          <div className="flex-column social-input detail">
+            <span className="name">{socialValue.name}</span>
+            <span className="email">{socialValue.isPrivate ? '******' : socialValue.value}</span>
+          </div>
+        ) : (
+          <div className="flex social-input click" onClick={() => handleSocialAuth(v)}>
+            <span className="click-text">{`Click Add ${v} Account`}</span>
+          </div>
+        )}
+      </div>
+    ),
+    [handleSocialAuth, socialValue],
   );
 
   const renderGuardianAccount = useMemo(
@@ -263,41 +263,15 @@ export default function AddGuardian() {
         label: t('Guardian Phone'),
       },
       [LoginType.Google]: {
-        element: (
-          <div className="social">
-            {socialValue?.value ? (
-              <div className="flex-column social-input detail">
-                <span className="name">{socialValue.name}</span>
-                <span className="email">{socialValue.value}</span>
-              </div>
-            ) : (
-              <div className="flex social-input click" onClick={() => handleSocialAuth('Google')}>
-                <span className="click-text">Click Add Google Account</span>
-              </div>
-            )}
-          </div>
-        ),
+        element: renderSocialGuardianAccount('Google'),
         label: t('Guardian Google'),
       },
       [LoginType.Apple]: {
-        element: (
-          <div className="social">
-            {socialValue?.value ? (
-              <div className="flex-column social-input detail">
-                <span className="name">{socialValue.name}</span>
-                <span className="email">{socialValue.value}</span>
-              </div>
-            ) : (
-              <div className="flex social-input click" onClick={() => handleSocialAuth('Apple')}>
-                <span className="click-text">Click Add Apple Account</span>
-              </div>
-            )}
-          </div>
-        ),
+        element: renderSocialGuardianAccount('Apple'),
         label: t('Guardian Apple'),
       },
     }),
-    [emailVal, handleEmailInputChange, handlePhoneInputChange, handleSocialAuth, socialValue, t],
+    [emailVal, handleEmailInputChange, handlePhoneInputChange, renderSocialGuardianAccount, t],
   );
 
   const handleCommonVerify = useCallback(
@@ -461,7 +435,7 @@ export default function AddGuardian() {
     if (guardianType === LoginType.Email) {
       handleCommonVerify(emailVal || '');
     } else if (guardianType === LoginType.Phone) {
-      handleCommonVerify(`${phoneValue?.code}${phoneValue?.phoneNumber}`);
+      handleCommonVerify(`+${phoneValue?.code} ${phoneValue?.phoneNumber}`);
     } else {
       message.info('router error');
     }

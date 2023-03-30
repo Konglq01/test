@@ -1,5 +1,6 @@
 import { ISocialLogin } from '@portkey-wallet/types/types-ca/wallet';
 import { message } from 'antd';
+import { JOIN_AUTH_URL } from 'constants/index';
 import InternalMessage from 'messages/InternalMessage';
 import { PortkeyMessageTypes } from 'messages/InternalMessageTypes';
 import { useCallback } from 'react';
@@ -35,7 +36,5 @@ export const setPinAction = async (pin: string) => {
   await InternalMessage.payload(PortkeyMessageTypes.SET_SEED, pin).send();
 };
 
-const loginUrl = 'https://portkey-website-auth.vercel.app/join'; //'http://localhost:3000/join';
-
 export const socialLoginAction = async (type: ISocialLogin): Promise<SendResponseParams> =>
-  await InternalMessage.payload(PortkeyMessageTypes.SOCIAL_LOGIN, { externalLink: `${loginUrl}/${type}` }).send();
+  await InternalMessage.payload(PortkeyMessageTypes.SOCIAL_LOGIN, { externalLink: `${JOIN_AUTH_URL}/${type}` }).send();

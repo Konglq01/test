@@ -201,7 +201,7 @@ export default class ServiceWorkerInstantiate {
     try {
       if (!externalLink) return sendResponse(errorHandler(400001, 'Missing param externalLink'));
       socialLoginService.startSocialLogin(() => {
-        notificationService.close(errorHandler(200001), 'windows');
+        notificationService.close(errorHandler(200001, 'User Cancel'), 'windows');
         socialLoginService.finishSocialLogin();
       });
 

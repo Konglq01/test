@@ -1,5 +1,5 @@
 import React, { ReactElement, useCallback, useEffect, useMemo, useRef } from 'react';
-import LockManager from 'utils/LockManager';
+import LockManager, { canLock } from 'utils/LockManager';
 import useEffectOnce from 'hooks/useEffectOnce';
 import usePrevious from 'hooks/usePrevious';
 import { useSettings } from 'hooks/store';
@@ -7,6 +7,8 @@ import { useCurrentWallet, useOriginChainId } from '@portkey-wallet/hooks/hooks-
 import { isIos } from '@portkey-wallet/utils/mobile/device';
 import { AppState, AppStateStatus } from 'react-native';
 import { useCheckUpdate } from 'hooks/device';
+let appState = 'active',
+  changeTime = Date.now();
 interface AppListenerProps {
   children: ReactElement;
 }
@@ -31,16 +33,23 @@ const AppListener: React.FC<AppListenerProps> = props => {
 
   const handleAppStateChange = useCallback(
     (nextAppState: AppStateStatus) => {
-      if (nextAppState === 'active') checkUpdate();
+      const currentTime = Date.now();
+      if (nextAppState === 'active' && appState === 'background' && currentTime > changeTime + 1000) checkUpdate();
+      if (nextAppState === 'background') {
+        if (canLock) appState = nextAppState;
+        changeTime = currentTime;
+      } else {
+        appState = nextAppState;
+      }
     },
     [checkUpdate],
   );
-
   useEffectOnce(() => {
-    checkUpdate();
+    const timer = setTimeout(checkUpdate, 1000);
     const listener = AppState.addEventListener('change', handleAppStateChange);
     lockManager.current = new LockManager(lockingTime * 1000);
     return () => {
+      timer && clearTimeout(timer);
       lockManager.current?.stopListening();
       listener.remove();
     };

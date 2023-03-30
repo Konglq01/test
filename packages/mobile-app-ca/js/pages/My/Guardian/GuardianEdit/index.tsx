@@ -186,8 +186,10 @@ const GuardianEdit: React.FC = () => {
     if (selectedVerifier === undefined || selectedType === undefined) return;
     const guardianType = selectedType.value;
     let guardianAccount = account;
+    let showGuardianAccount;
     if (guardianType === LoginType.Phone) {
-      guardianAccount = `+${country.code} ${account}`;
+      guardianAccount = `+${country.code}${account}`;
+      showGuardianAccount = `+${country.code} ${account}`;
     }
     if (guardianType === LoginType.Email) {
       const guardianErrorMsg = checkEmail(account);
@@ -221,7 +223,7 @@ const GuardianEdit: React.FC = () => {
       title2: (
         <Text>
           <TextL>{`${selectedVerifier.name} will send a verification code to `}</TextL>
-          <TextL style={fonts.mediumFont}>{guardianAccount}</TextL>
+          <TextL style={fonts.mediumFont}>{showGuardianAccount || guardianAccount}</TextL>
           <TextL>{` to verify your ${guardianType === LoginType.Phone ? 'phone number' : 'email address'}.`}</TextL>
         </Text>
       ),
@@ -418,9 +420,9 @@ const GuardianEdit: React.FC = () => {
         {account ? (
           <View style={pageStyles.thirdPartAccount}>
             {firstName && <TextM style={pageStyles.firstNameStyle}>{firstName}</TextM>}
-            <TextM style={[!!firstName && FontStyles.font3]} numberOfLines={1}>
+            <TextS style={[!!firstName && FontStyles.font3]} numberOfLines={1}>
               {account}
-            </TextM>
+            </TextS>
           </View>
         ) : (
           <Touchable onPress={onGoogleSign}>
@@ -440,9 +442,9 @@ const GuardianEdit: React.FC = () => {
         {account ? (
           <View style={pageStyles.thirdPartAccount}>
             {firstName && <TextM style={pageStyles.firstNameStyle}>{firstName}</TextM>}
-            <TextM style={[!!firstName && FontStyles.font3]} numberOfLines={1}>
+            <TextS style={[!!firstName && FontStyles.font3]} numberOfLines={1}>
               {account}
-            </TextM>
+            </TextS>
           </View>
         ) : (
           <Touchable onPress={onAppleSign}>

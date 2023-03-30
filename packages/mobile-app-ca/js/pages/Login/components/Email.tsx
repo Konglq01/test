@@ -16,7 +16,6 @@ import { useOnLogin } from 'hooks/login';
 import TermsServiceButton from './TermsServiceButton';
 import Button from './Button';
 import { useFocusEffect } from '@react-navigation/native';
-import { pTd } from 'utils/unit';
 
 let timer: string | number | NodeJS.Timeout | undefined;
 
@@ -49,7 +48,7 @@ export default function Email({
     if (message) return;
     Loading.show();
     try {
-      await onLogin(loginAccount as string);
+      await onLogin({ loginAccount: loginAccount as string });
     } catch (error) {
       setErrorMessage(handleErrorMessage(error));
     }
@@ -80,7 +79,7 @@ export default function Email({
   return (
     <View style={[BGStyles.bg1, styles.card, GStyles.itemCenter]}>
       <View style={GStyles.width100}>
-        <View style={[GStyles.flexRowWrap, GStyles.marginBottom(24)]}>
+        <View style={[GStyles.flexRowWrap, GStyles.marginBottom(20)]}>
           <Button title="Phone" style={GStyles.marginRight(8)} onPress={() => setLoginType(PageLoginType.phone)} />
           <Button isActive title="Email" onPress={() => setLoginType(PageLoginType.email)} />
         </View>

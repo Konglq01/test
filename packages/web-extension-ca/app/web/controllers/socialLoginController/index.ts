@@ -1,7 +1,6 @@
 import { apis } from 'utils/BrowserApis';
 
 const GOOGLE_OAUTH2_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
-// const APPLE_OAUTH2_URL = 'https://appleid.apple.com/auth/authorize';
 const alarmsName = 'SocialLoginTimer';
 
 export default class SocialLoginController {
@@ -13,8 +12,9 @@ export default class SocialLoginController {
   startSocialLogin(onCancel?: () => void) {
     this.isSocialLogin = true;
 
-    const createdListener = (tab: chrome.tabs.Tab) => {
-      if (this.isOAuthTabs(tab.url ?? '')) this.authTabId = tab.id;
+    const createdListener = async (tab: chrome.tabs.Tab) => {
+      const isOAuth = await this.isOAuthTabs(tab.id as number);
+      if (isOAuth) this.authTabId = tab.id;
     };
 
     apis.tabs.onCreated.addListener(createdListener);
@@ -41,7 +41,12 @@ export default class SocialLoginController {
     apis.alarms.clear(alarmsName);
   }
 
-  isOAuthTabs(url: string) {
-    return !url.includes(GOOGLE_OAUTH2_URL); //|| !url.includes(APPLE_OAUTH2_URL);
+  isOAuthTabs(tabId: number): Promise<boolean | undefined> {
+    return new Promise((resolve) => {
+      apis.tabs.get(tabId, (tab: chrome.tabs.Tab) => {
+        const isOAuth = (tab.url || tab.pendingUrl)?.includes(GOOGLE_OAUTH2_URL);
+        resolve(isOAuth);
+      });
+    });
   }
 }

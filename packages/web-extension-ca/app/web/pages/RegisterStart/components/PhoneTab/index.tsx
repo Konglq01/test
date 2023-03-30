@@ -44,7 +44,7 @@ const PhoneTab = forwardRef(({ confirmText, error, validate, onFinish }: PhoneTa
         className="login-btn"
         type="primary"
         onClick={async () => {
-          await validatePhone(`${countryCode.country.code} ${phoneNumber}`);
+          await validatePhone(`+${countryCode.country.code} ${phoneNumber}`);
           onFinish?.({
             code: countryCode.country.code,
             phoneNumber,

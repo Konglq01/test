@@ -326,7 +326,7 @@ export default function GuardianApproval() {
                   <GuardianItem
                     key={item.key}
                     guardianItem={item}
-                    setGuardianStatus={setGuardianStatus}
+                    setGuardianStatus={onSetGuardianStatus}
                     guardiansStatus={guardiansStatus}
                     isExpired={isExpired}
                     isSuccess={isSuccess}

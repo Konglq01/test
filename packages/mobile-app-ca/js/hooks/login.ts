@@ -87,6 +87,8 @@ export function useOnManagerAddressAndQueryResult() {
             ...data,
           };
         }
+        console.log(data, '====data');
+
         const req = await fetch({
           data,
         });
@@ -145,6 +147,13 @@ export function useIntervalGetResult() {
   return useCallback((params: IntervalGetResultParams) => intervalGetResult(params), []);
 }
 
+type LoginParams = {
+  loginAccount: string;
+  loginType?: LoginType;
+  authenticationInfo?: AuthenticationInfo;
+  showLoginAccount?: string;
+};
+
 export function useOnLogin() {
   const dispatch = useAppDispatch();
   const getVerifierServers = useGetVerifierServers();
@@ -152,7 +161,8 @@ export function useOnLogin() {
   const getRegisterInfo = useGetRegisterInfo();
   const getChainInfo = useGetChainInfo();
   return useCallback(
-    async (loginAccount: string, loginType = LoginType.Email, authenticationInfo?: AuthenticationInfo) => {
+    async (params: LoginParams) => {
+      const { loginAccount, loginType = LoginType.Email, authenticationInfo, showLoginAccount } = params;
       try {
         const { originChainId } = await getRegisterInfo({
           loginGuardianIdentifier: loginAccount,
@@ -170,12 +180,22 @@ export function useOnLogin() {
           });
         } else {
           dispatch(setOriginChainId(DefaultChainId));
-          navigationService.navigate('SelectVerifier', { loginAccount, loginType, authenticationInfo });
+          navigationService.navigate('SelectVerifier', {
+            showLoginAccount: showLoginAccount || loginAccount,
+            loginAccount,
+            loginType,
+            authenticationInfo,
+          });
         }
       } catch (error) {
         if (handleErrorCode(error) === '3002') {
           dispatch(setOriginChainId(DefaultChainId));
-          navigationService.navigate('SelectVerifier', { loginAccount, loginType, authenticationInfo });
+          navigationService.navigate('SelectVerifier', {
+            showLoginAccount: showLoginAccount || loginAccount,
+            loginAccount,
+            loginType,
+            authenticationInfo,
+          });
         } else {
           throw error;
         }

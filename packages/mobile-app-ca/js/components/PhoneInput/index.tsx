@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef } from 'react';
-import { Text, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import useEffectOnce from 'hooks/useEffectOnce';
 import { useLanguage } from 'i18n/hooks';
 import myEvents from 'utils/deviceEvent';
@@ -12,6 +12,7 @@ import { useFocusEffect } from '@react-navigation/native';
 
 import Svg from 'components/Svg';
 import { defaultColors } from 'assets/theme';
+import { TextM } from 'components/CommonText';
 
 let timer: string | number | NodeJS.Timeout | undefined;
 
@@ -54,8 +55,8 @@ export default function PhoneInput({ selectCountry, onCountryChange, ...inputPro
         <Touchable
           style={inputStyles.countryRow}
           onPress={() => navigationService.navigate('SelectCountry', { selectCountry })}>
-          <Text>+ {selectCountry?.code}</Text>
-          <Svg size={12} icon="down-arrow" />
+          <TextM>+ {selectCountry?.code}</TextM>
+          <Svg color={defaultColors.font3} size={12} icon="down-arrow" />
         </Touchable>
       }
       type="general"

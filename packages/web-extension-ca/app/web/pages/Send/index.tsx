@@ -430,7 +430,7 @@ export default function Send() {
   );
 
   const { isPrompt } = useCommonState();
-  const mainContent = () => {
+  const mainContent = useCallback(() => {
     return (
       <div className={clsx(['page-send', isPrompt ? 'detail-page-prompt' : null])}>
         <TitleWrapper
@@ -488,7 +488,7 @@ export default function Send() {
         )}
       </div>
     );
-  };
+  }, [StageObj, btnDisabled, errorMsg, isPrompt, navigate, stage, symbol, t, toAccount, type, walletName]);
 
   return <>{isPrompt ? <PromptFrame content={mainContent()} /> : mainContent()}</>;
 }

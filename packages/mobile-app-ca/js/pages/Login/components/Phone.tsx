@@ -43,7 +43,11 @@ export default function Phone({
   const onPageLogin = useCallback(async () => {
     Loading.show();
     try {
-      await onLogin(`+${country.code} ${loginAccount}` as string, LoginType.Phone);
+      await onLogin({
+        showLoginAccount: `+${country.code} ${loginAccount}`,
+        loginAccount: `+${country.code}${loginAccount}`,
+        loginType: LoginType.Phone,
+      });
     } catch (error) {
       setErrorMessage(handleErrorMessage(error));
     }
@@ -62,7 +66,7 @@ export default function Phone({
   return (
     <View style={[BGStyles.bg1, styles.card, GStyles.itemCenter]}>
       <View style={GStyles.width100}>
-        <View style={[GStyles.flexRowWrap, GStyles.marginBottom(24)]}>
+        <View style={[GStyles.flexRowWrap, GStyles.marginBottom(20)]}>
           <Button
             title="Phone"
             isActive

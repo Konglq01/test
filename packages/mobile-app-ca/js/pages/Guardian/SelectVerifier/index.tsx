@@ -31,6 +31,7 @@ export type RouterParams = {
   loginAccount: string;
   loginType: LoginType;
   authenticationInfo?: AuthenticationInfo;
+  showLoginAccount?: string;
 };
 
 const ScrollViewProps = { disabled: true };
@@ -40,7 +41,7 @@ export default function SelectVerifier() {
 
   const [selectedVerifier, setSelectedVerifier] = useState(verifierList[0]);
 
-  const { loginAccount, loginType, authenticationInfo } = useRouterParams<RouterParams>();
+  const { loginAccount, loginType, authenticationInfo, showLoginAccount } = useRouterParams<RouterParams>();
   const verifyToken = useVerifyToken();
   const originChainId = useOriginChainId();
 
@@ -100,7 +101,7 @@ export default function SelectVerifier() {
       title2: (
         <Text>
           <TextL>{`${selectedVerifier.name} will send a verification code to `}</TextL>
-          <TextL style={fonts.mediumFont}>{loginAccount}</TextL>
+          <TextL style={fonts.mediumFont}>{showLoginAccount || loginAccount}</TextL>
           <TextL>{` to verify your ${loginType === LoginType.Phone ? 'phone number' : 'email address'}.`}</TextL>
         </Text>
       ),
@@ -116,7 +117,7 @@ export default function SelectVerifier() {
         },
       ],
     });
-  }, [loginAccount, loginType, originChainId, selectedVerifier, t]);
+  }, [loginAccount, loginType, originChainId, selectedVerifier, showLoginAccount, t]);
   const onConfirm = useCallback(async () => {
     switch (loginType) {
       case LoginType.Apple:
@@ -167,7 +168,10 @@ export default function SelectVerifier() {
         <View style={styles.verifierRow}>
           {verifierList.slice(0, 3).map(item => {
             return (
-              <Touchable style={GStyles.center} key={item.name} onPress={() => setSelectedVerifier(item)}>
+              <Touchable
+                style={[GStyles.center, GStyles.flex1]}
+                key={item.name}
+                onPress={() => setSelectedVerifier(item)}>
                 <VerifierImage label={item.name} uri={item.imageUrl} size={42} />
                 <TextS style={[FontStyles.font3, styles.verifierTitle]}>{item.name}</TextS>
               </Touchable>
@@ -188,7 +192,7 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   selectedItem: {
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     paddingVertical: 13,
     marginTop: 24,
     marginBottom: 48,

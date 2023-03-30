@@ -20,8 +20,6 @@ import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { addressFormat } from '@portkey-wallet/utils';
 import { useCommonState } from 'store/Provider/hooks';
 import PromptFrame from 'pages/components/PromptFrame';
-import { getAWSUrlWithSize } from '@portkey-wallet/utils/img';
-import { NFT_LARGE_SIZE } from '@portkey-wallet/constants/constants-ca/assets';
 
 export interface ITransactionQuery {
   item: ActivityItemType;
@@ -90,7 +88,7 @@ export default function Transaction() {
       <div className="nft-amount">
         <div className="assets">
           {nftInfo?.imageUrl ? (
-            <img className="assets-img" src={getAWSUrlWithSize(nftInfo?.imageUrl, NFT_LARGE_SIZE, NFT_LARGE_SIZE)} />
+            <img className="assets-img" src={nftInfo?.imageUrl} />
           ) : (
             <p>{nftInfo?.alias?.slice(0, 1)}</p>
           )}
@@ -266,7 +264,9 @@ export default function Transaction() {
     );
   }, [openOnExplorer, t]);
 
-  const mainContent = () => {
+  const { isPrompt } = useCommonState();
+
+  const mainContent = useCallback(() => {
     return (
       <div className={clsx(['transaction-detail-modal', isPrompt ? 'detail-page-prompt' : null])}>
         <div className="header">
@@ -287,9 +287,20 @@ export default function Transaction() {
         </div>
       </div>
     );
-  };
-
-  const { isPrompt } = useCommonState();
+  }, [
+    activityItem.nftInfo?.nftId,
+    activityItem.transactionType,
+    fromToUI,
+    isNft,
+    isPrompt,
+    networkUI,
+    nftHeaderUI,
+    onClose,
+    statusAndDateUI,
+    tokenHeaderUI,
+    transactionUI,
+    viewOnExplorerUI,
+  ]);
 
   return <>{isPrompt ? <PromptFrame content={mainContent()} className="transaction-detail" /> : mainContent()}</>;
 }
