@@ -85,6 +85,8 @@ export function useOnManagerAddressAndQueryResult() {
             ...data,
           };
         }
+        console.log(data, '====data');
+
         const req = await fetch({
           data,
         });
@@ -143,13 +145,21 @@ export function useIntervalGetResult() {
   return useCallback((params: IntervalGetResultParams) => intervalGetResult(params), []);
 }
 
+type LoginParams = {
+  loginAccount: string;
+  loginType?: LoginType;
+  authenticationInfo?: AuthenticationInfo;
+  showLoginAccount?: string;
+};
+
 export function useOnLogin() {
   const chainInfo = useCurrentChain('AELF');
   const dispatch = useAppDispatch();
   const getVerifierServers = useGetVerifierServers();
   const getGuardiansInfo = useGetGuardiansInfo();
   return useCallback(
-    async (loginAccount: string, loginType = LoginType.Email, authenticationInfo?: AuthenticationInfo) => {
+    async (params: LoginParams) => {
+      const { loginAccount, loginType = LoginType.Email, authenticationInfo, showLoginAccount } = params;
       try {
         let _chainInfo;
         if (!chainInfo) {
@@ -166,11 +176,21 @@ export function useOnLogin() {
             authenticationInfo,
           });
         } else {
-          navigationService.navigate('SelectVerifier', { loginAccount, loginType, authenticationInfo });
+          navigationService.navigate('SelectVerifier', {
+            showLoginAccount: showLoginAccount || loginAccount,
+            loginAccount,
+            loginType,
+            authenticationInfo,
+          });
         }
       } catch (error) {
         if (handleErrorCode(error) === '3002') {
-          navigationService.navigate('SelectVerifier', { loginAccount, loginType, authenticationInfo });
+          navigationService.navigate('SelectVerifier', {
+            showLoginAccount: showLoginAccount || loginAccount,
+            loginAccount,
+            loginType,
+            authenticationInfo,
+          });
         } else {
           throw error;
         }

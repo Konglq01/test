@@ -55,7 +55,7 @@ export const useRecovery = () => {
         default:
           value = {};
       }
-      const result = await handleGuardian({
+      await handleGuardian({
         rpcUrl: currentChain.endPoint,
         chainType: currentNetwork.walletType,
         address: currentChain.caContractAddress,

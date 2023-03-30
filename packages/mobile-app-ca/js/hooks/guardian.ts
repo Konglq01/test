@@ -29,7 +29,10 @@ export const useGetHolderInfo = () => {
   return useCallback(async (loginInfo: LoginInfo, _chainInfo?: ChainItemType) => {
     if (!loginInfo) throw new Error('Could not find accountInfo');
     return request.wallet.guardianIdentifiers({
-      params: { chainId: DefaultChainId, ...loginInfo },
+      params: {
+        chainId: DefaultChainId,
+        ...loginInfo,
+      },
     });
   }, []);
 };

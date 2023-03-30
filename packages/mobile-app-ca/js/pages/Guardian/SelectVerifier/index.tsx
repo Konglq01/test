@@ -31,6 +31,7 @@ export type RouterParams = {
   loginAccount: string;
   loginType: LoginType;
   authenticationInfo?: AuthenticationInfo;
+  showLoginAccount?: string;
 };
 
 const ScrollViewProps = { disabled: true };
@@ -40,7 +41,7 @@ export default function SelectVerifier() {
 
   const [selectedVerifier, setSelectedVerifier] = useState(verifierList[0]);
 
-  const { loginAccount, loginType, authenticationInfo } = useRouterParams<RouterParams>();
+  const { loginAccount, loginType, authenticationInfo, showLoginAccount } = useRouterParams<RouterParams>();
   const verifyToken = useVerifyToken();
 
   const onConfirmAuth = useCallback(async () => {
@@ -99,7 +100,7 @@ export default function SelectVerifier() {
       title2: (
         <Text>
           <TextL>{`${selectedVerifier.name} will send a verification code to `}</TextL>
-          <TextL style={fonts.mediumFont}>{loginAccount}</TextL>
+          <TextL style={fonts.mediumFont}>{showLoginAccount || loginAccount}</TextL>
           <TextL>{` to verify your ${loginType === LoginType.Phone ? 'phone number' : 'email address'}.`}</TextL>
         </Text>
       ),
@@ -115,7 +116,7 @@ export default function SelectVerifier() {
         },
       ],
     });
-  }, [loginAccount, loginType, selectedVerifier, t]);
+  }, [loginAccount, loginType, selectedVerifier, showLoginAccount, t]);
   const onConfirm = useCallback(async () => {
     switch (loginType) {
       case LoginType.Apple:

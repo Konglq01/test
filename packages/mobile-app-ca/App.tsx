@@ -21,6 +21,13 @@ import InterfaceProvider from 'contexts/useInterface';
 import GlobalStyleHandler from 'components/GlobalStyleHandler';
 import { lockScreenOrientation } from 'utils/screenOrientation';
 import Updater from 'components/Updater';
+import CodePush from 'react-native-code-push';
+
+const codePushOptions = {
+  updateDialog: false,
+  installMode: CodePush.InstallMode.ON_NEXT_RESTART,
+  checkFrequency: CodePush.CheckFrequency.ON_APP_RESUME,
+};
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -86,4 +93,4 @@ const App = () => {
   );
 };
 
-export default Sentry.wrap(App);
+export default Sentry.wrap(CodePush(codePushOptions)(App));

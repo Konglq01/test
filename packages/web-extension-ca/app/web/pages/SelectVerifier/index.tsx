@@ -168,9 +168,7 @@ export default function SelectVerifier() {
           onCancel={() => setOpen(false)}>
           <p className="modal-content">
             {`${t('verificationCodeTip1', { verifier: selectItem?.name })} `}
-            <span className="bold">{`${LoginType.Phone === loginAccount.loginType ? '+ ' : ''}${
-              loginAccount.guardianAccount
-            }`}</span>
+            <span className="bold">{loginAccount.guardianAccount}</span>
             {` ${t('verificationCodeTip2', { type: LoginType[loginAccount.loginType] })}`}
           </p>
           <div className="btn-wrapper">

@@ -48,7 +48,7 @@ export default function Email({
     if (message) return;
     Loading.show();
     try {
-      await onLogin(loginAccount as string);
+      await onLogin({ loginAccount: loginAccount as string });
     } catch (error) {
       setErrorMessage(handleErrorMessage(error));
     }

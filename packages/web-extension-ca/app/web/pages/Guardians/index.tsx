@@ -34,9 +34,8 @@ export default function Guardians() {
   const accountShow = useCallback((guardian: UserGuardianItem) => {
     switch (guardian.guardianType) {
       case LoginType.Email:
-        return <div className="account-text">{guardian.guardianAccount}</div>;
       case LoginType.Phone:
-        return <div className="account-text">{`+${guardian.guardianAccount}`}</div>;
+        return <div className="account-text">{guardian.guardianAccount}</div>;
       case LoginType.Google:
         return (
           <div className="account-text">

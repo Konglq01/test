@@ -25,7 +25,9 @@
     "build:apk": "cd android && ./gradlew assembleRelease",
     "build:ipa": "cd ios && fastlane build_ipa",
     "push:ios": "cd ios && fastlane distribute_firebase",
-    "distribute:ios": "yarn build:ipa && yarn push:ios"
+    "distribute:ios": "yarn build:ipa && yarn push:ios",
+    "hotBundle:android": "appcenter codepush release-react -a aelf-web/DID-Android -d Production",
+    "hotBundle:ios": "appcenter codepush release-react -a aelf-web/DID-IOS -d Production --plist-file ./ios/DID/Info.plist"
   },
   "workspaces": {
     "nohoist": [
@@ -165,6 +167,7 @@
     "metro-react-native-babel-preset": "^0.70.3",
     "prettier": "^2.6.2",
     "react-i18next": "^11.16.9",
+    "react-native-code-push": "^7.1.0",
     "react-native-codegen": "^0.70.5",
     "react-test-renderer": "18.0.0",
     "typescript": "^4.4.4"
