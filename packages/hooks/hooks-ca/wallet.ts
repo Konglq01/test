@@ -10,8 +10,8 @@ import { getApolloClient } from '@portkey-wallet/graphql/contract/apollo';
 import { request } from '@portkey-wallet/api/api-did';
 import { useAppCommonDispatch } from '../index';
 import { setWalletNameAction } from '@portkey-wallet/store/store-ca/wallet/actions';
-import { DeviceInfoType, DeviceItemType } from '@portkey-wallet/types/types-ca/device';
-import { extraDataDecode, extraDataListDecode } from '@portkey-wallet/utils/device';
+import { DeviceInfoType } from '@portkey-wallet/types/types-ca/device';
+import { extraDataListDecode } from '@portkey-wallet/utils/device';
 import { ChainId } from '@portkey-wallet/types';
 
 export interface CurrentWalletType extends WalletInfoType, CAInfoType {
