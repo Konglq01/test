@@ -14,25 +14,19 @@ import CommonAvatar from 'components/CommonAvatar';
 import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
 import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
 import { chainShowText } from '@portkey-wallet/utils';
-import { ChainId } from '@portkey-wallet/types';
 import { FontStyles } from 'assets/theme/styles';
+import { ChainId } from '@portkey-wallet/types';
+import { CryptoInfoType } from 'pages/Buy/types';
 
-type ItemValueType = string;
+type ItemType = CryptoInfoType;
 
-type ItemTypeBase = {
-  chainId: ChainId;
-  symbol: string;
-  name: string;
-  [key: string]: any;
-};
-
-type SelectListProps<ItemType extends ItemTypeBase> = {
-  value?: ItemValueType; // `${chainId} ${symbol}`
+type SelectListProps = {
+  value?: string; // `${network}_${symbol}`
   list: Array<ItemType>;
   callBack: (item: ItemType) => void;
 };
 
-const SelectList = <ItemType extends ItemTypeBase>({ list, callBack, value }: SelectListProps<ItemType>) => {
+const SelectList = ({ list, callBack, value }: SelectListProps) => {
   const { t } = useLanguage();
   const gStyle = useGStyles();
   const [keyWord, setKeyWord] = useState<string>('');
@@ -40,7 +34,7 @@ const SelectList = <ItemType extends ItemTypeBase>({ list, callBack, value }: Se
 
   const _list = useMemo(() => {
     const _keyWord = keyWord?.trim();
-    return _keyWord === '' ? list : list.filter(item => item.name === _keyWord);
+    return _keyWord === '' ? list : list.filter(item => item.crypto === _keyWord);
   }, [keyWord, list]);
 
   return (
@@ -61,7 +55,7 @@ const SelectList = <ItemType extends ItemTypeBase>({ list, callBack, value }: Se
           {_list.map(item => {
             return (
               <Touchable
-                key={item.chainId}
+                key={`${item.network}_${item.crypto}`}
                 onPress={() => {
                   OverlayModal.hide();
                   callBack(item);
@@ -69,18 +63,20 @@ const SelectList = <ItemType extends ItemTypeBase>({ list, callBack, value }: Se
                 <View style={styles.itemRow}>
                   <CommonAvatar
                     hasBorder
-                    title={item?.symbol}
+                    title={item.crypto}
                     avatarSize={pTd(32)}
-                    svgName={item?.symbol === ELF_SYMBOL ? 'elf-icon' : undefined}
-                    imageUrl={symbolImages[item?.symbol]}
+                    svgName={item.crypto === ELF_SYMBOL ? 'elf-icon' : undefined}
+                    imageUrl={symbolImages[item.crypto]}
                   />
                   <View style={styles.itemContent}>
                     <View>
-                      <TextL>{item.name}</TextL>
-                      <TextM style={FontStyles.font7}>{`${chainShowText(item.chainId)} ${item.chainId}`}</TextM>
+                      <TextL>{item.crypto}</TextL>
+                      <TextM style={FontStyles.font7}>{`${chainShowText(item.networkName as ChainId)} ${
+                        item.networkName
+                      }`}</TextM>
                     </View>
 
-                    {value !== undefined && value === `${item.chainId} ${item.symbol}` && (
+                    {value !== undefined && value === `${item.network}_${item.crypto}` && (
                       <Svg iconStyle={styles.itemIcon} icon="selected" size={pTd(24)} />
                     )}
                   </View>
@@ -96,9 +92,9 @@ const SelectList = <ItemType extends ItemTypeBase>({ list, callBack, value }: Se
   );
 };
 
-const showList = <ItemType extends ItemTypeBase>(params: SelectListProps<ItemType>) => {
+const showList = (params: SelectListProps) => {
   Keyboard.dismiss();
-  OverlayModal.show(<SelectList<ItemType> {...params} />, {
+  OverlayModal.show(<SelectList {...params} />, {
     position: 'bottom',
   });
 };

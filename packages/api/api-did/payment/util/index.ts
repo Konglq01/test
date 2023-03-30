@@ -30,3 +30,13 @@ export const getCryptoInfo = async (params: { fiat: string }, symbol: string, ch
   }
   return (rst.data as CryptoInfoType[]).find((item: any) => item.symbol === symbol && item.chainId === chainId);
 };
+
+export const getCryptoList = async (params: { fiat: string }) => {
+  const rst = await request.payment.getCryptoList({
+    params,
+  });
+  if (rst.returnCode !== '0000') {
+    throw new Error(rst.returnMsg);
+  }
+  return rst.data as CryptoInfoType[];
+};

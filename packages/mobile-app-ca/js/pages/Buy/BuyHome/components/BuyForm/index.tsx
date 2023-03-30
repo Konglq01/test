@@ -11,7 +11,6 @@ import Touchable from 'components/Touchable';
 import Svg from 'components/Svg';
 import fonts from 'assets/theme/fonts';
 import SelectToken from '../SelectToken';
-import { ChainId } from '@portkey-wallet/types';
 import { usePayment } from 'hooks/store';
 import SelectCurrency from '../SelectCurrency';
 import { FiatType } from '@portkey-wallet/store/store-ca/payment/type';
@@ -20,24 +19,15 @@ import { FontStyles } from 'assets/theme/styles';
 import CommonButton from 'components/CommonButton';
 import navigationService from 'utils/navigationService';
 import { countryCodeMap } from '@portkey-wallet/constants/constants-ca/payment';
-import { fetchOrderQuote, getCryptoInfo } from '@portkey-wallet/api/api-did/payment/util';
+import { fetchOrderQuote, getCryptoList } from '@portkey-wallet/api/api-did/payment/util';
 import CommonToast from 'components/CommonToast';
 import { ErrorType } from 'types/common';
 import { INIT_HAS_ERROR, INIT_NONE_ERROR } from 'constants/common';
-
-const list = [
-  {
-    symbol: 'ELF',
-    name: 'ELF',
-    chainId: 'AELF' as ChainId,
-  },
-];
+import { CryptoInfoType } from '@portkey-wallet/api/api-did/payment/type';
+import { LimitType, TypeEnum } from 'pages/Buy/types';
+import { tokenList } from 'pages/Buy/constants';
 
 const MAX_REFRESH_TIME = 12;
-interface LimitType {
-  min: number;
-  max: number;
-}
 
 export default function BuyForm() {
   const { t } = useLanguage();
@@ -45,97 +35,93 @@ export default function BuyForm() {
   const [fiat, setFiat] = useState<FiatType | undefined>(
     buyFiatList.find(item => item.currency === 'USD' && item.country === 'US'),
   );
-  const [token, setToken] = useState<any>(list[0]);
+  const [token, setToken] = useState<any>(tokenList[0]);
   const [amount, setAmount] = useState<string>('100');
   const [amountError, setAmountError] = useState<ErrorType>(INIT_NONE_ERROR);
   const [receiveAmount, setReceiveAmount] = useState<string>('');
+  const [rate, setRate] = useState<string>('');
 
   const rateRefreshTimeRef = useRef(MAX_REFRESH_TIME);
   const [rateRefreshTime, setRateRefreshTime] = useState<number>(MAX_REFRESH_TIME);
   const limitAmountRef = useRef<LimitType>();
+  const refreshReceiveRef = useRef<() => void>();
+  const cryptoListRef = useRef<CryptoInfoType[]>();
 
   const setLimitAmount = useCallback(async () => {
     limitAmountRef.current = undefined;
-    if (fiat === undefined || token === undefined) return;
-    try {
-      const rst = await getCryptoInfo(
-        {
-          fiat: fiat.currency,
-        },
-        token.symbol,
-        token.chainId,
-      );
-      console.log('rst', rst);
-      if (rst && rst.maxPurchaseAmount !== null && rst.minPurchaseAmount !== null) {
-        limitAmountRef.current = {
-          min: rst.minPurchaseAmount,
-          max: rst.maxPurchaseAmount,
-        };
+
+    if (fiat === undefined) return;
+    if (cryptoListRef.current === undefined) {
+      try {
+        const rst = await getCryptoList({ fiat: fiat.currency });
+        cryptoListRef.current = rst;
+      } catch (error) {
+        console.log(error);
       }
-    } catch (error) {
-      console.log(error);
     }
+    if (token === undefined || cryptoListRef.current === undefined) return;
+    const cryptoInfo = cryptoListRef.current.find(
+      item => item.crypto === token.crypto && item.network === token.network,
+    );
+
+    if (cryptoInfo === undefined || cryptoInfo.minPurchaseAmount === null || cryptoInfo.maxPurchaseAmount === null)
+      return;
+
+    console.log('cryptoInfo', cryptoInfo);
+    limitAmountRef.current = {
+      min: cryptoInfo.minPurchaseAmount,
+      max: cryptoInfo.maxPurchaseAmount,
+    };
   }, [fiat, token]);
 
-  // useEffectOnce(() => {
-  //   const defaultFiat = buyFiatList.find(item => item.currency === 'USD' && item.country === 'US');
-  //   if (defaultFiat) {
-  //     setFiat(defaultFiat);
-  //   }
-  //   setToken(list[0]);
-  // });
+  const isAllowAmount = useMemo(() => {
+    const reg = /^\d+(\.\d+)?$/;
+    if (amount === '' || !reg.test(amount)) return false;
+    return true;
+  }, [amount]);
 
   const refreshReceive = useCallback(async () => {
-    if (fiat === undefined || token === undefined) return;
-    const reg = /^\d+(\.\d+)?$/;
-    if (amount === '' || !reg.test(amount)) {
+    if (fiat === undefined || token === undefined || limitAmountRef.current === undefined || !isAllowAmount) return;
+
+    const { min, max } = limitAmountRef.current;
+    const amountNum = Number(amount);
+    let _amount = amount;
+    let isOnlySetRate = false;
+
+    if (amountNum < min || amountNum > max) {
+      setAmountError({
+        ...INIT_HAS_ERROR,
+        errorMsg: `Limit Amount ${min}-${max} ${fiat?.currency}`,
+      });
       setReceiveAmount('');
-      return;
+      isOnlySetRate = true;
+      _amount = min + '';
     }
 
     try {
       const rst = await fetchOrderQuote({
-        crypto: token.symbol,
-        network: token.chainId,
+        crypto: token.crypto,
+        network: token.network,
         fiat: fiat.currency,
         country: fiat.country,
-        amount,
+        amount: _amount,
         side: 'BUY',
-      } as any);
-      console.log('rst', rst);
-      // TODO: setReceiveAmount
+      });
+
+      setRate((1 / Number(rst.cryptoPrice)).toFixed(2) + '');
+      if (!isOnlySetRate) setReceiveAmount(rst.cryptoQuantity);
     } catch (error) {
-      console.log('error');
+      console.log('error', error);
       CommonToast.failError(error);
     }
-  }, [amount, fiat, token]);
-
-  const refreshRate = useCallback(async () => {
-    if (fiat === undefined || token === undefined) return;
-
-    try {
-      const rst = await fetchOrderQuote({
-        crypto: token.symbol,
-        network: token.chainId,
-        fiat: fiat.currency,
-        country: fiat.country,
-        amount: '1',
-        side: 'BUY',
-      } as any);
-      console.log('refreshRate:rst', rst);
-    } catch (error) {
-      console.log('error');
-      CommonToast.failError(error);
-    }
-  }, [fiat, token]);
+  }, [amount, fiat, isAllowAmount, token]);
+  refreshReceiveRef.current = refreshReceive;
 
   useEffectOnce(() => {
-    refreshRate();
     const timer = setInterval(() => {
       rateRefreshTimeRef.current = --rateRefreshTimeRef.current;
       if (rateRefreshTimeRef.current === 0) {
-        refreshRate();
-        refreshReceive();
+        refreshReceiveRef.current?.();
         rateRefreshTimeRef.current = MAX_REFRESH_TIME;
       }
       setRateRefreshTime(rateRefreshTimeRef.current);
@@ -144,14 +130,6 @@ export default function BuyForm() {
       clearInterval(timer);
     };
   });
-
-  useEffect(() => {
-    setLimitAmount();
-  }, [setLimitAmount]);
-
-  useEffect(() => {
-    refreshReceive();
-  }, [refreshReceive]);
 
   const onAmountInput = useCallback((text: string) => {
     setAmountError(INIT_NONE_ERROR);
@@ -165,12 +143,6 @@ export default function BuyForm() {
     setAmount(text);
   }, []);
 
-  const isAllowNext = useMemo(() => {
-    const reg = /^\d+(\.\d+)?$/;
-    if (amount === '' || !reg.test(amount)) return false;
-    return true;
-  }, [amount]);
-
   const onNext = useCallback(() => {
     if (limitAmountRef.current === undefined) return;
     const amountNum = Number(amount);
@@ -182,8 +154,29 @@ export default function BuyForm() {
       });
       return;
     }
-    navigationService.navigate('BuyPreview');
-  }, [amount, fiat?.currency]);
+    navigationService.navigate('BuyPreview', {
+      amount,
+      fiat,
+      token,
+      type: TypeEnum.BUY,
+      receiveAmount,
+      rate,
+    });
+  }, [amount, fiat, rate, receiveAmount, token]);
+
+  const onAmountBlur = useCallback(() => {
+    refreshReceive();
+  }, [refreshReceive]);
+
+  const onChooseChange = useCallback(async () => {
+    await setLimitAmount();
+    refreshReceiveRef.current?.();
+  }, [setLimitAmount]);
+
+  useEffect(() => {
+    // only fiat||token change will trigger
+    onChooseChange();
+  }, [onChooseChange]);
 
   return (
     <View style={styles.formContainer}>
@@ -212,6 +205,7 @@ export default function BuyForm() {
           autoCorrect={false}
           keyboardType="decimal-pad"
           onChangeText={onAmountInput}
+          onBlur={onAmountBlur}
           errorMessage={amountError.isError ? amountError.errorMsg : ''}
           // placeholder={t('Enter Phone Number')}
         />
@@ -226,13 +220,13 @@ export default function BuyForm() {
               style={styles.unitWrap}
               onPress={() => {
                 SelectToken.showList({
-                  value: `${token.chainId} ${token.symbol}`,
-                  list,
+                  value: `${token.network}_${token.crypto}`,
+                  list: tokenList,
                   callBack: setToken,
                 });
               }}>
               <Svg size={24} icon="elf-icon" iconStyle={styles.unitIconStyle} />
-              <TextL style={[GStyles.flex1, fonts.mediumFont]}>ELF</TextL>
+              <TextL style={[GStyles.flex1, fonts.mediumFont]}>{token.crypto}</TextL>
               <Svg size={16} icon="down-arrow" color={defaultColors.icon1} />
             </Touchable>
           }
@@ -240,11 +234,13 @@ export default function BuyForm() {
           maxLength={30}
           autoCorrect={false}
           keyboardType="decimal-pad"
-          // placeholder={t('Enter Phone Number')}
+          placeholder=" "
         />
 
         <View style={styles.rateWrap}>
-          <TextM style={[GStyles.flex1, FontStyles.font3]}>1 ELF ≈ 0.2874 USD</TextM>
+          <TextM style={[GStyles.flex1, FontStyles.font3]}>
+            {rate === '' ? '' : `1 ${token?.crypto} ≈ ${rate} ${fiat?.currency}`}
+          </TextM>
           <View style={[GStyles.flexRow, GStyles.alignCenter]}>
             <Svg size={16} icon="time" />
             <TextS style={styles.refreshLabel}>{rateRefreshTime}s</TextS>
@@ -252,7 +248,7 @@ export default function BuyForm() {
         </View>
       </View>
 
-      <CommonButton type="primary" disabled={!isAllowNext} onPress={onNext}>
+      <CommonButton type="primary" disabled={!isAllowAmount} onPress={onNext}>
         Next
       </CommonButton>
     </View>

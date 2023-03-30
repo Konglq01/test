@@ -10,21 +10,17 @@ import fonts from 'assets/theme/fonts';
 import { FontStyles } from 'assets/theme/styles';
 import BuyForm from './components/BuyForm';
 import SellForm from './components/SellForm';
-
-enum TabType {
-  BUY,
-  SELL,
-}
+import { TypeEnum } from '../types';
 
 const tabList = [
   {
     name: 'Buy',
-    type: TabType.BUY,
+    type: TypeEnum.BUY,
     component: <BuyForm />,
   },
   {
     name: 'Sell',
-    type: TabType.SELL,
+    type: TypeEnum.SELL,
     component: <SellForm />,
   },
 ];
@@ -32,7 +28,7 @@ const tabList = [
 export default function BuyHome() {
   const { t } = useLanguage();
 
-  const [selectTab, setSelectTab] = useState<TabType>(TabType.BUY);
+  const [selectTab, setSelectTab] = useState<TypeEnum>(TypeEnum.BUY);
 
   return (
     <PageContainer

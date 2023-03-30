@@ -1,5 +1,5 @@
 import { defaultColors } from 'assets/theme';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { pTd } from 'utils/unit';
 import PageContainer from 'components/PageContainer';
@@ -12,14 +12,33 @@ import CommonButton from 'components/CommonButton';
 import achImg from 'assets/image/pngs/ach.png';
 import achPaymentImg from 'assets/image/pngs/ach_payment.png';
 import ActionSheet from 'components/ActionSheet';
+import { CryptoInfoType, TypeEnum } from '../types';
+import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
+import { FiatType } from '@portkey-wallet/store/store-ca/payment/type';
 
-enum TabType {
-  BUY,
-  SELL,
+interface RouterParams {
+  type?: TypeEnum;
+  token?: CryptoInfoType;
+  fiat?: FiatType;
+  amount?: string;
+  receiveAmount?: string;
+  rate?: string;
 }
 
-export default function BuyHome() {
+export default function BuyPreview() {
+  const {
+    type,
+    token,
+    fiat,
+    amount,
+    receiveAmount: receiveAmountProps,
+    rate: rateProps,
+  } = useRouterParams<RouterParams>();
+
   const { t } = useLanguage();
+
+  const receiveAmount = useMemo(() => receiveAmountProps, [receiveAmountProps]);
+  const rate = useMemo(() => rateProps, [rateProps]);
 
   return (
     <PageContainer
@@ -30,17 +49,19 @@ export default function BuyHome() {
       <View>
         <View style={styles.amountContainer}>
           <View style={styles.primaryWrap}>
-            <Text style={styles.primaryAmount}>500</Text>
-            <TextM style={styles.primaryUnit}>USD</TextM>
+            <Text style={styles.primaryAmount}>{amount}</Text>
+            <TextM style={styles.primaryUnit}>{fiat?.currency}</TextM>
           </View>
-          <TextM style={FontStyles.font3}>I will receive 1735 ELF</TextM>
+          <TextM style={FontStyles.font3}>
+            I will receive {receiveAmount} {token?.crypto}
+          </TextM>
         </View>
 
         <TextS style={GStyles.marginLeft(8)}>Service provider</TextS>
         <View style={styles.paymentWrap}>
           <View style={[GStyles.flexRow, GStyles.spaceBetween, GStyles.itemCenter, GStyles.marginBottom(24)]}>
             <Image resizeMode="contain" source={achImg} style={styles.achImgStyle} />
-            <TextM style={FontStyles.font3}>1 ELF ≈ 0.2874 USD</TextM>
+            <TextM style={FontStyles.font3}>{`1 ${token?.crypto} ≈ ${rate} ${fiat?.currency}`}</TextM>
           </View>
           <Image resizeMode="contain" source={achPaymentImg} style={styles.achPaymentImgStyle} />
         </View>
