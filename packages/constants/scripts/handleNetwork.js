@@ -3,6 +3,7 @@ const path = require('path');
 
 const filePath = path.resolve(__dirname, `../constants-ca/network.ts`);
 
+
 let fileName = 'network-testnet';
 
 if (process.argv[2]) {
@@ -11,3 +12,4 @@ if (process.argv[2]) {
 }
 
 fs.writeFileSync(filePath, `export * from './${fileName}';\n`);
+

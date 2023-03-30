@@ -224,6 +224,24 @@ export default function AddGuardian() {
     }
   }, []);
 
+  const renderSocialGuardianAccount = useCallback(
+    (v: ISocialLogin) => (
+      <div className="social">
+        {socialValue?.value ? (
+          <div className="flex-column social-input detail">
+            <span className="name">{socialValue.name}</span>
+            <span className="email">{socialValue.isPrivate ? '******' : socialValue.value}</span>
+          </div>
+        ) : (
+          <div className="flex social-input click" onClick={() => handleSocialAuth(v)}>
+            <span className="click-text">{`Click Add ${v} Account`}</span>
+          </div>
+        )}
+      </div>
+    ),
+    [handleSocialAuth, socialValue],
+  );
+
   const renderGuardianAccount = useMemo(
     () => ({
       [LoginType.Email]: {
@@ -244,41 +262,15 @@ export default function AddGuardian() {
         label: t('Guardian Phone'),
       },
       [LoginType.Google]: {
-        element: (
-          <div className="social">
-            {socialValue?.value ? (
-              <div className="flex-column social-input detail">
-                <span className="name">{socialValue.name}</span>
-                <span className="email">{socialValue.value}</span>
-              </div>
-            ) : (
-              <div className="flex social-input click" onClick={() => handleSocialAuth('Google')}>
-                <span className="click-text">Click Add Google Account</span>
-              </div>
-            )}
-          </div>
-        ),
+        element: renderSocialGuardianAccount('Google'),
         label: t('Guardian Google'),
       },
       [LoginType.Apple]: {
-        element: (
-          <div className="social">
-            {socialValue?.value ? (
-              <div className="flex-column social-input detail">
-                <span className="name">{socialValue.name}</span>
-                <span className="email">{socialValue.value}</span>
-              </div>
-            ) : (
-              <div className="flex social-input click" onClick={() => handleSocialAuth('Apple')}>
-                <span className="click-text">Click Add Apple Account</span>
-              </div>
-            )}
-          </div>
-        ),
+        element: renderSocialGuardianAccount('Apple'),
         label: t('Guardian Apple'),
       },
     }),
-    [emailVal, handleEmailInputChange, handlePhoneInputChange, handleSocialAuth, socialValue, t],
+    [emailVal, handleEmailInputChange, handlePhoneInputChange, renderSocialGuardianAccount, t],
   );
 
   const handleCommonVerify = useCallback(
