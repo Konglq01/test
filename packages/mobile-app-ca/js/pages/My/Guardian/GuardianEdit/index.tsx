@@ -408,9 +408,9 @@ const GuardianEdit: React.FC = () => {
         {account ? (
           <View style={pageStyles.thirdPartAccount}>
             {firstName && <TextM style={pageStyles.firstNameStyle}>{firstName}</TextM>}
-            <TextM style={[!!firstName && FontStyles.font3]} numberOfLines={1}>
+            <TextS style={[!!firstName && FontStyles.font3]} numberOfLines={1}>
               {account}
-            </TextM>
+            </TextS>
           </View>
         ) : (
           <Touchable onPress={onGoogleSign}>
@@ -430,9 +430,9 @@ const GuardianEdit: React.FC = () => {
         {account ? (
           <View style={pageStyles.thirdPartAccount}>
             {firstName && <TextM style={pageStyles.firstNameStyle}>{firstName}</TextM>}
-            <TextM style={[!!firstName && FontStyles.font3]} numberOfLines={1}>
+            <TextS style={[!!firstName && FontStyles.font3]} numberOfLines={1}>
               {account}
-            </TextM>
+            </TextS>
           </View>
         ) : (
           <Touchable onPress={onAppleSign}>
