@@ -29,6 +29,8 @@ import { transactionTypesForActivityList as transactionList } from '@portkey-wal
 import fonts from 'assets/theme/fonts';
 import { fetchTokenListAsync } from '@portkey-wallet/store/store-ca/assets/slice';
 import { formatChainInfoToShow } from '@portkey-wallet/utils';
+import BuyButton from 'components/BuyButton';
+import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
 
 interface RouterParams {
   tokenInfo: TokenItemShowType;
@@ -114,6 +116,11 @@ const TokenDetail: React.FC = () => {
     dispatch(fetchTokenListAsync({ caAddresses: currentWallet.walletInfo.caAddressList || [] }));
   });
 
+  const isBuyButtonShow = useMemo(
+    () => tokenInfo.symbol === ELF_SYMBOL && tokenInfo.chainId === 'AELF',
+    [tokenInfo.chainId, tokenInfo.symbol],
+  );
+
   return (
     <PageContainer
       type="leftBack"
@@ -136,9 +143,9 @@ const TokenDetail: React.FC = () => {
         {currentWallet?.currentNetwork === 'MAIN' && (
           <Text style={styles.dollarBalance}>{`$ ${currentToken?.balanceInUsd}`}</Text>
         )}
-        <View style={styles.buttonGroupWrap}>
+        <View style={[styles.buttonGroupWrap, !isBuyButtonShow && GStyles.paddingArg(0, 116.5)]}>
+          {isBuyButtonShow && <BuyButton themeType="innerPage" />}
           <SendButton themeType="innerPage" sentToken={currentToken} />
-          <View style={styles.space} />
           <ReceiveButton currentTokenInfo={currentToken} themeType="innerPage" receiveButton={currentToken} />
         </View>
       </View>

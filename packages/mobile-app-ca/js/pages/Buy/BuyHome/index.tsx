@@ -11,6 +11,7 @@ import { FontStyles } from 'assets/theme/styles';
 import BuyForm from './components/BuyForm';
 
 import { TypeEnum } from '../types';
+import ActionSheet from 'components/ActionSheet';
 
 const tabList = [
   {
@@ -42,7 +43,14 @@ export default function BuyHome() {
               key={tabItem.name}
               onPress={() => {
                 if (tabItem.type === TypeEnum.SELL) {
-                  // TODO: Toast
+                  ActionSheet.alert({
+                    title2: (
+                      <TextM style={[GStyles.textAlignCenter]}>
+                        On-ramp is not supported on the Testnet. The on-ramp service on Mainnet is coming soon.
+                      </TextM>
+                    ),
+                    buttons: [{ title: 'OK' }],
+                  });
                   return;
                 }
                 setSelectTab(tabItem.type);

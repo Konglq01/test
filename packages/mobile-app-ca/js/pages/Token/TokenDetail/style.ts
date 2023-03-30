@@ -36,9 +36,11 @@ export const styles = StyleSheet.create({
   buttonGroupWrap: {
     marginTop: pTd(40),
     marginBottom: pTd(40),
+    paddingHorizontal: pTd(70.5),
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'center',
+    width: '100%',
+    justifyContent: 'space-between',
     alignItems: 'center',
   },
   space: {

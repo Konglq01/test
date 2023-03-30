@@ -127,7 +127,21 @@ export default function BuyPreview() {
           </TextM>
           .
         </TextM>
-        <CommonButton type="primary">Go to AlchemyPay</CommonButton>
+        <CommonButton
+          type="primary"
+          onPress={() => {
+            ActionSheet.alert({
+              title2: (
+                <TextM style={[GStyles.textAlignCenter]}>
+                  On-ramp is not supported on the Testnet. The on-ramp service on Mainnet is coming soon.
+                </TextM>
+              ),
+              buttons: [{ title: 'OK' }],
+            });
+            return;
+          }}>
+          Go to AlchemyPay
+        </CommonButton>
       </View>
     </PageContainer>
   );
