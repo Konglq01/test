@@ -17,6 +17,8 @@ import CommonToast from 'components/CommonToast';
 import { useGetCurrentCAContract } from 'hooks/contract';
 import { addManager } from 'utils/wallet';
 import { extraDataEncode, getDeviceInfoFromQR } from '@portkey-wallet/utils/device';
+import socket from '@portkey-wallet/socket/socket-did';
+import { request } from '@portkey-wallet/api/api-did';
 const ScrollViewProps = { disabled: true };
 export default function ScanLogin() {
   const { data } = useRouterParams<{ data?: LoginQRData }>();
@@ -27,14 +29,20 @@ export default function ScanLogin() {
   const getCurrentCAContract = useGetCurrentCAContract();
 
   const onLogin = useCallback(async () => {
-    if (!caHash || loading) return;
+    if (!caHash || loading || !managerAddress) return;
     try {
       setLoading(true);
       const deviceInfo = getDeviceInfoFromQR(qrExtraData, deviceType);
       const contract = await getCurrentCAContract();
-      const extraData = extraDataEncode(deviceInfo || {});
+      const extraData = await extraDataEncode(deviceInfo || {}, true);
+      console.log('extraData===', extraData);
+
       const req = await addManager({ contract, caHash, address, managerAddress, extraData });
       if (req?.error) throw req?.error;
+      socket.doOpen({
+        url: `${request.defaultConfig.baseURL}/ca`,
+        clientId: managerAddress,
+      });
       navigationService.navigate('Tab');
     } catch (error) {
       CommonToast.failError(error);

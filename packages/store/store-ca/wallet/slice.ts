@@ -10,6 +10,7 @@ import {
   setCAInfoType,
   setChainListAction,
   setManagerInfo,
+  setOriginChainId,
   setWalletNameAction,
 } from './actions';
 import { WalletError, WalletState } from './type';
@@ -92,6 +93,9 @@ export const walletSlice = createSlice({
       })
       .addCase(setWalletNameAction, (state, action) => {
         state.walletName = action.payload;
+      })
+      .addCase(setOriginChainId, (state, action) => {
+        state.originChainId = action.payload;
       });
   },
 });

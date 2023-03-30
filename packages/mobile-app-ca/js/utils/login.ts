@@ -2,12 +2,14 @@ import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type'
 import { resetWallet } from '@portkey-wallet/store/store-ca/wallet/actions';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import ActionSheet from 'components/ActionSheet';
+import OverlayModal from 'components/OverlayModal';
 import { GuardiansStatus } from 'pages/Guardian/types';
 import { AppDispatch } from 'store';
 import { resetUser } from 'store/user/actions';
 import navigationService from './navigationService';
 
 export function queryFailAlert(dispatch: AppDispatch, isRecovery?: boolean, isReset?: boolean) {
+  OverlayModal.hide();
   ActionSheet.alert({
     message: isRecovery ? 'Wallet Recovery Failed!' : 'Wallet Register Failed!',
     buttons: [

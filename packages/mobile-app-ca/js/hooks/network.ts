@@ -1,5 +1,5 @@
 import { NetworkItem } from '@portkey-wallet/types/types-ca/network';
-import { useWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { useOriginChainId, useWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { changeNetworkType } from '@portkey-wallet/store/store-ca/wallet/actions';
 import { ParamListBase, RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from 'navigation';
@@ -9,6 +9,7 @@ import navigationService from 'utils/navigationService';
 
 export function useChangeNetwork(route: RouteProp<ParamListBase>) {
   const dispatch = useAppDispatch();
+  const originChainId = useOriginChainId();
   const { walletInfo } = useWallet();
   return useCallback(
     (network: NetworkItem) => {
@@ -16,11 +17,11 @@ export function useChangeNetwork(route: RouteProp<ParamListBase>) {
       const tmpCaInfo = caInfo?.[network.networkType];
       let routeName: keyof RootStackParamList = 'LoginPortkey';
 
-      if (tmpCaInfo?.managerInfo && tmpCaInfo.AELF?.caAddress) routeName = 'Tab';
+      if (tmpCaInfo?.managerInfo && tmpCaInfo[originChainId]?.caAddress) routeName = 'Tab';
 
       if (routeName !== route.name) navigationService.reset(routeName);
       dispatch(changeNetworkType(network.networkType));
     },
-    [dispatch, route.name, walletInfo],
+    [dispatch, originChainId, route.name, walletInfo],
   );
 }

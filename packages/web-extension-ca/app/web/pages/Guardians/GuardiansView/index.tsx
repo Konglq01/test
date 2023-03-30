@@ -18,11 +18,10 @@ import {
   setOpGuardianAction,
   setPreGuardianAction,
 } from '@portkey-wallet/store/store-ca/guardians/actions';
-import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { useCurrentWallet, useOriginChainId } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { GuardianMth } from 'types/guardians';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
 import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type';
-import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
 import useGuardianList from 'hooks/useGuardianList';
 import { verification } from 'utils/api';
@@ -46,7 +45,8 @@ export default function GuardiansView() {
   const [tipOpen, setTipOpen] = useState<boolean>(false);
   const [switchFail, setSwitchFail] = useState<SwitchFail>(SwitchFail.default);
   const currentNetwork = useCurrentNetworkInfo();
-  const currentChain = useCurrentChain();
+  const originChainId = useOriginChainId();
+  const currentChain = useCurrentChain(originChainId);
   const dispatch = useAppDispatch();
   const { setLoading } = useLoading();
   const { walletInfo } = useCurrentWallet();
@@ -74,7 +74,7 @@ export default function GuardiansView() {
       if (!data) throw 'Action error';
       const verifySocialParams = {
         verifierId: opGuardian?.verifier?.id,
-        chainId: currentChain?.chainId || DefaultChainId,
+        chainId: currentChain?.chainId || originChainId,
         accessToken: data?.access_token,
       };
       if (v === 'Google') {
@@ -103,7 +103,7 @@ export default function GuardiansView() {
         paramsOption: {
           method: GuardianMth.SetGuardianTypeForLogin,
           params: {
-            caHash: walletInfo?.AELF?.caHash,
+            caHash: walletInfo?.caHash,
             guardian: {
               type: currentGuardian?.guardianType,
               verifierId: currentGuardian?.verifier?.id,
@@ -118,6 +118,7 @@ export default function GuardiansView() {
       // setTipOpen(false);
     },
     [
+      originChainId,
       currentChain,
       currentGuardian,
       currentNetwork.walletType,
@@ -143,7 +144,7 @@ export default function GuardiansView() {
           paramsOption: {
             method: GuardianMth.UnsetGuardianTypeForLogin,
             params: {
-              caHash: walletInfo?.AELF?.caHash,
+              caHash: walletInfo?.caHash,
               guardian: {
                 type: currentGuardian?.guardianType,
                 verifierId: currentGuardian?.verifier?.id,
@@ -177,7 +178,7 @@ export default function GuardiansView() {
             guardianIdentifier: opGuardian?.guardianAccount as string,
             type: LoginType[opGuardian?.guardianType as LoginType],
             verifierId: opGuardian?.verifier?.id || '',
-            chainId: DefaultChainId,
+            chainId: originChainId,
           },
         });
         setLoading(false);
@@ -208,26 +209,17 @@ export default function GuardiansView() {
     }
   }, [
     currentChain,
-    currentGuardian?.guardianType,
-    currentGuardian?.identifierHash,
-    currentGuardian?.verifier?.id,
-    currentNetwork.walletType,
+    currentGuardian,
+    currentNetwork,
     dispatch,
     getGuardianList,
     handleSocialVerify,
     navigate,
-    opGuardian?.guardianAccount,
-    opGuardian?.guardianType,
-    opGuardian?.identifierHash,
-    opGuardian?.isLoginAccount,
-    opGuardian?.key,
-    opGuardian?.salt,
-    opGuardian?.verifier,
+    originChainId,
+    opGuardian,
     passwordSeed,
     setLoading,
-    walletInfo?.AELF?.caHash,
-    walletInfo.AESEncryptPrivateKey,
-    walletInfo.caHash,
+    walletInfo,
   ]);
 
   const handleSwitch = useCallback(
@@ -242,12 +234,8 @@ export default function GuardiansView() {
         }
         try {
           await getHolderInfo({
-            rpcUrl: currentChain?.endPoint as string,
-            address: currentChain?.caContractAddress as string,
-            chainType: currentNetwork.walletType,
-            paramsOption: {
-              guardianIdentifier: opGuardian?.guardianAccount,
-            },
+            chainId: originChainId,
+            guardianIdentifier: opGuardian?.guardianAccount,
           });
           setSwitchFail(SwitchFail.openFail);
         } catch (error: any) {
@@ -277,7 +265,7 @@ export default function GuardiansView() {
         }
       }
     },
-    [currentChain, currentGuardian, currentNetwork, handleSocialVerify, opGuardian, userGuardiansList, verifyHandler],
+    [currentGuardian, handleSocialVerify, opGuardian, originChainId, userGuardiansList, verifyHandler],
   );
 
   const accountShow = useMemo(() => {

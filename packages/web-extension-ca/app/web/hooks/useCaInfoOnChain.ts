@@ -1,6 +1,5 @@
-import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
-import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { useCurrentWallet, useOriginChainId } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import useInterval from '@portkey-wallet/hooks/useInterval';
 import { setCAInfo } from '@portkey-wallet/store/store-ca/wallet/actions';
 import { ChainItemType } from '@portkey-wallet/store/store-ca/wallet/type';
@@ -16,6 +15,7 @@ export const useCaInfoOnChain = () => {
   const { walletInfo, chainList } = useCurrentWallet();
   const currentNetwork = useCurrentNetworkInfo();
   const dispatch = useAppDispatch();
+  const originChainId = useOriginChainId();
 
   const getHolderInfoByChainId = useCallback(
     async ({
@@ -62,7 +62,7 @@ export const useCaInfoOnChain = () => {
     const pin = getSeedResult.data.privateKey;
     if (!pin) return;
     chainList
-      .filter((chain) => chain.chainId !== DefaultChainId)
+      .filter((chain) => chain.chainId !== originChainId)
       .forEach((chain) => {
         if (!walletInfo[chain.chainId as ChainId]) {
           getHolderInfoByChainId({
@@ -73,7 +73,7 @@ export const useCaInfoOnChain = () => {
           });
         }
       });
-  }, [chainList, currentNetwork.walletType, getHolderInfoByChainId, walletInfo]);
+  }, [chainList, currentNetwork, originChainId, getHolderInfoByChainId, walletInfo]);
 
   const check = useCallback(
     () => chainList?.every((chain) => walletInfo[chain.chainId as ChainId] || !isAddress(chain.caContractAddress)),

@@ -70,7 +70,6 @@ const getCAHolderByManager = async (network: NetworkType, params: GetCAHolderByM
     const caHash = result.caHolderManagerInfo[0].caHash;
     const guardianResult = await getLoginGuardianAccount(network, {
       dto: {
-        chainId: params.chainId,
         caHash,
         skipCount: 0,
         maxResultCount: 100,

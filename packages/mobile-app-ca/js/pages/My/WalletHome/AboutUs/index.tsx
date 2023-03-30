@@ -42,6 +42,14 @@ const AboutUs = () => {
             Linking.openURL('https://discord.com/invite/EUBq3rHQhr');
           }}
         />
+        <Divider style={styles.dividerStyle} />
+        <MenuItem
+          icon="telegram"
+          title="Join us on Telegram"
+          onPress={() => {
+            Linking.openURL('https://t.me/Portkey_Official_Group');
+          }}
+        />
       </View>
 
       <MenuItem

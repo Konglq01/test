@@ -17,7 +17,7 @@ import PortKeyTitle from 'pages/components/PortKeyTitle';
 import clsx from 'clsx';
 import SettingHeader from 'pages/components/SettingHeader';
 import useLocationState from 'hooks/useLocationState';
-import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { useCurrentWallet, useOriginChainId } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { handleGuardian } from 'utils/sandboxUtil/handleGuardian';
 import { GuardianMth } from 'types/guardians';
 import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
@@ -39,7 +39,8 @@ export default function VerifierAccount() {
   const { isPrompt } = useCommonState();
   const { walletInfo } = useCurrentWallet();
   const currentNetwork = useCurrentNetworkInfo();
-  const currentChain = useCurrentChain();
+  const originChainId = useOriginChainId();
+  const currentChain = useCurrentChain(originChainId);
   const { setLoading } = useLoading();
   const { passwordSeed } = useUserInfo();
   const getGuardianList = useGuardianList();
@@ -59,7 +60,7 @@ export default function VerifierAccount() {
             paramsOption: {
               method: GuardianMth.SetGuardianTypeForLogin,
               params: {
-                caHash: walletInfo?.AELF?.caHash,
+                caHash: walletInfo?.caHash,
                 guardian: {
                   type: currentGuardian?.guardianType,
                   verifierId: currentGuardian?.verifier?.id,

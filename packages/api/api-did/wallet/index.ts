@@ -5,6 +5,10 @@ export default {
     target: '/api/app/account/guardianIdentifiers',
     config: { method: 'GET' },
   },
+  getRegisterInfo: {
+    target: '/api/app/account/registerInfo',
+    config: { method: 'GET' },
+  },
   // TODO Test api
   hubPing: '/api/app/account/hub/ping',
   getCreateResponse: 'api/app/account/hub/response',

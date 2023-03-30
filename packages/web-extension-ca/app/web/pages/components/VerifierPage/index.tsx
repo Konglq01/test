@@ -14,8 +14,8 @@ import { setUserGuardianSessionIdAction } from '@portkey-wallet/store/store-ca/g
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import { useEffectOnce } from 'react-use';
-import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verification } from 'utils/api';
+import { useOriginChainId } from '@portkey-wallet/hooks/hooks-ca/wallet';
 
 const MAX_TIMER = 60;
 
@@ -41,6 +41,8 @@ export default function VerifierPage({ currentGuardian, guardianType, isInitStat
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
 
+  const originChainId = useOriginChainId();
+
   useEffectOnce(() => {
     isInitStatus && setTimer(MAX_TIMER);
   });
@@ -60,7 +62,7 @@ export default function VerifierPage({ currentGuardian, guardianType, isInitStat
             verifierSessionId: currentGuardian.verifierInfo.sessionId,
             verificationCode: code,
             verifierId: currentGuardian.verifier?.id || '',
-            chainId: DefaultChainId,
+            chainId: originChainId,
           });
 
           setLoading(false);
@@ -81,7 +83,7 @@ export default function VerifierPage({ currentGuardian, guardianType, isInitStat
         message.error(_error);
       }
     },
-    [guardianType, currentGuardian, setLoading, onSuccess, t],
+    [guardianType, originChainId, currentGuardian, setLoading, onSuccess, t],
   );
 
   const resendCode = useCallback(async () => {
@@ -94,7 +96,7 @@ export default function VerifierPage({ currentGuardian, guardianType, isInitStat
           guardianIdentifier: currentGuardian.guardianAccount.replaceAll(' ', ''),
           type: LoginType[guardianType],
           verifierId: currentGuardian.verifier?.id || '',
-          chainId: DefaultChainId,
+          chainId: originChainId,
         },
       });
       setLoading(false);
@@ -116,7 +118,7 @@ export default function VerifierPage({ currentGuardian, guardianType, isInitStat
       const _error = verifyErrorHandler(error);
       message.error(_error);
     }
-  }, [currentGuardian, guardianType, dispatch, setLoading]);
+  }, [currentGuardian, guardianType, originChainId, dispatch, setLoading]);
 
   useEffect(() => {
     if (timer !== MAX_TIMER) return;

@@ -14,12 +14,11 @@ import { useAppDispatch } from 'store/hooks';
 import { usePreventHardwareBack } from '@portkey-wallet/hooks/mobile';
 import biometric from 'assets/image/pngs/biometric.png';
 import { pTd } from 'utils/unit';
-import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { useCurrentWalletInfo, useOriginChainId } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { onResultFail, TimerResult } from 'utils/wallet';
 import { CAInfo } from '@portkey-wallet/types/types-ca/wallet';
 import Loading from 'components/Loading';
 import { setCAInfo } from '@portkey-wallet/store/store-ca/wallet/actions';
-import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { handleErrorMessage } from '@portkey-wallet/utils';
 import { VerificationType } from '@portkey-wallet/types/verifier';
 import CommonToast from 'components/CommonToast';
@@ -38,6 +37,8 @@ export default function SetBiometrics() {
   const { address, managerInfo, caHash } = useCurrentWalletInfo();
   const [caInfo, setStateCAInfo] = useState<CAInfo | undefined>(paramsCAInfo);
   const setBiometrics = useSetBiometrics();
+  const originChainId = useOriginChainId();
+
   const isSyncCAInfo = useMemo(() => address && managerInfo && !caHash, [address, caHash, managerInfo]);
   const onIntervalGetResult = useIntervalGetResult();
 
@@ -68,7 +69,7 @@ export default function SetBiometrics() {
         setCAInfo({
           caInfo,
           pin,
-          chainId: DefaultChainId,
+          chainId: originChainId,
         }),
       );
       return navigationService.reset('Tab');
@@ -83,7 +84,7 @@ export default function SetBiometrics() {
             setCAInfo({
               caInfo: info,
               pin,
-              chainId: DefaultChainId,
+              chainId: originChainId,
             }),
           );
           Loading.hide();
@@ -93,7 +94,7 @@ export default function SetBiometrics() {
           onResultFail(dispatch, message, managerInfo?.verificationType === VerificationType.communityRecovery, true),
       });
     }
-  }, [caInfo, dispatch, isSyncCAInfo, managerInfo, onIntervalGetResult, pin, t]);
+  }, [caInfo, dispatch, isSyncCAInfo, managerInfo, onIntervalGetResult, originChainId, pin, t]);
   const openBiometrics = useCallback(async () => {
     if (!pin) return;
     try {

@@ -1,5 +1,5 @@
 import { useAppCASelector } from '.';
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useState, useEffect } from 'react';
 import { WalletInfoType } from '@portkey-wallet/types/wallet';
 import { CAInfoType } from '@portkey-wallet/types/types-ca/wallet';
 import { WalletState } from '@portkey-wallet/store/store-ca/wallet/type';
@@ -10,8 +10,9 @@ import { getApolloClient } from '@portkey-wallet/graphql/contract/apollo';
 import { request } from '@portkey-wallet/api/api-did';
 import { useAppCommonDispatch } from '../index';
 import { setWalletNameAction } from '@portkey-wallet/store/store-ca/wallet/actions';
-import { DeviceItemType } from '@portkey-wallet/types/types-ca/device';
-import { extraDataDecode } from '@portkey-wallet/utils/device';
+import { DeviceInfoType } from '@portkey-wallet/types/types-ca/device';
+import { extraDataListDecode } from '@portkey-wallet/utils/device';
+import { ChainId } from '@portkey-wallet/types';
 
 export interface CurrentWalletType extends WalletInfoType, CAInfoType {
   caHash?: string;
@@ -22,11 +23,12 @@ export interface CurrentWalletType extends WalletInfoType, CAInfoType {
 function getCurrentWalletInfo(
   walletInfo: WalletState['walletInfo'],
   currentNetwork: WalletState['currentNetwork'],
+  originChainId: ChainId,
 ): CurrentWalletType {
   const currentCAInfo = walletInfo?.caInfo?.[currentNetwork];
 
   const tmpWalletInfo: any = Object.assign({}, walletInfo, currentCAInfo, {
-    caHash: currentCAInfo?.AELF?.caHash,
+    caHash: currentCAInfo?.[originChainId]?.caHash,
     caAddressList: Object.values(currentCAInfo || {})
       ?.filter((info: any) => !!info?.caAddress)
       ?.map((i: any) => i?.caAddress),
@@ -41,17 +43,19 @@ export const useWallet = () => useAppCASelector(state => state.wallet);
 
 export const useCurrentWalletInfo = () => {
   const { currentNetwork, walletInfo } = useWallet();
-  return useMemo(() => getCurrentWalletInfo(walletInfo, currentNetwork), [walletInfo, currentNetwork]);
+  const originChainId = useOriginChainId();
+  return useMemo(() => getCurrentWalletInfo(walletInfo, currentNetwork, originChainId), [walletInfo, currentNetwork]);
 };
 
 export const useCurrentWallet = () => {
   const wallet = useWallet();
+  const originChainId = useOriginChainId();
 
   return useMemo(() => {
     const { walletInfo, currentNetwork, chainInfo } = wallet;
     return {
       ...wallet,
-      walletInfo: getCurrentWalletInfo(walletInfo, currentNetwork),
+      walletInfo: getCurrentWalletInfo(walletInfo, currentNetwork, originChainId),
       chainList: chainInfo?.[currentNetwork],
     };
   }, [wallet]);
@@ -59,16 +63,18 @@ export const useCurrentWallet = () => {
 
 export const useCurrentWalletDetails = () => {
   const { walletInfo, currentNetwork } = useWallet() || {};
+  const originChainId = useOriginChainId();
 
   return useMemo(() => {
-    return getCurrentWalletInfo(walletInfo, currentNetwork);
+    return getCurrentWalletInfo(walletInfo, currentNetwork, originChainId);
   }, [walletInfo, currentNetwork]);
 };
 
 export const useDeviceList = () => {
   const networkInfo = useCurrentNetworkInfo();
   const walletInfo = useCurrentWalletInfo();
-  const chainInfo = useCurrentChain();
+  const originChainId = useOriginChainId();
+  const chainInfo = useCurrentChain(originChainId);
   const { data, error, refetch } = useCaHolderManagerInfoQuery({
     client: getApolloClient(networkInfo.networkType),
     variables: {
@@ -81,21 +87,42 @@ export const useDeviceList = () => {
     },
     fetchPolicy: 'cache-and-network',
   });
-  const deviceList = useMemo<DeviceItemType[]>(() => {
-    if (error || !data || !data.caHolderManagerInfo || data.caHolderManagerInfo.length < 1) return [];
+
+  const [deviceList, setDeviceList] = useState<
+    {
+      managerAddress: string | null | undefined;
+      deviceInfo: DeviceInfoType;
+      transactionTime: number;
+      version: string;
+    }[]
+  >([]);
+
+  const getDeviceList = useCallback(async () => {
+    if (error || !data || !data.caHolderManagerInfo || data.caHolderManagerInfo.length < 1) {
+      setDeviceList([]);
+      return;
+    }
 
     const caHolderManagerInfo = data.caHolderManagerInfo[0];
     const managers = caHolderManagerInfo?.managerInfos || [];
-    return managers
-      .map(item => {
-        const extraData = extraDataDecode(item?.extraData || '');
+    console.log('managers===', managers);
+
+    const extraDataList = await extraDataListDecode(managers.map(item => item?.extraData || ''));
+    const _deviceList = managers
+      .map((item, idx) => {
         return {
-          ...extraData,
+          ...extraDataList[idx],
           managerAddress: item?.address,
         };
       })
       .reverse();
-  }, [data, error]);
+
+    setDeviceList(_deviceList);
+  }, [error, data]);
+
+  useEffect(() => {
+    getDeviceList();
+  }, [getDeviceList]);
 
   return { deviceList, refetch };
 };
@@ -140,4 +167,9 @@ export const useChainIdList = () => {
     () => Object.keys(currentCAInfo || {})?.filter((info: any) => info !== 'managerInfo'),
     [currentCAInfo],
   );
+};
+
+export const useOriginChainId = () => {
+  const { originChainId } = useWallet();
+  return useMemo(() => originChainId || 'tDVV', []);
 };

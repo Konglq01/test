@@ -44,11 +44,24 @@ export enum VersionDeviceType {
 // extraData: ExtraDataType
 // interface ExtraDataType {
 //   transactionTime: number;
-//   deviceInfo: string;
+//   deviceInfo: string; // DeviceInfoType
 //   version: string;
 // }
 // interface DeviceInfoType {
 //   deviceName: string;
+//   deviceType: DeviceType;
+// }
+
+// version 2.0.0
+// extraData: ExtraDataType
+// interface ExtraDataType {
+//   transactionTime: number;
+//   deviceInfo: string; // encrypt string => JSON.stringify(DeviceInfoType)
+//   version: string;
+// }
+// interface DeviceInfoType {
+//   deviceName: string;
+//   deviceType: DeviceType;
 // }
 
 export type UpdateNotify = {
