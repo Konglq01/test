@@ -148,9 +148,7 @@ export default function VerifierPage({ currentGuardian, guardianType, isInitStat
       <div className="send-tip">
         {isPrompt || 'Please contact your guardians, and enter '}
         <span>{t('sendCodeTip1', { codeCount: DIGIT_CODE.length })}</span>
-        <span className="account">{`${LoginType.Phone === currentGuardian?.guardianType ? '+ ' : ''}${
-          currentGuardian?.guardianAccount
-        }`}</span>
+        <span className="account">{currentGuardian?.guardianAccount}</span>
         <br />
         {t('sendCodeTip2', { minute: DIGIT_CODE.expiration })}
       </div>

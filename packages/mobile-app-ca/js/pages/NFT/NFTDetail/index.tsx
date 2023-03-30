@@ -14,8 +14,6 @@ import { IToSendHomeParamsType } from '@portkey-wallet/types/types-ca/routeParam
 import SafeAreaBox from 'components/SafeAreaBox';
 import Svg from 'components/Svg';
 import CommonAvatar from 'components/CommonAvatar';
-import { getAWSUrlWithSize } from '@portkey-wallet/utils/img';
-import { NFT_LARGE_SIZE } from '@portkey-wallet/constants/constants-ca/assets';
 
 export interface TokenDetailProps {
   route?: any;
@@ -26,6 +24,7 @@ interface NftItemType {
   balance: string;
   chainId: string;
   imageUrl: string;
+  imageLargeUrl: string;
   symbol: string;
   tokenContractAddress: string;
   tokenId: string;
@@ -36,7 +35,9 @@ const NFTDetail: React.FC<TokenDetailProps> = props => {
 
   const nftItem = useRouterParams<NftItemType>();
 
-  const { alias, balance, imageUrl, symbol, tokenId } = nftItem;
+  const { alias, balance, imageLargeUrl, symbol, tokenId } = nftItem;
+
+  console.log('nftItem', nftItem);
 
   return (
     <SafeAreaBox style={styles.pageWrap}>
@@ -47,11 +48,7 @@ const NFTDetail: React.FC<TokenDetailProps> = props => {
       <TextXXL style={styles.title}>{`${alias} #${tokenId}`}</TextXXL>
       <TextM style={[FontStyles.font3, styles.balance]}>{`Balance ${balance}`}</TextM>
 
-      <CommonAvatar
-        title={alias}
-        style={[imageUrl ? styles.image1 : styles.image]}
-        imageUrl={getAWSUrlWithSize(imageUrl, NFT_LARGE_SIZE)}
-      />
+      <CommonAvatar title={alias} style={[imageLargeUrl ? styles.image1 : styles.image]} imageUrl={imageLargeUrl} />
 
       <CommonButton
         type="primary"

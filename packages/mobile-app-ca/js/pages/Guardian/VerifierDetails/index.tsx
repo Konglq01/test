@@ -25,6 +25,7 @@ import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { request } from '@portkey-wallet/api/api-did';
 import { verification } from 'utils/api';
 import { useLanguage } from 'i18n/hooks';
+import { handlePhoneNumber } from '@portkey-wallet/utils';
 
 type RouterParams = {
   guardianItem?: UserGuardianItem;
@@ -102,11 +103,15 @@ export default function VerifierDetails() {
       if (!requestCodeResult || !guardianItem || !code) return;
       try {
         Loading.show();
+        let _guardianIdentifier = guardianItem.guardianAccount;
+        if (guardianItem?.guardianType === LoginType.Phone) {
+          _guardianIdentifier = handlePhoneNumber(_guardianIdentifier);
+        }
         const rst = await request.verify.checkVerificationCode({
           params: {
             type: LoginType[guardianItem?.guardianType as LoginType],
             verificationCode: code,
-            guardianIdentifier: guardianItem.guardianAccount,
+            guardianIdentifier: _guardianIdentifier,
             ...requestCodeResult,
             verifierId: guardianItem?.verifier?.id,
             chainId: DefaultChainId,
