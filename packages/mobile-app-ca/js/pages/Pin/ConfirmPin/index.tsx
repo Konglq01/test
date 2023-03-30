@@ -21,7 +21,7 @@ import PinContainer from 'components/PinContainer';
 import { GuardiansApproved } from 'pages/Guardian/types';
 import { StyleSheet } from 'react-native';
 import { useLanguage } from 'i18n/hooks';
-
+import { sendScanLoginSuccess } from '@portkey-wallet/api/api-did/message/utils';
 type RouterParams = {
   oldPin?: string;
   pin?: string;
@@ -72,6 +72,7 @@ export default function ConfirmPin() {
       if (managerInfo?.verificationType === VerificationType.addManager) {
         dispatch(createWallet({ walletInfo: paramsWalletInfo, caInfo, pin: confirmPin }));
         dispatch(setCredentials({ pin: confirmPin }));
+        paramsWalletInfo?.address && sendScanLoginSuccess({ targetClientId: paramsWalletInfo.address });
         if (biometricsReady) {
           navigationService.navigate('SetBiometrics', { pin: confirmPin });
         } else {
