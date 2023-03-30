@@ -19,6 +19,7 @@ import { useGetCurrentCAViewContract } from './contract';
 import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import useLockCallback from '@portkey-wallet/hooks/useLockCallback';
 import { ManagerInfo } from '@portkey-wallet/graphql/contract/__generated__/types';
+import { clearDiscover } from '@portkey-wallet/store/store-ca/discover/slice';
 
 export default function useLogOut() {
   const dispatch = useAppDispatch();
@@ -33,6 +34,7 @@ export default function useLogOut() {
       dispatch(resetNetwork());
       dispatch(resetGuardiansState());
       dispatch(resetContactAction());
+      dispatch(clearDiscover());
 
       request.initService();
       setTimeout(() => {
