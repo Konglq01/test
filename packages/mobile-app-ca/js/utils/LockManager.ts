@@ -3,7 +3,7 @@ import { AppState, AppStateStatus, NativeEventSubscription } from 'react-native'
 import BackgroundTimer from 'react-native-background-timer';
 import navigationService from './navigationService';
 import { getWalletAddress } from './redux';
-let canLock = true;
+export let canLock = true;
 
 export default class LockManager {
   lockTime: number;

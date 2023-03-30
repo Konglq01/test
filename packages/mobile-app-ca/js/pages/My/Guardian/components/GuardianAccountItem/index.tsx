@@ -1,4 +1,4 @@
-import { TextM } from 'components/CommonText';
+import { TextM, TextS } from 'components/CommonText';
 import React, { memo, useCallback, useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { pTd } from 'utils/unit';
@@ -37,9 +37,9 @@ const GuardianAccountItem = ({ guardian }: GuardianAccountItemProps) => {
     return (
       <View style={GStyles.flex1}>
         <TextM style={styles.firstNameStyle}>{guardian.firstName}</TextM>
-        <TextM style={FontStyles.font3} numberOfLines={1}>
+        <TextS style={FontStyles.font3} numberOfLines={1}>
           {guardianAccount}
-        </TextM>
+        </TextS>
       </View>
     );
   }, [guardianAccount, guardian]);

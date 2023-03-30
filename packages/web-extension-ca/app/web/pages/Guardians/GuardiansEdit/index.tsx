@@ -30,7 +30,6 @@ export default function GuardiansEdit() {
   const [removeOpen, setRemoveOpen] = useState<boolean>();
   const [removeClose, setRemoveClose] = useState<boolean>(false);
   const [selectVal, setSelectVal] = useState<string>(opGuardian?.verifier?.id as string);
-  const [selectName, setSelectName] = useState<string>(opGuardian?.verifier?.name as string);
   const [exist, setExist] = useState<boolean>(false);
   const { walletInfo } = useCurrentWallet();
   const userGuardianList = useGuardianList();
@@ -58,14 +57,10 @@ export default function GuardiansEdit() {
     [selectVal, verifierMap],
   );
 
-  const handleChange = useCallback(
-    (value: string) => {
-      setExist(false);
-      setSelectVal(value);
-      setSelectName(verifierMap?.[value]?.name || '');
-    },
-    [verifierMap],
-  );
+  const handleChange = useCallback((value: string) => {
+    setExist(false);
+    setSelectVal(value);
+  }, []);
 
   const guardiansChangeHandler = useCallback(async () => {
     const flag: boolean =
@@ -149,9 +144,8 @@ export default function GuardiansEdit() {
   const accountShow = useMemo(() => {
     switch (opGuardian?.guardianType) {
       case LoginType.Email:
-        return <div className="name account">{opGuardian?.guardianAccount}</div>;
       case LoginType.Phone:
-        return <div className="name account">+ {opGuardian?.guardianAccount}</div>;
+        return <div className="name account">{opGuardian?.guardianAccount}</div>;
       case LoginType.Google:
       case LoginType.Apple:
         return (

@@ -46,7 +46,7 @@ export default function Home() {
   return (
     <div className={clsx(['portkey-home', isPrompt ? 'portkey-prompt' : null])}>
       <PortKeyHeader onUserClick={onUserClick} />
-      <div className="portkey-home-body">
+      <div className="portkey-body">
         <MyBalance />
       </div>
     </div>

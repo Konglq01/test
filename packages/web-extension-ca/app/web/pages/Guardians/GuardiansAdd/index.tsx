@@ -125,7 +125,7 @@ export default function AddGuardian() {
         break;
       }
       case LoginType.Phone: {
-        key = `${phoneValue?.code}${phoneValue?.phoneNumber}&${verifierVal}`;
+        key = `+${phoneValue?.code}${phoneValue?.phoneNumber}&${verifierVal}`;
         tempAccount = `+${phoneValue?.code} ${phoneValue?.phoneNumber}`;
         break;
       }
@@ -440,7 +440,7 @@ export default function AddGuardian() {
     if (guardianType === LoginType.Email) {
       handleCommonVerify(emailVal || '');
     } else if (guardianType === LoginType.Phone) {
-      handleCommonVerify(`${phoneValue?.code}${phoneValue?.phoneNumber}`);
+      handleCommonVerify(`+${phoneValue?.code} ${phoneValue?.phoneNumber}`);
     } else {
       message.info('router error');
     }

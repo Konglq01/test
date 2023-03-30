@@ -10,7 +10,7 @@ import navigationService from 'utils/navigationService';
 import styles from '../styles';
 import Touchable from 'components/Touchable';
 import GStyles from 'assets/theme/GStyles';
-import { TextL, TextM, TextXXXL } from 'components/CommonText';
+import { TextS, TextXXXL } from 'components/CommonText';
 import { PageLoginType } from '../types';
 import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { WalletInfoType } from '@portkey-wallet/types/wallet';
@@ -20,7 +20,6 @@ import CommonToast from 'components/CommonToast';
 import { handleWalletInfo } from '@portkey-wallet/utils/wallet';
 import { LoginQRData } from '@portkey-wallet/types/types-ca/qrcode';
 import phone from 'assets/image/pngs/phone.png';
-import RQRCode from 'react-native-qrcode-svg';
 import { useIsFocused } from '@react-navigation/native';
 import { useGetDeviceInfo } from 'hooks/device';
 import { DEVICE_INFO_VERSION } from '@portkey-wallet/constants/constants-ca/device';
@@ -86,7 +85,8 @@ export default function QRCode({ setLoginType }: { setLoginType: (type: PageLogi
     };
   });
   const qrData = useMemo(() => {
-    if (!newWallet) return 'xxx';
+    if (!newWallet)
+      return '{"chainType":"aelf","type":"login","address":"2Aj8aTMsmgp1YyrVeCvB2dp9DbrLz5zgmAVmKNXsLnxhqzA69L","netWorkType":"TESTNET","extraData":{"deviceInfo":{"deviceType":2,"deviceName":"iOS"},"version":"1.0.0"}}';
 
     const data: LoginQRData = {
       // TODO: ethereum
@@ -99,26 +99,19 @@ export default function QRCode({ setLoginType }: { setLoginType: (type: PageLogi
         version: DEVICE_INFO_VERSION,
       },
     };
+
     return JSON.stringify(data);
   }, [currentNetwork, getDeviceInfo, newWallet]);
+
   return (
     <View style={[BGStyles.bg1, styles.card]}>
       <Touchable style={styles.iconBox} onPress={() => setLoginType(PageLoginType.referral)}>
         <Image source={phone} style={styles.iconStyle} />
       </Touchable>
       <TextXXXL style={[styles.qrCodeTitle, GStyles.textAlignCenter]}>Scan code to log in</TextXXXL>
-      <TextM style={[GStyles.textAlignCenter, FontStyles.font3]}>Please use the Portkey DApp to scan the QR code</TextM>
+      <TextS style={[GStyles.textAlignCenter, FontStyles.font3]}>Please use the Portkey DApp to scan the QR code</TextS>
       <View style={[GStyles.alignCenter, styles.qrCodeBox]}>
-        {newWallet ? (
-          <CommonQRCodeStyled qrData={qrData} />
-        ) : (
-          <>
-            <View style={styles.loading}>
-              <TextL>Updating...</TextL>
-            </View>
-            <RQRCode value={qrData} size={250} />
-          </>
-        )}
+        <CommonQRCodeStyled qrData={qrData} hasMask={!newWallet} />
       </View>
     </View>
   );

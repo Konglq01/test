@@ -68,9 +68,11 @@ export default function Referral({
   }, [googleSign, onLogin]);
   return (
     <View style={[BGStyles.bg1, styles.card, GStyles.itemCenter, GStyles.spaceBetween]}>
-      <Touchable style={styles.iconBox} onPress={() => setLoginType(PageLoginType.qrCode)}>
-        <Image source={qrCode} style={styles.iconStyle} />
-      </Touchable>
+      {type === PageType.login && (
+        <Touchable style={styles.iconBox} onPress={() => setLoginType(PageLoginType.qrCode)}>
+          <Image source={qrCode} style={styles.iconStyle} />
+        </Touchable>
+      )}
       <View style={GStyles.width100}>
         <CommonButton
           type="outline"
