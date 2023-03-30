@@ -14,6 +14,7 @@ import { DEVICE_TYPE } from 'constants/index';
 import { DEVICE_INFO_VERSION } from '@portkey-wallet/constants/constants-ca/device';
 import './index.less';
 import QRCodeCommon from 'pages/components/QRCodeCommon';
+import { setOriginChainId } from '@portkey-wallet/store/store-ca/wallet/actions';
 
 export default function ScanCard() {
   const navigate = useNavigate();
@@ -57,11 +58,11 @@ export default function ScanCard() {
 
   useEffect(() => {
     if (caWallet) {
-      // caWallet
+      dispatch(setOriginChainId(caWallet.originChainId));
       dispatch(
         setWalletInfoAction({
           walletInfo: newWallet,
-          caWalletInfo: caWallet,
+          caWalletInfo: caWallet.caInfo,
         }),
       );
       navigate('/login/set-pin/scan');

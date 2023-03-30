@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import CommonModal from 'components/CommonModal';
 import './index.less';
-import { useCurrentWallet, useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { useCurrentWallet, useCurrentWalletInfo, useOriginChainId } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { useLoading, useUserInfo } from 'store/Provider/hooks';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { removeManager } from 'utils/sandboxUtil/removeManager';
@@ -23,7 +23,9 @@ export default function ExitWallet({ open, onCancel }: ExitWalletProps) {
   const { walletInfo } = useCurrentWallet();
   const wallet = useCurrentWalletInfo();
   const { passwordSeed } = useUserInfo();
-  const currentChain = useCurrentChain();
+  const originChainId = useOriginChainId();
+
+  const currentChain = useCurrentChain(originChainId);
   const { setLoading } = useLoading();
   const currentNetwork = useCurrentNetworkInfo();
   const logout = useLogOut();

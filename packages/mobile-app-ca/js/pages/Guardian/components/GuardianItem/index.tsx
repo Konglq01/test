@@ -25,13 +25,13 @@ import { LoginGuardianTypeIcon } from 'constants/misc';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import { VerifierImage } from '../VerifierImage';
 import { GuardiansStatus, GuardiansStatusItem } from 'pages/Guardian/types';
-import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import useDebounceCallback from 'hooks/useDebounceCallback';
 import { verification } from 'utils/api';
 import { useLanguage } from 'i18n/hooks';
 import { useVerifyToken } from 'hooks/authentication';
 import { PRIVATE_GUARDIAN_ACCOUNT } from '@portkey-wallet/constants/constants-ca/guardian';
 import myEvents from 'utils/deviceEvent';
+import { useOriginChainId } from '@portkey-wallet/hooks/hooks-ca/wallet';
 
 export const AuthTypes = [LoginType.Apple, LoginType.Google];
 
@@ -85,6 +85,8 @@ function GuardianItemButton({
     },
     [guardianItem.key, setGuardianStatus],
   );
+  const originChainId = useOriginChainId();
+
   const onSendCode = useDebounceCallback(async () => {
     Loading.show();
     try {
@@ -93,7 +95,7 @@ function GuardianItemButton({
           type: LoginType[guardianInfo.guardianItem.guardianType],
           guardianIdentifier: guardianInfo.guardianItem.guardianAccount,
           verifierId: guardianInfo.guardianItem.verifier?.id,
-          chainId: DefaultChainId,
+          chainId: originChainId,
         },
       });
       if (req.verifierSessionId) {
@@ -125,7 +127,7 @@ function GuardianItemButton({
         accessToken: authenticationInfo?.[guardianItem.guardianAccount],
         id: guardianItem.guardianAccount,
         verifierId: guardianItem.verifier?.id,
-        chainId: DefaultChainId,
+        chainId: originChainId,
       });
 
       if (rst.accessToken) {
@@ -150,6 +152,7 @@ function GuardianItemButton({
     guardianItem.guardianType,
     guardianItem.verifier?.id,
     onSetGuardianStatus,
+    originChainId,
     verifyToken,
   ]);
   const onVerifier = useDebounceCallback(async () => {

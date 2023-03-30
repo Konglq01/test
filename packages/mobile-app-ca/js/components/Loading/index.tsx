@@ -19,7 +19,7 @@ type ShowOptionsType = {
   duration?: number;
 };
 
-function LoadingBody({ text, iconType }: { text?: string; iconType: IconType }) {
+function LoadingBody({ text }: { text?: string; iconType: IconType }) {
   return (
     <View style={GStyles.center}>
       <Spinner type="Circle" color={FontStyles.font11.color} size={40} />

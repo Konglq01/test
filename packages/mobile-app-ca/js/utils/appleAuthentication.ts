@@ -7,15 +7,12 @@ const DefaultSignInOptions = {
   ],
 };
 
-async function signInAsync(options: AppleAuthentication.AppleAuthenticationSignInOptions = DefaultSignInOptions) {
+export async function signInAsync(
+  options: AppleAuthentication.AppleAuthenticationSignInOptions = DefaultSignInOptions,
+) {
   return AppleAuthentication.signInAsync(options);
 }
 
-async function signOutAsync(options: AppleAuthentication.AppleAuthenticationSignOutOptions) {
+export async function signOutAsync(options: AppleAuthentication.AppleAuthenticationSignOutOptions) {
   return AppleAuthentication.signOutAsync(options);
 }
-
-export default {
-  signInAsync,
-  signOutAsync,
-};

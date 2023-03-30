@@ -9,11 +9,10 @@ import { resetLoginInfoAction } from 'store/reducers/loginCache/actions';
 import { clearAssets } from '@portkey-wallet/store/store-ca/assets/slice';
 import { resetContactAction } from '@portkey-wallet/store/store-ca/contact/actions';
 import { request } from '@portkey-wallet/api/api-did';
-import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { useCurrentWalletInfo, useOriginChainId } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { getHolderInfoByContract } from 'utils/sandboxUtil/getHolderInfo';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import useLockCallback from '@portkey-wallet/hooks/useLockCallback';
-import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network-test1';
 import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import { ManagerInfo } from '@portkey-wallet/graphql/contract/__generated__/types';
 import { handleErrorMessage } from '@portkey-wallet/utils';
@@ -46,7 +45,9 @@ export default function useLogOut() {
 
 export function useCheckManagerOnLogout() {
   const { caHash, address } = useCurrentWalletInfo();
-  const chain = useCurrentChain(DefaultChainId);
+
+  const originChainId = useOriginChainId();
+  const chain = useCurrentChain(originChainId);
   const network = useCurrentNetworkInfo();
   const logout = useLogOut();
   return useLockCallback(async () => {

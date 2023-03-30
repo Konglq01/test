@@ -30,4 +30,5 @@ export interface WalletState {
   walletInfo?: CAWalletInfoType;
   chainList: ChainItemType[];
   chainInfo?: { [key in NetworkType]?: ChainItemType[] };
+  originChainId?: ChainId;
 }

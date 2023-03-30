@@ -1,9 +1,4 @@
-import {
-  CaAccountRecoverResult,
-  CaAccountRegisterResult,
-  CAInfo,
-  ManagerInfo,
-} from '@portkey-wallet/types/types-ca/wallet';
+import { CAInfo, ManagerInfo } from '@portkey-wallet/types/types-ca/wallet';
 import { VerificationType } from '@portkey-wallet/types/verifier';
 import { clearTimeoutInterval, setTimeoutInterval } from '@portkey-wallet/utils/interval';
 import Loading from 'components/Loading';
@@ -12,43 +7,8 @@ import { queryFailAlert } from './login';
 import { AppDispatch } from 'store';
 import { ContractBasic } from '@portkey-wallet/contracts/utils/ContractBasic';
 import { request } from '@portkey-wallet/api/api-did';
-import Signalr from '@portkey-wallet/socket';
-import { listenList } from '@portkey-wallet/constants/constants-ca/socket';
+import socket from '@portkey-wallet/socket/socket-did';
 import { LoginQRData } from '@portkey-wallet/types/types-ca/qrcode';
-
-class SignalrDid extends Signalr {
-  public Ack(clientId: string, requestId: string) {
-    this.invoke('Ack', clientId, requestId);
-  }
-
-  public onCaAccountRegister(
-    { clientId, requestId }: { clientId: string; requestId: string },
-    callback: (data: CaAccountRegisterResult) => void,
-  ) {
-    return this.listen('caAccountRegister', (data: CaAccountRegisterResult) => {
-      if (data.requestId === requestId) {
-        if (data.body.registerStatus !== 'pending') {
-          this.Ack(clientId, requestId);
-        }
-        callback(data);
-      }
-    });
-  }
-
-  public onCaAccountRecover(
-    { clientId, requestId }: { clientId: string; requestId: string },
-    callback: (data: CaAccountRecoverResult) => void,
-  ) {
-    return this.listen('caAccountRecover', (data: CaAccountRecoverResult) => {
-      if (data.requestId === requestId) {
-        if (data.body.recoveryStatus !== 'pending') {
-          this.Ack(clientId, requestId);
-        }
-        callback(data);
-      }
-    });
-  }
-}
 
 export type TimerResult = {
   remove: () => void;
@@ -64,9 +24,6 @@ export function intervalGetResult({ managerInfo, onPass, onFail }: IntervalGetRe
   let timer = '',
     mark = false;
   const listenerList: TimerResult[] = [];
-  const socket = new SignalrDid({
-    listenList,
-  });
   const remove = () => {
     try {
       timer && clearTimeoutInterval(timer);

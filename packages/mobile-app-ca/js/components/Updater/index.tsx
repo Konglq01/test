@@ -12,6 +12,8 @@ import { useCaInfoOnChain } from 'hooks/useCaInfoOnChain';
 import { useFetchSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
 import { useCheckManager } from '@portkey-wallet/hooks/hooks-ca/graphql';
 import { useCheckManagerOnLogout } from 'hooks/useLogOut';
+import socket from '@portkey-wallet/socket/socket-did';
+import CommonToast from 'components/CommonToast';
 
 export default function Updater() {
   // FIXME: delete language
@@ -40,5 +42,11 @@ export default function Updater() {
   useMemo(() => {
     request.setLockCallBack(onLocking);
   }, [onLocking]);
+
+  useEffectOnce(() => {
+    socket.onScanLoginSuccess(data => {
+      CommonToast.success(data.body);
+    });
+  });
   return null;
 }

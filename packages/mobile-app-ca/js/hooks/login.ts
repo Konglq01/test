@@ -1,16 +1,15 @@
-import { CurrentWalletType } from '@portkey-wallet/hooks/hooks-ca/wallet';
+import { CurrentWalletType, useOriginChainId } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import {
   createWallet,
-  getChainListAsync,
   setCAInfo,
   setManagerInfo,
+  setOriginChainId,
 } from '@portkey-wallet/store/store-ca/wallet/actions';
 import { CAInfo, LoginType, ManagerInfo } from '@portkey-wallet/types/types-ca/wallet';
 import { AuthenticationInfo, VerificationType, VerifierInfo } from '@portkey-wallet/types/verifier';
 import { handleErrorCode, sleep } from '@portkey-wallet/utils';
 import Loading from 'components/Loading';
 import AElf from 'aelf-sdk';
-import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { request } from 'api';
 import { useCallback, useRef } from 'react';
 import { useAppDispatch } from 'store/hooks';
@@ -24,10 +23,12 @@ import { DigitInputInterface } from 'components/DigitInput';
 import { GuardiansApproved } from 'pages/Guardian/types';
 import { useGetDeviceInfo } from './device';
 import { extraDataEncode } from '@portkey-wallet/utils/device';
-import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { useGetGuardiansInfo, useGetVerifierServers } from './guardian';
 import { handleUserGuardiansList } from '@portkey-wallet/utils/guardian';
 import { useLanguage } from 'i18n/hooks';
+import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
+import { useGetChainInfo } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { useGetRegisterInfo } from '@portkey-wallet/hooks/hooks-ca/guardian';
 
 export function useOnManagerAddressAndQueryResult() {
   const { t } = useLanguage();
@@ -40,6 +41,7 @@ export function useOnManagerAddressAndQueryResult() {
       timer.current?.remove();
     };
   });
+  const originChainId = useOriginChainId();
   const onIntervalGetResult = useIntervalGetResult();
   return useCallback(
     async ({
@@ -71,7 +73,7 @@ export function useOnManagerAddressAndQueryResult() {
             clientId: tmpWalletInfo.address,
             requestId: tmpWalletInfo.address,
           },
-          chainId: DefaultChainId,
+          chainId: originChainId,
         };
 
         let fetch = request.verify.registerRequest;
@@ -124,7 +126,7 @@ export function useOnManagerAddressAndQueryResult() {
                 setCAInfo({
                   caInfo,
                   pin: confirmPin,
-                  chainId: DefaultChainId,
+                  chainId: originChainId,
                 }),
               );
               navigationService.reset('Tab');
@@ -138,7 +140,7 @@ export function useOnManagerAddressAndQueryResult() {
         pinRef?.current?.reset();
       }
     },
-    [biometricsReady, dispatch, getDeviceInfo, onIntervalGetResult, t],
+    [biometricsReady, dispatch, getDeviceInfo, onIntervalGetResult, originChainId, t],
   );
 }
 
@@ -154,29 +156,31 @@ type LoginParams = {
 };
 
 export function useOnLogin() {
-  const chainInfo = useCurrentChain('AELF');
   const dispatch = useAppDispatch();
   const getVerifierServers = useGetVerifierServers();
   const getGuardiansInfo = useGetGuardiansInfo();
+  const getRegisterInfo = useGetRegisterInfo();
+  const getChainInfo = useGetChainInfo();
   return useCallback(
     async (params: LoginParams) => {
       const { loginAccount, loginType = LoginType.Email, authenticationInfo, showLoginAccount } = params;
       try {
-        let _chainInfo;
-        if (!chainInfo) {
-          const chainList = await dispatch(getChainListAsync());
-          if (Array.isArray(chainList.payload)) _chainInfo = chainList.payload[1];
-        }
-        const verifierServers = await getVerifierServers(_chainInfo);
-        const holderInfo = await getGuardiansInfo({ guardianIdentifier: loginAccount }, _chainInfo);
+        const { originChainId } = await getRegisterInfo({
+          loginGuardianIdentifier: loginAccount,
+        });
+        const chainInfo = await getChainInfo(originChainId);
+        const verifierServers = await getVerifierServers(chainInfo);
+        const holderInfo = await getGuardiansInfo({ guardianIdentifier: loginAccount }, chainInfo);
         if (holderInfo?.guardianAccounts || holderInfo?.guardianList) {
           // login
+          dispatch(setOriginChainId(originChainId));
           navigationService.navigate('GuardianApproval', {
             loginAccount,
             userGuardiansList: handleUserGuardiansList(holderInfo, verifierServers),
             authenticationInfo,
           });
         } else {
+          dispatch(setOriginChainId(DefaultChainId));
           navigationService.navigate('SelectVerifier', {
             showLoginAccount: showLoginAccount || loginAccount,
             loginAccount,
@@ -186,6 +190,7 @@ export function useOnLogin() {
         }
       } catch (error) {
         if (handleErrorCode(error) === '3002') {
+          dispatch(setOriginChainId(DefaultChainId));
           navigationService.navigate('SelectVerifier', {
             showLoginAccount: showLoginAccount || loginAccount,
             loginAccount,
@@ -197,6 +202,6 @@ export function useOnLogin() {
         }
       }
     },
-    [chainInfo, dispatch, getGuardiansInfo, getVerifierServers],
+    [dispatch, getChainInfo, getGuardiansInfo, getRegisterInfo, getVerifierServers],
   );
 }

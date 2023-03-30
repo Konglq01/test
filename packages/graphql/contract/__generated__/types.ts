@@ -19,6 +19,17 @@ export enum BlockFilterType {
   Transaction = 'TRANSACTION',
 }
 
+export type CaHolderInfoDto = {
+  __typename?: 'CAHolderInfoDto';
+  caAddress?: Maybe<Scalars['String']>;
+  caHash?: Maybe<Scalars['String']>;
+  chainId?: Maybe<Scalars['String']>;
+  guardianList?: Maybe<GuardianList>;
+  id?: Maybe<Scalars['String']>;
+  managerInfos?: Maybe<Array<Maybe<ManagerInfo>>>;
+  originChainId?: Maybe<Scalars['String']>;
+};
+
 export type CaHolderManagerChangeRecordDto = {
   __typename?: 'CAHolderManagerChangeRecordDto';
   blockHeight: Scalars['Long'];
@@ -35,6 +46,7 @@ export type CaHolderManagerDto = {
   chainId?: Maybe<Scalars['String']>;
   id?: Maybe<Scalars['String']>;
   managerInfos?: Maybe<Array<Maybe<ManagerInfo>>>;
+  originChainId?: Maybe<Scalars['String']>;
 };
 
 export type CaHolderNftBalanceInfoDto = {
@@ -137,6 +149,15 @@ export type CaHolderTransactionPageResultDto = {
   totalRecordCount: Scalars['Long'];
 };
 
+export type GetCaHolderInfoDto = {
+  caAddress?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  caHash?: InputMaybe<Scalars['String']>;
+  chainId?: InputMaybe<Scalars['String']>;
+  loginGuardianIdentifierHash?: InputMaybe<Scalars['String']>;
+  maxResultCount: Scalars['Int'];
+  skipCount: Scalars['Int'];
+};
+
 export type GetCaHolderManagerChangeRecordDto = {
   chainId?: InputMaybe<Scalars['String']>;
   endBlockHeight: Scalars['Long'];
@@ -233,6 +254,15 @@ export type GetTokenInfoDto = {
   symbol?: InputMaybe<Scalars['String']>;
 };
 
+export type Guardian = {
+  __typename?: 'Guardian';
+  identifierHash?: Maybe<Scalars['String']>;
+  isLoginGuardian: Scalars['Boolean'];
+  salt?: Maybe<Scalars['String']>;
+  type: Scalars['Int'];
+  verifierId?: Maybe<Scalars['String']>;
+};
+
 export type GuardianDto = {
   __typename?: 'GuardianDto';
   identifierHash?: Maybe<Scalars['String']>;
@@ -240,6 +270,11 @@ export type GuardianDto = {
   salt?: Maybe<Scalars['String']>;
   type: Scalars['Int'];
   verifierId?: Maybe<Scalars['String']>;
+};
+
+export type GuardianList = {
+  __typename?: 'GuardianList';
+  guardians?: Maybe<Array<Maybe<Guardian>>>;
 };
 
 export type LoginGuardianChangeRecordDto = {
@@ -302,6 +337,7 @@ export type NftItemInfoDto = {
 
 export type Query = {
   __typename?: 'Query';
+  caHolderInfo?: Maybe<Array<Maybe<CaHolderInfoDto>>>;
   caHolderManagerChangeRecordInfo?: Maybe<Array<Maybe<CaHolderManagerChangeRecordDto>>>;
   caHolderManagerInfo?: Maybe<Array<Maybe<CaHolderManagerDto>>>;
   caHolderNFTBalanceInfo?: Maybe<CaHolderNftBalancePageResultDto>;
@@ -310,10 +346,15 @@ export type Query = {
   caHolderTokenBalanceInfo?: Maybe<CaHolderTokenBalancePageResultDto>;
   caHolderTransaction?: Maybe<CaHolderTransactionPageResultDto>;
   caHolderTransactionAddressInfo?: Maybe<CaHolderTransactionAddressPageResultDto>;
+  caHolderTransactionInfo?: Maybe<CaHolderTransactionPageResultDto>;
   loginGuardianChangeRecordInfo?: Maybe<Array<Maybe<LoginGuardianChangeRecordDto>>>;
   loginGuardianInfo?: Maybe<Array<Maybe<LoginGuardianDto>>>;
   syncState?: Maybe<SyncStateDto>;
   tokenInfo?: Maybe<Array<Maybe<TokenInfoDto>>>;
+};
+
+export type QueryCaHolderInfoArgs = {
+  dto?: InputMaybe<GetCaHolderInfoDto>;
 };
 
 export type QueryCaHolderManagerChangeRecordInfoArgs = {
@@ -346,6 +387,10 @@ export type QueryCaHolderTransactionArgs = {
 
 export type QueryCaHolderTransactionAddressInfoArgs = {
   dto?: InputMaybe<GetCaHolderTransactionAddressDto>;
+};
+
+export type QueryCaHolderTransactionInfoArgs = {
+  dto?: InputMaybe<GetCaHolderTransactionDto>;
 };
 
 export type QueryLoginGuardianChangeRecordInfoArgs = {

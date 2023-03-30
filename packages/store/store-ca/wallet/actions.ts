@@ -1,5 +1,5 @@
 import { getCaHolder } from '@portkey-wallet/api/api-did/es/utils';
-import { DefaultChainId, NetworkList } from '@portkey-wallet/constants/constants-ca/network';
+import { NetworkList } from '@portkey-wallet/constants/constants-ca/network';
 import { ChainId, NetworkType } from '@portkey-wallet/types';
 import { CAInfo, CAInfoType, ManagerInfo } from '@portkey-wallet/types/types-ca/wallet';
 import { WalletInfoType } from '@portkey-wallet/types/wallet';
@@ -72,7 +72,7 @@ export const getChainListAsync = createAsyncThunk(
   'wallet/getChainList',
   async (type: NetworkType | undefined, { getState, dispatch }) => {
     const {
-      wallet: { currentNetwork },
+      wallet: { currentNetwork, originChainId },
     } = getState() as { wallet: WalletState };
     const _networkType = type ? type : currentNetwork;
     const baseUrl = NetworkList.find(item => item.networkType === _networkType)?.apiUrl;
@@ -80,7 +80,7 @@ export const getChainListAsync = createAsyncThunk(
     const response = await getChainList({ baseUrl });
     if (!response?.items) throw Error('No data');
     dispatch(setChainListAction({ chainList: response.items, networkType: _networkType }));
-    return [response.items, response.items.find((item: any) => item.chainId === DefaultChainId)];
+    return [response.items, response.items.find((item: any) => item.chainId === originChainId)];
   },
 );
 
@@ -113,3 +113,5 @@ export const getWalletNameAsync = createAsyncThunk<WalletState['walletName'] | u
 );
 
 export const setWalletNameAction = createAction<string>('wallet/setWalletName');
+
+export const setOriginChainId = createAction<ChainId>('wallet/setOriginChainId');

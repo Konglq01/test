@@ -6,6 +6,7 @@ import assetsApi from './assets';
 import recentApi from './recent';
 import tokenApi from './token';
 import deviceApi from './device';
+import messageApi from './message';
 
 import esApi from './es';
 import myServer, { DidService } from './server';
@@ -42,6 +43,7 @@ export const EXPAND_APIS = {
   recent: recentApi,
   token: tokenApi,
   device: deviceApi,
+  message: messageApi,
 };
 
 export type BASE_REQ_TYPES = {
