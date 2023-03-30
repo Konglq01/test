@@ -47,7 +47,7 @@ const ViewOnWebView: React.FC = () => {
   const handleNavigationStateChange = useCallback(
     (navState: any) => {
       if (webViewPageType === 'default') return;
-      dispatch(upDateRecordsItem({ url, title: title ?? navState.title }));
+      dispatch(upDateRecordsItem({ url, title: title ? title : navState.title }));
     },
     [dispatch, title, url, webViewPageType],
   );
