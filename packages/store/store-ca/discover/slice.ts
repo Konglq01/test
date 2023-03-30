@@ -1,10 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { IRecordsItemType } from '@portkey-wallet/types/types-ca/discover';
-
-interface DiscoverStateType {
-  recordsList: IRecordsItemType[];
-  tabs: any[];
-}
+import { DiscoverStateType } from './type';
 
 const initialState: DiscoverStateType = {
   recordsList: [],
@@ -12,9 +8,9 @@ const initialState: DiscoverStateType = {
 };
 
 //it automatically uses the immer library to let you write simpler immutable updates with normal mutative code
-export const activitySlice = createSlice({
+export const discoverSlice = createSlice({
   name: 'discover',
-  initialState: initialState,
+  initialState,
   reducers: {
     addRecordsItem: (state, { payload }: { payload: IRecordsItemType }) => {
       const targetItem = state.recordsList.find(item => item.url === payload.url);
@@ -22,16 +18,14 @@ export const activitySlice = createSlice({
       if (targetItem) {
         const arr = state.recordsList.filter(item => item.url !== payload.url);
         arr.push(targetItem);
+        state.recordsList = arr;
       } else {
         state.recordsList.push(payload);
       }
     },
     upDateRecordsItem: (state, { payload }: { payload: IRecordsItemType }) => {
       state.recordsList = state.recordsList.map(item => {
-        if (item.url === payload.url) {
-          return payload;
-        }
-        return item;
+        return item.url === payload.url ? payload : item;
       });
     },
     clearRecordsList: state => {
@@ -41,6 +35,6 @@ export const activitySlice = createSlice({
   },
 });
 
-export const { addRecordsItem, upDateRecordsItem, clearRecordsList, clearDiscover } = activitySlice.actions;
+export const { addRecordsItem, upDateRecordsItem, clearRecordsList, clearDiscover } = discoverSlice.actions;
 
-export default activitySlice;
+export default discoverSlice;

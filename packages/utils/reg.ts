@@ -78,3 +78,8 @@ export function isValidPositiveInteger(num?: string) {
   if (!num) return false;
   return POSITIVE_INTEGER.test(num);
 }
+
+export const isValidUrl = (url: string) => {
+  var urlRegex = /^(https?|ftp):\/\/(-\.)?([^\s/?\.#]+\.?)+(\/[^\s]*)?$/i;
+  return urlRegex.test(url);
+};

@@ -1,7 +1,7 @@
 import { defaultColors } from 'assets/theme';
 import { FontStyles } from 'assets/theme/styles';
 import CommonAvatar from 'components/CommonAvatar';
-import { TextL, TextS } from 'components/CommonText';
+import { TextM, TextS } from 'components/CommonText';
 import React, { memo } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { pTd } from 'utils/unit';
@@ -16,12 +16,12 @@ const RecordItem: React.FC<TokenListItemType> = props => {
 
   return (
     <TouchableOpacity style={itemStyle.wrap} onPress={() => onPress?.()}>
-      <CommonAvatar hasBorder avatarSize={pTd(32)} svgName={'elf-icon'} />
+      <CommonAvatar hasBorder avatarSize={pTd(32)} svgName={'default_record'} imageUrl={item?.img || ''} />
       <View style={itemStyle.right}>
         <View style={itemStyle.infoWrap}>
-          <TextL numberOfLines={1} ellipsizeMode={'tail'} style={itemStyle.gameName}>
+          <TextM numberOfLines={1} ellipsizeMode={'tail'} style={itemStyle.gameName}>
             {item?.name || 'title'}
-          </TextL>
+          </TextM>
           <TextS numberOfLines={1} style={[FontStyles.font3, itemStyle.gameInfo]}>
             {item?.url || 'wwww.baidu.com'}
           </TextS>
@@ -42,7 +42,7 @@ const itemStyle = StyleSheet.create({
     alignItems: 'center',
   },
   right: {
-    height: pTd(80),
+    height: pTd(70),
     marginLeft: pTd(16),
     paddingRight: pTd(16),
     flex: 1,

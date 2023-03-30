@@ -271,6 +271,7 @@ const ActivityDetail = () => {
             if (!activityItem?.transactionId) return;
 
             navigationService.navigate('ViewOnWebView', {
+              title: t('View on Explorer'),
               url: getExploreLink(explorerUrl, activityItem?.transactionId || '', 'transaction'),
             });
           }}

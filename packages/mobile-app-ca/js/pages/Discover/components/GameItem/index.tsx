@@ -6,6 +6,7 @@ import React, { memo } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { pTd } from 'utils/unit';
 import { IGameListItemType } from '@portkey-wallet/types/types-ca/discover';
+import { IconName } from 'components/Svg';
 interface TokenListItemType {
   item: IGameListItemType;
   onPress?: () => void;
@@ -14,11 +15,9 @@ interface TokenListItemType {
 const GameItem: React.FC<TokenListItemType> = props => {
   const { item, onPress } = props;
 
-  console.log('4444', item);
-
   return (
     <TouchableOpacity style={itemStyle.wrap} onPress={() => onPress?.()}>
-      <CommonAvatar hasBorder avatarSize={pTd(40)} svgName={'elf-icon'} />
+      <CommonAvatar hasBorder avatarSize={pTd(40)} svgName={item.icon as IconName} />
       <View style={itemStyle.right}>
         <View style={itemStyle.infoWrap}>
           <TextL numberOfLines={1} ellipsizeMode={'tail'} style={itemStyle.gameName}>

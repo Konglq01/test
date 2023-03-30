@@ -1,14 +1,13 @@
 import React, { useCallback } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, ScrollView } from 'react-native';
 import CommonInput from 'components/CommonInput';
 import GStyles from 'assets/theme/GStyles';
 import { BGStyles } from 'assets/theme/styles';
 import PageContainer from 'components/PageContainer';
 import navigationService from 'utils/navigationService';
 import { useLanguage } from 'i18n/hooks';
+import GameSection from '../components/GameSection';
 import { GamesList } from './GameData';
-import { CommonSection } from '../components/CommonSection';
-import GameItem from '../components/GameItem';
 
 export default function DiscoverHome() {
   const { t } = useLanguage();
@@ -28,7 +27,7 @@ export default function DiscoverHome() {
       <View style={[BGStyles.bg5, styles.inputContainer]}>
         <CommonInput placeholder={t('Enter URL to explore')} onFocus={() => navigateToSearch()} />
       </View>
-      <CommonSection headerTitle="Games" data={GamesList} renderItem={itemData => <GameItem {...itemData} />} />
+      <GameSection data={GamesList} />
     </PageContainer>
   );
 }
