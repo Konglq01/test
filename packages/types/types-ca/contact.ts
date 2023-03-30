@@ -7,7 +7,7 @@ export interface AddressItem {
 }
 
 export interface RecentAddressItem extends AddressItem {
-  transactionTime: string;
+  transactionTime?: string;
 }
 
 export interface ContactItemType {

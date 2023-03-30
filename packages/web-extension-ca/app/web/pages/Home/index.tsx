@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import PortKeyHeader from 'pages/components/PortKeyHeader';
 import { useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router';
@@ -9,7 +10,7 @@ import './index.less';
 
 export default function Home() {
   const navigate = useNavigate();
-  const { isPopupInit } = useCommonState();
+  const { isPopupInit, isPrompt } = useCommonState();
 
   const onUserClick = useCallback(() => {
     navigate(`/setting`);
@@ -43,9 +44,9 @@ export default function Home() {
   }, [getLocationState, setLoading]);
 
   return (
-    <div className="portkey-home">
+    <div className={clsx(['portkey-home', isPrompt ? 'portkey-prompt' : null])}>
       <PortKeyHeader onUserClick={onUserClick} />
-      <div className="portkey-home-body">
+      <div className="portkey-body">
         <MyBalance />
       </div>
     </div>

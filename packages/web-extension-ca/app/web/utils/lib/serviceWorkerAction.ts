@@ -1,8 +1,10 @@
-import { ThreeWayLogin } from '@portkey-wallet/types/types-ca/wallet';
+import { ISocialLogin } from '@portkey-wallet/types/types-ca/wallet';
 import { message } from 'antd';
+import { JOIN_AUTH_URL } from 'constants/index';
 import InternalMessage from 'messages/InternalMessage';
 import { PortkeyMessageTypes } from 'messages/InternalMessageTypes';
 import { useCallback } from 'react';
+import { SendResponseParams } from 'types';
 import { setLocalStorage } from 'utils/storage/chromeStorage';
 
 export const completeRegistration = async () => {
@@ -34,7 +36,5 @@ export const setPinAction = async (pin: string) => {
   await InternalMessage.payload(PortkeyMessageTypes.SET_SEED, pin).send();
 };
 
-const loginUrl = 'http://localhost:3000/extension-login';
-
-export const threeWayLoginAction = async (type: ThreeWayLogin) =>
-  await InternalMessage.payload(PortkeyMessageTypes.THREE_WAY_LOGIN, { externalLink: `${loginUrl}/${type}` }).send();
+export const socialLoginAction = async (type: ISocialLogin): Promise<SendResponseParams> =>
+  await InternalMessage.payload(PortkeyMessageTypes.SOCIAL_LOGIN, { externalLink: `${JOIN_AUTH_URL}/${type}` }).send();

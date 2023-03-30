@@ -1,6 +1,6 @@
 {
   "name": "web-extension-ca",
-  "version": "1.1.5",
+  "version": "1.2.0",
   "description": "web-extension-ca",
   "private": true,
   "dependencies": {
@@ -123,7 +123,7 @@
     "node": ">=15.9.0"
   },
   "scripts": {
-    "prepro": "yarn workspace @portkey-wallet/constants run handle-network",
+    "handle-network": "yarn workspace @portkey-wallet/constants run handle-network",
     "lint": "eslint . --ext .tsx",
     "autod": "autod",
     "commit": "git-cz",

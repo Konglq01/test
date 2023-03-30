@@ -27,6 +27,7 @@ import navigationService from 'utils/navigationService';
 import { pTd } from 'utils/unit';
 import { useIsTestnet } from '@portkey-wallet/hooks/hooks-ca/network';
 import { HIDDEN_TRANSACTION_TYPES } from '@portkey-wallet/constants/constants-ca/activity';
+import { getAWSUrlWithSize } from '@portkey-wallet/utils/img';
 
 const ActivityDetail = () => {
   const { t } = useLanguage();
@@ -104,7 +105,7 @@ const ActivityDetail = () => {
               <TextM style={[styles.lightGrayFontColor]}>{t('Network')}</TextM>
               <View style={styles.networkInfoContent}>
                 <TextM style={[styles.blackFontColor]}>{formatChainInfoToShow(fromChainId, currentNetwork)}</TextM>
-                <View style={GStyles.flexRow}>
+                <View style={GStyles.flexRowWrap}>
                   <TextM style={[styles.lightGrayFontColor]}>{` → `}</TextM>
                   <TextM style={[styles.blackFontColor]}>{formatChainInfoToShow(toChainId, currentNetwork)}</TextM>
                 </View>
@@ -114,7 +115,7 @@ const ActivityDetail = () => {
           <View style={[styles.flexSpaceBetween, isNetworkShow && styles.marginTop16]}>
             <TextM style={[styles.lightGrayFontColor]}>{t('Transaction ID')}</TextM>
             <View style={GStyles.flex1} />
-            <View style={[GStyles.flexRow, styles.alignItemsEnd]}>
+            <View style={[GStyles.flexRowWrap, styles.alignItemsEnd]}>
               <TextM>{formatStr2EllipsisStr(_transactionId, 10, 'tail')}</TextM>
             </View>
             {CopyIconUI(transactionId)}
@@ -175,7 +176,11 @@ const ActivityDetail = () => {
           <>
             <View style={styles.topWrap}>
               {activityItem?.nftInfo?.imageUrl ? (
-                <Image style={styles.img} source={{ uri: activityItem?.nftInfo?.imageUrl || '' }} />
+                <Image
+                  resizeMode={'contain'}
+                  style={styles.img}
+                  source={{ uri: getAWSUrlWithSize(activityItem?.nftInfo?.imageUrl || '') }}
+                />
               ) : (
                 <Text style={styles.noImg}>{activityItem?.nftInfo?.alias?.slice(0, 1)}</Text>
               )}
@@ -217,7 +222,7 @@ const ActivityDetail = () => {
         {activityItem?.transactionType && !HIDDEN_TRANSACTION_TYPES.includes(activityItem?.transactionType) && (
           <>
             <View style={styles.section}>
-              <View style={[GStyles.flexRow]}>
+              <View style={[GStyles.flexRowWrap]}>
                 <TextM style={styles.lightGrayFontColor}>{t('From')}</TextM>
                 <View style={GStyles.flex1} />
                 <View style={[styles.alignItemsEnd, styles.justifyContentCenter]}>
@@ -236,7 +241,7 @@ const ActivityDetail = () => {
         {activityItem?.transactionType && !HIDDEN_TRANSACTION_TYPES.includes(activityItem?.transactionType) && (
           <>
             <View style={styles.section}>
-              <View style={[GStyles.flexRow]}>
+              <View style={[GStyles.flexRowWrap]}>
                 <TextM style={[styles.lightGrayFontColor]}>{t('To')}</TextM>
                 <View style={GStyles.flex1} />
                 <View style={[styles.alignItemsEnd, styles.justifyContentCenter]}>
@@ -261,7 +266,7 @@ const ActivityDetail = () => {
       <View style={styles.space} />
       {explorerUrl && (
         <CommonButton
-          containerStyle={[GStyles.marginTop(pTd(8)), styles.bottomButton]}
+          containerStyle={[GStyles.marginTop(8), styles.bottomButton]}
           onPress={() => {
             if (!activityItem?.transactionId) return;
 

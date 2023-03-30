@@ -100,10 +100,12 @@ export const fetchNFTCollectionsAsync = createAsyncThunk(
   async (
     {
       caAddresses,
+      maxNFTCount = PAGE_SIZE_IN_NFT_ITEM,
     }: // skipCount = 0,
     // maxResultCount = 1000,
     {
       caAddresses: string[];
+      maxNFTCount?: number;
       // skipCount: number;
       // maxResultCount: number;
     },
@@ -116,7 +118,7 @@ export const fetchNFTCollectionsAsync = createAsyncThunk(
 
     // if (totalRecordCount === 0 || totalRecordCount > accountNFTList.length) {
     const response = await fetchNFTSeriesList({ caAddresses, skipCount: 0, maxResultCount });
-    return { list: response.data, totalRecordCount: response.totalRecordCount };
+    return { list: response.data, totalRecordCount: response.totalRecordCount, maxNFTCount };
     // }
 
     return { list: [], totalRecordCount };
@@ -149,7 +151,8 @@ export const fetchNFTAsync = createAsyncThunk(
 
     const { skipCount, maxResultCount, totalRecordCount, children } = targetNFTCollection;
 
-    if ((pageNum + 1) * PAGE_SIZE_IN_NFT_ITEM <= children.length) return;
+    // has cache data
+    if ((pageNum + 1) * maxResultCount <= children.length) return;
 
     if (totalRecordCount === 0 || totalRecordCount > children.length) {
       const response = await fetchNFTList({ symbol, caAddresses, skipCount, maxResultCount });
@@ -264,11 +267,11 @@ export const assetsSlice = createSlice({
         // state.status = 'loading';
       })
       .addCase(fetchNFTCollectionsAsync.fulfilled, (state, action) => {
-        const { list, totalRecordCount } = action.payload;
+        const { list, totalRecordCount, maxNFTCount } = action.payload;
         const newAccountList: NFTCollectionItemShowType[] = list.map(item => ({
           isFetching: false,
           skipCount: 0,
-          maxResultCount: 9,
+          maxResultCount: maxNFTCount,
           totalRecordCount: 0,
           children: [],
           ...item,

@@ -7,7 +7,7 @@ type VerifyPasswordInputProps = InputProps;
 export type VerifyPasswordInputInterface = {
   verifyPassword: () => Promise<[boolean, string]>;
 };
-const VerifyPasswordInput = forwardRef((props: VerifyPasswordInputProps, forwardedRef) => {
+const VerifyPasswordInput = forwardRef(function VerifyPasswordInput(props: VerifyPasswordInputProps, forwardedRef) {
   const [password, setPassword] = useState<string>();
   const { t } = useLanguage();
   const [passwordError, setPasswordError] = useState<boolean>();
@@ -37,5 +37,4 @@ const VerifyPasswordInput = forwardRef((props: VerifyPasswordInputProps, forward
     />
   );
 });
-VerifyPasswordInput.displayName = 'VerifyPasswordInput';
 export default VerifyPasswordInput;

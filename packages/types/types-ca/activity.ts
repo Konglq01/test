@@ -36,6 +36,7 @@ export type TransactionFees = {
   symbol: string;
   fee: number;
   feeInUsd: string;
+  decimals: string;
 };
 
 export type the2ThFailedActivityItemType = {

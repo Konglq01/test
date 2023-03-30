@@ -43,7 +43,7 @@ export default function Mnemonic() {
             `This is your Secret Recovery Phrase. Please write it down and store it in a safe place. You'll be asked to re-enter this phrase (in the right order) on the next step`,
           )}
         </TextL>
-        <View style={[styles.mnemonicBox, GStyles.flexRow]}>
+        <View style={[styles.mnemonicBox, GStyles.flexRowWrap]}>
           {mnemonicList?.map((i, k) => {
             return (
               <View style={styles.mnemonicItem} key={i}>

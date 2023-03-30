@@ -5,6 +5,7 @@ import { TextM, TextS } from 'components/CommonText';
 import { defaultColors } from 'assets/theme';
 import { Image } from '@rneui/themed';
 import GStyles from 'assets/theme/GStyles';
+import { NFT_MIDDLE_SIZE } from '@portkey-wallet/constants/constants-ca/assets';
 
 export type NoDataPropsType = {
   style?: ViewStyle | ViewStyle[];
@@ -33,6 +34,7 @@ const NFTAvatar: React.FC<NoDataPropsType> = props => {
     <TouchableOpacity style={[styles.wrap, ...outStyles]} onPress={onPress}>
       {imageUrl && (
         <Image
+          resizeMode={'contain'}
           source={{
             uri: imageUrl,
           }}

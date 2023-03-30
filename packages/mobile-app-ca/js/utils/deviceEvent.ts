@@ -8,7 +8,11 @@ const EventList = [
   'clearQRWallet',
   'clearSignupInput',
   'refreshGuardiansList',
-  'nestScrollForPullCloseModal',
+  'setCountry',
+  'refreshDeviceList',
+  'nestScrollViewScrolledTop',
+  'nestScrollViewLayout',
+  'setAuthenticationInfo',
 ] as const;
 
 // eslint-disable-next-line no-new-func

@@ -27,10 +27,15 @@ export enum ApprovalType {
   addGuardian,
   deleteGuardian,
   editGuardian,
+  removeOtherManager,
 }
 
 export interface VerifierInfo {
   verifierId: string;
   verificationDoc: string;
   signature: string;
+}
+
+export interface AuthenticationInfo {
+  [userId: string]: string;
 }

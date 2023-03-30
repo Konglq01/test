@@ -21,10 +21,11 @@ import { useGetCurrentCAContract } from 'hooks/contract';
 import { setLoginAccount } from 'utils/guardian';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import { GuardiansStatusItem } from '../types';
-import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network-test2';
+import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { request } from '@portkey-wallet/api/api-did';
 import { verification } from 'utils/api';
 import { useLanguage } from 'i18n/hooks';
+import useLockCallback from '@portkey-wallet/hooks/useLockCallback';
 
 type RouterParams = {
   guardianItem?: UserGuardianItem;
@@ -97,7 +98,7 @@ export default function VerifierDetails() {
     }
   }, [caHash, getCurrentCAContract, guardianItem, managerAddress]);
 
-  const onFinish = useCallback(
+  const onFinish = useLockCallback(
     async (code: string) => {
       if (!requestCodeResult || !guardianItem || !code) return;
       try {

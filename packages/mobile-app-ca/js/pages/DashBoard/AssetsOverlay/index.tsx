@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import OverlayModal from 'components/OverlayModal';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View, DeviceEventEmitter } from 'react-native';
 import { TextL, TextS } from 'components/CommonText';
@@ -24,7 +24,6 @@ import { ChainId } from '@portkey-wallet/types';
 import { useGStyles } from 'assets/theme/useGStyles';
 import { useIsTestnet } from '@portkey-wallet/hooks/hooks-ca/network';
 import myEvents from 'utils/deviceEvent';
-import { isIos } from 'walletappnew/js/utils/device';
 
 type onFinishSelectTokenType = (tokenItem: any) => void;
 type TokenListProps = {
@@ -53,7 +52,7 @@ const AssetItem = (props: { symbol: string; onPress: (item: any) => void; item: 
     return (
       <TouchableOpacity style={itemStyle.wrap} onPress={() => onPress?.(item)}>
         {item.nftInfo.imageUrl ? (
-          <Image style={[itemStyle.left]} source={{ uri: item.nftInfo.imageUrl }} />
+          <Image resizeMode={'contain'} style={[itemStyle.left]} source={{ uri: item?.nftInfo?.imageUrl }} />
         ) : (
           <Text style={[itemStyle.left, itemStyle.noPic]}>{item.symbol[0]}</Text>
         )}
@@ -171,6 +170,13 @@ const AssetList = ({ account }: TokenListProps) => {
     );
   }, []);
 
+  const noData = useMemo(() => {
+    return debounceKeyword ? (
+      <NoData noPic message={t('No results found')} />
+    ) : (
+      <NoData noPic message={t('There are currently no assets to send.')} />
+    );
+  }, [debounceKeyword]);
   return (
     <ModalBody modalBodyType="bottom" title={t('Select Assets')} style={gStyles.overlayStyle}>
       {/* no assets in this account  */}
@@ -184,36 +190,28 @@ const AssetList = ({ account }: TokenListProps) => {
           setKeyword(v.trim());
         }}
       />
-
-      {listShow.length === 0 ? (
-        debounceKeyword ? (
-          <NoData noPic message={t('No results found')} />
-        ) : (
-          <NoData noPic message={t('There are currently no assets to send.')} />
-        )
-      ) : (
-        <FlatList
-          disableScrollViewPanResponder={true}
-          onLayout={e => {
-            DeviceEventEmitter.emit('nestScrollViewLayout', e.nativeEvent.layout);
-          }}
-          onScroll={({ nativeEvent }) => {
-            const {
-              contentOffset: { y: scrollY },
-            } = nativeEvent;
-            if (scrollY <= 0) {
-              myEvents.nestScrollForPullCloseModal.emit();
-            }
-          }}
-          style={styles.flatList}
-          data={listShow || []}
-          renderItem={renderItem}
-          keyExtractor={(_item, index) => `${index}`}
-          onEndReached={() => {
-            getList();
-          }}
-        />
-      )}
+      <FlatList
+        disableScrollViewPanResponder={true}
+        onLayout={e => {
+          myEvents.nestScrollViewLayout.emit(e.nativeEvent.layout);
+        }}
+        onScroll={({ nativeEvent }) => {
+          const {
+            contentOffset: { y: scrollY },
+          } = nativeEvent;
+          if (scrollY <= 0) {
+            myEvents.nestScrollViewScrolledTop.emit();
+          }
+        }}
+        style={styles.flatList}
+        data={listShow || []}
+        renderItem={renderItem}
+        keyExtractor={(_item, index) => `${index}`}
+        ListEmptyComponent={noData}
+        onEndReached={() => {
+          getList();
+        }}
+      />
     </ModalBody>
   );
 };

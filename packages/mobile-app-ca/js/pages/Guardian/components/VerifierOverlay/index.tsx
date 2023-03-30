@@ -25,7 +25,7 @@ const VerifierList = ({ verifierList, callBack, selectedVerifier }: VerifierList
           return (
             <Touchable
               key={item.name}
-              style={[GStyles.flexRow, GStyles.itemCenter, styles.itemRow]}
+              style={[GStyles.flexRowWrap, GStyles.itemCenter, styles.itemRow]}
               onPress={() => {
                 OverlayModal.hide();
                 callBack(item);

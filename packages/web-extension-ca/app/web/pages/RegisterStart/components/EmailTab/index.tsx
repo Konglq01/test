@@ -1,53 +1,48 @@
 import { Button } from 'antd';
 import { useCallback, useRef, useState } from 'react';
-import EmailInput, { EmailInputInstance } from 'pages/RegisterStart/components/EmailInput';
-import { useTranslation } from 'react-i18next';
-import './index.less';
-import { NetworkItem } from '@portkey-wallet/types/types-ca/network';
-import { ChainItemType } from '@portkey-wallet/store/store-ca/wallet/type';
+import { ValidateHandler } from 'types/wallet';
+import EmailInput, { EmailInputInstance } from '../EmailInput';
 import { useLoading } from 'store/Provider/hooks';
+import { handleErrorMessage } from '@portkey-wallet/utils';
 
 interface EmailTabProps {
-  onSuccess: (email: string) => void;
-  currentNetwork: NetworkItem;
-  isTermsChecked?: boolean;
-  currentChain?: ChainItemType;
+  confirmText: string;
+  validateEmail?: ValidateHandler;
+  onFinish?: (email: string) => void;
 }
 
-export default function EmailTab({ currentNetwork, currentChain, onSuccess }: EmailTabProps) {
-  const [error, setError] = useState<string>();
+export default function EmailTab({ confirmText, validateEmail, onFinish }: EmailTabProps) {
   const [val, setVal] = useState<string>();
+  const [error, setError] = useState<string>();
   const emailInputInstance = useRef<EmailInputInstance>();
-  const { t } = useTranslation();
   const { setLoading } = useLoading();
-
-  const onSignUp = useCallback(async () => {
+  const onClick = useCallback(async () => {
     try {
       setLoading(true, 'Checking account on the chain...');
-      await emailInputInstance?.current?.validateEmail(val, 'registered');
-      val && onSuccess(val);
+      await emailInputInstance?.current?.validateEmail(val);
+      val && onFinish?.(val);
     } catch (error: any) {
-      setError(error);
+      const msg = handleErrorMessage(error);
+      setError(msg);
     } finally {
       setLoading(false);
     }
-  }, [onSuccess, setLoading, val]);
+  }, [onFinish, setLoading, val]);
 
   return (
     <div className="email-sign-wrapper">
       <EmailInput
-        currentNetwork={currentNetwork}
-        currentChain={currentChain}
         val={val}
         ref={emailInputInstance}
+        validate={validateEmail}
         error={error}
         onChange={(v) => {
           setError(undefined);
           setVal(v);
         }}
       />
-      <Button className="login-primary-btn" type="primary" disabled={!val || !!error} onClick={onSignUp}>
-        {t('Sign Up')}
+      <Button className="login-primary-btn" type="primary" disabled={!val || !!error} onClick={onClick}>
+        {confirmText}
       </Button>
     </div>
   );

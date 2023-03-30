@@ -18,15 +18,15 @@ import { customFetch } from '@portkey-wallet/utils/fetch';
 import { useGetCurrentCAContract } from 'hooks/contract';
 import { addManager } from 'utils/wallet';
 import { request } from '@portkey-wallet/api/api-did';
-import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
-import { DEVICE_TYPE } from 'constants/common';
 import { useGetHolderInfo } from 'hooks/guardian';
 import { useAppCommonDispatch } from '@portkey-wallet/hooks';
-import { addFailedActivity } from '@portkey-wallet/store/store-ca/activity/slice';
 import { useAppCASelector } from '@portkey-wallet/hooks/hooks-ca';
 import { fetchTokensPriceAsync } from '@portkey-wallet/store/store-ca/assets/slice';
 import AppleTest from 'Test/AppleTest';
 import GoogleTest from 'Test/GoogleTest';
+import { extraDataEncode } from '@portkey-wallet/utils/device';
+import { useGetDeviceInfo } from 'hooks/device';
+import * as Network from 'expo-network';
 
 export default function HomeScreen() {
   const wallet = useCurrentWalletInfo();
@@ -35,9 +35,10 @@ export default function HomeScreen() {
   const activity = useAppCASelector(state => state.activity);
 
   const pin = usePin();
+  const getDeviceInfo = useGetDeviceInfo();
   const chainInfo = useCurrentChain('AELF');
   const getHolderInfo = useGetHolderInfo();
-  const { userGuardiansList, preGuardian } = useGuardiansInfo();
+  const { userGuardiansList } = useGuardiansInfo();
   console.log(userGuardiansList, '=====userGuardiansList');
 
   return (
@@ -142,7 +143,7 @@ export default function HomeScreen() {
                 caHash: wallet.caHash,
                 address: wallet.address,
                 managerAddress: tmpWalletInfo.address,
-                deviceType: DEVICE_TYPE,
+                extraData: extraDataEncode(getDeviceInfo()),
               });
               console.log(req, '===req');
             } catch (error) {
@@ -189,6 +190,20 @@ export default function HomeScreen() {
           title="fetch token Price"
           onPress={() => {
             dispatch(fetchTokensPriceAsync({}));
+          }}
+        />
+        <Button
+          title="SelectCountry"
+          onPress={() => {
+            navigationService.navigate('SelectCountry');
+          }}
+        />
+        <Button
+          title="getIpAddressAsync"
+          onPress={async () => {
+            const ipAddress = await Network.getIpAddressAsync();
+            const ipAddress2 = await customFetch('https://api.ipify.org/?format=json');
+            console.log(ipAddress, ipAddress2, '======ipAddress');
           }}
         />
 

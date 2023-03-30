@@ -250,7 +250,7 @@ const SendHome: React.FC = () => {
           {!assetInfo?.imageUrl ? (
             <Text style={styles.noImg}>{assetInfo?.alias[0]}</Text>
           ) : (
-            <Image style={styles.img} source={{ uri: assetInfo?.imageUrl }} />
+            <Image resizeMode={'contain'} style={styles.img} source={{ uri: assetInfo?.imageUrl }} />
           )}
           <View style={styles.topLeft}>
             <TextL style={[styles.nftTitle, fonts.mediumFont]}>{`${assetInfo.alias} #${assetInfo?.tokenId}`} </TextL>
@@ -394,7 +394,7 @@ export const styles = StyleSheet.create({
   topWrap: {
     width: '100%',
     marginTop: pTd(40),
-    ...GStyles.flexRow,
+    ...GStyles.flexRowWrap,
   },
   img: {
     width: pTd(64),
@@ -423,7 +423,7 @@ export const styles = StyleSheet.create({
     marginBottom: pTd(4),
   },
   tokenCount: {
-    marginTop: pTd(60),
+    marginTop: pTd(40),
     fontSize: pTd(28),
     width: '100%',
     textAlign: 'center',

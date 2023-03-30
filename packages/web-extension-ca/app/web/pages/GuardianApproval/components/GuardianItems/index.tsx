@@ -1,10 +1,10 @@
 import { setCurrentGuardianAction, setUserGuardianItemStatus } from '@portkey-wallet/store/store-ca/guardians/actions';
 import { UserGuardianItem, UserGuardianStatus } from '@portkey-wallet/store/store-ca/guardians/type';
-import { VerifyStatus } from '@portkey-wallet/types/verifier';
+import { VerifierInfo, VerifyStatus } from '@portkey-wallet/types/verifier';
 import { Button, message } from 'antd';
 import clsx from 'clsx';
 import VerifierPair from 'components/VerifierPair';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { useAppDispatch, useLoading } from 'store/Provider/hooks';
@@ -14,6 +14,10 @@ import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verifyErrorHandler } from 'utils/tryErrorHandler';
 import { verification } from 'utils/api';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import { handleErrorMessage } from '@portkey-wallet/utils';
+import { useVerifyToken } from 'hooks/authentication';
+import { handleVerificationDoc } from '@portkey-wallet/utils/guardian';
+import useLocationState from 'hooks/useLocationState';
 
 interface GuardianItemProps {
   disabled?: boolean;
@@ -24,9 +28,14 @@ interface GuardianItemProps {
 export default function GuardianItems({ disabled, item, isExpired, loginAccount }: GuardianItemProps) {
   const { t } = useTranslation();
   const { setLoading } = useLoading();
-  const { state } = useLocation();
+  const { state } = useLocationState<string>();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+
+  const isSocialLogin = useMemo(
+    () => item.guardianType === LoginType.Google || item.guardianType === LoginType.Apple,
+    [item.guardianType],
+  );
 
   const guardianSendCode = useCallback(
     async (item: UserGuardianItem) => {
@@ -92,7 +101,7 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
         const result = await verification.sendVerificationCode({
           params: {
             guardianIdentifier: item?.guardianAccount,
-            type: LoginType[loginAccount.loginType],
+            type: LoginType[item.guardianType],
             verifierId: item.verifier?.id || '',
             chainId: DefaultChainId,
           },
@@ -115,7 +124,11 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
               status: VerifyStatus.Verifying,
             }),
           );
-          navigate('/login/verifier-account', { state: 'login' });
+          if (state && state.indexOf('removeManage') !== -1) {
+            navigate('/setting/wallet-security/manage-devices/verifier-account', { state: state });
+          } else {
+            navigate('/login/verifier-account', { state: 'login' });
+          }
         }
       } catch (error: any) {
         console.log(error, 'error===');
@@ -127,15 +140,75 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
     [state, loginAccount, setLoading, guardianSendCode, dispatch, navigate],
   );
 
+  const verifyToken = useVerifyToken();
+
+  const socialVerifyHandler = useCallback(
+    async (item: UserGuardianItem) => {
+      try {
+        setLoading(true);
+        const result = await verifyToken(item.guardianType, {
+          accessToken: loginAccount?.authenticationInfo?.[item.guardianAccount],
+          id: item.guardianAccount,
+          verifierId: item.verifier?.id,
+          chainId: DefaultChainId,
+        });
+        const verifierInfo: VerifierInfo = { ...result, verifierId: item?.verifier?.id };
+        const { guardianIdentifier } = handleVerificationDoc(verifierInfo.verificationDoc);
+        dispatch(
+          setUserGuardianItemStatus({
+            key: item.key,
+            signature: verifierInfo.signature,
+            verificationDoc: verifierInfo.verificationDoc,
+            status: VerifyStatus.Verified,
+            identifierHash: guardianIdentifier,
+          }),
+        );
+      } catch (error) {
+        const msg = handleErrorMessage(error);
+        message.error(msg);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [dispatch, loginAccount?.authenticationInfo, setLoading, verifyToken],
+  );
+
   const verifyingHandler = useCallback(
     async (item: UserGuardianItem) => {
+      if (isSocialLogin) return socialVerifyHandler(item);
       dispatch(setCurrentGuardianAction({ ...item, isInitStatus: false }));
-      state && state.indexOf('guardians') !== -1
-        ? navigate('/setting/guardians/verifier-account', { state: state })
-        : navigate('/login/verifier-account', { state: 'login' });
+      if (state?.includes('guardians')) {
+        navigate('/setting/guardians/verifier-account', { state: state });
+      } else if (state?.includes('removeManage')) {
+        navigate('/setting/wallet-security/manage-devices/verifier-account', { state: state });
+      } else {
+        navigate('/login/verifier-account', { state: 'login' });
+      }
     },
-    [dispatch, navigate, state],
+    [dispatch, isSocialLogin, navigate, socialVerifyHandler, state],
   );
+
+  const accountShow = useCallback((guardian: UserGuardianItem) => {
+    switch (guardian.guardianType) {
+      case LoginType.Email: // return <div className="account-text">{guardian.guardianAccount}</div>;
+      case LoginType.Phone:
+        return <div className="account-text">{guardian.guardianAccount}</div>;
+      case LoginType.Google:
+        return (
+          <div className="account-text">
+            <div className="name">{guardian.firstName}</div>
+            <div className="detail">{guardian.thirdPartyEmail}</div>
+          </div>
+        );
+      case LoginType.Apple:
+        return (
+          <div className="account-text">
+            <div className="name">{guardian.firstName}</div>
+            <div className="detail">{guardian.isPrivate ? '******' : guardian.thirdPartyEmail}</div>
+          </div>
+        );
+    }
+  }, []);
 
   return (
     <li className={clsx('flex-between-center verifier-item', disabled && 'verifier-item-disabled')}>
@@ -146,7 +219,7 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
           verifierSrc={item.verifier?.imageUrl}
           verifierName={item?.verifier?.name}
         />
-        <span className="account-text">{item.guardianAccount}</span>
+        {accountShow(item)}
       </div>
       {isExpired && item.status !== VerifyStatus.Verified ? (
         <Button className="expired" type="text" disabled>
@@ -154,12 +227,12 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
         </Button>
       ) : (
         <>
-          {(!item.status || item.status === VerifyStatus.NotVerified) && (
+          {(!item.status || item.status === VerifyStatus.NotVerified) && !isSocialLogin && (
             <Button className="not-verified" type="primary" onClick={() => SendCode(item)}>
               {t('Send')}
             </Button>
           )}
-          {item.status === VerifyStatus.Verifying && (
+          {(item.status === VerifyStatus.Verifying || (!item.status && isSocialLogin)) && (
             <Button type="primary" className="verifying" onClick={() => verifyingHandler(item)}>
               {t('Verify')}
             </Button>

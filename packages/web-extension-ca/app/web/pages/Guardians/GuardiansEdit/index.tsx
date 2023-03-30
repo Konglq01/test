@@ -20,6 +20,7 @@ import { setLoginAccountAction } from 'store/reducers/loginCache/actions';
 import { VerifierItem } from '@portkey-wallet/types/verifier';
 import BaseVerifierIcon from 'components/BaseVerifierIcon';
 import { contractErrorHandler } from 'utils/tryErrorHandler';
+import { IconType } from 'types/icon';
 
 export default function GuardiansEdit() {
   const { t } = useTranslation();
@@ -29,7 +30,6 @@ export default function GuardiansEdit() {
   const [removeOpen, setRemoveOpen] = useState<boolean>();
   const [removeClose, setRemoveClose] = useState<boolean>(false);
   const [selectVal, setSelectVal] = useState<string>(opGuardian?.verifier?.id as string);
-  const [selectName, setSelectName] = useState<string>(opGuardian?.verifier?.name as string);
   const [exist, setExist] = useState<boolean>(false);
   const { walletInfo } = useCurrentWallet();
   const userGuardianList = useGuardianList();
@@ -57,14 +57,10 @@ export default function GuardiansEdit() {
     [selectVal, verifierMap],
   );
 
-  const handleChange = useCallback(
-    (value: string) => {
-      setExist(false);
-      setSelectVal(value);
-      setSelectName(verifierMap?.[value]?.name || '');
-    },
-    [verifierMap],
-  );
+  const handleChange = useCallback((value: string) => {
+    setExist(false);
+    setSelectVal(value);
+  }, []);
 
   const guardiansChangeHandler = useCallback(async () => {
     const flag: boolean =
@@ -145,6 +141,35 @@ export default function GuardiansEdit() {
     navigate('/setting/guardians/guardian-approval', { state: 'guardians/del' }); // status
   }, [opGuardian, dispatch, navigate, userGuardianList, walletInfo.caHash]);
 
+  const accountShow = useMemo(() => {
+    switch (opGuardian?.guardianType) {
+      case LoginType.Email:
+      case LoginType.Phone:
+        return <div className="name account">{opGuardian?.guardianAccount}</div>;
+      case LoginType.Google:
+      case LoginType.Apple:
+        return (
+          <div className="name account flex-column">
+            <span>{opGuardian.firstName || 'name'}</span>
+            <span className="account">{opGuardian.isPrivate ? '******' : opGuardian?.thirdPartyEmail}</span>
+          </div>
+        );
+    }
+  }, [opGuardian]);
+
+  const getGuardianIcon = useCallback((v: LoginType): IconType => {
+    switch (v) {
+      case LoginType.Email:
+        return 'email';
+      case LoginType.Phone:
+        return 'GuardianPhone';
+      case LoginType.Apple:
+        return 'GuardianApple';
+      case LoginType.Google:
+        return 'GuardianGoogle';
+    }
+  }, []);
+
   return (
     <div className="edit-guardians-page">
       <div className="edit-guardians-title">
@@ -157,8 +182,11 @@ export default function GuardiansEdit() {
         />
       </div>
       <div className="input-item">
-        <p className="label">{t('Guardian Type')}</p>
-        <p className="control">{currentGuardian?.guardianAccount}</p>
+        <p className="label">{`Guardian ${LoginType[opGuardian?.guardianType || 0]}`}</p>
+        <p className="control">
+          <CustomSvg type={getGuardianIcon(opGuardian?.guardianType || 0)} />
+          {accountShow}
+        </p>
       </div>
       <div className="input-item">
         <p className="label">{t('Verifier')}</p>

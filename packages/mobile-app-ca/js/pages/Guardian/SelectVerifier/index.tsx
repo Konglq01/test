@@ -20,10 +20,19 @@ import Loading from 'components/Loading';
 import { useVerifierList } from '@portkey-wallet/hooks/hooks-ca/network';
 import VerifierOverlay from '../components/VerifierOverlay';
 import { VerifierImage } from '../components/VerifierImage';
-import { LoginKeyType, LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import myEvents from 'utils/deviceEvent';
-import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network-test2';
+import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
 import { verification } from 'utils/api';
+import { AuthenticationInfo, VerificationType } from '@portkey-wallet/types/verifier';
+import { useVerifyToken } from 'hooks/authentication';
+
+export type RouterParams = {
+  loginAccount: string;
+  loginType: LoginType;
+  authenticationInfo?: AuthenticationInfo;
+  showLoginAccount?: string;
+};
 
 const ScrollViewProps = { disabled: true };
 export default function SelectVerifier() {
@@ -32,21 +41,43 @@ export default function SelectVerifier() {
 
   const [selectedVerifier, setSelectedVerifier] = useState(verifierList[0]);
 
-  const { loginAccount } = useRouterParams<{ loginAccount?: string }>();
+  const { loginAccount, loginType, authenticationInfo, showLoginAccount } = useRouterParams<RouterParams>();
+  const verifyToken = useVerifyToken();
 
-  const onConfirm = useCallback(async () => {
+  const onConfirmAuth = useCallback(async () => {
+    try {
+      Loading.show();
+      const rst = await verifyToken(loginType, {
+        accessToken: authenticationInfo?.[loginAccount || ''],
+        id: loginAccount,
+        verifierId: selectedVerifier?.id,
+        chainId: DefaultChainId,
+      });
+      navigationService.navigate('SetPin', {
+        managerInfo: {
+          verificationType: VerificationType.register,
+          loginAccount: loginAccount,
+          type: loginType,
+        },
+        verifierInfo: { ...rst, verifierId: selectedVerifier.id },
+      });
+    } catch (error) {
+      CommonToast.failError(error);
+    }
+    Loading.hide();
+  }, [authenticationInfo, loginAccount, loginType, selectedVerifier.id, verifyToken]);
+  const onDefaultConfirm = useCallback(() => {
     const confirm = async () => {
       try {
         Loading.show();
         const requestCodeResult = await verification.sendVerificationCode({
           params: {
-            type: LoginType[LoginType.Email],
+            type: LoginType[loginType],
             guardianIdentifier: loginAccount,
             verifierId: selectedVerifier.id,
             chainId: DefaultChainId,
           },
         });
-
         if (requestCodeResult.verifierSessionId) {
           navigationService.navigate('VerifierDetails', {
             requestCodeResult,
@@ -54,7 +85,7 @@ export default function SelectVerifier() {
               isLoginAccount: true,
               verifier: selectedVerifier,
               guardianAccount: loginAccount,
-              guardianType: LoginType.Email,
+              guardianType: loginType,
             },
           });
         } else {
@@ -69,8 +100,8 @@ export default function SelectVerifier() {
       title2: (
         <Text>
           <TextL>{`${selectedVerifier.name} will send a verification code to `}</TextL>
-          <TextL style={fonts.mediumFont}>{loginAccount}</TextL>
-          <TextL>{` to verify your email address.`}</TextL>
+          <TextL style={fonts.mediumFont}>{showLoginAccount || loginAccount}</TextL>
+          <TextL>{` to verify your ${loginType === LoginType.Phone ? 'phone number' : 'email address'}.`}</TextL>
         </Text>
       ),
       buttons: [
@@ -85,7 +116,19 @@ export default function SelectVerifier() {
         },
       ],
     });
-  }, [selectedVerifier, loginAccount, t]);
+  }, [loginAccount, loginType, selectedVerifier, showLoginAccount, t]);
+  const onConfirm = useCallback(async () => {
+    switch (loginType) {
+      case LoginType.Apple:
+      case LoginType.Google:
+        onConfirmAuth();
+        break;
+      default: {
+        onDefaultConfirm();
+        break;
+      }
+    }
+  }, [loginType, onConfirmAuth, onDefaultConfirm]);
   return (
     <PageContainer
       containerStyles={styles.containerStyles}
@@ -114,7 +157,7 @@ export default function SelectVerifier() {
           titleLeftElement={
             <VerifierImage label={selectedVerifier.name || ''} uri={selectedVerifier?.imageUrl} size={30} />
           }
-          titleStyle={[GStyles.flexRow, GStyles.itemCenter]}
+          titleStyle={[GStyles.flexRowWrap, GStyles.itemCenter]}
           titleTextStyle={styles.titleTextStyle}
           style={[styles.selectedItem, BorderStyles.border1]}
           title={selectedVerifier?.name}
@@ -124,7 +167,10 @@ export default function SelectVerifier() {
         <View style={styles.verifierRow}>
           {verifierList.slice(0, 3).map(item => {
             return (
-              <Touchable style={GStyles.center} key={item.name} onPress={() => setSelectedVerifier(item)}>
+              <Touchable
+                style={[GStyles.center, GStyles.flex1]}
+                key={item.name}
+                onPress={() => setSelectedVerifier(item)}>
                 <VerifierImage label={item.name} uri={item.imageUrl} size={42} />
                 <TextS style={[FontStyles.font3, styles.verifierTitle]}>{item.name}</TextS>
               </Touchable>
@@ -145,7 +191,7 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   selectedItem: {
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     paddingVertical: 13,
     marginTop: 24,
     marginBottom: 48,

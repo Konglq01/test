@@ -7,10 +7,11 @@ import Copy from 'components/Copy';
 import CustomSvg from 'components/CustomSvg';
 import TitleWrapper from 'components/TitleWrapper';
 import { useIsTestnet } from 'hooks/useNetwork';
+import PromptFrame from 'pages/components/PromptFrame';
 import QRCodeCommon from 'pages/components/QRCodeCommon';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router';
-import { useWalletInfo } from 'store/Provider/hooks';
+import { useCommonState, useWalletInfo } from 'store/Provider/hooks';
 import './index.less';
 
 export default function Receive() {
@@ -24,7 +25,6 @@ export default function Receive() {
     () => `ELF_${wallet?.[state.chainId || 'AELF']?.caAddress}_${state.chainId}`,
     [state, wallet],
   );
-  console.log('---receive', state);
 
   const rightElement = useMemo(() => {
     return (
@@ -58,24 +58,29 @@ export default function Receive() {
     [caAddress, currentNetwork, state],
   );
 
-  return (
-    <div className="receive-wrapper">
-      <TitleWrapper leftElement rightElement={rightElement} />
-      <div className="receive-content">
-        <div className={clsx(['single-account'])}>
-          <div className="name">My Wallet Address to Receive</div>
-        </div>
-        <div className="token-info">
-          {symbol === 'ELF' ? <CustomSvg type="elf-icon" /> : <div className="icon">{symbol?.[0]}</div>}
-          <p className="symbol">{symbol}</p>
-          <p className="network">{transNetworkText(state.chainId, isTestNet)}</p>
-        </div>
-        <QRCodeCommon value={JSON.stringify(shrinkSendQrData(value))} />
-        <div className="receive-address">
-          <div className="address">{caAddress}</div>
-          <Copy className="copy-icon" toCopy={caAddress}></Copy>
+  const { isPrompt } = useCommonState();
+  const mainContent = useCallback(() => {
+    return (
+      <div className={clsx(['receive-wrapper', isPrompt ? 'detail-page-prompt' : null])}>
+        <TitleWrapper leftElement rightElement={rightElement} />
+        <div className="receive-content">
+          <div className={clsx(['single-account'])}>
+            <div className="name">My Wallet Address to Receive</div>
+          </div>
+          <div className="token-info">
+            {symbol === 'ELF' ? <CustomSvg type="elf-icon" /> : <div className="icon">{symbol?.[0]}</div>}
+            <p className="symbol">{symbol}</p>
+            <p className="network">{transNetworkText(state.chainId, isTestNet)}</p>
+          </div>
+          <QRCodeCommon value={JSON.stringify(shrinkSendQrData(value))} />
+          <div className="receive-address">
+            <div className="address">{caAddress}</div>
+            <Copy className="copy-icon" toCopy={caAddress}></Copy>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }, [caAddress, isPrompt, isTestNet, rightElement, state.chainId, symbol, value]);
+
+  return <>{isPrompt ? <PromptFrame content={mainContent()} /> : mainContent()}</>;
 }

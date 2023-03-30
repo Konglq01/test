@@ -1,25 +1,14 @@
-import { request } from '@portkey-wallet/api/api-did';
-import { ContactItemType, IClickAddressProps, RecentContactItemType } from '@portkey-wallet/types/types-ca/contact';
+import { IClickAddressProps } from '@portkey-wallet/types/types-ca/contact';
 import { useTranslation } from 'react-i18next';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useEffectOnce } from 'react-use';
-import { useContact } from '@portkey-wallet/hooks/hooks-ca/contact';
 import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import LoadingMore from 'components/LoadingMore/LoadingMore';
 import RecentItem from './RecentItem';
 import { ChainId } from '@portkey-wallet/types';
-
-interface ApiRecentAddressItemType {
-  caAddress: string;
-  chainId: string;
-  name: string;
-  transactionTime: string;
-  address: string;
-  addressChainId: string;
-}
-
-const MAX_RESULT_ACCOUNT = 10;
-const RECENT_COUNT_LIMIT = 100;
+import { fetchRecentListAsync } from '@portkey-wallet/store/store-ca/recent/slice';
+import { useAppCommonDispatch } from '@portkey-wallet/hooks';
+import { useRecent } from '@portkey-wallet/hooks/hooks-ca/useRecent';
 
 export default function Recents({
   onChange,
@@ -29,81 +18,42 @@ export default function Recents({
   chainId: ChainId;
 }) {
   const { t } = useTranslation();
+  const dispatch = useAppCommonDispatch();
+
+  const [loading, setLoading] = useState<boolean>(false);
   const currentWallet = useCurrentWallet();
   const { walletInfo } = currentWallet;
-  const { contactMap } = useContact();
-  const [loading, setLoading] = useState<boolean>(false);
-  const [skipCount, setSkipCount] = useState(0);
-  const [recentTotalNumber, setRecentTotalNumber] = useState(0);
-  const [recentList, setRecentList] = useState<(ContactItemType | RecentContactItemType)[]>([]);
-
-  const fetchRecents = useCallback(() => {
-    setLoading(true);
-    return request.recent.fetchRecentTransactionUsers({
-      params: {
-        caAddresses: [walletInfo[chainId]?.caAddress],
-        skipCount,
-        maxResultCount: MAX_RESULT_ACCOUNT,
-      },
-    });
-  }, [chainId, skipCount, walletInfo]);
-
-  // Convert data so that the formats of Recents and Contacts are consistent, and get contactName for Recents.
-  const parseRecentsListToContactMap = useCallback(
-    (data: ApiRecentAddressItemType[]): any[] =>
-      data.map((ele: ApiRecentAddressItemType) => {
-        if (contactMap?.[ele.address]) {
-          const contactInfo = contactMap?.[ele.address][0];
-          return { ...contactInfo, address: ele.address, transactionTime: ele.transactionTime };
-        }
-        return { ...ele, addresses: [{ address: ele.address, chainId: ele.addressChainId }] };
-      }),
-    [contactMap],
-  );
-
-  const recentsListLimit = (list: any[]) => {
-    if (list.length <= RECENT_COUNT_LIMIT) return list;
-    return list.slice(0, RECENT_COUNT_LIMIT);
-  };
+  const currentRecent = useRecent(walletInfo?.[chainId]?.caAddress || '');
+  const currentRecentList = useMemo(() => currentRecent.recentContactList, [currentRecent.recentContactList]);
+  const recentTotalNumber = useMemo(() => currentRecent.totalRecordCount, [currentRecent.totalRecordCount]);
 
   // init Recents
   useEffectOnce(() => {
-    fetchRecents().then((res) => {
-      const { data, totalRecordCount } = res;
-      setSkipCount(MAX_RESULT_ACCOUNT);
-      setRecentList(recentsListLimit(parseRecentsListToContactMap(data as ApiRecentAddressItemType[])));
-      setRecentTotalNumber(totalRecordCount);
-      setLoading(false);
-    });
+    dispatch(fetchRecentListAsync({ caAddress: walletInfo?.[chainId]?.caAddress || '', isFirstTime: true }));
   });
 
   // load more recents
   const fetchMoreRecent = useCallback(async () => {
-    if (loading || recentTotalNumber >= RECENT_COUNT_LIMIT) return;
+    if (loading) return;
 
-    try {
-      const res = await fetchRecents();
-      const { data, totalRecordCount } = res;
-      const skipCountCompute =
-        skipCount + MAX_RESULT_ACCOUNT < RECENT_COUNT_LIMIT ? skipCount + MAX_RESULT_ACCOUNT : RECENT_COUNT_LIMIT;
-      setSkipCount(skipCountCompute);
-      setRecentList([...recentList, ...parseRecentsListToContactMap(data as ApiRecentAddressItemType[])]);
-      setRecentTotalNumber(totalRecordCount);
-      setLoading(false);
-    } catch (error) {
-      throw Error(JSON.stringify(error));
-    }
-  }, [fetchRecents, loading, parseRecentsListToContactMap, recentList, recentTotalNumber, skipCount]);
+    setLoading(true);
+    await dispatch(fetchRecentListAsync({ caAddress: walletInfo?.[chainId]?.caAddress || '', isFirstTime: false }));
+    setLoading(false);
+  }, [chainId, dispatch, loading, walletInfo]);
 
   return (
     <div className="recents">
-      {recentList.map((item, index) => (
+      {currentRecentList.map((item, index) => (
         <RecentItem item={item} key={index} onClick={onChange} />
       ))}
-      {recentList.length > 0 && (
-        <LoadingMore className="loading" hasMore={recentList.length < recentTotalNumber} loadMore={fetchMoreRecent} />
+      {currentRecentList.length > 0 && (
+        <LoadingMore
+          className="loading"
+          hasMore={currentRecentList.length < recentTotalNumber}
+          loadMore={fetchMoreRecent}
+        />
       )}
-      {recentList.length === 0 && <p className="no-data">{t('There is no recents')}</p>}
+      {currentRecentList.length === 0 && <p className="no-data">{t('There is no recents')}</p>}
     </div>
   );
 }

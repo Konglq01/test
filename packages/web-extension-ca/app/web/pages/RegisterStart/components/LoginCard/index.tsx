@@ -1,22 +1,39 @@
-import { Button } from 'antd';
-import CustomSvg from 'components/CustomSvg';
-import { useNavigate } from 'react-router';
-import EmailLogin from '../EmailLogin';
+import { useState } from 'react';
+import { LoginInfo } from 'store/reducers/loginCache/type';
+import { ValidateHandler } from 'types/wallet';
+import InputLogin from '../InputLogin';
+import SocialLogin from '../SocialLogin';
 
-export default function LoginCard() {
-  const navigate = useNavigate();
+enum STEP {
+  socialLogin,
+  inputLogin,
+}
+export default function LoginCard({
+  onFinish,
+  validateEmail,
+  validatePhone,
+  onSocialLoginFinish,
+}: {
+  onFinish: (data: LoginInfo) => void;
+  validateEmail?: ValidateHandler;
+  validatePhone?: ValidateHandler;
+  onSocialLoginFinish: (data: any) => void;
+}) {
+  const [step, setStep] = useState<STEP>(STEP.socialLogin);
+
   return (
-    <div className="login-card">
-      <h2 className="title">
-        Login
-        <CustomSvg type="QRCode" onClick={() => navigate('/register/start/scan')} />
-      </h2>
-      <div className="login-content">
-        <EmailLogin />
-        <Button className="sign-btn" onClick={() => navigate('/register/start/create')}>
-          Sign up
-        </Button>
-      </div>
+    <div className="register-start-card login-card">
+      {step === STEP.inputLogin ? (
+        <InputLogin
+          type="Login"
+          validateEmail={validateEmail}
+          validatePhone={validatePhone}
+          onFinish={onFinish}
+          onBack={() => setStep(STEP.socialLogin)}
+        />
+      ) : (
+        <SocialLogin type="Login" onFinish={onSocialLoginFinish} switchLogin={() => setStep(STEP.inputLogin)} />
+      )}
     </div>
   );
 }
