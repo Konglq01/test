@@ -278,7 +278,6 @@
     }
     .link {
       line-height: 20px;
-      margin-bottom: 24px;
     }
   }
 }
@@ -291,12 +290,17 @@
   .transaction-detail-modal {
     position: relative;
 
-    .transaction-info > .method-wrap {
-      gap: 32px;
+    .transaction-info {
+      .method-wrap {
+        gap: 32px;
 
-      .nft-amount {
-        width: 100%;
-        padding: 0 0 20px;
+        .nft-amount {
+          width: 100%;
+          padding: 0 0 20px;
+        }
+      }
+      .link {
+        margin-bottom: 16px;
       }
     }
   }
