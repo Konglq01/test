@@ -22,8 +22,8 @@ export default function RecentItem({
       onClick={() => {
         onClick({ ...item });
       }}>
-      <p className="address">{`ELF_${formatStr2EllipsisStr(item.address, [6, 6])}_${item.chainId}`}</p>
-      <p className="network">{transNetworkText(item.chainId, isTestNet)}</p>
+      <p className="address">{`ELF_${formatStr2EllipsisStr(item.address, [6, 6])}_${item.addressChainId}`}</p>
+      <p className="network">{transNetworkText(item.addressChainId, isTestNet)}</p>
     </div>
   );
 }

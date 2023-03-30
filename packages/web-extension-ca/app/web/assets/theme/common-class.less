@@ -185,8 +185,10 @@ td {
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow: overlay;
 
   .portkey-header {
+    position: relative;
     background-color: @bg-20;
     margin: 0 auto;
     .portkey-header-body {
@@ -268,6 +270,11 @@ td {
   min-width: @min-width;
   height: calc(100vh - 96px);
   max-height: @max-detail-height;
+  min-height: @min-detail-height;
+
+  @media screen and (max-width: 767px) {
+    min-height: calc(100vh - 72px);
+  }
 }
 // =========================================================
 // ============= Large screen adaptation [end] =============
