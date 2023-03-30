@@ -48,7 +48,11 @@ export default function Referral({
     try {
       Loading.show();
       const userInfo = await appleSign();
-      await onLogin(userInfo.user.id, LoginType.Apple, { [userInfo.user.id]: userInfo.identityToken as string });
+      await onLogin({
+        loginAccount: userInfo.user.id,
+        loginType: LoginType.Apple,
+        authenticationInfo: { [userInfo.user.id]: userInfo.identityToken as string },
+      });
     } catch (error) {
       CommonToast.failError(error);
     }
@@ -58,8 +62,10 @@ export default function Referral({
     try {
       Loading.show();
       const userInfo = await googleSign();
-      await onLogin(userInfo.user.id, LoginType.Google, {
-        [userInfo.user.id]: userInfo.accessToken,
+      await onLogin({
+        loginAccount: userInfo.user.id,
+        loginType: LoginType.Google,
+        authenticationInfo: { [userInfo.user.id]: userInfo.accessToken },
       });
     } catch (error) {
       CommonToast.failError(error);

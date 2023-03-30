@@ -43,7 +43,11 @@ export default function Phone({
   const onPageLogin = useCallback(async () => {
     Loading.show();
     try {
-      await onLogin(`+${country.code} ${loginAccount}` as string, LoginType.Phone);
+      await onLogin({
+        showLoginAccount: `+${country.code} ${loginAccount}`,
+        loginAccount: `+${country.code}${loginAccount}`,
+        loginType: LoginType.Phone,
+      });
     } catch (error) {
       setErrorMessage(handleErrorMessage(error));
     }
