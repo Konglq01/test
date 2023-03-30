@@ -7,7 +7,7 @@ import {
 } from '@portkey-wallet/store/store-ca/wallet/actions';
 import { CAInfo, LoginType, ManagerInfo } from '@portkey-wallet/types/types-ca/wallet';
 import { AuthenticationInfo, VerificationType, VerifierInfo } from '@portkey-wallet/types/verifier';
-import { handleErrorCode, sleep } from '@portkey-wallet/utils';
+import { handleErrorCode, handlePhoneNumber, sleep } from '@portkey-wallet/utils';
 import Loading from 'components/Loading';
 import AElf from 'aelf-sdk';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
@@ -72,11 +72,18 @@ export function useOnManagerAddressAndQueryResult() {
           },
           chainId: DefaultChainId,
         };
-
         let fetch = request.verify.registerRequest;
         if (isRecovery) {
           fetch = request.verify.recoveryRequest;
-          data.guardiansApproved = guardiansApproved?.map(i => ({ identifier: i.value, ...i }));
+          data.guardiansApproved = guardiansApproved?.map(i => {
+            let _value = i.value;
+            if (i.type === 'Phone') {
+              _value = handlePhoneNumber(_value);
+            }
+            return { identifier: _value, ...i, value: _value };
+          });
+          if (data.loginGuardianIdentifier?.includes('+'))
+            data.loginGuardianIdentifier = handlePhoneNumber(data.loginGuardianIdentifier);
         } else {
           data = {
             ...managerInfo,
@@ -84,7 +91,13 @@ export function useOnManagerAddressAndQueryResult() {
             type: LoginType[managerInfo.type],
             ...data,
           };
+          if (data.type === 'Phone') {
+            data.loginGuardianIdentifier = handlePhoneNumber(data.loginGuardianIdentifier);
+            data.loginAccount = handlePhoneNumber(data.loginAccount);
+          }
         }
+        console.log(data, '====data');
+
         const req = await fetch({
           data,
         });
