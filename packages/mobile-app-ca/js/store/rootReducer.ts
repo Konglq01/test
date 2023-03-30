@@ -17,6 +17,7 @@ import { tokenManagementSlice } from '@portkey-wallet/store/store-ca/tokenManage
 
 import { activitySlice } from '@portkey-wallet/store/store-ca/activity/slice';
 import { guardiansSlice } from '@portkey-wallet/store/store-ca/guardians/slice';
+import { discoverSlice } from '@portkey-wallet/store/store-ca/discover/slice';
 
 const userPersistConfig = {
   key: userSlice.name,
@@ -58,6 +59,10 @@ const guardiansPersistConfig = {
   key: guardiansSlice.name,
   storage: AsyncStorage,
 };
+const discoverPersistConfig = {
+  key: discoverSlice.name,
+  storage: AsyncStorage,
+};
 
 export const userReducer = persistReducer(userPersistConfig, userSlice.reducer);
 export const tokenReducer = persistReducer(tokenPersistConfig, tokenSlice.reducer);
@@ -67,6 +72,7 @@ export const recentReducer = persistReducer(recentPersistConfig, recentSlice.red
 export const activityReducer = persistReducer(activityPersistConfig, activitySlice.reducer);
 export const assetsReducer = persistReducer(assetsPersistConfig, assetsSlice.reducer);
 export const guardiansReducer = persistReducer(guardiansPersistConfig, guardiansSlice.reducer);
+export const discoverReducer = persistReducer(discoverPersistConfig, discoverSlice.reducer);
 
 const rootReducer = combineReducers({
   [userSlice.name]: userReducer,
@@ -82,6 +88,7 @@ const rootReducer = combineReducers({
   [assetsSlice.name]: assetsReducer,
   [activitySlice.name]: activityReducer,
   [tokenManagementSlice.name]: tokenManagementSlice.reducer,
+  [discoverSlice.name]: discoverReducer,
 });
 
 export default rootReducer;

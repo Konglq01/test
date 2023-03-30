@@ -1,10 +1,15 @@
-import React from 'react';
-import { StyleSheet } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { defaultColors } from 'assets/theme';
 import WebView from 'react-native-webview';
 import CustomHeader from 'components/CustomHeader';
 import SafeAreaBox from 'components/SafeAreaBox';
 import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
+import Svg from 'components/Svg';
+import BrowserOverlay from './components/BrowserOverlay';
+import { pTd } from 'utils/unit';
+import { useAppCommonDispatch } from '@portkey-wallet/hooks';
+import { upDateRecordsItem } from '@portkey-wallet/store/store-ca/discover/slice';
 
 const safeAreaColorMap = {
   white: defaultColors.bg1,
@@ -15,16 +20,57 @@ const safeAreaColorMap = {
 
 export type SafeAreaColorMapKeyUnit = keyof typeof safeAreaColorMap;
 
-interface ViewOnWebViewPropsType {
-  route?: any;
-}
+type WebViewPageType = 'default' | 'discover';
 
-const ViewOnWebView: React.FC<ViewOnWebViewPropsType> = () => {
-  const { title = 'AELF Block Explorer', url } = useRouterParams<{ url: string; title?: string }>();
+const ViewOnWebView: React.FC = () => {
+  const {
+    title = '',
+    url,
+    webViewPageType = 'default',
+  } = useRouterParams<{ url: string; title?: string; webViewPageType?: WebViewPageType }>();
+
+  const [browserInfo, setBrowserInfo] = useState({ url, title });
+
+  const dispatch = useAppCommonDispatch();
+  const webViewRef = React.useRef<WebView>(null);
+
+  const handleReload = useCallback(() => {
+    if (webViewPageType === 'default') return;
+
+    if (webViewRef && webViewRef.current) webViewRef.current.reload();
+  }, [webViewPageType]);
+
+  const showDialog = useCallback(() => {
+    BrowserOverlay.showBrowserModal({ browserInfo, setBrowserInfo, handleReload });
+  }, [browserInfo, handleReload]);
+
+  const handleNavigationStateChange = useCallback(
+    (navState: any) => {
+      if (webViewPageType === 'default') return;
+      dispatch(upDateRecordsItem({ url, title: title ? title : navState.title }));
+    },
+    [dispatch, title, url, webViewPageType],
+  );
+
   return (
     <SafeAreaBox edges={['top', 'right', 'left']} style={[{ backgroundColor: safeAreaColorMap.blue }]}>
-      <CustomHeader themeType={'blue'} titleDom={title} />
-      <WebView style={pageStyles.webView} source={{ uri: url ?? '' }} />
+      <CustomHeader
+        themeType={'blue'}
+        titleDom={browserInfo?.title}
+        rightDom={
+          webViewPageType === 'discover' && (
+            <TouchableOpacity onPress={showDialog} style={pageStyles.svgWrap}>
+              <Svg icon="more" size={pTd(20)} />
+            </TouchableOpacity>
+          )
+        }
+      />
+      <WebView
+        ref={webViewRef}
+        style={pageStyles.webView}
+        source={{ uri: url ?? '' }}
+        onNavigationStateChange={handleNavigationStateChange}
+      />
     </SafeAreaBox>
   );
 };
@@ -37,8 +83,16 @@ export const pageStyles = StyleSheet.create({
     paddingRight: 0,
     backgroundColor: defaultColors.bg1,
   },
+  svgWrap: {
+    marginRight: pTd(16),
+  },
+  webViewContainer: {
+    flex: 1,
+    backgroundColor: 'red',
+  },
   webView: {
     width: '100%',
+    flex: 1,
   },
   noResult: {},
 });

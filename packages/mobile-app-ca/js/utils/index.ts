@@ -20,3 +20,10 @@ export const checkNetwork = async () => {
   const state = await Network.getNetworkStateAsync();
   if (!state.isConnected || !state.isInternetReachable) throw new Error('Unstable network. Please try again later.');
 };
+
+export const getFaviconUrl = (url: string) => {
+  const reg = /:\/\/(.[^/]+)/;
+  const domain = url.match(reg);
+  const newDomain = domain ? domain[1] : '';
+  return `https://${newDomain}/favicon.ico`;
+};

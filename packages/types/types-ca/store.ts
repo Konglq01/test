@@ -13,6 +13,8 @@ import { GuardiansState } from '@portkey-wallet/store/store-ca/guardians/type';
 import { guardiansSlice } from '@portkey-wallet/store/store-ca/guardians/slice';
 import { contactSlice, ContactState } from '@portkey-wallet/store/store-ca/contact/slice';
 import { ActivityStateType } from '@portkey-wallet/store/store-ca/activity/type';
+import { discoverSlice } from '@portkey-wallet/store/store-ca/discover/slice';
+import { DiscoverStateType } from '@portkey-wallet/store/store-ca/discover/type';
 
 export type CACommonState = RootCommonState & {
   [tokenManagementSlice.name]: TokenState;
@@ -23,4 +25,5 @@ export type CACommonState = RootCommonState & {
   [walletSlice.name]: WalletState;
   [contactSlice.name]: ContactState;
   [guardiansSlice.name]: GuardiansState;
+  [discoverSlice.name]: DiscoverStateType;
 };

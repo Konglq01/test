@@ -15,6 +15,7 @@ import { NFTCollectionItemShowType } from '@portkey-wallet/types/types-ca/assets
 import Touchable from 'components/Touchable';
 import { OpenCollectionObjType } from './index';
 import { ChainId } from '@portkey-wallet/types';
+import { formatChainInfoToShow } from '@portkey-wallet/utils';
 
 export enum NoDataMessage {
   CustomNetWorkNoData = 'No transaction records accessible from the current custom network',
@@ -90,9 +91,7 @@ export default function NFTItem(props: NFTItemPropsType) {
           <TextL style={styles.nftSeriesName} ellipsizeMode="tail">
             {collectionName}
           </TextL>
-          <TextS style={styles.nftSeriesChainInfo}>
-            {`${chainId === 'AELF' ? 'MainChain' : 'SideChain'} ${chainId} ${currentNetwork !== 'MAIN' && 'Testnet'}`}
-          </TextS>
+          <TextS style={styles.nftSeriesChainInfo}>{formatChainInfoToShow(chainId, currentNetwork)}</TextS>
         </View>
         <View>
           <TextXL style={styles.nftSeriesName}>{itemCount}</TextXL>
