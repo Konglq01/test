@@ -102,6 +102,8 @@ project.ext.react = [
 
 apply from: "../../node_modules/react-native/react.gradle"
 apply from: "../../node_modules/@sentry/react-native/sentry.gradle"
+apply from: "../../node_modules/react-native-code-push/android/codepush.gradle"
+
 
 /**
  * Set this to true to create two separate APKs instead of one:
@@ -273,6 +275,7 @@ android {
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
+            resValue "string", "CodePushDeploymentKey", '""'
         }
         release {
             // Caution! In production, you need to generate your own keystore file.
@@ -290,6 +293,7 @@ android {
                 nativeSymbolUploadEnabled true
                 unstrippedNativeLibsDir 'build/intermediates/merged_native_libs/release/out/lib'
             }
+            resValue "string", "CodePushDeploymentKey", 'ZKO8Q8iDDTqLAwPaiRNxjropcK6k8gehLhv6S'
         }
     }
 

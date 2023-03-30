@@ -26,7 +26,7 @@ export default function InputInfo({ confirmText, onFinish, validateEmail, valida
             onFinish={(v) =>
               onFinish({
                 loginType: LoginType.Phone,
-                guardianAccount: `${v.code} ${v.phoneNumber}`,
+                guardianAccount: `+${v.code} ${v.phoneNumber}`,
               })
             }
           />

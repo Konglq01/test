@@ -17,6 +17,7 @@ import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import { handleErrorMessage } from '@portkey-wallet/utils';
 import { useVerifyToken } from 'hooks/authentication';
 import { handleVerificationDoc } from '@portkey-wallet/utils/guardian';
+import useLocationState from 'hooks/useLocationState';
 
 interface GuardianItemProps {
   disabled?: boolean;
@@ -27,7 +28,7 @@ interface GuardianItemProps {
 export default function GuardianItems({ disabled, item, isExpired, loginAccount }: GuardianItemProps) {
   const { t } = useTranslation();
   const { setLoading } = useLoading();
-  const { state } = useLocation();
+  const { state } = useLocationState<string>();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -176,9 +177,9 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
     async (item: UserGuardianItem) => {
       if (isSocialLogin) return socialVerifyHandler(item);
       dispatch(setCurrentGuardianAction({ ...item, isInitStatus: false }));
-      if (state?.indexOf('guardians') !== -1) {
+      if (state?.includes('guardians')) {
         navigate('/setting/guardians/verifier-account', { state: state });
-      } else if (state?.indexOf('removeManage') !== -1) {
+      } else if (state?.includes('removeManage')) {
         navigate('/setting/wallet-security/manage-devices/verifier-account', { state: state });
       } else {
         navigate('/login/verifier-account', { state: 'login' });
@@ -189,10 +190,9 @@ export default function GuardianItems({ disabled, item, isExpired, loginAccount 
 
   const accountShow = useCallback((guardian: UserGuardianItem) => {
     switch (guardian.guardianType) {
-      case LoginType.Email:
-        return <div className="account-text">{guardian.guardianAccount}</div>;
+      case LoginType.Email: // return <div className="account-text">{guardian.guardianAccount}</div>;
       case LoginType.Phone:
-        return <div className="account-text">{`+${guardian.guardianAccount}`}</div>;
+        return <div className="account-text">{guardian.guardianAccount}</div>;
       case LoginType.Google:
         return (
           <div className="account-text">
