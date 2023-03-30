@@ -44,7 +44,7 @@ export default function DiscoverSearch() {
     // if URL is valid, navigate to webview
 
     if (isValidUrl(newValue)) {
-      dispatch(addRecordsItem({ name: newValue, url: newValue }));
+      dispatch(addRecordsItem({ title: newValue, url: newValue }));
       navigationService.navigate('ViewOnWebView', { url: newValue, webViewPageType: 'discover' });
       setShowRecord(true);
     } else {
