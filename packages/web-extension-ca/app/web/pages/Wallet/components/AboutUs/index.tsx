@@ -27,6 +27,11 @@ export default function AboutUs() {
         label: 'Join us on Discord',
         link: 'https://discord.com/invite/EUBq3rHQhr',
       },
+      {
+        icon: 'Telegram',
+        label: 'Join us on Telegram',
+        link: 'https://t.me/Portkey_Official_Group',
+      },
     ],
     [],
   );
