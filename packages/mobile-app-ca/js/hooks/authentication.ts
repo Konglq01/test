@@ -13,9 +13,9 @@ import { ChainId } from '@portkey-wallet/types';
 import { AppleUserInfo, getGoogleUserInfo, parseAppleIdentityToken } from '@portkey-wallet/utils/authentication';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
 import { useInterface } from 'contexts/useInterface';
-import { checkNetwork } from 'utils';
 import { handleErrorMessage, sleep } from '@portkey-wallet/utils';
 import { changeCanLock } from 'utils/LockManager';
+import { AppState } from 'react-native';
 
 if (!isIos) {
   GoogleSignin.configure({
@@ -50,10 +50,9 @@ export type GoogleAuthResponse = GoogleAuthentication;
 export function useGoogleAuthentication() {
   const [androidResponse, setResponse] = useState<any>();
   const [{ googleRequest, response, promptAsync }] = useInterface();
-
   const iosPromptAsync: () => Promise<GoogleAuthResponse> = useCallback(async () => {
-    await checkNetwork();
     await sleep(2000);
+    if (AppState.currentState !== 'active') throw { message: '' };
     const info = await promptAsync();
     if (info.type === 'success') {
       const exchangeRequest = new AccessTokenRequest({
