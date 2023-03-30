@@ -34,7 +34,9 @@ export default function ScanLogin() {
       setLoading(true);
       const deviceInfo = getDeviceInfoFromQR(qrExtraData, deviceType);
       const contract = await getCurrentCAContract();
-      const extraData = extraDataEncode(deviceInfo || {});
+      const extraData = await extraDataEncode(deviceInfo || {}, true);
+      console.log('extraData===', extraData);
+
       const req = await addManager({ contract, caHash, address, managerAddress, extraData });
       if (req?.error) throw req?.error;
       socket.doOpen({

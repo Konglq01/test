@@ -130,6 +130,7 @@ export default function HomeScreen() {
             // const aa = await getVerifierServers();
             // console.log(JSON.stringify(aa), '=====aa');
 
+            const extraData = await extraDataEncode(getDeviceInfo());
             try {
               const tmpWalletInfo = AElf.wallet.createNewWallet();
               const contract = await getCurrentCAContract();
@@ -138,7 +139,7 @@ export default function HomeScreen() {
                 caHash: wallet.caHash,
                 address: wallet.address,
                 managerAddress: tmpWalletInfo.address,
-                extraData: extraDataEncode(getDeviceInfo()),
+                extraData,
               });
               console.log(req, '===req');
             } catch (error) {

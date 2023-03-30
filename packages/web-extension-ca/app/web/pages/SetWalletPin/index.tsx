@@ -2,7 +2,7 @@ import { Button, Form, message } from 'antd';
 import { FormItem } from 'components/BaseAntd';
 import ConfirmPassword from 'components/ConfirmPassword';
 import PortKeyTitle from 'pages/components/PortKeyTitle';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { useAppDispatch, useGuardiansInfo, useLoading, useLoginInfo } from 'store/Provider/hooks';
 import { setPinAction } from 'utils/lib/serviceWorkerAction';
@@ -42,7 +42,6 @@ export default function SetWalletPin() {
   const getWalletCAAddressResult = useFetchDidWallet();
   const network = useCurrentNetworkInfo();
   const { userGuardianStatus } = useGuardiansInfo();
-  const extraData = useMemo(() => extraDataEncode(getDeviceInfo(DEVICE_TYPE)), []);
   const originChainId = useOriginChainId();
 
   console.log(walletInfo, state, scanWalletInfo, scanCaWalletInfo, 'walletInfo===caWallet');
@@ -54,6 +53,7 @@ export default function SetWalletPin() {
         throw 'Missing account!!! Please login/register again';
       const requestId = randomId();
       if (!registerVerifier) throw 'Missing Verifier Server';
+      const extraData = await extraDataEncode(getDeviceInfo(DEVICE_TYPE));
       const result = await registerDIDWallet({
         type: LoginType[loginAccount.loginType],
         loginGuardianIdentifier: loginAccount.guardianAccount.replaceAll(' ', ''),
@@ -73,7 +73,7 @@ export default function SetWalletPin() {
         sessionId: result.sessionId,
       };
     },
-    [extraData, loginAccount, originChainId, registerVerifier],
+    [loginAccount, originChainId, registerVerifier],
   );
 
   const getGuardiansApproved: () => GuardiansApprovedType[] = useCallback(() => {
@@ -94,6 +94,7 @@ export default function SetWalletPin() {
         throw 'Missing account!!! Please login/register again';
       const guardiansApproved = getGuardiansApproved();
       const requestId = randomId();
+      const extraData = await extraDataEncode(getDeviceInfo(DEVICE_TYPE));
       const result = await recoveryDIDWallet({
         loginGuardianIdentifier: loginAccount.guardianAccount.replaceAll(' ', ''),
         manager: managerAddress,
@@ -111,7 +112,7 @@ export default function SetWalletPin() {
         sessionId: result.sessionId,
       };
     },
-    [loginAccount, getGuardiansApproved, extraData, originChainId],
+    [loginAccount, getGuardiansApproved, originChainId],
   );
 
   const createByScan = useCallback(

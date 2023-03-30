@@ -1,5 +1,5 @@
 import { useAppCASelector } from '.';
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useState, useEffect } from 'react';
 import { WalletInfoType } from '@portkey-wallet/types/wallet';
 import { CAInfoType } from '@portkey-wallet/types/types-ca/wallet';
 import { WalletState } from '@portkey-wallet/store/store-ca/wallet/type';
@@ -10,8 +10,8 @@ import { getApolloClient } from '@portkey-wallet/graphql/contract/apollo';
 import { request } from '@portkey-wallet/api/api-did';
 import { useAppCommonDispatch } from '../index';
 import { setWalletNameAction } from '@portkey-wallet/store/store-ca/wallet/actions';
-import { DeviceItemType } from '@portkey-wallet/types/types-ca/device';
-import { extraDataDecode } from '@portkey-wallet/utils/device';
+import { DeviceInfoType } from '@portkey-wallet/types/types-ca/device';
+import { extraDataListDecode } from '@portkey-wallet/utils/device';
 import { ChainId } from '@portkey-wallet/types';
 
 export interface CurrentWalletType extends WalletInfoType, CAInfoType {
@@ -87,21 +87,42 @@ export const useDeviceList = () => {
     },
     fetchPolicy: 'cache-and-network',
   });
-  const deviceList = useMemo<DeviceItemType[]>(() => {
-    if (error || !data || !data.caHolderManagerInfo || data.caHolderManagerInfo.length < 1) return [];
+
+  const [deviceList, setDeviceList] = useState<
+    {
+      managerAddress: string | null | undefined;
+      deviceInfo: DeviceInfoType;
+      transactionTime: number;
+      version: string;
+    }[]
+  >([]);
+
+  const getDeviceList = useCallback(async () => {
+    if (error || !data || !data.caHolderManagerInfo || data.caHolderManagerInfo.length < 1) {
+      setDeviceList([]);
+      return;
+    }
 
     const caHolderManagerInfo = data.caHolderManagerInfo[0];
     const managers = caHolderManagerInfo?.managerInfos || [];
-    return managers
-      .map(item => {
-        const extraData = extraDataDecode(item?.extraData || '');
+    console.log('managers===', managers);
+
+    const extraDataList = await extraDataListDecode(managers.map(item => item?.extraData || ''));
+    const _deviceList = managers
+      .map((item, idx) => {
         return {
-          ...extraData,
+          ...extraDataList[idx],
           managerAddress: item?.address,
         };
       })
       .reverse();
-  }, [data, error]);
+
+    setDeviceList(_deviceList);
+  }, [error, data]);
+
+  useEffect(() => {
+    getDeviceList();
+  }, [getDeviceList]);
 
   return { deviceList, refetch };
 };
