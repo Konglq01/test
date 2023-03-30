@@ -1,5 +1,3 @@
-import { Button } from 'antd';
-import CustomPassword from 'components/CustomPassword';
 import InputPin from 'pages/AccountSetting/components/InputPin';
 import SubmitPinButton from 'pages/AccountSetting/components/SubmitPinButton';
 import SecondPageHeader from 'pages/components/SecondPageHeader';

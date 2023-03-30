@@ -1,7 +1,10 @@
 import { Form, Button, FormProps } from 'antd';
 import FormItem from 'antd/es/form/FormItem';
+import clsx from 'clsx';
 import ConfirmPassword from 'components/ConfirmPassword';
 import { ReactNode } from 'react';
+import { useCommonState } from 'store/Provider/hooks';
+import './index.less';
 
 export interface ISetNewPinFormProps extends FormProps {
   onSave: () => void;
@@ -17,9 +20,11 @@ export default function SetNewPinForm({
   confirmPinLabel,
   btnText,
 }: ISetNewPinFormProps) {
+  const { isPrompt } = useCommonState();
+
   return (
     <Form
-      className="set-pin-form"
+      className={clsx(['set-pin-form', isPrompt ? 'set-pin-form-prompt' : null])}
       name="SetPinForm"
       form={form}
       requiredMark={false}

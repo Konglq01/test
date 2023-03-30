@@ -53,6 +53,7 @@ export default function SetNewPin() {
 
   return isPrompt ? (
     <SetNewPinPrompt
+      form={form}
       title={title}
       setPinLabel={setPinLabel}
       confirmPinLabel={confirmPinLabel}
@@ -62,6 +63,7 @@ export default function SetNewPin() {
     />
   ) : (
     <SetNewPinPopup
+      form={form}
       title={title}
       setPinLabel={setPinLabel}
       confirmPinLabel={confirmPinLabel}

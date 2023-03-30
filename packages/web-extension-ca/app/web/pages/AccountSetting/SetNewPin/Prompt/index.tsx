@@ -1,8 +1,10 @@
 import SetNewPinForm from 'pages/AccountSetting/components/SetNewPinForm';
 import SecondPageHeader from 'pages/components/SecondPageHeader';
 import { ISetNewPinProps } from '..';
+import './index.less';
 
 export default function SetNewPinPrompt({
+  form,
   title,
   goBack,
   setPinLabel,
@@ -13,7 +15,13 @@ export default function SetNewPinPrompt({
   return (
     <div className="set-new-pin-prompt">
       <SecondPageHeader title={title} leftCallBack={goBack} />
-      <SetNewPinForm setPinLabel={setPinLabel} confirmPinLabel={confirmPinLabel} btnText={btnText} onSave={onSave} />
+      <SetNewPinForm
+        form={form}
+        setPinLabel={setPinLabel}
+        confirmPinLabel={confirmPinLabel}
+        btnText={btnText}
+        onSave={onSave}
+      />
     </div>
   );
 }

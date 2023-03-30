@@ -2,8 +2,10 @@ import BackHeader from 'components/BackHeader';
 import CustomSvg from 'components/CustomSvg';
 import SetNewPinForm from 'pages/AccountSetting/components/SetNewPinForm';
 import { ISetNewPinProps } from '..';
+import './index.less';
 
 export default function SetNewPinPopup({
+  form,
   title,
   goBack,
   setPinLabel,
@@ -16,7 +18,13 @@ export default function SetNewPinPopup({
       <div className="set-pin-title">
         <BackHeader title={title} leftCallBack={goBack} rightElement={<CustomSvg type="Close2" onClick={goBack} />} />
       </div>
-      <SetNewPinForm setPinLabel={setPinLabel} confirmPinLabel={confirmPinLabel} btnText={btnText} onSave={onSave} />
+      <SetNewPinForm
+        form={form}
+        setPinLabel={setPinLabel}
+        confirmPinLabel={confirmPinLabel}
+        btnText={btnText}
+        onSave={onSave}
+      />
     </div>
   );
 }
