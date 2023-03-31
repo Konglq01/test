@@ -2,7 +2,7 @@ import { View, TouchableOpacity, ViewStyle, StyleProp } from 'react-native';
 import React, { ReactNode, useEffect, useMemo } from 'react';
 import Svg from 'components/Svg';
 import { blueStyles, hideTitleStyles, whitStyles } from './style/index.style';
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import navigationService from 'utils/navigationService';
 import { pTd } from 'utils/unit';
 import GStyles from 'assets/theme/GStyles';
@@ -43,7 +43,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = props => {
 
   // theme change
   const styles = themeType === 'blue' ? blueStyles : whitStyles;
-
+  const isFocused = useIsFocused();
   const navigation = useNavigation();
 
   // if can go back
@@ -61,7 +61,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = props => {
     );
   }, [leftIconType, styles.leftBackTitle.color]);
   useHardwareBackPress(() => {
-    if (leftCallback) {
+    if (isFocused && leftCallback) {
       leftCallback();
       return true;
     }
