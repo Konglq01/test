@@ -17,7 +17,7 @@ export const styles = StyleSheet.create({
     width: '100%',
     paddingVertical: 15,
     overflow: 'hidden',
-    borderBottomWidth: 1,
+    borderBottomWidth: StyleSheet.hairlineWidth,
     alignItems: 'center',
     justifyContent: 'center',
     borderBottomColor: defaultColors.border1,

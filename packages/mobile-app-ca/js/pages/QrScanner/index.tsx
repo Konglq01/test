@@ -16,7 +16,8 @@ import GStyles from 'assets/theme/GStyles';
 import { FontStyles } from 'assets/theme/styles';
 import { isIos, screenHeight, screenWidth } from '@portkey-wallet/utils/mobile/device';
 
-// import { useAppCASelector } from '@portkey-wallet/hooks';
+import { Camera } from 'expo-camera';
+import { expandQrData } from '@portkey-wallet/utils/qrCode';
 
 interface QrScannerProps {
   route?: any;
@@ -42,7 +43,8 @@ const QrScanner: React.FC<QrScannerProps> = () => {
     ({ data = '' }) => {
       try {
         if (typeof data === 'string') {
-          const qrCodeData = JSON.parse(data);
+          const qrCodeData = expandQrData(JSON.parse(data));
+
           // if not currentNetwork
           if (currentNetwork !== qrCodeData.netWorkType) return invalidQRCode();
           handleQRCodeData(qrCodeData, previousRouteInfo, setRefresh);
@@ -64,23 +66,22 @@ const QrScanner: React.FC<QrScannerProps> = () => {
     if (result && result?.uri) {
       const scanResult = await BarCodeScanner.scanFromURLAsync(result?.uri, [BarCodeScanner.Constants.BarCodeType.qr]);
 
-      console.log('scanResult', scanResult);
-
       if (scanResult[0]?.data) handleBarCodeScanned({ data: scanResult[0]?.data || '' });
     }
   };
 
-  // TODO: test ui in Mason's Phone
   return (
     <View style={PageStyle.wrapper}>
       {refresh ? null : (
-        <BarCodeScanner
+        <Camera
+          ratio={'16:9'}
           style={[PageStyle.barCodeScanner, !isIos && PageStyle.barCodeScannerAndroid]}
           onBarCodeScanned={handleBarCodeScanned}>
           <SafeAreaView style={PageStyle.innerView}>
             <View style={PageStyle.iconWrap}>
               <Text style={PageStyle.leftBlock} />
               <TouchableOpacity
+                style={PageStyle.svgWrap}
                 onPress={() => {
                   navigationService.goBack();
                 }}>
@@ -95,7 +96,7 @@ const QrScanner: React.FC<QrScannerProps> = () => {
               <TextM style={[FontStyles.font2, PageStyle.albumText]}>{t('Album')}</TextM>
             </TouchableOpacity>
           </SafeAreaView>
-        </BarCodeScanner>
+        </Camera>
       )}
     </View>
   );
@@ -127,9 +128,8 @@ export const PageStyle = StyleSheet.create({
     height: '100%',
   },
   iconWrap: {
+    marginTop: pTd(16),
     width: '100%',
-    height: pTd(50),
-    marginRight: pTd(25),
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'flex-end',
@@ -137,10 +137,12 @@ export const PageStyle = StyleSheet.create({
   },
   icon: {
     width: pTd(40),
-    marginRight: pTd(5),
+  },
+  svgWrap: {
+    ...GStyles.paddingArg(16, 0, 16, 16),
   },
   scan: {
-    marginTop: pTd(142),
+    marginTop: pTd(136),
     marginLeft: 'auto',
     marginRight: 'auto',
   },

@@ -13,6 +13,7 @@ import SettingHeader from 'pages/components/SettingHeader';
 import { useTranslation } from 'react-i18next';
 import GuardianItems from './components/GuardianItems';
 import { useRecovery } from './hooks/useRecovery';
+import { useRemoveOtherManage } from './hooks/useRemoveOtherManage';
 
 export default function GuardianApproval() {
   const { userGuardianStatus, guardianExpiredTime, opGuardian, preGuardian } = useGuardiansInfo();
@@ -34,7 +35,6 @@ export default function GuardianApproval() {
     return filterVerifiedList;
   }, [opGuardian, preGuardian, state, userGuardianStatus]);
 
-  console.log(userVerifiedList, userGuardianStatus, 'userGuardianStatus==');
   const approvalLength = useMemo(() => {
     return getApprovalCount(userVerifiedList.length);
   }, [userVerifiedList.length]);
@@ -46,13 +46,17 @@ export default function GuardianApproval() {
 
   const handleGuardianRecovery = useRecovery();
 
+  const handleRemoveOtherManage = useRemoveOtherManage();
+
   const recoveryWallet = useCallback(() => {
     if (state && state.indexOf('guardians') !== -1) {
       handleGuardianRecovery();
+    } else if (state && state.indexOf('removeManage') !== -1) {
+      handleRemoveOtherManage();
     } else {
       navigate('/login/set-pin/login');
     }
-  }, [handleGuardianRecovery, navigate, state]);
+  }, [handleGuardianRecovery, handleRemoveOtherManage, navigate, state]);
 
   useEffect(() => {
     if (!guardianExpiredTime) return setIsExpired(false);
@@ -76,6 +80,9 @@ export default function GuardianApproval() {
       } else if ('guardians/add' === state) {
         navigate('/setting/guardians/add', { state: 'back' });
       }
+    } else if (state && state.indexOf('removeManage') !== -1) {
+      const manageAddress = state.split('_')[1];
+      navigate(`/setting/wallet-security/manage-devices/${manageAddress}`);
     } else {
       navigate('/register/start');
     }

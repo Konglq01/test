@@ -5,6 +5,7 @@ export type ActivityStateType = {
   activityMap: ActivityStateMap;
   isFetchingActivities: boolean;
   failedActivityMap: { [transactionId: string]: the2ThFailedActivityItemType };
+  isLoading?: boolean;
 };
 
 export type ActivityStateMap = {
@@ -28,6 +29,8 @@ export interface IActivitiesApiParams {
   transactionTypes?: TransactionTypes[];
   chainId?: string;
   symbol?: string;
+  width?: number;
+  height?: number;
 }
 
 export interface IActivitiesApiResponse {

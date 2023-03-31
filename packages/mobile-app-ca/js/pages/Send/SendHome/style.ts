@@ -11,6 +11,10 @@ export const styles = StyleSheet.create({
     paddingLeft: 0,
     paddingRight: 0,
   },
+  iconStyle: {
+    paddingRight: pTd(24),
+    paddingLeft: pTd(24),
+  },
   group: {
     backgroundColor: defaultColors.bg1,
     marginTop: pTd(24),
@@ -33,6 +37,11 @@ export const styles = StyleSheet.create({
     marginTop: pTd(4),
     marginLeft: pTd(26),
     paddingLeft: pTd(8),
+  },
+  nftErrorMessage: {
+    marginLeft: 0,
+    paddingLeft: 0,
+    textAlign: 'center',
   },
   space: {
     height: pTd(24),

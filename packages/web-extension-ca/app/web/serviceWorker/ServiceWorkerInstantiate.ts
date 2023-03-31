@@ -20,8 +20,11 @@ import InternalMessage from 'messages/InternalMessage';
 import { CreatePromptType, SendResponseFun } from 'types';
 import errorHandler from 'utils/errorHandler';
 import { apis } from 'utils/BrowserApis';
+import SocialLoginController from 'controllers/socialLoginController';
 
 const notificationService = new NotificationService();
+const socialLoginService = new SocialLoginController();
+
 // Get default data in redux
 const store = getStoreState();
 
@@ -161,7 +164,7 @@ export default class ServiceWorkerInstantiate {
           this.openRecaptchaPage(sendResponse, message.payload);
           break;
         case PortkeyMessageTypes.SOCIAL_LOGIN:
-          this.threeWayLogin(sendResponse, message.payload);
+          this.socialLogin(sendResponse, message.payload);
           break;
         case WalletMessageTypes.CONNECT:
           this.connectWallet(sendResponse, message.payload);
@@ -173,7 +176,7 @@ export default class ServiceWorkerInstantiate {
           ServiceWorkerInstantiate.getWalletState(sendResponse);
           break;
         case WalletMessageTypes.SOCIAL_LOGIN:
-          this.getLoginByThreeWay(sendResponse, message.payload);
+          this.getSocialLogin(sendResponse, message.payload);
           break;
 
         default:
@@ -194,9 +197,14 @@ export default class ServiceWorkerInstantiate {
     }
   }
 
-  async threeWayLogin(sendResponse: SendResponseFun, { externalLink }: { externalLink: string }) {
+  async socialLogin(sendResponse: SendResponseFun, { externalLink }: { externalLink: string }) {
     try {
       if (!externalLink) return sendResponse(errorHandler(400001, 'Missing param externalLink'));
+      socialLoginService.startSocialLogin(() => {
+        notificationService.close(errorHandler(200001, 'User Cancel'), 'windows');
+        socialLoginService.finishSocialLogin();
+      });
+
       const result = await notificationService.openPrompt(
         {
           method: PromptRouteTypes.EXPAND_FULL_SCREEN,
@@ -206,16 +214,17 @@ export default class ServiceWorkerInstantiate {
       );
       if (result.error)
         return sendResponse({
-          ...errorHandler(700001),
-          error: (result as any)?.error?.message || result.error || result,
+          ...errorHandler(700001, result),
         });
+
       sendResponse({ ...errorHandler(0), data: (result as any)?.response || result });
     } catch (error) {
       sendResponse(errorHandler(100001, error));
     }
   }
 
-  async getLoginByThreeWay(sendResponse: SendResponseFun, message: any) {
+  async getSocialLogin(sendResponse: SendResponseFun, message: any) {
+    socialLoginService.finishSocialLogin();
     this.notificationServiceClose(sendResponse, { closeParams: message.params, promptType: 'windows' });
   }
 

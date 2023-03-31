@@ -1,13 +1,15 @@
 @import '../../../../assets/theme/color.less';
 
 .balance {
+  overflow-y: overlay;
+
   .wallet-name {
     line-height: 22px;
     color: @font-11;
     font-size: 16px;
     text-align: center;
     font-weight: 500;
-    padding: 21px 0;
+    padding: 21px 24px;
     border-bottom: 1px solid @border-2;
   }
   .balance-amount {
@@ -80,8 +82,12 @@
       cursor: pointer;
       display: flex;
       align-items: center;
-      padding: 25px 16px 24px;
+      padding: 24px 16px;
       border-bottom: 1px solid @border-2;
+
+      @media screen and (min-width: 768px) {
+        padding: 24px;
+      }
 
       .token-logo {
         margin-right: 16px;
@@ -114,40 +120,25 @@
         color: @font-11;
       }
 
-      .info {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        & > span {
-          &:nth-of-type(1) {
+      .desc {
+        width: 100%;
+        .info {
+          flex: 1;
+          display: flex;
+          justify-content: space-between;
+          gap: 4px;
+          & > span {
             font-size: 18px;
             color: @font-11;
             height: 22px;
             line-height: 22px;
           }
-
-          &:nth-of-type(2) {
-            font-size: 14px;
-            color: @font-13;
-            height: 20px;
-            line-height: 20px;
-          }
         }
-      }
-      .amount {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        align-items: flex-end;
-        height: 46px;
-
-        & > p {
-          line-height: 22px;
-          font-size: 18px;
-          color: @font-11;
-        }
-        .convert {
+        .amount {
+          margin-top: 2px;
+          display: flex;
+          justify-content: space-between;
+          gap: 4px;
           line-height: 20px;
           font-size: 14px;
           color: @font-13;
@@ -166,6 +157,10 @@
     align-items: center;
     text-align: center;
     cursor: pointer;
+
+    @media screen and (min-width: 768px) {
+      margin-bottom: 40px;
+    }
 
     div.custom-svg {
       margin-right: 8px;

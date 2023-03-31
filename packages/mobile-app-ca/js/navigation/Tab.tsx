@@ -4,21 +4,18 @@ import DashBoard from 'pages/DashBoard';
 import Svg from 'components/Svg';
 import { defaultColors } from 'assets/theme';
 import { useLanguage } from 'i18n/hooks';
-import MyMenu from 'pages/MyMenu';
+import MyMenu from 'pages/My';
 import { useCurrentWalletInfo } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import useLogOut from 'hooks/useLogOut';
-import HomeScreen from 'pages/Home';
 
 const Tab = createBottomTabNavigator();
 
+type tabMenuIcon = typeof tabMenuList[number]['icon'];
+
 export const tabMenuList = [
   { name: 'Wallet', label: 'Wallet', index: 0, icon: 'logo-icon', component: DashBoard },
-  // ...(__DEV__ ? ([{ name: 'Home', label: 'Home', index: 1, icon: 'logo-icon', component: HomeScreen }] as const) : []),
-  { name: 'Home', label: 'Home', index: 1, icon: 'logo-icon', component: HomeScreen },
   { name: 'Settings', label: 'My', index: 2, icon: 'my', component: MyMenu },
 ] as const;
-
-type tabMenuIcon = typeof tabMenuList[number]['icon'];
 
 export default function TabRoot() {
   const { t } = useLanguage();
@@ -46,6 +43,7 @@ export default function TabRoot() {
           component={ele.component}
           options={{
             title: t(ele.label),
+            tabBarActiveTintColor: defaultColors.font4,
           }}
         />
       ))}

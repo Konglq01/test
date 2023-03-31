@@ -5,6 +5,7 @@ import SendButton from 'components/SendButton';
 import ReceiveButton from 'components/ReceiveButton';
 import { styles } from './style';
 import { useNavigation } from '@react-navigation/native';
+import useEffectOnce from 'hooks/useEffectOnce';
 
 import navigationService from 'utils/navigationService';
 import NoData from 'components/NoData';
@@ -16,19 +17,23 @@ import { FontStyles } from 'assets/theme/styles';
 import { TextXL } from 'components/CommonText';
 import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
 import useRouterParams from '@portkey-wallet/hooks/useRouterParams';
-import { request } from '@portkey-wallet/api/api-did';
+import { useAppCASelector, useAppCommonDispatch } from '@portkey-wallet/hooks';
 import { useCurrentWallet } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import { ActivityItemType } from '@portkey-wallet/types/types-ca/activity';
-import { unitConverter } from '@portkey-wallet/utils/converter';
+import { getActivityListAsync } from '@portkey-wallet/store/store-ca/activity/action';
+import { getCurrentActivityMapKey } from '@portkey-wallet/utils/activity';
+import { IActivitiesApiParams } from '@portkey-wallet/store/store-ca/activity/type';
+import { divDecimals, formatAmountShow, unitConverter } from '@portkey-wallet/utils/converter';
 import { ZERO } from '@portkey-wallet/constants/misc';
 import { transactionTypesForActivityList as transactionList } from '@portkey-wallet/constants/constants-ca/activity';
 import fonts from 'assets/theme/fonts';
+import { fetchTokenListAsync } from '@portkey-wallet/store/store-ca/assets/slice';
+import { formatChainInfoToShow } from '@portkey-wallet/utils';
 
 interface RouterParams {
   tokenInfo: TokenItemShowType;
 }
 
-const MAX_RESULT_COUNT = 10;
 const INIT_PAGE_INFO = {
   curPage: 0,
   total: 0,
@@ -40,7 +45,22 @@ const TokenDetail: React.FC = () => {
   const { tokenInfo } = useRouterParams<RouterParams>();
   const currentWallet = useCurrentWallet();
   const navigation = useNavigation();
-  const [listShow, setListShow] = useState<any[]>([]);
+  const dispatch = useAppCommonDispatch();
+  const activity = useAppCASelector(state => state.activity);
+  const { accountToken } = useAppCASelector(state => state.assets);
+
+  const [reFreshing, setFreshing] = useState(false);
+
+  const currentActivity = useMemo(
+    () => activity?.activityMap?.[getCurrentActivityMapKey(tokenInfo.chainId, tokenInfo.symbol)] ?? {},
+    [activity?.activityMap, tokenInfo.chainId, tokenInfo.symbol],
+  );
+
+  const currentToken = useMemo(() => {
+    return accountToken.accountTokenList.find(
+      ele => ele.symbol === tokenInfo.symbol && ele.chainId === tokenInfo.chainId,
+    );
+  }, [accountToken.accountTokenList, tokenInfo.chainId, tokenInfo.symbol]);
 
   const fixedParamObj = useMemo(
     () => ({
@@ -57,35 +77,21 @@ const TokenDetail: React.FC = () => {
 
   const getActivityList = useCallback(
     async (isInit = false) => {
-      if (!isInit && listShow.length > 0 && listShow.length >= pageInfoRef.current.total) return;
+      const { data, maxResultCount = 10, skipCount = 0, totalRecordCount = 0 } = currentActivity || {};
+      if (!isInit && data?.length >= totalRecordCount) return;
       if (pageInfoRef.current.isLoading) return;
       pageInfoRef.current.isLoading = true;
-      try {
-        const response = await request.activity.activityList({
-          params: {
-            ...fixedParamObj,
-            skipCount: pageInfoRef.current.curPage * MAX_RESULT_COUNT,
-            maxResultCount: MAX_RESULT_COUNT,
-          },
-        });
-        pageInfoRef.current.curPage = pageInfoRef.current.curPage + 1;
-        pageInfoRef.current.total = response.totalRecordCount;
-        console.log('request.activity.activityList:', response);
-        if (isInit) {
-          setListShow(response.data);
-        } else {
-          setListShow(pre => pre.concat(response.data));
-        }
-      } catch (err) {
-        console.log('request.activity.activityList: err', err);
-      }
+      const params: IActivitiesApiParams = {
+        ...fixedParamObj,
+        skipCount: isInit ? 0 : skipCount + maxResultCount,
+        maxResultCount,
+      };
+      await dispatch(getActivityListAsync(params));
       pageInfoRef.current.isLoading = false;
     },
-    [fixedParamObj, listShow.length],
+    [currentActivity, dispatch, fixedParamObj],
   );
 
-  const [currentToken] = useState<TokenItemShowType>(tokenInfo);
-  const [reFreshing, setFreshing] = useState(false);
   const onRefreshList = useCallback(async () => {
     pageInfoRef.current = {
       ...INIT_PAGE_INFO,
@@ -95,7 +101,18 @@ const TokenDetail: React.FC = () => {
     setFreshing(false);
   }, [getActivityList]);
 
-  const balanceShow = `${unitConverter(ZERO.plus(tokenInfo?.balance || 0).div(`1e${tokenInfo.decimals}`))}`;
+  const balanceShow = useMemo(
+    () => `${formatAmountShow(divDecimals(currentToken?.balance || '0', currentToken?.decimals))}`,
+    [currentToken?.balance, currentToken?.decimals],
+  );
+
+  useEffectOnce(() => {
+    getActivityList(true);
+  });
+
+  useEffectOnce(() => {
+    dispatch(fetchTokenListAsync({ caAddresses: currentWallet.walletInfo.caAddressList || [] }));
+  });
 
   return (
     <PageContainer
@@ -104,9 +121,9 @@ const TokenDetail: React.FC = () => {
       titleDom={
         <View>
           <TextXL style={[GStyles.textAlignCenter, FontStyles.font2, fonts.mediumFont]}>{tokenInfo.symbol}</TextXL>
-          <Text style={[GStyles.textAlignCenter, FontStyles.font2, styles.subTitle]}>{`${
-            tokenInfo.chainId === 'AELF' ? 'MainChain' : 'SideChain'
-          } ${tokenInfo.chainId}`}</Text>
+          <Text style={[GStyles.textAlignCenter, FontStyles.font2, styles.subTitle]}>
+            {formatChainInfoToShow(tokenInfo.chainId)}
+          </Text>
         </View>
       }
       safeAreaColor={['blue', 'white']}
@@ -114,37 +131,25 @@ const TokenDetail: React.FC = () => {
       containerStyles={styles.pageWrap}
       scrollViewProps={{ disabled: true }}>
       <View style={styles.card}>
-        <Text style={styles.tokenBalance}>{`${balanceShow} ${tokenInfo.symbol}`}</Text>
+        <Text style={styles.tokenBalance}>{`${balanceShow} ${currentToken?.symbol}`}</Text>
         {/* TODO : multiply rate */}
         {currentWallet?.currentNetwork === 'MAIN' && (
-          <Text style={styles.dollarBalance}>{`$ ${tokenInfo?.balanceInUsd}`}</Text>
+          <Text style={styles.dollarBalance}>{`$ ${currentToken?.balanceInUsd}`}</Text>
         )}
         <View style={styles.buttonGroupWrap}>
           <SendButton themeType="innerPage" sentToken={currentToken} />
           <View style={styles.space} />
-          <ReceiveButton currentTokenInfo={tokenInfo} themeType="innerPage" receiveButton={currentToken} />
+          <ReceiveButton currentTokenInfo={currentToken} themeType="innerPage" receiveButton={currentToken} />
         </View>
       </View>
-      {/* first time loading  */}
-      {/* {isLoadingFirstTime && <Dialog.Loading />} */}
-      {listShow.length === 0 && <NoData noPic message="You have no transactions." />}
+
       <FlashList
         refreshing={reFreshing}
-        data={listShow || []}
+        data={currentActivity?.data || []}
         keyExtractor={(_item, index) => `${index}`}
+        ListEmptyComponent={<NoData noPic message="You have no transactions." />}
         renderItem={({ item }: { item: ActivityItemType }) => {
-          return (
-            <TransferItem
-              item={item}
-              onPress={() =>
-                navigationService.navigate('ActivityDetail', {
-                  transactionId: item.transactionId,
-                  blockHash: item.blockHash,
-                  isReceived: item.isReceived,
-                })
-              }
-            />
-          );
+          return <TransferItem item={item} onPress={() => navigationService.navigate('ActivityDetail', item)} />;
         }}
         onRefresh={() => {
           onRefreshList();

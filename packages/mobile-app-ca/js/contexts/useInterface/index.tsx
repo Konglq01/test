@@ -5,6 +5,8 @@ import usePrevious from 'hooks/usePrevious';
 import React, { createContext, useContext, useEffect, useMemo, useReducer } from 'react';
 import { InterfaceActions, setCurrentInterface } from './actions';
 import { State } from './types';
+import * as Google from 'expo-auth-session/providers/google';
+import Config from 'react-native-config';
 
 const INITIAL_STATE = {};
 const InterfaceContext = createContext<any>(INITIAL_STATE);
@@ -41,6 +43,11 @@ export default function Provider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
   const currentNetwork = useCurrentNetwork();
   const prevRpcUrl = usePrevious(currentNetwork.rpcUrl);
+  const [googleRequest, response, promptAsync] = Google.useAuthRequest({
+    iosClientId: Config.GOOGLE_IOS_CLIENT_ID,
+    androidClientId: Config.GOOGLE_ANDROID_CLIENT_ID,
+    shouldAutoExchangeCode: false,
+  });
   useEffect(() => {
     if (currentNetwork.chainType === 'aelf') {
       if (prevRpcUrl !== currentNetwork.rpcUrl) dispatch(setCurrentInterface(getAelfInstance(currentNetwork.rpcUrl)));
@@ -49,7 +56,11 @@ export default function Provider({ children }: { children: React.ReactNode }) {
     }
   }, [currentNetwork.chainType, currentNetwork.rpcUrl, prevRpcUrl]);
   return (
-    <InterfaceContext.Provider value={useMemo(() => [state, dispatch], [state, dispatch])}>
+    <InterfaceContext.Provider
+      value={useMemo(
+        () => [{ ...state, googleRequest, response, promptAsync }, dispatch],
+        [state, googleRequest, response, promptAsync],
+      )}>
       {children}
     </InterfaceContext.Provider>
   );

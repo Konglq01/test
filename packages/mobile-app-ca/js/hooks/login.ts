@@ -1,8 +1,13 @@
 import { CurrentWalletType } from '@portkey-wallet/hooks/hooks-ca/wallet';
-import { createWallet, setCAInfo, setManagerInfo } from '@portkey-wallet/store/store-ca/wallet/actions';
+import {
+  createWallet,
+  getChainListAsync,
+  setCAInfo,
+  setManagerInfo,
+} from '@portkey-wallet/store/store-ca/wallet/actions';
 import { CAInfo, LoginType, ManagerInfo } from '@portkey-wallet/types/types-ca/wallet';
-import { VerificationType, VerifierInfo } from '@portkey-wallet/types/verifier';
-import { sleep } from '@portkey-wallet/utils';
+import { AuthenticationInfo, VerificationType, VerifierInfo } from '@portkey-wallet/types/verifier';
+import { handleErrorCode, sleep } from '@portkey-wallet/utils';
 import Loading from 'components/Loading';
 import AElf from 'aelf-sdk';
 import { DefaultChainId } from '@portkey-wallet/constants/constants-ca/network';
@@ -17,11 +22,18 @@ import useEffectOnce from './useEffectOnce';
 import { setCredentials } from 'store/user/actions';
 import { DigitInputInterface } from 'components/DigitInput';
 import { GuardiansApproved } from 'pages/Guardian/types';
-import { DEVICE_TYPE } from 'constants/common';
+import { useGetDeviceInfo } from './device';
+import { extraDataEncode } from '@portkey-wallet/utils/device';
+import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
+import { useGetGuardiansInfo, useGetVerifierServers } from './guardian';
+import { handleUserGuardiansList } from '@portkey-wallet/utils/guardian';
+import { useLanguage } from 'i18n/hooks';
 
 export function useOnManagerAddressAndQueryResult() {
+  const { t } = useLanguage();
   const dispatch = useAppDispatch();
   const biometricsReady = useBiometricsReady();
+  const getDeviceInfo = useGetDeviceInfo();
   const timer = useRef<TimerResult>();
   useEffectOnce(() => {
     return () => {
@@ -45,7 +57,7 @@ export function useOnManagerAddressAndQueryResult() {
       verifierInfo?: VerifierInfo;
       guardiansApproved?: GuardiansApproved;
     }) => {
-      Loading.show();
+      Loading.show({ text: t('Creating address on the chain...') });
       await sleep(1000);
       const isRecovery = managerInfo.verificationType === VerificationType.communityRecovery;
       try {
@@ -53,7 +65,7 @@ export function useOnManagerAddressAndQueryResult() {
         let data: any = {
           loginGuardianIdentifier: managerInfo.loginAccount,
           manager: tmpWalletInfo.address,
-          extraData: `${DEVICE_TYPE},${Date.now()}`,
+          extraData: extraDataEncode(getDeviceInfo()),
           context: {
             clientId: tmpWalletInfo.address,
             requestId: tmpWalletInfo.address,
@@ -73,7 +85,8 @@ export function useOnManagerAddressAndQueryResult() {
             ...data,
           };
         }
-        console.log(data, JSON.stringify(data), managerInfo, '====data');
+        console.log(data, '====data');
+
         const req = await fetch({
           data,
         });
@@ -115,7 +128,7 @@ export function useOnManagerAddressAndQueryResult() {
               );
               navigationService.reset('Tab');
             },
-            onFail: (message: string) => onResultFail(dispatch, message, isRecovery),
+            onFail: (message: string) => onResultFail(dispatch, message, isRecovery, true),
           });
         }
       } catch (error) {
@@ -124,10 +137,65 @@ export function useOnManagerAddressAndQueryResult() {
         pinRef?.current?.reset();
       }
     },
-    [biometricsReady, dispatch, onIntervalGetResult],
+    [biometricsReady, dispatch, getDeviceInfo, onIntervalGetResult, t],
   );
 }
 
 export function useIntervalGetResult() {
   return useCallback((params: IntervalGetResultParams) => intervalGetResult(params), []);
+}
+
+type LoginParams = {
+  loginAccount: string;
+  loginType?: LoginType;
+  authenticationInfo?: AuthenticationInfo;
+  showLoginAccount?: string;
+};
+
+export function useOnLogin() {
+  const chainInfo = useCurrentChain('AELF');
+  const dispatch = useAppDispatch();
+  const getVerifierServers = useGetVerifierServers();
+  const getGuardiansInfo = useGetGuardiansInfo();
+  return useCallback(
+    async (params: LoginParams) => {
+      const { loginAccount, loginType = LoginType.Email, authenticationInfo, showLoginAccount } = params;
+      try {
+        let _chainInfo;
+        if (!chainInfo) {
+          const chainList = await dispatch(getChainListAsync());
+          if (Array.isArray(chainList.payload)) _chainInfo = chainList.payload[1];
+        }
+        const verifierServers = await getVerifierServers(_chainInfo);
+        const holderInfo = await getGuardiansInfo({ guardianIdentifier: loginAccount }, _chainInfo);
+        if (holderInfo?.guardianAccounts || holderInfo?.guardianList) {
+          // login
+          navigationService.navigate('GuardianApproval', {
+            loginAccount,
+            userGuardiansList: handleUserGuardiansList(holderInfo, verifierServers),
+            authenticationInfo,
+          });
+        } else {
+          navigationService.navigate('SelectVerifier', {
+            showLoginAccount: showLoginAccount || loginAccount,
+            loginAccount,
+            loginType,
+            authenticationInfo,
+          });
+        }
+      } catch (error) {
+        if (handleErrorCode(error) === '3002') {
+          navigationService.navigate('SelectVerifier', {
+            showLoginAccount: showLoginAccount || loginAccount,
+            loginAccount,
+            loginType,
+            authenticationInfo,
+          });
+        } else {
+          throw error;
+        }
+      }
+    },
+    [chainInfo, dispatch, getGuardiansInfo, getVerifierServers],
+  );
 }

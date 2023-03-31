@@ -1,5 +1,5 @@
 import { View, TouchableOpacity, ViewStyle, StyleProp } from 'react-native';
-import React, { ReactNode, useMemo } from 'react';
+import React, { ReactNode, useEffect, useMemo } from 'react';
 import Svg from 'components/Svg';
 import { blueStyles, hideTitleStyles, whitStyles } from './style/index.style';
 import { useNavigation } from '@react-navigation/native';
@@ -19,6 +19,7 @@ export type CustomHeaderProps = {
   rightDom?: ReactNode;
   backTitle?: string;
   leftCallback?: () => void;
+  onGestureStartCallback?: () => void;
   type?: 'leftBack' | 'default';
   leftIconType?: 'close' | 'back';
   style?: StyleProp<ViewStyle>;
@@ -37,6 +38,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = props => {
     themeType = 'white',
     style,
     leftIconType = 'back',
+    onGestureStartCallback,
   } = props;
 
   // theme change
@@ -54,7 +56,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = props => {
         color={styles.leftBackTitle.color}
         icon={isClose ? 'close2' : 'left-arrow'}
         size={pTd(20)}
-        iconStyle={GStyles.marginRight(pTd(4))}
+        iconStyle={GStyles.marginRight(4)}
       />
     );
   }, [leftIconType, styles.leftBackTitle.color]);
@@ -65,19 +67,32 @@ const CustomHeader: React.FC<CustomHeaderProps> = props => {
     }
     return false;
   });
+  useEffect(() => {
+    if (onGestureStartCallback) {
+      const unsubscribe = navigation.addListener('gestureStart' as any, () => {
+        onGestureStartCallback();
+      });
+      return unsubscribe;
+    }
+  }, [navigation, onGestureStartCallback]);
+
   const letElement = useMemo(() => {
     if (leftDom) return leftDom;
-    if (!isCanGoBack) return null;
+    if (!isCanGoBack && !leftCallback) return null;
     const onPress = leftCallback ? leftCallback : () => navigationService.goBack();
     if (type === 'leftBack') {
       return (
-        <TouchableOpacity style={[GStyles.flexRow, GStyles.itemCenter]} onPress={onPress}>
+        <TouchableOpacity style={[GStyles.flexRowWrap, GStyles.itemCenter, { padding: pTd(16) }]} onPress={onPress}>
           {leftIcon}
           <TextL style={styles.leftBackTitle}>{t(backTitle)}</TextL>
         </TouchableOpacity>
       );
     }
-    return <TouchableOpacity onPress={onPress}>{leftIcon}</TouchableOpacity>;
+    return (
+      <TouchableOpacity onPress={onPress} style={{ padding: pTd(16) }}>
+        {leftIcon}
+      </TouchableOpacity>
+    );
   }, [backTitle, isCanGoBack, leftCallback, leftDom, leftIcon, styles.leftBackTitle, t, type]);
 
   const centerElement = useMemo(() => {

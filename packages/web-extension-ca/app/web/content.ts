@@ -143,7 +143,7 @@ class Content {
     (document.head || document.documentElement).appendChild(script);
     console.log(script.src, 'injectInteractionScript');
     script.onload = () => {
-      console.log('portKey inject.js onload!!!');
+      console.log('portKey_did inject.js onload!!!');
       script.remove();
     };
   }

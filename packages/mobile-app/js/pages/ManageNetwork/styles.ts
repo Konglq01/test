@@ -13,7 +13,7 @@ const styles = StyleSheet.create({
   inputWrap: {
     width: '100%',
     backgroundColor: defaultColors.bg5,
-    ...GStyles.paddingArg(0, pTd(16), 16),
+    ...GStyles.paddingArg(0, 16, 16),
   },
 });
 export default styles;

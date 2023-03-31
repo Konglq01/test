@@ -1,4 +1,4 @@
-import { DeviceType } from '@portkey-wallet/types/types-ca/wallet';
+import { DeviceType } from '@portkey-wallet/types/types-ca/device';
 
 export const prefixCls = 'portkey';
 // redux
@@ -19,14 +19,22 @@ export const ACK_KEEP_ALIVE_WAIT_TIME = 60_000;
 
 // device
 export const DEVICE_TYPE = (() => {
-  if (!navigator?.userAgent) return DeviceType.other;
+  if (!navigator?.userAgent) return DeviceType.OTHER;
   const agent = navigator.userAgent.toLowerCase();
   const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
   if (isMac) {
-    return DeviceType.mac;
+    return DeviceType.MAC;
   }
   if (agent.indexOf('win') >= 0 || agent.indexOf('wow') >= 0) {
-    return DeviceType.windows;
+    return DeviceType.WINDOWS;
   }
-  return DeviceType.other;
+  return DeviceType.OTHER;
 })();
+
+// NFT
+export const PAGE_SIZE_IN_NFT_ITEM_PROMPT = 6;
+
+// JOIN AUTH URL
+export const AUTH_HOST = 'https://test.portkey.finance';
+export const JOIN_AUTH_URL = `${AUTH_HOST}/join`;
+export const AUTH_APPLE_URL = `${AUTH_HOST}/apple-auth`;

@@ -3,6 +3,7 @@ import { AppState, AppStateStatus, NativeEventSubscription } from 'react-native'
 import BackgroundTimer from 'react-native-background-timer';
 import navigationService from './navigationService';
 import { getWalletAddress } from './redux';
+export let canLock = true;
 
 export default class LockManager {
   lockTime: number;
@@ -23,7 +24,6 @@ export default class LockManager {
   handleAppStateChange = async (nextAppState: AppStateStatus) => {
     // Don't auto-lock
     if (this.lockTime === Infinity) return;
-
     if (nextAppState !== 'active') {
       // Auto-lock immediately
       if (this.lockTime === 0) {
@@ -59,10 +59,14 @@ export default class LockManager {
   };
 
   lockApp = async () => {
-    this.gotoLockScreen();
+    canLock && this.gotoLockScreen();
   };
 
   stopListening() {
     this.listener.remove();
   }
+}
+
+export function changeCanLock(value: boolean) {
+  canLock = value;
 }

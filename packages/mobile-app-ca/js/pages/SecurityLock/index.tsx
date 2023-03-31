@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AppState, AppStateStatus } from 'react-native';
+import { AppState, AppStateStatus, StyleSheet } from 'react-native';
 import { useAppDispatch } from 'store/hooks';
 import { setCredentials } from 'store/user/actions';
 import { useUser } from 'hooks/store';
@@ -113,6 +113,7 @@ export default function SecurityLock() {
     },
     [caInfo, dispatch, handleRouter, isSyncCAInfo, managerInfo, onIntervalGetResult],
   );
+
   const verifyBiometrics = useDebounceCallback(
     async () => {
       if (!biometrics || (verifyTime && verifyTime + 1000 > new Date().getTime())) return;
@@ -164,8 +165,21 @@ export default function SecurityLock() {
     [errorMessage, handlePassword],
   );
   return (
-    <PageContainer hideHeader>
-      <PinContainer ref={digitInput} title="Enter Pin" onChangeText={onChangeText} errorMessage={errorMessage} />
+    <PageContainer hideHeader containerStyles={styles.container} scrollViewProps={{ disabled: true }}>
+      <PinContainer
+        ref={digitInput}
+        title="Enter Pin"
+        onChangeText={onChangeText}
+        errorMessage={errorMessage}
+        isBiometrics={biometrics && biometricsReady}
+        onBiometricsPress={verifyBiometrics}
+      />
     </PageContainer>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});

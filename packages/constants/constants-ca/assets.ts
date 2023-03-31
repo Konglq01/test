@@ -4,7 +4,7 @@ export enum TransactionError {
   TOKEN_NOT_ENOUGH = 'Insufficient funds',
   NFT_NOT_ENOUGH = 'Insufficient quantity',
   FEE_NOT_ENOUGH = 'Insufficient funds for transaction fee',
-  CROSS_NOT_ENOUGH = 'Insufficient funds for cross chain transaction fee',
+  CROSS_NOT_ENOUGH = 'Insufficient funds for cross-chain transaction fee',
 }
 
 export const REFRESH_TIME = 5 * 60 * 1000; // 5min refresh
@@ -26,3 +26,7 @@ export const NEW_CLIENT_MOCK_ELF_LIST: TokenItemShowType[] = [
 export const PAGE_SIZE_IN_NFT_ITEM = 9;
 
 export const ELF_SYMBOL = 'ELF';
+
+export const NFT_SMALL_SIZE = 144;
+export const NFT_MIDDLE_SIZE = 294;
+export const NFT_LARGE_SIZE = 1008;

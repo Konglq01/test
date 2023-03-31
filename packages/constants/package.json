@@ -9,7 +9,7 @@
     "prebuild": "rm -rf dist",
     "build": "tsc",
     "start": "tsc --watch",
-    "handle-network": "cd ./scripts && node handleNetwork.js && cd .."
+    "handle-network": "cd ./scripts && node handleNetwork.js"
   },
   "dependencies": {
     "@portkey-wallet/types": "^0.0.1"

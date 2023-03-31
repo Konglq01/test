@@ -17,7 +17,7 @@ export default function Entrance() {
     <ImageBackground resizeMode="cover" style={styles.imgBox} source={background}>
       <SafeAreaBox style={styles.safeAreaBox}>
         <CommonButton
-          containerStyle={GStyles.paddingTop(pTd(16))}
+          containerStyle={GStyles.paddingTop(16)}
           type="outline"
           onPress={() => navigationService.navigate('ImportWallet')}>
           {t('Access Existing Wallet')}

@@ -21,3 +21,5 @@ export const NetworkList: NetworkItem[] = [
 ];
 
 export const DefaultChainId = 'AELF';
+
+export const OfficialWebsite = 'https://portkey.finance';

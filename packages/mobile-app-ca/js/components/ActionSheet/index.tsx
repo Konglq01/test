@@ -51,9 +51,10 @@ type AlertBodyProps = {
   message?: ReactNode;
   message2?: ReactNode;
   buttons?: ButtonRowProps['buttons'];
+  autoClose?: boolean;
 };
 
-function AlertBody({ title, message, buttons, message2, title2 }: AlertBodyProps) {
+function AlertBody({ title, message, buttons, message2, title2, autoClose = true }: AlertBodyProps) {
   return (
     <View style={styles.alertBox}>
       {title ? <TextTitle style={styles.alertTitle}>{title}</TextTitle> : null}
@@ -64,7 +65,7 @@ function AlertBody({ title, message, buttons, message2, title2 }: AlertBodyProps
         buttons={buttons?.map(i => ({
           ...i,
           onPress: () => {
-            OverlayModal.hide();
+            if (autoClose) OverlayModal.hide();
             i.onPress?.();
           },
         }))}

@@ -1,7 +1,7 @@
 import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
 import { ZERO } from '@portkey-wallet/constants/misc';
 import { useSymbolImages } from '@portkey-wallet/hooks/hooks-ca/useToken';
-import { unitConverter } from '@portkey-wallet/utils/converter';
+import { divDecimals, formatAmountShow, unitConverter } from '@portkey-wallet/utils/converter';
 import { defaultColors } from 'assets/theme';
 import { FontStyles } from 'assets/theme/styles';
 import CommonAvatar from 'components/CommonAvatar';
@@ -25,6 +25,7 @@ const TokenListItem: React.FC<TokenListItemType> = props => {
   return (
     <TouchableOpacity style={itemStyle.wrap} onPress={() => onPress?.(item)}>
       <CommonAvatar
+        hasBorder
         style={itemStyle.left}
         title={item?.symbol}
         avatarSize={pTd(48)}
@@ -36,7 +37,7 @@ const TokenListItem: React.FC<TokenListItemType> = props => {
           <TextL numberOfLines={1} ellipsizeMode={'tail'} style={itemStyle.tokenName}>
             {item?.symbol}
           </TextL>
-          <TextS numberOfLines={1} style={[FontStyles.font7, itemStyle.chainInfo]}>
+          <TextS numberOfLines={1} style={[FontStyles.font3, itemStyle.chainInfo]}>
             {formatChainInfoToShow(item?.chainId, currentNetwork)}
           </TextS>
         </View>
@@ -44,7 +45,7 @@ const TokenListItem: React.FC<TokenListItemType> = props => {
         {!noBalanceShow && (
           <View style={itemStyle.balanceWrap}>
             <TextL style={itemStyle.token} numberOfLines={1} ellipsizeMode={'tail'}>
-              {unitConverter(ZERO.plus(item?.balance).div(`1e${item.decimals}`))}
+              {formatAmountShow(divDecimals(item?.balance, item.decimals))}
             </TextL>
             <TextS numberOfLines={1} ellipsizeMode={'tail'} style={itemStyle.dollar}>
               {currentNetwork === 'MAIN' &&
