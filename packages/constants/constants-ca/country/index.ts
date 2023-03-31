@@ -45,4 +45,4 @@ export const countryCodeFilter = (filterFelid: string) => {
   }
 };
 
-export const DefaultCountry = { country: 'China', code: '86', iso: 'CN' };
+export const DefaultCountry = { country: 'Hong Kong', code: '852', iso: 'HK' };
