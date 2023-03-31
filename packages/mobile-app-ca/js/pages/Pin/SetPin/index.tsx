@@ -11,6 +11,7 @@ import myEvents from 'utils/deviceEvent';
 import { AElfWallet } from '@portkey-wallet/types/aelf';
 import PinContainer from 'components/PinContainer';
 import { GuardiansApproved } from 'pages/Guardian/types';
+import { StyleSheet } from 'react-native';
 
 type RouterParams = {
   oldPin?: string;
@@ -21,7 +22,9 @@ type RouterParams = {
   guardiansApproved?: GuardiansApproved;
 };
 
-const scrollViewProps = {};
+const scrollViewProps = {
+  disabled: true,
+};
 const MessageMap: any = {
   [VerificationType.register]: 'Are you sure you want to leave this page? All changes will not be saved.',
   [VerificationType.communityRecovery]:
@@ -69,7 +72,8 @@ export default function SetPin() {
       titleDom
       type="leftBack"
       backTitle={oldPin ? 'Change Pin' : undefined}
-      leftCallback={leftCallback}>
+      leftCallback={leftCallback}
+      containerStyles={styles.container}>
       <PinContainer
         showHeader
         ref={digitInput}
@@ -89,3 +93,9 @@ export default function SetPin() {
     </PageContainer>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});

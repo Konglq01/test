@@ -54,7 +54,7 @@ export default function ShowPrivateKey() {
                   const isCopy = await setStringAsync(mnemonic);
                   isCopy && CommonToast.success(i18n.t('Copy Success'));
                 }}
-                style={[styles.copyRow, GStyles.flexRow, GStyles.itemCenter]}>
+                style={[styles.copyRow, GStyles.flexRowWrap, GStyles.itemCenter]}>
                 <Svg icon="copy" size={pTd(12)} />
                 <TextS style={styles.primaryText}>{t('Copy')}</TextS>
               </Touchable>
@@ -74,7 +74,7 @@ export default function ShowPrivateKey() {
           <TextL style={[styles.tipText, fonts.mediumFont, styles.tipTitle]}>
             {t('DO NOT SHARE THIS PHRASE WITH ANYONE!2')}
           </TextL>
-          <TextM style={[styles.tipText, GStyles.marginTop(pTd(8))]}>
+          <TextM style={[styles.tipText, GStyles.marginTop(8)]}>
             {t('These words can be used to steal all your accounts.')}
           </TextM>
         </View>
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   mnemonicTipText: {
-    ...GStyles.marginArg(8, pTd(10), 32),
+    ...GStyles.marginArg(8, 10, 32),
     color: defaultColors.font3,
   },
 });

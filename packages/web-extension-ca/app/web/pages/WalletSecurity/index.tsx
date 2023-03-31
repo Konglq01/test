@@ -4,27 +4,30 @@ import { useTranslation } from 'react-i18next';
 import BackHeader from 'components/BackHeader';
 import CustomSvg from 'components/CustomSvg';
 import MenuItem from 'components/MenuItem';
+import { useDeviceList } from '@portkey-wallet/hooks/hooks-ca/wallet';
 import './index.less';
-
-interface MenuItemInfo {
-  label: string;
-  click: () => void;
-}
 
 export default function WalletSecurity() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { deviceList } = useDeviceList();
 
-  const MenuList: MenuItemInfo[] = useMemo(
+  const MenuList = useMemo(
     () => [
       {
-        label: t('Manage Devices'),
+        key: t('Login Devices'),
+        label: (
+          <div className="flex manage-device">
+            <span>{t('Login Devices')}</span>
+            <span className="number">{deviceList.length}</span>
+          </div>
+        ),
         click: () => {
           navigate('/setting/wallet-security/manage-devices');
         },
       },
     ],
-    [navigate, t],
+    [deviceList.length, navigate, t],
   );
 
   return (
@@ -47,8 +50,8 @@ export default function WalletSecurity() {
       </div>
       <div className="menu-list">
         {MenuList.map((item) => (
-          <MenuItem key={item.label} height={53} onClick={item.click}>
-            {t(item.label)}
+          <MenuItem key={item.key} height={53} onClick={item.click}>
+            {item.label}
           </MenuItem>
         ))}
       </div>

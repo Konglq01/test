@@ -16,4 +16,5 @@ export default {
     target: '/api/app/account/nickname',
     config: { method: 'PUT' },
   },
+  pullNotify: 'api/app/notify/pullNotify',
 } as const;

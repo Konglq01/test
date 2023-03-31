@@ -21,7 +21,7 @@ export default function NFTInfo({ nftItem = { alias: '', balance: 0 } }: AmountN
     <View style={styles.wrap}>
       <CommonAvatar
         shapeType="square"
-        imageUrl={nftItem.imageUrl}
+        imageUrl={nftItem?.imageUrl}
         title={nftItem?.alias || ''}
         avatarSize={pTd(56)}
         style={styles.avatar}
@@ -38,7 +38,7 @@ export const styles = StyleSheet.create({
   wrap: {
     paddingTop: pTd(12),
     paddingBottom: pTd(16),
-    ...GStyles.flexRow,
+    ...GStyles.flexRowWrap,
     alignItems: 'center',
   },
   avatar: {

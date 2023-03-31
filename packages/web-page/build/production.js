@@ -7,13 +7,5 @@ module.exports = {
       exclude: ['error'],
     },
   },
-  experimental: {
-    'react-use': {
-      transform: 'react-use/lib/{{member}}',
-    },
-    lodash: {
-      transform: 'lodash/{{member}}',
-    },
-  },
   resolve: {},
 };

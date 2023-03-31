@@ -10,9 +10,7 @@ import { formatChainInfoToShow, formatStr2EllipsisStr } from '@portkey-wallet/ut
 import { pTd } from 'utils/unit';
 import { ActivityItemType } from '@portkey-wallet/types/types-ca/activity';
 import { TransactionTypes, transactionTypesMap } from '@portkey-wallet/constants/constants-ca/activity';
-import { unitConverter } from '@portkey-wallet/utils/converter';
-import { ZERO } from '@portkey-wallet/constants/misc';
-import { SvgUri } from 'react-native-svg';
+import { AmountSign, divDecimals, formatAmountShow, formatWithCommas } from '@portkey-wallet/utils/converter';
 import CommonButton from 'components/CommonButton';
 import { useAppCASelector } from '@portkey-wallet/hooks/hooks-ca';
 import Loading from 'components/Loading';
@@ -27,13 +25,13 @@ import { usePin } from 'hooks/store';
 import ActionSheet from 'components/ActionSheet';
 import CommonToast from 'components/CommonToast';
 import { addressFormat } from '@portkey-wallet/utils';
+import CommonAvatar from 'components/CommonAvatar';
+import { HIDDEN_TRANSACTION_TYPES } from '@portkey-wallet/constants/constants-ca/activity';
 
 interface ActivityItemPropsType {
   item?: ActivityItemType;
   onPress?: (item: any) => void;
 }
-
-const hiddenArr = [TransactionTypes.SOCIAL_RECOVERY, TransactionTypes.ADD_MANAGER, TransactionTypes.REMOVE_MANAGER];
 
 const ActivityItem: React.FC<ActivityItemPropsType> = ({ item, onPress }) => {
   const { t } = useLanguage();
@@ -44,12 +42,12 @@ const ActivityItem: React.FC<ActivityItemPropsType> = ({ item, onPress }) => {
   const dispatch = useAppDispatch();
 
   const amountString = useMemo(() => {
-    const { amount = '', isReceived, decimals = '', symbol } = item || {};
-    let _amountString = '';
-    if (amount) _amountString += isReceived ? '+' : '-';
-    _amountString += unitConverter(ZERO.plus(amount).div(`1e${decimals}`));
-    _amountString += symbol ? ` ${symbol}` : '';
-    return _amountString;
+    const { amount = '', isReceived, decimals = 8, symbol } = item || {};
+    let prefix = ' ';
+
+    if (amount) prefix = isReceived ? AmountSign.PLUS : AmountSign.MINUS;
+
+    return `${prefix} ${formatAmountShow(divDecimals(amount, Number(decimals)))}${symbol ? ' ' + symbol : ''}`;
   }, [item]);
 
   const showRetry = useCallback(
@@ -109,7 +107,13 @@ const ActivityItem: React.FC<ActivityItemPropsType> = ({ item, onPress }) => {
     <TouchableOpacity style={itemStyle.itemWrap} onPress={() => onPress?.(item)}>
       <Text style={itemStyle.time}>{formatTransferTime(Number(item?.timestamp) * 1000)}</Text>
       <View style={itemStyle.contentWrap}>
-        {<SvgUri style={itemStyle.left} width={pTd(32)} height={pTd(32)} uri={item?.listIcon || ''} />}
+        <CommonAvatar
+          style={itemStyle.left}
+          svgName={
+            HIDDEN_TRANSACTION_TYPES.includes(item?.transactionType as TransactionTypes) ? 'Contract' : 'transfer'
+          }
+          avatarSize={pTd(32)}
+        />
 
         <View style={itemStyle.center}>
           <Text style={itemStyle.centerType}>
@@ -121,7 +125,7 @@ const ActivityItem: React.FC<ActivityItemPropsType> = ({ item, onPress }) => {
             {formatStr2EllipsisStr(addressFormat(item?.fromAddress, item?.fromChainId), 10)}
           </Text>
 
-          {item?.transactionType && !hiddenArr.includes(item?.transactionType) && (
+          {item?.transactionType && !HIDDEN_TRANSACTION_TYPES.includes(item?.transactionType) && (
             <Text style={[itemStyle.centerStatus, FontStyles.font3]}>
               {formatChainInfoToShow(item?.fromChainId)}
               {'-->'}
@@ -182,6 +186,7 @@ const itemStyle = StyleSheet.create({
     width: pTd(32),
     height: pTd(32),
     borderWidth: 0,
+    backgroundColor: defaultColors.bg1,
   },
   center: {
     flex: 1,

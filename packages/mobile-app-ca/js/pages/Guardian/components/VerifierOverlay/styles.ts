@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
   itemRow: {
     paddingVertical: 20,
     paddingHorizontal: pTd(24),
-    borderBottomWidth: 1,
+    borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: defaultColors.border4,
   },
   itemName: {

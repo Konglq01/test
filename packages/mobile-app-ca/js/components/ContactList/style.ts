@@ -3,7 +3,7 @@ import GStyles from 'assets/theme/GStyles';
 import { defaultColors } from 'assets/theme';
 import { pTd } from 'utils/unit';
 
-const { font2 } = defaultColors;
+const { font2, bg1 } = defaultColors;
 
 export const styles = StyleSheet.create({
   listWrap: {
@@ -37,8 +37,11 @@ export const styles = StyleSheet.create({
     color: font2,
   },
   sectionIndex: {
-    height: 30,
+    height: pTd(30),
     lineHeight: pTd(22),
     ...GStyles.paddingArg(8, 20, 0),
+  },
+  sectionIndexWrap: {
+    backgroundColor: bg1,
   },
 });

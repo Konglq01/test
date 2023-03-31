@@ -1,26 +1,16 @@
 import { useCurrentNetwork } from '@portkey-wallet/hooks/network';
-import { AccountType } from '@portkey-wallet/types/wallet';
-import { addressFormat } from '@portkey-wallet/utils';
 import { ScreenWidth } from '@rneui/base';
 import { defaultColors } from 'assets/theme';
 import { TextM } from 'components/CommonText';
-import Svg from 'components/Svg';
 import React from 'react';
 import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
-import QRCode from 'react-native-qrcode-svg';
 import { pTd } from 'utils/unit';
 import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
 import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
-import { SendTokenQRDataType } from '@portkey-wallet/types/types-ca/qrcode';
+import { shrinkSendQrData, QRCodeDataObjType } from '@portkey-wallet/utils/qrCode';
+import CommonQRCodeStyled from 'components/CommonQRCodeStyled';
 
 const cardWidth = ScreenWidth * 0.63;
-
-// const info = {
-//   chainId: 'ELF',
-//   tokenSymbol: 'xxx',
-//   caAddress: 'xxxx',
-//   networkType: 'MAIN',
-// };
 
 export default function AccountCard({
   tokenInfo,
@@ -32,11 +22,9 @@ export default function AccountCard({
   style?: StyleProp<ViewStyle>;
 }) {
   const { chainType } = useCurrentNetwork();
-  // const address = addressFormat(account.address, chainId, chainType);
-
   const currentNetWork = useCurrentNetworkInfo();
 
-  const info: SendTokenQRDataType = {
+  const info: QRCodeDataObjType = {
     address: toCaAddress,
     netWorkType: currentNetWork.networkType,
     chainType,
@@ -55,10 +43,7 @@ export default function AccountCard({
 
   return (
     <View style={[styles.container, style]}>
-      <View style={styles.logoBox}>
-        <Svg size={ScreenWidth * 0.13} icon="logo-icon" color={defaultColors.font9} />
-      </View>
-      <QRCode size={cardWidth} value={JSON.stringify(info)} />
+      <CommonQRCodeStyled qrData={JSON.stringify(shrinkSendQrData(info))} />
       <TextM style={styles.textStyle}>{toCaAddress}</TextM>
     </View>
   );
@@ -87,10 +72,10 @@ const styles = StyleSheet.create({
   logoBox: {
     position: 'absolute',
     zIndex: 99,
-    padding: pTd(14),
-    borderRadius: pTd(4),
+    padding: pTd(6),
+    borderRadius: pTd(6),
     backgroundColor: defaultColors.bg1,
     alignSelf: 'center',
-    top: ScreenWidth * 0.27,
+    top: ScreenWidth * 0.3,
   },
 });

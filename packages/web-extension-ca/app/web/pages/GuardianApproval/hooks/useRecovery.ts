@@ -38,7 +38,7 @@ export const useRecovery = () => {
 
   return useCallback(async () => {
     try {
-      setLoading(true);
+      setLoading(true, 'Processing on the chain...');
       const privateKey = aes.decrypt(walletInfo.AESEncryptPrivateKey, passwordSeed);
       if (!currentChain?.endPoint || !privateKey) return message.error('handle guardian error');
       let value;
@@ -55,7 +55,7 @@ export const useRecovery = () => {
         default:
           value = {};
       }
-      const result = await handleGuardian({
+      await handleGuardian({
         rpcUrl: currentChain.endPoint,
         chainType: currentNetwork.walletType,
         address: currentChain.caContractAddress,

@@ -66,7 +66,7 @@ const PayComponents = (props: { callBack?: (v: boolean) => void }) => {
             <TextM>cancel</TextM>
           </TouchableOpacity>
         </View>
-        <Password maxLength={6} style={GStyles.marginArg(pTd(25), 0, pTd(15), 0)} onChange={onChange} />
+        <Password maxLength={6} style={GStyles.marginArg(25, 0, 15, 0)} onChange={onChange} />
         <View style={styles.payTipsBox}>
           {pwTip ? <TextM style={[GStyles.pwTip, styles.tips]}>Wrong password</TextM> : null}
         </View>

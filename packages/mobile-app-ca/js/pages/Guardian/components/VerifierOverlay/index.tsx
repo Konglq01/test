@@ -25,12 +25,12 @@ const VerifierList = ({ verifierList, callBack, selectedVerifier }: VerifierList
           return (
             <Touchable
               key={item.name}
-              style={[GStyles.flexRow, GStyles.itemCenter, styles.itemRow]}
+              style={[GStyles.flexRowWrap, GStyles.itemCenter, styles.itemRow]}
               onPress={() => {
                 OverlayModal.hide();
                 callBack(item);
               }}>
-              <VerifierImage uri={item.imageUrl} size={36} />
+              <VerifierImage uri={item.imageUrl} size={36} label={item.name} />
               <TextXL style={styles.itemName}>{item.name}</TextXL>
               {selectedVerifier.name === item.name && (
                 <Svg iconStyle={styles.itemIcon} icon="selected" size={pTd(24)} />

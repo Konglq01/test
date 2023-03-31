@@ -3,6 +3,7 @@ import { NetworkType } from '@portkey-wallet/types/index';
 import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import { TokenItemShowType } from '@portkey-wallet/types/types-ca/token';
 import { IAssetItemType } from './type';
+import { NFT_SMALL_SIZE, NFT_MIDDLE_SIZE } from '@portkey-wallet/constants/constants-ca/assets';
 
 const data = [0, 1, 2, 3, 4, 5, 6, 7].map((ele, index) => {
   return {
@@ -30,8 +31,6 @@ export function fetchTokenList({
   data: ITokenItemResponse[];
   totalRecordCount: number;
 }> {
-  console.log('fetching....list', skipCount, maxResultCount);
-  // return new Promise(resolve => setTimeout(() => resolve(mockTokenData), 500));
   return request.assets.fetchAccountTokenList({
     params: {
       caAddresses,
@@ -58,6 +57,8 @@ export function fetchAssetList({
       SkipCount: skipCount,
       MaxResultCount: maxResultCount,
       Keyword: keyword,
+      width: NFT_SMALL_SIZE,
+      height: -1,
     },
   });
 }
@@ -76,6 +77,8 @@ export function fetchNFTSeriesList({
       caAddresses,
       skipCount,
       maxResultCount,
+      width: NFT_SMALL_SIZE,
+      height: -1,
     },
   });
 }
@@ -92,7 +95,7 @@ export function fetchNFTList({
   maxResultCount: number;
 }): Promise<{ data: any[]; totalRecordCount: number }> {
   return request.assets.fetchAccountNftCollectionItemList({
-    params: { caAddresses, symbol, skipCount, maxResultCount },
+    params: { caAddresses, symbol, skipCount, maxResultCount, width: NFT_MIDDLE_SIZE, height: -1 },
   });
 }
 

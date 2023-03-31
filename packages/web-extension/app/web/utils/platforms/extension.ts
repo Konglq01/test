@@ -100,11 +100,8 @@ export default class ExtensionPlatform {
     try {
       const platformInfo = apis.runtime.getPlatformInfo();
       cb(platformInfo);
-      return;
     } catch (e: any) {
       cb(e);
-      // eslint-disable-next-line no-useless-return
-      return;
     }
   }
 
@@ -121,7 +118,7 @@ export default class ExtensionPlatform {
   //   }
   // }
 
-  addOnRemovedListener(listener: (windowId: number) => void) {
+  windowOnRemovedListener(listener: (windowId: number) => void) {
     apis.windows.onRemoved.addListener(listener);
   }
 

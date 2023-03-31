@@ -11,6 +11,10 @@ export interface BaseGuardianItem {
   key: string; // `${loginGuardianType}&${verifier?.name}`,
   identifierHash: string;
   salt: string;
+  thirdPartyEmail?: string;
+  isPrivate?: boolean;
+  firstName?: string;
+  lastName?: string;
 }
 
 export interface IVerifierInfo {
@@ -34,7 +38,18 @@ export interface GuardiansState {
   userGuardiansList?: UserGuardianItem[];
   userGuardianStatus?: { [x: string]: UserGuardianStatus };
   currentGuardian?: UserGuardianItem;
-  preGuardian?: UserGuardianItem;
-  opGuardian?: UserGuardianItem;
+  preGuardian?: StoreUserGuardianItem;
+  opGuardian?: StoreUserGuardianItem;
   guardianExpiredTime?: number; // timestamp
+}
+
+export interface StoreUserGuardianItem extends UserGuardianItem {
+  phone?: { code: string; phoneNumber: string };
+  social?: {
+    id: string;
+    name: string;
+    value: string;
+    accessToken: string;
+    isPrivate?: boolean;
+  };
 }

@@ -1,3 +1,4 @@
+import { DefaultCountry } from '@portkey-wallet/constants/constants-ca/country';
 import { createSlice } from '@reduxjs/toolkit';
 import {
   setLoginAccountAction,
@@ -10,8 +11,8 @@ import { LoginState } from './type';
 
 const initialState: LoginState = {
   countryCode: {
-    index: 'S',
-    country: { country: 'Singapore', code: '65', iso: 'SG' },
+    index: DefaultCountry.country[0],
+    country: DefaultCountry,
   },
 };
 
@@ -35,6 +36,6 @@ export const loginSlice = createSlice({
       .addCase(setCountryCodeAction, (state, action) => {
         state.countryCode = action.payload;
       })
-      .addCase(resetLoginInfoAction, () => initialState);
+      .addCase(resetLoginInfoAction, () => ({ ...initialState }));
   },
 });

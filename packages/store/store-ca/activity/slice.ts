@@ -8,6 +8,7 @@ const initialState: ActivityStateType = {
   activityMap: {},
   isFetchingActivities: false,
   failedActivityMap: {},
+  isLoading: false,
 };
 
 //it automatically uses the immer library to let you write simpler immutable updates with normal mutative code
@@ -21,17 +22,14 @@ export const activitySlice = createSlice({
     removeFailedActivity: (state, { payload }: { payload: string }) => {
       delete state.failedActivityMap[payload];
     },
-    clearActivity: state =>
-      (state = {
-        ...initialState,
-        failedActivityMap: state.failedActivityMap,
-      }),
-    clearState: state => (state = initialState),
+    clearActivity: state => initialState,
   },
   extraReducers: builder => {
     builder.addCase(getActivityListAsync.fulfilled, (state, action) => {
       const { data, totalRecordCount, skipCount, maxResultCount, chainId, symbol } = action.payload;
       const currentMapKey = getCurrentActivityMapKey(chainId, symbol);
+
+      if (!state.activityMap) state.activityMap = {};
 
       state.activityMap[currentMapKey] = {
         data: skipCount === 0 ? data : [...state.activityMap[currentMapKey].data, ...data],
@@ -41,10 +39,18 @@ export const activitySlice = createSlice({
         chainId,
         symbol,
       };
+
+      state.isLoading = false;
+    });
+    builder.addCase(getActivityListAsync.pending, (state, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(getActivityListAsync.rejected, (state, action) => {
+      state.isLoading = false;
     });
   },
 });
 
-export const { addFailedActivity, removeFailedActivity, clearState, clearActivity } = activitySlice.actions;
+export const { addFailedActivity, removeFailedActivity, clearActivity } = activitySlice.actions;
 
 export default activitySlice;

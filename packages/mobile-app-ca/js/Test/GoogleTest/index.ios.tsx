@@ -8,7 +8,9 @@ import CommonButton from 'components/CommonButton';
 WebBrowser.maybeCompleteAuthSession();
 
 export default function GoogleTestIOS() {
-  const [request, response, promptAsync] = Google.useAuthRequest({ iosClientId: Config.GOOGLE_IOS_CLIENT_ID });
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    iosClientId: Config.GOOGLE_IOS_CLIENT_ID,
+  });
   console.log(response, '=====response');
   const getUserInfo = useCallback(async () => {
     if (response?.type === 'success') {

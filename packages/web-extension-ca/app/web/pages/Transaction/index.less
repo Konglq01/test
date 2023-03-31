@@ -10,6 +10,7 @@
   display: flex;
   flex-direction: column;
   padding: 24px;
+  overflow-y: overlay;
   .header {
     display: flex;
     justify-content: flex-end;
@@ -97,12 +98,15 @@
           height: 64px;
           border-radius: 6px;
           background: @bg-15;
-          background-position: center;
-          background-size: contain;
-          background-repeat: no-repeat;
           left: 48px;
           font-size: 24px;
           color: @font-12;
+          overflow: hidden;
+          .assets-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+          }
         }
         .info {
           flex: 1;
@@ -279,4 +283,25 @@
 }
 .prompt-body {
   position: relative;
+}
+
+.transaction-detail {
+  height: 100vh;
+  .transaction-detail-modal {
+    position: relative;
+
+    .transaction-info {
+      .method-wrap {
+        gap: 32px;
+
+        .nft-amount {
+          width: 100%;
+          padding: 0 0 20px;
+        }
+      }
+      .link {
+        margin-bottom: 16px;
+      }
+    }
+  }
 }

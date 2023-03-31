@@ -5,6 +5,7 @@ export const styles = StyleSheet.create({
   sectionListWrap: {
     flex: 1,
     paddingRight: pTd(20),
+    overflow: 'hidden',
   },
   sectionListWrapFull: {
     paddingRight: 0,
@@ -17,22 +18,9 @@ export const styles = StyleSheet.create({
   },
   indexBarWrap: {
     position: 'absolute',
-    right: pTd(4),
-    top: pTd(42),
-    height: pTd(432),
-    width: pTd(10),
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    flexDirection: 'column',
-  },
-  indexItemWrap: {
-    flex: 1,
-  },
-  indexItem: {
-    width: pTd(10),
-    textAlign: 'center',
-    overflow: 'hidden',
-    fontSize: pTd(11),
-    lineHeight: pTd(11),
+    right: 0,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
   },
 });

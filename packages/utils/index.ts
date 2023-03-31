@@ -199,3 +199,37 @@ export const formatAddress2NoPrefix = (address: string): string => {
   }
   return address;
 };
+
+/**
+ * check current networkType
+ * @param network
+ * @returns
+ */
+export const isMainNet = (network: NetworkType): boolean => network === 'MAIN';
+
+export const getAddressChainId = (toAddress: string, defaultChainId: ChainId) => {
+  if (!toAddress.includes('_')) return defaultChainId;
+  const arr = toAddress.split('_');
+  const addressChainId = arr[arr.length - 1];
+  // no suffix
+  if (isAelfAddress(addressChainId)) {
+    return defaultChainId;
+  }
+  return addressChainId;
+};
+
+/**
+ *  check is the same address
+ * @param address1
+ * @param address2
+ * @returns
+ */
+export const isSameAddresses = (address1: string, address2: string): boolean => address1.trim() === address2.trim();
+
+export function handlePhoneNumber(str?: string) {
+  if (str) {
+    str = str.replace(/\s/g, '');
+    if (str[0] !== '+') str = '+' + str;
+  }
+  return str || '';
+}

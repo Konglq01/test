@@ -2,7 +2,7 @@
 
 .tab-nft {
   .empty-text {
-    padding: 32px 0;
+    padding: 32px 0 40px;
     line-height: 20px;
     color: @font-12;
     font-size: 14px;
@@ -28,7 +28,7 @@
     border: none;
     .@{app-prefix}-collapse-item {
       border: none;
-      border-bottom: 1px solid @border-2;;
+      border-bottom: 1px solid @border-2;
       .@{app-prefix}-collapse-header {
         align-items: center;
         padding: 25px 16px;
@@ -68,7 +68,7 @@
           height: 100%;
           border-radius: 6px;
           object-fit: cover;
-      }
+        }
       }
       .info {
         display: flex;
@@ -177,6 +177,28 @@
           path {
             fill: @font-9;
           }
+        }
+      }
+    }
+  }
+
+  @media screen and (min-width: 768px) {
+    .nft-list {
+      padding-bottom: 18px;
+    }
+    .@{app-prefix}-collapse{
+      .@{app-prefix}-collapse-item{
+        .@{app-prefix}-collapse-header {
+          padding: 24px;
+        }
+      }
+      
+      .list{
+        gap: 18px;
+        padding: 0 24px 24px 48px;
+        .item{
+          width: 120px;
+          height: 120px;
         }
       }
     }

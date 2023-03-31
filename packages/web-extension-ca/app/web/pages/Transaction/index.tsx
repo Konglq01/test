@@ -4,8 +4,8 @@ import { fetchActivity } from '@portkey-wallet/store/store-ca/activity/api';
 import { ActivityItemType, TransactionStatus } from '@portkey-wallet/types/types-ca/activity';
 import { Transaction } from '@portkey-wallet/types/types-ca/trade';
 import { getExploreLink } from '@portkey-wallet/utils';
-import { AmountSign, formatAmount, transNetworkText } from '@portkey-wallet/utils/activity';
-import { formatStr2EllipsisStr } from '@portkey-wallet/utils/converter';
+import { transNetworkText } from '@portkey-wallet/utils/activity';
+import { formatStr2EllipsisStr, AmountSign, formatWithCommas } from '@portkey-wallet/utils/converter';
 import clsx from 'clsx';
 import Copy from 'components/Copy';
 import CustomSvg from 'components/CustomSvg';
@@ -18,6 +18,8 @@ import { useIsTestnet } from 'hooks/useNetwork';
 import { dateFormat } from 'utils';
 import { useCurrentChain } from '@portkey-wallet/hooks/hooks-ca/chainList';
 import { addressFormat } from '@portkey-wallet/utils';
+import { useCommonState } from 'store/Provider/hooks';
+import PromptFrame from 'pages/components/PromptFrame';
 
 export interface ITransactionQuery {
   item: ActivityItemType;
@@ -84,12 +86,12 @@ export default function Transaction() {
     const { nftInfo, amount } = activityItem;
     return (
       <div className="nft-amount">
-        <div
-          className="assets"
-          style={{
-            backgroundImage: `url(${nftInfo?.imageUrl})`,
-          }}>
-          <p>{!nftInfo?.imageUrl ? nftInfo?.alias?.slice(0, 1) : ''}</p>
+        <div className="assets">
+          {nftInfo?.imageUrl ? (
+            <img className="assets-img" src={nftInfo?.imageUrl} />
+          ) : (
+            <p>{nftInfo?.alias?.slice(0, 1)}</p>
+          )}
         </div>
         <div className="info">
           <p className="index">
@@ -109,9 +111,13 @@ export default function Transaction() {
     if (transactionType && !hiddenTransactionTypeArr.includes(transactionType)) {
       return (
         <p className="amount">
-          {`${formatAmount({ amount, decimals, sign })} ${symbol ?? ''}`}
+          {`${formatWithCommas({ amount, decimals, sign })} ${symbol ?? ''}`}
           {!isTestNet && (
-            <span className="usd">{`$ ${formatAmount({ amount: priceInUsd, decimals: 0, digits: 2 })}`}</span>
+            <span className="usd">{`${formatWithCommas({
+              sign: AmountSign.USD,
+              amount: priceInUsd,
+              digits: 2,
+            })}`}</span>
           )}
         </p>
       );
@@ -204,12 +210,18 @@ export default function Transaction() {
             feeInfo.map((item, idx) => {
               return (
                 <div key={'transactionFee' + idx} className="right-item">
-                  <span>{`${formatAmount({ amount: item.fee, decimals: isNft ? 8 : activityItem.decimals })} ${
-                    item.symbol ?? ''
-                  }`}</span>
+                  <span>{`${formatWithCommas({
+                    amount: item.fee,
+                    decimals: item?.decimals || 8,
+                  })} ${item.symbol ?? ''}`}</span>
                   {!isTestNet && (
                     <span className="right-usd">
-                      $ {formatAmount({ amount: item.feeInUsd, decimals: activityItem.decimals, digits: 2 })}
+                      {formatWithCommas({
+                        sign: AmountSign.USD,
+                        amount: item.feeInUsd,
+                        decimals: item?.decimals || 8,
+                        digits: 2,
+                      })}
                     </span>
                   )}
                 </div>
@@ -218,7 +230,7 @@ export default function Transaction() {
         </span>
       </p>
     );
-  }, [activityItem.decimals, feeInfo, isNft, isTestNet, t]);
+  }, [feeInfo, isTestNet, t]);
 
   const transactionUI = useCallback(() => {
     return (
@@ -252,24 +264,43 @@ export default function Transaction() {
     );
   }, [openOnExplorer, t]);
 
-  return (
-    <div className="transaction-detail-modal">
-      <div className="header">
-        <CustomSvg type="Close2" onClick={onClose} />
-      </div>
-      <div className="transaction-info">
-        <div className="method-wrap">
-          <p className="method-name">
-            {transactionTypesMap(activityItem.transactionType, activityItem.nftInfo?.nftId)}
-          </p>
-          {isNft ? nftHeaderUI() : tokenHeaderUI()}
+  const { isPrompt } = useCommonState();
+
+  const mainContent = useCallback(() => {
+    return (
+      <div className={clsx(['transaction-detail-modal', isPrompt ? 'detail-page-prompt' : null])}>
+        <div className="header">
+          <CustomSvg type="Close2" onClick={onClose} />
         </div>
-        {statusAndDateUI()}
-        {fromToUI()}
-        {networkUI()}
-        {transactionUI()}
-        {viewOnExplorerUI()}
+        <div className="transaction-info">
+          <div className="method-wrap">
+            <p className="method-name">
+              {transactionTypesMap(activityItem.transactionType, activityItem.nftInfo?.nftId)}
+            </p>
+            {isNft ? nftHeaderUI() : tokenHeaderUI()}
+          </div>
+          {statusAndDateUI()}
+          {fromToUI()}
+          {networkUI()}
+          {transactionUI()}
+          {viewOnExplorerUI()}
+        </div>
       </div>
-    </div>
-  );
+    );
+  }, [
+    activityItem.nftInfo?.nftId,
+    activityItem.transactionType,
+    fromToUI,
+    isNft,
+    isPrompt,
+    networkUI,
+    nftHeaderUI,
+    onClose,
+    statusAndDateUI,
+    tokenHeaderUI,
+    transactionUI,
+    viewOnExplorerUI,
+  ]);
+
+  return <>{isPrompt ? <PromptFrame content={mainContent()} className="transaction-detail" /> : mainContent()}</>;
 }

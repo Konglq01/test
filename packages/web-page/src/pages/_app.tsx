@@ -4,13 +4,11 @@ import { useRouter } from 'next/router';
 import '../styles/globals.less';
 import '../styles/common.less';
 import '../styles/antd.less';
-// import '@portkey-wallet/did-ui-react/dist/assets/index.css';
 import dynamic from 'next/dynamic';
 import PageHead from 'components/PageHead';
 import { Provider as ReduxProvider } from 'react-redux';
-import microApp from '@micro-zoe/micro-app';
+// import microApp from '@micro-zoe/micro-app';
 import { store } from '../redux/store';
-import Footer from '../components/Footer';
 import initAxios from '../utils/axios';
 const Provider = dynamic(import('hooks/Providers/ProviderBasic'), { ssr: false });
 import { QueryClientProvider, QueryClient } from 'react-query';
@@ -21,7 +19,7 @@ export default function APP({ Component, pageProps }: AppProps) {
   const router = useRouter();
   useEffect(() => {
     // init micro-app
-    microApp.start();
+    // microApp.start();
 
     /**
      * BUG FIX
@@ -38,7 +36,7 @@ export default function APP({ Component, pageProps }: AppProps) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <PageHead title={'portkey'} />
+      <PageHead title={'Portkey'} />
       <ReduxProvider store={store}>
         <Provider>
           {/* <Header /> */}

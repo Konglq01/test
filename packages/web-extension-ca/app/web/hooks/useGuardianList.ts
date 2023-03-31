@@ -14,6 +14,8 @@ const useGuardiansList = () => {
   const fetch = useCallback(
     async (paramsOption: { guardianIdentifier?: string; caHash?: string }) => {
       try {
+        if (paramsOption?.guardianIdentifier)
+          paramsOption.guardianIdentifier = paramsOption.guardianIdentifier.replaceAll(' ', '');
         if (!currentChain?.endPoint) throw 'Could not find chain information';
         const res = await getHolderInfo({
           rpcUrl: currentChain.endPoint,

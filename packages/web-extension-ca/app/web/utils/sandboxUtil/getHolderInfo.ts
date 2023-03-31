@@ -6,9 +6,9 @@ import { SandboxErrorCode, SandboxEventService, SandboxEventTypes } from '@portk
 export const getHolderInfo = async ({
   paramsOption,
 }: {
-  rpcUrl: string;
-  address: string;
-  chainType: ChainType;
+  rpcUrl?: string;
+  address?: string;
+  chainType?: ChainType;
   paramsOption: {
     guardianIdentifier?: string;
     caHash?: string;
