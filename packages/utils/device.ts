@@ -25,6 +25,16 @@ export const getDeviceInfoFromQR = (qrExtraData?: QRExtraDataType, deviceType?: 
   return DEVICE_TYPE_INFO[deviceType];
 };
 
+const isJSON = (str: string) => {
+  if (typeof str !== 'string') return false;
+  try {
+    JSON.parse(str);
+    return true;
+  } catch (_e) {
+    return false;
+  }
+};
+
 export const extraDataEncode = async (deviceInfo: DeviceInfoType, isNeedEncrypt = false): Promise<string> => {
   if (!isNeedEncrypt) {
     return JSON.stringify({
@@ -38,13 +48,15 @@ export const extraDataEncode = async (deviceInfo: DeviceInfoType, isNeedEncrypt 
   try {
     const rst = await request.device.fetchEncrypt({
       params: {
-        data: {
-          deviceInfo: deviceInfoJSON,
-        },
+        data: [deviceInfoJSON],
       },
     });
-    const resultMap = rst.result;
-    deviceInfoJSON = resultMap?.deviceInfo || '';
+    const resultList = rst?.result;
+    deviceInfoJSON = resultList?.[0] || '';
+
+    if (typeof deviceInfoJSON !== 'string' || isJSON(deviceInfoJSON)) {
+      deviceInfoJSON = '';
+    }
   } catch (error) {
     deviceInfoJSON = '';
     console.log(error);
@@ -78,20 +90,25 @@ export const extraDataListDecode = async (extraDataStrList: string[]) => {
     return extraEncodeData;
   });
 
-  const decryptData: Record<string, string> = {};
+  const decryptDataList: Array<string> = [];
+  const decryptIndexList: Array<number> = [];
   extraDataList.forEach((item, idx) => {
     if (!item.deviceInfo || item.version !== '2.0.0') return;
-    decryptData[`${idx}`] = item.deviceInfo;
+    decryptDataList.push(item.deviceInfo);
+    decryptIndexList.push(idx);
   });
   try {
     const rst = await request.device.fetchDecrypt({
       params: {
-        data: decryptData,
+        data: decryptDataList,
       },
     });
-    const resultMap = rst.result;
-    for (const key in resultMap) {
-      extraDataList[Number(key)].deviceInfo = resultMap[key];
+    const resultList = rst.result;
+    if (Array.isArray(resultList)) {
+      resultList.forEach((item, idx) => {
+        if (typeof item !== 'string') return;
+        extraDataList[decryptIndexList[idx]].deviceInfo = item;
+      });
     }
   } catch (error) {
     console.log('fetchDecrypt: error', error);
