@@ -33,3 +33,8 @@ export const DEVICE_TYPE = (() => {
 
 // NFT
 export const PAGE_SIZE_IN_NFT_ITEM_PROMPT = 6;
+
+// JOIN AUTH URL
+export const AUTH_HOST = 'https://test.portkey.finance';
+export const JOIN_AUTH_URL = `${AUTH_HOST}/join`;
+export const AUTH_APPLE_URL = `${AUTH_HOST}/apple-auth`;

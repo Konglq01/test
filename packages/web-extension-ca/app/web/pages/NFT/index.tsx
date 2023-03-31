@@ -15,16 +15,25 @@ export default function NFT() {
   const mainContent = useCallback(() => {
     return (
       <div className={clsx(['nft-detail', isPrompt ? 'detail-page-prompt' : null])}>
-        <SettingHeader leftCallBack={() => navigate(-1)} />
-        <div className="picture">{state.imageUrl ? <img src={state.imageUrl} /> : state.symbol?.slice(0, 1)}</div>
-        <div className="info">
-          <div className="title flex">
-            <p className="title-alias">{state.alias}&nbsp;</p>
-            <p>#{state.tokenId}</p>
+        <div className="nft-detail-body">
+          <SettingHeader leftCallBack={() => navigate(-1)} />
+          <div className="picture picture-common flex-center">
+            {state.imageUrl ? (
+              <img className="picture-common" src={state.imageUrl} />
+            ) : (
+              <div className="picture-text picture-common flex-center">{state.symbol?.slice(0, 1)}</div>
+            )}
           </div>
-          <p className="amount">Balance: {state.balance}</p>
-          <p className="label">{state.symbol}</p>
-          {/* <p className="information">Symbol information Symbol information Symbol information</p> */}
+
+          <div className="info">
+            <div className="title flex">
+              <p className="title-alias">{state.alias}&nbsp;</p>
+              <p>#{state.tokenId}</p>
+            </div>
+            <p className="amount">Balance: {state.balance}</p>
+            <p className="label">{state.symbol}</p>
+            {/* <p className="information">Symbol information Symbol information Symbol information</p> */}
+          </div>
         </div>
         <div className="btn-wrap">
           <Button type="primary" onClick={() => navigate(`/send/nft/${state.symbol}`, { state })}>
