@@ -11,6 +11,7 @@ import VerifierPair from 'components/VerifierPair';
 import { Button } from 'antd';
 import { UserGuardianItem } from '@portkey-wallet/store/store-ca/guardians/type';
 import { LoginType } from '@portkey-wallet/types/types-ca/wallet';
+import useVerifierList from 'hooks/useVerifierList';
 import './index.less';
 
 export default function Guardians() {
@@ -20,6 +21,7 @@ export default function Guardians() {
   const { userGuardiansList } = useGuardiansInfo();
   const { walletInfo } = useCurrentWallet();
   const getGuardianList = useGuardianList();
+  useVerifierList();
 
   const formatGuardianList = useMemo(() => {
     const temp = [...(userGuardiansList || [])];
