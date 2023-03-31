@@ -432,7 +432,7 @@ export default function AddGuardian() {
     if (guardianType === LoginType.Email) {
       handleCommonVerify(emailVal || '');
     } else if (guardianType === LoginType.Phone) {
-      handleCommonVerify(`+${phoneValue?.code} ${phoneValue?.phoneNumber}`);
+      handleCommonVerify(`+${phoneValue?.code}${phoneValue?.phoneNumber}`);
     } else {
       message.info('router error');
     }
