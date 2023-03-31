@@ -36,6 +36,6 @@ export const loginSlice = createSlice({
       .addCase(setCountryCodeAction, (state, action) => {
         state.countryCode = action.payload;
       })
-      .addCase(resetLoginInfoAction, (state) => ({ ...initialState, countryCode: state.countryCode }));
+      .addCase(resetLoginInfoAction, () => ({ ...initialState }));
   },
 });
