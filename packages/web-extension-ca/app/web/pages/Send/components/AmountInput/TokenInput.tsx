@@ -1,7 +1,7 @@
 import { ZERO } from '@portkey-wallet/constants/misc';
 import { BaseToken } from '@portkey-wallet/types/types-ca/token';
 import { divDecimals, formatAmountShow } from '@portkey-wallet/utils/converter';
-import { Input } from 'antd';
+import { Button, Input } from 'antd';
 import clsx from 'clsx';
 import { handleKeyDown } from 'pages/Send/utils/util.keyDown';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -12,6 +12,7 @@ import { ChainId } from '@portkey-wallet/types';
 import { useCurrentNetworkInfo } from '@portkey-wallet/hooks/hooks-ca/network';
 import { ELF_SYMBOL } from '@portkey-wallet/constants/constants-ca/assets';
 import CustomSvg from 'components/CustomSvg';
+import { DEFAULT_FEE } from '@portkey-wallet/constants/constants-ca/wallet';
 
 export default function TokenInput({
   fromAccount,
@@ -19,6 +20,7 @@ export default function TokenInput({
   value,
   errorMsg,
   onChange,
+  getTranslationInfo,
 }: {
   fromAccount: { address: string; AESEncryptPrivateKey: string };
   toAccount: { address: string };
@@ -26,6 +28,7 @@ export default function TokenInput({
   value: string;
   errorMsg: string;
   onChange: (params: { amount: string; balance: string }) => void;
+  getTranslationInfo: (num: string) => any;
 }) {
   const currentNetwork = useCurrentNetworkInfo();
   const currentChain = useCurrentChain(token.chainId as ChainId);
@@ -33,6 +36,7 @@ export default function TokenInput({
   const { t } = useTranslation();
   const [amount, setAmount] = useState<string>(value ? `${value} ${token.symbol}` : '');
   const [balance, setBalance] = useState<string>('');
+  const [maxAmount, setMaxAmount] = useState('');
 
   const getTokenBalance = useCallback(async () => {
     if (!currentChain) return;
@@ -50,11 +54,31 @@ export default function TokenInput({
     console.log(result, currentChain, 'balances==getTokenBalance=');
   }, [currentChain, currentNetwork.walletType, fromAccount.address, token.address, token.symbol]);
 
-  useEffect(() => {
-    console.log('getTokenBalance==');
+  const getMaxAmount = useCallback(async () => {
+    if (!balance) {
+      setMaxAmount(balance);
+      return;
+    }
+    if (token.symbol === 'ELF') {
+      if (ZERO.plus(divDecimals(balance, token.decimals)).isLessThanOrEqualTo(ZERO.plus(DEFAULT_FEE))) {
+        setMaxAmount(divDecimals(balance, token.decimals).toString());
+        return;
+      }
+      const fee = await getTranslationInfo(divDecimals(balance, token.decimals).toString());
+      if (fee) {
+        setMaxAmount(divDecimals(balance, token.decimals).toString());
+      } else {
+        setMaxAmount(ZERO.plus(divDecimals(balance, token.decimals)).minus(DEFAULT_FEE).toString());
+      }
+    } else {
+      setMaxAmount(divDecimals(balance, token.decimals).toString());
+    }
+  }, [balance, getTranslationInfo, token]);
 
+  useEffect(() => {
     getTokenBalance();
-  }, [getTokenBalance]);
+    getMaxAmount();
+  }, [getMaxAmount, getTokenBalance]);
 
   const handleAmountBlur = useCallback(() => {
     // setAmount((v) => {
@@ -73,6 +97,11 @@ export default function TokenInput({
     // });
     onChange({ amount, balance });
   }, [amount, balance, onChange]);
+
+  const handleMax = useCallback(() => {
+    setAmount(maxAmount);
+    onChange({ amount: maxAmount, balance });
+  }, [balance, maxAmount, onChange]);
 
   return (
     <div className="amount-wrap">
@@ -97,7 +126,10 @@ export default function TokenInput({
         </div>
       </div>
       <div className="item amount">
-        <span className="label">{t('Amount_with_colon')}</span>
+        <div className="label">
+          <div>{t('Amount_with_colon')}</div>
+          <Button onClick={handleMax}>Max</Button>
+        </div>
         <div className="control">
           <div className="amount-input">
             <Input

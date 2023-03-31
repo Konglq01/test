@@ -10,6 +10,7 @@ export default function AmountInput({
   token,
   errorMsg,
   onChange,
+  getTranslationInfo,
 }: {
   fromAccount: { address: string; AESEncryptPrivateKey: string };
   type: 'token' | 'nft';
@@ -18,6 +19,7 @@ export default function AmountInput({
   token: BaseToken;
   errorMsg: string;
   onChange: (params: { amount: string; balance: string }) => void;
+  getTranslationInfo: (v: string) => void;
 }) {
   return type === 'token' ? (
     <TokenInput
@@ -27,6 +29,7 @@ export default function AmountInput({
       token={token}
       errorMsg={errorMsg}
       onChange={onChange}
+      getTranslationInfo={getTranslationInfo}
     />
   ) : (
     <NftInput

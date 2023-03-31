@@ -158,39 +158,42 @@ export default function Send() {
     [retryCrossChain, t],
   );
 
-  const getTranslationInfo = useCallback(async () => {
-    try {
-      if (!toAccount?.address) throw 'No toAccount';
-      const privateKey = await aes.decrypt(wallet.AESEncryptPrivateKey, passwordSeed);
-      if (!privateKey) throw t(WalletError.invalidPrivateKey);
-      if (!currentChain) throw 'No ChainInfo';
-      const feeRes = await getTransferFee({
-        managerAddress: wallet.address,
-        toAddress: toAccount?.address,
-        privateKey,
-        chainInfo: currentChain,
-        chainType: currentNetwork.walletType,
-        token: tokenInfo,
-        caHash: wallet.caHash as string,
-        amount: timesDecimals(amount, tokenInfo.decimals).toNumber(),
-      });
-      return feeRes;
-    } catch (error) {
-      const _error = contractErrorHandler(error);
-      console.log('getFee===error', _error);
-    }
-  }, [
-    amount,
-    currentChain,
-    currentNetwork.walletType,
-    passwordSeed,
-    t,
-    toAccount?.address,
-    tokenInfo,
-    wallet.AESEncryptPrivateKey,
-    wallet.address,
-    wallet.caHash,
-  ]);
+  const getTranslationInfo = useCallback(
+    async (num = '') => {
+      try {
+        if (!toAccount?.address) throw 'No toAccount';
+        const privateKey = await aes.decrypt(wallet.AESEncryptPrivateKey, passwordSeed);
+        if (!privateKey) throw t(WalletError.invalidPrivateKey);
+        if (!currentChain) throw 'No ChainInfo';
+        const feeRes = await getTransferFee({
+          managerAddress: wallet.address,
+          toAddress: toAccount?.address,
+          privateKey,
+          chainInfo: currentChain,
+          chainType: currentNetwork.walletType,
+          token: tokenInfo,
+          caHash: wallet.caHash as string,
+          amount: timesDecimals(num || amount, tokenInfo.decimals).toNumber(),
+        });
+        return feeRes;
+      } catch (error) {
+        const _error = contractErrorHandler(error);
+        console.log('getFee===error', _error);
+      }
+    },
+    [
+      amount,
+      currentChain,
+      currentNetwork.walletType,
+      passwordSeed,
+      t,
+      toAccount?.address,
+      tokenInfo,
+      wallet.AESEncryptPrivateKey,
+      wallet.address,
+      wallet.caHash,
+    ],
+  );
 
   const handleCheckPreview = useCallback(async () => {
     try {
@@ -381,6 +384,7 @@ export default function Send() {
               setAmount(amount);
               setBalance(balance);
             }}
+            getTranslationInfo={getTranslationInfo}
           />
         ),
       },
@@ -419,6 +423,7 @@ export default function Send() {
       amount,
       tipMsg,
       tokenInfo,
+      getTranslationInfo,
       txFee,
       chainInfo?.chainId,
       validateToAddress,
