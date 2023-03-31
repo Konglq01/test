@@ -25,9 +25,7 @@
     "build:apk": "cd android && ./gradlew assembleRelease",
     "build:ipa": "cd ios && fastlane build_ipa",
     "push:ios": "cd ios && fastlane distribute_firebase",
-    "distribute:ios": "yarn build:ipa && yarn push:ios",
-    "hotBundle:android": "appcenter codepush release-react -a aelf-web/DID-Android -d Production",
-    "hotBundle:ios": "appcenter codepush release-react -a aelf-web/DID-IOS -d Production --plist-file ./ios/DID/Info.plist"
+    "distribute:ios": "yarn build:ipa && yarn push:ios"
   },
   "workspaces": {
     "nohoist": [
